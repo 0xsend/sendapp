@@ -23,10 +23,16 @@ A complete ERC20 token indexing system for Send app that automatically discovers
 │   addresses at database layer via BEFORE trigger)   │
 └──────────────────┬──────────────────────────────────┘
                    │
+                   │ INSERT
                    ▼
 ┌─────────────────────────────────────────────────────┐
-│  Trigger: discover_token_from_transfer()            │
-│  Auto-inserts into erc20_tokens + erc20_balances    │
+│  Trigger 1: discover_token_from_transfer()          │
+│  (Inserts new tokens into erc20_tokens)             │
+└─────────────────────────────────────────────────────┘
+                   │
+┌─────────────────────────────────────────────────────┐
+│  Trigger 2: update_erc20_balances_from_transfer()   │
+│  (Updates erc20_balances: sender -v, receiver +v)   │
 └──────────────────┬──────────────────────────────────┘
                    │
                    ▼
@@ -34,7 +40,7 @@ A complete ERC20 token indexing system for Send app that automatically discovers
 │  PostgreSQL / Supabase                              │
 │  • erc20_tokens (discovered tokens)                 │
 │  • erc20_token_metadata (enriched data)             │
-│  • erc20_balances (calculated from transfers)       │
+│  • erc20_balances (auto-updated via trigger)        │
 │  • erc20_balance_reconciliations (drift tracking)   │
 └──────────────────┬──────────────────────────────────┘
                    │
