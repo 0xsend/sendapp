@@ -123,7 +123,7 @@ export function OnboardingScreen() {
         return
       }
 
-      const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
+      const message = formatErrorMessage(error).trim() || 'Unknown error'
 
       // Check for "No user id" which means token is invalid
       if (message.includes('No user id')) {

@@ -15,4 +15,26 @@ describe('formatErrorMessage', () => {
     const result = formatErrorMessage(error)
     expect(result).toBe('Some other error message')
   })
+
+  it('flags Cloudflare-blocked responses and returns mitigation guidance', () => {
+    const response = {
+      status: 403,
+      url: 'https://api.send.app/signup',
+      headers: new Headers({
+        server: 'cloudflare',
+        'cf-ray': '12345abcd',
+      }),
+    }
+
+    const error = {
+      message: 'ERR_NETWORK',
+      meta: { response },
+    }
+
+    const result = formatErrorMessage(error)
+
+    expect(result).toBe(
+      'Cloudflare is blocking this request — try disabling your VPN then reload with Ctrl+R, or use an incognito window for signup.'
+    )
+  })
 })
