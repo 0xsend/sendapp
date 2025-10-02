@@ -90,9 +90,9 @@ export function DepositForm() {
 
   const uop = useUserOp({
     paymaster: sendVerifyingPaymasterAddress[chainId],
-    paymasterVerificationGasLimit: 200000n,
-    paymasterPostOpGasLimit: 200000n,
-    callGasLimit: 1_000_000n,
+    paymasterVerificationGasLimit: vault.data ? 200000n : 500000n,
+    paymasterPostOpGasLimit: vault.data ? 200000n : 500000n,
+    callGasLimit: vault.data ? 1_000_000n : 2_000_000n,
     sender,
     calls: calls.data ?? undefined,
   })
