@@ -92,7 +92,8 @@ export function DepositForm() {
     paymaster: sendVerifyingPaymasterAddress[chainId],
     paymasterVerificationGasLimit: vault.data ? 200000n : 1_000_000n,
     paymasterPostOpGasLimit: vault.data ? 200000n : 1_000_000n,
-    callGasLimit: vault.data ? 1_000_000n : 5_000_000n,
+    // Let useUserOp estimate all gas limits automatically for complex operations
+    callGasLimit: vault.data ? 1_000_000n : undefined,
     sender,
     calls: calls.data ?? undefined,
   })

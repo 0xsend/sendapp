@@ -140,6 +140,7 @@ function userOpQueryOptions({
   nonce,
   calls,
   callGasLimit,
+  verificationGasLimit,
   chainId,
   maxFeePerGas,
   maxPriorityFeePerGas,
@@ -152,6 +153,7 @@ function userOpQueryOptions({
   nonce: bigint | undefined
   calls: SendAccountCall[] | undefined
   callGasLimit: bigint | undefined
+  verificationGasLimit?: bigint | undefined
   chainId: number | undefined
   maxFeePerGas: bigint | undefined
   maxPriorityFeePerGas: bigint | undefined
@@ -168,6 +170,7 @@ function userOpQueryOptions({
         nonce,
         calls,
         callGasLimit,
+        verificationGasLimit,
         chainId,
         maxFeePerGas,
         maxPriorityFeePerGas,
@@ -194,6 +197,7 @@ function userOpQueryOptions({
           nonce,
           calls,
           callGasLimit,
+          verificationGasLimit = undefined,
           chainId,
           maxFeePerGas,
           maxPriorityFeePerGas,
@@ -248,6 +252,7 @@ function userOpQueryOptions({
         ...defaultUserOp,
         ...paymasterDefaults,
         callGasLimit: callGasLimit ?? defaultUserOp.callGasLimit,
+        verificationGasLimit: verificationGasLimit ?? defaultUserOp.verificationGasLimit,
         maxFeePerGas,
         maxPriorityFeePerGas,
         sender,
@@ -265,8 +270,13 @@ function userOpQueryOptions({
           .catch((e) => {
             throwNiceError(e)
           })
-          .then(({ callGasLimit: cgl, preVerificationGas }) => {
+          .then(({ callGasLimit: cgl, verificationGasLimit: vgl, preVerificationGas }) => {
             userOp.callGasLimit = cgl
+
+            // Use estimated verificationGasLimit if higher than default
+            if (vgl > userOp.verificationGasLimit) {
+              userOp.verificationGasLimit = vgl
+            }
 
             const preVerificationGasWithBuffer = wMulDown(
               preVerificationGas,
@@ -298,6 +308,7 @@ export function useUserOp({
   sender,
   calls,
   callGasLimit,
+  verificationGasLimit,
   paymaster,
   paymasterVerificationGasLimit,
   paymasterPostOpGasLimit,
@@ -306,6 +317,7 @@ export function useUserOp({
 }: {
   sender: Address | undefined
   callGasLimit?: bigint | undefined
+  verificationGasLimit?: bigint | undefined
   calls: SendAccountCall[] | undefined
   paymaster?: Hex
   paymasterVerificationGasLimit?: bigint
@@ -339,6 +351,7 @@ export function useUserOp({
         nonce,
         calls,
         callGasLimit,
+        verificationGasLimit,
         maxFeePerGas,
         maxPriorityFeePerGas,
         chainId,
@@ -352,6 +365,7 @@ export function useUserOp({
       nonce,
       calls,
       callGasLimit,
+      verificationGasLimit,
       maxFeePerGas,
       maxPriorityFeePerGas,
       chainId,
