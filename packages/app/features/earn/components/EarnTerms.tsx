@@ -2,7 +2,7 @@ import { Anchor, type AnchorProps, Paragraph } from '@my/ui'
 
 export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
   const colorProps = {
-    color: hasError ? '$lightGrayTextField' : '$lightGrayTextField',
+    color: hasError ? '$error' : '$lightGrayTextField',
     '$theme-light': {
       color: hasError ? '$error' : '$darkGrayTextField',
     },

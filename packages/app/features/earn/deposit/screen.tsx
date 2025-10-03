@@ -1,5 +1,6 @@
 import {
   Card,
+  Circle,
   Fade,
   Paragraph,
   Separator,
@@ -407,6 +408,8 @@ export function DepositForm() {
               },
             },
             areTermsAccepted: {
+              borderWidth: 2,
+              borderColor: form.formState.errors.areTermsAccepted ? '$error' : '$borderColor',
               backgroundColor: form.getValues().areTermsAccepted ? '$primary' : '$color1',
             },
           }}
@@ -538,7 +541,13 @@ export function DepositForm() {
               {!coinBalances.isLoading && !hasExistingDeposit && <ReferredBy />}
               {hasExistingDeposit ? null : (
                 <XStack gap={'$3'} ai={'center'}>
-                  {areTermsAccepted}
+                  {form.formState.errors.areTermsAccepted ? (
+                    <Shake shakeKey="areTermsAccepted" baseStyle={{ flexShrink: 0 }}>
+                      <Circle size={'$3'} borderWidth={2} borderColor={'$error'} />
+                    </Shake>
+                  ) : (
+                    areTermsAccepted
+                  )}
                   {form.formState.errors.areTermsAccepted ? (
                     <Shake shakeKey="areTermsAccepted" baseStyle={{ width: '100%', flex: 1 }}>
                       <EarnTerms hasError={true} />
