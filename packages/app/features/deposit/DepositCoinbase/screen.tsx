@@ -33,6 +33,17 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
+  // Web-only: detect iOS Safari to guide users when popups are blocked
+  const niceError = error ? toNiceError(error) : null
+  const isIOSWeb =
+    (Platform.OS === 'web' &&
+      typeof navigator !== 'undefined' &&
+      /iPhone|iPad|iPod/i.test(navigator.userAgent)) ||
+    Platform.OS === 'ios'
+  const shouldShowIOSPopupHelp = Boolean(
+    isIOSWeb && niceError && /popup was blocked/i.test(niceError)
+  )
+
   const handleConfirmTransaction = (amount: number) => {
     openOnramp(amount)
   }
@@ -47,25 +58,37 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
     switch (true) {
       case !!error:
         return (
-          <FadeCard ai={'center'} testID="error">
-            <IconError size={'$4'} color={'$error'} />
-            <YStack ai={'center'} gap={'$2'}>
-              <Paragraph size={'$8'} fontWeight={500} ta={'center'}>
-                Coinbase window was closed
-              </Paragraph>
+          <>
+            <FadeCard ai={'center'} testID="error">
+              <IconError size={'$4'} color={'$error'} />
+              <YStack ai={'center'} gap={'$2'}>
+                <Paragraph size={'$8'} fontWeight={500} ta={'center'}>
+                  Coinbase window was closed
+                </Paragraph>
+                <Paragraph
+                  size={'$5'}
+                  ta={'center'}
+                  color={'$lightGrayTextField'}
+                  $theme-light={{ color: '$darkGrayTextField' }}
+                >
+                  {niceError}
+                </Paragraph>
+              </YStack>
+              <PrimaryButton onPress={closeOnramp}>
+                <PrimaryButton.Text>try again</PrimaryButton.Text>
+              </PrimaryButton>
+            </FadeCard>
+            {shouldShowIOSPopupHelp && (
               <Paragraph
                 size={'$5'}
                 ta={'center'}
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                {toNiceError(error)}
+                Turn off "Block Popups" in iOS Safari Settings then try again.
               </Paragraph>
-            </YStack>
-            <PrimaryButton onPress={closeOnramp}>
-              <PrimaryButton.Text>try again</PrimaryButton.Text>
-            </PrimaryButton>
-          </FadeCard>
+            )}
+          </>
         )
       case coinbaseStatus === 'success':
         return (
