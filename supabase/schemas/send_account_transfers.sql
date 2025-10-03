@@ -171,6 +171,7 @@ CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_activity" AFTER
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_temporal_activity" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_delete_temporal_activity"();
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_insert_activity"();
 
+
 -- RLS
 ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 
