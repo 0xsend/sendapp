@@ -13,6 +13,7 @@ import {
   useMedia,
   type ButtonProps,
   Button,
+  View,
 } from '@my/ui'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
@@ -55,7 +56,7 @@ const InvestmentsBalanceCardContent = (props: CardProps) => {
   }
 
   return (
-    <HomeBodyCard onPress={toggleSubScreen} {...props}>
+    <HomeBodyCard materialInteractive onPress={toggleSubScreen} {...props}>
       {props.children}
     </HomeBodyCard>
   )
@@ -68,6 +69,8 @@ const InvestmentsBalanceCardHomeScreenHeader = () => {
   )
   const isInvestmentsScreen = queryParams.token === 'investments'
 
+  const isChevronLeft = isInvestmentCoin || isInvestmentsScreen
+
   return (
     <Card.Header p={0} jc="space-between" fd="row">
       <Paragraph
@@ -78,20 +81,15 @@ const InvestmentsBalanceCardHomeScreenHeader = () => {
       >
         Invest
       </Paragraph>
-      {isInvestmentCoin || isInvestmentsScreen ? (
-        <ChevronLeft
-          size={'$1'}
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-          $lg={{ display: 'none' }}
-        />
-      ) : (
+
+      <View animateOnly={['transform']} animation="fast" rotate={isChevronLeft ? '180deg' : '0deg'}>
         <ChevronRight
-          size={'$1'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
+          size="$1"
+          color={isChevronLeft ? '$primary' : '$lightGrayTextField'}
+          $theme-light={{ color: isChevronLeft ? '$color12' : '$darkGrayTextField' }}
+          $lg={{ display: isChevronLeft ? 'none' : 'flex' }}
         />
-      )}
+      </View>
     </Card.Header>
   )
 }
