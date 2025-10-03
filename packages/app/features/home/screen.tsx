@@ -81,6 +81,7 @@ export function HomeScreen() {
                 <HomeBody
                   key="home-body"
                   animation="200ms"
+                  animateOnly={['opacity', 'transform']}
                   enterStyle={{
                     opacity: 0,
                     y: media.gtLg ? 0 : 300,
@@ -133,7 +134,7 @@ function HomeBody(props: XStackProps) {
             </StablesBalanceCard.Footer>
           </StablesBalanceCard>
           <SavingsBalanceCard href="/earn" w="100%" />
-          <InvestmentsBalanceCard padded size="$5" gap="$3" w="100%">
+          <InvestmentsBalanceCard padded gap="$3" w="100%">
             <InvestmentsBalanceCard.HomeScreenHeader />
             <Card.Footer jc="space-between" ai="center">
               <YStack gap="$3">
@@ -151,20 +152,22 @@ function HomeBody(props: XStackProps) {
             <FriendsCard href="/account/affiliate" />
           </HomeBodyCardRow>
         </YStack>
-        {(() => {
-          switch (true) {
-            case Platform.OS !== 'web':
-              return null
-            case selectedCoin !== undefined:
-              return <TokenDetails />
-            case queryParams.token === 'investments':
-              return <InvestmentsBody />
-            case queryParams.token === 'stables':
-              return <StablesBody />
-            default:
-              return null
-          }
-        })()}
+        <AnimatePresence>
+          {(() => {
+            switch (true) {
+              case Platform.OS !== 'web':
+                return null
+              case selectedCoin !== undefined:
+                return <TokenDetails />
+              case queryParams.token === 'investments':
+                return <InvestmentsBody />
+              case queryParams.token === 'stables':
+                return <StablesBody />
+              default:
+                return null
+            }
+          })()}
+        </AnimatePresence>
       </XStack>
     </IsPriceHiddenProvider>
   )
@@ -213,8 +216,27 @@ export function InvestmentsBody() {
   const formattedDeltaUSD = localizeAmount(Math.abs(delta24hUSD).toFixed(2))
   const sign = delta24hUSD >= 0 ? '+' : '-'
 
+  const media = useMedia()
+
   return (
-    <YStack ai="center" $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+    <YStack
+      key={media.gtLg ? 'investments-body-lg' : 'investments-body-xs'}
+      {...(media.gtLg && {
+        animation: '100ms',
+        enterStyle: {
+          o: 0,
+          x: -30,
+        },
+        exitStyle: {
+          o: 0,
+          x: -20,
+        },
+      })}
+      ai="center"
+      $gtXs={{ gap: '$3' }}
+      gap={'$3.5'}
+      f={1}
+    >
       <InvestmentsPortfolioCard padded size="$6" w="100%" mah={220} gap="$5">
         <Card.Header p={0}>
           <Paragraph
@@ -313,9 +335,7 @@ export function InvestmentsBody() {
 
       {/* Holdings list */}
       <YStack w={'100%'} gap={'$2'}>
-        <H4 fontWeight={600} size={'$7'}>
-          Your Holdings
-        </H4>
+        <H4 size="$7">Your Holdings</H4>
         <Card
           bc={'$color1'}
           width="100%"
@@ -356,13 +376,30 @@ export function InvestmentsBody() {
   )
 }
 
-export function StablesBody() {
+export const StablesBody = YStack.styleable((props) => {
   const media = useMedia()
 
   return (
-    <YStack $gtXs={{ gap: '$3' }} gap={'$3.5'} f={1}>
+    <YStack
+      key={media.gtLg ? 'stables-body-lg' : 'stables-body-xs'}
+      {...(media.gtLg && {
+        animation: '100ms',
+        enterStyle: {
+          o: 0,
+          x: -30,
+        },
+        exitStyle: {
+          o: 0,
+          x: -20,
+        },
+      })}
+      $gtXs={{ gap: '$3' }}
+      gap={'$3.5'}
+      f={1}
+      {...props}
+    >
       {media.lg && (
-        <StablesBalanceCard>
+        <StablesBalanceCard materialInteractive={false}>
           <StablesBalanceCard.StablesScreenHeader />
           <StablesBalanceCard.Footer>
             <StablesBalanceCard.Balance />
@@ -381,7 +418,9 @@ export function StablesBody() {
       </Card>
     </YStack>
   )
-}
+})
+
+StablesBody.displayName = 'StablesBody'
 
 export const HomeBodyCard = styled(Card, {
   size: '$5',
@@ -389,6 +428,7 @@ export const HomeBodyCard = styled(Card, {
   f: 1,
   mah: 150,
   p: '$1.5',
+  materialInteractive: true,
 })
 
 export const HomeBodyCardRow = styled(XStack, {
