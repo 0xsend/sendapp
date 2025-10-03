@@ -159,7 +159,7 @@ export const SignUpScreen = () => {
       redirect()
     } catch (error) {
       setFormState(FormState.Idle)
-      const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
+      const message = formatErrorMessage(error).trim() || 'Unknown error'
 
       form.setError('root', {
         type: 'custom',
