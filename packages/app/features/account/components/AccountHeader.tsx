@@ -30,7 +30,7 @@ const ShareProfileDialog = lazy(() =>
 )
 
 export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
-  const { profile, distributionShares } = useUser()
+  const { profile } = useUser()
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const hoverStyles = useHoverStyles()
 
@@ -54,11 +54,6 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
     []
   )
 
-  const isVerified = useMemo(
-    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
-    [distributionShares]
-  )
-
   const handleSharePress = useCallback(async () => {
     if (!referralHref) return
 
@@ -77,7 +72,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
 
   // Verification status icon component
   const VerificationIcon = () => {
-    if (isVerified) {
+    if (profile?.is_verified) {
       return (
         <IconBadgeCheckSolid
           size={'$1.5'}
@@ -135,7 +130,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                 <Paragraph size={'$8'} fontWeight={600} numberOfLines={1}>
                   {name || '---'}
                 </Paragraph>
-                {!isVerified ? (
+                {!profile?.is_verified ? (
                   <Tooltip placement={'bottom'} delay={0}>
                     <Tooltip.Content
                       enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
@@ -168,7 +163,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                     </Tooltip.Content>
                     <Tooltip.Trigger
                       onPress={(e) => {
-                        if (isVerified) {
+                        if (profile?.is_verified) {
                           return
                         }
                         e.preventDefault()
