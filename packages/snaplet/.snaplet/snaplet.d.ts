@@ -15,7 +15,7 @@ type Enum_public_link_in_bio_domain_names = 'Discord' | 'Facebook' | 'GitHub' | 
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
-type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
+type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'send_token_hodler' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
 type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
 type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
@@ -842,6 +842,14 @@ interface Table_realtime_tenants {
   private_only: boolean;
   migrations_ran: number | null;
   broadcast_adapter: string | null;
+interface Table_public_token_balances {
+  id: number;
+  user_id: string;
+  address: string;
+  chain_id: number;
+  token: string | null;
+  balance: number;
+  updated_at: string;
 }
 interface Table_auth_users {
   instance_id: string | null;
@@ -979,6 +987,7 @@ interface Schema_public {
   swap_routers: Table_public_swap_routers;
   tag_receipts: Table_public_tag_receipts;
   tags: Table_public_tags;
+  token_balances: Table_public_token_balances;
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
@@ -1495,6 +1504,17 @@ interface Tables_relationships {
     childDestinationsTables: "_realtime.extensions" | {};
     
   };
+  "public.token_balances": {
+    parent: {
+       token_balances_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "auth.users": {
     parent: {
 
@@ -1516,10 +1536,11 @@ interface Tables_relationships {
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
        tags_user_id_fkey: "public.tags";
+       token_balances_user_id_fkey: "public.token_balances";
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.token_balances" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {
