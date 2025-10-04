@@ -1734,6 +1734,7 @@ export type Database = {
           chain_id: number | null
           id: string | null
           is_public: boolean | null
+          is_verified: boolean | null
           links_in_bio:
             | Database["public"]["Tables"]["link_in_bio"]["Row"][]
             | null
@@ -2018,6 +2019,10 @@ export type Database = {
           type: Database["public"]["Enums"]["verification_type"]
         }
         Returns: undefined
+      }
+      is_verified: {
+        Args: { p: Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: boolean
       }
       leaderboard_referrals_all_time: {
         Args: Record<PropertyKey, never>

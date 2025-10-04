@@ -51,7 +51,7 @@ begin
         sa.address,
         sa.chain_id,
         case when current_setting('role')::text = 'service_role' then p.is_public
-            when p.is_public then true
+        when p.is_public then true
             else false end,
         p.send_id,
         ( select array_agg(t2.name::text)
@@ -79,27 +79,24 @@ begin
         ELSE NULL
         END,
         p.banner_url::text,
-        CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified
+        public.is_verified(p) AS is_verified
     from profiles p
     join auth.users a on a.id = p.id
     left join send_accounts sa on sa.user_id = p.id
     left join tags mt on mt.id = sa.main_tag_id
     left join send_account_tags sat on sat.send_account_id = sa.id
     left join tags t on t.id = sat.tag_id and t.status = 'confirmed'::tag_status
-    left join distribution_shares ds on ds.user_id = p.id
-        and ds.distribution_id = (select id from current_distribution_id)
     where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
-        (lookup_type = 'tag' and t.name = identifier::citext) or
-        (lookup_type = 'refcode' and p.referral_code = identifier) or
-        (lookup_type = 'address' and sa.address = identifier) or
-        (p.is_public and lookup_type = 'phone' and a.phone::text = identifier))
-    and (p.is_public
-     or ( select auth.uid() ) is not null
-     or current_setting('role')::text = 'service_role')
+           (lookup_type = 'tag'    and t.name = identifier::citext) or
+           (lookup_type = 'refcode' and p.referral_code = identifier) or
+           (lookup_type = 'address' and sa.address = identifier) or
+           (p.is_public and lookup_type = 'phone' and a.phone::text = identifier))
+      and (p.is_public
+        or ( select auth.uid() ) is not null
+        or current_setting('role')::text = 'service_role')
     limit 1;
 end;
-$function$
-;
+$function$;
 
 ALTER FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_type_enum", "identifier" "text") OWNER TO "postgres";
 
@@ -517,55 +514,61 @@ GRANT ALL ON FUNCTION "public"."get_friends"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_friends"() TO "service_role";
 
 -- Views
-create or replace view "public"."referrer" as  WITH referrer AS (
-         SELECT p.send_id
-           FROM (referrals r
-             JOIN profiles p ON ((r.referrer_id = p.id)))
-          WHERE (r.referred_id = ( SELECT auth.uid() AS uid))
-          ORDER BY r.created_at
-         LIMIT 1
-        ), profile_lookup AS (
-         SELECT p.id,
-            p.avatar_url,
-            p.name,
-            p.about,
-            p.refcode,
-            p.x_username,
-            p.birthday,
-            p.tag,
-            p.address,
-            p.chain_id,
-            p.is_public,
-            p.sendid,
-            p.all_tags,
-            p.main_tag_id,
-            p.main_tag_name,
-            p.links_in_bio,
-            p.banner_url,
-            referrer.send_id
-           FROM (profile_lookup('sendid'::lookup_type_enum, ( SELECT (referrer_1.send_id)::text AS send_id
-                   FROM referrer referrer_1)) p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id, is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio, banner_url, is_verified)
-             JOIN referrer ON ((referrer.send_id IS NOT NULL)))
-        )
- SELECT profile_lookup.id,
-    profile_lookup.avatar_url,
-    profile_lookup.name,
-    profile_lookup.about,
-    profile_lookup.refcode,
-    profile_lookup.x_username,
-    profile_lookup.birthday,
-    profile_lookup.tag,
-    profile_lookup.address,
-    profile_lookup.chain_id,
-    profile_lookup.is_public,
-    profile_lookup.sendid,
-    profile_lookup.all_tags,
-    profile_lookup.main_tag_id,
-    profile_lookup.main_tag_name,
-    profile_lookup.links_in_bio,
-    profile_lookup.send_id,
-    profile_lookup.banner_url
-   FROM profile_lookup;
+CREATE OR REPLACE VIEW "public"."referrer" AS
+WITH referrer AS (
+  SELECT p.send_id
+  FROM referrals r
+  JOIN profiles p ON r.referrer_id = p.id
+  WHERE r.referred_id = (SELECT auth.uid() AS uid)
+  ORDER BY r.created_at
+  LIMIT 1
+), profile_lookup AS (
+  SELECT p.id,
+         p.avatar_url,
+         p.name,
+         p.about,
+         p.refcode,
+         p.x_username,
+         p.birthday,
+         p.tag,
+         p.address,
+         p.chain_id,
+         p.is_public,
+         p.sendid,
+         p.all_tags,
+         p.main_tag_id,
+         p.main_tag_name,
+         p.links_in_bio,
+         p.banner_url,
+         p.is_verified,
+         referrer.send_id
+  FROM profile_lookup('sendid'::lookup_type_enum,
+                      (SELECT (referrer_1.send_id)::text AS send_id FROM referrer referrer_1))
+       p(id, avatar_url, name, about, refcode, x_username, birthday, tag, address, chain_id,
+         is_public, sendid, all_tags, main_tag_id, main_tag_name, links_in_bio, banner_url, is_verified)
+  JOIN referrer ON (referrer.send_id IS NOT NULL)
+)
+SELECT profile_lookup.id,
+       profile_lookup.avatar_url,
+       profile_lookup.name,
+       profile_lookup.about,
+       profile_lookup.refcode,
+       profile_lookup.x_username,
+       profile_lookup.birthday,
+       profile_lookup.tag,
+       profile_lookup.address,
+       profile_lookup.chain_id,
+       profile_lookup.is_public,
+       profile_lookup.sendid,
+       profile_lookup.all_tags,
+       profile_lookup.main_tag_id,
+       profile_lookup.main_tag_name,
+       profile_lookup.links_in_bio,
+       profile_lookup.send_id,
+       profile_lookup.banner_url,
+       profile_lookup.is_verified
+FROM profile_lookup;
+
 
 ALTER TABLE "public"."referrer" OWNER TO "postgres";
 

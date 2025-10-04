@@ -46,7 +46,7 @@ export const useUser = () => {
     const { data, error } = await supabase
       .from('profiles')
       .select(
-        '*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*), canton_party_verifications(*)'
+        '*, is_verified, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*), canton_party_verifications(*)'
       )
       .eq('id', user?.id ?? '')
       .single()
