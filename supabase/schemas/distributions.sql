@@ -7,7 +7,8 @@ CREATE TYPE "public"."verification_type" AS ENUM (
     'send_one_hundred',
     'total_tag_referrals',
     'send_streak',
-    'send_ceiling'
+    'send_ceiling',
+    'send_token_hodler'
 );
 
 ALTER TYPE "public"."verification_type" OWNER TO "postgres";
