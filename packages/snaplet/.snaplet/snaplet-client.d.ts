@@ -719,6 +719,20 @@ type Override = {
       extensions?: string;
     };
   }
+  token_balances?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      address?: string;
+      chain_id?: string;
+      token?: string;
+      balance?: string;
+      updated_at?: string;
+      token_key?: string;
+      users?: string;
+    };
+  }
   users?: {
     name?: string;
     fields?: {
@@ -767,6 +781,7 @@ type Override = {
       receipts?: string;
       send_accounts?: string;
       tags?: string;
+      token_balances?: string;
       webauthn_credentials?: string;
     };
   }
@@ -1187,6 +1202,13 @@ export interface Fingerprint {
     migrationsRan?: FingerprintNumberField;
     extensions?: FingerprintRelationField;
   }
+  tokenBalances?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    balance?: FingerprintNumberField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
   users?: {
     emailConfirmedAt?: FingerprintDateField;
     invitedAt?: FingerprintDateField;
@@ -1215,6 +1237,7 @@ export interface Fingerprint {
     receipts?: FingerprintRelationField;
     sendAccounts?: FingerprintRelationField;
     tags?: FingerprintRelationField;
+    tokenBalances?: FingerprintRelationField;
     webauthnCredentials?: FingerprintRelationField;
   }
   webauthnCredentials?: {
