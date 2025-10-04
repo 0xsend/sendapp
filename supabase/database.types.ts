@@ -58,6 +58,15 @@ export type Database = MergeDeep<
             address: Hex
           }
         }
+        distribution_verifications: {
+          // Allow writing bigint|string for weight; reads remain number via generated types
+          Insert: {
+            weight?: number | string | bigint
+          }
+          Update: {
+            weight?: number | string | bigint
+          }
+        }
         profiles: {
           Row: {
             tags: DatabaseGenerated['public']['Tables']['tags']['Row'][]
@@ -131,6 +140,31 @@ export type Database = MergeDeep<
             log_addr: PgBytea
             owner: PgBytea
             sender: PgBytea
+          }
+        }
+        token_balances: {
+          Row: {
+            address: Hex
+          }
+          Insert: {
+            address: Hex
+            balance?: number | string | bigint
+            chain_id: number
+            id?: number
+            token?: PgBytea | null
+            token_key?: string | null
+            updated_at?: string
+            user_id: string
+          }
+          Update: {
+            address?: Hex
+            balance?: number | string | bigint
+            chain_id?: number
+            id?: number
+            token?: PgBytea | null
+            token_key?: string | null
+            updated_at?: string
+            user_id?: string
           }
         }
       }
