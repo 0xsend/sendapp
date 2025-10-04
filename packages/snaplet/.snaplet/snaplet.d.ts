@@ -15,10 +15,11 @@ type Enum_public_link_in_bio_domain_names = 'Discord' | 'Facebook' | 'GitHub' | 
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
 type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
-type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
+type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'send_token_hodler' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
 type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
 type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
+type Enum_storage_buckettype = 'ANALYTICS' | 'STANDARD';
 type Enum_temporal_transfer_status = 'cancelled' | 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 interface Table_net_http_response {
   id: number | null;
@@ -64,6 +65,14 @@ interface Table_storage_buckets {
   file_size_limit: number | null;
   allowed_mime_types: string[] | null;
   owner_id: string | null;
+  type: Enum_storage_buckettype;
+}
+interface Table_storage_buckets_analytics {
+  id: string;
+  type: Enum_storage_buckettype;
+  format: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_public_canton_party_verifications {
   id: string;
@@ -180,6 +189,22 @@ interface Table_net_http_request_queue {
   headers: Json;
   body: string | null;
   timeout_milliseconds: number;
+}
+interface Table_storage_iceberg_namespaces {
+  id: string;
+  bucket_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_storage_iceberg_tables {
+  id: string;
+  namespace_id: string;
+  bucket_id: string;
+  name: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_auth_identities {
   provider_id: string;
@@ -335,6 +360,9 @@ interface Table_public_referrals {
   referred_id: string;
   id: number;
   created_at: string;
+}
+interface Table_public_referrer_send_id {
+  send_id: number | null;
 }
 interface Table_auth_refresh_tokens {
   instance_id: string | null;
@@ -759,6 +787,7 @@ interface Table_auth_sso_providers {
   resource_id: string | null;
   created_at: string | null;
   updated_at: string | null;
+  disabled: boolean | null;
 }
 interface Table_realtime_subscription {
   id: number;
@@ -842,6 +871,17 @@ interface Table_realtime_tenants {
   private_only: boolean;
   migrations_ran: number | null;
   broadcast_adapter: string | null;
+  max_presence_events_per_second: number | null;
+  max_payload_size_in_kb: number | null;
+}
+interface Table_public_token_balances {
+  id: number;
+  user_id: string;
+  address: string;
+  chain_id: number;
+  token: string | null;
+  balance: number;
+  updated_at: string;
 }
 interface Table_auth_users {
   instance_id: string | null;
@@ -956,6 +996,7 @@ interface Schema_public {
   profiles: Table_public_profiles;
   receipts: Table_public_receipts;
   referrals: Table_public_referrals;
+  referrer_send_id: Table_public_referrer_send_id;
   send_account_created: Table_public_send_account_created;
   send_account_credentials: Table_public_send_account_credentials;
   send_account_receives: Table_public_send_account_receives;
@@ -979,6 +1020,7 @@ interface Schema_public {
   swap_routers: Table_public_swap_routers;
   tag_receipts: Table_public_tag_receipts;
   tags: Table_public_tags;
+  token_balances: Table_public_token_balances;
   webauthn_credentials: Table_public_webauthn_credentials;
 }
 interface Schema_realtime {
@@ -994,6 +1036,9 @@ interface Schema_shovel {
 }
 interface Schema_storage {
   buckets: Table_storage_buckets;
+  buckets_analytics: Table_storage_buckets_analytics;
+  iceberg_namespaces: Table_storage_iceberg_namespaces;
+  iceberg_tables: Table_storage_iceberg_tables;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
   prefixes: Table_storage_prefixes;
@@ -1036,7 +1081,7 @@ interface Database {
   vault: Schema_vault;
 }
 interface Extension {
-  extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "uuid-ossp";
+  extensions: "http" | "pg_net" | "pg_stat_statements" | "pg_trgm" | "pgcrypto" | "pgjwt" | "pgtap" | "uuid-ossp";
   graphql: "pg_graphql";
   pgtle: "pg_tle";
   public: "citext" | "supabase-dbdev";
@@ -1055,17 +1100,6 @@ interface Tables_relationships {
     childDestinationsTables: "temporal.send_earn_deposits" | {};
     
   };
-  "public.affiliate_stats": {
-    parent: {
-       affiliate_stats_user_id_fkey: "public.profiles";
-    };
-    children: {
-
-    };
-    parentDestinationsTables: "public.profiles" | {};
-    childDestinationsTables:  | {};
-    
-  };
   "storage.buckets": {
     parent: {
 
@@ -1078,6 +1112,19 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    
+  };
+  "storage.buckets_analytics": {
+    parent: {
+
+    };
+    children: {
+       iceberg_namespaces_bucket_id_fkey: "storage.iceberg_namespaces";
+       iceberg_tables_bucket_id_fkey: "storage.iceberg_tables";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "storage.iceberg_namespaces" | "storage.iceberg_tables" | {};
+    
   };
   "public.canton_party_verifications": {
     parent: {
@@ -1171,6 +1218,29 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.saml_relay_states" | {};
+    
+  };
+  "storage.iceberg_namespaces": {
+    parent: {
+       iceberg_namespaces_bucket_id_fkey: "storage.buckets_analytics";
+    };
+    children: {
+       iceberg_tables_namespace_id_fkey: "storage.iceberg_tables";
+    };
+    parentDestinationsTables: "storage.buckets_analytics" | {};
+    childDestinationsTables: "storage.iceberg_tables" | {};
+    
+  };
+  "storage.iceberg_tables": {
+    parent: {
+       iceberg_tables_bucket_id_fkey: "storage.buckets_analytics";
+       iceberg_tables_namespace_id_fkey: "storage.iceberg_namespaces";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "storage.buckets_analytics" | "storage.iceberg_namespaces" | {};
+    childDestinationsTables:  | {};
     
   };
   "auth.identities": {
@@ -1277,12 +1347,10 @@ interface Tables_relationships {
        profiles_id_fkey: "auth.users";
     };
     children: {
-       affiliate_stats_user_id_fkey: "public.affiliate_stats";
-       referrals_referred_id_fkey: "public.referrals";
-       referrals_referrer_id_fkey: "public.referrals";
+
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.affiliate_stats" | "public.referrals" | {};
+    childDestinationsTables:  | {};
     
   };
   "public.receipts": {
@@ -1293,18 +1361,6 @@ interface Tables_relationships {
 
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables:  | {};
-    
-  };
-  "public.referrals": {
-    parent: {
-       referrals_referred_id_fkey: "public.profiles";
-       referrals_referrer_id_fkey: "public.profiles";
-    };
-    children: {
-
-    };
-    parentDestinationsTables: "public.profiles" | {};
     childDestinationsTables:  | {};
     
   };
@@ -1495,6 +1551,17 @@ interface Tables_relationships {
     childDestinationsTables: "_realtime.extensions" | {};
     
   };
+  "public.token_balances": {
+    parent: {
+       token_balances_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "auth.users": {
     parent: {
 
@@ -1516,10 +1583,11 @@ interface Tables_relationships {
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
        tags_user_id_fkey: "public.tags";
+       token_balances_user_id_fkey: "public.token_balances";
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.token_balances" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {
