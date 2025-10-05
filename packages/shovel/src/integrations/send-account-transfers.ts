@@ -11,6 +11,7 @@ import {
   spx6900Address,
   usdcAddress,
   mamoAddress,
+  masqAddress,
 } from '@my/wagmi/generated'
 
 export const transfersTable: Table = {
@@ -58,6 +59,7 @@ export const integration: Omit<Integration, 'sources'> = {
         ...new Set(Object.values(coinbaseWrappedBtcAddress)),
         ...new Set(Object.values(eurcAddress)),
         ...new Set(Object.values(mamoAddress)),
+        ...new Set(Object.values(masqAddress)),
       ].sort(),
     },
   ] as BlockData[],

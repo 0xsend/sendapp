@@ -10,6 +10,7 @@ import {
   coinbaseWrappedBtcAddress as coinbaseWrappedBtcAddresses,
   eurcAddress as eurcAddresses,
   mamoAddress as mamoAddresses,
+  masqAddress as masqAddresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -26,6 +27,7 @@ export const COINGECKO_IDS = [
   'coinbase-wrapped-btc',
   'euro-coin',
   'mamo',
+  'masq',
 ] as const satisfies readonly [string, ...string[]]
 export type CoingeckoId = (typeof COINGECKO_IDS)[number]
 
@@ -157,6 +159,15 @@ export const mamoCoin = {
   coingeckoTokenId: 'mamo',
 } as const satisfies erc20Coin
 
+export const masqCoin = {
+  label: 'MASQ',
+  symbol: 'MASQ',
+  token: masqAddresses[baseMainnet.id],
+  decimals: 18,
+  formatDecimals: 2,
+  coingeckoTokenId: 'masq',
+} as const satisfies erc20Coin
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -195,6 +206,7 @@ export const partnerCoins: coin[] = [
   morphoCoin,
   eurcCoin,
   mamoCoin,
+  masqCoin,
 ] as const
 export type partnerCoins = typeof partnerCoins
 
@@ -247,6 +259,7 @@ export const erc20Coins: erc20Coin[] = [
   morphoCoin,
   eurcCoin,
   mamoCoin,
+  masqCoin,
 ] as const
 
 export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
@@ -262,4 +275,5 @@ export const investmentCoins = [
   aerodromeCoin,
   morphoCoin,
   mamoCoin,
+  masqCoin,
 ] as const
