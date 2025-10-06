@@ -21,8 +21,8 @@
     },
     {
       "name": "base_logs",
-      "batch_size": 2000,
-      "concurrency": 2,
+      "batch_size": 10,
+      "concurrency": 8,
       "chain_id": "$BASE_CHAIN_ID",
       "url": "$BASE_RPC_URL_PRIMARY",
       "urls": [
