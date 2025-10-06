@@ -1691,6 +1691,18 @@ export type Database = {
       }
     }
     Views: {
+      active_distribution_shares: {
+        Row: {
+          address: string | null
+          amount: number | null
+          bonus_pool_amount: number | null
+          distribution_id: number | null
+          fixed_pool_amount: number | null
+          hodler_pool_amount: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       activity_feed: {
         Row: {
           created_at: string | null
@@ -1814,8 +1826,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_active_distribution_share: {
+        Row: {
+          address: string | null
+          amount: number | null
+          bonus_pool_amount: number | null
+          distribution_id: number | null
+          fixed_pool_amount: number | null
+          hodler_pool_amount: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      active_distribution_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       calculate_and_insert_send_ceiling_verification: {
         Args: { distribution_number: number }
         Returns: undefined
@@ -1853,6 +1881,18 @@ export type Database = {
         Args: { "": string }
         Returns: string
       }
+      compute_active_distribution_shares: {
+        Args: { mode?: string }
+        Returns: {
+          address: string
+          amount: number
+          bonus_pool_amount: number
+          distribution_id: number
+          fixed_pool_amount: number
+          hodler_pool_amount: number
+          user_id: string
+        }[]
+      }
       confirm_tags: {
         Args: {
           _event_id: string
@@ -1872,6 +1912,10 @@ export type Database = {
       }
       create_tag: {
         Args: { send_account_id: string; tag_name: string }
+        Returns: number
+      }
+      cubic_bezier_multiplier: {
+        Args: { p1?: number; p2?: number; rank: number; total: number }
         Returns: number
       }
       distribution_hodler_addresses: {
@@ -2271,6 +2315,7 @@ export type Database = {
         send_id: number | null
         phone: string | null
         is_verified: boolean | null
+        verified_at: string | null
       }
     }
   }
