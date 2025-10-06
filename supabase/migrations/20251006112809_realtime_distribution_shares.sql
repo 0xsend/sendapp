@@ -34,15 +34,17 @@ WITH d AS (
   SELECT ss.minimum_sends::numeric AS min_sends, ss.scaling_divisor::numeric AS scaling_div
   FROM send_slash ss
   JOIN d ON ss.distribution_id = d.id
-), holders AS (
-  SELECT lower(h.address)::citext AS address, h.user_id
-  FROM d, LATERAL distribution_hodler_addresses(d.id) h
-), tb AS (
-  SELECT h.user_id, h.address, tb.balance::numeric AS bal
-  FROM holders h
-  JOIN token_balances tb ON tb.address = h.address AND tb.chain_id = (SELECT chain_id FROM d)
+), dv_bal AS (
+  SELECT sa.user_id,
+         lower(sa.address)::citext AS address,
+         dv.weight::numeric AS bal
+  FROM d
+  JOIN distribution_verifications dv
+    ON dv.distribution_id = d.id
+   AND dv.type = 'send_token_hodler'::verification_type
+  JOIN send_accounts sa ON sa.user_id = dv.user_id
 ), min_bal AS (
-  SELECT * FROM tb WHERE bal >= (SELECT hodler_min FROM d)
+  SELECT * FROM dv_bal WHERE bal >= (SELECT hodler_min FROM d)
 ), earn_ok AS (
   SELECT m.user_id
   FROM min_bal m

@@ -1691,18 +1691,6 @@ export type Database = {
       }
     }
     Views: {
-      active_distribution_shares: {
-        Row: {
-          address: string | null
-          amount: number | null
-          bonus_pool_amount: number | null
-          distribution_id: number | null
-          fixed_pool_amount: number | null
-          hodler_pool_amount: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
       activity_feed: {
         Row: {
           created_at: string | null
@@ -1746,7 +1734,6 @@ export type Database = {
           chain_id: number | null
           id: string | null
           is_public: boolean | null
-          is_verified: boolean | null
           links_in_bio:
             | Database["public"]["Tables"]["link_in_bio"]["Row"][]
             | null
@@ -1757,7 +1744,6 @@ export type Database = {
           send_id: number | null
           sendid: number | null
           tag: string | null
-          verified_at: string | null
           x_username: string | null
         }
         Relationships: []
@@ -1826,24 +1812,8 @@ export type Database = {
         }
         Relationships: []
       }
-      user_active_distribution_share: {
-        Row: {
-          address: string | null
-          amount: number | null
-          bonus_pool_amount: number | null
-          distribution_id: number | null
-          fixed_pool_amount: number | null
-          hodler_pool_amount: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
     }
     Functions: {
-      active_distribution_id: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
       calculate_and_insert_send_ceiling_verification: {
         Args: { distribution_number: number }
         Returns: undefined
@@ -1881,18 +1851,6 @@ export type Database = {
         Args: { "": string }
         Returns: string
       }
-      compute_active_distribution_shares: {
-        Args: { mode?: string }
-        Returns: {
-          address: string
-          amount: number
-          bonus_pool_amount: number
-          distribution_id: number
-          fixed_pool_amount: number
-          hodler_pool_amount: number
-          user_id: string
-        }[]
-      }
       confirm_tags: {
         Args: {
           _event_id: string
@@ -1912,10 +1870,6 @@ export type Database = {
       }
       create_tag: {
         Args: { send_account_id: string; tag_name: string }
-        Returns: number
-      }
-      cubic_bezier_multiplier: {
-        Args: { p1?: number; p2?: number; rank: number; total: number }
         Returns: number
       }
       distribution_hodler_addresses: {
@@ -2236,10 +2190,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
-      verified_at: {
-        Args: { p: Database["public"]["Tables"]["profiles"]["Row"] }
-        Returns: string
-      }
     }
     Enums: {
       key_type_enum: "ES256"
@@ -2307,7 +2257,6 @@ export type Database = {
           | null
         banner_url: string | null
         is_verified: boolean | null
-        verified_at: string | null
       }
       tag_search_result: {
         avatar_url: string | null
@@ -2315,7 +2264,6 @@ export type Database = {
         send_id: number | null
         phone: string | null
         is_verified: boolean | null
-        verified_at: string | null
       }
     }
   }
