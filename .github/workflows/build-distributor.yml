@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: 'Environment name (staging, production)'
+        description: 'Environment name (dev, production)'
         required: true
         type: string
     outputs:
@@ -14,13 +14,13 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment name (staging, production)'
+        description: 'Environment name (dev, production)'
         required: true
         type: choice
         options:
-          - staging
+          - dev
           - production
-        default: staging
+        default: dev
 
 jobs:
   build-distributor:
