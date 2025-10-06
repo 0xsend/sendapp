@@ -8,11 +8,11 @@ import {
   Spinner,
   Stack,
   styled,
+  Theme,
   useMedia,
   XStack,
   type XStackProps,
   YStack,
-  Theme,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -31,13 +31,13 @@ import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import type { coin } from 'app/data/coins'
 import { investmentCoins } from 'app/data/coins'
 import { CoinSheet } from 'app/components/CoinSheet'
 import { Link } from 'solito/link'
 import { Platform } from 'react-native'
-import { usePathname } from 'app/utils/usePathname'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { formatUnits } from 'viem'
 import { calculatePercentageChange } from './utils/calculatePercentageChange'
@@ -177,7 +177,6 @@ export function InvestmentsBody() {
   const { investmentCoins: myInvestmentCoins, isLoading } = useCoins()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   useHoverStyles()
-  const pathname = usePathname()
   const { isPriceHidden } = useIsPriceHidden()
 
   // Market data for portfolio-level computations
@@ -206,12 +205,6 @@ export function InvestmentsBody() {
       total === 0 ? 0 : assets.reduce((s, a) => s + (a.value / total) * a.pct24h, 0)
     return { delta24hUSD: delta, pct24h: weightedPct }
   }, [marketData, ownedCoins])
-
-  useEffect(() => {
-    if (pathname === '/token') {
-      setIsSheetOpen(false)
-    }
-  }, [pathname])
 
   const formattedDeltaUSD = localizeAmount(Math.abs(delta24hUSD).toFixed(2))
   const sign = delta24hUSD >= 0 ? '+' : '-'
@@ -359,20 +352,49 @@ export function InvestmentsBody() {
           <CoinSheet.Handle onPress={() => setIsSheetOpen(false)}>New Investments</CoinSheet.Handle>
         )}
         <CoinSheet.Items>
-          {investmentCoins.map((coin) => (
-            <Link
-              key={coin.symbol}
-              href={{
-                pathname: Platform.OS === 'web' ? '/' : '/token',
-                query: { token: coin.token },
-              }}
-            >
-              <CoinSheet.Item coin={coin} />
-            </Link>
-          ))}
+          {investmentCoins.map((coin) =>
+            Platform.OS === 'web' ? (
+              <InvestSheetItemWeb key={coin.symbol} coin={coin} />
+            ) : (
+              <InvestSheetItemNative
+                key={coin.symbol}
+                coin={coin}
+                onPress={() => setIsSheetOpen(false)}
+              />
+            )
+          )}
         </CoinSheet.Items>
       </CoinSheet>
     </YStack>
+  )
+}
+
+const InvestSheetItemWeb = ({ coin }: { coin: coin }) => {
+  return (
+    <Link
+      key={coin.symbol}
+      href={{
+        pathname: '/',
+        query: { token: coin.token },
+      }}
+    >
+      <CoinSheet.Item coin={coin} />
+    </Link>
+  )
+}
+
+const InvestSheetItemNative = ({ coin, onPress }: { coin: coin; onPress: () => void }) => {
+  const router = useRouter()
+
+  const handlePress = () => {
+    onPress()
+    router.push({ pathname: '/token', query: { token: coin.token } })
+  }
+
+  return (
+    <XStack key={coin.symbol} onPress={handlePress}>
+      <CoinSheet.Item coin={coin} />
+    </XStack>
   )
 }
 
