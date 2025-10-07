@@ -16,6 +16,7 @@ export default function ProfileSendButton({ sendId }: { sendId?: number | null }
       position="relative"
       bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
       f={1}
+      testID="profileSendButton"
     >
       <Button.Icon>
         <IconArrowUp size={'$1'} color={isDark ? '$primary' : '$color12'} />
