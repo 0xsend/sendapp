@@ -31,23 +31,25 @@ const baseRpcUrls = {
   ],
 }
 
-// baseSrcBlockHeaders is to be used for integrations that require block headers
-const baseSrcBlockHeaders: Source = {
-  name: 'base_block_headers',
-  batch_size: 100,
-  concurrency: 1,
-  ...baseRpcUrls,
-}
+// baseSrcBlockHeaders is available but currently unused
+// Removed from sources array 2025-10-07: No integrations use block headers
+// To re-enable: add back to sources array and update integration sources
+// const baseSrcBlockHeaders: Source = {
+//   name: 'base_block_headers',
+//   batch_size: 100,
+//   concurrency: 1,
+//   ...baseRpcUrls,
+// }
 
 // baseSrcLogs is to be used for integrations that require logs
 const baseSrcLogs: Source = {
   name: 'base_logs',
-  batch_size: 2000,
-  concurrency: 2,
+  batch_size: 10,
+  concurrency: 8,
   ...baseRpcUrls,
 }
 
-export const sources: Source[] = [baseSrcBlockHeaders, baseSrcLogs]
+export const sources: Source[] = [baseSrcLogs]
 
 export const integrations: Integration[] = [
   {

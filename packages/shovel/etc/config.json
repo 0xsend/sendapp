@@ -5,21 +5,6 @@
   "pg_url": "$DATABASE_URL",
   "eth_sources": [
     {
-      "name": "base_block_headers",
-      "batch_size": 100,
-      "concurrency": 1,
-      "chain_id": "$BASE_CHAIN_ID",
-      "url": "$BASE_RPC_URL_PRIMARY",
-      "urls": [
-        "$BASE_RPC_URL_PRIMARY",
-        "$BASE_RPC_URL_BACKUP1",
-        "$BASE_RPC_URL_PRIMARY",
-        "$BASE_RPC_URL_BACKUP2",
-        "$BASE_RPC_URL_PRIMARY",
-        "$BASE_RPC_URL_BACKUP3"
-      ]
-    },
-    {
       "name": "base_logs",
       "batch_size": 10,
       "concurrency": 8,
