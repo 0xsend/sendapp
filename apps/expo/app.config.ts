@@ -38,6 +38,7 @@ module.exports = {
       {
         android: {
           compileSdkVersion: 35,
+          targetSdkVersion: 35,
         },
         ios: {
           deploymentTarget: '15.1',
