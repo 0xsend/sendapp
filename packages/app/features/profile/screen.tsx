@@ -156,7 +156,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               )}
               <YStack px="$4" gap="$3" jc="space-around" f={1} als="center">
                 <XStack ai="center" gap="$2">
-                  <H3 lineHeight={32} color="$color12">
+                  <H3 lineHeight={32} color="$color12" testID="profileName">
                     {otherUserProfile?.name ?? '---'}
                   </H3>
                   {otherUserProfile?.is_verified ? (

@@ -4,20 +4,20 @@ import { IconBadgeCheckSolid } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 
 interface CantonWalletStatusProps {
-  hasRewardsInLatestDistribution?: boolean
+  canConnectCantonWallet?: boolean
   isExpanded: boolean
   onToggle: () => void
 }
 
 export function CantonWalletStatus({
-  hasRewardsInLatestDistribution,
+  canConnectCantonWallet,
   isExpanded,
   onToggle,
 }: CantonWalletStatusProps) {
   const { profile } = useUser()
   const cantonVerification = profile?.canton_party_verifications?.[0]
 
-  const shouldShowVerificationOption = !cantonVerification && hasRewardsInLatestDistribution
+  const shouldShowVerificationOption = !cantonVerification && canConnectCantonWallet
 
   const shouldShowStatus = !!cantonVerification
 

@@ -37,6 +37,7 @@ const BaseCoinSchema = z.object({
   formatDecimals: z.number().min(0).optional(),
   shortLabel: z.string().optional(),
   coingeckoTokenId: z.enum(COINGECKO_IDS),
+  minXfrAmt: z.number().min(0).optional(),
 })
 
 // ERC20 specific schema
@@ -62,6 +63,7 @@ export const usdcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
+  minXfrAmt: 0.01,
 } as const satisfies erc20Coin
 
 export const ethCoin = {
@@ -80,6 +82,7 @@ export const sendCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'send-token-2',
+  minXfrAmt: 1,
 } as const satisfies erc20Coin
 
 // can probably remove this
