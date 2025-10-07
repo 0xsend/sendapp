@@ -102,12 +102,23 @@ export function SendAmountForm() {
   const parsedAmount = BigInt(sendParams.amount ?? '0')
   const formAmount = form.watch('amount')
 
+  const minimumAmount = coin?.minAmount
+    ? BigInt(Math.floor(coin.minAmount * 10 ** coin.decimals))
+    : BigInt(0)
+
+  const belowMinimum =
+    coin?.minAmount !== undefined &&
+    sendParams.amount !== undefined &&
+    parsedAmount > BigInt(0) &&
+    parsedAmount < minimumAmount
+
   const canSubmit =
     !isLoadingCoins &&
     coin?.balance !== undefined &&
     sendParams.amount !== undefined &&
     coin.balance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
+    !belowMinimum &&
     !noteValidationError
 
   const insufficientAmount =
@@ -288,7 +299,7 @@ export function SendAmountForm() {
                   bc={'$color1'}
                   br={'$6'}
                   p={'$5'}
-                  borderColor={insufficientAmount ? '$error' : 'transparent'}
+                  borderColor={insufficientAmount || belowMinimum ? '$error' : 'transparent'}
                   bw={1}
                 >
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
@@ -324,16 +335,25 @@ export function SendAmountForm() {
                                 <XStack gap={'$2'}>
                                   <Paragraph
                                     testID="SendFormBalance"
-                                    color={insufficientAmount ? '$error' : '$silverChalice'}
+                                    color={
+                                      insufficientAmount || belowMinimum
+                                        ? '$error'
+                                        : '$silverChalice'
+                                    }
                                     size={'$5'}
                                     $theme-light={{
-                                      color: insufficientAmount ? '$error' : '$darkGrayTextField',
+                                      color:
+                                        insufficientAmount || belowMinimum
+                                          ? '$error'
+                                          : '$darkGrayTextField',
                                     }}
                                   >
                                     Balance:
                                   </Paragraph>
                                   <Paragraph
-                                    color={insufficientAmount ? '$error' : '$color12'}
+                                    color={
+                                      insufficientAmount || belowMinimum ? '$error' : '$color12'
+                                    }
                                     size={'$5'}
                                     fontWeight={'600'}
                                   >
@@ -343,6 +363,16 @@ export function SendAmountForm() {
                                 {insufficientAmount && (
                                   <Paragraph color={'$error'} size={'$5'}>
                                     Insufficient funds
+                                  </Paragraph>
+                                )}
+                                {belowMinimum && coin?.minAmount !== undefined && (
+                                  <Paragraph
+                                    color={'$error'}
+                                    size={'$5'}
+                                    testID="SendFormMinimumError"
+                                  >
+                                    Minimum: {formatAmount(coin.minAmount.toString(), 12, 4)}{' '}
+                                    {coin.symbol}
                                   </Paragraph>
                                 )}
                               </XStack>

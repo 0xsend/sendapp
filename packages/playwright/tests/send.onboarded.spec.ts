@@ -212,7 +212,12 @@ async function handleTokenTransfer({
 }): Promise<void> {
   const isETH = token.symbol === 'ETH'
   const decimalAmount: string = (() => {
-    const amt = (Math.random() * 1000).toFixed(token.decimals).toString()
+    const minAmount = token.minAmount ?? 0
+    const randomAmount = Math.random() * 1000
+    // Ensure amount is at least the minimum
+    const amt = Math.max(randomAmount, minAmount * 2)
+      .toFixed(token.decimals)
+      .toString()
     if (token.decimals > 0) {
       // trailing zeros are not allowed in the decimal part
       return amt.replace(/0+$/, '')
@@ -314,3 +319,76 @@ const truncateDecimals = (amount: string, decimals: number) => {
 
   return decimals === 0 ? amount.slice(0, index) : amount.slice(0, index + decimals + 1)
 }
+
+test('cannot send below minimum amount for SEND token', async ({ page, seed, supabase }) => {
+  const plan = await createUserWithTagsAndAccounts(seed)
+  const tag = plan.tags[0]
+  const profile = plan.profile
+  assert(!!tag?.name, 'tag not found')
+  assert(!!profile?.name, 'profile name not found')
+  assert(!!plan.sendAccount, 'send account not found')
+
+  const { data: sendAccount, error } = await supabase.from('send_accounts').select('*').single()
+  expect(error).toBeFalsy()
+  assert(!!sendAccount, 'no send account found')
+
+  // Fund account with enough SEND
+  const fundAmount = parseUnits('100', 18) // 100 SEND
+  await fund({ address: sendAccount.address, amount: fundAmount, coin: coins[1] }) // coins[1] is SEND
+
+  // goto send page directly
+  await page.goto('/')
+
+  const sendLink = page.getByTestId('sidebar-nav-send')
+  await expect(sendLink).toBeVisible()
+  await sendLink.click()
+
+  await expect(async () => {
+    // fill search input
+    const searchInput = page.getByRole('search', { name: 'query' })
+    expect(searchInput).toBeVisible()
+    await searchInput.fill(tag.name)
+    await expect(searchInput).toHaveValue(tag.name)
+  }).toPass({
+    timeout: 15_000,
+  })
+
+  // click user
+  const searchResult = page
+    .getByTestId('searchResults')
+    .getByRole('link', { name: tag.name, exact: false })
+  await expect(searchResult).toBeVisible()
+  await searchResult.click()
+
+  await expect(page).toHaveURL(/\/send/)
+  await page.reload() // ensure balance is updated
+
+  const sendPage = new SendPage(page, expect)
+  await sendPage.expectTokenSelect('SEND')
+
+  // Try to send below minimum (0.5 SEND, minimum is 1)
+  await expect(sendPage.amountInput).toBeVisible()
+  await sendPage.amountInput.fill('0.5')
+
+  // Wait for validation to process
+  await page.waitForTimeout(500)
+
+  // Verify error message is displayed
+  const minimumError = page.getByTestId('SendFormMinimumError')
+  await expect(minimumError).toBeVisible()
+  await expect(minimumError).toHaveText(/Minimum: 1 SEND/)
+
+  // Verify continue button is disabled
+  await expect(sendPage.continueButton).toBeVisible()
+  await expect(sendPage.continueButton).toBeDisabled()
+
+  // Now send exactly minimum amount (1 SEND) - should work
+  await sendPage.amountInput.fill('1')
+  await page.waitForTimeout(500)
+
+  // Error message should disappear
+  await expect(minimumError).toBeHidden()
+
+  // Continue button should be enabled
+  await expect(sendPage.continueButton).toBeEnabled()
+})
