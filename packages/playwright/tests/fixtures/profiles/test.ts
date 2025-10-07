@@ -10,15 +10,15 @@ export class ProfilePage {
   constructor(page: Page, profile: { name: string; about: string }) {
     this.page = page
     this.profile = profile
-    this.sendButton = page.getByRole('link', { name: 'SEND', exact: true })
+    this.sendButton = page.getByTestId('profileSendButton')
   }
 
   async visit(tag: string, expect?: Expect) {
     await this.page.goto(`/${tag}`)
     await expect?.(async () => {
       const title = await this.page.title()
-      expect?.(title).toBe('Send | Profile')
+      expect?.(title).toBe(`localhost/${tag}`)
     }).toPass()
-    await expect?.(this.page.locator('#profileName')).toHaveText(this.profile.name)
+    await expect?.(this.page.getByTestId('profileName')).toHaveText(this.profile.name)
   }
 }

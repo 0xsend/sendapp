@@ -1553,24 +1553,9 @@ exports[`shovel config 1`] = `
   "pg_url": "$DATABASE_URL",
   "sources": [
     {
-      "batch_size": 100,
+      "batch_size": 10,
       "chain_id": "$BASE_CHAIN_ID",
-      "concurrency": 1,
-      "name": "base_block_headers",
-      "url": "$BASE_RPC_URL_PRIMARY",
-      "urls": [
-        "$BASE_RPC_URL_PRIMARY",
-        "$BASE_RPC_URL_BACKUP1",
-        "$BASE_RPC_URL_PRIMARY",
-        "$BASE_RPC_URL_BACKUP2",
-        "$BASE_RPC_URL_PRIMARY",
-        "$BASE_RPC_URL_BACKUP3",
-      ],
-    },
-    {
-      "batch_size": 2000,
-      "chain_id": "$BASE_CHAIN_ID",
-      "concurrency": 2,
+      "concurrency": 8,
       "name": "base_logs",
       "url": "$BASE_RPC_URL_PRIMARY",
       "urls": [
