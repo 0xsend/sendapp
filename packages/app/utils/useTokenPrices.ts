@@ -3,6 +3,8 @@ import {
   baseMainnet,
   coinbaseWrappedBtcAddress,
   eurcAddress,
+  mamoAddress,
+  masqAddress,
   moonwellAddress,
   morphoAddress,
   sendTokenAddress,
@@ -29,6 +31,8 @@ export const CoingeckoTokenPricesSchema = z.object({
   'aerodrome-finance': CoingeckoTokenPriceSchema,
   'coinbase-wrapped-btc': CoingeckoTokenPriceSchema,
   'euro-coin': CoingeckoTokenPriceSchema,
+  mamo: CoingeckoTokenPriceSchema,
+  masq: CoingeckoTokenPriceSchema,
 })
 
 const DexScreenerTokenPriceSchema = z.object({
@@ -66,6 +70,8 @@ export const fetchDexScreenerPrices = async () => {
     aerodromeFinanceAddress['8453'],
     coinbaseWrappedBtcAddress['8453'],
     eurcAddress['8453'],
+    mamoAddress['8453'],
+    masqAddress['8453'],
   ]
 
   const res = await fetch(`https://api.dexscreener.com/tokens/v1/base/${tokensToFetch.join(',')}`)
@@ -110,6 +116,12 @@ const normalizeDexScreenerPrices = (prices: z.infer<typeof DexScreenerTokenPrice
           break
         case 'EURC':
           acc[eurcAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
+          break
+        case 'MAMO':
+          acc[mamoAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
+          break
+        case 'MASQ':
+          acc[masqAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
           break
         default:
           break
