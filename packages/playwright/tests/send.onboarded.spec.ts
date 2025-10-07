@@ -212,10 +212,10 @@ async function handleTokenTransfer({
 }): Promise<void> {
   const isETH = token.symbol === 'ETH'
   const decimalAmount: string = (() => {
-    const minAmount = token.minAmount ?? 0
+    const minXfrAmt = token.minXfrAmt ?? 0
     const randomAmount = Math.random() * 1000
     // Ensure amount is at least the minimum
-    const amt = Math.max(randomAmount, minAmount * 2)
+    const amt = Math.max(randomAmount, minXfrAmt * 2)
       .toFixed(token.decimals)
       .toString()
     if (token.decimals > 0) {

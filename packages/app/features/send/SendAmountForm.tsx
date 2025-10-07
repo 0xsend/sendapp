@@ -102,15 +102,15 @@ export function SendAmountForm() {
   const parsedAmount = BigInt(sendParams.amount ?? '0')
   const formAmount = form.watch('amount')
 
-  const minimumAmount = coin?.minAmount
-    ? BigInt(Math.floor(coin.minAmount * 10 ** coin.decimals))
+  const minXfrAmt = coin?.minXfrAmt
+    ? BigInt(Math.floor(coin.minXfrAmt * 10 ** coin.decimals))
     : BigInt(0)
 
   const belowMinimum =
-    coin?.minAmount !== undefined &&
+    coin?.minXfrAmt !== undefined &&
     sendParams.amount !== undefined &&
     parsedAmount > BigInt(0) &&
-    parsedAmount < minimumAmount
+    parsedAmount < minXfrAmt
 
   const canSubmit =
     !isLoadingCoins &&
@@ -365,13 +365,13 @@ export function SendAmountForm() {
                                     Insufficient funds
                                   </Paragraph>
                                 )}
-                                {belowMinimum && coin?.minAmount !== undefined && (
+                                {belowMinimum && coin?.minXfrAmt !== undefined && (
                                   <Paragraph
                                     color={'$error'}
                                     size={'$5'}
                                     testID="SendFormMinimumError"
                                   >
-                                    Minimum: {formatAmount(coin.minAmount.toString(), 12, 4)}{' '}
+                                    Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
                                     {coin.symbol}
                                   </Paragraph>
                                 )}

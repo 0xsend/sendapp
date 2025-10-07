@@ -37,7 +37,7 @@ const BaseCoinSchema = z.object({
   formatDecimals: z.number().min(0).optional(),
   shortLabel: z.string().optional(),
   coingeckoTokenId: z.enum(COINGECKO_IDS),
-  minAmount: z.number().min(0).optional(),
+  minXfrAmt: z.number().min(0).optional(),
 })
 
 // ERC20 specific schema
@@ -63,7 +63,7 @@ export const usdcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
-  minAmount: 0.01,
+  minXfrAmt: 0.01,
 } as const satisfies erc20Coin
 
 export const ethCoin = {
@@ -73,7 +73,6 @@ export const ethCoin = {
   decimals: 18,
   coingeckoTokenId: 'ethereum',
   formatDecimals: 5,
-  minAmount: 0.001,
 } as const satisfies ethCoin
 
 export const sendCoin = {
@@ -83,7 +82,7 @@ export const sendCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'send-token-2',
-  minAmount: 1,
+  minXfrAmt: 1,
 } as const satisfies erc20Coin
 
 // can probably remove this
@@ -103,7 +102,6 @@ export const spx6900Coin = {
   decimals: 8,
   formatDecimals: 2,
   coingeckoTokenId: 'spx6900',
-  minAmount: 0.01,
 } as const satisfies erc20Coin
 
 export const moonwellCoin = {
@@ -113,7 +111,6 @@ export const moonwellCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'moonwell-artemis',
-  minAmount: 1,
 } as const satisfies erc20Coin
 
 export const morphoCoin = {
@@ -123,7 +120,6 @@ export const morphoCoin = {
   decimals: 18,
   formatDecimals: 2,
   coingeckoTokenId: 'morpho',
-  minAmount: 0.01,
 } as const satisfies erc20Coin
 
 export const aerodromeCoin = {
@@ -134,7 +130,6 @@ export const aerodromeCoin = {
   decimals: 18,
   formatDecimals: 2,
   coingeckoTokenId: 'aerodrome-finance',
-  minAmount: 0.01,
 } as const satisfies erc20Coin
 
 export const cbBtcCoin = {
@@ -145,7 +140,6 @@ export const cbBtcCoin = {
   decimals: 8,
   formatDecimals: 6,
   coingeckoTokenId: 'coinbase-wrapped-btc',
-  minAmount: 0.000001,
 } as const satisfies erc20Coin
 
 export const eurcCoin = {
@@ -155,7 +149,6 @@ export const eurcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'euro-coin',
-  minAmount: 0.01,
 } as const satisfies erc20Coin
 
 export const mamoCoin = {
@@ -165,7 +158,6 @@ export const mamoCoin = {
   decimals: 18,
   formatDecimals: 2,
   coingeckoTokenId: 'mamo',
-  minAmount: 0.01,
 } as const satisfies erc20Coin
 
 /**

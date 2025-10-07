@@ -30,7 +30,6 @@ describe('TagReceiptsDataSchema', () => {
             symbol: 'ETH',
             token: 'eth',
             formatDecimals: 5,
-            minAmount: 0.001,
           },
         },
       },
