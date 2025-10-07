@@ -19,6 +19,21 @@ export const CardFrame = styled(ThemeableStack, {
         position: 'relative',
       },
     },
+    materialInteractive: {
+      true: {
+        cursor: 'pointer',
+        focusable: true,
+        hoverStyle: {
+          elevation: '$0.9',
+        },
+        pressStyle: {
+          elevation: '$0.75',
+        },
+        '$platform-web': {
+          transition: 'box-shadow 150ms ease',
+        },
+      },
+    },
 
     size: {
       '...size': (val, { tokens }) => {

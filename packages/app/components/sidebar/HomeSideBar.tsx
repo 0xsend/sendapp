@@ -22,6 +22,7 @@ import {
   IconSendLogo,
   IconWorldSearch,
 } from 'app/components/icons'
+import { Lock } from '@tamagui/lucide-icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
@@ -55,7 +56,7 @@ const links = [
   },
   __DEV__ || baseMainnet.id === 84532
     ? {
-        icon: <Paragraph px="$1">🔒</Paragraph>,
+        icon: <Lock size="$1" />,
         text: 'Secret shop',
         href: '/secret-shop',
       }

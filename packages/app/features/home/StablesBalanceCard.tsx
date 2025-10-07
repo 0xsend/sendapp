@@ -7,6 +7,7 @@ import {
   Paragraph,
   Spinner,
   useMedia,
+  View,
   withStaticProperties,
   XStack,
 } from '@my/ui'
@@ -33,6 +34,8 @@ const StablesBalanceCardHomeScreenHeader = () => {
   )
   const isStablesScreen = queryParams.token === 'stables'
 
+  const isChevronLeft = isStableCoin || isStablesScreen
+
   return (
     <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
       <Paragraph
@@ -44,20 +47,14 @@ const StablesBalanceCardHomeScreenHeader = () => {
         Cash Balance
       </Paragraph>
       <XStack flex={1} />
-      {isStableCoin || isStablesScreen ? (
-        <ChevronLeft
-          size={'$1'}
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-          $lg={{ display: 'none' }}
-        />
-      ) : (
+      <View animateOnly={['transform']} animation="fast" rotate={isChevronLeft ? '180deg' : '0deg'}>
         <ChevronRight
-          size={'$1'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
+          size="$1"
+          color={isChevronLeft ? '$primary' : '$lightGrayTextField'}
+          $theme-light={{ color: isChevronLeft ? '$color12' : '$darkGrayTextField' }}
+          $lg={{ display: isChevronLeft ? 'none' : 'flex' }}
         />
-      )}
+      </View>
     </Card.Header>
   )
 }
@@ -217,10 +214,10 @@ export const StablesBalanceCardContent = (props: CardProps) => {
     <Card
       w="100%"
       onPress={toggleSubScreen}
-      cursor="pointer"
       size={'$5'}
       br="$7"
       p={'$1.5'}
+      materialInteractive
       {...props}
     >
       {props.children}
