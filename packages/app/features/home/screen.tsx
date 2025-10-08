@@ -330,7 +330,6 @@ export function InvestmentsBody() {
       <YStack w={'100%'} gap={'$2'}>
         <H4 size="$7">Your Holdings</H4>
         <Card
-          bc={'$color1'}
           width="100%"
           p="$2"
           $gtSm={{
@@ -430,7 +429,6 @@ export const StablesBody = YStack.styleable((props) => {
       )}
 
       <Card
-        bc={'$color1'}
         width="100%"
         $gtSm={{
           p: '$4',
