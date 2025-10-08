@@ -2482,6 +2482,127 @@ export const mamoAddress = {
 export const mamoConfig = { address: mamoAddress, abi: mamoAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MASQ
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const masqAbi = [
+  {
+    type: 'event',
+    inputs: [
+      { name: 'owner', type: 'address', indexed: true },
+      { name: 'spender', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true },
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'sender', type: 'address' },
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const masqAddress = {
+  8453: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
+  84532: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
+  845337: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const masqConfig = { address: masqAddress, abi: masqAbi } as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Moonwell
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9479,6 +9600,212 @@ export const watchMamoApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
 export const watchMamoTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: mamoAbi,
   address: mamoAddress,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasq = /*#__PURE__*/ createReadContract({ abi: masqAbi, address: masqAddress })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasqAllowance = /*#__PURE__*/ createReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasqBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasqDecimals = /*#__PURE__*/ createReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasqName = /*#__PURE__*/ createReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasqSymbol = /*#__PURE__*/ createReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const readMasqTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const writeMasq = /*#__PURE__*/ createWriteContract({ abi: masqAbi, address: masqAddress })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const writeMasqApprove = /*#__PURE__*/ createWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const writeMasqTransfer = /*#__PURE__*/ createWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const writeMasqTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const prepareWriteMasq = /*#__PURE__*/ createSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const prepareWriteMasqApprove = /*#__PURE__*/ createSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const prepareWriteMasqTransfer = /*#__PURE__*/ createSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const prepareWriteMasqTransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const watchMasqEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: masqAbi,
+  address: masqAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link masqAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const watchMasqApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: masqAbi,
+  address: masqAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link masqAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const watchMasqTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: masqAbi,
+  address: masqAddress,
   eventName: 'Transfer',
 })
 
@@ -18666,6 +18993,218 @@ export const useWatchMamoApprovalEvent = /*#__PURE__*/ createUseWatchContractEve
 export const useWatchMamoTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: mamoAbi,
   address: mamoAddress,
+  eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasq = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasqAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasqBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasqDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasqName = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasqSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useReadMasqTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWriteMasq = /*#__PURE__*/ createUseWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWriteMasqApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWriteMasqTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWriteMasqTransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useSimulateMasq = /*#__PURE__*/ createUseSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useSimulateMasqApprove = /*#__PURE__*/ createUseSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useSimulateMasqTransfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link masqAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useSimulateMasqTransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: masqAbi,
+  address: masqAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link masqAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWatchMasqEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: masqAbi,
+  address: masqAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link masqAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWatchMasqApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: masqAbi,
+  address: masqAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link masqAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3)
+ */
+export const useWatchMasqTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: masqAbi,
+  address: masqAddress,
   eventName: 'Transfer',
 })
 
