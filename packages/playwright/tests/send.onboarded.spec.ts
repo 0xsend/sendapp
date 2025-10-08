@@ -1,15 +1,15 @@
 import { expect, test as sendAccountTest } from '@my/playwright/fixtures/send-accounts'
 import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
-import { createUserWithTagsAndAccounts, createUserWithoutTags } from '@my/snaplet'
+import { createUserWithoutTags, createUserWithTagsAndAccounts } from '@my/snaplet'
 import type { Database } from '@my/supabase/database.types'
 import { mergeTests, type Page } from '@playwright/test'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { coins, type coin, ethCoin } from 'app/data/coins'
+import { type coin, coins, ethCoin, sendCoin } from 'app/data/coins'
 import { assert } from 'app/utils/assert'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import { shorten } from 'app/utils/strings'
 import debug from 'debug'
-import { isAddress, parseUnits, withRetry } from 'viem'
+import { parseUnits } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { ProfilePage } from './fixtures/profiles'
 import { SendPage } from './fixtures/send'
@@ -335,7 +335,7 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
 
   // Fund account with enough SEND
   const fundAmount = parseUnits('100', 18) // 100 SEND
-  await fund({ address: sendAccount.address, amount: fundAmount, coin: coins[1] }) // coins[1] is SEND
+  await fund({ address: sendAccount.address, amount: fundAmount, coin: sendCoin })
 
   // goto send page directly
   await page.goto('/')

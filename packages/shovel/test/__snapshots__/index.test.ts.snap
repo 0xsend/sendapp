@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`shovel config 1`] = `
 {
@@ -104,6 +104,7 @@ exports[`shovel config 1`] = `
             "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
             "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3",
             "0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C",
             "0x58D97B57BB95320F9a05dC918Aef65434969c2B2",
             "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
