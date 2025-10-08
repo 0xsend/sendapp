@@ -4,6 +4,18 @@ import { maskOptions, templates } from './templates'
 import { componentThemeDefinitions } from './componentThemeDefinitions'
 import { shadows } from './shadows'
 import { palettes } from './palettes'
+import { lightColors, darkColors } from './token-colors'
+
+const nonInherited = {
+  light: {
+    ...lightColors,
+    ...shadows.light,
+  },
+  dark: {
+    ...darkColors,
+    ...shadows.dark,
+  },
+}
 
 const colorThemeDefinition = (colorName: string) => [
   {
@@ -26,23 +38,21 @@ const themesBuilder = createThemeBuilder()
     light: {
       template: 'base',
       palette: 'light',
-      nonInheritedValues: {
-        ...shadows.light,
-      },
+      nonInheritedValues: nonInherited.light,
     },
     dark: {
       template: 'base',
       palette: 'dark',
-      nonInheritedValues: {
-        ...shadows.dark,
-      },
+      nonInheritedValues: nonInherited.dark,
     },
   })
   .addChildThemes({
     yellow: colorThemeDefinition('yellow'),
     green: colorThemeDefinition('green'),
+    neon: colorThemeDefinition('neon'),
     red: colorThemeDefinition('red'),
     gray: colorThemeDefinition('gray'),
+    aztec: colorThemeDefinition('aztec'),
   })
   .addChildThemes({
     ghost: {
