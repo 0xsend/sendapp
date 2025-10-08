@@ -1,4 +1,4 @@
-import { baseMainnetClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
+import { baseMainnetClient, cdpBundlerClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import {
@@ -11,7 +11,7 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import type { UserOperation } from 'permissionless'
 import { isAddressEqual, zeroAddress, type Address } from 'viem'
-import { createUserOpActivities, type UserOpActivities } from './wagmi'
+import { createUserOpActivities, type UserOpActivities } from '../userop-workflow/activities'
 
 import {
   getUserIdFromAddress,
@@ -59,7 +59,7 @@ export const createDepositActivities = (
     updateTemporalDepositActivity,
     verifyDepositIndexedActivity,
     upsertReferralRelationshipActivity,
-    ...createUserOpActivities(env),
+    ...createUserOpActivities(env, cdpBundlerClient),
   }
 }
 
