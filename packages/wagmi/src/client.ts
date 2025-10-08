@@ -1,5 +1,6 @@
 import debug from 'debug'
 import { bundlerActions, type BundlerClient } from 'permissionless'
+import { paymasterActions, type PaymasterClient } from 'permissionless/actions/pimlico'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { createClient, createPublicClient, http, type HttpTransport, type PublicClient } from 'viem'
 import { baseMainnet, mainnet } from './chains'
@@ -58,8 +59,11 @@ if (!isWeb) {
   CDP_BUNDLER_RPC_URL = getRpcUrl(CDP_BUNDLER_RPC_URL)
 }
 
-export const cdpBundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07, typeof baseMainnet> =
-  createClient({
-    chain: baseMainnet,
-    transport: http(CDP_BUNDLER_RPC_URL),
-  }).extend(bundlerActions(ENTRYPOINT_ADDRESS_V07))
+// CDP Bundler + Paymaster client (uses standard Pimlico-compatible API)
+export const cdpBundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07, typeof baseMainnet> &
+  PaymasterClient<typeof ENTRYPOINT_ADDRESS_V07> = createClient({
+  chain: baseMainnet,
+  transport: http(CDP_BUNDLER_RPC_URL),
+})
+  .extend(bundlerActions(ENTRYPOINT_ADDRESS_V07))
+  .extend(paymasterActions(ENTRYPOINT_ADDRESS_V07))

@@ -1,6 +1,6 @@
 import { Queue } from '@my/temporal'
 import { getTemporalClient } from '@my/temporal/client'
-import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, cdpBundlerClient, entryPointAddress } from '@my/wagmi'
 import { DepositWorkflow, version } from '@my/workflows'
 import { WorkflowExecutionAlreadyStartedError } from '@temporalio/client'
 import { TRPCError } from '@trpc/server'
@@ -19,6 +19,41 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 
 export const sendEarnRouter = createTRPCRouter({
+  sponsorDeposit: protectedProcedure
+    .input(
+      z.object({
+        /**
+         * The user op to sponsor (without paymaster data).
+         */
+        userop: UserOperationSchema,
+        entryPoint: address,
+      })
+    )
+    .mutation(async ({ ctx: { session }, input: { userop, entryPoint } }) => {
+      const log = debug(`api:routers:sendEarn:${session.user.id}:sponsorDeposit`)
+      log('Received sponsor request', { userop, entryPoint })
+
+      assert(ENTRYPOINT_ADDRESS_V07 === entryPoint, 'Invalid entry point')
+
+      // Get paymaster sponsorship + gas estimates from CDP (Pimlico-compatible API)
+      try {
+        const sponsorResult = await cdpBundlerClient.sponsorUserOperation({
+          userOperation: userop,
+        })
+
+        log('CDP sponsorship result', sponsorResult)
+
+        // CDP returns updated userOp fields including paymaster and gas values
+        return sponsorResult
+      } catch (error) {
+        log('Failed to sponsor deposit', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to sponsor deposit with CDP',
+          cause: error,
+        })
+      }
+    }),
   deposit: protectedProcedure
     .input(
       z.object({

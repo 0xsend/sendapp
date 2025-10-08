@@ -12,7 +12,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -90,10 +90,7 @@ export function DepositForm() {
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
 
   const uop = useUserOp({
-    paymaster: sendVerifyingPaymasterAddress[chainId],
-    paymasterVerificationGasLimit: vault.data ? 200000n : 1_000_000n,
-    paymasterPostOpGasLimit: vault.data ? 200000n : 1_000_000n,
-    callGasLimit: vault.data ? 1_000_000n : 5_000_000n,
+    // Don't set paymaster or callGasLimit - we'll get these from CDP sponsorship
     sender,
     calls: calls.data ?? undefined,
   })
@@ -108,8 +105,6 @@ export function DepositForm() {
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
   const queryClient = useQueryClient()
-
-  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
 
   const depositMutation = api.sendEarn.deposit.useMutation({
     onMutate: () => {
@@ -146,6 +141,8 @@ export function DepositForm() {
     },
   })
 
+  const sponsorDepositMutation = api.sendEarn.sponsorDeposit.useMutation()
+
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
@@ -154,26 +151,30 @@ export function DepositForm() {
     assert(uop.isSuccess, 'uop is not success')
 
     try {
-      log('Requesting paymaster signature')
-      const paymasterResult = await paymasterSignMutation.mutateAsync({
+      // Get paymaster data + gas estimates from CDP
+      log('Requesting CDP sponsorship')
+      const sponsorResult = await sponsorDepositMutation.mutateAsync({
         userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
-      log('Paymaster signature received', paymasterResult)
+      log('CDP sponsorship received', sponsorResult)
 
-      // Update the user operation with the paymaster data
-      uop.data.paymasterData = paymasterResult.paymasterData
+      // Update userOp with CDP's paymaster data and gas estimates
+      const sponsoredUserOp = {
+        ...uop.data,
+        ...sponsorResult,
+      }
 
-      // Sign with the user's passkey
-      uop.data.signature = await signUserOp({
-        userOp: uop.data,
+      // Sign with the user's passkey (signature covers all fields including gas)
+      sponsoredUserOp.signature = await signUserOp({
+        userOp: sponsoredUserOp,
         webauthnCreds,
         chainId: chainId,
         entryPoint: entryPointAddress[chainId],
       })
 
       await depositMutation.mutateAsync({
-        userop: uop.data,
+        userop: sponsoredUserOp,
         entryPoint: entryPointAddress[chainId],
       })
     } catch (error) {
@@ -191,7 +192,7 @@ export function DepositForm() {
     webauthnCreds,
     chainId,
     depositMutation,
-    paymasterSignMutation,
+    sponsorDepositMutation,
     toast,
   ])
 
