@@ -141,7 +141,7 @@ export function DepositForm() {
     },
   })
 
-  const sponsorDepositMutation = api.sendEarn.sponsorDeposit.useMutation()
+  const sponsorUserOpMutation = api.erc7677Paymaster.sponsorUserOperation.useMutation()
 
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
@@ -151,9 +151,9 @@ export function DepositForm() {
     assert(uop.isSuccess, 'uop is not success')
 
     try {
-      // Get paymaster data + gas estimates from CDP
+      // Get paymaster data + gas estimates from CDP via ERC-7677 endpoint
       log('Requesting CDP sponsorship')
-      const sponsorResult = await sponsorDepositMutation.mutateAsync({
+      const sponsorResult = await sponsorUserOpMutation.mutateAsync({
         userop: uop.data,
         entryPoint: entryPointAddress[chainId],
       })
@@ -192,7 +192,7 @@ export function DepositForm() {
     webauthnCreds,
     chainId,
     depositMutation,
-    sponsorDepositMutation,
+    sponsorUserOpMutation,
     toast,
   ])
 
