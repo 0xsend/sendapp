@@ -76,3 +76,65 @@ export const greenPalette = {
     green12: brandColors.white,
   },
 }
+
+export const neon = {
+  light: {
+    neon1: 'hsl(125, 96%, 96%)',
+    neon2: 'hsl(125, 96%, 88%)',
+    neon3: 'hsl(125, 96%, 78%)',
+    neon4: 'hsl(125, 96%, 68%)',
+    neon5: 'hsl(125, 96%, 65%)',
+    neon6: 'hsl(125, 96%, 60%)',
+    neon7: 'hsl(125, 96%, 50%)', // Primary
+    neon8: 'hsl(125, 96%, 40%)',
+    neon9: 'hsl(125, 96%, 32%)',
+    neon10: 'hsl(125, 96%, 25%)',
+    neon11: 'hsl(125, 96%, 18%)',
+    neon12: 'hsl(125, 96%, 12%)',
+  },
+  dark: {
+    neon1: 'hsl(125, 96%, 12%)',
+    neon2: 'hsl(125, 96%, 18%)',
+    neon3: 'hsl(125, 96%, 25%)',
+    neon4: 'hsl(125, 96%, 32%)',
+    neon5: 'hsl(125, 96%, 40%)',
+    neon6: 'hsl(125, 96%, 50%)',
+    neon7: 'hsl(125, 96%, 60%)',
+    neon8: 'hsl(125, 96%, 65%)',
+    neon9: 'hsl(125, 96%, 68%)',
+    neon10: 'hsl(125, 96%, 78%)',
+    neon11: 'hsl(125, 96%, 88%)',
+    neon12: 'hsl(125, 96%, 96%)',
+  },
+}
+
+export const aztec = {
+  light: {
+    aztec1: 'hsl(190, 33%, 98%)',
+    aztec2: 'hsl(190, 33%, 95%)',
+    aztec3: 'hsl(190, 33%, 89%)',
+    aztec4: 'hsl(190, 33%, 82%)',
+    aztec5: 'hsl(190, 33%, 74%)',
+    aztec6: 'hsl(190, 33%, 66%)',
+    aztec7: 'hsl(190, 33%, 58%)',
+    aztec8: 'hsl(190, 33%, 50%)',
+    aztec9: 'hsl(190, 33%, 42%)',
+    aztec10: 'hsl(190, 33%, 32%)',
+    aztec11: 'hsl(190, 33%, 20%)',
+    aztec12: 'hsl(190, 54%, 6%)',
+  },
+  dark: {
+    aztec1: 'hsl(190, 54%, 6%)',
+    aztec2: 'hsl(190, 45%, 8%)',
+    aztec3: 'hsl(190, 40%, 10%)',
+    aztec4: 'hsl(190, 38%, 13%)',
+    aztec5: 'hsl(190, 35%, 16%)',
+    aztec6: 'hsl(190, 33%, 20%)',
+    aztec7: 'hsl(190, 33%, 35%)',
+    aztec8: 'hsl(190, 33%, 50%)',
+    aztec9: 'hsl(190, 33%, 65%)',
+    aztec10: 'hsl(190, 33%, 78%)',
+    aztec11: 'hsl(190, 33%, 90%)',
+    aztec12: 'hsl(190, 33%, 98%)',
+  },
+}
