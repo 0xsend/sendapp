@@ -12,5 +12,4 @@ export {
   mainnetClient,
   baseMainnetClient,
   baseMainnetBundlerClient,
-  cdpBundlerClient,
 } from './client'

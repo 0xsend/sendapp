@@ -1,4 +1,4 @@
-import { cdpBundlerClient } from '@my/wagmi'
+import { cdpBundlerClient } from '@my/workflows/utils'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
 import {
