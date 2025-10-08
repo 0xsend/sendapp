@@ -6,17 +6,22 @@ const CardContext = createStyledContext({
   size: '$true' as SizeTokens,
 })
 
+// TODO: refactor onces new themes are ready
 export const CardFrame = styled(ThemeableStack, {
   name: 'Card',
   context: CardContext,
-  elevation: '$0.75',
-
+  '$theme-dark': {
+    shadowColor: '$shadowColor',
+    shadowOpacity: 1,
+  },
   variants: {
     unstyled: {
       false: {
         size: '$true',
         backgroundColor: '$background',
         position: 'relative',
+        elevation: '$0.75',
+        shadowOpacity: 0.3,
       },
     },
     materialInteractive: {
@@ -24,13 +29,27 @@ export const CardFrame = styled(ThemeableStack, {
         cursor: 'pointer',
         focusable: true,
         hoverStyle: {
-          elevation: '$0.9',
+          elevation: '$1',
+          shadowOpacity: 0.3,
         },
         pressStyle: {
           elevation: '$0.75',
+          shadowOpacity: 0.3,
         },
         '$platform-web': {
           transition: 'box-shadow 150ms ease',
+        },
+        '$theme-dark': {
+          elevation: '$0.75',
+          hoverStyle: {
+            shadowOpacity: 1,
+          },
+          pressStyle: {
+            shadowOpacity: 1,
+          },
+          focusStyle: {
+            shadowOpacity: 1,
+          },
         },
       },
     },
