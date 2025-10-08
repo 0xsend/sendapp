@@ -1,4 +1,4 @@
-import { baseMainnetClient, cdpBundlerClient, entryPointAddress } from '@my/wagmi'
+import { cdpBundlerClient } from '@my/wagmi'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
 import {
@@ -112,22 +112,7 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         })
       }
 
-      // Simulate the transaction to ensure it will succeed
-      await baseMainnetClient
-        .call({
-          account: entryPointAddress[baseMainnetClient.chain.id],
-          to: userop.sender,
-          data: userop.callData,
-        })
-        .catch((e) => {
-          log('Simulation failed', e)
-          throw new TRPCError({
-            code: 'PRECONDITION_FAILED',
-            message: e.message,
-          })
-        })
-
-      // Request sponsorship from CDP paymaster (Pimlico-compatible API)
+      // Request sponsorship from CDP paymaster (CDP will simulate during sponsorship)
       try {
         const sponsorResult = await cdpBundlerClient.sponsorUserOperation({
           userOperation: userop,
