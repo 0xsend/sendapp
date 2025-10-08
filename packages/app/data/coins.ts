@@ -10,6 +10,7 @@ import {
   coinbaseWrappedBtcAddress as coinbaseWrappedBtcAddresses,
   eurcAddress as eurcAddresses,
   mamoAddress as mamoAddresses,
+  masqAddress as masqAddresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -26,6 +27,7 @@ export const COINGECKO_IDS = [
   'coinbase-wrapped-btc',
   'euro-coin',
   'mamo',
+  'masq',
 ] as const satisfies readonly [string, ...string[]]
 export type CoingeckoId = (typeof COINGECKO_IDS)[number]
 
@@ -37,6 +39,7 @@ const BaseCoinSchema = z.object({
   formatDecimals: z.number().min(0).optional(),
   shortLabel: z.string().optional(),
   coingeckoTokenId: z.enum(COINGECKO_IDS),
+  minXfrAmt: z.number().min(0).optional(),
 })
 
 // ERC20 specific schema
@@ -62,6 +65,7 @@ export const usdcCoin = {
   decimals: 6,
   formatDecimals: 2,
   coingeckoTokenId: 'usd-coin',
+  minXfrAmt: 0.01,
 } as const satisfies erc20Coin
 
 export const ethCoin = {
@@ -80,6 +84,7 @@ export const sendCoin = {
   decimals: 18,
   formatDecimals: 0,
   coingeckoTokenId: 'send-token-2',
+  minXfrAmt: 1,
 } as const satisfies erc20Coin
 
 // can probably remove this
@@ -157,6 +162,15 @@ export const mamoCoin = {
   coingeckoTokenId: 'mamo',
 } as const satisfies erc20Coin
 
+export const masqCoin = {
+  label: 'MASQ',
+  symbol: 'MASQ',
+  token: masqAddresses[baseMainnet.id],
+  decimals: 18,
+  formatDecimals: 2,
+  coingeckoTokenId: 'masq',
+} as const satisfies erc20Coin
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -195,6 +209,7 @@ export const partnerCoins: coin[] = [
   morphoCoin,
   eurcCoin,
   mamoCoin,
+  masqCoin,
 ] as const
 export type partnerCoins = typeof partnerCoins
 
@@ -247,6 +262,7 @@ export const erc20Coins: erc20Coin[] = [
   morphoCoin,
   eurcCoin,
   mamoCoin,
+  masqCoin,
 ] as const
 
 export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
@@ -262,4 +278,5 @@ export const investmentCoins = [
   aerodromeCoin,
   morphoCoin,
   mamoCoin,
+  masqCoin,
 ] as const

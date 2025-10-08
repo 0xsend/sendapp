@@ -37,6 +37,9 @@ import { Platform } from 'react-native'
 import { CantonWalletStatus } from '../components/CantonWalletStatus'
 import { CantonWalletForm } from '../components/CantonWalletForm'
 
+// Canton wallet minimum SEND balance requirement (2000 SEND)
+const CANTON_WALLET_MIN_SEND_BALANCE = 2000n * BigInt(10 ** 18)
+
 //@todo get this from the db
 const verificationTypesAndTitles = {
   create_passkey: { title: 'Create a Passkey' },
@@ -130,8 +133,7 @@ export function ActivityRewardsScreen() {
               return (
                 <>
                   <DistributionRequirementsCard
-                    pickedDistribution={distributions[selectedDistributionIndex]}
-                    latestDistribution={distributions[0]}
+                    distribution={distributions[selectedDistributionIndex]}
                     verificationsQuery={verificationsQuery}
                   />
                   <TaskCards
@@ -158,12 +160,10 @@ export function ActivityRewardsScreen() {
 }
 
 const DistributionRequirementsCard = ({
-  pickedDistribution,
+  distribution,
   verificationsQuery,
-  latestDistribution,
 }: {
-  pickedDistribution: UseDistributionsResultData[number]
-  latestDistribution?: UseDistributionsResultData[number]
+  distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
@@ -173,11 +173,11 @@ const DistributionRequirementsCard = ({
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
     error: snapshotBalanceError,
-  } = useSnapshotBalance({ distribution: pickedDistribution, sendAccount })
+  } = useSnapshotBalance({ distribution, sendAccount })
 
   const { data: sendEarnBalances, isLoading: isLoadingSendEarnBalances } =
     useSendEarnBalancesAtBlock(
-      pickedDistribution.snapshot_block_num ? BigInt(pickedDistribution.snapshot_block_num) : null
+      distribution.snapshot_block_num ? BigInt(distribution.snapshot_block_num) : null
     )
 
   const totalAssets = useMemo(
@@ -185,7 +185,16 @@ const DistributionRequirementsCard = ({
     [sendEarnBalances]
   )
 
-  const hasMinSavings = totalAssets >= BigInt(pickedDistribution.earn_min_balance)
+  const hasMinSavings = totalAssets >= BigInt(distribution.earn_min_balance)
+
+  const sendTagPurchased = verifications?.verification_values?.some(
+    (v) => v.type === 'tag_registration' && v.weight > 0n
+  )
+
+  const canConnectCantonWallet = useMemo(() => {
+    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_MIN_SEND_BALANCE
+    return sendTagPurchased && hasMinSavings && hasMinCantonBalance
+  }, [sendTagPurchased, hasMinSavings, snapshotBalance])
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
@@ -198,15 +207,6 @@ const DistributionRequirementsCard = ({
   }
 
   if (snapshotBalanceError) throw snapshotBalanceError
-
-  const sendTagPurchased = verifications?.verification_values?.some(
-    (v) => v.type === 'tag_registration' && v.weight > 0n
-  )
-
-  const hasRewardsInLatestDistribution =
-    latestDistribution?.distribution_shares &&
-    latestDistribution.distribution_shares.length > 0 &&
-    BigInt(latestDistribution.distribution_shares[0]?.amount ?? 0) > 0n
 
   return (
     <FadeCard br={12} p="$4" gap="$4" $gtMd={{ gap: '$6', p: '$6' }}>
@@ -228,7 +228,7 @@ const DistributionRequirementsCard = ({
                 $gtXl={{ fontSize: '$10' }}
               >
                 {`${formatAmount(
-                  formatUnits(snapshotBalance ?? 0n, pickedDistribution.token_decimals ?? 18) ?? 0,
+                  formatUnits(snapshotBalance ?? 0n, distribution.token_decimals ?? 18) ?? 0,
                   9,
                   0
                 )} SEND`}
@@ -256,8 +256,8 @@ const DistributionRequirementsCard = ({
               Balance{' '}
               {formatAmount(
                 formatUnits(
-                  BigInt(pickedDistribution.hodler_min_balance ?? 0n),
-                  pickedDistribution.token_decimals ?? 18
+                  BigInt(distribution.hodler_min_balance ?? 0n),
+                  distribution.token_decimals ?? 18
                 ) ?? 0,
                 9,
                 sendCoin.formatDecimals
@@ -267,8 +267,8 @@ const DistributionRequirementsCard = ({
               switch (true) {
                 case isLoadingSnapshotBalance:
                   return <Spinner size="small" />
-                case pickedDistribution.hodler_min_balance === undefined ||
-                  BigInt(pickedDistribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
+                case distribution.hodler_min_balance === undefined ||
+                  BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                   return (
                     <Theme name="red">
                       <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -285,15 +285,12 @@ const DistributionRequirementsCard = ({
               }
             })()}
           </XStack>
-          {BigInt(pickedDistribution.earn_min_balance ?? 0n) > 0n ? (
+          {BigInt(distribution.earn_min_balance ?? 0n) > 0n ? (
             <XStack ai="center" gap="$2">
               <Paragraph>
                 Savings Deposit $
                 {formatAmount(
-                  formatUnits(
-                    BigInt(pickedDistribution.earn_min_balance ?? 0n),
-                    usdcCoin.decimals
-                  ) ?? 0n,
+                  formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
                   9,
                   2
                 )}{' '}
@@ -321,7 +318,7 @@ const DistributionRequirementsCard = ({
             </XStack>
           ) : null}
           <CantonWalletStatus
-            hasRewardsInLatestDistribution={hasRewardsInLatestDistribution}
+            canConnectCantonWallet={canConnectCantonWallet}
             isExpanded={isCantonFormExpanded}
             onToggle={() => setIsCantonFormExpanded(!isCantonFormExpanded)}
           />

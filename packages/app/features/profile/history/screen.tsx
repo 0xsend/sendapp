@@ -100,6 +100,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
             <Stack f={1} mt={'$2'}>
               {activities?.length ? (
                 <FlatList
+                  testID="TokenActivityFeed"
                   style={{ flex: 1 }}
                   data={activities}
                   keyExtractor={(activity) =>

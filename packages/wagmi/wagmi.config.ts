@@ -239,6 +239,15 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
+      name: 'MASQ',
+      address: {
+        [baseLocal.id]: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
+        [base.id]: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
+        [baseSepolia.id]: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
+      },
+      abi: erc20Abi,
+    },
+    {
       name: 'EntryPoint',
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
