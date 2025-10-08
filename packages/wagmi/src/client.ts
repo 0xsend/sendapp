@@ -48,3 +48,18 @@ export const baseMainnetBundlerClient: BundlerClient<
   chain: baseMainnet,
   transport: http(BUNDLER_RPC_URL),
 }).extend(bundlerActions(ENTRYPOINT_ADDRESS_V07))
+
+// CDP Bundler client for Send Earn deposits
+let CDP_BUNDLER_RPC_URL =
+  process.env.CDP_BUNDLER_RPC_URL ?? process.env.NEXT_PUBLIC_CDP_BUNDLER_RPC_URL ?? BUNDLER_RPC_URL // Fallback to default bundler
+
+// Convert localhost URLs to device IP in native environments
+if (!isWeb) {
+  CDP_BUNDLER_RPC_URL = getRpcUrl(CDP_BUNDLER_RPC_URL)
+}
+
+export const cdpBundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07, typeof baseMainnet> =
+  createClient({
+    chain: baseMainnet,
+    transport: http(CDP_BUNDLER_RPC_URL),
+  }).extend(bundlerActions(ENTRYPOINT_ADDRESS_V07))

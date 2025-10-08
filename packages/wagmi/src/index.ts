@@ -8,4 +8,9 @@ export {
   baseMainnet,
 } from './chains'
 export { config, chains, client } from './config'
-export { mainnetClient, baseMainnetClient, baseMainnetBundlerClient } from './client'
+export {
+  mainnetClient,
+  baseMainnetClient,
+  baseMainnetBundlerClient,
+  cdpBundlerClient,
+} from './client'
