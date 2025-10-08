@@ -1,4 +1,4 @@
-import { baseMainnet, cdpBundlerClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnetClient, cdpBundlerClient, entryPointAddress } from '@my/wagmi'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
 import {
@@ -46,10 +46,7 @@ export const erc7677PaymasterRouter = createTRPCRouter({
       assert(ENTRYPOINT_ADDRESS_V07 === entryPoint, 'Invalid entry point')
 
       // Ensure user has a send account
-      const { data: sendAccount, error: sendAccountError } = await supabase
-        .from('send_accounts')
-        .select('*')
-        .single()
+      const { error: sendAccountError } = await supabase.from('send_accounts').select('*').single()
       if (sendAccountError) {
         log('No send account found')
         throw new TRPCError({
@@ -58,62 +55,83 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         })
       }
 
-      // Validate operation is whitelisted for sponsorship
-      let isValidOperation = false
-
-      // Try to decode as SendEarn deposit
+      // Decode and validate operation
+      let depositArgs: ReturnType<typeof decodeSendEarnDepositUserOp>
       try {
-        const depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
-
-        if (isVaultDeposit(depositArgs)) {
-          const { owner, assets, vault } = depositArgs
-          if (isAddress(owner) && isAddress(vault) && assets >= MINIMUM_USDC_VAULT_DEPOSIT) {
-            log('Validated as SendEarn vault deposit', { assets: assets.toString() })
-            isValidOperation = true
-          } else if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
-            log('Deposit amount below minimum', {
-              assets: assets.toString(),
-              minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
-            })
-          }
-        } else if (isFactoryDeposit(depositArgs)) {
-          const { owner, assets } = depositArgs
-          if (isAddress(owner) && assets >= MINIMUM_USDC_VAULT_DEPOSIT) {
-            log('Validated as SendEarn factory deposit', { assets: assets.toString() })
-            isValidOperation = true
-          } else if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
-            log('Deposit amount below minimum', {
-              assets: assets.toString(),
-              minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
-            })
-          }
-        }
+        depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
       } catch (e) {
-        log('Not a SendEarn deposit operation', e)
-      }
-
-      if (!isValidOperation) {
-        log('Operation is not whitelisted for CDP sponsorship')
+        log('Failed to decode as SendEarn deposit', e)
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'Operation is not whitelisted for CDP sponsorship',
+          message: 'Operation is not a valid SendEarn deposit',
         })
       }
 
-      // Request sponsorship from CDP paymaster
-      try {
-        const sponsorResult = (await cdpBundlerClient.request({
-          method: 'pm_sponsorUserOperation',
-          params: [userop, entryPoint, { chainId: baseMainnet.id }],
-        })) as {
-          paymaster?: `0x${string}`
-          paymasterData?: `0x${string}`
-          callGasLimit?: bigint
-          verificationGasLimit?: bigint
-          preVerificationGas?: bigint
-          paymasterVerificationGasLimit?: bigint
-          paymasterPostOpGasLimit?: bigint
+      // Validate deposit based on type
+      if (isVaultDeposit(depositArgs)) {
+        const { owner, assets, vault } = depositArgs
+        assert(isAddress(owner), 'Invalid owner address')
+        assert(isAddress(vault), 'Invalid vault address')
+
+        if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
+          log('Deposit amount below minimum', {
+            assets: assets.toString(),
+            minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
+          })
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Minimum deposit is ${MINIMUM_USDC_VAULT_DEPOSIT.toString()} USDC`,
+          })
         }
+
+        assert(assets > 0n, 'Invalid deposit amount')
+        log('Validated as SendEarn vault deposit', { assets: assets.toString() })
+      } else if (isFactoryDeposit(depositArgs)) {
+        const { owner, assets, referrer } = depositArgs
+        assert(isAddress(owner), 'Invalid owner address')
+        assert(isAddress(referrer), 'Invalid referrer address')
+
+        if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
+          log('Deposit amount below minimum', {
+            assets: assets.toString(),
+            minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
+          })
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Minimum deposit is ${MINIMUM_USDC_VAULT_DEPOSIT.toString()} USDC`,
+          })
+        }
+
+        assert(assets > 0n, 'Invalid deposit amount')
+        log('Validated as SendEarn factory deposit', { assets: assets.toString() })
+      } else {
+        log('Unknown deposit type')
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Invalid deposit type',
+        })
+      }
+
+      // Simulate the transaction to ensure it will succeed
+      await baseMainnetClient
+        .call({
+          account: entryPointAddress[baseMainnetClient.chain.id],
+          to: userop.sender,
+          data: userop.callData,
+        })
+        .catch((e) => {
+          log('Simulation failed', e)
+          throw new TRPCError({
+            code: 'PRECONDITION_FAILED',
+            message: e.message,
+          })
+        })
+
+      // Request sponsorship from CDP paymaster (Pimlico-compatible API)
+      try {
+        const sponsorResult = await cdpBundlerClient.sponsorUserOperation({
+          userOperation: userop,
+        })
 
         log('CDP sponsorship result', sponsorResult)
 
