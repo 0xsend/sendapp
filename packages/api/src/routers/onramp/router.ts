@@ -35,11 +35,40 @@ async function generateJWT(keyName: string, keySecret: string): Promise<string> 
 export const onrampRouter = createTRPCRouter({
   getSessionToken: protectedProcedure
     .input(GetSessionTokenRequestSchema)
-    .mutation(async ({ input: { addresses, assets } }) => {
+    .mutation(async ({ input: { addresses, assets }, ctx }) => {
       log('calling getSessionToken with input: ', {
         addresses,
         assets,
       })
+
+      // Extract and validate client IP for Coinbase security requirements
+      const clientIp = ctx.ip || ctx.req.socket?.remoteAddress
+
+      if (!clientIp) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Unable to determine client IP for security verification',
+        })
+      }
+
+      // Implement CORS security based on origin
+      const origin = ctx.req.headers.origin
+
+      const isWebRequest = origin && ['https://send.app', 'https://www.send.app'].includes(origin)
+
+      if (isWebRequest) {
+        // Set CORS headers for approved web origins
+        ctx.res.setHeader('Access-Control-Allow-Origin', origin)
+        ctx.res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        ctx.res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+      } else if (origin && !isWebRequest) {
+        // Block unauthorized web origins
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Origin not allowed',
+        })
+      }
+      // Mobile requests (no origin) pass through without CORS headers
 
       // Get API credentials from environment variables
       const keyName = process.env.CDP_API_KEY
@@ -67,11 +96,15 @@ export const onrampRouter = createTRPCRouter({
 
       const requestBody = {
         addresses,
+        clientIp, // Required by Coinbase security requirements
         ...(assets && { assets }),
       }
 
       log('Making request to CDP API:', {
         url: cdpApiUrl,
+        clientIp,
+        origin,
+        isWebRequest,
         addressCount: addresses.length,
         hasAssets: !!assets,
       })

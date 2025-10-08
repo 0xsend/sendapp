@@ -35,6 +35,16 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
     requestOrigin: opts.req.headers.origin,
 
     /**
+     * Client IP address extracted from request headers
+     */
+    ip,
+
+    /**
+     * Request object for accessing headers
+     */
+    req: opts.req,
+
+    /**
      * The Supabase user session
      */
     session,
