@@ -47,6 +47,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
       const options = { queryKey: [useSendAccount.queryKey] }
       await queryClient.cancelQueries(options)
       queryClient.removeQueries(options)
+      queryClient.clear()
     }
   }, [session, queryClient])
 
