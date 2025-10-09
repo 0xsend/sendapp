@@ -28,7 +28,7 @@ import { IconCoin } from '../icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Platform } from 'react-native'
+import { Platform, Dimensions } from 'react-native'
 
 export const CoinField = ({
   native = false,
@@ -55,6 +55,19 @@ export const CoinField = ({
   const disabled = isSubmitting
 
   const pickedCoinSymbol = coins.find((coin) => coin.token === field.value)?.symbol
+
+  // Calculate dynamic snap point for Sheet
+  const filteredCoins = coins.filter((coin) => showAllCoins || (coin.balance && coin.balance >= 0n))
+  const headerHeight = 90
+  const itemHeight = 70
+  const contentHeight = headerHeight + filteredCoins.length * itemHeight
+  const screenHeight = Dimensions.get('window').height
+  const contentPercentage = (contentHeight / screenHeight) * 100
+
+  // Use fit-content if less than 75%, otherwise lock at 75%
+  const useFitContent = contentPercentage <= 75
+  const snapPoints = useFitContent ? ['fit'] : [75]
+  const snapPointsMode = useFitContent ? 'fit' : 'percent'
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
@@ -113,34 +126,24 @@ export const CoinField = ({
                 native
                 modal
                 dismissOnSnapToBottom
-                snapPoints={['fit']}
-                snapPointsMode="fit"
+                snapPoints={snapPoints}
+                snapPointsMode={snapPointsMode}
+                disableDrag={!useFitContent}
                 animation={'quick'}
               >
                 <Sheet.Frame maw={738} bc={'$color1'} px={'$3.5'} py={'$6'}>
-                  {Platform.OS === 'web' && (
-                    <Sheet.Handle
-                      py="$5"
-                      f={1}
-                      bc="transparent"
-                      jc={'space-between'}
-                      opacity={1}
-                      m={0}
-                    >
-                      <XStack ai="center" jc="space-between" w="100%" px="$4">
-                        <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                          Select Currency
-                        </Paragraph>
-                        <Button
-                          chromeless
-                          unstyled
-                          icon={<IconX color={'$color12'} size={'$1.5'} />}
-                          onPress={() => setIsOpen(false)}
-                        />
-                      </XStack>
-                    </Sheet.Handle>
-                  )}
-                  <ScrollView>
+                  <XStack ai="center" jc="space-between" w="100%" px="$4">
+                    <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                      Select Currency
+                    </Paragraph>
+                    <Button
+                      chromeless
+                      unstyled
+                      icon={<IconX color={'$color12'} size={'$1.5'} />}
+                      onPress={() => setIsOpen(false)}
+                    />
+                  </XStack>
+                  <ScrollView showsVerticalScrollIndicator={false}>
                     <Adapt.Contents />
                   </ScrollView>
                 </Sheet.Frame>
@@ -172,18 +175,16 @@ export const CoinField = ({
                 >
                   <Select.Group disabled={disabled} space="$0" p={'$2'}>
                     {/* <Select.Label>{label}</Select.Label> */}
-                    {coins
-                      .filter((coin) => showAllCoins || (coin.balance && coin.balance >= 0n))
-                      .map((coin, i) => {
-                        return (
-                          <CoinFieldItem
-                            active={coin.token === field.value}
-                            coin={coin}
-                            index={i}
-                            key={coin.token}
-                          />
-                        )
-                      })}
+                    {filteredCoins.map((coin, i) => {
+                      return (
+                        <CoinFieldItem
+                          active={coin.token === field.value}
+                          coin={coin}
+                          index={i}
+                          key={coin.token}
+                        />
+                      )
+                    })}
                   </Select.Group>
                   {/* special icon treatment for native */}
                   {native && isWeb && (
