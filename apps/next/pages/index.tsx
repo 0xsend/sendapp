@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { getRemoteAssets } from 'utils/getRemoteAssets'
 import type { GetPlaiceholderImage } from 'app/utils/getPlaiceholderImage'
 import { useQueryClient } from '@tanstack/react-query'
+import { SSheet as Sheet } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
 import { useAuthScreenParams } from 'app/routers/params'
@@ -68,11 +69,13 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
     <>
       <NextSeo {...seo} />
       {session ? (
-        <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
-          <SendEarnProvider>
-            <HomeScreen />
-          </SendEarnProvider>
-        </HomeLayout>
+        <Sheet.SheetIosBackgroundScale>
+          <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
+            <SendEarnProvider>
+              <HomeScreen />
+            </SendEarnProvider>
+          </HomeLayout>
+        </Sheet.SheetIosBackgroundScale>
       ) : (
         <AuthCarouselContext.Provider
           value={{
