@@ -49,16 +49,9 @@ export const useUser = () => {
         '*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*), canton_party_verifications(*)'
       )
       .eq('id', user?.id ?? '')
-      .single()
+      .maybeSingle()
 
     if (error) {
-      // no rows - edge case of user being deleted
-      if (error.code === 'PGRST116') {
-        log('no profile found for user', user?.id)
-        await supabase.auth.signOut()
-        replace('/')
-        return null
-      }
       // check unauthorized or jwt error
       if (error.code === 'PGRST301' || error.code === 'PGRST401') {
         log('unauthorized or invalid JWT token')
@@ -67,6 +60,10 @@ export const useUser = () => {
         return null
       }
       throw new Error(error.message)
+    }
+    if (!data) {
+      log('no profile found for user', user?.id)
+      return null
     }
     return data
   }, [supabase, user?.id, replace])
