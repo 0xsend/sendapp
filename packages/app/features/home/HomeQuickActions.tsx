@@ -172,8 +172,9 @@ const Earn = () => {
   const isSmallScreen = !media.gtXs
 
   // Determine navigation target based on deposit status
-  const { totalAssets: totalAssetsData } = useSendEarnCoin(usdcCoin)
-  const { totalCurrentValue } = totalAssetsData
+  const {
+    totalAssets: { totalCurrentValue },
+  } = useSendEarnCoin(usdcCoin)
   const hasExistingDeposit = totalCurrentValue > 0n
 
   const href = useMemo(

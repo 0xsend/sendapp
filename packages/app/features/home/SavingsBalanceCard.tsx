@@ -16,8 +16,10 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden } = useIsPriceHidden()
 
   // Use the SendEarnProvider pattern
-  const { coinBalances, totalAssets: totalAssetsData } = useSendEarnCoin(usdcCoin)
-  const { totalCurrentValue, vaults } = totalAssetsData
+  const {
+    coinBalances,
+    totalAssets: { totalCurrentValue, vaults },
+  } = useSendEarnCoin(usdcCoin)
 
   const hasExistingDeposit = totalCurrentValue > 0n
 
