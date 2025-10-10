@@ -18,6 +18,7 @@ const IconSwapHorizontal = memo<IconProps>((props) => (
     <IconSwap {...props} />
   </YStack>
 ))
+IconSwapHorizontal.displayName = 'IconSwapHorizontal'
 
 export const TABS = [
   {

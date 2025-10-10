@@ -13,7 +13,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, memo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits, withRetry } from 'viem'
@@ -40,6 +40,94 @@ type WithdrawFormSchema = z.infer<typeof WithdrawFormSchema>
 export function WithdrawScreen() {
   return <WithdrawForm />
 }
+
+// Memoized balance display to prevent flickering
+const BalanceDisplay = memo(
+  ({
+    depositBalance,
+    coinDecimals,
+    coinSymbol,
+    insufficientAmount,
+  }: {
+    depositBalance: bigint
+    coinDecimals: number | undefined
+    coinSymbol: string | undefined
+    insufficientAmount: boolean
+  }) => {
+    return (
+      <XStack gap={'$2'} flexDirection={'column'} $gtSm={{ flexDirection: 'row' }}>
+        <XStack gap={'$2'}>
+          <Paragraph
+            testID="withdraw-deposit-form-balance"
+            color={insufficientAmount ? '$error' : '$silverChalice'}
+            size={'$5'}
+            $theme-light={{
+              color: insufficientAmount ? '$error' : '$darkGrayTextField',
+            }}
+          >
+            Deposit Balance:
+          </Paragraph>
+          <Paragraph
+            color={insufficientAmount ? '$error' : '$color12'}
+            size={'$5'}
+            fontWeight={'600'}
+          >
+            {coinDecimals ? formatAmount(formatUnits(depositBalance, coinDecimals), 12, 2) : '-'}
+          </Paragraph>
+          <Paragraph
+            color={insufficientAmount ? '$error' : '$silverChalice'}
+            size={'$5'}
+            $theme-light={{
+              color: insufficientAmount ? '$error' : '$darkGrayTextField',
+            }}
+          >
+            {coinSymbol}
+          </Paragraph>
+        </XStack>
+        {insufficientAmount && (
+          <Paragraph color={'$error'} size={'$5'}>
+            Insufficient funds
+          </Paragraph>
+        )}
+      </XStack>
+    )
+  }
+)
+BalanceDisplay.displayName = 'BalanceDisplay'
+
+// Memoized benefits display to prevent flickering
+const WithdrawBenefitsDisplay = memo(
+  ({
+    isError,
+    error,
+    formattedApy,
+    currentMonthlyEarning,
+    reducedMonthlyEarning,
+    parsedAmount,
+  }: {
+    isError: boolean
+    error: Error | null
+    formattedApy: string | undefined
+    currentMonthlyEarning: string | undefined
+    reducedMonthlyEarning: string | undefined
+    parsedAmount: bigint
+  }) => {
+    if (isError) {
+      return <Paragraph color="$error">{toNiceError(error)}</Paragraph>
+    }
+
+    // Always show CalculatedBenefits to avoid layout shift
+    return (
+      <CalculatedBenefits
+        apy={formattedApy ?? '...'}
+        monthlyEarning={currentMonthlyEarning ?? '...'}
+        rewards={''}
+        overrideMonthlyEarning={parsedAmount > BigInt(0) ? reducedMonthlyEarning : undefined}
+      />
+    )
+  }
+)
+WithdrawBenefitsDisplay.displayName = 'WithdrawBenefitsDisplay'
 
 export function WithdrawForm() {
   const form = useForm<WithdrawFormSchema>()
@@ -235,10 +323,16 @@ export function WithdrawForm() {
   // use deposit vault if it exists, or the default vault for the asset
   const baseApy = useSendEarnAPY({ vault: vault?.data ? vault.data : undefined })
 
+  // Memoize formatted APY to prevent unnecessary re-renders
+  const formattedApy = useMemo(() => {
+    if (baseApy.data?.baseApy === undefined) return undefined
+    return formatAmount(baseApy.data.baseApy, undefined, 2)
+  }, [baseApy.data?.baseApy])
+
   // Calculate current monthly earning (before withdrawal)
   const currentMonthlyEarning = useMemo(() => {
-    if (!coin.data?.decimals) return
-    if (!baseApy.data) return
+    if (!coin.data?.decimals) return undefined
+    if (!baseApy.data) return undefined
     const decimalAmount = Number(formatUnits(depositBalance, coin.data?.decimals))
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
@@ -246,8 +340,8 @@ export function WithdrawForm() {
 
   // Calculate reduced monthly earning (after withdrawal)
   const reducedMonthlyEarning = useMemo(() => {
-    if (!coin.data?.decimals) return
-    if (!baseApy.data) return
+    if (!coin.data?.decimals) return undefined
+    if (!baseApy.data) return undefined
     const decimalAmount = Number(formatUnits(depositBalance - parsedAmount, coin.data?.decimals))
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
@@ -430,78 +524,24 @@ export function WithdrawForm() {
                   </XStack>
                   <XStack jc="space-between" ai={'flex-start'}>
                     <Stack>
-                      <XStack gap={'$2'} flexDirection={'column'} $gtSm={{ flexDirection: 'row' }}>
-                        <XStack gap={'$2'}>
-                          <Paragraph
-                            testID="withdraw-deposit-form-balance"
-                            color={insufficientAmount ? '$error' : '$silverChalice'}
-                            size={'$5'}
-                            $theme-light={{
-                              color: insufficientAmount ? '$error' : '$darkGrayTextField',
-                            }}
-                          >
-                            Deposit Balance:
-                          </Paragraph>
-                          <Paragraph
-                            color={insufficientAmount ? '$error' : '$color12'}
-                            size={'$5'}
-                            fontWeight={'600'}
-                          >
-                            {coin.data?.decimals
-                              ? formatAmount(
-                                  formatUnits(depositBalance, coin.data?.decimals),
-                                  12,
-                                  2
-                                )
-                              : '-'}
-                          </Paragraph>
-                          <Paragraph
-                            color={insufficientAmount ? '$error' : '$silverChalice'}
-                            size={'$5'}
-                            $theme-light={{
-                              color: insufficientAmount ? '$error' : '$darkGrayTextField',
-                            }}
-                          >
-                            {coin.data?.symbol}
-                          </Paragraph>
-                        </XStack>
-                        {insufficientAmount && (
-                          <Paragraph color={'$error'} size={'$5'}>
-                            Insufficient funds
-                          </Paragraph>
-                        )}
-                      </XStack>
+                      <BalanceDisplay
+                        depositBalance={depositBalance}
+                        coinDecimals={coin.data?.decimals}
+                        coinSymbol={coin.data?.symbol}
+                        insufficientAmount={insufficientAmount}
+                      />
                     </Stack>
                   </XStack>
                 </YStack>
               </Fade>
-              {(() => {
-                switch (true) {
-                  case baseApy.isLoading:
-                    return <Spinner size="small" color={'$color12'} />
-                  case baseApy.isError:
-                    return <Paragraph color="$error">{toNiceError(baseApy.error)}</Paragraph>
-                  case baseApy.isSuccess && parsedAmount > 0n:
-                    return (
-                      <CalculatedBenefits
-                        apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
-                        monthlyEarning={currentMonthlyEarning ?? ''}
-                        rewards={''}
-                        overrideMonthlyEarning={
-                          parsedAmount > BigInt(0) ? reducedMonthlyEarning : undefined
-                        }
-                      />
-                    )
-                  default:
-                    return (
-                      <CalculatedBenefits
-                        apy={formatAmount(baseApy.data?.baseApy ?? 0, undefined, 2)}
-                        monthlyEarning={currentMonthlyEarning ?? ''}
-                        rewards={''}
-                      />
-                    )
-                }
-              })()}
+              <WithdrawBenefitsDisplay
+                isError={baseApy.isError}
+                error={baseApy.error}
+                formattedApy={formattedApy}
+                currentMonthlyEarning={currentMonthlyEarning}
+                reducedMonthlyEarning={reducedMonthlyEarning}
+                parsedAmount={parsedAmount}
+              />
             </YStack>
           )}
         </SchemaForm>

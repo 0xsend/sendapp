@@ -45,6 +45,7 @@ const IconSwapRotated = memo<IconProps>((props) => (
     <IconSwap {...props} size={'$1'} scale={1.2} />
   </YStack>
 ))
+IconSwapRotated.displayName = 'IconSwapRotated'
 
 const links = [
   {
