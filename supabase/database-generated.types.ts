@@ -1734,7 +1734,6 @@ export type Database = {
           chain_id: number | null
           id: string | null
           is_public: boolean | null
-          is_verified: boolean | null
           links_in_bio:
             | Database["public"]["Tables"]["link_in_bio"]["Row"][]
             | null
@@ -1745,7 +1744,6 @@ export type Database = {
           send_id: number | null
           sendid: number | null
           tag: string | null
-          verified_at: string | null
           x_username: string | null
         }
         Relationships: []
@@ -2192,10 +2190,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
-      verified_at: {
-        Args: { p: Database["public"]["Tables"]["profiles"]["Row"] }
-        Returns: string
-      }
     }
     Enums: {
       key_type_enum: "ES256"
@@ -2263,7 +2257,6 @@ export type Database = {
           | null
         banner_url: string | null
         is_verified: boolean | null
-        verified_at: string | null
       }
       tag_search_result: {
         avatar_url: string | null
