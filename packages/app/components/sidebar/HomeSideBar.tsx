@@ -27,12 +27,24 @@ import { Lock } from '@tamagui/lucide-icons'
 import { SideBarNavLink } from 'app/components/sidebar/SideBarNavLink'
 
 import type { ReactElement } from 'react'
+import { memo } from 'react'
 import { NavSheet } from '../NavSheet'
 
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { usePathname } from 'app/utils/usePathname'
+import type { IconProps } from '@tamagui/helpers-icon'
+
+// Wrapper component to rotate IconSwap 90 degrees for horizontal arrows.
+// This component is needed because SideBarNavLink uses cloneElement to pass color props,
+// and wrapping the icon inline would pass those props to YStack instead of IconSwap,
+// breaking the active/inactive color states.
+const IconSwapRotated = memo<IconProps>((props) => (
+  <YStack transform={[{ rotate: '90deg' }]}>
+    <IconSwap {...props} size={'$1'} scale={1.2} />
+  </YStack>
+))
 
 const links = [
   {
@@ -46,11 +58,7 @@ const links = [
     href: '/send',
   },
   {
-    icon: (
-      <YStack transform={[{ rotate: '90deg' }]}>
-        <IconSwap size={'$1'} scale={1.2} />
-      </YStack>
-    ),
+    icon: <IconSwapRotated />,
     text: 'Trade',
     href: '/trade',
   },
