@@ -45,24 +45,24 @@ export function useSendEarnAPY({
   const underlyingVault = useUnderlyingVault(underlyingVaultAddress)
 
   return useQuery({
-    queryKey: ['sendEarnAPY', { sendEarnVault, underlyingVault }] as const,
+    queryKey: [
+      'sendEarnAPY',
+      {
+        vault,
+        underlyingVaultData: underlyingVault.data,
+        fee: sendEarnVault.data?.[1],
+      },
+    ] as const,
     queryKeyHashFn: hashFn,
-    enabled: sendEarnVault.isFetched && underlyingVault.isFetched,
-    queryFn: ({
-      queryKey: [, { sendEarnVault, underlyingVault }],
-    }: {
-      queryKey: [
-        string,
-        {
-          sendEarnVault: ReturnType<typeof useSendEarnVault>
-          underlyingVault: ReturnType<typeof useUnderlyingVault>
-        },
-      ]
-    }): { baseApy: number } => {
+    enabled: sendEarnVault.isSuccess && underlyingVault.isSuccess,
+    staleTime: 30_000,
+    queryFn: (): { baseApy: number } => {
       throwIf(sendEarnVault.error)
       throwIf(underlyingVault.error)
       assert(sendEarnVault.isSuccess, 'Fetching send earn vault failed')
       assert(underlyingVault.isSuccess, 'Fetching underlying vault failed')
+      assert(sendEarnVault.data, 'Send earn vault data is undefined')
+      assert(underlyingVault.data, 'Underlying vault data is undefined')
 
       return {
         baseApy: calculateBaseApy({

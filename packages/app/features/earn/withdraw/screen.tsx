@@ -98,45 +98,33 @@ BalanceDisplay.displayName = 'BalanceDisplay'
 // Memoized benefits display to prevent flickering
 const WithdrawBenefitsDisplay = memo(
   ({
-    isLoading,
     isError,
     error,
-    apy,
+    formattedApy,
     currentMonthlyEarning,
     reducedMonthlyEarning,
     parsedAmount,
   }: {
-    isLoading: boolean
     isError: boolean
     error: Error | null
-    apy: number | undefined
+    formattedApy: string | undefined
     currentMonthlyEarning: string | undefined
     reducedMonthlyEarning: string | undefined
     parsedAmount: bigint
   }) => {
-    switch (true) {
-      case isLoading:
-        return <Spinner size="small" color={'$color12'} />
-      case isError:
-        return <Paragraph color="$error">{toNiceError(error)}</Paragraph>
-      case apy !== undefined && parsedAmount > 0n:
-        return (
-          <CalculatedBenefits
-            apy={formatAmount(apy, undefined, 2)}
-            monthlyEarning={currentMonthlyEarning ?? ''}
-            rewards={''}
-            overrideMonthlyEarning={parsedAmount > BigInt(0) ? reducedMonthlyEarning : undefined}
-          />
-        )
-      default:
-        return (
-          <CalculatedBenefits
-            apy={formatAmount(apy ?? 0, undefined, 2)}
-            monthlyEarning={currentMonthlyEarning ?? ''}
-            rewards={''}
-          />
-        )
+    if (isError) {
+      return <Paragraph color="$error">{toNiceError(error)}</Paragraph>
     }
+
+    // Always show CalculatedBenefits to avoid layout shift
+    return (
+      <CalculatedBenefits
+        apy={formattedApy ?? '...'}
+        monthlyEarning={currentMonthlyEarning ?? '...'}
+        rewards={''}
+        overrideMonthlyEarning={parsedAmount > BigInt(0) ? reducedMonthlyEarning : undefined}
+      />
+    )
   }
 )
 WithdrawBenefitsDisplay.displayName = 'WithdrawBenefitsDisplay'
@@ -335,10 +323,16 @@ export function WithdrawForm() {
   // use deposit vault if it exists, or the default vault for the asset
   const baseApy = useSendEarnAPY({ vault: vault?.data ? vault.data : undefined })
 
+  // Memoize formatted APY to prevent unnecessary re-renders
+  const formattedApy = useMemo(() => {
+    if (baseApy.data?.baseApy === undefined) return undefined
+    return formatAmount(baseApy.data.baseApy, undefined, 2)
+  }, [baseApy.data?.baseApy])
+
   // Calculate current monthly earning (before withdrawal)
   const currentMonthlyEarning = useMemo(() => {
-    if (!coin.data?.decimals) return
-    if (!baseApy.data) return
+    if (!coin.data?.decimals) return undefined
+    if (!baseApy.data) return undefined
     const decimalAmount = Number(formatUnits(depositBalance, coin.data?.decimals))
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
@@ -346,8 +340,8 @@ export function WithdrawForm() {
 
   // Calculate reduced monthly earning (after withdrawal)
   const reducedMonthlyEarning = useMemo(() => {
-    if (!coin.data?.decimals) return
-    if (!baseApy.data) return
+    if (!coin.data?.decimals) return undefined
+    if (!baseApy.data) return undefined
     const decimalAmount = Number(formatUnits(depositBalance - parsedAmount, coin.data?.decimals))
     const monthlyRate = (1 + baseApy.data.baseApy / 100) ** (1 / 12) - 1
     return formatAmount(Number(decimalAmount ?? 0) * monthlyRate)
@@ -541,10 +535,9 @@ export function WithdrawForm() {
                 </YStack>
               </Fade>
               <WithdrawBenefitsDisplay
-                isLoading={baseApy.isLoading}
                 isError={baseApy.isError}
                 error={baseApy.error}
-                apy={baseApy.data?.baseApy}
+                formattedApy={formattedApy}
                 currentMonthlyEarning={currentMonthlyEarning}
                 reducedMonthlyEarning={reducedMonthlyEarning}
                 parsedAmount={parsedAmount}
