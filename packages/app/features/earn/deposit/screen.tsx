@@ -30,7 +30,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, memo } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -60,6 +60,96 @@ type DepositFormSchema = z.infer<typeof DepositFormSchema>
 export function DepositScreen() {
   return <DepositForm />
 }
+
+// Memoized balance display to prevent flickering
+const DepositBalanceDisplay = memo(
+  ({
+    coinBalance,
+    coinDecimals,
+    insufficientAmount,
+    isLoading,
+  }: {
+    coinBalance: bigint | undefined
+    coinDecimals: number | undefined
+    insufficientAmount: boolean
+    isLoading: boolean
+  }) => {
+    if (isLoading) {
+      return <Spinner size="small" />
+    }
+
+    if (!coinBalance && coinBalance !== BigInt(0)) {
+      return null
+    }
+
+    return (
+      <XStack gap={'$2'} flexDirection={'column'} $gtSm={{ flexDirection: 'row' }}>
+        <XStack gap={'$2'}>
+          <Paragraph
+            testID="earning-form-balance"
+            color={insufficientAmount ? '$error' : '$silverChalice'}
+            size={'$5'}
+            $theme-light={{
+              color: insufficientAmount ? '$error' : '$darkGrayTextField',
+            }}
+          >
+            Balance:
+          </Paragraph>
+          <Paragraph
+            color={insufficientAmount ? '$error' : '$color12'}
+            size={'$5'}
+            fontWeight={'600'}
+          >
+            {coinDecimals ? formatAmount(formatUnits(coinBalance, coinDecimals), 12, 2) : '-'}
+          </Paragraph>
+        </XStack>
+        {insufficientAmount && (
+          <Paragraph color={'$error'} size={'$5'}>
+            Insufficient funds
+          </Paragraph>
+        )}
+      </XStack>
+    )
+  }
+)
+DepositBalanceDisplay.displayName = 'DepositBalanceDisplay'
+
+// Memoized benefits display to prevent flickering
+const DepositBenefitsDisplay = memo(
+  ({
+    isLoading,
+    isError,
+    error,
+    apy,
+    monthlyEarning,
+    parsedAmount,
+  }: {
+    isLoading: boolean
+    isError: boolean
+    error: Error | null
+    apy: number | undefined
+    monthlyEarning: string | undefined
+    parsedAmount: bigint
+  }) => {
+    switch (true) {
+      case isLoading:
+        return <Spinner size="small" color={'$color12'} />
+      case isError:
+        return <Paragraph color="$error">{toNiceError(error)}</Paragraph>
+      case apy !== undefined && parsedAmount > 0n:
+        return (
+          <CalculatedBenefits
+            apy={formatAmount(apy, undefined, 2)}
+            monthlyEarning={monthlyEarning ?? ''}
+            rewards={''}
+          />
+        )
+      default:
+        return <StaticBenefits />
+    }
+  }
+)
+DepositBenefitsDisplay.displayName = 'DepositBenefitsDisplay'
 
 export function DepositForm() {
   const form = useForm<DepositFormSchema>()
@@ -463,79 +553,24 @@ export function DepositForm() {
                   </XStack>
                   <XStack jc="space-between" ai={'flex-start'}>
                     <Stack>
-                      {(() => {
-                        switch (true) {
-                          case coin.isLoading || coinBalance.isLoading:
-                            return <Spinner size="small" />
-                          case !coinBalance.coin?.balance &&
-                            coinBalance.coin?.balance !== BigInt(0):
-                            return null
-                          default:
-                            return (
-                              <XStack
-                                gap={'$2'}
-                                flexDirection={'column'}
-                                $gtSm={{ flexDirection: 'row' }}
-                              >
-                                <XStack gap={'$2'}>
-                                  <Paragraph
-                                    testID="earning-form-balance"
-                                    color={insufficientAmount ? '$error' : '$silverChalice'}
-                                    size={'$5'}
-                                    $theme-light={{
-                                      color: insufficientAmount ? '$error' : '$darkGrayTextField',
-                                    }}
-                                  >
-                                    Balance:
-                                  </Paragraph>
-                                  <Paragraph
-                                    color={insufficientAmount ? '$error' : '$color12'}
-                                    size={'$5'}
-                                    fontWeight={'600'}
-                                  >
-                                    {coin.data?.decimals
-                                      ? formatAmount(
-                                          formatUnits(
-                                            coinBalance.coin.balance,
-                                            coin.data?.decimals
-                                          ),
-                                          12,
-                                          2
-                                        )
-                                      : '-'}
-                                  </Paragraph>
-                                </XStack>
-                                {insufficientAmount && (
-                                  <Paragraph color={'$error'} size={'$5'}>
-                                    Insufficient funds
-                                  </Paragraph>
-                                )}
-                              </XStack>
-                            )
-                        }
-                      })()}
+                      <DepositBalanceDisplay
+                        coinBalance={coinBalance.coin?.balance}
+                        coinDecimals={coin.data?.decimals}
+                        insufficientAmount={insufficientAmount}
+                        isLoading={coin.isLoading || coinBalance.isLoading}
+                      />
                     </Stack>
                   </XStack>
                 </YStack>
               </Fade>
-              {(() => {
-                switch (true) {
-                  case baseApy.isLoading:
-                    return <Spinner size="small" color={'$color12'} />
-                  case baseApy.isError:
-                    return <Paragraph color="$error">{toNiceError(baseApy.error)}</Paragraph>
-                  case baseApy.isSuccess && parsedAmount > 0n:
-                    return (
-                      <CalculatedBenefits
-                        apy={formatAmount(baseApy.data.baseApy, undefined, 2)}
-                        monthlyEarning={monthlyEarning ?? ''}
-                        rewards={''}
-                      />
-                    )
-                  default:
-                    return <StaticBenefits />
-                }
-              })()}
+              <DepositBenefitsDisplay
+                isLoading={baseApy.isLoading}
+                isError={baseApy.isError}
+                error={baseApy.error}
+                apy={baseApy.data?.baseApy}
+                monthlyEarning={monthlyEarning}
+                parsedAmount={parsedAmount}
+              />
               {/* Only show referred by if there is no existing deposit */}
               {!coinBalances.isLoading && !hasExistingDeposit && <ReferredBy />}
               {hasExistingDeposit ? null : (

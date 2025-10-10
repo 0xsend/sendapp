@@ -4,7 +4,7 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { Row } from 'app/features/earn/components/Row'
 import formatAmount from 'app/utils/formatAmount'
 import debug from 'debug'
-import { type ReactNode, useMemo } from 'react'
+import { type ReactNode, useMemo, memo } from 'react'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import type { SendEarnBalance } from './hooks'
@@ -56,7 +56,7 @@ const ListItem = ({ children }: { children: ReactNode }) => {
   )
 }
 
-const Badge = ({ text }: { text: string }) => {
+const Badge = memo(({ text }: { text: string }) => {
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
 
@@ -75,9 +75,9 @@ const Badge = ({ text }: { text: string }) => {
       <Paragraph size={'$5'}>{text}</Paragraph>
     </XStack>
   )
-}
+})
 
-const EarningsCallToAction = () => {
+const EarningsCallToAction = memo(() => {
   const { push } = useRouter()
 
   return (
@@ -108,14 +108,14 @@ const EarningsCallToAction = () => {
       </Card>
     </Fade>
   )
-}
+})
 
 const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) => {
   const { push } = useRouter()
-  const { getTotalAssets } = useSendEarn()
+  const { totalAssets: totalAssetsData } = useSendEarn()
 
   // Get total assets from provider (already computed and cached)
-  const { totalCurrentValue } = getTotalAssets()
+  const { totalCurrentValue } = totalAssetsData
 
   log('EarningsSummary using provider data', {
     totalCurrentValue,
