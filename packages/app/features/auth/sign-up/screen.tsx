@@ -72,9 +72,9 @@ export const SignUpScreen = () => {
   const { redirect } = useAuthRedirect()
   const passkeyDiagnosticErrorMessage = PASSKEY_DIAGNOSTIC_ERROR_MESSAGE
   const PASSKEY_TOAST_ID = 'passkey-integrity-signup'
-  const [diagnosticStatus, setDiagnosticStatus] = useState<'idle' | 'running' | 'success' | 'failure'>(
-    'idle'
-  )
+  const [diagnosticStatus, setDiagnosticStatus] = useState<
+    'idle' | 'running' | 'success' | 'failure'
+  >('idle')
   const [diagnosticMessage, setDiagnosticMessage] = useState<string | null>(null)
   const [hasCompletedPasskey, setHasCompletedPasskey] = useState(false)
   const hasSignedUpRef = useRef(false)
@@ -145,18 +145,19 @@ export const SignUpScreen = () => {
   const diagnosticIndicator = useMemo(() => {
     if (diagnosticStatus === 'idle') return null
 
-    const indicatorMessage = diagnosticMessage ??
+    const indicatorMessage =
+      diagnosticMessage ??
       (diagnosticStatus === 'running'
         ? "Checking your passkey's signing integrity..."
         : 'Passkey integrity check complete.')
 
     return (
-      <YStack w={'100%'} ai={'center'} gap={'$2'}>
+      <YStack ai={'center'} gap={'$2'} alignSelf="stretch">
         <XStack ai={'center'} gap={'$2'} jc={'center'}>
           {diagnosticStatus === 'running' ? (
             <Spinner size="small" />
           ) : diagnosticStatus === 'success' ? (
-            <CheckCircle size={18} color="$success" />
+            <CheckCircle size={18} color="$green10" />
           ) : (
             <AlertTriangle size={18} color="$error" />
           )}
@@ -166,7 +167,6 @@ export const SignUpScreen = () => {
         </XStack>
         {diagnosticStatus === 'failure' && (
           <Button
-            variant="primary"
             size="$3"
             backgroundColor="$primary"
             color="$black"
@@ -190,7 +190,8 @@ export const SignUpScreen = () => {
   useEffect(() => {
     const isUserRejectError = (value: unknown) => {
       if (!value) return false
-      const text = typeof value === 'string' ? value : value instanceof Error ? value.message : String(value)
+      const text =
+        typeof value === 'string' ? value : value instanceof Error ? value.message : String(value)
       return text.includes('REQUEST_REJECTION_FAILED') || text.includes('User clicked reject')
     }
 
@@ -208,8 +209,8 @@ export const SignUpScreen = () => {
       }
     }
 
-    let previousOnError: OnErrorEventHandler | null = null
-    let previousOnUnhandledRejection: ((this: Window, ev: PromiseRejectionEvent) => any) | null = null
+    let previousOnError: Window['onerror'] = null
+    let previousOnUnhandledRejection: Window['onunhandledrejection'] = null
     let previousConsoleError: ((...args: unknown[]) => void) | null = null
 
     const onError: OnErrorEventHandler = (message, source, lineno, colno, error) => {
@@ -222,7 +223,7 @@ export const SignUpScreen = () => {
       return false
     }
 
-    const onUnhandled = (event: PromiseRejectionEvent) => {
+    const onUnhandled = ((event: PromiseRejectionEvent) => {
       if (isUserRejectError(event.reason)) {
         event.preventDefault()
         return true
@@ -231,7 +232,7 @@ export const SignUpScreen = () => {
         return previousOnUnhandledRejection.call(window, event)
       }
       return false
-    }
+    }) as Exclude<Window['onunhandledrejection'], null>
 
     if (typeof window !== 'undefined') {
       window.addEventListener('error', errorHandler, { capture: true })
@@ -297,7 +298,7 @@ export const SignUpScreen = () => {
           onStart: () => {
             setDiagnosticStatus('running')
             setDiagnosticMessage("Checking your passkey's signing integrity...")
-            toast.hide(PASSKEY_TOAST_ID)
+            toast.hide()
             toast.show("Checking your passkey's signing integrity...", {
               id: PASSKEY_TOAST_ID,
               duration: 6000,
@@ -306,7 +307,7 @@ export const SignUpScreen = () => {
           onSuccess: () => {
             setDiagnosticStatus('success')
             setDiagnosticMessage('Passkey integrity check passed.')
-            toast.hide(PASSKEY_TOAST_ID)
+            toast.hide()
             toast.show('Passkey integrity check passed.', {
               id: PASSKEY_TOAST_ID,
             })
@@ -316,7 +317,7 @@ export const SignUpScreen = () => {
             setHasCompletedPasskey(false)
             setDiagnosticStatus('failure')
             setDiagnosticMessage(passkeyDiagnosticErrorMessage)
-            toast.hide(PASSKEY_TOAST_ID)
+            toast.hide()
             toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
               id: PASSKEY_TOAST_ID,
               duration: 8000,
@@ -341,9 +342,7 @@ export const SignUpScreen = () => {
       redirect()
     } catch (error) {
       setFormState(FormState.Idle)
-<<<<<<< HEAD
-      const message = formatErrorMessage(error).trim() || 'Unknown error'
-=======
+
       if (
         error &&
         typeof error === 'object' &&
@@ -351,11 +350,14 @@ export const SignUpScreen = () => {
         typeof (error as { message?: unknown }).message === 'string'
       ) {
         const messageText = (error as Error).message
-        if (messageText.includes('REQUEST_REJECTION_FAILED') || messageText.includes('User clicked reject')) {
+        if (
+          messageText.includes('REQUEST_REJECTION_FAILED') ||
+          messageText.includes('User clicked reject')
+        ) {
           setHasCompletedPasskey(false)
           setDiagnosticStatus('failure')
           setDiagnosticMessage(passkeyDiagnosticErrorMessage)
-          toast.hide(PASSKEY_TOAST_ID)
+          toast.hide()
           toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
             id: PASSKEY_TOAST_ID,
             duration: 8000,
@@ -368,8 +370,7 @@ export const SignUpScreen = () => {
         }
       }
 
-      const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
->>>>>>> 774154d7 (Wire passkey diagnostic UX into onboarding and sign-up)
+      const message = formatErrorMessage(error).trim() || 'Unknown error'
 
       form.setError('root', {
         type: 'custom',
@@ -547,7 +548,11 @@ export const SignUpScreen = () => {
                     </YStack>
                     <YStack gap={'$3.5'}>
                       <SubmitButton
-                        disabled={!canSubmit || formState !== FormState.Idle || diagnosticStatus === 'failure'}
+                        disabled={
+                          !canSubmit ||
+                          formState !== FormState.Idle ||
+                          diagnosticStatus === 'failure'
+                        }
                         onPress={() => form.handleSubmit(handleSubmit)()}
                       >
                         <SubmitButton.Text>create account</SubmitButton.Text>

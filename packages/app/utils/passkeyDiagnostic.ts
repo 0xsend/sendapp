@@ -88,6 +88,7 @@ function deviceHasGoogleMobileServices(): boolean | null {
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const deviceInfo: DeviceInfoModule = require('react-native-device-info')
     if (typeof deviceInfo.hasGmsSync === 'function') {
       cachedHasGms = deviceInfo.hasGmsSync()

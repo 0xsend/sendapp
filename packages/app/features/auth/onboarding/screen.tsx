@@ -7,7 +7,16 @@
  * - Generate a deterministic address from the public key
  * - Ask the user to deposit funds
  */
-import { Button, FadeCard, Paragraph, Spinner, SubmitButton, XStack, YStack, useAppToast } from '@my/ui'
+import {
+  Button,
+  FadeCard,
+  Paragraph,
+  Spinner,
+  SubmitButton,
+  XStack,
+  YStack,
+  useAppToast,
+} from '@my/ui'
 import {
   PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   PASSKEY_DIAGNOSTIC_TOAST_MESSAGE,
@@ -42,7 +51,9 @@ export function OnboardingScreen() {
   const { createSendAccount } = useCreateSendAccount()
   const toast = useAppToast()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
-  const [diagnosticStatus, setDiagnosticStatus] = useState<'idle' | 'running' | 'success' | 'failure'>('idle')
+  const [diagnosticStatus, setDiagnosticStatus] = useState<
+    'idle' | 'running' | 'success' | 'failure'
+  >('idle')
   const [diagnosticMessage, setDiagnosticMessage] = useState<string | null>(null)
   const passkeyDiagnosticErrorMessage = PASSKEY_DIAGNOSTIC_ERROR_MESSAGE
   const PASSKEY_TOAST_ID = 'passkey-integrity'
@@ -63,7 +74,7 @@ export function OnboardingScreen() {
     const baseProps = {
       ai: 'center' as const,
       gap: '$2' as const,
-      w: '100%',
+      alignSelf: 'stretch' as const,
     }
 
     const contentProps = {
@@ -72,7 +83,8 @@ export function OnboardingScreen() {
       jc: 'center' as const,
     }
 
-    const indicatorMessage = diagnosticMessage ??
+    const indicatorMessage =
+      diagnosticMessage ??
       (diagnosticStatus === 'running'
         ? "Checking your passkey's signing integrity..."
         : 'Passkey integrity check complete.')
@@ -83,7 +95,7 @@ export function OnboardingScreen() {
           {diagnosticStatus === 'running' ? (
             <Spinner size="small" />
           ) : diagnosticStatus === 'success' ? (
-            <CheckCircle size={18} color="$success" />
+            <CheckCircle size={18} color="$green10" />
           ) : (
             <AlertTriangle size={18} color="$error" />
           )}
@@ -93,7 +105,6 @@ export function OnboardingScreen() {
         </XStack>
         {diagnosticStatus === 'failure' && (
           <Button
-            variant="primary"
             size="$3"
             backgroundColor="$primary"
             color="$black"
@@ -156,7 +167,8 @@ export function OnboardingScreen() {
   useEffect(() => {
     const isUserRejectError = (value: unknown) => {
       if (!value) return false
-      const text = typeof value === 'string' ? value : value instanceof Error ? value.message : String(value)
+      const text =
+        typeof value === 'string' ? value : value instanceof Error ? value.message : String(value)
       return text.includes('REQUEST_REJECTION_FAILED') || text.includes('User clicked reject')
     }
 
@@ -173,8 +185,8 @@ export function OnboardingScreen() {
       }
     }
 
-    let previousOnError: OnErrorEventHandler | null = null
-    let previousOnUnhandledRejection: ((this: Window, ev: PromiseRejectionEvent) => any) | null = null
+    let previousOnError: Window['onerror'] = null
+    let previousOnUnhandledRejection: Window['onunhandledrejection'] = null
     let previousConsoleError: ((...args: unknown[]) => void) | null = null
 
     const onError: OnErrorEventHandler = (message, source, lineno, colno, error) => {
@@ -187,7 +199,7 @@ export function OnboardingScreen() {
       return false
     }
 
-    const onUnhandled = (event: PromiseRejectionEvent) => {
+    const onUnhandled = ((event: PromiseRejectionEvent) => {
       if (isUserRejectError(event.reason)) {
         event.preventDefault()
         return true
@@ -196,7 +208,7 @@ export function OnboardingScreen() {
         return previousOnUnhandledRejection.call(window, event)
       }
       return false
-    }
+    }) as Exclude<Window['onunhandledrejection'], null>
 
     if (typeof window !== 'undefined') {
       window.addEventListener('error', errorHandler, { capture: true })
@@ -252,7 +264,7 @@ export function OnboardingScreen() {
           onStart: () => {
             setDiagnosticStatus('running')
             setDiagnosticMessage("Checking your passkey's signing integrity...")
-            toast.hide(PASSKEY_TOAST_ID)
+            toast.hide()
             toast.show("Checking your passkey's signing integrity...", {
               id: PASSKEY_TOAST_ID,
               duration: 6000,
@@ -261,7 +273,7 @@ export function OnboardingScreen() {
           onSuccess: () => {
             setDiagnosticStatus('success')
             setDiagnosticMessage('Passkey integrity check passed.')
-            toast.hide(PASSKEY_TOAST_ID)
+            toast.hide()
             toast.show('Passkey integrity check passed.', {
               id: PASSKEY_TOAST_ID,
             })
@@ -269,7 +281,7 @@ export function OnboardingScreen() {
           onFailure: () => {
             setDiagnosticStatus('failure')
             setDiagnosticMessage(passkeyDiagnosticErrorMessage)
-            toast.hide(PASSKEY_TOAST_ID)
+            toast.hide()
             toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
               id: PASSKEY_TOAST_ID,
               duration: 8000,
@@ -303,11 +315,11 @@ export function OnboardingScreen() {
       ) {
         setDiagnosticStatus('failure')
         setDiagnosticMessage(passkeyDiagnosticErrorMessage)
-        toast.hide(PASSKEY_TOAST_ID)
-          toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
-            id: PASSKEY_TOAST_ID,
-            duration: 8000,
-          })
+        toast.hide()
+        toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
+          id: PASSKEY_TOAST_ID,
+          duration: 8000,
+        })
         form.setError('root', {
           type: 'custom',
           message: passkeyDiagnosticErrorMessage,
