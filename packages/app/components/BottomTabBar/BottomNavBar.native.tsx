@@ -25,7 +25,7 @@ const TABS = [
   },
 ]
 
-export default function BottomNavBar({ currentRoute }: { currentRoute: string }) {
+function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   const segments = useSegments()
   const { direction } = useScrollDirection()
   const translateY = useRef(new Animated.Value(0)).current
@@ -67,3 +67,7 @@ export default function BottomNavBar({ currentRoute }: { currentRoute: string })
     </Animated.View>
   )
 }
+
+BottomNavBar.displayName = 'BottomNavBar.native'
+
+export default BottomNavBar
