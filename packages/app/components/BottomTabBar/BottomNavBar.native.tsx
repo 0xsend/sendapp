@@ -1,4 +1,4 @@
-import { IconArrowUp, IconDeviceReset, IconHome } from 'app/components/icons'
+import { IconArrowUp, IconDeviceReset, IconHome, IconSwap } from 'app/components/icons'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
@@ -17,6 +17,11 @@ const TABS = [
     Icon: IconArrowUp,
     href: `/(tabs)/send?${new URLSearchParams({ sendToken: sendTokenAddress[baseMainnet.id] })}`,
     key: 'send/index',
+  },
+  {
+    Icon: IconSwap,
+    href: '/(tabs)/trade',
+    key: 'trade/index',
   },
   {
     Icon: IconDeviceReset,

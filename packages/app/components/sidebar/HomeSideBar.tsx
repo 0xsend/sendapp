@@ -20,6 +20,7 @@ import {
   IconDeviceReset,
   IconHome,
   IconSendLogo,
+  IconSwap,
   IconWorldSearch,
 } from 'app/components/icons'
 import { Lock } from '@tamagui/lucide-icons'
@@ -43,6 +44,11 @@ const links = [
     icon: <IconArrowUp size={'$1'} scale={1.3} />,
     text: 'Send',
     href: '/send',
+  },
+  {
+    icon: <IconSwap size={'$1'} scale={1.2} />,
+    text: 'Trade',
+    href: '/trade',
   },
   {
     icon: <IconDeviceReset size={'$1'} scale={1.2} />,

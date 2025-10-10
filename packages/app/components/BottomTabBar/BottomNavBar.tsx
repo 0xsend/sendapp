@@ -1,4 +1,10 @@
-import { IconArrowUp, IconDeviceReset, IconHome, IconWorldSearch } from 'app/components/icons'
+import {
+  IconArrowUp,
+  IconDeviceReset,
+  IconHome,
+  IconSwap,
+  IconWorldSearch,
+} from 'app/components/icons'
 import { XStack } from '@my/ui'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
@@ -14,6 +20,11 @@ export const TABS = [
     Icon: IconArrowUp,
     href: '/send',
     key: 'send',
+  },
+  {
+    Icon: IconSwap,
+    href: '/trade',
+    key: 'trade',
   },
   {
     Icon: IconDeviceReset,
