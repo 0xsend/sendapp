@@ -37,8 +37,8 @@ import { Platform } from 'react-native'
 import { CantonWalletStatus } from '../components/CantonWalletStatus'
 import { CantonWalletForm } from '../components/CantonWalletForm'
 
-// Canton wallet minimum SEND balance requirement (2000 SEND)
-const CANTON_WALLET_MIN_SEND_BALANCE = 2000n * BigInt(10 ** 18)
+// Canton wallet minimum SEND balance requirement (1000 SEND)
+const CANTON_WALLET_MIN_SEND_BALANCE = 1000n * BigInt(10 ** 18)
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
