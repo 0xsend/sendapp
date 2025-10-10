@@ -1611,6 +1611,39 @@ export type Database = {
         }
         Relationships: []
       }
+      token_balances: {
+        Row: {
+          address: string
+          balance: number
+          chain_id: number
+          id: number
+          token: string | null
+          token_key: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          balance?: number
+          chain_id: number
+          id?: number
+          token?: string | null
+          token_key?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          balance?: number
+          chain_id?: number
+          id?: number
+          token?: string | null
+          token_key?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       webauthn_credentials: {
         Row: {
           attestation_object: string
@@ -2190,6 +2223,7 @@ export type Database = {
         | "total_tag_referrals"
         | "send_streak"
         | "send_ceiling"
+        | "send_token_hodler"
       verification_value_mode: "individual" | "aggregate"
     }
     CompositeTypes: {
@@ -2491,6 +2525,7 @@ export const Constants = {
         "total_tag_referrals",
         "send_streak",
         "send_ceiling",
+        "send_token_hodler",
       ],
       verification_value_mode: ["individual", "aggregate"],
     },
