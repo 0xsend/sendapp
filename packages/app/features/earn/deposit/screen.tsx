@@ -1,6 +1,5 @@
 import {
   Card,
-  Circle,
   Fade,
   Paragraph,
   Separator,
@@ -540,22 +539,15 @@ export function DepositForm() {
               {/* Only show referred by if there is no existing deposit */}
               {!coinBalances.isLoading && !hasExistingDeposit && <ReferredBy />}
               {hasExistingDeposit ? null : (
-                <XStack gap={'$3'} ai={'center'}>
-                  {form.formState.errors.areTermsAccepted ? (
-                    <Shake shakeKey="areTermsAccepted" baseStyle={{ flexShrink: 0 }}>
-                      <Circle size={'$3'} borderWidth={2} borderColor={'$error'} />
-                    </Shake>
-                  ) : (
-                    areTermsAccepted
-                  )}
-                  {form.formState.errors.areTermsAccepted ? (
-                    <Shake shakeKey="areTermsAccepted" baseStyle={{ width: '100%', flex: 1 }}>
-                      <EarnTerms hasError={true} />
-                    </Shake>
-                  ) : (
-                    <EarnTerms />
-                  )}
-                </XStack>
+                <Shake
+                  shakeKey={form.formState.errors.areTermsAccepted ? 'areTermsAccepted' : undefined}
+                  baseStyle={{ width: '100%' }}
+                >
+                  <XStack gap={'$3'} ai={'center'}>
+                    {areTermsAccepted}
+                    <EarnTerms hasError={!!form.formState.errors.areTermsAccepted} />
+                  </XStack>
+                </Shake>
               )}
             </YStack>
           )}
