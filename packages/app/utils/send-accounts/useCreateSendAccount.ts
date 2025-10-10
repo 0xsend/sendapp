@@ -9,13 +9,12 @@ import type { User } from '@supabase/supabase-js'
 import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
 import { api } from 'app/utils/api'
 import {
-  PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   getPasskeyDiagnosticMode,
   runPasskeyDiagnostic,
   shouldRunPasskeyDiagnostic,
 } from 'app/utils/passkeyDiagnostic'
 
-type SendAccountData = Awaited<ReturnType<typeof useSendAccount>['refetch']>['data']
+type SendAccountData = ReturnType<typeof useSendAccount>['data']
 
 export const useCreateSendAccount = () => {
   const sendAccount = useSendAccount()
@@ -64,7 +63,12 @@ export const useCreateSendAccount = () => {
       }
     }
 
-    const { rawCred, authData } = credentialRef.current!
+    const credential = credentialRef.current
+    if (!credential) {
+      throw new Error('Passkey credential not available. Please try again.')
+    }
+
+    const { rawCred, authData } = credential
 
     const diagnosticMode = getPasskeyDiagnosticMode()
     if (await shouldRunPasskeyDiagnostic(diagnosticMode)) {

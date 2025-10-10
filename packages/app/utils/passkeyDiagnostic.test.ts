@@ -31,15 +31,21 @@ jest.mock('./signChallenge', () => ({
 }))
 
 const mockedSignChallenge = signChallenge as jest.MockedFunction<typeof signChallenge>
-const mockedPlatform = jest.requireMock('react-native').Platform as { OS: string }
+const reactNativeMock = jest.requireMock('react-native') as {
+  Platform: { OS: string }
+}
+const mockedPlatform = reactNativeMock.Platform
 const mockedDevice = jest.requireMock('expo-device') as {
   brand: string | null
   manufacturer: string | null
   modelName: string | null
   osName: string | null
 }
-const mockedHasGmsSync = jest.requireMock('react-native-device-info')
-  .hasGmsSync as jest.MockedFunction<() => boolean>
+const mockedHasGmsSync = (
+  jest.requireMock('react-native-device-info') as {
+    hasGmsSync: jest.MockedFunction<() => boolean>
+  }
+).hasGmsSync
 
 const originalLogging = process.env.NEXT_PUBLIC_PASSKEY_DIAGNOSTIC_LOGGING
 const originalPublicKeyCredential = (globalThis as typeof globalThis).PublicKeyCredential
@@ -62,7 +68,7 @@ function setPublicKeyCredential(value: typeof PublicKeyCredential | undefined) {
 }
 
 function createPublicKeyCredentialMock(hasSupport: boolean) {
-  const uvpaa = jest.fn().mockResolvedValue(hasSupport)
+  const uvpaa = jest.fn(async () => hasSupport)
   const mock = (() => {
     // noop constructor replacement
   }) as unknown as typeof PublicKeyCredential
