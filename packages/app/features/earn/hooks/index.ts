@@ -61,8 +61,8 @@ export function useSendEarnAPY({
       throwIf(underlyingVault.error)
       assert(sendEarnVault.isSuccess, 'Fetching send earn vault failed')
       assert(underlyingVault.isSuccess, 'Fetching underlying vault failed')
-      assert(sendEarnVault.data, 'Send earn vault data is undefined')
-      assert(underlyingVault.data, 'Underlying vault data is undefined')
+      assert(!!sendEarnVault.data, 'Send earn vault data is undefined')
+      assert(!!underlyingVault.data, 'Underlying vault data is undefined')
 
       return {
         baseApy: calculateBaseApy({
