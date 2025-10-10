@@ -27,6 +27,11 @@ export const TABS = [
     key: 'index',
   },
   {
+    Icon: IconWorldSearch,
+    href: '/explore',
+    key: 'explore',
+  },
+  {
     Icon: IconArrowUp,
     href: '/send',
     key: 'send',
@@ -40,11 +45,6 @@ export const TABS = [
     Icon: IconDeviceReset,
     href: '/activity',
     key: 'activity',
-  },
-  {
-    Icon: IconWorldSearch,
-    href: '/explore',
-    key: 'explore',
   },
 ]
 
