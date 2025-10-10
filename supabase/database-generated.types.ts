@@ -1792,7 +1792,7 @@ export type Database = {
           created_at: string
           id: string
           user_id: string
-        }[]
+        }
       }
       citext: {
         Args: { "": boolean } | { "": string } | { "": unknown }
