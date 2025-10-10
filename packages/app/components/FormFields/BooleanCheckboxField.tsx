@@ -40,6 +40,8 @@ export const BooleanCheckboxField = (
     ...checkboxProps
   } = (props as unknown as CheckboxProps & { enumValues?: unknown; labelProps?: LabelProps }) || {}
 
+  void _enumValues
+
   const [isChecked, setIsChecked] = useState(checkboxProps.defaultChecked)
 
   useEffect(() => {
