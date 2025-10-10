@@ -1,4 +1,4 @@
-import { cdpBundlerClient } from '@my/workflows/utils'
+import { erc7677BundlerClient } from '@my/workflows/utils'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
 import {
@@ -112,20 +112,20 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         })
       }
 
-      // Request sponsorship from CDP paymaster (CDP will simulate during sponsorship)
+      // Request sponsorship from ERC-7677 paymaster (provider will simulate during sponsorship)
       try {
-        const sponsorResult = await cdpBundlerClient.sponsorUserOperation({
+        const sponsorResult = await erc7677BundlerClient.sponsorUserOperation({
           userOperation: userop,
         })
 
-        log('CDP sponsorship result', sponsorResult)
+        log('ERC-7677 sponsorship result', sponsorResult)
 
         return sponsorResult
       } catch (error) {
-        log('Failed to sponsor with CDP', error)
+        log('Failed to sponsor with ERC-7677 paymaster', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to sponsor operation with CDP',
+          message: 'Failed to sponsor operation with ERC-7677 paymaster',
           cause: error,
         })
       }

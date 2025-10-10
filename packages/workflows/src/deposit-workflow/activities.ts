@@ -1,5 +1,5 @@
 import { baseMainnetClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
-import { bootstrap, cdpBundlerClient, isRetryableDBError } from '@my/workflows/utils'
+import { bootstrap, erc7677BundlerClient, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import {
   decodeSendEarnDepositUserOp,
@@ -59,7 +59,7 @@ export const createDepositActivities = (
     updateTemporalDepositActivity,
     verifyDepositIndexedActivity,
     upsertReferralRelationshipActivity,
-    ...createUserOpActivities(env, cdpBundlerClient),
+    ...createUserOpActivities(env, erc7677BundlerClient),
   }
 }
 
