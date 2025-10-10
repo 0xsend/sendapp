@@ -172,13 +172,13 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
  */
 export function sendEarnBalancesQueryOptions(
   supabase: SupabaseClient<Database>,
-  sendAddress: `0x${string}` | undefined
+  sendAccount: ReturnType<typeof useSendAccount>
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances', { sendAddress }] as const,
+    queryKey: ['send_earn_balances', { sendAccount }] as const,
     queryFn: async () => fetchSendEarnBalances(supabase),
-    enabled: !!sendAddress,
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
   })
 }
@@ -186,7 +186,7 @@ export function sendEarnBalancesQueryOptions(
 export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()
   const sendAccount = useSendAccount()
-  return useQuery(sendEarnBalancesQueryOptions(supabase, sendAccount.data?.address))
+  return useQuery(sendEarnBalancesQueryOptions(supabase, sendAccount))
 }
 
 const SendEarnBalanceTimelineSchema = z.object({
@@ -210,13 +210,13 @@ async function fetchSendEarnBalancesTimeline(supabase: SupabaseClient<Database>)
 
 export function sendEarnBalancesTimelineQueryOptions(
   supabase: SupabaseClient<Database>,
-  sendAddress: `0x${string}` | undefined
+  sendAccount: ReturnType<typeof useSendAccount>
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances_timeline', { sendAddress }] as const,
+    queryKey: ['send_earn_balances_timeline', { sendAccount }] as const,
     queryFn: async () => fetchSendEarnBalancesTimeline(supabase),
-    enabled: !!sendAddress,
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
   })
 }
@@ -224,7 +224,7 @@ export function sendEarnBalancesTimelineQueryOptions(
 export function useSendEarnBalancesTimeline(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()
   const sendAccount = useSendAccount()
-  return useQuery(sendEarnBalancesTimelineQueryOptions(supabase, sendAccount.data?.address))
+  return useQuery(sendEarnBalancesTimelineQueryOptions(supabase, sendAccount))
 }
 
 async function fetchSendEarnBalancesAtBlock(
@@ -258,13 +258,13 @@ async function fetchSendEarnBalancesAtBlock(
 export function sendEarnBalancesAtBlockQueryOptions(
   supabase: SupabaseClient<Database>,
   block_num: bigint | null,
-  sendAddress: `0x${string}` | undefined
+  sendAccount: ReturnType<typeof useSendAccount>
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances_at_block', { block_num, sendAddress }] as const,
+    queryKey: ['send_earn_balances_at_block', { block_num, sendAccount }] as const,
     queryFn: async () => fetchSendEarnBalancesAtBlock(supabase, block_num),
-    enabled: !!sendAddress,
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
   })
 }
@@ -272,9 +272,7 @@ export function sendEarnBalancesAtBlockQueryOptions(
 export function useSendEarnBalancesAtBlock(block_num: bigint | null) {
   const supabase = useSupabase()
   const sendAccount = useSendAccount()
-  return useQuery(
-    sendEarnBalancesAtBlockQueryOptions(supabase, block_num, sendAccount.data?.address)
-  )
+  return useQuery(sendEarnBalancesAtBlockQueryOptions(supabase, block_num, sendAccount))
 }
 
 /**
