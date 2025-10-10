@@ -19,6 +19,7 @@ type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_o
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
 type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
 type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
+type Enum_storage_buckettype = 'ANALYTICS' | 'STANDARD';
 type Enum_temporal_transfer_status = 'cancelled' | 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 interface Table_net_http_response {
   id: number | null;
@@ -64,6 +65,14 @@ interface Table_storage_buckets {
   file_size_limit: number | null;
   allowed_mime_types: string[] | null;
   owner_id: string | null;
+  type: Enum_storage_buckettype;
+}
+interface Table_storage_buckets_analytics {
+  id: string;
+  type: Enum_storage_buckettype;
+  format: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_public_canton_party_verifications {
   id: string;
@@ -180,6 +189,22 @@ interface Table_net_http_request_queue {
   headers: Json;
   body: string | null;
   timeout_milliseconds: number;
+}
+interface Table_storage_iceberg_namespaces {
+  id: string;
+  bucket_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_storage_iceberg_tables {
+  id: string;
+  namespace_id: string;
+  bucket_id: string;
+  name: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_auth_identities {
   provider_id: string;
@@ -759,6 +784,7 @@ interface Table_auth_sso_providers {
   resource_id: string | null;
   created_at: string | null;
   updated_at: string | null;
+  disabled: boolean | null;
 }
 interface Table_realtime_subscription {
   id: number;
@@ -842,6 +868,9 @@ interface Table_realtime_tenants {
   private_only: boolean;
   migrations_ran: number | null;
   broadcast_adapter: string | null;
+  max_presence_events_per_second: number | null;
+  max_payload_size_in_kb: number | null;
+}
 interface Table_public_token_balances {
   id: number;
   user_id: string;
@@ -1003,6 +1032,9 @@ interface Schema_shovel {
 }
 interface Schema_storage {
   buckets: Table_storage_buckets;
+  buckets_analytics: Table_storage_buckets_analytics;
+  iceberg_namespaces: Table_storage_iceberg_namespaces;
+  iceberg_tables: Table_storage_iceberg_tables;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
   prefixes: Table_storage_prefixes;
@@ -1087,6 +1119,19 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    
+  };
+  "storage.buckets_analytics": {
+    parent: {
+
+    };
+    children: {
+       iceberg_namespaces_bucket_id_fkey: "storage.iceberg_namespaces";
+       iceberg_tables_bucket_id_fkey: "storage.iceberg_tables";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "storage.iceberg_namespaces" | "storage.iceberg_tables" | {};
+    
   };
   "public.canton_party_verifications": {
     parent: {
@@ -1180,6 +1225,29 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "auth.saml_relay_states" | {};
+    
+  };
+  "storage.iceberg_namespaces": {
+    parent: {
+       iceberg_namespaces_bucket_id_fkey: "storage.buckets_analytics";
+    };
+    children: {
+       iceberg_tables_namespace_id_fkey: "storage.iceberg_tables";
+    };
+    parentDestinationsTables: "storage.buckets_analytics" | {};
+    childDestinationsTables: "storage.iceberg_tables" | {};
+    
+  };
+  "storage.iceberg_tables": {
+    parent: {
+       iceberg_tables_bucket_id_fkey: "storage.buckets_analytics";
+       iceberg_tables_namespace_id_fkey: "storage.iceberg_namespaces";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "storage.buckets_analytics" | "storage.iceberg_namespaces" | {};
+    childDestinationsTables:  | {};
     
   };
   "auth.identities": {

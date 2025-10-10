@@ -30,9 +30,9 @@ export function ChartLineSection({
   const native = useScrollNativeGesture()
 
   const gesturePad = 24
-  const { onScrub, ...restPathProps } = (pathProps ?? {}) as {
-    onScrub?: (payload: { active: boolean; ox?: number; oy?: number }) => void
-  } & Record<string, unknown>
+  const restPathProps = Object.fromEntries(
+    Object.entries((pathProps ?? {}) as Record<string, unknown>).filter(([k]) => k !== 'onScrub')
+  ) as Record<string, unknown>
 
   const mergedPanProps = {
     shouldCancelWhenOutside: false,

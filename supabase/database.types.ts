@@ -73,6 +73,8 @@ export type Database = MergeDeep<
             main_tag: DatabaseGenerated['public']['Tables']['tags']['Row']
             links_in_bio: DatabaseGenerated['public']['Tables']['link_in_bio']['Row'][]
             distribution_shares: ProfileDistributionShares[]
+            is_verified: boolean
+            verified_at: string
           }
         }
         webauthn_credentials: {

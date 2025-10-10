@@ -85,7 +85,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Turn off "Block Popups" in iOS Safari Settings then try again.
+                Turn off &quot;Block Popups&quot; in iOS Safari Settings then try again.
               </Paragraph>
             )}
           </>

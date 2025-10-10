@@ -16,7 +16,7 @@ import {
   View,
 } from '@my/ui'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
-import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
+import { ChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import {
