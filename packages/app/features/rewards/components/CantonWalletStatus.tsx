@@ -1,5 +1,5 @@
-import { Button, XStack, Paragraph, useAppToast } from '@my/ui'
-import { ChevronUp, ChevronDown } from '@tamagui/lucide-icons'
+import { Button, Paragraph, useAppToast, XStack } from '@my/ui'
+import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { IconBadgeCheckSolid } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { useCallback } from 'react'
@@ -27,20 +27,8 @@ export function CantonWalletStatus({
 
     await Clipboard.setStringAsync(cantonWalletAddress)
       .then(() => toast.show('Copied Canton wallet address to clipboard'))
-      .catch(() =>
-        toast.error('Something went wrong', {
-          message: 'We were unable to copy the Canton wallet address to clipboard',
-        })
-      )
+      .catch(() => toast.error('Unable to copy'))
   }, [cantonWalletAddress, toast.show, toast.error])
-
-  const handleCopyPress = useCallback(
-    (e) => {
-      e.preventDefault()
-      void copyCantonAddress()
-    },
-    [copyCantonAddress]
-  )
 
   if (!shouldShowVerificationOption && !shouldShowStatus) {
     return null
@@ -51,7 +39,7 @@ export function CantonWalletStatus({
       <Button
         chromeless
         unstyled
-        onPress={handleCopyPress}
+        onPress={copyCantonAddress}
         cursor={'pointer'}
         hoverStyle={{
           backgroundColor: '$backgroundTransparent',
