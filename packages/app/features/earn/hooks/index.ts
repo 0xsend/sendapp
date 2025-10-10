@@ -45,6 +45,7 @@ export function useSendEarnAPY({
   const underlyingVault = useUnderlyingVault(underlyingVaultAddress)
 
   return useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       'sendEarnAPY',
       {
