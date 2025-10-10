@@ -13,37 +13,38 @@ ALTER TABLE ONLY "public"."canton_party_verifications"
     ADD CONSTRAINT "canton_party_verifications_pkey" PRIMARY KEY ("id");
 
 ALTER TABLE ONLY "public"."canton_party_verifications"
-    ADD CONSTRAINT "canton_party_verifications_user_id_unique" 
+    ADD CONSTRAINT "canton_party_verifications_user_id_unique"
     UNIQUE ("user_id");
 
 -- Indexes
-CREATE INDEX "canton_party_verifications_user_id_idx" 
+CREATE INDEX "canton_party_verifications_user_id_idx"
     ON "public"."canton_party_verifications" USING "btree" ("user_id");
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."canton_party_verifications"
-    ADD CONSTRAINT "canton_party_verifications_user_id_fkey" 
+    ADD CONSTRAINT "canton_party_verifications_user_id_fkey"
     FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."canton_party_verifications"("public"."profiles") 
-RETURNS "public"."canton_party_verifications"
-    LANGUAGE "sql" STABLE
-    AS $_$
-    SELECT * FROM canton_party_verifications WHERE user_id = $1.id
-$_$;
+CREATE OR REPLACE FUNCTION public.canton_party_verifications(profiles)
+ RETURNS canton_party_verifications  -- Single object, not SETOF
+ LANGUAGE sql
+ STABLE
+AS $function$
+SELECT * FROM canton_party_verifications WHERE user_id = $1.id LIMIT 1
+$function$;
 
 ALTER FUNCTION "public"."canton_party_verifications"("public"."profiles") OWNER TO "postgres";
 
 -- RLS
 ALTER TABLE "public"."canton_party_verifications" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can insert their own canton verification" 
-    ON "public"."canton_party_verifications" 
+CREATE POLICY "Users can insert their own canton verification"
+    ON "public"."canton_party_verifications"
     FOR INSERT WITH CHECK ((SELECT auth.uid()) = "user_id");
 
-CREATE POLICY "Users can read their own canton verification" 
-    ON "public"."canton_party_verifications" 
+CREATE POLICY "Users can read their own canton verification"
+    ON "public"."canton_party_verifications"
     FOR SELECT USING ((SELECT auth.uid()) = "user_id");
 
 -- Grants
