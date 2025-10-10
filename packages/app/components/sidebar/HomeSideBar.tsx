@@ -46,7 +46,11 @@ const links = [
     href: '/send',
   },
   {
-    icon: <IconSwap size={'$1'} scale={1.2} />,
+    icon: (
+      <YStack transform={[{ rotate: '90deg' }]}>
+        <IconSwap size={'$1'} scale={1.2} />
+      </YStack>
+    ),
     text: 'Trade',
     href: '/trade',
   },
