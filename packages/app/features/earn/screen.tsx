@@ -76,6 +76,7 @@ const Badge = memo(({ text }: { text: string }) => {
     </XStack>
   )
 })
+Badge.displayName = 'Badge'
 
 const EarningsCallToAction = memo(() => {
   const { push } = useRouter()
@@ -109,6 +110,7 @@ const EarningsCallToAction = memo(() => {
     </Fade>
   )
 })
+EarningsCallToAction.displayName = 'EarningsCallToAction'
 
 const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) => {
   const { push } = useRouter()

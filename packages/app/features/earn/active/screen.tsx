@@ -281,6 +281,7 @@ const BreakdownRow = memo(
     )
   }
 )
+BreakdownRow.displayName = 'BreakdownRow'
 
 const EarningButton = memo(
   ({
@@ -328,3 +329,4 @@ const EarningButton = memo(
     )
   }
 )
+EarningButton.displayName = 'EarningButton'
