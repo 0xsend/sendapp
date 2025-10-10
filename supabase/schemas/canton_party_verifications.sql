@@ -27,7 +27,7 @@ ALTER TABLE ONLY "public"."canton_party_verifications"
 
 -- Functions
 CREATE OR REPLACE FUNCTION "public"."canton_party_verifications"("public"."profiles") 
-RETURNS SETOF "public"."canton_party_verifications"
+RETURNS "public"."canton_party_verifications"
     LANGUAGE "sql" STABLE
     AS $_$
     SELECT * FROM canton_party_verifications WHERE user_id = $1.id

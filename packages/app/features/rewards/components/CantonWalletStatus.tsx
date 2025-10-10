@@ -1,7 +1,9 @@
-import { Button, XStack, Paragraph } from '@my/ui'
-import { ChevronUp, ChevronDown } from '@tamagui/lucide-icons'
+import { Button, Paragraph, useAppToast, XStack } from '@my/ui'
+import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { IconBadgeCheckSolid } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
+import { useCallback } from 'react'
+import * as Clipboard from 'expo-clipboard'
 
 interface CantonWalletStatusProps {
   canConnectCantonWallet?: boolean
@@ -15,11 +17,18 @@ export function CantonWalletStatus({
   onToggle,
 }: CantonWalletStatusProps) {
   const { profile } = useUser()
-  const cantonVerification = profile?.canton_party_verifications?.[0]
+  const toast = useAppToast()
+  const cantonWalletAddress = profile?.canton_party_verifications?.canton_wallet_address
+  const shouldShowVerificationOption = !cantonWalletAddress && canConnectCantonWallet
+  const shouldShowStatus = !!cantonWalletAddress
 
-  const shouldShowVerificationOption = !cantonVerification && canConnectCantonWallet
+  const copyCantonAddress = useCallback(async () => {
+    if (!cantonWalletAddress) return
 
-  const shouldShowStatus = !!cantonVerification
+    await Clipboard.setStringAsync(cantonWalletAddress)
+      .then(() => toast.show('Copied Canton wallet address to clipboard'))
+      .catch(() => toast.error('Unable to copy'))
+  }, [cantonWalletAddress, toast.show, toast.error])
 
   if (!shouldShowVerificationOption && !shouldShowStatus) {
     return null
@@ -27,14 +36,30 @@ export function CantonWalletStatus({
 
   if (shouldShowStatus) {
     return (
-      <XStack ai="center" gap="$2">
-        <Paragraph>Canton Wallet Address Verified</Paragraph>
-        <IconBadgeCheckSolid
-          size={'$1.5'}
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-        />
-      </XStack>
+      <Button
+        chromeless
+        unstyled
+        onPress={copyCantonAddress}
+        cursor={'pointer'}
+        hoverStyle={{
+          backgroundColor: '$backgroundTransparent',
+        }}
+        pressStyle={{
+          backgroundColor: 'transparent',
+        }}
+        focusStyle={{
+          backgroundColor: 'transparent',
+        }}
+      >
+        <XStack ai="center" gap="$2">
+          <Paragraph>Canton Wallet Address Verified</Paragraph>
+          <IconBadgeCheckSolid
+            size={'$1.5'}
+            color={'$primary'}
+            $theme-light={{ color: '$color12' }}
+          />
+        </XStack>
+      </Button>
     )
   }
 
