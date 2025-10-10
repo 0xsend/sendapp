@@ -187,3 +187,59 @@ DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW EXECUTE FUNCTION "public"."refresh_scores_on_distribution_change"();
 
 CREATE OR REPLACE TRIGGER "filter_send_token_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_token_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_token_transfers_with_no_send_account_created"();
+
+-- Function: send_token_balance
+-- Sums SEND token transfers for a user's send account.
+--   - Address matching via concat('0x', encode(stt.f,'hex'))::citext
+--   - Converting account address to bytea via decode(replace(address,'0x',''),'hex')
+-- NOTE: this function relies on our shovel indexer. If the indexer misses a tx, the balance will be incorrect.
+CREATE OR REPLACE FUNCTION public.send_token_balance(p_user_id uuid)
+RETURNS numeric
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  account_address bytea;
+  account_block_time numeric;
+  result_balance numeric;
+BEGIN
+  -- Get account address and convert created_at to block_time
+  SELECT
+    decode(replace(sa.address::text, ('0x'::citext)::text, ''::text), 'hex'),
+    EXTRACT(EPOCH FROM sa.created_at)
+  INTO account_address, account_block_time
+  FROM public.send_accounts sa
+  WHERE sa.user_id = p_user_id;
+
+  -- Return 0 if no account found
+  IF account_address IS NULL THEN
+    RETURN 0;
+  END IF;
+
+  -- Sum transfers starting from account creation (with 1 hour buffer)
+  SELECT COALESCE(SUM(
+    CASE
+      WHEN stt.t = account_address AND stt.f = account_address THEN 0::numeric  -- Self-transfer = net 0
+      WHEN stt.t = account_address THEN stt.v::numeric
+      WHEN stt.f = account_address THEN -stt.v::numeric
+      ELSE 0::numeric
+    END
+  ), 0::numeric)
+  INTO result_balance
+  FROM public.send_token_transfers stt
+  WHERE stt.block_time >= (account_block_time - 3600)  -- Subtract 1 hour buffer
+    AND (stt.t = account_address OR stt.f = account_address);
+
+  RETURN result_balance;
+END;
+$function$
+;
+
+ALTER FUNCTION "public"."send_token_balance"("p_user_id" "uuid") OWNER TO "postgres";
+
+-- Grants
+REVOKE ALL ON FUNCTION "public"."send_token_balance"("p_user_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."send_token_balance"("p_user_id" "uuid") TO "anon";
+GRANT ALL ON FUNCTION "public"."send_token_balance"("p_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."send_token_balance"("p_user_id" "uuid") TO "service_role";
