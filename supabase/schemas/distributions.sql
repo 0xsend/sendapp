@@ -1052,6 +1052,76 @@ $_$;
 
 ALTER FUNCTION "public"."distribution_shares"("public"."profiles") OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "public"."verified_at"("public"."profiles") RETURNS timestamp with time zone
+    LANGUAGE "plpgsql" STABLE SECURITY DEFINER
+    SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_has_tag boolean := false;
+  v_has_hodler boolean := false;
+  v_has_earn boolean := false;
+  v_hodler_min numeric;
+  v_earn_min numeric;
+BEGIN
+  -- Active distribution thresholds
+  SELECT hodler_min_balance::numeric, earn_min_balance::numeric
+    INTO v_hodler_min, v_earn_min
+  FROM distributions
+  WHERE (now() AT TIME ZONE 'UTC') >= qualification_start
+    AND (now() AT TIME ZONE 'UTC') <  qualification_end
+  ORDER BY qualification_start DESC
+  LIMIT 1;
+
+  -- If there is no active distribution, not verified
+  IF v_hodler_min IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  -- 1) Quick check: must have at least one purchased tag receipt
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.sendtag_checkout_receipts scr
+    JOIN public.send_accounts sa
+      ON decode(replace(sa.address::text, ('0x'::citext)::text, ''::text), 'hex') = scr.sender
+    WHERE sa.user_id = $1.id
+  ) INTO v_has_tag;
+  IF NOT v_has_tag THEN
+    RETURN NULL;
+  END IF;
+
+  -- 2) Quick check: any earn balance meets threshold
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.send_earn_balances seb
+    JOIN public.send_accounts sa
+      ON seb.owner = decode(replace(sa.address::text, ('0x'::citext)::text, ''::text), 'hex')
+    WHERE sa.user_id = $1.id
+      AND seb.assets >= v_earn_min
+  ) INTO v_has_earn;
+  IF NOT v_has_earn THEN
+    RETURN NULL;
+  END IF;
+
+  -- 3) Hodler balance meets threshold
+  v_has_hodler := public.send_token_balance($1.id) >= v_hodler_min;
+  IF NOT v_has_hodler THEN
+    RETURN NULL;
+  END IF;
+
+  -- All checks passed
+  RETURN (now() AT TIME ZONE 'UTC');
+END;
+$function$
+;
+
+ALTER FUNCTION "public"."verified_at"("public"."profiles") OWNER TO "postgres";
+
+REVOKE ALL ON FUNCTION "public"."verified_at"("public"."profiles") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."verified_at"("public"."profiles") TO "anon";
+GRANT ALL ON FUNCTION "public"."verified_at"("public"."profiles") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."verified_at"("public"."profiles") TO "service_role";
+
+
 -- Function grants
 REVOKE ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."calculate_and_insert_send_ceiling_verification"("distribution_number" integer) TO "service_role";

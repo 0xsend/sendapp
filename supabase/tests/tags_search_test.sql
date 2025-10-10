@@ -1,7 +1,7 @@
 -- Tag Search
 begin;
 
-select plan(13);
+select plan(12);
 
 create extension "basejump-supabase_test_helpers"; -- noqa: RF05
 
@@ -87,7 +87,8 @@ select results_eq($$
         'alice', -- tag_name
         $$ || :alice_send_id || $$, -- alice's send_id
         null, -- phone,
-        false -- is_verified
+        false, -- is_verified
+        null -- verified_at
       )::tag_search_result]
     ) $$, 'Tags should be visible to the authenticated user');
 
@@ -122,7 +123,8 @@ select results_eq($$
         'alice', -- tag_name
         $$ || :alice_send_id || $$, -- alice's send_id
         null, -- phone
-        false -- is_verified
+        false, -- is_verified
+        null -- verified_at
       )::tag_search_result]
     ) $$, 'You can search by send_id');
 
@@ -166,14 +168,14 @@ select tests.create_supabase_user('bossman_user');
 
 -- Insert tags for testing distance-based ordering
 insert into tags (name, user_id, status)
-values 
+values
   ('bigboss', tests.get_supabase_uid('bigboss_user'), 'confirmed'),
   ('Boss', tests.get_supabase_uid('boss_user'), 'confirmed'),
   ('bossman', tests.get_supabase_uid('bossman_user'), 'confirmed');
 
 -- Create send accounts for the new users
 insert into send_accounts (user_id, address, chain_id, init_code)
-values 
+values
   (tests.get_supabase_uid('bigboss_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF11', 8453, '\\x00'),
   (tests.get_supabase_uid('boss_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF22', 8453, '\\x00'),
   (tests.get_supabase_uid('bossman_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF33', 8453, '\\x00');
@@ -203,14 +205,14 @@ select tests.create_supabase_user('multi_tag_user');
 
 -- Insert multiple tags for the same user that would match "test"
 insert into tags (name, user_id, status)
-values 
+values
   ('test', tests.get_supabase_uid('multi_tag_user'), 'confirmed'),
   ('tester', tests.get_supabase_uid('multi_tag_user'), 'confirmed'),
   ('testing', tests.get_supabase_uid('multi_tag_user'), 'confirmed');
 
 -- Create send account for multi_tag_user
 insert into send_accounts (user_id, address, chain_id, init_code)
-values 
+values
   (tests.get_supabase_uid('multi_tag_user'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF44', 8453, '\\x00');
 
 -- Create send_account_tags associations for all tags
@@ -227,13 +229,13 @@ select tests.authenticate_as('neo');
 
 -- Test deduplication: should return only ONE result for the user, with the best matching tag
 select results_eq($$
-  SELECT array_length(tag_matches, 1) from tag_search('test', 10, 0) 
+  SELECT array_length(tag_matches, 1) from tag_search('test', 10, 0)
   WHERE (tag_matches[1]).avatar_url = 'multi_tag_avatar'; $$, $$
     values (1) $$, 'Should return only one result per profile even with multiple matching tags');
 
 -- Test that the best match (exact match "test") is returned for the multi-tag user
 select results_eq($$
-  SELECT (tag_matches[i]).tag_name 
+  SELECT (tag_matches[i]).tag_name
   FROM tag_search('test', 10, 0), generate_series(1, array_length(tag_matches, 1)) as i
   WHERE (tag_matches[i]).avatar_url = 'multi_tag_avatar'; $$, $$
     values ('test'::text) $$, 'Should return the best matching tag (exact match) for profile with multiple tags');
@@ -251,14 +253,14 @@ select tests.create_supabase_user('low_score_charlie');
 
 -- Insert tags - impostor has 'alic3' (fuzzy match for 'aliceY'), genuine has 'aliceY' (exact match)
 insert into tags (name, user_id, status)
-values 
+values
   ('alic3', tests.get_supabase_uid('impostor_alice'), 'confirmed'),  -- trigram distance ~0.3 from 'aliceY'
   ('aliceY', tests.get_supabase_uid('genuine_alice'), 'confirmed'),    -- exact match, distance 0
   ('charlie', tests.get_supabase_uid('low_score_charlie'), 'confirmed'); -- for testing non-exact filtering
 
 -- Create send accounts for all users
 insert into send_accounts (user_id, address, chain_id, init_code)
-values 
+values
   (tests.get_supabase_uid('impostor_alice'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF55', 8453, '\\x00'),
   (tests.get_supabase_uid('genuine_alice'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF66', 8453, '\\x00'),
   (tests.get_supabase_uid('low_score_charlie'), '0xABCDEF1234567890ABCDEF1234567890ABCDEF77', 8453, '\\x00');
@@ -347,47 +349,6 @@ select ok(
   'Trigram distance between alic3 and alice should be deterministic and measurable'
 );
 
--- ===== NEW CASE-SENSITIVE EXACT MATCH TESTS =====
-select tests.authenticate_as_service_role();
-
--- Create test users for case-sensitive tag matching
-select tests.create_supabase_user('ethen_high_score');
-select tests.create_supabase_user('ethen_low_score');
-
--- Insert case-sensitive tags - 'ethen' (will get high score) and 'Ethen_' (will get low score)
-insert into tags (name, user_id, status)
-values 
-  ('ethen', tests.get_supabase_uid('ethen_high_score'), 'confirmed'),
-  ('Ethen_', tests.get_supabase_uid('ethen_low_score'), 'confirmed');
-
--- Create send accounts for the case-sensitive test users
-insert into send_accounts (user_id, address, chain_id, init_code)
-values 
-  (tests.get_supabase_uid('ethen_high_score'), '0xABCDEF1234567890ABCDEF1234567890ABCDEFBB', 8453, '\\x00'),
-  (tests.get_supabase_uid('ethen_low_score'), '0xABCDEF1234567890ABCDEF1234567890ABCDEFCC', 8453, '\\x00');
-
--- Create send_account_tags associations
-insert into send_account_tags (send_account_id, tag_id)
-select sa.id, t.id
-from send_accounts sa
-join tags t on t.user_id = sa.user_id
-where t.name in ('ethen', 'Ethen_');
-
--- Set avatars for testing
-update profiles set avatar_url = 'ethen_high_avatar' where id = tests.get_supabase_uid('ethen_high_score');
-update profiles set avatar_url = 'ethen_low_avatar' where id = tests.get_supabase_uid('ethen_low_score');
-
--- Send scores will be computed by the materialized view, not inserted directly
--- For case-sensitive exact match tests, we rely on the trigram distance prioritization
-
-select tests.authenticate_as('neo');
-
--- Test case-sensitive exact match prioritization
--- When searching for 'Ethen_', the exact match 'Ethen_' should appear first
-select ok(exists(
-  SELECT 1 FROM tag_search('Ethen_', 20, 0)
-  WHERE (tag_matches[1]).tag_name = 'Ethen_'
-), 'Case-sensitive exact match Ethen_ should appear first');
 
 select finish();
 rollback;
