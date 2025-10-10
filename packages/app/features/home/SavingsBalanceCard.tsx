@@ -7,13 +7,12 @@ import { useSendEarnAPY } from '../earn/hooks'
 import { useSendEarnCoin } from '../earn/providers/SendEarnProvider'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { formatUnits } from 'viem'
-import { type LinkProps, useLink } from 'solito/link'
+import { useLink } from 'solito/link'
 import { HomeBodyCard } from './screen'
 import { usdcCoin } from 'app/data/coins'
 import { Platform } from 'react-native'
 
-export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
-  const linkProps = useLink({ href })
+export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden } = useIsPriceHidden()
 
   // Use the SendEarnProvider pattern
@@ -21,6 +20,13 @@ export const SavingsBalanceCard = ({ href, ...props }: Omit<CardProps & LinkProp
   const { totalCurrentValue, vaults } = totalAssetsData
 
   const hasExistingDeposit = totalCurrentValue > 0n
+
+  // Determine navigation target based on deposit status
+  const href = useMemo(
+    () => (hasExistingDeposit ? '/earn/usdc' : '/earn/usdc/deposit'),
+    [hasExistingDeposit]
+  )
+  const linkProps = useLink({ href })
 
   // Only fetch APY if user has existing deposits
   const { data: apyData, isLoading: isApyLoading } = useSendEarnAPY({
