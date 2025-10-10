@@ -43,6 +43,8 @@ export const useSheetIosBackgroundScale = ({
 export const SheetIosBackgroundScale = YStack.styleable(({ children, ...props }) => {
   const [isBackgroundScaleApplied, setIsBackgroundScaleApplied] = useState(false)
 
+  if (!isWeb) return children
+
   return (
     <SheetIosModalContext.Provider
       isBackgroundScaleApplied={isBackgroundScaleApplied}
