@@ -5,6 +5,7 @@ import {
   Label,
   LinkableButton,
   Paragraph,
+  Spinner,
   SubmitButton,
   useAppToast,
   useDebounce,
@@ -20,11 +21,15 @@ import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useCreateSendAccount, useSignIn } from 'app/utils/send-accounts'
+import {
+  PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
+  PASSKEY_DIAGNOSTIC_TOAST_MESSAGE,
+} from 'app/utils/passkeyDiagnostic'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { useSetFirstSendtag } from 'app/utils/useFirstSendtag'
 import { useUser } from 'app/utils/useUser'
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
@@ -32,6 +37,7 @@ import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
 import useIsScreenFocused from 'app/utils/useIsScreenFocused'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
+import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -64,11 +70,20 @@ export const SignUpScreen = () => {
   const isScreenFocused = useIsScreenFocused()
   const { xxs } = useMedia()
   const { redirect } = useAuthRedirect()
+  const passkeyDiagnosticErrorMessage = PASSKEY_DIAGNOSTIC_ERROR_MESSAGE
+  const PASSKEY_TOAST_ID = 'passkey-integrity-signup'
+  const [diagnosticStatus, setDiagnosticStatus] = useState<'idle' | 'running' | 'success' | 'failure'>(
+    'idle'
+  )
+  const [diagnosticMessage, setDiagnosticMessage] = useState<string | null>(null)
+  const [hasCompletedPasskey, setHasCompletedPasskey] = useState(false)
+  const hasSignedUpRef = useRef(false)
 
   const formName = form.watch('name')
   const formIsAgreedToTerms = form.watch('isAgreedToTerms')
   const validationError = form.formState.errors.root
   const canSubmit = formName && formIsAgreedToTerms && captchaToken
+  const canRetryDiagnostic = diagnosticStatus === 'failure' && formState === FormState.Idle
 
   const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
   const { mutateAsync: signInMutateAsync } = useSignIn()
@@ -122,49 +137,247 @@ export const SignUpScreen = () => {
   }, [queryParams.tag, form])
 
   useEffect(() => {
-    if (user?.id && formState === FormState.Idle && isScreenFocused) {
+    if (user?.id && formState === FormState.Idle && isScreenFocused && hasCompletedPasskey) {
       router.replace('/auth/onboarding')
     }
-  }, [user?.id, router.replace, formState, isScreenFocused])
+  }, [user?.id, router.replace, formState, isScreenFocused, hasCompletedPasskey])
+
+  const diagnosticIndicator = useMemo(() => {
+    if (diagnosticStatus === 'idle') return null
+
+    const indicatorMessage = diagnosticMessage ??
+      (diagnosticStatus === 'running'
+        ? "Checking your passkey's signing integrity..."
+        : 'Passkey integrity check complete.')
+
+    return (
+      <YStack w={'100%'} ai={'center'} gap={'$2'}>
+        <XStack ai={'center'} gap={'$2'} jc={'center'}>
+          {diagnosticStatus === 'running' ? (
+            <Spinner size="small" />
+          ) : diagnosticStatus === 'success' ? (
+            <CheckCircle size={18} color="$success" />
+          ) : (
+            <AlertTriangle size={18} color="$error" />
+          )}
+          <Paragraph ta="center" color={diagnosticStatus === 'failure' ? '$error' : '$color12'}>
+            {indicatorMessage}
+          </Paragraph>
+        </XStack>
+        {diagnosticStatus === 'failure' && (
+          <Button
+            variant="primary"
+            size="$3"
+            backgroundColor="$primary"
+            color="$black"
+            hoverStyle={{ backgroundColor: '$primary', opacity: 0.9 }}
+            disabled={!canRetryDiagnostic}
+            onPress={() => form.handleSubmit(handleSubmit)()}
+          >
+            Retry integrity check
+          </Button>
+        )}
+      </YStack>
+    )
+  }, [diagnosticStatus, diagnosticMessage, canRetryDiagnostic, form])
 
   const createAccount = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
     assert(!!sessionData?.session?.user?.id, 'No user id')
-    return await createSendAccount({ user: sessionData.session.user, accountName: formName })
+    return sessionData.session.user
   }
+
+  useEffect(() => {
+    const isUserRejectError = (value: unknown) => {
+      if (!value) return false
+      const text = typeof value === 'string' ? value : value instanceof Error ? value.message : String(value)
+      return text.includes('REQUEST_REJECTION_FAILED') || text.includes('User clicked reject')
+    }
+
+    const errorHandler = (event: ErrorEvent) => {
+      if (isUserRejectError(event.message) || isUserRejectError(event.error)) {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+      }
+    }
+
+    const rejectionHandler = (event: PromiseRejectionEvent) => {
+      if (isUserRejectError(event.reason)) {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+      }
+    }
+
+    let previousOnError: OnErrorEventHandler | null = null
+    let previousOnUnhandledRejection: ((this: Window, ev: PromiseRejectionEvent) => any) | null = null
+    let previousConsoleError: ((...args: unknown[]) => void) | null = null
+
+    const onError: OnErrorEventHandler = (message, source, lineno, colno, error) => {
+      if (isUserRejectError(error) || isUserRejectError(message)) {
+        return true
+      }
+      if (typeof previousOnError === 'function') {
+        return previousOnError.call(window, message, source, lineno, colno, error)
+      }
+      return false
+    }
+
+    const onUnhandled = (event: PromiseRejectionEvent) => {
+      if (isUserRejectError(event.reason)) {
+        event.preventDefault()
+        return true
+      }
+      if (typeof previousOnUnhandledRejection === 'function') {
+        return previousOnUnhandledRejection.call(window, event)
+      }
+      return false
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('error', errorHandler, { capture: true })
+      window.addEventListener('unhandledrejection', rejectionHandler, { capture: true })
+      previousOnError = window.onerror
+      previousOnUnhandledRejection = window.onunhandledrejection
+      previousConsoleError = console.error
+      window.onerror = onError
+      window.onunhandledrejection = onUnhandled
+      console.error = (...args: unknown[]) => {
+        if (args.some((arg) => isUserRejectError(arg))) {
+          return
+        }
+        previousConsoleError?.(...args)
+      }
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('error', errorHandler, { capture: true } as EventListenerOptions)
+        window.removeEventListener('unhandledrejection', rejectionHandler, {
+          capture: true,
+        } as EventListenerOptions)
+        window.onerror = previousOnError ?? null
+        window.onunhandledrejection = previousOnUnhandledRejection ?? null
+      }
+      if (previousConsoleError) {
+        console.error = previousConsoleError
+      }
+    }
+  }, [])
 
   const handleSubmit = async ({ name }: z.infer<typeof SignUpScreenFormSchema>) => {
     try {
       setFormState(FormState.SigningUp)
+      setHasCompletedPasskey(false)
+      setDiagnosticStatus('idle')
+      setDiagnosticMessage(null)
       const validatedSendtag = await validateSendtagMutateAsync({ name })
 
-      const auth = await signUpMutateAsync({
-        sendtag: validatedSendtag,
-        captchaToken,
-      })
-      assert(!!auth.session, 'No session returned')
-      supabase.auth.setSession(auth.session)
+      if (!hasSignedUpRef.current) {
+        const auth = await signUpMutateAsync({
+          sendtag: validatedSendtag,
+          captchaToken,
+        })
+        assert(!!auth.session, 'No session returned')
+        supabase.auth.setSession(auth.session)
 
-      await setFirstSendtagMutateAsync(validatedSendtag).catch((error) => {
-        // don't interrupt flow if async storage is not available
-        console.error('Unable to save sendtag into async storage: ', error.message)
+        await setFirstSendtagMutateAsync(validatedSendtag).catch((error) => {
+          // don't interrupt flow if async storage is not available
+          console.error('Unable to save sendtag into async storage: ', error.message)
+        })
+
+        hasSignedUpRef.current = true
+      }
+
+      const sessionUser = await createAccount()
+
+      const createdSendAccount = await createSendAccount({
+        user: sessionUser,
+        accountName: validatedSendtag,
+        passkeyDiagnosticCallbacks: {
+          onStart: () => {
+            setDiagnosticStatus('running')
+            setDiagnosticMessage("Checking your passkey's signing integrity...")
+            toast.hide(PASSKEY_TOAST_ID)
+            toast.show("Checking your passkey's signing integrity...", {
+              id: PASSKEY_TOAST_ID,
+              duration: 6000,
+            })
+          },
+          onSuccess: () => {
+            setDiagnosticStatus('success')
+            setDiagnosticMessage('Passkey integrity check passed.')
+            toast.hide(PASSKEY_TOAST_ID)
+            toast.show('Passkey integrity check passed.', {
+              id: PASSKEY_TOAST_ID,
+            })
+          },
+          onFailure: () => {
+            setFormState(FormState.Idle)
+            setHasCompletedPasskey(false)
+            setDiagnosticStatus('failure')
+            setDiagnosticMessage(passkeyDiagnosticErrorMessage)
+            toast.hide(PASSKEY_TOAST_ID)
+            toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
+              id: PASSKEY_TOAST_ID,
+              duration: 8000,
+            })
+            form.setError('root', {
+              type: 'custom',
+              message: passkeyDiagnosticErrorMessage,
+            })
+          },
+        },
       })
 
-      const createdSendAccount = await createAccount()
+      if (!createdSendAccount) {
+        return
+      }
       await registerFirstSendtagMutateAsync({
         name: validatedSendtag,
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
+      setHasCompletedPasskey(true)
       redirect()
     } catch (error) {
       setFormState(FormState.Idle)
+<<<<<<< HEAD
       const message = formatErrorMessage(error).trim() || 'Unknown error'
+=======
+      if (
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof (error as { message?: unknown }).message === 'string'
+      ) {
+        const messageText = (error as Error).message
+        if (messageText.includes('REQUEST_REJECTION_FAILED') || messageText.includes('User clicked reject')) {
+          setHasCompletedPasskey(false)
+          setDiagnosticStatus('failure')
+          setDiagnosticMessage(passkeyDiagnosticErrorMessage)
+          toast.hide(PASSKEY_TOAST_ID)
+          toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
+            id: PASSKEY_TOAST_ID,
+            duration: 8000,
+          })
+          form.setError('root', {
+            type: 'custom',
+            message: passkeyDiagnosticErrorMessage,
+          })
+          return
+        }
+      }
+
+      const message = formatErrorMessage(error).split('.')[0] ?? 'Unknown error'
+>>>>>>> 774154d7 (Wire passkey diagnostic UX into onboarding and sign-up)
 
       form.setError('root', {
         type: 'custom',
         message,
       })
+      setDiagnosticStatus('idle')
+      setDiagnosticMessage(null)
+      setHasCompletedPasskey(false)
       return
     }
   }
@@ -328,17 +541,18 @@ export const SignUpScreen = () => {
                           </Anchor>
                         </Label>
                       </XStack>
-                      {validationError && (
+                      {validationError && diagnosticStatus !== 'failure' && (
                         <Paragraph color={'$error'}>{validationError.message}</Paragraph>
                       )}
                     </YStack>
                     <YStack gap={'$3.5'}>
                       <SubmitButton
-                        disabled={!canSubmit || formState !== FormState.Idle}
+                        disabled={!canSubmit || formState !== FormState.Idle || diagnosticStatus === 'failure'}
                         onPress={() => form.handleSubmit(handleSubmit)()}
                       >
                         <SubmitButton.Text>create account</SubmitButton.Text>
                       </SubmitButton>
+                      {diagnosticIndicator}
                       <XStack w={'100%'} gap={'$2'} jc={'center'} ai={'center'}>
                         <Paragraph $theme-light={{ color: '$darkGrayTextField' }}>
                           Already have an account?
