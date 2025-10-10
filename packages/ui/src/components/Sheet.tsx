@@ -1,7 +1,7 @@
 import { Sheet as TSheet } from '@tamagui/sheet'
 
 import { useState, useEffect } from 'react'
-import { YStack, createStyledContext, withStaticProperties } from 'tamagui'
+import { YStack, createStyledContext, isWeb, withStaticProperties } from 'tamagui'
 
 const SheetIosModalContext = createStyledContext<{
   isBackgroundScaleApplied: boolean
@@ -34,12 +34,12 @@ export const useSheetIosBackgroundScale = ({
     context?.onBackgroundScaleChange(isSheetOpen)
   }, [isSheetOpen, context?.onBackgroundScaleChange, enabled])
 
-  if (!context) {
-    throw new Error('useSheetIosBackdrop must be used within a SheetIosBackdrop')
-  }
   return context
 }
 
+/**
+ * Web only
+ * make the background page to scale down to mimic iOS modal sheet */
 export const SheetIosBackgroundScale = YStack.styleable(({ children, ...props }) => {
   const [isBackgroundScaleApplied, setIsBackgroundScaleApplied] = useState(false)
 
@@ -48,7 +48,7 @@ export const SheetIosBackgroundScale = YStack.styleable(({ children, ...props })
       isBackgroundScaleApplied={isBackgroundScaleApplied}
       onBackgroundScaleChange={setIsBackgroundScaleApplied}
     >
-      <YStack h="100%" bg="$gray12">
+      <YStack h="100%" bg="$aztec2Dark">
         <YStack
           h="100%"
           bg="$background"
