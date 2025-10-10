@@ -478,9 +478,17 @@ BEGIN
                         AND t.status = 'confirmed'
                     LEFT JOIN scores ON scores.user_id = p.id
                     WHERE
-                        -- Use ILIKE '%' only when NOT exact to avoid excluding true exact matches like 'Ethen_'
-                        LOWER(t.name) = LOWER(query)
-                        OR (NOT (LOWER(t.name) = LOWER(query)) AND (t.name <<-> query < 0.7 OR t.name ILIKE '%' || query || '%'))
+                        -- Show users with good tag matches (exact or fuzzy)
+                        -- Verified users: show regardless of send score
+                        -- Unverified users: only show if they have send scores
+                        (
+                            (p.verified_at IS NOT NULL)
+                            OR (p.verified_at IS NULL AND scores.user_id IS NOT NULL)
+                        ) AND (
+                            -- Use ILIKE '%' only when NOT exact to avoid excluding true exact matches like 'Ethen_'
+                            LOWER(t.name) = LOWER(query)
+                            OR (NOT (LOWER(t.name) = LOWER(query)) AND (t.name <<-> query < 0.7 OR t.name ILIKE '%' || query || '%'))
+                        )
                 )
                 SELECT
                     tm.avatar_url,
@@ -493,6 +501,7 @@ BEGIN
                     tm.send_score,
                     tm.is_exact,
                     tm.primary_rank,
+                    CASE WHEN tm.verified_at IS NOT NULL THEN 0 ELSE 1 END AS verified_rank,
                     (
                         -- Secondary ranking varies by match type:
                         -- For exact matches (primary_rank=0): use negative send_score (higher score = better/lower secondary rank)
@@ -509,6 +518,7 @@ BEGIN
                     ROW_NUMBER() OVER (PARTITION BY tm.send_id ORDER BY (
                         -- Deduplication uses same ranking logic as main ordering
                         tm.primary_rank,  -- Primary: exact vs fuzzy
+                        CASE WHEN tm.verified_at IS NOT NULL THEN 0 ELSE 1 END,  -- Verified users before unverified
                         CASE
                             WHEN tm.is_exact THEN
                                 -tm.send_score  -- Secondary: send_score DESC for exact
@@ -520,7 +530,7 @@ BEGIN
                 FROM tag_matches tm
             ) ranked_matches
             WHERE ranked_matches.rn = 1
-            ORDER BY ranked_matches.primary_rank ASC, ranked_matches.secondary_rank ASC
+            ORDER BY ranked_matches.primary_rank ASC, ranked_matches.verified_rank ASC, ranked_matches.secondary_rank ASC
             LIMIT limit_val OFFSET offset_val
         ) sub
     ) AS tag_matches,
