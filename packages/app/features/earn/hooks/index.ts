@@ -45,24 +45,25 @@ export function useSendEarnAPY({
   const underlyingVault = useUnderlyingVault(underlyingVaultAddress)
 
   return useQuery({
-    queryKey: ['sendEarnAPY', { sendEarnVault, underlyingVault }] as const,
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      'sendEarnAPY',
+      {
+        vault,
+        underlyingVaultData: underlyingVault.data,
+        fee: sendEarnVault.data?.[1],
+      },
+    ] as const,
     queryKeyHashFn: hashFn,
-    enabled: sendEarnVault.isFetched && underlyingVault.isFetched,
-    queryFn: ({
-      queryKey: [, { sendEarnVault, underlyingVault }],
-    }: {
-      queryKey: [
-        string,
-        {
-          sendEarnVault: ReturnType<typeof useSendEarnVault>
-          underlyingVault: ReturnType<typeof useUnderlyingVault>
-        },
-      ]
-    }): { baseApy: number } => {
+    enabled: sendEarnVault.isSuccess && underlyingVault.isSuccess,
+    staleTime: 30_000,
+    queryFn: (): { baseApy: number } => {
       throwIf(sendEarnVault.error)
       throwIf(underlyingVault.error)
       assert(sendEarnVault.isSuccess, 'Fetching send earn vault failed')
       assert(underlyingVault.isSuccess, 'Fetching underlying vault failed')
+      assert(!!sendEarnVault.data, 'Send earn vault data is undefined')
+      assert(!!underlyingVault.data, 'Underlying vault data is undefined')
 
       return {
         baseApy: calculateBaseApy({
@@ -170,18 +171,23 @@ async function fetchSendEarnBalances(supabase: SupabaseClient<Database>) {
  * Fetches the user's send earn balances from supabase. This includes all
  * send earn vaults the user has deposited into.
  */
-export function sendEarnBalancesQueryOptions(supabase: SupabaseClient<Database>) {
+export function sendEarnBalancesQueryOptions(
+  supabase: SupabaseClient<Database>,
+  sendAccount: ReturnType<typeof useSendAccount>
+) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances'] as const,
+    queryKey: ['send_earn_balances', { sendAccount }] as const,
     queryFn: async () => fetchSendEarnBalances(supabase),
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
   })
 }
 
 export function useSendEarnBalances(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()
-  return useQuery(sendEarnBalancesQueryOptions(supabase))
+  const sendAccount = useSendAccount()
+  return useQuery(sendEarnBalancesQueryOptions(supabase, sendAccount))
 }
 
 const SendEarnBalanceTimelineSchema = z.object({
@@ -203,18 +209,23 @@ async function fetchSendEarnBalancesTimeline(supabase: SupabaseClient<Database>)
   return SendEarnBalancesTimelineSchema.parse(data)
 }
 
-export function sendEarnBalancesTimelineQueryOptions(supabase: SupabaseClient<Database>) {
+export function sendEarnBalancesTimelineQueryOptions(
+  supabase: SupabaseClient<Database>,
+  sendAccount: ReturnType<typeof useSendAccount>
+) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances_timeline'] as const,
+    queryKey: ['send_earn_balances_timeline', { sendAccount }] as const,
     queryFn: async () => fetchSendEarnBalancesTimeline(supabase),
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
   })
 }
 
 export function useSendEarnBalancesTimeline(): UseQueryReturnType<SendEarnBalance[]> {
   const supabase = useSupabase()
-  return useQuery(sendEarnBalancesQueryOptions(supabase))
+  const sendAccount = useSendAccount()
+  return useQuery(sendEarnBalancesTimelineQueryOptions(supabase, sendAccount))
 }
 
 async function fetchSendEarnBalancesAtBlock(
@@ -247,19 +258,22 @@ async function fetchSendEarnBalancesAtBlock(
 
 export function sendEarnBalancesAtBlockQueryOptions(
   supabase: SupabaseClient<Database>,
-  block_num: bigint | null
+  block_num: bigint | null,
+  sendAccount: ReturnType<typeof useSendAccount>
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances_at_block', { block_num }] as const,
+    queryKey: ['send_earn_balances_at_block', { block_num, sendAccount }] as const,
     queryFn: async () => fetchSendEarnBalancesAtBlock(supabase, block_num),
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
   })
 }
 
 export function useSendEarnBalancesAtBlock(block_num: bigint | null) {
   const supabase = useSupabase()
-  return useQuery(sendEarnBalancesAtBlockQueryOptions(supabase, block_num))
+  const sendAccount = useSendAccount()
+  return useQuery(sendEarnBalancesAtBlockQueryOptions(supabase, block_num, sendAccount))
 }
 
 /**

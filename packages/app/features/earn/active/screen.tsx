@@ -16,7 +16,7 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { toNiceError } from 'app/utils/toNiceError'
 import debug from 'debug'
-import { type NamedExoticComponent, useMemo } from 'react'
+import { type NamedExoticComponent, useMemo, memo } from 'react'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
@@ -256,71 +256,77 @@ const ErrorMessage = ({ error }: { error: Error | undefined }) => {
   )
 }
 
-const BreakdownRow = ({
-  symbol,
-  value,
-  label,
-}: {
-  symbol: string
-  label: string
-  value: string
-}) => {
-  return (
-    <XStack jc={'space-between'} ai={'center'} flexWrap={'wrap'} rowGap={'$3'} gap={'$3'}>
-      <XStack ai={'center'} gap={'$3.5'}>
-        <IconCoin symbol={symbol} size={'$2'} />
+const BreakdownRow = memo(
+  ({
+    symbol,
+    value,
+    label,
+  }: {
+    symbol: string
+    label: string
+    value: string
+  }) => {
+    return (
+      <XStack jc={'space-between'} ai={'center'} flexWrap={'wrap'} rowGap={'$3'} gap={'$3'}>
+        <XStack ai={'center'} gap={'$3.5'}>
+          <IconCoin symbol={symbol} size={'$2'} />
+          <Paragraph size={'$7'} fontWeight={600}>
+            {label}
+          </Paragraph>
+        </XStack>
         <Paragraph size={'$7'} fontWeight={600}>
-          {label}
+          {value}
         </Paragraph>
       </XStack>
-      <Paragraph size={'$7'} fontWeight={600}>
-        {value}
-      </Paragraph>
-    </XStack>
-  )
-}
+    )
+  }
+)
+BreakdownRow.displayName = 'BreakdownRow'
 
-const EarningButton = ({
-  Icon,
-  label,
-  href,
-}: {
-  label: string
-  Icon: NamedExoticComponent<IconProps>
-  href: string
-}) => {
-  const hoverStyles = useHoverStyles()
+const EarningButton = memo(
+  ({
+    Icon,
+    label,
+    href,
+  }: {
+    label: string
+    Icon: NamedExoticComponent<IconProps>
+    href: string
+  }) => {
+    const hoverStyles = useHoverStyles()
 
-  return (
-    <Fade flexGrow={1} flexShrink={1}>
-      <Link href={href}>
-        <XStack
-          jc={'center'}
-          py={'$3.5'}
-          br={'$6'}
-          backgroundColor={'$color1'}
-          elevation={'$0.75'}
-          hoverStyle={hoverStyles}
-        >
-          <Stack
-            flexDirection={'column'}
-            gap={'$2'}
+    return (
+      <Fade flexGrow={1} flexShrink={1}>
+        <Link href={href}>
+          <XStack
             jc={'center'}
-            ai={'center'}
-            width={'100%'}
-            flexWrap={Platform.OS === 'web' ? 'wrap' : undefined}
-            $gtSm={{
-              flexDirection: 'row',
-              gap: '$3',
-            }}
+            py={'$3.5'}
+            br={'$6'}
+            backgroundColor={'$color1'}
+            elevation={'$0.75'}
+            hoverStyle={hoverStyles}
           >
-            <Icon size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-            <Paragraph size={'$5'} $gtSm={{ size: '$6' }}>
-              {label}
-            </Paragraph>
-          </Stack>
-        </XStack>
-      </Link>
-    </Fade>
-  )
-}
+            <Stack
+              flexDirection={'column'}
+              gap={'$2'}
+              jc={'center'}
+              ai={'center'}
+              width={'100%'}
+              flexWrap={Platform.OS === 'web' ? 'wrap' : undefined}
+              $gtSm={{
+                flexDirection: 'row',
+                gap: '$3',
+              }}
+            >
+              <Icon size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+              <Paragraph size={'$5'} $gtSm={{ size: '$6' }}>
+                {label}
+              </Paragraph>
+            </Stack>
+          </XStack>
+        </Link>
+      </Fade>
+    )
+  }
+)
+EarningButton.displayName = 'EarningButton'
