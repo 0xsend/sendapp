@@ -7,17 +7,14 @@ import type {
   GetUserOperationReceiptReturnType,
   UserOperation,
   WaitForUserOperationReceiptParameters,
+  BundlerClient,
 } from 'permissionless'
+// biome-ignore lint/style/useImportType: ENTRYPOINT_ADDRESS_V07 is used with typeof in type position
+import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import superjson from 'superjson'
 import type { Hex } from 'viem'
+import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { bootstrap } from '../utils'
-import {
-  getBaseBlockNumber,
-  sendUserOperation,
-  simulateUserOperation,
-  waitForTransactionReceipt,
-  waitForUserOperationReceipt,
-} from './wagmi'
 
 export type UserOpActivities = {
   simulateUserOperationActivity: (userOp: UserOperation<'v0.7'>) => Promise<void>
@@ -35,13 +32,18 @@ export type UserOpActivities = {
 }
 
 export const createUserOpActivities = (
-  env: Record<string, string | undefined>
+  env: Record<string, string | undefined>,
+  bundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07> = baseMainnetBundlerClient
 ): UserOpActivities => {
   bootstrap(env)
   return {
     async simulateUserOperationActivity(userOp) {
       try {
-        await simulateUserOperation(userOp)
+        await baseMainnetClient.call({
+          account: entryPointAddress[baseMainnetClient.chain.id],
+          to: userOp.sender,
+          data: userOp.callData,
+        })
       } catch (error) {
         log.error('Failed to simulate user operation', { error })
         throw ApplicationFailure.nonRetryable(
@@ -66,7 +68,7 @@ export const createUserOpActivities = (
     },
     async getBaseBlockNumberActivity() {
       try {
-        return await getBaseBlockNumber()
+        return await baseMainnetClient.getBlockNumber()
       } catch (error) {
         log.error('Failed to get block number', { code: error.code, error })
         throw ApplicationFailure.retryable('Failed to get block number')
@@ -74,7 +76,9 @@ export const createUserOpActivities = (
     },
     async sendUserOpActivity(userOp) {
       try {
-        const hash = await sendUserOperation(userOp)
+        const hash = await bundlerClient.sendUserOperation({
+          userOperation: userOp,
+        })
         const hashBytea = hexToBytea(hash)
         return hashBytea
       } catch (error) {
@@ -95,7 +99,7 @@ export const createUserOpActivities = (
     async waitForTransactionReceiptActivity(hash) {
       try {
         const hexHash = byteaToHex(hash)
-        const bundlerReceipt = await waitForTransactionReceipt(hexHash)
+        const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt({ hash: hexHash })
         log.info('waitForTransactionReceiptActivity', {
           bundlerReceipt: superjson.stringify(bundlerReceipt),
         })
@@ -116,7 +120,7 @@ export const createUserOpActivities = (
      */
     async waitForUserOperationReceiptActivity(params: WaitForUserOperationReceiptParameters) {
       try {
-        const bundlerReceipt = await waitForUserOperationReceipt(params)
+        const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt(params)
         log.info('waitForUserOperationReceiptActivity', {
           bundlerReceipt,
         })
