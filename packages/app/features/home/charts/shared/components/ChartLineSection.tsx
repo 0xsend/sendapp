@@ -64,8 +64,8 @@ export function ChartLineSection({
             strokeWidth={3.5}
             panGestureHandlerProps={mergedPanProps}
             onScrub={
-              typeof pathProps?.onScrub === 'function'
-                ? (pathProps.onScrub as (payload: {
+              typeof onScrub === 'function'
+                ? (onScrub as (payload: {
                     active: boolean
                     ox?: number
                     oy?: number

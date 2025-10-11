@@ -48,7 +48,7 @@ export const TABS = [
   },
 ]
 
-export default function BottomNavBar({ currentRoute }: { currentRoute: string }) {
+function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   const { direction } = useScrollDirection()
   const { height } = useTabBarSize()
 
@@ -70,3 +70,7 @@ export default function BottomNavBar({ currentRoute }: { currentRoute: string })
     </XStack>
   )
 }
+
+BottomNavBar.displayName = 'BottomNavBar'
+
+export default BottomNavBar

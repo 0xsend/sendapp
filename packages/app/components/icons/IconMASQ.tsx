@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { Defs, G, Path, RadialGradient, Rect, Stop, Svg } from 'react-native-svg'
 
 const Masq = (props) => {
-  const { size, color, ...rest } = props
+  const { size, ...rest } = props
   return (
     <Svg
       width={size}

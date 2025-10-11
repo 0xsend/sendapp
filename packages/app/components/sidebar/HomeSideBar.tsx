@@ -82,7 +82,7 @@ const links = [
     : undefined,
 ].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
 
-const HomeSideBar = ({ ...props }: YStackProps) => {
+function HomeSideBar({ ...props }: YStackProps) {
   return (
     <SideBar {...props} ai={'flex-start'} px="$7">
       <YStack width={'100%'}>
@@ -99,6 +99,8 @@ const HomeSideBar = ({ ...props }: YStackProps) => {
     </SideBar>
   )
 }
+
+HomeSideBar.displayName = 'HomeSideBar'
 
 const DesktopAccountMenuEntry = () => {
   const { profile, isLoadingProfile } = useUser()

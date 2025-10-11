@@ -13,7 +13,7 @@ import {
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
-import { ChevronLeft, ChevronRight } from '@tamagui/lucide-icons'
+import { ChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { stableCoins, usdcCoin } from 'app/data/coins'
