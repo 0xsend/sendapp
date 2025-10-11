@@ -54,6 +54,11 @@ const links = [
     href: '/',
   },
   {
+    icon: <IconWorldSearch size={'$1'} scale={1.1} />,
+    text: 'Explore',
+    href: '/explore',
+  },
+  {
     icon: <IconArrowUp size={'$1'} scale={1.3} />,
     text: 'Send',
     href: '/send',
@@ -67,11 +72,6 @@ const links = [
     icon: <IconDeviceReset size={'$1'} scale={1.2} />,
     text: 'Activity',
     href: '/activity',
-  },
-  {
-    icon: <IconWorldSearch size={'$1'} scale={1.1} />,
-    text: 'Explore',
-    href: '/explore',
   },
   __DEV__ || baseMainnet.id === 84532
     ? {
