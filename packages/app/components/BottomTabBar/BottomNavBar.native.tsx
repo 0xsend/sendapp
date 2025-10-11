@@ -14,6 +14,7 @@ const IconSwapHorizontal = memo<IconProps>((props) => (
     <IconSwap {...props} />
   </View>
 ))
+IconSwapHorizontal.displayName = 'IconSwapHorizontal'
 
 const TABS = [
   {

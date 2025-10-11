@@ -12,6 +12,8 @@ import { IconArrowUp, IconPlus, IconStacks } from 'app/components/icons'
 import { usdcCoin } from 'app/data/coins'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useSendEarnCoin } from '../earn/providers/SendEarnProvider'
+import { useMemo } from 'react'
 
 type HomeQuickActionsProps = XStackProps
 
@@ -169,8 +171,19 @@ const Earn = () => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
 
+  // Determine navigation target based on deposit status
+  const {
+    totalAssets: { totalCurrentValue },
+  } = useSendEarnCoin(usdcCoin)
+  const hasExistingDeposit = totalCurrentValue > 0n
+
+  const href = useMemo(
+    () => (hasExistingDeposit ? '/earn/usdc' : '/earn/usdc/deposit'),
+    [hasExistingDeposit]
+  )
+
   return (
-    <QuickActionButton href={'/earn'}>
+    <QuickActionButton href={href}>
       <YStack
         gap="$2"
         jc={'space-between'}

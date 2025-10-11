@@ -45,12 +45,18 @@ const IconSwapRotated = memo<IconProps>((props) => (
     <IconSwap {...props} size={'$1'} scale={1.2} />
   </YStack>
 ))
+IconSwapRotated.displayName = 'IconSwapRotated'
 
 const links = [
   {
     icon: <IconHome size={'$1'} scale={1.2} />,
     text: 'Home',
     href: '/',
+  },
+  {
+    icon: <IconWorldSearch size={'$1'} scale={1.1} />,
+    text: 'Explore',
+    href: '/explore',
   },
   {
     icon: <IconArrowUp size={'$1'} scale={1.3} />,
@@ -66,11 +72,6 @@ const links = [
     icon: <IconDeviceReset size={'$1'} scale={1.2} />,
     text: 'Activity',
     href: '/activity',
-  },
-  {
-    icon: <IconWorldSearch size={'$1'} scale={1.1} />,
-    text: 'Explore',
-    href: '/explore',
   },
   __DEV__ || baseMainnet.id === 84532
     ? {

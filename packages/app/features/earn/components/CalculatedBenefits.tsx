@@ -1,23 +1,26 @@
 import { Card, Fade, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { Row } from 'app/features/earn/components/Row'
+import { memo } from 'react'
 
-export const CalculatedBenefits = ({
-  apy,
-  monthlyEarning,
-  rewards,
-  overrideApy,
-  overrideMonthlyEarning,
-  overrideRewards,
-}: {
-  apy: string
-  monthlyEarning: string
-  rewards: string
-  overrideApy?: string
-  overrideMonthlyEarning?: string
-  overrideRewards?: string
-}) => {
-  return (
-    <Fade>
+export const CalculatedBenefits = memo(
+  ({
+    apy,
+    monthlyEarning,
+    rewards,
+    overrideApy,
+    overrideMonthlyEarning,
+    overrideRewards,
+    showStaticInfo,
+  }: {
+    apy: string
+    monthlyEarning: string
+    rewards: string
+    overrideApy?: string
+    overrideMonthlyEarning?: string
+    overrideRewards?: string
+    showStaticInfo?: boolean
+  }) => {
+    return (
       <YStack gap={'$3.5'}>
         <Paragraph size={'$7'} fontWeight={'600'}>
           Benefits
@@ -25,10 +28,10 @@ export const CalculatedBenefits = ({
         <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
           <YStack gap={'$3.5'}>
             <XStack gap={'$2.5'} jc={'space-between'}>
-              <Paragraph size={'$6'}>Deposit APY</Paragraph>
+              <Paragraph size={'$6'}>{showStaticInfo ? 'APY' : 'Deposit APY'}</Paragraph>
               <XStack gap={'$2.5'}>
                 <Paragraph size={'$6'} textDecorationLine={overrideApy ? 'line-through' : 'none'}>
-                  {apy}%
+                  {showStaticInfo && apy === '...' ? 'up to 12' : apy}%
                 </Paragraph>
                 {overrideApy && (
                   <Paragraph size={'$6'} color={'$error'}>
@@ -39,7 +42,7 @@ export const CalculatedBenefits = ({
             </XStack>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
             <YStack gap={'$2'}>
-              {monthlyEarning ? (
+              {monthlyEarning && monthlyEarning !== '...' ? (
                 <Row
                   label={'Estimated Monthly Earning'}
                   value={`${monthlyEarning}${overrideMonthlyEarning ? '' : ' USDC'}`}
@@ -48,17 +51,27 @@ export const CalculatedBenefits = ({
                   }
                 />
               ) : null}
-              {rewards ? (
-                <Row
-                  label={'Rewards'}
-                  value={`${rewards}${overrideRewards ? '' : ' SEND'}`}
-                  overrideValue={overrideRewards ? `${overrideRewards} SEND` : undefined}
-                />
+              {showStaticInfo ? (
+                <Row label={'Withdraw Anytime'} value={'Full flexibility'} />
               ) : null}
+              <Row
+                label={'Rewards'}
+                value={
+                  rewards && rewards !== '...'
+                    ? `${rewards}${overrideRewards ? '' : ' SEND'}`
+                    : 'Bonus SEND tokens'
+                }
+                overrideValue={
+                  rewards && rewards !== '...' && overrideRewards
+                    ? `${overrideRewards} SEND`
+                    : undefined
+                }
+              />
             </YStack>
           </YStack>
         </Card>
       </YStack>
-    </Fade>
-  )
-}
+    )
+  }
+)
+CalculatedBenefits.displayName = 'CalculatedBenefits'
