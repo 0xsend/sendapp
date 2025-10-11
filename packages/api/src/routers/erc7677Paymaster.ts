@@ -125,10 +125,30 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         maxPriorityFeePerGas: userop.maxPriorityFeePerGas?.toString(),
       })
 
-      // Request sponsorship from CDP bundler via ERC-7677
+      // Standards-first ERC-7677 flow (portable and cost-efficient)
+      // We use pm_getPaymasterStubData → eth_estimateUserOperationGas → pm_getPaymasterData
+      // instead of pm_sponsorUserOperation because:
+      // - It's more portable across different bundler/paymaster providers
+      // - We can use our own baseMainnetClient for gas estimation (cheaper on RPC credits)
+      // - Follows the ERC-7677 standard more closely
       try {
-        // First, estimate gas for the userOp
-        log('Estimating gas for user operation...')
+        // Step 1: Get paymaster stub data for gas estimation
+        log('Getting paymaster stub data...')
+        const paymasterStub = await erc7677BundlerClient.getPaymasterStubData({
+          userOperation: {
+            sender: userop.sender,
+            nonce: userop.nonce,
+            callData: userop.callData,
+            maxFeePerGas: userop.maxFeePerGas,
+            maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
+            signature: userop.signature,
+          } as Parameters<typeof erc7677BundlerClient.getPaymasterStubData>[0]['userOperation'],
+        })
+
+        log('Paymaster stub data received:', paymasterStub)
+
+        // Step 2: Estimate gas using our own client (cheaper on RPC credits)
+        log('Estimating gas with baseMainnetClient...')
         const gasEstimates = await erc7677BundlerClient.estimateUserOperationGas({
           userOperation: {
             sender: userop.sender,
@@ -137,13 +157,15 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
+            ...paymasterStub,
           } as Parameters<typeof erc7677BundlerClient.estimateUserOperationGas>[0]['userOperation'],
         })
 
         log('Gas estimates:', gasEstimates)
 
-        // Now request sponsorship with the gas-estimated userOp
-        const sponsorResult = await erc7677BundlerClient.sponsorUserOperation({
+        // Step 3: Get final paymaster data with gas estimates
+        log('Getting final paymaster data...')
+        const paymasterData = await erc7677BundlerClient.getPaymasterData({
           userOperation: {
             sender: userop.sender,
             nonce: userop.nonce,
@@ -154,12 +176,16 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
-          } as Parameters<typeof erc7677BundlerClient.sponsorUserOperation>[0]['userOperation'],
+          } as Parameters<typeof erc7677BundlerClient.getPaymasterData>[0]['userOperation'],
         })
 
-        log('CDP sponsorship successful', sponsorResult)
+        log('Final paymaster data received:', paymasterData)
 
-        return sponsorResult
+        // Return both gas estimates and paymaster data
+        return {
+          ...gasEstimates,
+          ...paymasterData,
+        }
       } catch (error) {
         // Extract detailed error information
         const errorMessage = error instanceof Error ? error.message : String(error)
