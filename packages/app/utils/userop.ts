@@ -1,5 +1,5 @@
 import {
-  baseMainnetBundlerClient,
+  sendBaseMainnetBundlerClient,
   entryPointAddress,
   sendAccountAbi,
   sendTokenAbi,
@@ -258,7 +258,7 @@ function userOpQueryOptions({
 
       if (!callGasLimit) {
         // only estimate the gas for the call
-        await baseMainnetBundlerClient
+        await sendBaseMainnetBundlerClient
           .estimateUserOperationGas({
             userOperation: userOp,
           })

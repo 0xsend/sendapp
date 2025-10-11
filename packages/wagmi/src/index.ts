@@ -11,5 +11,5 @@ export { config, chains, client } from './config'
 export {
   mainnetClient,
   baseMainnetClient,
-  baseMainnetBundlerClient,
+  sendBaseMainnetBundlerClient,
 } from './client'

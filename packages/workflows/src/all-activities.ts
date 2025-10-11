@@ -1,3 +1,4 @@
+import { sendBaseMainnetBundlerClient } from '@my/wagmi'
 import { createTransferActivities } from './transfer-workflow/activities'
 import { createDepositActivities } from './deposit-workflow/activities'
 import { createUserOpActivities } from './userop-workflow/activities'
@@ -6,7 +7,7 @@ export function createMonorepoActivities(env: Record<string, string | undefined>
     ...createTransferActivities(env),
     ...createDepositActivities(env),
     // TODO: likely can remove since each workflow and activity should be self contained
-    ...createUserOpActivities(env),
+    ...createUserOpActivities(env, sendBaseMainnetBundlerClient),
   }
 }
 

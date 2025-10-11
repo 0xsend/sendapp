@@ -41,7 +41,7 @@ if (!isWeb) {
   BUNDLER_RPC_URL = getRpcUrl(BUNDLER_RPC_URL)
 }
 
-export const baseMainnetBundlerClient: BundlerClient<
+export const sendBaseMainnetBundlerClient: BundlerClient<
   typeof ENTRYPOINT_ADDRESS_V07,
   typeof baseMainnet
 > = createClient({

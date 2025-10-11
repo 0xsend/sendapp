@@ -13,7 +13,7 @@ import type {
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import superjson from 'superjson'
 import type { Hex } from 'viem'
-import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { bootstrap } from '../utils'
 
 export type UserOpActivities = {
@@ -33,7 +33,7 @@ export type UserOpActivities = {
 
 export const createUserOpActivities = (
   env: Record<string, string | undefined>,
-  bundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07> = baseMainnetBundlerClient
+  bundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07>
 ): UserOpActivities => {
   bootstrap(env)
   return {
