@@ -252,17 +252,20 @@ function userOpQueryOptions({
               paymasterData !== undefined ? paymasterData : defaultUserOp.paymasterData,
           }
 
-      // For ERC-7677, don't apply default gas limits - let the paymaster estimate them
+      // For ERC-7677, skip defaults - gas limits will be estimated by paymaster
       const userOp: UserOperation<'v0.7'> = skipGasEstimation
-        ? ({
+        ? {
             sender,
             nonce,
             callData,
             maxFeePerGas,
             maxPriorityFeePerGas,
             signature: '0x',
-            // Omit gas limits entirely - pm_sponsorUserOperation will estimate them
-          } as UserOperation<'v0.7'>)
+            // Provide minimal gas limits - ERC-7677 paymaster will replace these
+            callGasLimit: 0n,
+            verificationGasLimit: 0n,
+            preVerificationGas: 0n,
+          }
         : {
             ...defaultUserOp,
             ...paymasterDefaults,

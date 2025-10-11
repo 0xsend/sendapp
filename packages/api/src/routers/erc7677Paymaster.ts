@@ -7,9 +7,9 @@ import {
   isVaultDeposit,
 } from 'app/utils/decodeSendEarnDepositUserOp'
 import { address } from 'app/utils/zod'
-import { UserOperationSchema } from 'app/utils/zod/evm'
+import { UserOperationERC7677InputSchema } from 'app/utils/zod/evm'
 import debug from 'debug'
-import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
+import { ENTRYPOINT_ADDRESS_V07, type UserOperation } from 'permissionless'
 import { isAddress, parseUnits, toHex } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
@@ -33,9 +33,9 @@ export const erc7677PaymasterRouter = createTRPCRouter({
     .input(
       z.object({
         /**
-         * The user op to sponsor (without paymaster data).
+         * The user op to sponsor (without paymaster data, gas limits optional).
          */
-        userop: UserOperationSchema,
+        userop: UserOperationERC7677InputSchema,
         entryPoint: address,
       })
     )
@@ -58,7 +58,8 @@ export const erc7677PaymasterRouter = createTRPCRouter({
       // Decode and validate operation
       let depositArgs: ReturnType<typeof decodeSendEarnDepositUserOp>
       try {
-        depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
+        // Cast to UserOperation - decodeSendEarnDepositUserOp only uses callData and sender
+        depositArgs = decodeSendEarnDepositUserOp({ userOp: userop as UserOperation<'v0.7'> })
       } catch (e) {
         log('Failed to decode as SendEarn deposit', e)
         throw new TRPCError({
@@ -136,7 +137,7 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
-          },
+          } as Parameters<typeof erc7677BundlerClient.estimateUserOperationGas>[0]['userOperation'],
         })
 
         log('Gas estimates:', gasEstimates)
@@ -153,7 +154,7 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
-          },
+          } as Parameters<typeof erc7677BundlerClient.sponsorUserOperation>[0]['userOperation'],
         })
 
         log('CDP sponsorship successful', sponsorResult)

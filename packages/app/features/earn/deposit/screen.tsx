@@ -9,7 +9,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -21,6 +21,7 @@ import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useUser } from 'app/utils/useUser'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
@@ -166,11 +167,20 @@ export function DepositForm() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
+  const { tags } = useUser()
+
+  // Check if this account should use ERC-7677 paymaster
+  const useERC7677Paymaster = useMemo(() => {
+    const erc7677Sendtags = [
+      'yoursendtag', // TODO: Replace with actual test sendtags
+    ]
+    return tags?.some((tag) => erc7677Sendtags.includes(tag.name)) ?? false
+  }, [tags])
 
   const uop = useUserOp({
     sender,
     calls: calls.data ?? undefined,
-    skipGasEstimation: true, // Skip gas estimation - ERC-7677 paymaster will provide gas limits
+    skipGasEstimation: useERC7677Paymaster, // Skip gas estimation only for ERC-7677 flow
   })
   const webauthnCreds = useMemo(
     () =>
@@ -220,6 +230,7 @@ export function DepositForm() {
   })
 
   const sponsorUserOpMutation = api.erc7677Paymaster.sponsorUserOperation.useMutation()
+  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
 
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
@@ -229,18 +240,37 @@ export function DepositForm() {
     assert(uop.isSuccess, 'uop is not success')
 
     try {
-      // Get paymaster data + gas estimates from CDP via ERC-7677 endpoint
-      log('Requesting CDP sponsorship')
-      const sponsorResult = await sponsorUserOpMutation.mutateAsync({
-        userop: uop.data,
-        entryPoint: entryPointAddress[chainId],
-      })
-      log('CDP sponsorship received', sponsorResult)
+      let sponsoredUserOp = { ...uop.data }
 
-      // Update userOp with CDP's paymaster data and gas estimates
-      const sponsoredUserOp = {
-        ...uop.data,
-        ...sponsorResult,
+      if (useERC7677Paymaster) {
+        // ERC-7677 Paymaster Flow (uses external bundler/paymaster)
+        log('Using ERC-7677 paymaster flow')
+        const sponsorResult = await sponsorUserOpMutation.mutateAsync({
+          userop: uop.data,
+          entryPoint: entryPointAddress[chainId],
+        })
+        log('ERC-7677 sponsorship received', sponsorResult)
+
+        // Update userOp with paymaster data and gas estimates from ERC-7677
+        sponsoredUserOp = {
+          ...uop.data,
+          ...sponsorResult,
+        }
+      } else {
+        // Send Paymaster Flow (legacy)
+        log('Using Send paymaster flow')
+        const paymasterResult = await paymasterSignMutation.mutateAsync({
+          userop: uop.data,
+          entryPoint: entryPointAddress[chainId],
+        })
+        log('Send paymaster signature received', paymasterResult)
+
+        // Update userOp with Send paymaster data
+        sponsoredUserOp = {
+          ...uop.data,
+          paymaster: sendVerifyingPaymasterAddress[chainId],
+          paymasterData: paymasterResult.paymasterData,
+        }
       }
 
       // Sign with the user's passkey (signature covers all fields including gas)
@@ -271,6 +301,8 @@ export function DepositForm() {
     chainId,
     depositMutation,
     sponsorUserOpMutation,
+    paymasterSignMutation,
+    useERC7677Paymaster,
     toast,
   ])
 
