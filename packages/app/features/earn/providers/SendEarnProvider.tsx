@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import type { erc20Coin } from 'app/data/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, useCallback, type ReactNode } from 'react'
 import { isAddressEqual } from 'viem'
 import type { UseQueryReturnType } from 'wagmi/query'
 import {
@@ -34,8 +34,8 @@ type SendEarnContextType = {
     error: Error | null
   }
 
-  // Total values for all assets
-  getTotalAssets: () => {
+  // Total values for all assets (direct values instead of function)
+  totalAssets: {
     vaults: `0x${string}`[]
     shares: bigint[]
     currentAssets: UseQueryReturnType<bigint[] | undefined>
@@ -106,8 +106,8 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
   }, [allCurrentAssets.data])
 
   // Function to get balances for a specific coin
-  const getCoinBalances = useMemo(() => {
-    return (coin: erc20Coin | undefined) => {
+  const getCoinBalances = useCallback(
+    (coin: erc20Coin | undefined) => {
       if (!coin?.token || !allBalances.data || !vaultAssets.data || !allCurrentAssets.data) {
         return {
           data: undefined,
@@ -142,49 +142,49 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
         isSuccess: true,
         error: null,
       }
-    }
-  }, [
-    allBalances.data,
-    vaultAssets.data,
-    allCurrentAssets.data,
-    balancesWithShares,
-    allBalances.isLoading,
-    vaultAssets.isLoading,
-    allCurrentAssets.isLoading,
-    allBalances.error,
-    vaultAssets.error,
-    allCurrentAssets.error,
-  ])
+    },
+    [
+      allBalances.data,
+      vaultAssets.data,
+      allCurrentAssets.data,
+      balancesWithShares,
+      allBalances.isLoading,
+      vaultAssets.isLoading,
+      allCurrentAssets.isLoading,
+      allBalances.error,
+      vaultAssets.error,
+      allCurrentAssets.error,
+    ]
+  )
 
-  // Function to get total assets across all vaults
-  const getTotalAssets = useMemo(() => {
-    return () => ({
+  // Total assets across all vaults (memoized object instead of function)
+  const totalAssets = useMemo(
+    () => ({
       vaults: vaultsWithBalance,
       shares: sharesWithBalance,
       currentAssets: allCurrentAssets,
       totalCurrentValue,
-    })
-  }, [vaultsWithBalance, sharesWithBalance, allCurrentAssets, totalCurrentValue])
+    }),
+    [vaultsWithBalance, sharesWithBalance, allCurrentAssets, totalCurrentValue]
+  )
 
   // Overall loading state
   const isLoading = sendAccount.isLoading || allBalances.isLoading
 
   // Function to invalidate all related queries
-  const invalidateQueries = useMemo(() => {
-    return () => {
-      queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
-      queryClient.invalidateQueries({ queryKey: ['sendEarnCoinBalances'] })
-      queryClient.invalidateQueries({ queryKey: ['vaultConvertSharesToAssets'] })
-      queryClient.invalidateQueries({ queryKey: ['myEarnRewards'] })
-      queryClient.invalidateQueries({ queryKey: ['myAffiliateVault'] })
-    }
+  const invalidateQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['send_earn_balances'] })
+    queryClient.invalidateQueries({ queryKey: ['sendEarnCoinBalances'] })
+    queryClient.invalidateQueries({ queryKey: ['vaultConvertSharesToAssets'] })
+    queryClient.invalidateQueries({ queryKey: ['myEarnRewards'] })
+    queryClient.invalidateQueries({ queryKey: ['myAffiliateVault'] })
   }, [queryClient])
 
   const contextValue = useMemo(
     (): SendEarnContextType => ({
       allBalances,
       getCoinBalances,
-      getTotalAssets,
+      totalAssets,
       affiliateRewards,
       affiliateRewardsBalance,
       isLoading,
@@ -193,7 +193,7 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
     [
       allBalances,
       getCoinBalances,
-      getTotalAssets,
+      totalAssets,
       affiliateRewards,
       affiliateRewardsBalance,
       isLoading,
