@@ -39,7 +39,7 @@ export const createUserOpActivities = (
   return {
     async simulateUserOperationActivity(userOp) {
       try {
-        await baseMainnetClient.call({
+        await bundlerClient.call({
           account: entryPointAddress[baseMainnetClient.chain.id],
           to: userOp.sender,
           data: userOp.callData,
@@ -68,7 +68,7 @@ export const createUserOpActivities = (
     },
     async getBaseBlockNumberActivity() {
       try {
-        return await baseMainnetClient.getBlockNumber()
+        return await bundlerClient.getBlockNumber()
       } catch (error) {
         log.error('Failed to get block number', { code: error.code, error })
         throw ApplicationFailure.retryable('Failed to get block number')
