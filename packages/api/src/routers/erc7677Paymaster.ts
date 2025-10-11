@@ -10,7 +10,7 @@ import { address } from 'app/utils/zod'
 import { UserOperationSchema } from 'app/utils/zod/evm'
 import debug from 'debug'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
-import { isAddress, parseUnits } from 'viem'
+import { isAddress, parseUnits, toHex } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 
@@ -112,20 +112,70 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         })
       }
 
-      // Request sponsorship from ERC-7677 paymaster (provider will simulate during sponsorship)
+      // Log the userOp being sent for debugging
+      log('Received userOp from frontend:', {
+        sender: userop.sender,
+        nonce: userop.nonce.toString(),
+        callData: `${userop.callData.substring(0, 66)}...`, // First 32 bytes
+        callGasLimit: userop.callGasLimit?.toString(),
+        verificationGasLimit: userop.verificationGasLimit?.toString(),
+        preVerificationGas: userop.preVerificationGas?.toString(),
+        maxFeePerGas: userop.maxFeePerGas?.toString(),
+        maxPriorityFeePerGas: userop.maxPriorityFeePerGas?.toString(),
+      })
+
+      // Request sponsorship from CDP via Pimlico bundler
       try {
-        const sponsorResult = await erc7677BundlerClient.sponsorUserOperation({
-          userOperation: userop,
+        // First, use Pimlico bundler to estimate gas and prepare the userOp
+        log('Estimating gas with Pimlico bundler...')
+        const gasEstimates = await erc7677BundlerClient.estimateUserOperationGas({
+          userOperation: {
+            sender: userop.sender,
+            nonce: userop.nonce,
+            callData: userop.callData,
+            maxFeePerGas: userop.maxFeePerGas,
+            maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
+            signature: userop.signature,
+          },
         })
 
-        log('ERC-7677 sponsorship result', sponsorResult)
+        log('Gas estimates:', gasEstimates)
+
+        // Now request sponsorship with the gas-estimated userOp
+        const sponsorResult = await erc7677BundlerClient.sponsorUserOperation({
+          userOperation: {
+            sender: userop.sender,
+            nonce: userop.nonce,
+            callData: userop.callData,
+            callGasLimit: gasEstimates.callGasLimit,
+            verificationGasLimit: gasEstimates.verificationGasLimit,
+            preVerificationGas: gasEstimates.preVerificationGas,
+            maxFeePerGas: userop.maxFeePerGas,
+            maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
+            signature: userop.signature,
+          },
+        })
+
+        log('CDP sponsorship successful', sponsorResult)
 
         return sponsorResult
       } catch (error) {
-        log('Failed to sponsor with ERC-7677 paymaster', error)
+        // Extract detailed error information
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        const errorDetails = {
+          message: errorMessage,
+          name: error instanceof Error ? error.name : 'Unknown',
+          stack: error instanceof Error ? error.stack : undefined,
+          cause: error?.cause,
+          details: error?.details,
+          data: error?.data,
+        }
+
+        log('Failed to sponsor with ERC-7677 paymaster', errorDetails)
+
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to sponsor operation with ERC-7677 paymaster',
+          message: `Failed to sponsor operation: ${errorMessage}`,
           cause: error,
         })
       }

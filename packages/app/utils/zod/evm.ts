@@ -25,9 +25,9 @@ export const UserOperationSchema = z.object({
   factory: address.optional(),
   factoryData: hex.optional(),
   callData: hex,
-  callGasLimit: z.bigint(),
-  verificationGasLimit: z.bigint(),
-  preVerificationGas: z.bigint(),
+  callGasLimit: z.bigint().optional(), // Optional for ERC-7677 paymaster estimation
+  verificationGasLimit: z.bigint().optional(), // Optional for ERC-7677 paymaster estimation
+  preVerificationGas: z.bigint().optional(), // Optional for ERC-7677 paymaster estimation
   maxFeePerGas: z.bigint(),
   maxPriorityFeePerGas: z.bigint(),
   paymaster: address.optional(),

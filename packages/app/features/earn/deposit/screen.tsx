@@ -168,9 +168,9 @@ export function DepositForm() {
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
 
   const uop = useUserOp({
-    // Don't set paymaster or callGasLimit - we'll get these from CDP sponsorship
     sender,
     calls: calls.data ?? undefined,
+    skipGasEstimation: true, // Skip gas estimation - ERC-7677 paymaster will provide gas limits
   })
   const webauthnCreds = useMemo(
     () =>
