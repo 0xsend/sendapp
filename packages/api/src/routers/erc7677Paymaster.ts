@@ -125,10 +125,10 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         maxPriorityFeePerGas: userop.maxPriorityFeePerGas?.toString(),
       })
 
-      // Request sponsorship from CDP via Pimlico bundler
+      // Request sponsorship from CDP bundler via ERC-7677
       try {
-        // First, use Pimlico bundler to estimate gas and prepare the userOp
-        log('Estimating gas with Pimlico bundler...')
+        // First, estimate gas for the userOp
+        log('Estimating gas for user operation...')
         const gasEstimates = await erc7677BundlerClient.estimateUserOperationGas({
           userOperation: {
             sender: userop.sender,
