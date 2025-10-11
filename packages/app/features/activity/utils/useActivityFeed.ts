@@ -21,14 +21,101 @@ import type { ZodError } from 'zod'
 const sendtagCheckoutAddresses = Object.values(sendtagCheckoutAddress)
 
 /**
+ * Creates a grouped activity from multiple SendAccountTransfers from the same sender.
+ * Shows only the most recent transfer's value and note.
+ */
+function createGroupedTransferActivity(transfers: Activity[]): Activity {
+  // Sort transfers by timestamp (most recent first)
+  const sortedTransfers = transfers.sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+
+  const mostRecentTransfer = sortedTransfers[0]
+  if (!mostRecentTransfer) {
+    throw new Error('No transfers provided for grouping')
+  }
+
+  // Use the most recent transfer's data (value, note, etc.) without modification
+  const groupedActivity: Activity = {
+    ...mostRecentTransfer,
+    data: {
+      ...mostRecentTransfer.data,
+      // Add metadata to indicate this is a grouped transfer
+      grouped_transfers: sortedTransfers.length,
+      transfer_count: sortedTransfers.length,
+    },
+    // Keep the most recent transfer's timestamp
+    created_at: mostRecentTransfer.created_at,
+  }
+
+  return groupedActivity
+}
+
+/**
+ * Groups SendAccountTransfers from the same sender into a single activity.
+ * Only groups transfers between Send accounts (both from_user and to_user have send_id).
+ * Excludes withdrawals/deposits (where one send_id is null).
+ * The grouped activity will show the most recent transfer's value and note.
+ */
+function groupSendAccountTransfers(activities: Activity[]): Activity[] {
+  const grouped: Activity[] = []
+  const transferGroups = new Map<string, Activity[]>()
+
+  // Separate transfers from other activities
+  for (const activity of activities) {
+    if (activity.event_name === Events.SendAccountTransfers) {
+      // Only group transfers between Send accounts (both have send_id)
+      // Skip withdrawals/deposits (where one send_id is null)
+      const isBetweenSendAccounts = activity.from_user?.send_id && activity.to_user?.send_id
+
+      if (isBetweenSendAccounts) {
+        const senderKey = activity.data.f.toLowerCase()
+        if (!transferGroups.has(senderKey)) {
+          transferGroups.set(senderKey, [])
+        }
+        const group = transferGroups.get(senderKey)
+        if (group) {
+          group.push(activity)
+        }
+      } else {
+        // Don't group withdrawals/deposits - add them individually
+        grouped.push(activity)
+      }
+    } else {
+      grouped.push(activity)
+    }
+  }
+
+  // Process each group of transfers
+  for (const [, transferGroup] of transferGroups) {
+    if (transferGroup.length === 1) {
+      // Single transfer, no grouping needed
+      const singleTransfer = transferGroup[0]
+      if (singleTransfer) {
+        grouped.push(singleTransfer)
+      }
+    } else {
+      // Multiple transfers from same sender - create grouped activity
+      const groupedActivity = createGroupedTransferActivity(transferGroup)
+      grouped.push(groupedActivity)
+    }
+  }
+
+  // Sort by created_at to maintain chronological order
+  return grouped.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+}
+
+/**
  * Infinite query to fetch activity feed. Filters out activities with no from or to user (not a send app user).
  * Processes activities to handle special cases like Send Earn deposits.
  *
  * @param pageSize - number of items to fetch per page
+ * @param groupTransfers - whether to group SendAccountTransfers from the same sender
  */
 export function useActivityFeed({
   pageSize = 10,
-}: { pageSize?: number } = {}): UseInfiniteQueryResult<
+  groupTransfers = false,
+}: { pageSize?: number; groupTransfers?: boolean } = {}): UseInfiniteQueryResult<
   InfiniteData<Activity[]>,
   PostgrestError | ZodError
 > {
@@ -36,8 +123,8 @@ export function useActivityFeed({
   const addressBook = useAddressBook()
   const enabled = useMemo(() => addressBook.isError || addressBook.isSuccess, [addressBook])
   const queryKey = useMemo(
-    () => ['activity_feed', { addressBook, pageSize }] as const,
-    [addressBook, pageSize]
+    () => ['activity_feed', { addressBook, pageSize, groupTransfers }] as const,
+    [addressBook, pageSize, groupTransfers]
   )
   return useInfiniteQuery<
     Activity[],
@@ -60,7 +147,7 @@ export function useActivityFeed({
       }
       return firstPageParam - 1
     },
-    queryFn: async ({ queryKey: [, { addressBook, pageSize }], pageParam }) => {
+    queryFn: async ({ queryKey: [, { addressBook, pageSize, groupTransfers }], pageParam }) => {
       throwIf(addressBook.error)
       assert(!!addressBook.data, 'Fetching address book failed')
       return await fetchActivityFeed({
@@ -68,6 +155,7 @@ export function useActivityFeed({
         supabase,
         pageSize,
         addressBook: addressBook.data,
+        groupTransfers,
       })
     },
   })
@@ -80,17 +168,20 @@ export function useActivityFeed({
  * @param params.addressBook - The address book containing known addresses and their labels
  * @param params.supabase - The Supabase client
  * @param params.pageSize - The number of items to fetch per page
+ * @param params.groupTransfers - whether to group SendAccountTransfers from the same sender
  */
 async function fetchActivityFeed({
   pageParam,
   supabase,
   pageSize,
   addressBook,
+  groupTransfers,
 }: {
   pageParam: number
   addressBook: AddressBook
   supabase: SupabaseClient<Database>
   pageSize: number
+  groupTransfers: boolean
 }): Promise<Activity[]> {
   const from = pageParam * pageSize
   const to = (pageParam + 1) * pageSize - 1
@@ -129,6 +220,14 @@ async function fetchActivityFeed({
     .range(from, to)
   const { data, error } = await request
   throwIf(error)
-  // Parse and process the raw data
-  return EventArraySchema.parse(data)
+
+  // Parse the raw data first
+  const activities = EventArraySchema.parse(data)
+
+  // Group transfers if requested
+  if (groupTransfers) {
+    return groupSendAccountTransfers(activities)
+  }
+
+  return activities
 }
