@@ -22,12 +22,7 @@ import {
 // Internal
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useProfileScreenParams } from 'app/routers/params'
-import {
-  IconAccount,
-  IconLinkInBio,
-  IconCheckCircle,
-  IconBadgeCheckSolid,
-} from 'app/components/icons'
+import { IconAccount, IconLinkInBio, IconBadgeCheckSolid } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
