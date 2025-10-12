@@ -3,6 +3,7 @@ import { ApplicationFailure, log } from '@temporalio/activity'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { decodeExecuteBatchCalldata } from 'app/utils/decode-calldata'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { shouldUseErc7677 } from 'app/utils/shouldUseErc7677'
 import type {
   GetUserOperationReceiptReturnType,
   UserOperation,
@@ -11,7 +12,7 @@ import type {
 } from 'permissionless'
 import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types/entrypoint'
 import superjson from 'superjson'
-import type { Hex } from 'viem'
+import type { Address, Hex } from 'viem'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { bootstrap } from '../utils'
 
@@ -24,17 +25,30 @@ export type UserOpActivities = {
   }>
   getBaseBlockNumberActivity: () => Promise<bigint>
   sendUserOpActivity: (userOp: UserOperation<'v0.7'>) => Promise<PgBytea>
-  waitForTransactionReceiptActivity: (hash: PgBytea) => Promise<GetUserOperationReceiptReturnType>
+  waitForTransactionReceiptActivity: (
+    hash: PgBytea,
+    sender: Address
+  ) => Promise<GetUserOperationReceiptReturnType>
   waitForUserOperationReceiptActivity: (
-    params: WaitForUserOperationReceiptParameters
+    params: WaitForUserOperationReceiptParameters & { sender: Address }
   ) => Promise<GetUserOperationReceiptReturnType>
 }
 
 export const createUserOpActivities = (
   env: Record<string, string | undefined>,
-  bundlerClient: BundlerClient<ENTRYPOINT_ADDRESS_V07_TYPE>
+  sendBundlerClient: BundlerClient<ENTRYPOINT_ADDRESS_V07_TYPE>,
+  erc7677BundlerClient: BundlerClient<ENTRYPOINT_ADDRESS_V07_TYPE>
 ): UserOpActivities => {
   bootstrap(env)
+
+  /**
+   * Helper to select the appropriate bundler client based on sender address.
+   * Uses ERC-7677 bundler for addresses in allowlist, Send bundler otherwise.
+   */
+  const getBundlerClient = (sender: Address | undefined) => {
+    return shouldUseErc7677(sender) ? erc7677BundlerClient : sendBundlerClient
+  }
+
   return {
     async simulateUserOperationActivity(userOp) {
       try {
@@ -75,6 +89,14 @@ export const createUserOpActivities = (
     },
     async sendUserOpActivity(userOp) {
       try {
+        // Select bundler based on sender address
+        const bundlerClient = getBundlerClient(userOp.sender)
+
+        log.info('Sending userOp', {
+          sender: userOp.sender,
+          useErc7677: shouldUseErc7677(userOp.sender),
+        })
+
         const hash = await bundlerClient.sendUserOperation({
           userOperation: userOp,
         })
@@ -95,10 +117,21 @@ export const createUserOpActivities = (
      * Waits for the transaction receipt for the given hash.
      * @deprecated - use waitForUserOperationReceiptActivity instead
      */
-    async waitForTransactionReceiptActivity(hash) {
+    async waitForTransactionReceiptActivity(hash, sender) {
       try {
         const hexHash = byteaToHex(hash)
-        const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt({ hash: hexHash })
+        // Select bundler based on sender address
+        const bundlerClient = getBundlerClient(sender)
+
+        log.info('Waiting for transaction receipt', {
+          hash: hexHash,
+          sender,
+          useErc7677: shouldUseErc7677(sender),
+        })
+
+        const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt({
+          hash: hexHash,
+        })
         log.info('waitForTransactionReceiptActivity', {
           bundlerReceipt: superjson.stringify(bundlerReceipt),
         })
@@ -117,9 +150,21 @@ export const createUserOpActivities = (
     /**
      * Waits for the user operation receipt for the given hash.
      */
-    async waitForUserOperationReceiptActivity(params: WaitForUserOperationReceiptParameters) {
+    async waitForUserOperationReceiptActivity(
+      params: WaitForUserOperationReceiptParameters & { sender: Address }
+    ) {
       try {
-        const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt(params)
+        // Select bundler based on sender address
+        const { sender, ...waitParams } = params
+        const bundlerClient = getBundlerClient(sender)
+
+        log.info('Waiting for userOp receipt', {
+          sender,
+          hash: waitParams.hash,
+          useErc7677: shouldUseErc7677(sender),
+        })
+
+        const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt(waitParams)
         log.info('waitForUserOperationReceiptActivity', {
           bundlerReceipt,
         })

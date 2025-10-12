@@ -54,17 +54,15 @@ export const createDepositActivities = (
 ): DepositActivities => {
   bootstrap(env)
 
-  // Use send bundler on localhost/development, otherwise use ERC-7677 bundler
-  const isLocalhost = process.env.NODE_ENV === 'development' || !process.env.ERC7677_BUNDLER_RPC_URL
-  const bundlerClient = isLocalhost ? sendBaseMainnetBundlerClient : erc7677BundlerClient
-
+  // Pass both bundler clients to createUserOpActivities
+  // Dynamic selection happens in the activities based on sender address
   return {
     upsertTemporalDepositActivity,
     decodeDepositUserOpActivity,
     updateTemporalDepositActivity,
     verifyDepositIndexedActivity,
     upsertReferralRelationshipActivity,
-    ...createUserOpActivities(env, bundlerClient),
+    ...createUserOpActivities(env, sendBaseMainnetBundlerClient, erc7677BundlerClient),
   }
 }
 

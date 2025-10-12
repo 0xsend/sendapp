@@ -21,8 +21,8 @@ import { assert } from 'app/utils/assert'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useUser } from 'app/utils/useUser'
 import { signUserOp } from 'app/utils/signUserOp'
+import { shouldUseErc7677 } from 'app/utils/shouldUseErc7677'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
@@ -167,25 +167,11 @@ export function DepositForm() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
-  const { tags } = useUser()
-
-  // Check if this account should use ERC-7677 paymaster
-  const useERC7677Paymaster = useMemo(() => {
-    // Disable ERC-7677 on localhost/development
-    if (__DEV__ || process.env.NODE_ENV === 'development') {
-      return false
-    }
-
-    const erc7677Sendtags = [
-      'yoursendtag', // TODO: Replace with actual test sendtags
-    ]
-    return tags?.some((tag) => erc7677Sendtags.includes(tag.name)) ?? false
-  }, [tags])
 
   const uop = useUserOp({
     sender,
     calls: calls.data ?? undefined,
-    skipGasEstimation: useERC7677Paymaster, // Skip gas estimation only for ERC-7677 flow
+    skipGasEstimation: shouldUseErc7677(sender), // Skip gas estimation only for ERC-7677 flow
   })
   const webauthnCreds = useMemo(
     () =>
@@ -247,7 +233,7 @@ export function DepositForm() {
     try {
       let sponsoredUserOp = { ...uop.data }
 
-      if (useERC7677Paymaster) {
+      if (shouldUseErc7677(sender)) {
         // ERC-7677 Paymaster Flow (uses external bundler/paymaster)
         log('Using ERC-7677 paymaster flow')
         const sponsorResult = await sponsorUserOpMutation.mutateAsync({
@@ -307,7 +293,6 @@ export function DepositForm() {
     depositMutation,
     sponsorUserOpMutation,
     paymasterSignMutation,
-    useERC7677Paymaster,
     toast,
   ])
 
