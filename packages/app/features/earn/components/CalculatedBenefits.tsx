@@ -1,4 +1,4 @@
-import { Card, Fade, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { Card, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { Row } from 'app/features/earn/components/Row'
 import { memo } from 'react'
 
