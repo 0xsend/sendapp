@@ -9,8 +9,7 @@ import type {
   WaitForUserOperationReceiptParameters,
   BundlerClient,
 } from 'permissionless'
-// biome-ignore lint/style/useImportType: ENTRYPOINT_ADDRESS_V07 is used with typeof in type position
-import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types/entrypoint'
 import superjson from 'superjson'
 import type { Hex } from 'viem'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
@@ -33,7 +32,7 @@ export type UserOpActivities = {
 
 export const createUserOpActivities = (
   env: Record<string, string | undefined>,
-  bundlerClient: BundlerClient<typeof ENTRYPOINT_ADDRESS_V07>
+  bundlerClient: BundlerClient<ENTRYPOINT_ADDRESS_V07_TYPE>
 ): UserOpActivities => {
   bootstrap(env)
   return {

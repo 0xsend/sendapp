@@ -1,6 +1,7 @@
 import debug from 'debug'
 import { bundlerActions, type BundlerClient } from 'permissionless'
 import { paymasterActionsEip7677, type PaymasterActionsEip7677 } from 'permissionless/experimental'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types/entrypoint'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { baseMainnet } from '@my/wagmi'
 import { createClient, http } from 'viem'
@@ -34,11 +35,8 @@ if (!ERC7677_BUNDLER_RPC_URL) {
  *
  * Never import this in packages/app or any client-facing code.
  */
-export const erc7677BundlerClient: BundlerClient<
-  typeof ENTRYPOINT_ADDRESS_V07,
-  typeof baseMainnet
-> &
-  PaymasterActionsEip7677<typeof ENTRYPOINT_ADDRESS_V07> = createClient({
+export const erc7677BundlerClient: BundlerClient<ENTRYPOINT_ADDRESS_V07_TYPE, typeof baseMainnet> &
+  PaymasterActionsEip7677<ENTRYPOINT_ADDRESS_V07_TYPE> = createClient({
   chain: baseMainnet,
   transport: http(ERC7677_BUNDLER_RPC_URL),
 })
