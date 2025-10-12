@@ -1,4 +1,4 @@
-import { baseMainnetClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
+import { baseMainnetClient, sendBaseMainnetBundlerClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
 import { bootstrap, erc7677BundlerClient, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import {
@@ -53,13 +53,18 @@ export const createDepositActivities = (
   env: Record<string, string | undefined>
 ): DepositActivities => {
   bootstrap(env)
+
+  // Use send bundler on localhost/development, otherwise use ERC-7677 bundler
+  const isLocalhost = process.env.NODE_ENV === 'development' || !process.env.ERC7677_BUNDLER_RPC_URL
+  const bundlerClient = isLocalhost ? sendBaseMainnetBundlerClient : erc7677BundlerClient
+
   return {
     upsertTemporalDepositActivity,
     decodeDepositUserOpActivity,
     updateTemporalDepositActivity,
     verifyDepositIndexedActivity,
     upsertReferralRelationshipActivity,
-    ...createUserOpActivities(env, erc7677BundlerClient),
+    ...createUserOpActivities(env, bundlerClient),
   }
 }
 

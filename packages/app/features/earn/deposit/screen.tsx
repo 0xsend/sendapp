@@ -171,6 +171,11 @@ export function DepositForm() {
 
   // Check if this account should use ERC-7677 paymaster
   const useERC7677Paymaster = useMemo(() => {
+    // Disable ERC-7677 on localhost/development
+    if (__DEV__ || process.env.NODE_ENV === 'development') {
+      return false
+    }
+
     const erc7677Sendtags = [
       'yoursendtag', // TODO: Replace with actual test sendtags
     ]
