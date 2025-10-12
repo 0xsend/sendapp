@@ -37,7 +37,7 @@
     "@wagmi/core": "^2.16.7",
     "change-case": "^5.4.2",
     "expo-constants": "~17.0.3",
-    "permissionless": "^0.1.14",
+    "permissionless": "^0.1.49",
     "viem": "^2.27.2",
     "wagmi": "^2.14.16"
   }

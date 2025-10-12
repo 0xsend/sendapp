@@ -1,7 +1,6 @@
 import debug from 'debug'
 import { bundlerActions, type BundlerClient } from 'permissionless'
-import { pimlicoPaymasterActions } from 'permissionless/actions/pimlico'
-import type { PimlicoPaymasterClient } from 'permissionless/clients/pimlico'
+import { paymasterActionsEip7677, type PaymasterActionsEip7677 } from 'permissionless/experimental'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { baseMainnet } from '@my/wagmi'
 import { createClient, http } from 'viem'
@@ -39,9 +38,9 @@ export const erc7677BundlerClient: BundlerClient<
   typeof ENTRYPOINT_ADDRESS_V07,
   typeof baseMainnet
 > &
-  PimlicoPaymasterClient<typeof ENTRYPOINT_ADDRESS_V07> = createClient({
+  PaymasterActionsEip7677<typeof ENTRYPOINT_ADDRESS_V07> = createClient({
   chain: baseMainnet,
   transport: http(ERC7677_BUNDLER_RPC_URL),
 })
   .extend(bundlerActions(ENTRYPOINT_ADDRESS_V07))
-  .extend(pimlicoPaymasterActions(ENTRYPOINT_ADDRESS_V07))
+  .extend(paymasterActionsEip7677(ENTRYPOINT_ADDRESS_V07))

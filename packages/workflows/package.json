@@ -66,7 +66,7 @@
     "@temporalio/workflow": "^1.11.7",
     "@wagmi/core": "^2.16.7",
     "app": "workspace:*",
-    "permissionless": "^0.1.14",
+    "permissionless": "^0.1.49",
     "viem": "^2.27.2",
     "wagmi": "^2.14.16"
   }

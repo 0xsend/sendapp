@@ -1,4 +1,5 @@
 import { erc7677BundlerClient } from '@my/workflows/utils'
+import { baseMainnet } from '@my/wagmi'
 import { TRPCError } from '@trpc/server'
 import { assert } from 'app/utils/assert'
 import {
@@ -10,7 +11,7 @@ import { address } from 'app/utils/zod'
 import { UserOperationERC7677InputSchema } from 'app/utils/zod/evm'
 import debug from 'debug'
 import { ENTRYPOINT_ADDRESS_V07, type UserOperation } from 'permissionless'
-import { isAddress, parseUnits, toHex } from 'viem'
+import { isAddress, parseUnits } from 'viem'
 import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 
@@ -135,6 +136,7 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         // Step 1: Get paymaster stub data for gas estimation
         log('Getting paymaster stub data...')
         const paymasterStub = await erc7677BundlerClient.getPaymasterStubData({
+          chain: baseMainnet,
           userOperation: {
             sender: userop.sender,
             nonce: userop.nonce,
@@ -166,6 +168,7 @@ export const erc7677PaymasterRouter = createTRPCRouter({
         // Step 3: Get final paymaster data with gas estimates
         log('Getting final paymaster data...')
         const paymasterData = await erc7677BundlerClient.getPaymasterData({
+          chain: baseMainnet,
           userOperation: {
             sender: userop.sender,
             nonce: userop.nonce,
