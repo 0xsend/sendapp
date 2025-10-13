@@ -1,5 +1,5 @@
 import {
-  baseMainnetBundlerClient,
+  sendBaseMainnetBundlerClient,
   baseMainnetClient,
   entryPointAddress,
   sendAccountAbi,
@@ -102,10 +102,10 @@ export async function sendUserOpTransfer({
   })
 
   try {
-    const hash = await baseMainnetBundlerClient.sendUserOperation({
+    const hash = await sendBaseMainnetBundlerClient.sendUserOperation({
       userOperation: userOp,
     })
-    const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
+    const receipt = await sendBaseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
     assert(receipt.success === true, 'Failed to send userOp')
     return receipt
   } catch (e) {

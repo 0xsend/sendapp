@@ -1,5 +1,5 @@
 import type { UserOperation, GetUserOperationReceiptReturnType } from 'permissionless'
-import { baseMainnetClient, entryPointAddress, baseMainnetBundlerClient } from '@my/wagmi'
+import { baseMainnetClient, entryPointAddress, sendBaseMainnetBundlerClient } from '@my/wagmi'
 import type { CallExecutionError } from 'viem'
 import { signUserOp } from './signUserOp'
 import { throwNiceError, useAccountNonce } from './userop'
@@ -71,13 +71,13 @@ export async function sendUserOp({
     entryPoint,
   })
 
-  const hash = await baseMainnetBundlerClient
+  const hash = await sendBaseMainnetBundlerClient
     .sendUserOperation({
       userOperation: userOp,
     })
     .catch((e) => throwNiceError(e))
 
-  const receipt = await baseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
+  const receipt = await sendBaseMainnetBundlerClient.waitForUserOperationReceipt({ hash })
 
   assert(receipt.success, 'Failed to send userOp')
 

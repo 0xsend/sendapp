@@ -1,5 +1,5 @@
 import { getTemporalClient } from '@my/temporal/client'
-import { baseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { sendBaseMainnetBundlerClient, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { startWorkflow } from '@my/workflows/utils'
 import type { PostgrestError } from '@supabase/supabase-js'
 import { TRPCError } from '@trpc/server'
@@ -129,7 +129,7 @@ export const temporalRouter = createTRPCRouter({
 
 async function lookupTransferReceipt(userOpHash: Hex, startTime: Date): Promise<boolean> {
   const blockTimeWindow = Math.floor(startTime.getTime() / 1000) - 5 * 60 // subtract 5 minutes as a buffer window
-  const receipt = await baseMainnetBundlerClient.getUserOperationReceipt({
+  const receipt = await sendBaseMainnetBundlerClient.getUserOperationReceipt({
     hash: userOpHash,
   })
   assert(!!receipt, 'Transfer not onchain')

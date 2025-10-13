@@ -1,6 +1,6 @@
 import { describe, test, jest, beforeEach, expect } from '@jest/globals'
 import { act, renderHook, waitFor } from '@testing-library/react-native'
-import { baseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
+import { sendBaseMainnetBundlerClient, sendAccountAbi } from '@my/wagmi'
 import { signUserOpHash } from './signUserOp'
 import { encodeFunctionData, erc20Abi } from 'viem'
 import { useUserOpTransferMutation, useGenerateTransferUserOp } from './useUserOpTransferMutation'
@@ -40,7 +40,7 @@ jest.mock('@my/wagmi', () => ({
     // @ts-expect-error - this is a mock
     call: jest.fn().mockResolvedValue({}),
   },
-  baseMainnetBundlerClient: {
+  sendBaseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
     // @ts-expect-error - this is a mock
     waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),
@@ -78,9 +78,9 @@ describe('useUserOpTransferMutation', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     // @ts-expect-error mock
-    baseMainnetBundlerClient.sendUserOperation.mockReset()
+    sendBaseMainnetBundlerClient.sendUserOperation.mockReset()
     // @ts-expect-error mock
-    baseMainnetBundlerClient.waitForUserOperationReceipt.mockReset()
+    sendBaseMainnetBundlerClient.waitForUserOperationReceipt.mockReset()
     // @ts-expect-error mock
     signUserOpHash.mockReset()
   })
@@ -93,14 +93,14 @@ describe('useUserOpTransferMutation', () => {
       ...defaultUserOp,
     }
     // @ts-expect-error - testing
-    baseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
+    sendBaseMainnetBundlerClient.sendUserOperation = jest.fn().mockImplementation((_args) => {
       expect(_args).toStrictEqual({
         userOperation: userOp,
       })
       return Promise.resolve('0x123')
     })
     // @ts-expect-error mock
-    baseMainnetBundlerClient.waitForUserOperationReceipt.mockResolvedValue({ success: true })
+    sendBaseMainnetBundlerClient.waitForUserOperationReceipt.mockResolvedValue({ success: true })
     // @ts-expect-error mock
     signUserOpHash.mockResolvedValue('0x123')
 
@@ -114,8 +114,8 @@ describe('useUserOpTransferMutation', () => {
       jest.runAllTimers()
     })
     expect(signUserOpHash).toHaveBeenCalledTimes(1)
-    expect(baseMainnetBundlerClient.sendUserOperation).toHaveBeenCalledTimes(1)
-    expect(baseMainnetBundlerClient.waitForUserOperationReceipt).toHaveBeenCalledTimes(1)
+    expect(sendBaseMainnetBundlerClient.sendUserOperation).toHaveBeenCalledTimes(1)
+    expect(sendBaseMainnetBundlerClient.waitForUserOperationReceipt).toHaveBeenCalledTimes(1)
   })
 })
 

@@ -11,7 +11,7 @@ import {
   YStack,
   Separator,
 } from '@my/ui'
-import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
+import { sendBaseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
@@ -111,7 +111,7 @@ function RewardsBalance() {
 
       setUseropState('Sending transaction...')
 
-      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
+      const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
       })
 
@@ -119,7 +119,7 @@ function RewardsBalance() {
 
       const receipt = await withRetry(
         () =>
-          baseMainnetBundlerClient.waitForUserOperationReceipt({
+          sendBaseMainnetBundlerClient.waitForUserOperationReceipt({
             hash: userOpHash,
             timeout: 10000,
           }),

@@ -1,9 +1,9 @@
 import { expect, test, jest, beforeEach, afterEach } from '@jest/globals'
 
 import {
-  baseMainnetBundlerClient,
+  sendBaseMainnetBundlerClient,
   baseMainnetClient,
-  baseMainnetBundlerClient as bundlerClient,
+  sendBaseMainnetBundlerClient as bundlerClient,
   entryPointAddress,
   iEntryPointAbi,
   sendAccountFactoryAbi,
@@ -348,7 +348,7 @@ async function generateUserOp(publicKey: [Hex, Hex]) {
     entryPoint: entrypoint.address,
   })
   const gasPrices = await baseMainnetClient.getGasPrice()
-  const gasEstimate = await baseMainnetBundlerClient.estimateUserOperationGas({
+  const gasEstimate = await sendBaseMainnetBundlerClient.estimateUserOperationGas({
     userOperation: userOp,
   })
 

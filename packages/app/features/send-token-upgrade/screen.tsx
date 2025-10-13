@@ -15,7 +15,7 @@ import {
   YStack,
 } from '@my/ui'
 import {
-  baseMainnetBundlerClient,
+  sendBaseMainnetBundlerClient,
   baseMainnetClient,
   entryPointAddress,
   sendTokenV0Address,
@@ -219,7 +219,7 @@ function UpgradeTokenButton() {
 
       setUserOpState('Sending transaction...')
 
-      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
+      const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
       })
 
@@ -227,7 +227,7 @@ function UpgradeTokenButton() {
 
       const receipt = await withRetry(
         () =>
-          baseMainnetBundlerClient.waitForUserOperationReceipt({
+          sendBaseMainnetBundlerClient.waitForUserOperationReceipt({
             hash: userOpHash,
             timeout: 10_000,
           }),
