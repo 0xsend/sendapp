@@ -88,7 +88,7 @@ jest.mock('@my/wagmi', () => ({
     // @ts-expect-error - mock
     simulateContract: jest.fn().mockResolvedValue({}),
   },
-  baseMainnetBundlerClient: {
+  sendBaseMainnetBundlerClient: {
     sendUserOperation: jest.fn(),
     // @ts-expect-error - mock
     waitForUserOperationReceipt: jest.fn().mockResolvedValue({ success: true }),

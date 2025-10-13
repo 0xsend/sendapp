@@ -76,6 +76,7 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
       await activities.waitForUserOperationReceiptActivity({
         hash: byteaToHex(userOpHashBytea),
         timeout: 60_000,
+        sender: userOp.sender,
       })
     log.debug(
       `Transaction receipt received: txHash=${receipt.transactionHash}, block=${receipt.blockNumber}`

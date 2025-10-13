@@ -1,5 +1,5 @@
 import {
-  baseMainnetBundlerClient,
+  sendBaseMainnetBundlerClient,
   entryPointAddress,
   sendAccountAbi,
   sendTokenAbi,
@@ -147,6 +147,7 @@ function userOpQueryOptions({
   paymasterVerificationGasLimit,
   paymasterPostOpGasLimit,
   paymasterData,
+  skipGasEstimation,
 }: {
   sender: Hex | undefined
   nonce: bigint | undefined
@@ -159,6 +160,7 @@ function userOpQueryOptions({
   paymasterVerificationGasLimit?: bigint
   paymasterPostOpGasLimit?: bigint
   paymasterData?: Hex
+  skipGasEstimation?: boolean
 }) {
   return queryOptions({
     queryKey: [
@@ -175,6 +177,7 @@ function userOpQueryOptions({
         paymasterVerificationGasLimit,
         paymasterPostOpGasLimit,
         paymasterData,
+        skipGasEstimation,
       },
     ] as const,
     retry(failureCount, error) {
@@ -201,6 +204,7 @@ function userOpQueryOptions({
           paymasterVerificationGasLimit,
           paymasterPostOpGasLimit,
           paymasterData,
+          skipGasEstimation,
         },
       ],
     }) => {
@@ -231,34 +235,52 @@ function userOpQueryOptions({
         args: [calls],
       })
 
-      // allow for customizing the paymaster, otherwise use the default token (USDC) paymaster
-      const paymasterDefaults = {
-        paymaster: paymaster !== undefined ? paymaster : tokenPaymasterAddress[chainId],
-        paymasterVerificationGasLimit:
-          paymasterVerificationGasLimit !== undefined
-            ? paymasterVerificationGasLimit
-            : defaultUserOp.paymasterVerificationGasLimit,
-        paymasterPostOpGasLimit:
-          paymasterPostOpGasLimit !== undefined
-            ? paymasterPostOpGasLimit
-            : defaultUserOp.paymasterPostOpGasLimit,
-        paymasterData: paymasterData !== undefined ? paymasterData : defaultUserOp.paymasterData,
-      }
-      const userOp: UserOperation<'v0.7'> = {
-        ...defaultUserOp,
-        ...paymasterDefaults,
-        callGasLimit: callGasLimit ?? defaultUserOp.callGasLimit,
-        maxFeePerGas,
-        maxPriorityFeePerGas,
-        sender,
-        nonce,
-        callData,
-        signature: '0x',
-      }
+      // For ERC-7677, skip paymaster defaults as they'll be provided by the paymaster
+      const paymasterDefaults = skipGasEstimation
+        ? {}
+        : {
+            paymaster: paymaster !== undefined ? paymaster : tokenPaymasterAddress[chainId],
+            paymasterVerificationGasLimit:
+              paymasterVerificationGasLimit !== undefined
+                ? paymasterVerificationGasLimit
+                : defaultUserOp.paymasterVerificationGasLimit,
+            paymasterPostOpGasLimit:
+              paymasterPostOpGasLimit !== undefined
+                ? paymasterPostOpGasLimit
+                : defaultUserOp.paymasterPostOpGasLimit,
+            paymasterData:
+              paymasterData !== undefined ? paymasterData : defaultUserOp.paymasterData,
+          }
 
-      if (!callGasLimit) {
+      // For ERC-7677, skip defaults - gas limits will be estimated by paymaster
+      const userOp: UserOperation<'v0.7'> = skipGasEstimation
+        ? {
+            sender,
+            nonce,
+            callData,
+            maxFeePerGas,
+            maxPriorityFeePerGas,
+            signature: '0x',
+            // Provide minimal gas limits - ERC-7677 paymaster will replace these
+            callGasLimit: 0n,
+            verificationGasLimit: 0n,
+            preVerificationGas: 0n,
+          }
+        : {
+            ...defaultUserOp,
+            ...paymasterDefaults,
+            callGasLimit: callGasLimit ?? defaultUserOp.callGasLimit,
+            maxFeePerGas,
+            maxPriorityFeePerGas,
+            sender,
+            nonce,
+            callData,
+            signature: '0x',
+          }
+
+      if (!callGasLimit && !skipGasEstimation) {
         // only estimate the gas for the call
-        await baseMainnetBundlerClient
+        await sendBaseMainnetBundlerClient
           .estimateUserOperationGas({
             userOperation: userOp,
           })
@@ -292,6 +314,7 @@ function userOpQueryOptions({
  * pause the query. It relies on the useAccountNonce hook to get the nonce and the useEstimateFeesPerGas hook to get the
  * gas fees.
  *
+ * @param skipGasEstimation - Skip gas estimation for ERC-7677 paymaster operations (default: false)
  * TODO: add nonce to the userop params, until then you must manually invalidate the nonce query
  */
 export function useUserOp({
@@ -302,6 +325,7 @@ export function useUserOp({
   paymasterVerificationGasLimit,
   paymasterPostOpGasLimit,
   paymasterData,
+  skipGasEstimation = false,
   chainId = baseMainnetClient.chain.id,
 }: {
   sender: Address | undefined
@@ -311,6 +335,7 @@ export function useUserOp({
   paymasterVerificationGasLimit?: bigint
   paymasterPostOpGasLimit?: bigint
   paymasterData?: Hex
+  skipGasEstimation?: boolean
   chainId?: keyof typeof entryPointAddress
 }): UseQueryReturnType<UserOperation<'v0.7'>, Error> {
   const { data: nonce, error: nonceError, isLoading: isLoadingNonce } = useAccountNonce({ sender })
@@ -346,6 +371,7 @@ export function useUserOp({
         paymasterVerificationGasLimit,
         paymasterPostOpGasLimit,
         paymasterData,
+        skipGasEstimation,
       }),
     [
       sender,
@@ -359,6 +385,7 @@ export function useUserOp({
       paymasterVerificationGasLimit,
       paymasterPostOpGasLimit,
       paymasterData,
+      skipGasEstimation,
     ]
   )
   const queryFn: typeof uopQo.queryFn = useMemo(

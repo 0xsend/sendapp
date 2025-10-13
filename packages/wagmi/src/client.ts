@@ -1,5 +1,6 @@
 import debug from 'debug'
 import { bundlerActions, type BundlerClient } from 'permissionless'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { createClient, createPublicClient, http, type HttpTransport, type PublicClient } from 'viem'
 import { baseMainnet, mainnet } from './chains'
@@ -41,8 +42,8 @@ if (!isWeb) {
   BUNDLER_RPC_URL = getRpcUrl(BUNDLER_RPC_URL)
 }
 
-export const baseMainnetBundlerClient: BundlerClient<
-  typeof ENTRYPOINT_ADDRESS_V07,
+export const sendBaseMainnetBundlerClient: BundlerClient<
+  ENTRYPOINT_ADDRESS_V07_TYPE,
   typeof baseMainnet
 > = createClient({
   chain: baseMainnet,

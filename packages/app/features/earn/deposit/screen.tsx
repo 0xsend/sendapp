@@ -22,6 +22,7 @@ import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAm
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
+import { shouldUseErc7677 } from 'app/utils/shouldUseErc7677'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
@@ -168,12 +169,9 @@ export function DepositForm() {
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
 
   const uop = useUserOp({
-    paymaster: sendVerifyingPaymasterAddress[chainId],
-    paymasterVerificationGasLimit: vault.data ? 200000n : 1_000_000n,
-    paymasterPostOpGasLimit: vault.data ? 200000n : 1_000_000n,
-    callGasLimit: vault.data ? 1_000_000n : 5_000_000n,
     sender,
     calls: calls.data ?? undefined,
+    skipGasEstimation: shouldUseErc7677(sender), // Skip gas estimation only for ERC-7677 flow
   })
   const webauthnCreds = useMemo(
     () =>
@@ -186,8 +184,6 @@ export function DepositForm() {
   // MUTATION DEPOSIT USEROP via Temporal
   const toast = useAppToast()
   const queryClient = useQueryClient()
-
-  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
 
   const depositMutation = api.sendEarn.deposit.useMutation({
     onMutate: () => {
@@ -224,6 +220,9 @@ export function DepositForm() {
     },
   })
 
+  const sponsorUserOpMutation = api.erc7677Paymaster.sponsorUserOperation.useMutation()
+  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
+
   const handleDepositSubmit = useCallback(async () => {
     log('handleDepositSubmit: formState', form.formState)
     assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
@@ -232,26 +231,49 @@ export function DepositForm() {
     assert(uop.isSuccess, 'uop is not success')
 
     try {
-      log('Requesting paymaster signature')
-      const paymasterResult = await paymasterSignMutation.mutateAsync({
-        userop: uop.data,
-        entryPoint: entryPointAddress[chainId],
-      })
-      log('Paymaster signature received', paymasterResult)
+      let sponsoredUserOp = { ...uop.data }
 
-      // Update the user operation with the paymaster data
-      uop.data.paymasterData = paymasterResult.paymasterData
+      if (shouldUseErc7677(sender)) {
+        // ERC-7677 Paymaster Flow (uses external bundler/paymaster)
+        log('Using ERC-7677 paymaster flow')
+        const sponsorResult = await sponsorUserOpMutation.mutateAsync({
+          userop: uop.data,
+          entryPoint: entryPointAddress[chainId],
+        })
+        log('ERC-7677 sponsorship received', sponsorResult)
 
-      // Sign with the user's passkey
-      uop.data.signature = await signUserOp({
-        userOp: uop.data,
+        // Update userOp with paymaster data and gas estimates from ERC-7677
+        sponsoredUserOp = {
+          ...uop.data,
+          ...sponsorResult,
+        }
+      } else {
+        // Send Paymaster Flow (legacy)
+        log('Using Send paymaster flow')
+        const paymasterResult = await paymasterSignMutation.mutateAsync({
+          userop: uop.data,
+          entryPoint: entryPointAddress[chainId],
+        })
+        log('Send paymaster signature received', paymasterResult)
+
+        // Update userOp with Send paymaster data
+        sponsoredUserOp = {
+          ...uop.data,
+          paymaster: sendVerifyingPaymasterAddress[chainId],
+          paymasterData: paymasterResult.paymasterData,
+        }
+      }
+
+      // Sign with the user's passkey (signature covers all fields including gas)
+      sponsoredUserOp.signature = await signUserOp({
+        userOp: sponsoredUserOp,
         webauthnCreds,
         chainId: chainId,
         entryPoint: entryPointAddress[chainId],
       })
 
       await depositMutation.mutateAsync({
-        userop: uop.data,
+        userop: sponsoredUserOp,
         entryPoint: entryPointAddress[chainId],
       })
     } catch (error) {
@@ -269,6 +291,7 @@ export function DepositForm() {
     webauthnCreds,
     chainId,
     depositMutation,
+    sponsorUserOpMutation,
     paymasterSignMutation,
     toast,
   ])

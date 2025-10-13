@@ -178,29 +178,40 @@ export const createTransferActivities = (
       const block_num = bundlerReceipt.receipt.blockNumber.toString()
       const tx_idx = bundlerReceipt.receipt.transactionIndex.toString()
 
-      const log_idx = token
-        ? logs
-            .find(
-              ({ topics }) =>
-                topics[0] &&
-                topics[1] &&
-                topics[2] &&
-                isTransferTopic(topics[0]) &&
-                isAddressInTopic(topics[1], from) &&
-                isAddressInTopic(topics[2], to)
-            )
-            ?.logIndex.toString()
-        : logs
-            .find(
-              ({ topics, address }) =>
-                address.toLowerCase() === to.toLowerCase() &&
-                topics[0] &&
-                topics[1] &&
-                isReceiveTopic(topics[0]) &&
-                isAddressInTopic(topics[1], from)
-            )
-            ?.logIndex.toString()
+      const matchingLog = token
+        ? logs.find(
+            ({ topics }) =>
+              topics[0] &&
+              topics[1] &&
+              topics[2] &&
+              isTransferTopic(topics[0]) &&
+              isAddressInTopic(topics[1], from) &&
+              isAddressInTopic(topics[2], to)
+          )
+        : logs.find(
+            ({ topics, address }) =>
+              address.toLowerCase() === to.toLowerCase() &&
+              topics[0] &&
+              topics[1] &&
+              isReceiveTopic(topics[0]) &&
+              isAddressInTopic(topics[1], from)
+          )
 
+      if (!matchingLog || matchingLog.logIndex === null) {
+        throw ApplicationFailure.nonRetryable(
+          'No matching transfer log found in receipt',
+          'LOG_NOT_FOUND',
+          {
+            token,
+            from,
+            to,
+            block_num,
+            tx_idx,
+          }
+        )
+      }
+
+      const log_idx = matchingLog.logIndex.toString()
       const eventName = token ? 'send_account_transfers' : 'send_account_receives'
       const eventId = `${eventName}/base_logs/${block_num}/${tx_idx}/${log_idx}`
 

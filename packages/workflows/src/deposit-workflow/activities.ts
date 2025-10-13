@@ -1,5 +1,5 @@
-import { baseMainnetClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
-import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
+import { baseMainnetClient, sendBaseMainnetBundlerClient, sendEarnUsdcFactoryAbi } from '@my/wagmi'
+import { bootstrap, erc7677BundlerClient, isRetryableDBError } from '@my/workflows/utils'
 import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import {
   decodeSendEarnDepositUserOp,
@@ -53,13 +53,16 @@ export const createDepositActivities = (
   env: Record<string, string | undefined>
 ): DepositActivities => {
   bootstrap(env)
+
+  // Pass both bundler clients to createUserOpActivities
+  // Dynamic selection happens in the activities based on sender address
   return {
     upsertTemporalDepositActivity,
     decodeDepositUserOpActivity,
     updateTemporalDepositActivity,
     verifyDepositIndexedActivity,
     upsertReferralRelationshipActivity,
-    ...createUserOpActivities(env),
+    ...createUserOpActivities(env, sendBaseMainnetBundlerClient, erc7677BundlerClient),
   }
 }
 

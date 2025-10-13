@@ -4,6 +4,7 @@ import { accountRecoveryRouter } from './account-recovery/router'
 import { authRouter } from './auth/router'
 import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
+import { erc7677PaymasterRouter } from './erc7677Paymaster'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
 import { sendEarnRouter } from './sendEarn'
@@ -22,6 +23,7 @@ type AppRouterType = ReturnType<
     auth: typeof authRouter
     challenge: typeof accountRecoveryRouter
     distribution: typeof distributionRouter
+    erc7677Paymaster: typeof erc7677PaymasterRouter
     secretShop: typeof secretShopRouter
     sendAccount: typeof sendAccountRouter
     sendEarn: typeof sendEarnRouter
@@ -37,6 +39,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   auth: authRouter,
   challenge: accountRecoveryRouter,
   distribution: distributionRouter,
+  erc7677Paymaster: erc7677PaymasterRouter,
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
   sendEarn: sendEarnRouter,

@@ -6204,7 +6204,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     ms: "npm:^2.1.3"
     p-queue: "npm:^8.0.1"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     superjson: "npm:^2.2.1"
     typescript: "npm:^5.8.3"
     viem: "npm:^2.27.2"
@@ -6250,7 +6250,7 @@ __metadata:
     dotenv-cli: "npm:^7.3.0"
     extract-zip: "npm:^2.0.1"
     jsonwebtoken: "npm:^9.0.2"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     pg: "npm:^8.12.0"
     typescript: "npm:^5.8.3"
     viem: "npm:^2.27.2"
@@ -6264,7 +6264,7 @@ __metadata:
     "@indexsupply/shovel-config": "npm:^0.0.18"
     "@my/wagmi": "workspace:*"
     "@types/bun": "npm:^1.1.6"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     viem: "npm:^2.27.2"
     zx: "npm:^8.1.2"
   peerDependencies:
@@ -6368,7 +6368,7 @@ __metadata:
     debug: "npm:^4.4.1"
     expo-constants: "npm:~17.0.3"
     globby: "npm:^14.0.0"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     typescript: "npm:^5.8.3"
     viem: "npm:^2.27.2"
     wagmi: "npm:^2.14.16"
@@ -6393,7 +6393,7 @@ __metadata:
     dotenv-cli: "npm:^7.3.0"
     jest: "npm:^29"
     nyc: "npm:^17.0.0"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     source-map-support: "npm:^0.5.21"
     ts-jest: "npm:^29"
     ts-node: "npm:^10.9.2"
@@ -14013,7 +14013,7 @@ __metadata:
     libphonenumber-js: "npm:^1.10.58"
     next: "npm:15.3.1"
     nock: "npm:^14.0.3"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     react-hook-form: "npm:^7.48.2"
     react-native: "npm:0.76.9"
     react-native-passkeys: "npm:~0.3.3"
@@ -28554,12 +28554,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"permissionless@npm:^0.1.14":
-  version: 0.1.14
-  resolution: "permissionless@npm:0.1.14"
+"permissionless@npm:^0.1.49":
+  version: 0.1.49
+  resolution: "permissionless@npm:0.1.49"
   peerDependencies:
-    viem: ^2.0.0
-  checksum: 10/45a64f9ac0fe8996502dbf8a3bf2614dbd934824a4bffaa68fdfdde49c9a4d702a98b43369c2e126ad7fb5e6897cae4e6cd185bf4c524f189606e24b91ea5a12
+    viem: ">=2.14.1 <2.18.0"
+  checksum: 10/8ec7e019c5d00697ae57193d65439c2ea3b90631c6fc0cc3400f40e0d63695e87ea03eed6119ce8beb9b4602d5e715ad13a9ca8d8f9f61bcbe7b0253a7638b99
   languageName: node
   linkType: hard
 
@@ -36174,7 +36174,7 @@ __metadata:
     "@wagmi/core": "npm:^2.16.7"
     app: "workspace:*"
     dotenv-cli: "npm:^7.3.0"
-    permissionless: "npm:^0.1.14"
+    permissionless: "npm:^0.1.49"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.8.3"
     viem: "npm:^2.27.2"

@@ -89,7 +89,7 @@ jest.mock('@my/wagmi', () => {
         id: 845337,
       },
     },
-    baseMainnetBundlerClient: {
+    sendBaseMainnetBundlerClient: {
       transport: {
         url: 'http://127.0.0.1',
       },

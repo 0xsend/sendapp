@@ -112,14 +112,20 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
     },
   })
 
-  const bundlerReceipt = await waitForTransactionReceiptActivity(hash).catch(async (error) => {
-    log.error('waitForTransactionReceiptActivity failed', { error })
-    await updateTemporalSendAccountTransferActivity({
-      workflow_id: workflowId,
-      status: 'failed',
-    })
-    throw ApplicationFailure.nonRetryable('Error sending user operation', error.code, error.details)
-  })
+  const bundlerReceipt = await waitForTransactionReceiptActivity(hash, userOp.sender).catch(
+    async (error) => {
+      log.error('waitForTransactionReceiptActivity failed', { error })
+      await updateTemporalSendAccountTransferActivity({
+        workflow_id: workflowId,
+        status: 'failed',
+      })
+      throw ApplicationFailure.nonRetryable(
+        'Error sending user operation',
+        error.code,
+        error.details
+      )
+    }
+  )
   debugLog('Receipt received:', { tx_hash: bundlerReceipt.receipt.transactionHash })
 
   const { eventName, eventId } = await getEventFromTransferActivity({
