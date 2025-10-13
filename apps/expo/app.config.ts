@@ -33,6 +33,8 @@ module.exports = {
     permissions: ['android.permission.RECORD_AUDIO'],
   },
   plugins: [
+    'expo-secure-store',
+    'expo-web-browser',
     [
       'expo-build-properties',
       {
