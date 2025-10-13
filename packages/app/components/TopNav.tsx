@@ -90,7 +90,8 @@ export function TopNav({
     path.includes('/earn') ||
     path.includes('/sendpot') ||
     path.includes('/feed') ||
-    path.includes('/rewards')
+    path.includes('/rewards') ||
+    path.includes('/canton-wallet')
 
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
