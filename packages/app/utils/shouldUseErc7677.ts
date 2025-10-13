@@ -2,9 +2,6 @@ import { isAddressEqual, type Address } from 'viem'
 
 /**
  * Hardcoded allowlist of addresses that should use the ERC-7677 bundler/paymaster
- *
- * Use '*' to enable for all production users
- * Or list specific addresses for gradual rollout
  */
 const ERC7677_ADDRESS_ALLOWLIST = [
   '0x189aD18aF2732550D06413810737B20eA9A4F1aD',
@@ -27,11 +24,6 @@ export function shouldUseErc7677(address: Address | undefined): boolean {
   // Always use Send bundler in development
   if (__DEV__ || process.env.NODE_ENV === 'development') {
     return false
-  }
-
-  // Check for wildcard (all users)
-  if (ERC7677_ADDRESS_ALLOWLIST.includes('*')) {
-    return true
   }
 
   // Check if address is in allowlist
