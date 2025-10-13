@@ -11,6 +11,7 @@ export const Page: NextPageWithLayout = () => {
       <ExploreScreen
         images={{
           rewards: 'https://ghassets.send.app/app_images/explore_rewards.jpg',
+          cantonWallet: 'https://ghassets.send.app/app_images/explore_canton.jpg',
           sendpot: 'https://ghassets.send.app/app_images/sendpot.jpg',
         }}
       />
