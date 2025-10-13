@@ -248,6 +248,15 @@ export default defineConfig({
       abi: erc20Abi,
     },
     {
+      name: 'LateNightOnBase',
+      address: {
+        [baseLocal.id]: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+        [base.id]: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+        [baseSepolia.id]: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+      },
+      abi: erc20Abi,
+    },
+    {
       name: 'EntryPoint',
       address: {
         [mainnet.id]: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',

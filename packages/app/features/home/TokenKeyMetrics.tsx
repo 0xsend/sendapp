@@ -83,7 +83,13 @@ export function TokenKeyMetrics() {
     coin?.coingeckoTokenId
   )
   const { data: marketData, isLoading: isLoadingMarketData } = useTokensMarketData()
-  const mdM = marketData?.find((m) => m.id === coin?.coingeckoTokenId)
+
+  // Don't render if coin doesn't have CoinGecko ID
+  if (!coin?.coingeckoTokenId) {
+    return null
+  }
+
+  const mdM = marketData?.find((m) => m.id === coin.coingeckoTokenId)
   const md = coingeckoCoin?.market_data
 
   const isLoading = !!isLoadingMarketData || isLoadingCoingeckoCoin

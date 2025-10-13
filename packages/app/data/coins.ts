@@ -11,6 +11,7 @@ import {
   eurcAddress as eurcAddresses,
   mamoAddress as mamoAddresses,
   masqAddress as masqAddresses,
+  lateNightOnBaseAddress as lateNightOnBaseAddresses,
 } from '@my/wagmi'
 import { z } from 'zod'
 
@@ -38,7 +39,7 @@ const BaseCoinSchema = z.object({
   decimals: z.number().min(0).max(18),
   formatDecimals: z.number().min(0).optional(),
   shortLabel: z.string().optional(),
-  coingeckoTokenId: z.enum(COINGECKO_IDS),
+  coingeckoTokenId: z.enum(COINGECKO_IDS).optional(),
   minXfrAmt: z.number().min(0).optional(),
 })
 
@@ -171,6 +172,16 @@ export const masqCoin = {
   coingeckoTokenId: 'masq',
 } as const satisfies erc20Coin
 
+export const lateNightOnBaseCoin = {
+  label: 'latenightonbase',
+  shortLabel: 'LNOB',
+  symbol: 'LNOB',
+  token: lateNightOnBaseAddresses[baseMainnet.id],
+  decimals: 18,
+  formatDecimals: 0,
+  // CoinGecko not available - uses DexScreener only
+} as const satisfies erc20Coin
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -210,6 +221,7 @@ export const partnerCoins: coin[] = [
   eurcCoin,
   mamoCoin,
   masqCoin,
+  lateNightOnBaseCoin,
 ] as const
 export type partnerCoins = typeof partnerCoins
 
@@ -263,6 +275,7 @@ export const erc20Coins: erc20Coin[] = [
   eurcCoin,
   mamoCoin,
   masqCoin,
+  lateNightOnBaseCoin,
 ] as const
 
 export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
@@ -279,4 +292,5 @@ export const investmentCoins = [
   morphoCoin,
   mamoCoin,
   masqCoin,
+  lateNightOnBaseCoin,
 ] as const
