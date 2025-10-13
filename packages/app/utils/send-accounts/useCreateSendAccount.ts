@@ -9,9 +9,9 @@ import type { User } from '@supabase/supabase-js'
 import { base64URLNoPadToBase16 } from 'app/utils/base64ToBase16'
 import { api } from 'app/utils/api'
 import {
+  evaluatePasskeyDiagnostic,
   getPasskeyDiagnosticMode,
   runPasskeyDiagnostic,
-  shouldRunPasskeyDiagnostic,
 } from 'app/utils/passkeyDiagnostic'
 
 type SendAccountData = ReturnType<typeof useSendAccount>['data']
@@ -37,7 +37,7 @@ export const useCreateSendAccount = () => {
       onSuccess?: () => void
       onFailure?: (cause: unknown) => void
     }
-  }): Promise<SendAccountData> => {
+  }): Promise<SendAccountData | null> => {
     const { data: alreadyCreatedSendAccount, error: errorCheckingAlreadyCreatedSendAccount } =
       await sendAccount.refetch()
     if (errorCheckingAlreadyCreatedSendAccount) throw errorCheckingAlreadyCreatedSendAccount
@@ -71,7 +71,8 @@ export const useCreateSendAccount = () => {
     const { rawCred, authData } = credential
 
     const diagnosticMode = getPasskeyDiagnosticMode()
-    if (await shouldRunPasskeyDiagnostic(diagnosticMode)) {
+    const diagnosticDecision = await evaluatePasskeyDiagnostic(diagnosticMode)
+    if (diagnosticDecision.shouldRun) {
       passkeyDiagnosticCallbacks?.onStart?.()
       const diagnosticResult = await runPasskeyDiagnostic({
         allowedCredentials: [
@@ -84,7 +85,7 @@ export const useCreateSendAccount = () => {
 
       if (!diagnosticResult.success) {
         passkeyDiagnosticCallbacks?.onFailure?.(diagnosticResult.cause)
-        return null as SendAccountData
+        return null
       }
 
       passkeyDiagnosticCallbacks?.onSuccess?.()

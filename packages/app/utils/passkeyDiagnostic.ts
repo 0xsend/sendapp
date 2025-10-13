@@ -1,3 +1,4 @@
+import debug from 'debug'
 import * as Device from 'expo-device'
 import { Platform } from 'react-native'
 import type { Hex } from 'viem'
@@ -5,6 +6,8 @@ import type { Hex } from 'viem'
 import { signChallenge } from './signChallenge'
 
 const PASSKEY_DIAGNOSTIC_CHALLENGE: Hex = `0x${'00'.repeat(32)}`
+
+const log = debug('app:passkey-diagnostics')
 
 export const PASSKEY_DIAGNOSTIC_ERROR_MESSAGE =
   'Passkey health check failed. Try creating your passkey on a device with iCloud Keychain or Google Password Manager.'
@@ -14,6 +17,43 @@ export const PASSKEY_DIAGNOSTIC_TOAST_MESSAGE = 'Passkey integrity check failed.
 export type PasskeyDiagnosticMode = 'disabled' | 'always' | 'high-risk'
 
 export type PasskeyDiagnosticResult = { success: true } | { success: false; cause: unknown }
+
+export type PasskeyDiagnosticRunReason =
+  | 'mode-always'
+  | 'high-risk-environment'
+  | 'web-platform-authenticator-missing'
+
+export type PasskeyDiagnosticSkipReason =
+  | 'mode-disabled'
+  | 'environment-not-high-risk'
+  | 'web-platform-authenticator-present'
+  | 'unknown-web-platform-support'
+
+export type PasskeyDiagnosticDecision =
+  | { shouldRun: true; reason: PasskeyDiagnosticRunReason }
+  | { shouldRun: false; reason: PasskeyDiagnosticSkipReason }
+
+const PASSKEY_DIAGNOSTIC_RUN_REASONS: readonly PasskeyDiagnosticRunReason[] = [
+  'mode-always',
+  'high-risk-environment',
+  'web-platform-authenticator-missing',
+]
+
+function createPasskeyDiagnosticDecision(
+  reason: PasskeyDiagnosticRunReason | PasskeyDiagnosticSkipReason
+): PasskeyDiagnosticDecision {
+  if (PASSKEY_DIAGNOSTIC_RUN_REASONS.includes(reason as PasskeyDiagnosticRunReason)) {
+    return {
+      shouldRun: true,
+      reason: reason as PasskeyDiagnosticRunReason,
+    }
+  }
+
+  return {
+    shouldRun: false,
+    reason: reason as PasskeyDiagnosticSkipReason,
+  }
+}
 
 export class PasskeyDiagnosticError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
@@ -36,6 +76,8 @@ function normalize(value?: string | null): string {
   return value?.toLowerCase() ?? ''
 }
 
+// Derived from internal field reports and community bug threads where OEM builds regularly broke WebAuthn/passkey flows.
+// Keep this list tight and review periodically as firmware quality changes.
 const HIGH_RISK_ANDROID_VENDORS = [
   'vivo',
   'iqoo',
@@ -162,7 +204,7 @@ function isDiagnosticLoggingEnabled(): boolean {
 
 function logPasskeyDiagnostic(event: string, details: Record<string, unknown>) {
   if (!isDiagnosticLoggingEnabled()) return
-  console.info('[passkey-diagnostic]', event, details)
+  log(event, details)
 }
 
 export function isHighRiskPasskeyEnvironment(userAgent?: string): boolean {
@@ -237,30 +279,39 @@ export function isHighRiskPasskeyEnvironment(userAgent?: string): boolean {
   return false
 }
 
-export async function shouldRunPasskeyDiagnostic(
+export async function evaluatePasskeyDiagnostic(
   mode: PasskeyDiagnosticMode,
   userAgent?: string
-): Promise<boolean> {
-  switch (mode) {
-    case 'always':
-      return true
-    case 'high-risk':
-      break
-    default:
-      return false
+): Promise<PasskeyDiagnosticDecision> {
+  let reason: PasskeyDiagnosticRunReason | PasskeyDiagnosticSkipReason
+
+  if (mode === 'always') {
+    reason = 'mode-always'
+  } else if (mode !== 'high-risk') {
+    reason = 'mode-disabled'
+  } else if (isHighRiskPasskeyEnvironment(userAgent)) {
+    reason = 'high-risk-environment'
+  } else if (Platform.OS === 'web') {
+    const webPlatformSupport = await detectWebPlatformAuthenticatorSupport()
+    if (webPlatformSupport === 'missing') {
+      reason = 'web-platform-authenticator-missing'
+    } else if (webPlatformSupport === 'supported') {
+      reason = 'web-platform-authenticator-present'
+    } else {
+      reason = 'unknown-web-platform-support'
+    }
+  } else {
+    reason = 'environment-not-high-risk'
   }
 
-  const highRiskEnvironment = isHighRiskPasskeyEnvironment(userAgent)
-  if (highRiskEnvironment) {
-    return true
-  }
-
-  const webPlatformSupport = await detectWebPlatformAuthenticatorSupport()
-  if (webPlatformSupport === 'missing') {
-    return true
-  }
-
-  return false
+  const decision = createPasskeyDiagnosticDecision(reason)
+  logPasskeyDiagnostic('decision', {
+    mode,
+    userAgent,
+    reason: decision.reason,
+    shouldRun: decision.shouldRun,
+  })
+  return decision
 }
 
 export async function runPasskeyDiagnostic({

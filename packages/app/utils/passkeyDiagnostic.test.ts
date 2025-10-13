@@ -2,8 +2,8 @@ import { afterAll, beforeEach, describe, expect, it, jest } from '@jest/globals'
 
 import {
   PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
+  evaluatePasskeyDiagnostic,
   runPasskeyDiagnostic,
-  shouldRunPasskeyDiagnostic,
   __unsafeResetPasskeyDiagnosticCache,
   __unsafeGetWebPlatformSupportCache,
   isHighRiskPasskeyEnvironment,
@@ -149,29 +149,29 @@ describe('passkeyDiagnostic', () => {
   })
 
   it('should run in always mode', async () => {
-    const result = await shouldRunPasskeyDiagnostic('always')
-    expect(result).toBe(true)
+    const decision = await evaluatePasskeyDiagnostic('always')
+    expect(decision).toEqual({ shouldRun: true, reason: 'mode-always' })
   })
 
   it('runs in high-risk mode when user agent matches', async () => {
-    const result = await shouldRunPasskeyDiagnostic(
+    const decision = await evaluatePasskeyDiagnostic(
       'high-risk',
       'Mozilla/5.0 (Linux; Android 13; vivo X90 Build/TP1A)'
     )
-    expect(result).toBe(true)
+    expect(decision).toEqual({ shouldRun: true, reason: 'high-risk-environment' })
   })
 
   it('runs in high-risk mode when vendor fingerprint matches expanded OEM list', async () => {
     mockedDevice.brand = 'Realme'
-    const result = await shouldRunPasskeyDiagnostic('high-risk')
-    expect(result).toBe(true)
+    const decision = await evaluatePasskeyDiagnostic('high-risk')
+    expect(decision).toEqual({ shouldRun: true, reason: 'high-risk-environment' })
   })
 
   it('skips when vendor matches but Google Mobile Services is available', async () => {
     mockedDevice.brand = 'Vivo'
     mockedHasGmsSync.mockReturnValue(true)
-    const result = await shouldRunPasskeyDiagnostic('high-risk')
-    expect(result).toBe(false)
+    const decision = await evaluatePasskeyDiagnostic('high-risk')
+    expect(decision).toEqual({ shouldRun: false, reason: 'environment-not-high-risk' })
   })
 
   it('runs in high-risk mode when android vendor is unknown', async () => {
@@ -180,14 +180,14 @@ describe('passkeyDiagnostic', () => {
     mockedDevice.brand = null
     mockedDevice.manufacturer = null
     mockedDevice.modelName = null
-    const result = await shouldRunPasskeyDiagnostic('high-risk')
-    expect(result).toBe(true)
+    const decision = await evaluatePasskeyDiagnostic('high-risk')
+    expect(decision).toEqual({ shouldRun: true, reason: 'high-risk-environment' })
   })
 
   it('runs in high-risk mode when device brand matches', async () => {
     mockedDevice.brand = 'Vivo'
-    const result = await shouldRunPasskeyDiagnostic('high-risk')
-    expect(result).toBe(true)
+    const decision = await evaluatePasskeyDiagnostic('high-risk')
+    expect(decision).toEqual({ shouldRun: true, reason: 'high-risk-environment' })
   })
 
   it('runs in high-risk mode when user agent is a placeholder', async () => {
@@ -196,26 +196,26 @@ describe('passkeyDiagnostic', () => {
     mockedDevice.brand = null
     mockedDevice.manufacturer = null
     mockedDevice.modelName = null
-    const result = await shouldRunPasskeyDiagnostic('high-risk', 'reactnative')
-    expect(result).toBe(true)
+    const decision = await evaluatePasskeyDiagnostic('high-risk', 'reactnative')
+    expect(decision).toEqual({ shouldRun: true, reason: 'high-risk-environment' })
   })
 
   it('skips in high-risk mode for safe user agent', async () => {
     mockedPlatform.OS = 'ios'
     mockedDevice.osName = 'iOS'
-    const result = await shouldRunPasskeyDiagnostic(
+    const decision = await evaluatePasskeyDiagnostic(
       'high-risk',
       'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'
     )
-    expect(result).toBe(false)
+    expect(decision).toEqual({ shouldRun: false, reason: 'environment-not-high-risk' })
   })
 
   it('skips when disabled', async () => {
-    const result = await shouldRunPasskeyDiagnostic(
+    const decision = await evaluatePasskeyDiagnostic(
       'disabled',
       'Mozilla/5.0 (Linux; Android 13; vivo X90 Build/TP1A)'
     )
-    expect(result).toBe(false)
+    expect(decision).toEqual({ shouldRun: false, reason: 'mode-disabled' })
   })
 
   it('runs when web UVPAA reports missing support', async () => {
@@ -237,12 +237,12 @@ describe('passkeyDiagnostic', () => {
     expect(ua.toLowerCase().includes('moto')).toBe(false)
     expect(ua.toLowerCase().includes('vivo')).toBe(false)
     const isHighRisk = isHighRiskPasskeyEnvironment(ua)
-    const result = await shouldRunPasskeyDiagnostic('high-risk', ua)
+    const decision = await evaluatePasskeyDiagnostic('high-risk', ua)
 
     expect(isAndroidCheck).toBe(false)
     expect(uaMatchesVendor).toBe(false)
     expect(isHighRisk).toBe(false)
-    expect(result).toBe(true)
+    expect(decision).toEqual({ shouldRun: true, reason: 'web-platform-authenticator-missing' })
     expect(__unsafeGetWebPlatformSupportCache()).toBe('missing')
     expect(uvpaa).toHaveBeenCalled()
   })
@@ -266,12 +266,12 @@ describe('passkeyDiagnostic', () => {
     expect(ua.toLowerCase().includes('moto')).toBe(false)
     expect(ua.toLowerCase().includes('vivo')).toBe(false)
     const isHighRisk = isHighRiskPasskeyEnvironment(ua)
-    const result = await shouldRunPasskeyDiagnostic('high-risk', ua)
+    const decision = await evaluatePasskeyDiagnostic('high-risk', ua)
 
     expect(isAndroidCheck).toBe(false)
     expect(uaMatchesVendor).toBe(false)
     expect(isHighRisk).toBe(false)
-    expect(result).toBe(false)
+    expect(decision).toEqual({ shouldRun: false, reason: 'web-platform-authenticator-present' })
     expect(__unsafeGetWebPlatformSupportCache()).toBe('supported')
     expect(uvpaa).toHaveBeenCalled()
   })
