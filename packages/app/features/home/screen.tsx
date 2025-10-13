@@ -279,9 +279,11 @@ export function InvestmentsBody() {
               <CoinsModal.Close asChild>
                 <Button
                   pressStyle={{
-                    scale: 0.8,
+                    scale: 0.9,
                     bg: '$backgroundHover',
                   }}
+                  animation="100ms"
+                  animateOnly={['transform']}
                   size="$3"
                   circular
                   bg="$backgroundHover"
