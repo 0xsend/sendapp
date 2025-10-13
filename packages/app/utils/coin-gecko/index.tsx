@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import type { coins, CoinWithBalance } from 'app/data/coins'
+import type { CoingeckoId, coins, CoinWithBalance } from 'app/data/coins'
 import { allCoins, COINGECKO_IDS } from 'app/data/coins'
 import { z } from 'zod'
 import { api } from 'app/utils/api'
@@ -56,12 +56,15 @@ export type MarketData = z.infer<typeof MarketDataSchema>
  * React query function to fetch current token price for a given token id
  * Delegates to the multi-token markets fetch and selects the first.
  */
-export const useTokenPrice = <T extends coins[number]['coingeckoTokenId']>(tokenId: T) => {
+export const useTokenPrice = (tokenId: CoingeckoId) => {
   const q = useTokensMarketData()
   const price = q.data?.find((m) => m.id === tokenId)?.current_price ?? 0
   return {
     ...q,
-    data: q.data ? ({ [tokenId]: { usd: price } } as { [key in T]: { usd: number } }) : undefined,
+    data:
+      tokenId && q.data
+        ? ({ [tokenId]: { usd: price } } as { [key in CoingeckoId]: { usd: number } })
+        : undefined,
   }
 }
 
@@ -92,7 +95,8 @@ export const useTokensMarketData = <R = MarketData>(options?: {
   select?: (data: MarketData) => R
   enabled?: boolean
 }) => {
-  const ids = allCoins.map((c) => c.coingeckoTokenId)
+  // Filter out coins without CoinGecko IDs
+  const ids = allCoins.map((c) => c.coingeckoTokenId).filter((id) => id !== undefined)
   const canonicalIds = Array.from(new Set(ids)).sort().join(',')
 
   return useQuery<MarketData, Error, R>({

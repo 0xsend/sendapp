@@ -30,7 +30,10 @@ export function TokenChartSection() {
 
   const containerWidth = measuredWidth || Dimensions.get('window').width
 
-  if (coin === undefined) return null
+  // Don't render if coin doesn't have CoinGecko ID
+  if (!coin?.coingeckoTokenId || coin === undefined) {
+    return null
+  }
 
   return (
     <ChartCardSection title="Price Overview" tf={tf}>

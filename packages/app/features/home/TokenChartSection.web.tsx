@@ -59,6 +59,11 @@ export function TokenChartSection() {
   const { active, price, ts, onScrub } = useScrubState()
   const pathProps = { onScrub }
 
+  // Don't render if coin doesn't have CoinGecko ID
+  if (!coin?.coingeckoTokenId) {
+    return null
+  }
+
   return (
     <ChartCardSection title="Price Overview" tf={tf}>
       <YStack onLayout={onLayoutContainer}>
