@@ -1,6 +1,6 @@
 import debug from 'debug'
 import { bundlerActions, type BundlerClient } from 'permissionless'
-import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types/entrypoint'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { createClient, createPublicClient, http, type HttpTransport, type PublicClient } from 'viem'
 import { baseMainnet, mainnet } from './chains'

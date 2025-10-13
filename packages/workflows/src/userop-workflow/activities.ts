@@ -10,7 +10,7 @@ import type {
   WaitForUserOperationReceiptParameters,
   BundlerClient,
 } from 'permissionless'
-import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types/entrypoint'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
 import superjson from 'superjson'
 import type { Address, Hex } from 'viem'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'

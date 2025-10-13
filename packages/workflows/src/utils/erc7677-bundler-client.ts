@@ -1,7 +1,7 @@
 import debug from 'debug'
 import { bundlerActions, type BundlerClient } from 'permissionless'
 import { paymasterActionsEip7677, type PaymasterActionsEip7677 } from 'permissionless/experimental'
-import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types/entrypoint'
+import type { ENTRYPOINT_ADDRESS_V07_TYPE } from 'permissionless/types'
 import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless/utils'
 import { baseMainnet } from '@my/wagmi'
 import { createClient, http } from 'viem'
