@@ -67,6 +67,9 @@ const mockMyWagmi = {
   masqAddress: {
     845337: '0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3',
   },
+  lateNightOnBaseAddress: {
+    845337: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+  },
   entryPointAddress: {
     845337: '0x0000000071727De22E5E9d8BAf0edAc6f37da032',
   },
@@ -113,6 +116,7 @@ export const eurcAddress = mockMyWagmi.eurcAddress
 
 export const mamoAddress = mockMyWagmi.mamoAddress
 export const masqAddress = mockMyWagmi.masqAddress
+export const lateNightOnBaseAddress = mockMyWagmi.lateNightOnBaseAddress
 export const tokenPaymasterAddress = mockMyWagmi.tokenPaymasterAddress
 export const entryPointAddress = mockMyWagmi.entryPointAddress
 export const sendVerifierAbi = mockMyWagmi.sendVerifierAbi

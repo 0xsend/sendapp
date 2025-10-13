@@ -46,6 +46,11 @@ export const TokenAbout = () => {
     }
   }
 
+  // Don't render if coin doesn't have CoinGecko ID
+  if (!coin?.coingeckoTokenId) {
+    return null
+  }
+
   return (
     <YStack gap={'$3'}>
       <H4 fontWeight={600} size={'$7'}>
