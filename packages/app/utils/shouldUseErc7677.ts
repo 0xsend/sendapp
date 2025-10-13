@@ -22,7 +22,7 @@ export function shouldUseErc7677(address: Address | undefined): boolean {
   }
 
   // Always use Send bundler in development
-  if (__DEV__ || process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     return false
   }
 
