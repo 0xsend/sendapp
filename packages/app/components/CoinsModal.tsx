@@ -34,7 +34,7 @@ export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => 
   return (
     <Popover
       offset={{
-        mainAxis: -186,
+        mainAxis: -184,
       }}
       open={open}
       onOpenChange={setOpen}
@@ -109,9 +109,10 @@ const Items = ({ children, ...props }: GetProps<typeof Sheet.ScrollView>) => {
 
 const ConisModalContent = styled(Popover.Content, {
   rotate: '0deg',
-  transformOrigin: 'right top',
-  enterStyle: { o: 0, rotate: '-2deg' },
-  exitStyle: { o: 0, rotate: '-2deg' },
+  transformOrigin: 'center top',
+  o: 1,
+  enterStyle: { o: 0, y: 50 },
+  exitStyle: { o: 0, y: 50 },
   elevation: '$5',
   shadowOpacity: 0.08,
   '$theme-dark': {
@@ -124,7 +125,7 @@ const ConisModalContent = styled(Popover.Content, {
   boc: '$aztec3',
   br: '$6',
   animation: [
-    'fastExitHeavy',
+    'responsive',
     {
       opacity: {
         overshootClamping: true,
