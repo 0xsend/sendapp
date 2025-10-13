@@ -130,4 +130,17 @@ export const animations = createAnimations({
     type: 'timing',
     duration: 80,
   },
+
+  responsive: {
+    type: 'spring',
+    stiffness: 1000,
+    damping: 80,
+    mass: 0.9,
+  },
+  smoothResponsive: {
+    type: 'spring',
+    stiffness: 700,
+    damping: 70,
+    mass: 1.1,
+  },
 })
