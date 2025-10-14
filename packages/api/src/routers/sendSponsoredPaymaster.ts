@@ -63,7 +63,7 @@ const VERIFYING_PAYMASTER_POSTOP_GAS_LIMIT = 50000n
  *
  * @see https://eips.ethereum.org/EIPS/eip-7677
  */
-export const sponsoredPaymasterRouter = createTRPCRouter({
+export const sendSponsoredPaymasterRouter = createTRPCRouter({
   /**
    * pm_getPaymasterStubData - ERC-7677 compliant method
    *
@@ -85,7 +85,9 @@ export const sponsoredPaymasterRouter = createTRPCRouter({
     )
     .mutation(
       async ({ ctx: { session, supabase }, input: { userOp, entryPoint, sendAccountCalls } }) => {
-        const log = debug(`api:routers:sponsoredPaymaster:getPaymasterStubData:${session.user.id}`)
+        const log = debug(
+          `api:routers:sendSponsoredPaymaster:getPaymasterStubData:${session.user.id}`
+        )
 
         if (entryPoint !== ENTRYPOINT_ADDRESS_V07) {
           throw new TRPCError({
@@ -217,7 +219,7 @@ export const sponsoredPaymasterRouter = createTRPCRouter({
     )
     .mutation(
       async ({ ctx: { session, supabase }, input: { userOp, entryPoint, sendAccountCalls } }) => {
-        const log = debug(`api:routers:sponsoredPaymaster:getPaymasterData:${session.user.id}`)
+        const log = debug(`api:routers:sendSponsoredPaymaster:getPaymasterData:${session.user.id}`)
 
         if (entryPoint !== ENTRYPOINT_ADDRESS_V07) {
           throw new TRPCError({

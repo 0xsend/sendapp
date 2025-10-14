@@ -75,11 +75,11 @@ export function useUserOpWithPaymaster({
 
   // Choose paymaster based on sponsored flag
   const getPaymasterStubData = sponsored
-    ? api.sponsoredPaymaster.getPaymasterStubData.useMutation()
-    : api.send7677Paymaster.getPaymasterStubData.useMutation()
+    ? api.sendSponsoredPaymaster.getPaymasterStubData.useMutation()
+    : api.sendUSDCPaymaster.getPaymasterStubData.useMutation()
   const getPaymasterData = sponsored
-    ? api.sponsoredPaymaster.getPaymasterData.useMutation()
-    : api.send7677Paymaster.getPaymasterData.useMutation()
+    ? api.sendSponsoredPaymaster.getPaymasterData.useMutation()
+    : api.sendUSDCPaymaster.getPaymasterData.useMutation()
 
   const enabled =
     sender !== undefined &&

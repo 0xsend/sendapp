@@ -18,7 +18,7 @@ export function usePaymasterFees({
 }: {
   userOp: UserOperation<'v0.7'> | undefined
 }): UseQueryResult<{ totalFee: bigint; decimals: number }, Error> {
-  const getPaymasterData = api.send7677Paymaster.getPaymasterData.useMutation()
+  const getPaymasterData = api.sendUSDCPaymaster.getPaymasterData.useMutation()
 
   return useQuery({
     queryKey: ['paymasterFees', { userOp }],

@@ -89,7 +89,7 @@ async function calculateRequiredTokenAmount({
  *
  * @see https://docs.base.org/base-account/improve-ux/sponsor-gas/erc20-paymasters
  */
-export const send7677PaymasterRouter = createTRPCRouter({
+export const sendUSDCPaymasterRouter = createTRPCRouter({
   /**
    * pm_getPaymasterStubData - ERC-7677 compliant method
    *
@@ -116,7 +116,7 @@ export const send7677PaymasterRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx: { session }, input: { userOp, entryPoint, context } }) => {
-      const log = debug(`api:routers:send7677Paymaster:getPaymasterStubData:${session.user.id}`)
+      const log = debug(`api:routers:sendUSDCPaymaster:getPaymasterStubData:${session.user.id}`)
 
       if (entryPoint !== ENTRYPOINT_ADDRESS_V07) {
         throw new TRPCError({
@@ -194,7 +194,7 @@ export const send7677PaymasterRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx: { session }, input: { userOp, entryPoint, context } }) => {
-      const log = debug(`api:routers:send7677Paymaster:getPaymasterData:${session.user.id}`)
+      const log = debug(`api:routers:sendUSDCPaymaster:getPaymasterData:${session.user.id}`)
 
       if (entryPoint !== ENTRYPOINT_ADDRESS_V07) {
         throw new TRPCError({
