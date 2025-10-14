@@ -7,9 +7,8 @@ import {
   useReadBaseJackpotTicketPrice,
 } from '@my/wagmi/contracts/base-jackpot'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useUserOp } from 'app/utils/userop'
 import type { GetUserOperationReceiptReturnType } from 'permissionless'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
 import { assert } from 'app/utils/assert'
 import { useSendUserOpMutation, type SendUserOpArgs } from 'app/utils/sendUserOp'
 import debug from 'debug'
@@ -95,36 +94,27 @@ function usePrepareInternal({
     ]
   }, [tokenAddress, ticketPrice, quantity, recipient, referrer, sender])
 
-  const {
-    data: userOp,
-    error: userOpError,
-    isLoading: isLoadingUserOp,
-    refetch: refetchUserOp,
-  } = useUserOp({ sender, calls })
+  const { data: result, error, isLoading, refetch } = useUserOpWithPaymaster({ sender, calls })
 
-  const {
-    data: usdcFees,
-    isLoading: isLoadingUSDCFees,
-    error: usdcFeesError,
-    refetch: refetchUSDCFees,
-  } = useUSDCFees({ userOp })
+  const isPreparing = isLoading || isLoadingTicketPrice
+  const prepareError = error || ticketPriceError
 
-  const isPreparing = isLoadingUserOp || isLoadingUSDCFees || isLoadingTicketPrice
-  const prepareError = userOpError || ticketPriceError || usdcFeesError
-
-  log('Preparation state:', { isPreparing, prepareError, userOp, usdcFees, ticketPrice })
+  log('Preparation state:', {
+    isPreparing,
+    prepareError,
+    userOp: result?.userOp,
+    fees: result?.fees,
+    ticketPrice,
+  })
 
   return {
-    userOp,
-    usdcFees,
+    userOp: result?.userOp,
+    fees: result?.fees,
     calls,
     isPreparing,
     prepareError,
     ticketPrice,
-    refetchPrepare: useCallback(async () => {
-      await refetchUserOp()
-      await refetchUSDCFees()
-    }, [refetchUserOp, refetchUSDCFees]),
+    refetchPrepare: refetch,
   }
 }
 
@@ -133,7 +123,7 @@ export function usePurchaseJackpotTicket(
   options?: UseMutationOptions<GetUserOperationReceiptReturnType, Error, PurchaseAsyncVariables>
 ) {
   const queryClient = useQueryClient()
-  const { userOp, usdcFees, calls, isPreparing, prepareError, ticketPrice, refetchPrepare } =
+  const { userOp, fees, calls, isPreparing, prepareError, ticketPrice, refetchPrepare } =
     usePrepareInternal(args)
 
   const {
@@ -186,7 +176,7 @@ export function usePurchaseJackpotTicket(
   return {
     isPreparing,
     prepareError,
-    usdcFees,
+    fees,
     ticketPrice,
     userOp,
     refetchPrepare,

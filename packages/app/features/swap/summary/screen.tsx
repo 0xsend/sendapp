@@ -41,13 +41,12 @@ export const SwapSummaryScreen = () => {
     status: encodeRouteStatus,
   } = api.swap.encodeSwapRoute.useMutation()
 
-  const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
-    useSwap({
-      amount: BigInt(inAmount || '0'),
-      token: inToken,
-      routerAddress: encodedRoute?.routerAddress,
-      swapCallData: encodedRoute?.data,
-    })
+  const { userOp, userOpError, isLoadingUserOp, fees, feesError, isLoadingFees } = useSwap({
+    amount: BigInt(inAmount || '0'),
+    token: inToken,
+    routerAddress: encodedRoute?.routerAddress,
+    swapCallData: encodedRoute?.data,
+  })
 
   const {
     mutateAsync: sendUserOpMutateAsync,
@@ -61,7 +60,7 @@ export const SwapSummaryScreen = () => {
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
   const isUSDCSelected = inCoin?.label === 'USDC'
-  const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
+  const gas = fees ? fees.totalFee : BigInt(Number.MAX_SAFE_INTEGER)
   const hasEnoughBalance = inCoin?.balance && inCoin.balance >= BigInt(inAmount ?? '0')
   const hasEnoughGas =
     (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(inAmount || '0') + gas : gas)
@@ -94,7 +93,7 @@ export const SwapSummaryScreen = () => {
     hasEnoughBalance &&
     encodedRoute &&
     userOp &&
-    usdcFees
+    fees
 
   const encodeRoute = useCallback(async () => {
     if (!sendAccount?.address || !routeSummary) {
@@ -266,12 +265,12 @@ export const SwapSummaryScreen = () => {
                 label={'Transaction Fee'}
                 value={(() => {
                   switch (true) {
-                    case isLoadingUSDCFees:
+                    case isLoadingFees:
                       return <Spinner size="small" color="$color12" />
-                    case !!usdcFeesError || !usdcFees:
+                    case !!feesError || !fees:
                       return '-'
                     default:
-                      return `${formatAmount(formatUnits(gas, usdcFees.decimals))} USDC`
+                      return `${formatAmount(formatUnits(gas, fees.decimals))} USDC`
                   }
                 })()}
               />
@@ -291,8 +290,8 @@ export const SwapSummaryScreen = () => {
                 return toNiceError(encodeRouteError)
               case !!userOpError:
                 return toNiceError(userOpError)
-              case !!usdcFeesError:
-                return toNiceError(usdcFeesError)
+              case !!feesError:
+                return toNiceError(feesError)
               case !!sendUserOpError:
                 return toNiceError(sendUserOpError)
               default:

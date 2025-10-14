@@ -143,10 +143,9 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
 
   const [error, setError] = useState<string>()
   const [attempts, setAttempts] = useState(0)
-  const { userOp, userOpError, isLoadingUserOp, usdcFees, usdcFeesError, isLoadingUSDCFees } =
+  const { userOp, userOpError, isLoadingUserOp, fees, feesError, isLoadingFees } =
     useSendtagCheckout()
-  const canAffordTags =
-    usdc?.balance && usdcFees && usdc.balance + usdcFees.baseFee + usdcFees.gasFees >= amountDue
+  const canAffordTags = usdc?.balance && fees && usdc.balance + fees.totalFee >= amountDue
 
   const queryClient = useQueryClient()
   const { mutateAsync: sendUserOp, isPending: sendTransactionIsPending } = useMutation({
@@ -228,7 +227,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     }
   }, [txWaitError])
 
-  const possibleErrors = [checkoutErrors, userOpError, usdcFeesError, referrerError] as (Error & {
+  const possibleErrors = [checkoutErrors, userOpError, feesError, referrerError] as (Error & {
     details?: string
   })[]
 
@@ -286,8 +285,8 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     !sendTransactionIsPending &&
     !submitting &&
     !txWaitLoading &&
-    !usdcFeesError &&
-    !isLoadingUSDCFees &&
+    !feesError &&
+    !isLoadingFees &&
     !isLoadingReferrer &&
     !!(referrerProfile?.address || !referralCode)
 
@@ -296,14 +295,12 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       {tokensQuery.error && (
         <Paragraph color="$error">{tokensQuery.error?.message?.split('.').at(0)}</Paragraph>
       )}
-      {usdcFeesError && (
-        <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
-      )}
+      {feesError && <Paragraph color="$error">{feesError?.message?.split('.').at(0)}</Paragraph>}
       {(() => {
         switch (true) {
           case isLoadingUserOp ||
             isLoadingUSDC ||
-            isLoadingUSDCFees ||
+            isLoadingFees ||
             isLoadingReceipts ||
             isLoadingReferrer:
             return (

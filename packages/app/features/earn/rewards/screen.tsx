@@ -24,7 +24,8 @@ import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useAccountNonce, useUserOp } from 'app/utils/userop'
+import { useAccountNonce } from 'app/utils/userop'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
 import debug from 'debug'
 import { useMemo, useState } from 'react'
 import { Platform, SectionList } from 'react-native'
@@ -71,13 +72,20 @@ function RewardsBalance() {
   const calls = useSendEarnClaimRewardsCalls({ sender })
 
   // Create the user operation
-  const uop = useUserOp({
+  const {
+    data: result,
+    error: uopError,
+    isLoading: uopIsLoading,
+  } = useUserOpWithPaymaster({
     sender,
     calls: calls.data ?? undefined,
   })
+  const uop = useMemo(() => result?.userOp, [result?.userOp])
 
   // DEBUG
   log('uop', uop)
+  log('uopError', uopError)
+  log('uopIsLoading', uopIsLoading)
   log('calls', calls)
 
   // Check if the user has rewards to claim
@@ -100,19 +108,22 @@ function RewardsBalance() {
   // MUTATION CLAIM REWARDS USEROP
   const mutation = useMutation({
     mutationFn: async () => {
-      assert(uop.isSuccess, 'uop is not success')
+      assert(uop !== undefined, 'uop is not defined')
 
-      uop.data.signature = await signUserOp({
-        userOp: uop.data,
-        webauthnCreds,
-        chainId: chainId,
-        entryPoint: entryPointAddress[chainId],
-      })
+      const signedUserOp = {
+        ...uop,
+        signature: await signUserOp({
+          userOp: uop,
+          webauthnCreds,
+          chainId: chainId,
+          entryPoint: entryPointAddress[chainId],
+        }),
+      }
 
       setUseropState('Sending transaction...')
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
-        userOperation: uop.data,
+        userOperation: signedUserOp,
       })
 
       setUseropState('Waiting for confirmation...')
@@ -164,12 +175,11 @@ function RewardsBalance() {
   const canClaim =
     !affiliateRewards.isLoading &&
     !calls.isLoading &&
-    !uop.isLoading &&
+    !uopIsLoading &&
     hasEnoughRewards &&
     calls.isSuccess &&
-    uop.isSuccess &&
+    uop !== undefined &&
     !calls.isPending &&
-    !uop.isPending &&
     mutation.isIdle
 
   const handleClaimPress = () => {
@@ -224,7 +234,7 @@ function RewardsBalance() {
         ) : null}
 
         <XStack alignItems="center" jc="center" gap={'$2'}>
-          {[calls.error, sendAccount.error, uop.error, mutation.error, affiliateRewards.error]
+          {[calls.error, sendAccount.error, uopError, mutation.error, affiliateRewards.error]
             .filter(Boolean)
             .map((e) =>
               e ? (

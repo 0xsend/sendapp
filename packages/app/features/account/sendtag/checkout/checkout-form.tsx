@@ -48,7 +48,7 @@ export const CheckoutForm = () => {
 
 function TotalPrice() {
   const pendingTags = usePendingTags()
-  const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
+  const { fees, feesError, isLoadingFees } = useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { coin: usdc, isLoading: isCoinLoading } = useCoin('USDC')
 
@@ -94,23 +94,20 @@ function TotalPrice() {
           </Paragraph>
           {(() => {
             switch (true) {
-              case isLoadingUSDCFees:
+              case isLoadingFees:
                 return <Spinner color="$color11" />
-              case !!usdcFeesError:
+              case !!feesError:
                 return (
                   <Paragraph color="$error" textAlign={'right'}>
-                    {usdcFeesError?.message?.split('.').at(0)}
+                    {feesError?.message?.split('.').at(0)}
                   </Paragraph>
                 )
-              case !usdcFees:
+              case !fees:
                 return <Paragraph size={'$5'}>-</Paragraph>
               default:
                 return (
                   <Paragraph size={'$5'}>
-                    {formatAmount(
-                      formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals)
-                    )}{' '}
-                    USDC
+                    {formatAmount(formatUnits(fees.totalFee, fees.decimals))} USDC
                   </Paragraph>
                 )
             }

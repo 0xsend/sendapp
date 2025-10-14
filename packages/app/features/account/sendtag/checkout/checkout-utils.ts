@@ -13,8 +13,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { usePendingTags } from 'app/utils/tags'
 import { throwIf } from 'app/utils/throwIf'
 import { useReferrer } from 'app/utils/useReferrer'
-import { useUserOp } from 'app/utils/userop'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
 import { useMemo } from 'react'
 import { encodeFunctionData, erc20Abi, zeroAddress } from 'viem'
 import { fetchSendtagCheckoutReceipts } from './checkout-utils.fetchSendtagCheckoutReceipts'
@@ -111,26 +110,19 @@ export function useSendtagCheckout() {
     [amountDue, chainId, checkoutArgs]
   )
   const {
-    data: userOp,
-    error: userOpError,
-    isLoading: isLoadingUserOp,
-  } = useUserOp({
+    data: result,
+    error,
+    isLoading,
+  } = useUserOpWithPaymaster({
     sender,
     calls,
   })
-  const {
-    data: usdcFees,
-    isLoading: isLoadingUSDCFees,
-    error: usdcFeesError,
-  } = useUSDCFees({
-    userOp,
-  })
   return {
-    userOp,
-    userOpError,
-    isLoadingUserOp,
-    usdcFees,
-    usdcFeesError,
-    isLoadingUSDCFees,
+    userOp: result?.userOp,
+    userOpError: error,
+    isLoadingUserOp: isLoading,
+    fees: result?.fees,
+    feesError: error,
+    isLoadingFees: isLoading,
   }
 }

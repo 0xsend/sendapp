@@ -10,7 +10,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useSendScreenParams } from 'app/routers/params'
@@ -20,13 +20,11 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { shorten } from 'app/utils/strings'
 import { throwIf } from 'app/utils/throwIf'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
-import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useAccountNonce } from 'app/utils/userop'
-import { useEffect, useRef, useState } from 'react'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'solito/router'
-import { formatUnits, isAddress } from 'viem'
-import { useEstimateFeesPerGas } from 'wagmi'
+import { encodeFunctionData, erc20Abi, formatUnits, isAddress } from 'viem'
 import { useCoin } from 'app/provider/coins'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoins, allCoinsDict } from 'app/data/coins'
@@ -105,53 +103,69 @@ export function SendConfirm() {
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
+  // Create calls for the transfer
+  const calls = useMemo(() => {
+    const to = profile?.address ?? recipient
+    if (!to || !isAddress(to)) return undefined
+
+    const transferAmount = BigInt(queryParams.amount ?? '0')
+    if (transferAmount <= 0n) return undefined
+
+    // Native ETH transfer
+    if (sendToken === 'eth') {
+      return [
+        {
+          dest: to as `0x${string}`,
+          value: transferAmount,
+          data: '0x' as `0x${string}`,
+        },
+      ]
+    }
+
+    // ERC20 token transfer
+    if (!sendToken || !isAddress(sendToken)) return undefined
+
+    return [
+      {
+        dest: sendToken as `0x${string}`,
+        value: 0n,
+        data: encodeFunctionData({
+          abi: erc20Abi,
+          functionName: 'transfer',
+          args: [to as `0x${string}`, transferAmount],
+        }),
+      },
+    ]
+  }, [profile?.address, recipient, sendToken, queryParams.amount])
+
   const {
-    data: nonce,
-    error: nonceError,
-    isLoading: nonceIsLoading,
-  } = useAccountNonce({
+    data: result,
+    isLoading: isGeneratingUserOp,
+    error: userOpError,
+  } = useUserOpWithPaymaster({
     sender: sendAccount?.address,
+    calls,
   })
 
-  const { data: userOp, isPending: isGeneratingUserOp } = useGenerateTransferUserOp({
-    sender: sendAccount?.address,
-    // @ts-expect-error some work to` do here
-    to: profile?.address ?? recipient,
-    token: sendToken === 'eth' ? undefined : sendToken,
-    amount: BigInt(queryParams.amount ?? '0'),
-    nonce,
-  })
+  const userOp = useMemo(() => result?.userOp, [result?.userOp])
+  const fees = useMemo(() => result?.fees, [result?.fees])
 
   const { mutateAsync: validateUserOp, isPending: isValidatePending } = useValidateTransferUserOp()
 
-  const {
-    data: usdcFees,
-    isLoading: isFeesLoading,
-    error: usdcFeesError,
-  } = useUSDCFees({
-    userOp,
-  })
-
-  const {
-    data: feesPerGas,
-    isLoading: isGasLoading,
-    error: feesPerGasError,
-  } = useEstimateFeesPerGas({
-    chainId: baseMainnet.id,
-  })
+  const feesError = userOpError
+  const isFeesLoading = isGeneratingUserOp
 
   const hasEnoughBalance = !!selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
-  const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
+  const gas = fees ? fees.totalFee : BigInt(Number.MAX_SAFE_INTEGER)
   const hasEnoughGas =
     (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
 
-  const isLoading =
-    nonceIsLoading || isProfileLoading || isSendAccountLoading || isGeneratingUserOp || isGasLoading
+  const isLoading = isProfileLoading || isSendAccountLoading || isGeneratingUserOp
 
   const isSubmitting = isValidatePending || isTransferPending || isTransferInitialized
 
   const canSubmit =
-    !isLoading && !isSubmitting && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
+    !isLoading && !isSubmitting && hasEnoughBalance && hasEnoughGas && userOp !== undefined
 
   const localizedAmount = localizeAmount(
     formatUnits(
@@ -193,10 +207,7 @@ export function SendConfirm() {
     try {
       assert(!!userOp, 'User op is required')
       assert(!!selectedCoin?.balance, 'Balance is not available')
-      assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
-      assert(nonce !== undefined, 'Nonce is not available')
-      throwIf(feesPerGasError)
-      assert(!!feesPerGas, 'Fees per gas is not available')
+      throwIf(userOpError)
       assert(
         !note || !formFields.note.safeParse(note).error,
         'Note failed to match validation constraints'
@@ -205,15 +216,9 @@ export function SendConfirm() {
       assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
-      const _userOp = {
-        ...userOp,
-        maxFeePerGas: feesPerGas.maxFeePerGas,
-        maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
-      }
 
-      log('gasEstimate', usdcFees)
-      log('feesPerGas', feesPerGas)
-      log('userOp', _userOp)
+      log('gasEstimate', fees)
+      log('userOp', userOp)
       const chainId = baseMainnetClient.chain.id
       const entryPoint = entryPointAddress[chainId]
 
@@ -223,9 +228,12 @@ export function SendConfirm() {
         webauthnCreds,
         entryPoint,
       })
-      userOp.signature = signature
+      const signedUserOp = {
+        ...userOp,
+        signature,
+      }
 
-      const validatedUserOp = await validateUserOp(userOp)
+      const validatedUserOp = await validateUserOp(signedUserOp)
       assert(!!validatedUserOp, 'Operation expected to fail')
 
       const { workflowId } = await transfer({
@@ -259,8 +267,7 @@ export function SendConfirm() {
     }
   }, [])
 
-  if (isSendAccountLoading || nonceIsLoading || isProfileLoading)
-    return <Spinner size="large" color={'$color12'} />
+  if (isSendAccountLoading || isProfileLoading) return <Spinner size="large" color={'$color12'} />
 
   return (
     <YStack
@@ -365,16 +372,13 @@ export function SendConfirm() {
                 Fees
               </Paragraph>
               {isFeesLoading && <Spinner size="small" color={'$color11'} />}
-              {usdcFees && (
+              {fees && (
                 <Paragraph size={'$6'}>
-                  {formatAmount(
-                    formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals)
-                  )}{' '}
-                  USDC
+                  {formatAmount(formatUnits(fees.totalFee, fees.decimals))} USDC
                 </Paragraph>
               )}
-              {usdcFeesError && (
-                <Paragraph color="$error">{usdcFeesError?.message?.split('.').at(0)}</Paragraph>
+              {feesError && (
+                <Paragraph color="$error">{feesError?.message?.split('.').at(0)}</Paragraph>
               )}
             </XStack>
           </YStack>

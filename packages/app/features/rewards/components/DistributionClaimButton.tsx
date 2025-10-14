@@ -1,12 +1,11 @@
 import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useAppToast } from '@my/ui'
-import { baseMainnet, type sendMerkleDropAddress } from '@my/wagmi'
+import { sendAccountAbi, sendMerkleDropAbi, type sendMerkleDropAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCoin } from 'app/provider/coins'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import {
   type UseDistributionsResultData,
-  useGenerateClaimUserOp,
   useSendMerkleDropIsClaimed,
   useSendMerkleDropsAreClaimed,
   useSendMerkleDropTrancheActive,
@@ -17,10 +16,10 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { throwIf } from 'app/utils/throwIf'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce } from 'app/utils/userop'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
-import { useEffect, useState } from 'react'
-import { type Hex, isAddress } from 'viem'
-import { useEstimateFeesPerGas } from 'wagmi'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
+import { api } from 'app/utils/api'
+import { useEffect, useMemo, useState } from 'react'
+import { encodeFunctionData, type Hex, isAddress } from 'viem'
 
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
@@ -66,40 +65,75 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     index: share?.index !== undefined ? BigInt(share.index) : undefined,
   })
 
-  const {
-    data: nonce,
-    error: nonceError,
-    isLoading: isNonceLoading,
-  } = useAccountNonce({
-    sender: sendAccount?.address,
-  })
-
   const webauthnCreds =
     sendAccount?.send_account_credentials
       .filter((c) => !!c.webauthn_credentials)
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
 
-  const { data: userOp, error: userOpError } = useGenerateClaimUserOp({
-    distribution,
-    share,
-    nonce,
-  })
+  // Get the merkle proof from the API
+  const {
+    data: merkleProof,
+    isLoading: isLoadingProof,
+    error: errorProof,
+  } = api.distribution.proof.useQuery({ distributionId: distribution.id })
+
+  // Build calls for claiming
+  const calls = useMemo(() => {
+    if (
+      !sendAccount?.address ||
+      !isAddress(sendAccount.address) ||
+      !share?.address ||
+      !share?.amount ||
+      !share?.index ||
+      !merkleDropAddress ||
+      !merkleProof ||
+      isClaimed
+    ) {
+      return undefined
+    }
+
+    return [
+      {
+        dest: merkleDropAddress as `0x${string}`,
+        value: 0n,
+        data: encodeFunctionData({
+          abi: sendMerkleDropAbi,
+          functionName: 'claimTranche',
+          args: [
+            sendAccount.address as `0x${string}`,
+            trancheId,
+            BigInt(share.index),
+            BigInt(share.amount),
+            merkleProof,
+          ],
+        }),
+      },
+    ]
+  }, [
+    sendAccount?.address,
+    share?.address,
+    share?.amount,
+    share?.index,
+    merkleDropAddress,
+    merkleProof,
+    isClaimed,
+    trancheId,
+  ])
 
   const {
-    data: usdcFees,
-    isLoading: isFeesLoading,
-    error: usdcFeesError,
-  } = useUSDCFees({
-    userOp,
+    data: result,
+    isLoading: isGeneratingUserOp,
+    error: userOpError,
+  } = useUserOpWithPaymaster({
+    sender: sendAccount?.address,
+    calls,
   })
 
-  const {
-    data: feesPerGas,
-    isLoading: isGasLoading,
-    error: feesPerGasError,
-  } = useEstimateFeesPerGas({
-    chainId: baseMainnet.id,
-  })
+  const userOp = useMemo(() => result?.userOp, [result?.userOp])
+  const fees = useMemo(() => result?.fees, [result?.fees])
+
+  const isFeesLoading = isGeneratingUserOp || isLoadingProof
+  const feesError = userOpError || errorProof
 
   const {
     mutateAsync: sendUserOp,
@@ -108,24 +142,17 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     error: claimError,
   } = useUserOpClaimMutation()
 
-  const hasEnoughGas =
-    usdcFees && (usdc?.balance ?? BigInt(0)) >= usdcFees.baseFee + usdcFees.gasFees
+  const hasEnoughGas = fees && (usdc?.balance ?? BigInt(0)) >= fees.totalFee
   const canClaim = isTrancheActive && isClaimActive && isEligible && hasEnoughGas
   useEffect(() => {
-    if (usdcFeesError) {
-      setError(usdcFeesError)
+    if (feesError) {
+      setError(feesError)
     }
     if (userOpError) {
       setError(userOpError)
     }
-    if (feesPerGasError) {
-      setError(feesPerGasError)
-    }
     if (isClaimError) {
       setError(claimError)
-    }
-    if (nonceError) {
-      setError(nonceError)
     }
     if (isTrancheActiveError) {
       setError(isTrancheActiveError)
@@ -133,16 +160,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     if (isClaimedError) {
       setError(isClaimedError)
     }
-  }, [
-    usdcFeesError,
-    feesPerGasError,
-    claimError,
-    nonceError,
-    isTrancheActiveError,
-    isClaimedError,
-    isClaimError,
-    userOpError,
-  ])
+  }, [feesError, claimError, isTrancheActiveError, isClaimedError, isClaimError, userOpError])
 
   useEffect(() => {
     if (error) {
@@ -154,21 +172,13 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   async function onSubmit() {
     try {
       assert(!!userOp, 'User op is required')
-      assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
-      assert(nonce !== undefined, 'Nonce is not available')
-      throwIf(feesPerGasError)
-      assert(!!feesPerGas, 'Fees per gas is not available')
+      throwIf(userOpError)
 
       const sender = sendAccount?.address as `0x${string}`
       assert(isAddress(sender), 'No sender address')
-      const _userOp = {
-        ...userOp,
-        maxFeePerGas: feesPerGas.maxFeePerGas,
-        maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
-      }
 
       const receipt = await sendUserOp({
-        userOp: _userOp,
+        userOp,
         webauthnCreds,
       })
       assert(receipt.success, 'Failed to send user op')
@@ -194,14 +204,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         onPress={onSubmit}
         br={12}
         disabledStyle={{ opacity: 0.7, cursor: 'not-allowed', pointerEvents: 'none' }}
-        disabled={
-          !canClaim ||
-          isClaimPending ||
-          !!sentTxHash ||
-          !!feesPerGasError ||
-          !!usdcFeesError ||
-          isClaimed
-        }
+        disabled={!canClaim || isClaimPending || !!sentTxHash || !!feesError || isClaimed}
         gap={4}
         maw={194}
         width={'100%'}
@@ -213,10 +216,8 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
               isClaimedLoading ||
               isFeesLoading ||
               isUSDCLoading ||
-              isNonceLoading ||
               isClaimPending ||
-              isLoadingSendAccount ||
-              isGasLoading:
+              isLoadingSendAccount:
               return (
                 <ButtonOg.Icon>
                   <Spinner size="small" color="$color12" />
@@ -230,11 +231,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
                   Not yet claimable
                 </ButtonOg.Text>
               )
-            case !!isTrancheActiveError ||
-              !!isClaimedError ||
-              !!nonceError ||
-              !!feesPerGasError ||
-              !!usdcFeesError:
+            case !!isTrancheActiveError || !!isClaimedError || !!feesError:
               return <ButtonOg.Text opacity={0.5}>Error</ButtonOg.Text>
             case isClaimPending && !isClaimError:
               return (

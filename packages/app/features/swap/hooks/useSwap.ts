@@ -1,8 +1,7 @@
 import { encodeFunctionData, erc20Abi, type Hex } from 'viem'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useMemo } from 'react'
-import { useUserOp } from 'app/utils/userop'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
 
 export const useSwap = ({
   swapCallData,
@@ -52,28 +51,20 @@ export const useSwap = ({
   }, [token, routerAddress, amount, swapCallData])
 
   const {
-    data: userOp,
-    error: userOpError,
-    isLoading: isLoadingUserOp,
-  } = useUserOp({
+    data: result,
+    error,
+    isLoading,
+  } = useUserOpWithPaymaster({
     sender,
     calls,
   })
 
-  const {
-    data: usdcFees,
-    isLoading: isLoadingUSDCFees,
-    error: usdcFeesError,
-  } = useUSDCFees({
-    userOp,
-  })
-
   return {
-    userOp,
-    userOpError,
-    isLoadingUserOp,
-    usdcFees,
-    usdcFeesError,
-    isLoadingUSDCFees,
+    userOp: result?.userOp,
+    userOpError: error,
+    isLoadingUserOp: isLoading,
+    fees: result?.fees,
+    feesError: error,
+    isLoadingFees: isLoading,
   }
 }

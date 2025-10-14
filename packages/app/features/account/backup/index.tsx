@@ -16,7 +16,6 @@ import {
 import {
   baseMainnetClient,
   sendAccountAbi,
-  tokenPaymasterAddress,
   usdcAddress,
   useReadSendAccountGetActiveSigningKeys,
 } from '@my/wagmi'
@@ -31,16 +30,14 @@ import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
-import { defaultUserOp } from 'app/utils/userOpConstants'
-import { useAccountNonce } from 'app/utils/userop'
-import type { UserOperation } from 'permissionless'
 import { useCallback, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useLink } from 'solito/link'
 import { encodeFunctionData } from 'viem'
-import { useBalance, useEstimateFeesPerGas } from 'wagmi'
+import { useBalance } from 'wagmi'
 import { z } from 'zod'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
+import { useUserOpClaimMutation } from 'app/utils/distributions'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { Linking, Platform } from 'react-native'
@@ -411,90 +408,45 @@ const RemovePasskeyConfirmation = ({
     token: usdcAddress[baseMainnetClient.chain.id],
   })
   const form = useForm<RemovePasskeySchema>()
-  const {
-    data: nonce,
-    error: nonceError,
-    isLoading: isLoadingNonce,
-  } = useAccountNonce({ sender: sendAccount?.address })
-  const {
-    data: feesPerGas,
-    error: gasFeesError,
-    isLoading: isLoadingGasFees,
-  } = useEstimateFeesPerGas({
-    chainId: baseMainnetClient.chain.id,
-  })
-  const { maxFeePerGas, maxPriorityFeePerGas } = feesPerGas ?? {}
-  const {
-    data: userOp,
-    error: userOpError,
-    isLoading: isLoadingUserOp,
-  } = useQuery({
-    queryKey: [
-      'removeSigningKey',
-      sendAccount?.address,
-      String(nonce),
-      sendAccount,
-      keySlot,
-      String(maxFeePerGas),
-      String(maxPriorityFeePerGas),
-    ],
-    enabled:
-      !!sendAccount &&
-      !!cred &&
-      nonce !== undefined &&
-      keySlot !== undefined &&
-      maxFeePerGas !== undefined &&
-      maxPriorityFeePerGas !== undefined,
+
+  // Build calls for removing the signing key
+  const calls = useQuery({
+    queryKey: ['removeSigningKeyCalls', sendAccount?.address, keySlot],
+    enabled: !!sendAccount && !!cred && keySlot !== undefined,
     queryFn: async () => {
       assert(!!sendAccount, 'No send account found')
       assert(keySlot !== undefined, 'No key slot found')
-      assert(nonce !== undefined, 'No nonce found')
-      assert(maxFeePerGas !== undefined, 'No max fee per gas found')
-      assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
-      const callData = encodeFunctionData({
-        abi: sendAccountAbi,
-        functionName: 'executeBatch',
-        args: [
-          [
-            {
-              dest: sendAccount?.address,
-              value: 0n,
-              data: encodeFunctionData({
-                abi: sendAccountAbi,
-                functionName: 'removeSigningKey',
-                args: [keySlot],
-              }),
-            },
-          ],
-        ],
-      })
 
-      const chainId = baseMainnetClient.chain.id
-      const paymaster = tokenPaymasterAddress[chainId]
-      const userOp: UserOperation<'v0.7'> = {
-        ...defaultUserOp,
-        maxFeePerGas,
-        maxPriorityFeePerGas,
-        sender: sendAccount?.address,
-        nonce,
-        callData,
-        paymaster,
-        paymasterData: '0x',
-        signature: '0x',
-      }
-      return userOp
+      return [
+        {
+          dest: sendAccount.address as `0x${string}`,
+          value: 0n,
+          data: encodeFunctionData({
+            abi: sendAccountAbi,
+            functionName: 'removeSigningKey',
+            args: [keySlot],
+          }),
+        },
+      ]
     },
   })
-  const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
+
+  const {
+    data: result,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+  } = useUserOpWithPaymaster({
+    sender: sendAccount?.address,
+    calls: calls.data,
+  })
+
+  const userOp = result?.userOp
+
+  const { mutateAsync: sendUserOp } = useUserOpClaimMutation()
   const queryClient = useQueryClient()
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
-  const isLoading =
-    isLoadingNonce ||
-    isLoadingGasFees ||
-    isLoadingSendAccount ||
-    isLoadingUserOp ||
-    isLoadingUsdcBal
+  const isLoading = isLoadingSendAccount || isLoadingUserOp || isLoadingUsdcBal || calls.isLoading
   const inputVal = form.watch('name', '')
 
   const renderAfterContent = useCallback(
@@ -547,8 +499,6 @@ const RemovePasskeyConfirmation = ({
     try {
       if (isActiveOnchain) {
         throwIf(sendAccountError)
-        throwIf(nonceError)
-        throwIf(gasFeesError)
         throwIf(userOpError)
         throwIf(usdcBalError)
         assert((usdcBal?.value ?? 0n) > 0n, 'No USDC balance to pay for gas fees')
@@ -562,7 +512,6 @@ const RemovePasskeyConfirmation = ({
       throwIf(error)
 
       await queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
-      await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
       await queryClient.invalidateQueries({ queryKey: ['webauthn_credentials'] })
     } catch (e) {
       console.error(e)

@@ -9,7 +9,7 @@ import {
   useAppToast,
   YStack,
 } from '@my/ui'
-import { baseMainnetClient, sendAccountAbi, tokenPaymasterAddress } from '@my/wagmi'
+import { baseMainnetClient, sendAccountAbi } from '@my/wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -19,18 +19,15 @@ import { COSEECDHAtoXY } from 'app/utils/passkeys'
 import { useSendAccount } from 'app/utils/send-accounts/useSendAccounts'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
-import { useUserOpTransferMutation } from 'app/utils/useUserOpTransferMutation'
-import { defaultUserOp } from 'app/utils/userOpConstants'
-import { useAccountNonce } from 'app/utils/userop'
 import debug from 'debug'
-import type { UserOperation } from 'permissionless'
 import { FormProvider, useForm } from 'react-hook-form'
 import { createParam } from 'solito'
 import { useRouter } from 'solito/router'
 import { encodeFunctionData } from 'viem'
-import { useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { Platform } from 'react-native'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
+import { useUserOpClaimMutation } from 'app/utils/distributions'
 
 const log = debug('app:settings:backup:confirm')
 
@@ -128,100 +125,56 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
       .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
   const router = useRouter()
   const form = useForm()
-  const {
-    data: nonce,
-    error: nonceError,
-    isLoading: isLoadingNonce,
-  } = useAccountNonce({ sender: sendAccount?.address })
-  const {
-    data: feesPerGas,
-    error: gasFeesError,
-    isLoading: isLoadingGasFees,
-  } = useEstimateFeesPerGas({
-    chainId: baseMainnetClient.chain.id,
-  })
-  const { maxFeePerGas, maxPriorityFeePerGas } = feesPerGas ?? {}
-  const {
-    data: userOp,
-    error: userOpError,
-    isLoading: isLoadingUserOp,
-  } = useQuery({
-    queryKey: [
-      'addSigningKey',
-      sendAccount?.address,
-      String(nonce),
-      sendAccount,
-      webauthnCred,
-      keySlot,
-      webauthnCred.public_key,
-      String(maxFeePerGas),
-      String(maxPriorityFeePerGas),
-    ],
-    enabled:
-      !!sendAccount &&
-      !!webauthnCred &&
-      nonce !== undefined &&
-      keySlot !== undefined &&
-      maxFeePerGas !== undefined &&
-      maxPriorityFeePerGas !== undefined,
+
+  // Build calls for adding the signing key
+  const calls = useQuery({
+    queryKey: ['addSigningKeyCalls', sendAccount?.address, webauthnCred.public_key, keySlot],
+    enabled: !!sendAccount && !!webauthnCred && keySlot !== undefined,
     queryFn: async () => {
       assert(!!sendAccount, 'No send account found')
       assert(!!webauthnCred, 'No webauthn credential found')
       assert(keySlot !== undefined, 'No key slot found')
-      assert(nonce !== undefined, 'No nonce found')
-      assert(maxFeePerGas !== undefined, 'No max fee per gas found')
-      assert(maxPriorityFeePerGas !== undefined, 'No max priority fee per gas found')
-      const xY = COSEECDHAtoXY(byteaToBytes(webauthnCred.public_key as `\\x${string}`))
-      const callData = encodeFunctionData({
-        abi: sendAccountAbi,
-        functionName: 'executeBatch',
-        args: [
-          [
-            {
-              dest: sendAccount?.address,
-              value: 0n,
-              data: encodeFunctionData({
-                abi: sendAccountAbi,
-                functionName: 'addSigningKey',
-                args: [keySlot, xY],
-              }),
-            },
-          ],
-        ],
-      })
 
-      const chainId = baseMainnetClient.chain.id
-      const paymaster = tokenPaymasterAddress[chainId]
-      const userOp: UserOperation<'v0.7'> = {
-        ...defaultUserOp,
-        maxFeePerGas,
-        maxPriorityFeePerGas,
-        sender: sendAccount?.address,
-        nonce,
-        callData,
-        paymaster,
-        paymasterData: '0x',
-        signature: '0x',
-      }
-      return userOp
+      const xY = COSEECDHAtoXY(byteaToBytes(webauthnCred.public_key as `\\x${string}`))
+
+      return [
+        {
+          dest: sendAccount.address as `0x${string}`,
+          value: 0n,
+          data: encodeFunctionData({
+            abi: sendAccountAbi,
+            functionName: 'addSigningKey',
+            args: [keySlot, xY],
+          }),
+        },
+      ]
     },
   })
-  const { mutateAsync: sendUserOp } = useUserOpTransferMutation()
+
+  const {
+    data: result,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+  } = useUserOpWithPaymaster({
+    sender: sendAccount?.address,
+    calls: calls.data,
+  })
+
+  const userOp = result?.userOp
+
+  const { mutateAsync: sendUserOp } = useUserOpClaimMutation()
+
   log('sendUserOp', {
     userOp,
     webauthnCred,
     sendAccount,
     keySlot,
-    nonce,
-    gasFeesError,
     userOpError,
   })
   const onSubmit = async () => {
     try {
       log('sendUserOp', { userOp, webauthnCreds, sendAccount })
       throwIf(sendAccountError)
-      throwIf(nonceError)
-      throwIf(gasFeesError)
       throwIf(userOpError)
       assert(!!userOp, 'User op is required')
       const {
@@ -244,7 +197,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
     }
   }
 
-  const isLoading = isLoadingNonce || isLoadingGasFees || isLoadingSendAccount || isLoadingUserOp
+  const isLoading = isLoadingSendAccount || isLoadingUserOp || calls.isLoading
 
   return (
     <FormProvider {...form}>

@@ -63,7 +63,7 @@ export function ConfirmBuyTicketsScreen() {
     purchaseAsync,
     isPurchasing,
     purchaseError,
-    usdcFees,
+    fees,
     ticketPrice,
   } = usePurchaseJackpotTicket(
     {
@@ -128,8 +128,8 @@ export function ConfirmBuyTicketsScreen() {
   const formattedTicketPrice = formatAmount(formatUnits(ticketPriceBn, decimalsToUse))
   const ticketsToShow: number = numberOfTickets > 0 ? numberOfTickets : 0
 
-  const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
-  const feeDecimals = typeof usdcFees?.decimals === 'number' ? usdcFees.decimals : 6
+  const gas = fees ? fees.totalFee : BigInt(Number.MAX_SAFE_INTEGER)
+  const feeDecimals = typeof fees?.decimals === 'number' ? fees.decimals : 6
 
   const initLoading = isLoadingToken || isLoadingDecimals || isSendAccountLoading || isPreparing
 
@@ -188,7 +188,7 @@ export function ConfirmBuyTicketsScreen() {
             <Row
               label={'Est. Transaction Fee'}
               value={(() => {
-                if (!usdcFees) {
+                if (!fees) {
                   return '-'
                 }
                 return `${formatAmount(formatUnits(gas, feeDecimals))} USDC`

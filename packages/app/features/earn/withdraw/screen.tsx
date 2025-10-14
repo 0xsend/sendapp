@@ -10,7 +10,8 @@ import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useAccountNonce, useUserOp } from 'app/utils/userop'
+import { useAccountNonce } from 'app/utils/userop'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
 import { useCallback, useEffect, useMemo, useState, memo } from 'react'
@@ -149,10 +150,15 @@ export function WithdrawForm() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnWithdrawCalls({ sender, asset, amount: parsedAmount, coin: coinData })
-  const uop = useUserOp({
+  const {
+    data: result,
+    error: uopError,
+    isLoading: uopIsLoading,
+  } = useUserOpWithPaymaster({
     sender,
     calls: calls.data ?? undefined,
   })
+  const uop = useMemo(() => result?.userOp, [result?.userOp])
   const webauthnCreds = useMemo(
     () =>
       sendAccount?.data?.send_account_credentials
@@ -169,19 +175,22 @@ export function WithdrawForm() {
     mutationFn: async () => {
       log('formState', form.formState)
       assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
-      assert(uop.isSuccess, 'uop is not success')
+      assert(uop !== undefined, 'uop is not defined')
 
-      uop.data.signature = await signUserOp({
-        userOp: uop.data,
-        webauthnCreds,
-        chainId: chainId,
-        entryPoint: entryPointAddress[chainId],
-      })
+      const signedUserOp = {
+        ...uop,
+        signature: await signUserOp({
+          userOp: uop,
+          webauthnCreds,
+          chainId: chainId,
+          entryPoint: entryPointAddress[chainId],
+        }),
+      }
 
       setUseropState('Sending transaction...')
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
-        userOperation: uop.data,
+        userOperation: signedUserOp,
       })
 
       setUseropState('Waiting for confirmation...')
@@ -242,6 +251,8 @@ export function WithdrawForm() {
 
   // DEBUG
   log('uop', uop)
+  log('uopError', uopError)
+  log('uopIsLoading', uopIsLoading)
   log('calls', calls)
   log('mutation', mutation)
 
@@ -262,9 +273,9 @@ export function WithdrawForm() {
     depositBalance >= parsedAmount &&
     parsedAmount > BigInt(0) &&
     calls.isSuccess &&
-    uop.isSuccess &&
+    uop !== undefined &&
     !calls.isPending &&
-    !uop.isPending &&
+    !uopIsLoading &&
     !mutation.isPending &&
     Object.keys(form.formState.errors).length === 0
 
@@ -365,7 +376,7 @@ export function WithdrawForm() {
             </Paragraph>
           </Fade>
         ) : null}
-        {[calls.error, sendAccount.error, uop.error, mutation.error].filter(Boolean).map((e) =>
+        {[calls.error, sendAccount.error, uopError, mutation.error].filter(Boolean).map((e) =>
           e ? (
             <Fade key="error-state">
               <XStack alignItems="center" jc="center" gap={'$2'} key={e.message} role="alert">
@@ -379,7 +390,7 @@ export function WithdrawForm() {
           disabled={!canSubmit}
           iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
         >
-          {[calls.isLoading, sendAccount.isLoading, uop.isLoading].some((p) => p) &&
+          {[calls.isLoading, sendAccount.isLoading, uopIsLoading].some((p) => p) &&
           !mutation.isPending ? (
             <Spinner size="small" />
           ) : (
@@ -393,12 +404,12 @@ export function WithdrawForm() {
       useropState,
       calls.error,
       sendAccount.error,
-      uop.error,
+      uopError,
       mutation.error,
       canSubmit,
       calls.isLoading,
       sendAccount.isLoading,
-      uop.isLoading,
+      uopIsLoading,
     ]
   )
 

@@ -33,7 +33,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useUserOp } from 'app/utils/userop'
+import { useUserOpWithPaymaster } from 'app/utils/useUserOpWithPaymaster'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useMemo, useState } from 'react'
 import { encodeFunctionData, erc20Abi, withRetry } from 'viem'
@@ -178,49 +178,67 @@ function UpgradeTokenButton() {
   const [userOpState, setUserOpState] = useState('')
 
   const calls = useMemo(
-    () => [
-      {
-        dest: sendTokenV0Address[chainId],
-        value: 0n,
-        data: encodeFunctionData({
-          abi: erc20Abi,
-          functionName: 'approve',
-          args: [sendTokenV0LockboxAddress[chainId], sendTokenV0Bal.data ?? 0n],
-        }),
-      },
-      {
-        dest: sendTokenV0LockboxAddress[chainId],
-        value: 0n,
-        data: encodeFunctionData({
-          abi: sendTokenV0LockboxAbi,
-          functionName: 'deposit',
-          args: [sendTokenV0Bal.data ?? 0n],
-        }),
-      },
-    ],
+    () =>
+      sendTokenV0Bal.data && sendTokenV0Bal.data > 0n
+        ? [
+            {
+              dest: sendTokenV0Address[chainId] as `0x${string}`,
+              value: 0n,
+              data: encodeFunctionData({
+                abi: erc20Abi,
+                functionName: 'approve',
+                args: [sendTokenV0LockboxAddress[chainId], sendTokenV0Bal.data],
+              }),
+            },
+            {
+              dest: sendTokenV0LockboxAddress[chainId] as `0x${string}`,
+              value: 0n,
+              data: encodeFunctionData({
+                abi: sendTokenV0LockboxAbi,
+                functionName: 'deposit',
+                args: [sendTokenV0Bal.data],
+              }),
+            },
+          ]
+        : undefined,
     [sendTokenV0Bal.data, chainId]
   )
 
-  const paymasterSign = api.sendAccount.paymasterSign.useMutation({
+  const {
+    data: result,
+    isLoading: isGeneratingUserOp,
+    error: userOpError,
+  } = useUserOpWithPaymaster({
+    sender,
+    calls,
+  })
+
+  const userOp = useMemo(() => result?.userOp, [result?.userOp])
+
+  const toast = useAppToast()
+  const queryClient = useQueryClient()
+
+  const upgradeTokenMutation = api.sendAccount.paymasterSign.useMutation({
     onMutate: () => setUserOpState('Requesting signature...'),
-    onSuccess: async (data) => {
-      assert(uop.isSuccess, 'uop is not success')
+    onSuccess: async () => {
+      assert(userOp !== undefined, 'userOp is required')
 
-      // assign paymasterData to the userOp
-      uop.data.paymasterData = data.paymasterData
+      setUserOpState('Signing transaction...')
 
-      // sign the userOp
-      uop.data.signature = await signUserOp({
-        userOp: uop.data,
-        webauthnCreds,
-        chainId: baseMainnetClient.chain.id,
-        entryPoint: entryPointAddress[baseMainnetClient.chain.id],
-      })
+      const signedUserOp = {
+        ...userOp,
+        signature: await signUserOp({
+          userOp,
+          webauthnCreds,
+          chainId: baseMainnetClient.chain.id,
+          entryPoint: entryPointAddress[baseMainnetClient.chain.id],
+        }),
+      }
 
       setUserOpState('Sending transaction...')
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
-        userOperation: uop.data,
+        userOperation: signedUserOp,
       })
 
       setUserOpState('Waiting for confirmation...')
@@ -247,31 +265,21 @@ function UpgradeTokenButton() {
     },
   })
 
-  const uop = useUserOp({
-    paymaster: sendVerifyingPaymasterAddress[chainId],
-    paymasterVerificationGasLimit: 200000n,
-    paymasterPostOpGasLimit: 200000n,
-    paymasterData: paymasterSign.data?.paymasterData,
-    callGasLimit: 150000n,
-    sender,
-    calls,
-  })
-
-  const toast = useAppToast()
-  const queryClient = useQueryClient()
-
-  const canSendUserOp = uop.isSuccess && !uop.isPending && !paymasterSign.isPending
-  const anyError = uop.error || paymasterSign.error
+  const canSendUserOp =
+    userOp !== undefined && !isGeneratingUserOp && !upgradeTokenMutation.isPending
+  const anyError = userOpError || upgradeTokenMutation.error
 
   return (
     <YStack gap="$4" w="100%" maw={500}>
       <Paragraph color="$color10" ta="center">
         {(() => {
           switch (true) {
-            case paymasterSign.isPending && userOpState !== '':
+            case upgradeTokenMutation.isPending && userOpState !== '':
               return userOpState
-            case paymasterSign.isPending:
+            case upgradeTokenMutation.isPending:
               return 'Waiting for confirmation...'
+            case isGeneratingUserOp:
+              return 'Preparing transaction...'
             default:
               return `Click "Upgrade" to proceed.${anyError ? ' Please try again.' : ''}`
           }
@@ -288,19 +296,19 @@ function UpgradeTokenButton() {
         onPress={(e) => {
           e.preventDefault()
           if (!canSendUserOp) return
-          paymasterSign.mutate({
-            userop: uop.data,
+          upgradeTokenMutation.mutate({
+            userop: userOp,
             sendAccountCalls: calls,
             entryPoint: entryPointAddress[chainId],
           })
         }}
         disabled={!canSendUserOp}
         icon={<IconUpgrade size="$1" />}
-        iconAfter={paymasterSign.isPending ? <Spinner size="small" /> : undefined}
+        iconAfter={upgradeTokenMutation.isPending ? <Spinner size="small" /> : undefined}
       >
-        <Button.Text>{paymasterSign.isPending ? 'UPGRADING...' : 'UPGRADE'}</Button.Text>
+        <Button.Text>{upgradeTokenMutation.isPending ? 'UPGRADING...' : 'UPGRADE'}</Button.Text>
       </Button>
-      {[uop.error, paymasterSign.error].filter(Boolean).map((e) =>
+      {[userOpError, upgradeTokenMutation.error].filter(Boolean).map((e) =>
         e ? (
           <Paragraph key={e.message} color="$error">
             {toNiceError(e)}

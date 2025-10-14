@@ -4,7 +4,7 @@ import { encodeFunctionData } from 'viem'
 import { useSwap } from './useSwap'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useUserOp } from 'app/utils/userop'
-import { useUSDCFees } from 'app/utils/useUSDCFees'
+import { usePaymasterFees } from 'app/utils/usePaymasterFees'
 
 jest.mock('app/utils/send-accounts', () => ({
   useSendAccount: jest.fn(),
@@ -14,8 +14,8 @@ jest.mock('app/utils/userop', () => ({
   useUserOp: jest.fn().mockReturnValue({ data: {} }),
 }))
 
-jest.mock('app/utils/useUSDCFees', () => ({
-  useUSDCFees: jest.fn().mockReturnValue({ data: {} }),
+jest.mock('app/utils/usePaymasterFees', () => ({
+  usePaymasterFees: jest.fn().mockReturnValue({ data: {} }),
 }))
 
 jest.mock('viem', () => ({
@@ -25,7 +25,7 @@ jest.mock('viem', () => ({
 
 const useSendAccountMock = useSendAccount as unknown as jest.Mock
 const useUserOpMock = useUserOp as unknown as jest.Mock
-const useUSDCFeesMock = useUSDCFees as unknown as jest.Mock
+const usePaymasterFeesMock = usePaymasterFees as unknown as jest.Mock
 const encodeFunctionDataMock = encodeFunctionData as unknown as jest.Mock
 
 describe('useSwap', () => {
@@ -130,7 +130,7 @@ describe('useSwap', () => {
         },
       ],
     })
-    expect(useUSDCFeesMock).toHaveBeenCalledWith({ userOp: { field: 'mockedValue' } })
+    expect(usePaymasterFeesMock).toHaveBeenCalledWith({ userOp: { field: 'mockedValue' } })
   })
 
   it('should call userOp and fee hooks with proper data when token is eth', () => {
@@ -156,7 +156,7 @@ describe('useSwap', () => {
         },
       ],
     })
-    expect(useUSDCFeesMock).toHaveBeenCalledWith({ userOp: { field: 'mockedValue' } })
+    expect(usePaymasterFeesMock).toHaveBeenCalledWith({ userOp: { field: 'mockedValue' } })
   })
 
   it('should return proper fields', () => {
@@ -166,9 +166,9 @@ describe('useSwap', () => {
       error: new Error('UserOp error'),
       isLoading: true,
     })
-    useUSDCFeesMock.mockReturnValue({
+    usePaymasterFeesMock.mockReturnValue({
       data: { field: 'mockedFees' },
-      error: new Error('USDC Fees error'),
+      error: new Error('Fees error'),
       isLoading: true,
     })
 
@@ -184,8 +184,8 @@ describe('useSwap', () => {
     expect(result.current.userOp).toEqual({ field: 'mockedUserOp' })
     expect(result.current.userOpError).toEqual(new Error('UserOp error'))
     expect(result.current.isLoadingUserOp).toBe(true)
-    expect(result.current.usdcFees).toEqual({ field: 'mockedFees' })
-    expect(result.current.usdcFeesError).toEqual(new Error('USDC Fees error'))
-    expect(result.current.isLoadingUSDCFees).toBe(true)
+    expect(result.current.fees).toEqual({ field: 'mockedFees' })
+    expect(result.current.feesError).toEqual(new Error('Fees error'))
+    expect(result.current.isLoadingFees).toBe(true)
   })
 })
