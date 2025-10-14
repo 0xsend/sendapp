@@ -1,4 +1,4 @@
-import { CheckCircle } from '@tamagui/lucide-icons'
+import { Check } from '@tamagui/lucide-icons'
 import { FadeCard, Paragraph, PrimaryButton, YStack } from '@my/ui'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/link'
@@ -17,7 +17,7 @@ export function DepositSuccessScreen() {
       }}
     >
       <FadeCard ai={'center'}>
-        <CheckCircle size={'$3'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+        <Check size={'$3'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         <YStack ai={'center'} gap={'$2'}>
           <Paragraph size={'$8'} fontWeight={500} ta={'center'} $gtLg={{ size: '$9' }}>
             Deposit Complete

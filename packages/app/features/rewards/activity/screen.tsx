@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { IconAccount, IconBadgeCheckSolid, IconInfoCircle } from 'app/components/icons'
+import { IconAccount, IconInfoCircle } from 'app/components/icons'
 import {
   type DistributionsVerificationsQuery,
   type UseDistributionsResultData,
@@ -34,6 +34,7 @@ import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
+import { Check } from '@tamagui/lucide-icons'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -229,11 +230,7 @@ const DistributionRequirementsCard = ({
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Purchased</Paragraph>
             {sendTagPurchased ? (
-              <IconBadgeCheckSolid
-                size={'$1.5'}
-                color={'$primary'}
-                $theme-light={{ color: '$color12' }}
-              />
+              <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
             ) : (
               <Theme name="red">
                 <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -265,11 +262,7 @@ const DistributionRequirementsCard = ({
                   )
                 default:
                   return (
-                    <IconBadgeCheckSolid
-                      size={'$1.5'}
-                      color={'$primary'}
-                      $theme-light={{ color: '$color12' }}
-                    />
+                    <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
                   )
               }
             })()}
@@ -296,7 +289,7 @@ const DistributionRequirementsCard = ({
                     )
                   default:
                     return (
-                      <IconBadgeCheckSolid
+                      <Check
                         size={'$1.5'}
                         color={'$primary'}
                         $theme-light={{ color: '$color12' }}
@@ -404,13 +397,7 @@ const TaskCard = ({
 
   const statusConfig = {
     completed: {
-      icon: (
-        <IconBadgeCheckSolid
-          size={'$1.5'}
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-        />
-      ),
+      icon: <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
       text: isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed',
     },
     pending: {
