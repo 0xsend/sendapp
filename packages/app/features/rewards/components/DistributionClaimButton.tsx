@@ -127,6 +127,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   } = useUserOpWithPaymaster({
     sender: sendAccount?.address,
     calls,
+    sponsored: true,
   })
 
   const userOp = useMemo(() => result?.userOp, [result?.userOp])
@@ -142,7 +143,8 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
     error: claimError,
   } = useUserOpClaimMutation()
 
-  const hasEnoughGas = fees && (usdc?.balance ?? BigInt(0)) >= fees.totalFee
+  // For sponsored operations, fees will be undefined so we don't need to check gas balance
+  const hasEnoughGas = fees ? (usdc?.balance ?? BigInt(0)) >= fees.totalFee : true
   const canClaim = isTrancheActive && isClaimActive && isEligible && hasEnoughGas
   useEffect(() => {
     if (feesError) {

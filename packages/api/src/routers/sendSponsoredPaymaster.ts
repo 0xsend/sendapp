@@ -1,11 +1,13 @@
 import {
   baseMainnet,
   sendAccountAbi,
+  sendMerkleDropAbi,
   sendTokenV0Address,
   sendTokenV0LockboxAddress,
   sendVerifyingPaymasterAbi,
   sendVerifyingPaymasterAddress,
 } from '@my/wagmi'
+import { sendEarnAffiliateAbi } from '@0xsend/send-earn-contracts'
 import {
   decodeSendEarnDepositUserOp,
   isFactoryDeposit as isSendEarnFactoryDeposit,
@@ -53,6 +55,32 @@ const VERIFYING_PAYMASTER_VERIFICATION_GAS_LIMIT = 70000n
 const VERIFYING_PAYMASTER_POSTOP_GAS_LIMIT = 50000n
 
 /**
+ * Helper to check if a call is a SendEarn Affiliate pay (claim rewards) operation
+ */
+function isSendEarnAffiliatePay(call: { dest: string; data: string }): boolean {
+  try {
+    // Check if the function selector matches 'pay(address)'
+    // pay(address) selector is 0x1b9265b8
+    return call.data.startsWith('0x1b9265b8')
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Helper to check if a call is a SendMerkleDrop claimTranche operation
+ */
+function isSendMerkleDropClaim(call: { dest: string; data: string }): boolean {
+  try {
+    // Check if the function selector matches 'claimTranche(address,uint256,uint256,uint256,bytes32[])'
+    // claimTranche selector is 0x99c2731b
+    return call.data.startsWith('0x99c2731b')
+  } catch {
+    return false
+  }
+}
+
+/**
  * ERC-7677 Sponsored Paymaster Router
  *
  * Implements the ERC-7677 specification for sponsored gas payments.
@@ -60,6 +88,8 @@ const VERIFYING_PAYMASTER_POSTOP_GAS_LIMIT = 50000n
  * with gas sponsorship (free for users) for whitelisted operations:
  * 1. Send token V0 upgrade operations
  * 2. SendEarn deposit operations
+ * 3. SendEarn affiliate reward claims
+ * 4. Distribution (merkle drop) claims
  *
  * @see https://eips.ethereum.org/EIPS/eip-7677
  */
@@ -166,6 +196,22 @@ export const sendSponsoredPaymasterRouter = createTRPCRouter({
               } else {
                 log('callData mismatch for send token upgrade')
               }
+            }
+          }
+        }
+
+        // If not SendEarn or token upgrade, try to validate as claim operation
+        if (!isValidOperation && sendAccountCalls) {
+          for (const call of sendAccountCalls) {
+            if (isSendEarnAffiliatePay(call)) {
+              log('Validated as SendEarn affiliate reward claim')
+              isValidOperation = true
+              break
+            }
+            if (isSendMerkleDropClaim(call)) {
+              log('Validated as distribution merkle drop claim')
+              isValidOperation = true
+              break
             }
           }
         }
@@ -298,6 +344,22 @@ export const sendSponsoredPaymasterRouter = createTRPCRouter({
               } else {
                 log('callData mismatch for send token upgrade')
               }
+            }
+          }
+        }
+
+        // If not SendEarn or token upgrade, try to validate as claim operation
+        if (!isValidOperation && sendAccountCalls) {
+          for (const call of sendAccountCalls) {
+            if (isSendEarnAffiliatePay(call)) {
+              log('Validated as SendEarn affiliate reward claim')
+              isValidOperation = true
+              break
+            }
+            if (isSendMerkleDropClaim(call)) {
+              log('Validated as distribution merkle drop claim')
+              isValidOperation = true
+              break
             }
           }
         }

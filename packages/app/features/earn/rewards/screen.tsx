@@ -71,7 +71,7 @@ function RewardsBalance() {
   // Get the calls for claiming rewards
   const calls = useSendEarnClaimRewardsCalls({ sender })
 
-  // Create the user operation
+  // Create the user operation with sponsored gas
   const {
     data: result,
     error: uopError,
@@ -79,6 +79,7 @@ function RewardsBalance() {
   } = useUserOpWithPaymaster({
     sender,
     calls: calls.data ?? undefined,
+    sponsored: true,
   })
   const uop = useMemo(() => result?.userOp, [result?.userOp])
 
