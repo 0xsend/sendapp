@@ -1,0 +1,4 @@
+npx expo-router-sitemap
+
+emulator -list-avds
+emulator -avd Pixel_8_Pro_API_35
