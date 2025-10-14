@@ -167,7 +167,7 @@ export const accountRecoveryRouter = createTRPCRouter({
 
         return credentials.map((credential) => ({
           id: byteaToBase64URLNoPad(credential.raw_credential_id as `\\x${string}`),
-          userHandle: credential.display_name,
+          userHandle: credential.name,
         }))
       } catch (error) {
         logger('Error signing in with phone: ', error)
