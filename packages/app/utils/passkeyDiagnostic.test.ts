@@ -1,5 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it, jest } from '@jest/globals'
 
+import type { Debugger } from 'debug'
+
 import {
   PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   evaluatePasskeyDiagnostic,
@@ -8,6 +10,8 @@ import {
   __unsafeGetWebPlatformSupportCache,
   isHighRiskPasskeyEnvironment,
   __unsafeMatchesHighRiskVendor,
+  __unsafeSetPasskeyDiagnosticLogger,
+  __unsafeResetPasskeyDiagnosticLogger,
 } from './passkeyDiagnostic'
 import { signChallenge } from './signChallenge'
 
@@ -86,6 +90,7 @@ beforeEach(() => {
   process.env.NEXT_PUBLIC_PASSKEY_DIAGNOSTIC_LOGGING = undefined
   __unsafeResetPasskeyDiagnosticCache()
   setPublicKeyCredential(originalPublicKeyCredential)
+  __unsafeResetPasskeyDiagnosticLogger()
 })
 
 afterAll(() => {
@@ -286,7 +291,8 @@ describe('PasskeyDiagnosticError', () => {
 describe('diagnostic logging', () => {
   it('logs lifecycle when enabled', async () => {
     process.env.NEXT_PUBLIC_PASSKEY_DIAGNOSTIC_LOGGING = 'enabled'
-    const logSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
+    const logSpy = jest.fn()
+    __unsafeSetPasskeyDiagnosticLogger(logSpy as unknown as Debugger)
 
     mockedSignChallenge.mockResolvedValue({
       accountName: 'user-id',
@@ -300,16 +306,14 @@ describe('diagnostic logging', () => {
 
     expect(result.success).toBe(true)
     expect(logSpy).toHaveBeenCalledWith(
-      '[passkey-diagnostic]',
       'run-start',
       expect.objectContaining({ credentialCount: 1 })
     )
     expect(logSpy).toHaveBeenCalledWith(
-      '[passkey-diagnostic]',
       'run-success',
       expect.objectContaining({ credentialCount: 1 })
     )
 
-    logSpy.mockRestore()
+    __unsafeResetPasskeyDiagnosticLogger()
   })
 })

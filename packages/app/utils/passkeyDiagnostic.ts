@@ -1,4 +1,5 @@
 import debug from 'debug'
+import type { Debugger } from 'debug'
 import * as Device from 'expo-device'
 import { Platform } from 'react-native'
 import type { Hex } from 'viem'
@@ -7,7 +8,8 @@ import { signChallenge } from './signChallenge'
 
 const PASSKEY_DIAGNOSTIC_CHALLENGE: Hex = `0x${'00'.repeat(32)}`
 
-const log = debug('app:passkey-diagnostics')
+const defaultPasskeyDiagnosticLogger = debug('app:passkey-diagnostics')
+let log: Debugger = defaultPasskeyDiagnosticLogger
 
 export const PASSKEY_DIAGNOSTIC_ERROR_MESSAGE =
   'Passkey health check failed. Try creating your passkey on a device with iCloud Keychain or Google Password Manager.'
@@ -362,4 +364,12 @@ export const __unsafeHighRiskVendors = HIGH_RISK_ANDROID_VENDORS
 
 export function __unsafeMatchesHighRiskVendor(value: string): boolean {
   return matchesHighRiskVendor(normalize(value))
+}
+
+export function __unsafeSetPasskeyDiagnosticLogger(logger: Debugger) {
+  log = logger
+}
+
+export function __unsafeResetPasskeyDiagnosticLogger() {
+  log = defaultPasskeyDiagnosticLogger
 }
