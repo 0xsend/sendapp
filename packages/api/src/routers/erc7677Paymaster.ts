@@ -144,6 +144,9 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
+            // Include factory fields if present
+            factory: userop.factory,
+            factoryData: userop.factoryData,
           } as Parameters<typeof erc7677BundlerClient.getPaymasterStubData>[0]['userOperation'],
         })
 
@@ -159,6 +162,10 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
+            // Include factory fields if present
+            factory: userop.factory,
+            factoryData: userop.factoryData,
+            // Include paymaster stub data from step 1
             ...paymasterStub,
           } as Parameters<typeof erc7677BundlerClient.estimateUserOperationGas>[0]['userOperation'],
         })
@@ -179,6 +186,11 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
+            // Include factory fields (required by CDP even for deployed accounts)
+            factory: userop.factory,
+            factoryData: userop.factoryData,
+            // Include paymaster stub data from step 1
+            ...paymasterStub,
           } as Parameters<typeof erc7677BundlerClient.getPaymasterData>[0]['userOperation'],
         })
 
