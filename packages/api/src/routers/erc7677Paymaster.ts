@@ -144,6 +144,10 @@ export const erc7677PaymasterRouter = createTRPCRouter({
             maxFeePerGas: userop.maxFeePerGas,
             maxPriorityFeePerGas: userop.maxPriorityFeePerGas,
             signature: userop.signature,
+            // Dummy gas limits for stub call (will be estimated in step 2)
+            callGasLimit: 0n,
+            verificationGasLimit: 0n,
+            preVerificationGas: 0n,
           } as Parameters<typeof erc7677BundlerClient.getPaymasterStubData>[0]['userOperation'],
         })
 
