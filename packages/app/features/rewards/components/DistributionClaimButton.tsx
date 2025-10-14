@@ -1,5 +1,5 @@
 import { Button as ButtonOg, Spinner, type ButtonProps, YStack, useAppToast } from '@my/ui'
-import { sendAccountAbi, sendMerkleDropAbi, type sendMerkleDropAddress } from '@my/wagmi'
+import { sendMerkleDropAbi, type sendMerkleDropAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCoin } from 'app/provider/coins'
 import { assert } from 'app/utils/assert'
@@ -146,19 +146,19 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const canClaim = isTrancheActive && isClaimActive && isEligible && hasEnoughGas
   useEffect(() => {
     if (feesError) {
-      setError(feesError)
+      setError(feesError as Error)
     }
     if (userOpError) {
       setError(userOpError)
     }
     if (isClaimError) {
-      setError(claimError)
+      setError(claimError as Error)
     }
     if (isTrancheActiveError) {
-      setError(isTrancheActiveError)
+      setError(isTrancheActiveError as Error)
     }
     if (isClaimedError) {
-      setError(isClaimedError)
+      setError(isClaimedError as Error)
     }
   }, [feesError, claimError, isTrancheActiveError, isClaimedError, isClaimError, userOpError])
 
@@ -187,7 +187,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
       await queryClient.invalidateQueries({ queryKey: [useSendMerkleDropsAreClaimed.queryKey] })
     } catch (e) {
       console.error(e)
-      setError(e)
+      setError(e as Error)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }
   }

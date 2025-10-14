@@ -6,6 +6,7 @@ import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
 import { erc7677PaymasterRouter } from './erc7677Paymaster'
 import { send7677PaymasterRouter } from './send7677Paymaster'
+import { sponsoredPaymasterRouter } from './sponsoredPaymaster'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
 import { sendEarnRouter } from './sendEarn'
@@ -26,6 +27,7 @@ type AppRouterType = ReturnType<
     distribution: typeof distributionRouter
     erc7677Paymaster: typeof erc7677PaymasterRouter
     send7677Paymaster: typeof send7677PaymasterRouter
+    sponsoredPaymaster: typeof sponsoredPaymasterRouter
     secretShop: typeof secretShopRouter
     sendAccount: typeof sendAccountRouter
     sendEarn: typeof sendEarnRouter
@@ -43,6 +45,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   distribution: distributionRouter,
   erc7677Paymaster: erc7677PaymasterRouter,
   send7677Paymaster: send7677PaymasterRouter,
+  sponsoredPaymaster: sponsoredPaymasterRouter,
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
   sendEarn: sendEarnRouter,

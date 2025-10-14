@@ -28,7 +28,7 @@ export type SendAccountCall = {
 
 export type UseUserOpWithPaymasterResult = {
   userOp: UserOperation<'v0.7'>
-  fees: {
+  fees?: {
     totalFee: bigint
     decimals: number
   }
@@ -41,21 +41,24 @@ export type UseUserOpWithPaymasterResult = {
  * 1. Gets paymaster stub data for gas estimation
  * 2. Estimates gas with stub data
  * 3. Gets final paymaster data with gas estimates
- * 4. Returns complete userOp + fee information
+ * 4. Returns complete userOp + fee information (or no fees if sponsored)
  *
  * This replaces the need for separate useUserOp + usePaymasterFees calls.
  *
  * @param sender - The sender address
  * @param calls - The calls to execute
- * @returns Query result with complete userOp and fee information
+ * @param sponsored - Whether to use sponsored gas (default: false)
+ * @returns Query result with complete userOp and optional fee information
  */
 export function useUserOpWithPaymaster({
   sender,
   calls,
+  sponsored = false,
   chainId = baseMainnet.id,
 }: {
   sender: Address | undefined
   calls: SendAccountCall[] | undefined
+  sponsored?: boolean
   chainId?: keyof typeof EntryPointAddressType
 }): UseQueryResult<UseUserOpWithPaymasterResult, Error> {
   const { data: nonce, error: nonceError, isLoading: isLoadingNonce } = useAccountNonce({ sender })
@@ -70,8 +73,13 @@ export function useUserOpWithPaymaster({
     },
   })
 
-  const getPaymasterStubData = api.send7677Paymaster.getPaymasterStubData.useMutation()
-  const getPaymasterData = api.send7677Paymaster.getPaymasterData.useMutation()
+  // Choose paymaster based on sponsored flag
+  const getPaymasterStubData = sponsored
+    ? api.sponsoredPaymaster.getPaymasterStubData.useMutation()
+    : api.send7677Paymaster.getPaymasterStubData.useMutation()
+  const getPaymasterData = sponsored
+    ? api.sponsoredPaymaster.getPaymasterData.useMutation()
+    : api.send7677Paymaster.getPaymasterData.useMutation()
 
   const enabled =
     sender !== undefined &&
@@ -91,10 +99,11 @@ export function useUserOpWithPaymaster({
         calls: calls?.map((c) => ({ dest: c.dest, value: c.value.toString(), data: c.data })),
         maxFeePerGas: maxFeePerGas?.toString(),
         maxPriorityFeePerGas: maxPriorityFeePerGas?.toString(),
+        sponsored,
         chainId,
       },
     ],
-    [sender, nonce, calls, maxFeePerGas, maxPriorityFeePerGas, chainId]
+    [sender, nonce, calls, maxFeePerGas, maxPriorityFeePerGas, sponsored, chainId]
   )
 
   // Error states (gasFeesError, nonceError) are intentionally excluded from queryKey
@@ -123,7 +132,7 @@ export function useUserOpWithPaymaster({
       const entryPoint = entryPointAddress[chainId] ?? ENTRYPOINT_ADDRESS_V07
 
       // Step 1: Get paymaster stub data for gas estimation
-      log('Step 1: Getting paymaster stub data...')
+      log('Step 1: Getting paymaster stub data...', { sponsored })
       const stubResult = await getPaymasterStubData.mutateAsync({
         userOp: {
           sender,
@@ -136,6 +145,7 @@ export function useUserOpWithPaymaster({
           maxPriorityFeePerGas,
         },
         entryPoint,
+        ...(sponsored && { sendAccountCalls: calls }),
       })
 
       log('Stub data received:', stubResult)
@@ -175,7 +185,7 @@ export function useUserOpWithPaymaster({
       }
 
       // Step 3: Get final paymaster data with gas estimates
-      log('Step 3: Getting final paymaster data...')
+      log('Step 3: Getting final paymaster data...', { sponsored })
       const finalResult = await getPaymasterData.mutateAsync({
         userOp: {
           sender,
@@ -188,6 +198,7 @@ export function useUserOpWithPaymaster({
           maxPriorityFeePerGas,
         },
         entryPoint,
+        ...(sponsored && { sendAccountCalls: calls }),
       })
 
       log('Final paymaster data received:', finalResult)
@@ -213,10 +224,16 @@ export function useUserOpWithPaymaster({
 
       return {
         userOp: completeUserOp,
-        fees: {
-          totalFee: BigInt(finalResult.tokenPayment.maxFee),
-          decimals: finalResult.tokenPayment.decimals,
-        },
+        ...(sponsored
+          ? {}
+          : 'tokenPayment' in finalResult
+            ? {
+                fees: {
+                  totalFee: BigInt(finalResult.tokenPayment.maxFee),
+                  decimals: finalResult.tokenPayment.decimals,
+                },
+              }
+            : {}),
       }
     },
   })

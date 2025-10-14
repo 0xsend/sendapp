@@ -411,7 +411,7 @@ const RemovePasskeyConfirmation = ({
 
   // Build calls for removing the signing key
   const calls = useQuery({
-    queryKey: ['removeSigningKeyCalls', sendAccount?.address, keySlot],
+    queryKey: ['removeSigningKeyCalls', sendAccount?.address, keySlot, sendAccount],
     enabled: !!sendAccount && !!cred && keySlot !== undefined,
     queryFn: async () => {
       assert(!!sendAccount, 'No send account found')

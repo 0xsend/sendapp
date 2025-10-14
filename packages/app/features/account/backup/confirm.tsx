@@ -9,7 +9,7 @@ import {
   useAppToast,
   YStack,
 } from '@my/ui'
-import { baseMainnetClient, sendAccountAbi } from '@my/wagmi'
+import { sendAccountAbi } from '@my/wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { SchemaForm } from 'app/utils/SchemaForm'
@@ -128,7 +128,14 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
 
   // Build calls for adding the signing key
   const calls = useQuery({
-    queryKey: ['addSigningKeyCalls', sendAccount?.address, webauthnCred.public_key, keySlot],
+    queryKey: [
+      'addSigningKeyCalls',
+      sendAccount?.address,
+      webauthnCred.public_key,
+      keySlot,
+      sendAccount,
+      webauthnCred,
+    ],
     enabled: !!sendAccount && !!webauthnCred && keySlot !== undefined,
     queryFn: async () => {
       assert(!!sendAccount, 'No send account found')

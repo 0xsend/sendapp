@@ -21,7 +21,6 @@ import {
   sendTokenV0Address,
   sendTokenV0LockboxAbi,
   sendTokenV0LockboxAddress,
-  sendVerifyingPaymasterAddress,
   useReadSendTokenV0BalanceOf,
 } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
@@ -211,6 +210,7 @@ function UpgradeTokenButton() {
   } = useUserOpWithPaymaster({
     sender,
     calls,
+    sponsored: true,
   })
 
   const userOp = useMemo(() => result?.userOp, [result?.userOp])
