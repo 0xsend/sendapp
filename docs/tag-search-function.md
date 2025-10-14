@@ -33,7 +33,9 @@ CREATE TYPE tag_search_result AS (
     avatar_url text,
     tag_name text,
     send_id integer,
-    phone text
+    phone text,
+    is_verified boolean,
+    verified_at timestamptz
 );
 ```
 
@@ -80,11 +82,11 @@ WHERE (t.name <<-> query < 0.7 OR t.name ILIKE '%' || query || '%')
 ```
 
 **Key Features**:
-1. **`ROW_NUMBER()` Window Function**: Ranks each user's tags by combined priority and distance
+1. **`ROW_NUMBER()` Window Function**: Ranks each user's tags by combined priority
 2. **`PARTITION BY tm.send_id`**: Groups by user to ensure one result per profile
-3. **`ORDER BY primary_rank, secondary_rank`**: Prioritizes exact matches, then by score/distance
+3. **`ORDER BY primary_rank, verified_rank, secondary_rank`**: Prioritizes exact matches, then verified status, then score/distance
 4. **Filter `WHERE rn = 1`**: Keeps only the best matching tag per profile
-5. **Final ordering**: `ORDER BY primary_rank ASC, secondary_rank ASC` (exact matches first)
+5. **Final ordering**: `ORDER BY primary_rank ASC, verified_rank ASC, secondary_rank ASC` (exact first, verified before unverified)
 
 #### Example Scenarios
 
@@ -139,28 +141,39 @@ The ranking system ensures exact matches always appear before fuzzy matches by i
 
 #### Final Ordering Strategy
 
-Results are ordered by: `ORDER BY (primary_rank ASC, secondary_rank ASC)`
+Results are ordered by: `ORDER BY (primary_rank ASC, verified_rank ASC, secondary_rank ASC)`
 
 This guarantees:
 - ✅ All exact matches appear before any fuzzy matches
+- ✅ Within each match type, verified users appear before unverified users
 - ✅ Within exact matches, higher send_score users appear first
 - ✅ Within fuzzy matches, trigram distance and send score ranking is used
 - ✅ Deduplication logic ensures one row per profile
 
+#### Verified Weighting
+
+Verified status participates in ranking as a middle tier between exact/fuzzy and distance/score.
+- `verified_rank = CASE WHEN tm.verified_at IS NOT NULL THEN 0 ELSE 1 END`
+- Applied in both the deduplication partition ordering and the final ORDER BY
+- Note: Exact matches (primary_rank = 0) always outrank fuzzy matches (primary_rank = 1), regardless of verification
+
 #### Implementation Details
 
 ```sql
--- Primary ranking: exact matches (rank=0) always outrank fuzzy matches (rank=1)
-CASE WHEN LOWER(t.name) = LOWER(query) THEN 0 ELSE 1 END AS primary_rank,
+-- Primary ranking: exact (0) vs fuzzy (1)
+CASE WHEN tm.is_exact THEN 0 ELSE 1 END AS primary_rank,
+
+-- Verified weighting: verified first within each tier
+CASE WHEN tm.verified_at IS NOT NULL THEN 0 ELSE 1 END AS verified_rank,
 
 -- Secondary ranking varies by match type
 CASE 
-    WHEN LOWER(t.name) = LOWER(query) THEN 
-        -COALESCE(scores.total_score, 0)  -- Negative for DESC ordering within exact matches
+    WHEN tm.is_exact THEN 
+        -tm.send_score  -- Higher send_score ranks earlier for exact matches
     ELSE 
         -- Fuzzy ranking formula: distance - (send_score / 1M)
-        CASE WHEN (t.name <-> query) IS NULL THEN 0 ELSE (t.name <-> query) END
-        - (COALESCE(scores.total_score, 0) / 1000000.0)
+        CASE WHEN tm.distance IS NULL THEN 0 ELSE tm.distance END
+        - (tm.send_score / 1000000.0)
 END AS secondary_rank
 ```
 

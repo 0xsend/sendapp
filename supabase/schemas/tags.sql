@@ -398,6 +398,7 @@ $function$;
 
 ALTER FUNCTION "public"."tags_before_insert_or_update_func"() OWNER TO "postgres";
 
+
 CREATE OR REPLACE FUNCTION public.tag_search(query text, limit_val integer, offset_val integer)
  RETURNS TABLE(send_id_matches tag_search_result[], tag_matches tag_search_result[], phone_matches tag_search_result[])
  LANGUAGE plpgsql
@@ -470,10 +471,7 @@ BEGIN
             array_agg(ROW(sub.avatar_url, sub.tag_name, sub.send_id, sub.phone, sub.is_verified, sub.verified_at)::public.tag_search_result)
         FROM (
             WITH scores AS (
-                -- Aggregate user send scores, summing all scores for cumulative activity
-                SELECT
-                    user_id,
-                    SUM(score) AS total_score
+                SELECT user_id, SUM(score) AS total_score
                 FROM private.send_scores_history
                 GROUP BY user_id
             ),
@@ -491,8 +489,7 @@ BEGIN
                 FROM profiles p
                 JOIN send_accounts sa ON sa.user_id = p.id
                 JOIN send_account_tags sat ON sat.send_account_id = sa.id
-                JOIN tags t ON t.id = sat.tag_id
-                    AND t.status = 'confirmed'
+                JOIN tags t ON t.id = sat.tag_id AND t.status = 'confirmed'
                 LEFT JOIN scores ON scores.user_id = p.id
                 WHERE
                     LOWER(t.name) = LOWER(query)
@@ -511,23 +508,19 @@ BEGIN
                     c.primary_rank,
                     (
                         CASE
-                            WHEN c.is_exact THEN
-                                -c.send_score
-                            ELSE
-                                CASE WHEN c.distance IS NULL THEN 0 ELSE c.distance END
-                                - (c.send_score / 1000000.0)
+                            WHEN c.is_exact THEN -c.send_score
+                            ELSE (CASE WHEN c.distance IS NULL THEN 0 ELSE c.distance END) - (c.send_score / 1000000.0)
                         END
                     ) AS secondary_rank,
-                    ROW_NUMBER() OVER (PARTITION BY c.send_id ORDER BY (
-                        c.primary_rank,
-                        CASE
-                            WHEN c.is_exact THEN
-                                -c.send_score
-                            ELSE
-                                CASE WHEN c.distance IS NULL THEN 0 ELSE c.distance END
-                                - (c.send_score / 1000000.0)
-                        END
-                    )) AS rn
+                    ROW_NUMBER() OVER (
+                        PARTITION BY c.send_id
+                        ORDER BY c.primary_rank, (
+                            CASE
+                                WHEN c.is_exact THEN -c.send_score
+                                ELSE (CASE WHEN c.distance IS NULL THEN 0 ELSE c.distance END) - (c.send_score / 1000000.0)
+                            END
+                        )
+                    ) AS rn
                 FROM candidates c
             ),
             page AS (
@@ -551,21 +544,34 @@ BEGIN
                     page.send_id,
                     page.phone,
                     (va.verified_at_result IS NOT NULL) AS is_verified,
-                    va.verified_at_result AS verified_at
+                    va.verified_at_result AS verified_at,
+                    page.primary_rank,
+                    page.secondary_rank
                 FROM page
                 JOIN profiles p2 ON p2.id = page.user_id
                 CROSS JOIN LATERAL (
                     SELECT public.verified_at(p2) AS verified_at_result
                 ) va
             )
-            SELECT * FROM enriched
+            SELECT
+                avatar_url,
+                tag_name,
+                send_id,
+                phone,
+                is_verified,
+                verified_at
+            FROM enriched
+            ORDER BY
+                primary_rank ASC,
+                CASE WHEN is_verified THEN 0 ELSE 1 END ASC,
+                secondary_rank ASC
         ) sub
     ) AS tag_matches,
     -- phone matches, disabled for now
     (null::public.tag_search_result[]) AS phone_matches;
 END;
 $function$
-;
+
 
 ALTER FUNCTION "public"."tag_search"("query" "text", "limit_val" integer, "offset_val" integer) OWNER TO "postgres";
 
