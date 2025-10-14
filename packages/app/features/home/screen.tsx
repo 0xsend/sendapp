@@ -3,12 +3,14 @@ import {
   Button,
   Card,
   H1,
+  H2,
   H4,
   Paragraph,
   Spinner,
   Stack,
   styled,
   Theme,
+  useEvent,
   useMedia,
   XStack,
   type XStackProps,
@@ -35,13 +37,14 @@ import { useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { coin } from 'app/data/coins'
 import { investmentCoins } from 'app/data/coins'
-import { CoinSheet } from 'app/components/CoinSheet'
+import { CoinsModal } from 'app/components/CoinsModal'
 import { Link } from 'solito/link'
-import { Platform } from 'react-native'
+import { type LayoutChangeEvent, Platform } from 'react-native'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { formatUnits } from 'viem'
 import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { localizeAmount } from 'app/utils/formatAmount'
+import { IconX } from 'app/components/icons'
 
 export function HomeScreen() {
   const media = useMedia()
@@ -211,6 +214,12 @@ export function InvestmentsBody() {
 
   const media = useMedia()
 
+  const [modalContainerWidth, setModalContainerWidth] = useState(0)
+
+  const onModalContainerLayout = useEvent((e: LayoutChangeEvent) => {
+    setModalContainerWidth(Math.floor(e.nativeEvent.layout.width))
+  })
+
   return (
     <YStack
       key={media.gtLg ? 'investments-body-lg' : 'investments-body-xs'}
@@ -230,7 +239,14 @@ export function InvestmentsBody() {
       gap={'$3.5'}
       f={1}
     >
-      <InvestmentsPortfolioCard padded size="$6" w="100%" mah={220} gap="$5">
+      <InvestmentsPortfolioCard
+        onLayout={onModalContainerLayout}
+        padded
+        size="$6"
+        w="100%"
+        mah={220}
+        gap="$5"
+      >
         <Card.Header p={0}>
           <Paragraph
             fontSize={'$5'}
@@ -243,7 +259,56 @@ export function InvestmentsBody() {
         </Card.Header>
 
         <InvestmentsBalanceCard.Body />
-        <InvestmentsBalanceCard.Footer onInvest={() => setIsSheetOpen(true)} />
+
+        <CoinsModal
+          open={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
+          trigger={
+            <CoinsModal.Trigger asChild>
+              <Button theme="neon_active" br="$4" jc="center" ai="center" pos="relative" mah={32}>
+                <Button.Text color="$black">INVEST</Button.Text>
+              </Button>
+            </CoinsModal.Trigger>
+          }
+        >
+          <CoinsModal.Content w={modalContainerWidth - 24}>
+            <XStack p="$3" px="$4" pr="$3" ai="center" jc="space-between" w="100%">
+              <H2 size="$8" col="$gray11" fow="300">
+                New Investments
+              </H2>
+              <CoinsModal.Close asChild>
+                <Button
+                  pressStyle={{
+                    scale: 0.9,
+                    bg: '$backgroundHover',
+                  }}
+                  animation="100ms"
+                  animateOnly={['transform']}
+                  size="$3"
+                  circular
+                  bg="$backgroundHover"
+                >
+                  <Button.Icon scaleIcon={2}>
+                    <IconX color="$color12" />
+                  </Button.Icon>
+                </Button>
+              </CoinsModal.Close>
+            </XStack>
+            <CoinsModal.Items>
+              {investmentCoins.map((coin) =>
+                Platform.OS === 'web' ? (
+                  <InvestSheetItemWeb key={coin.symbol} coin={coin} />
+                ) : (
+                  <InvestSheetItemNative
+                    key={coin.symbol}
+                    coin={coin}
+                    onPress={() => setIsSheetOpen(false)}
+                  />
+                )
+              )}
+            </CoinsModal.Items>
+          </CoinsModal.Content>
+        </CoinsModal>
       </InvestmentsPortfolioCard>
 
       {/* Summary cards under the header */}
@@ -345,25 +410,6 @@ export function InvestmentsBody() {
           )}
         </Card>
       </YStack>
-
-      <CoinSheet open={isSheetOpen} onOpenChange={() => setIsSheetOpen(false)}>
-        {Platform.OS === 'web' && (
-          <CoinSheet.Handle onPress={() => setIsSheetOpen(false)}>New Investments</CoinSheet.Handle>
-        )}
-        <CoinSheet.Items>
-          {investmentCoins.map((coin) =>
-            Platform.OS === 'web' ? (
-              <InvestSheetItemWeb key={coin.symbol} coin={coin} />
-            ) : (
-              <InvestSheetItemNative
-                key={coin.symbol}
-                coin={coin}
-                onPress={() => setIsSheetOpen(false)}
-              />
-            )
-          )}
-        </CoinSheet.Items>
-      </CoinSheet>
     </YStack>
   )
 }
@@ -377,7 +423,7 @@ const InvestSheetItemWeb = ({ coin }: { coin: coin }) => {
         query: { token: coin.token },
       }}
     >
-      <CoinSheet.Item coin={coin} />
+      <CoinsModal.Item coin={coin} />
     </Link>
   )
 }
@@ -385,16 +431,12 @@ const InvestSheetItemWeb = ({ coin }: { coin: coin }) => {
 const InvestSheetItemNative = ({ coin, onPress }: { coin: coin; onPress: () => void }) => {
   const router = useRouter()
 
-  const handlePress = () => {
+  const handlePress = useEvent(() => {
     onPress()
     router.push({ pathname: '/token', query: { token: coin.token } })
-  }
+  })
 
-  return (
-    <XStack key={coin.symbol} onPress={handlePress}>
-      <CoinSheet.Item coin={coin} />
-    </XStack>
-  )
+  return <CoinsModal.Item key={coin.symbol} onPress={handlePress} coin={coin} />
 }
 
 export const StablesBody = YStack.styleable((props) => {

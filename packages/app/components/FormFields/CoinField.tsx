@@ -19,9 +19,9 @@ import {
   YStack,
 } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { useTsController } from '@ts-react/form'
-import { IconCheckCircle, IconX } from 'app/components/icons'
+import { IconX } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useId, useState } from 'react'
 import { IconCoin } from '../icons/IconCoin'
@@ -246,9 +246,7 @@ const CoinFieldItem = ({
         >
           {coin.symbol}
         </Select.ItemText>
-        {active && (
-          <IconCheckCircle size="$0.9" color={'$primary'} $theme-light={{ color: '$color12' }} />
-        )}
+        {active && <Check size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />}
       </XStack>
       <XStack gap={'$3.5'} ai={'center'}>
         <TokenBalance coin={coin} />
