@@ -6,10 +6,12 @@ import type {
   AuthenticationResponseJSON,
   RegistrationResponseJSON,
 } from 'react-native-passkeys/build/ReactNativePasskeys.types'
-import { type Hex, bytesToHex } from 'viem'
+import { bytesToHex, type Hex } from 'viem'
 import {
   contractFriendlyKeyToDER,
+  COSEECDHAtoXY,
   createResponseToDER,
+  decodeCBORWithExtensions,
   derKeytoContractFriendlyKey,
   parseAndNormalizeSig,
   parseCreateResponse,
@@ -302,5 +304,252 @@ describe('Passkey', () => {
     })
     expect(parsedSignResponse.responseTypeLocation).toEqual(1n)
     expect(parsedSignResponse.challengeLocation).toEqual(23n)
+  })
+})
+
+describe('COSEECDHAtoXY with WebAuthn extensions', () => {
+  it('handles standard 77-byte COSE key without extensions', () => {
+    // Standard P-256 key (77 bytes) - user key slot 0
+    const standardKey = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 171, 8, 195, 219, 141, 226, 108, 106, 113, 234, 83, 216,
+      147, 85, 132, 185, 16, 78, 73, 167, 74, 232, 103, 153, 13, 71, 49, 224, 25, 12, 109, 167, 34,
+      88, 32, 175, 158, 40, 142, 171, 234, 228, 164, 131, 185, 29, 87, 158, 239, 249, 206, 246, 43,
+      196, 243, 153, 32, 53, 83, 19, 224, 196, 175, 49, 105, 90, 127,
+    ])
+
+    const [x, y] = COSEECDHAtoXY(standardKey)
+
+    expect(x).toBe('0xab08c3db8de26c6a71ea53d8935584b9104e49a74ae867990d4731e0190c6da7')
+    expect(y).toBe('0xaf9e288eabeae4a483b91d579eeff9cef62bc4f39920355313e0c4af31695a7f')
+  })
+
+  it('handles 91-byte COSE key with credProtect extension (production user case)', () => {
+    // Real production key from user f20775c9-90b1-4cf9-9a56-c2dfb260cc67
+    // 77 bytes COSE key + 14 bytes credProtect extension
+    const keyWithCredProtect = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 175, 156, 10, 134, 77, 217, 255, 18, 193, 117, 115, 81,
+      207, 211, 56, 163, 209, 114, 58, 53, 165, 10, 166, 23, 208, 11, 121, 253, 16, 242, 74, 39, 34,
+      88, 32, 204, 37, 178, 31, 50, 223, 114, 22, 160, 11, 39, 18, 56, 213, 15, 168, 37, 68, 38, 80,
+      249, 171, 58, 244, 36, 67, 101, 238, 27, 56, 81, 255,
+      // credProtect extension (14 bytes)
+      161, 107, 99, 114, 101, 100, 80, 114, 111, 116, 101, 99, 116, 2,
+    ])
+
+    const [x, y] = COSEECDHAtoXY(keyWithCredProtect)
+
+    // Expected X and Y coordinates from the first 77 bytes
+    expect(x).toBe('0xaf9c0a864dd9ff12c1757351cfd338a3d1723a35a50aa617d00b79fd10f24a27')
+    expect(y).toBe('0xcc25b21f32df7216a00b271238d50fa825442650f9ab3af4244365ee1b3851ff')
+  })
+
+  it('handles another production user key with credProtect (key slot 1)', () => {
+    // Real production key from user f20775c9-90b1-4cf9-9a56-c2dfb260cc67, key slot 1
+    const keyWithCredProtect = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 238, 51, 207, 123, 157, 18, 154, 99, 161, 88, 226, 61,
+      255, 121, 35, 179, 252, 235, 38, 139, 118, 149, 132, 67, 35, 137, 181, 91, 158, 209, 172, 156,
+      34, 88, 32, 132, 50, 197, 125, 226, 173, 219, 121, 112, 66, 18, 244, 8, 243, 143, 125, 184,
+      195, 194, 95, 193, 141, 81, 103, 104, 161, 159, 204, 243, 134, 229, 200,
+    ])
+
+    const [x, y] = COSEECDHAtoXY(keyWithCredProtect)
+
+    expect(x).toBe('0xee33cf7b9d129a63a158e23dff7923b3fceb268b769584432389b55b9ed1ac9c')
+    expect(y).toBe('0x8432c57de2addb79704212f408f38f7db8c3c25fc18d516768a19fccf386e5c8')
+  })
+
+  it('extracts correct coordinates regardless of extension data', () => {
+    // Create a key with arbitrary extension data
+    const coseKey = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32,
+      // X coordinate (32 bytes)
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+      27, 28, 29, 30, 31, 32, 34, 88, 32,
+      // Y coordinate (32 bytes)
+      33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
+      56, 57, 58, 59, 60, 61, 62, 63, 64,
+    ])
+
+    const [x, y] = COSEECDHAtoXY(coseKey)
+
+    expect(x).toBe('0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20')
+    expect(y).toBe('0x2122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40')
+  })
+
+  it('handles 78-byte COSE key (minor variation)', () => {
+    // Some authenticators produce 78-byte keys (less common)
+    const key78Bytes = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 171, 8, 195, 219, 141, 226, 108, 106, 113, 234, 83, 216,
+      147, 85, 132, 185, 16, 78, 73, 167, 74, 232, 103, 153, 13, 71, 49, 224, 25, 12, 109, 167, 34,
+      88, 32, 175, 158, 40, 142, 171, 234, 228, 164, 131, 185, 29, 87, 158, 239, 249, 206, 246, 43,
+      196, 243, 153, 32, 53, 83, 19, 224, 196, 175, 49, 105, 90, 127,
+      // 1 extra byte
+      0,
+    ])
+
+    const [x, y] = COSEECDHAtoXY(key78Bytes)
+
+    // Should extract the same coordinates as the 77-byte version
+    expect(x).toBe('0xab08c3db8de26c6a71ea53d8935584b9104e49a74ae867990d4731e0190c6da7')
+    expect(y).toBe('0xaf9e288eabeae4a483b91d579eeff9cef62bc4f39920355313e0c4af31695a7f')
+  })
+
+  it('throws error for invalid COSE structure', () => {
+    const invalidKey = new Uint8Array([1, 2, 3, 4, 5])
+
+    expect(() => COSEECDHAtoXY(invalidKey)).toThrow()
+  })
+
+  it('throws error for COSE key missing X or Y coordinates', () => {
+    // Valid CBOR map but missing required fields
+    const incompleteKey = new Uint8Array([
+      161, // Map with 1 item
+      1, // Key: 1
+      2, // Value: 2
+    ])
+
+    expect(() => COSEECDHAtoXY(incompleteKey)).toThrow('Invalid COSE public key')
+  })
+})
+
+describe('decodeCBORWithExtensions', () => {
+  it('decodes standard CBOR without extensions', () => {
+    // Standard 77-byte COSE P-256 public key
+    const standardKey = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 171, 8, 195, 219, 141, 226, 108, 106, 113, 234, 53, 216,
+      147, 85, 132, 185, 16, 78, 73, 167, 74, 232, 103, 153, 13, 71, 49, 224, 25, 12, 109, 167, 34,
+      88, 32, 175, 158, 40, 142, 171, 234, 228, 164, 131, 185, 29, 87, 158, 239, 249, 206, 246, 43,
+      196, 243, 153, 32, 53, 83, 19, 224, 196, 175, 49, 105, 90, 127,
+    ])
+
+    const decoded = decodeCBORWithExtensions<Map<number, ArrayBuffer>>(standardKey)
+
+    expect(decoded instanceof Map).toBe(true)
+    expect(decoded.size).toBe(5) // COSE key has 5 fields: kty(1), alg(3), crv(-1), x(-2), y(-3)
+    expect(decoded.get(-2)).toBeDefined() // X coordinate
+    expect(decoded.get(-3)).toBeDefined() // Y coordinate
+  })
+
+  it('decodes CBOR with credProtect extension (production user case)', () => {
+    // Real production key from user f20775c9-90b1-4cf9-9a56-c2dfb260cc67
+    // 77 bytes COSE key + 14 bytes credProtect extension
+    const keyWithCredProtect = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 175, 156, 10, 134, 77, 217, 255, 18, 193, 117, 115, 81,
+      207, 211, 56, 163, 209, 114, 58, 53, 165, 10, 166, 23, 208, 11, 121, 253, 16, 242, 74, 39, 34,
+      88, 32, 204, 37, 178, 31, 50, 223, 114, 22, 160, 11, 39, 18, 56, 213, 15, 168, 37, 68, 38, 80,
+      249, 171, 58, 244, 36, 67, 101, 238, 27, 56, 81, 255,
+      // credProtect extension (14 bytes): {credProtect: 2}
+      161, 107, 99, 114, 101, 100, 80, 114, 111, 116, 101, 99, 116, 2,
+    ])
+
+    const decoded = decodeCBORWithExtensions<Map<number, ArrayBuffer>>(keyWithCredProtect)
+
+    // Should successfully decode the main COSE key structure
+    expect(decoded instanceof Map).toBe(true)
+    expect(decoded.size).toBe(5) // COSE key has 5 fields
+
+    // Verify X coordinate
+    const xBuffer = decoded.get(-2)
+    expect(xBuffer).toBeDefined()
+    if (xBuffer) {
+      expect(Buffer.from(xBuffer).toString('hex')).toBe(
+        'af9c0a864dd9ff12c1757351cfd338a3d1723a35a50aa617d00b79fd10f24a27'
+      )
+    }
+
+    // Verify Y coordinate
+    const yBuffer = decoded.get(-3)
+    expect(yBuffer).toBeDefined()
+    if (yBuffer) {
+      expect(Buffer.from(yBuffer).toString('hex')).toBe(
+        'cc25b21f32df7216a00b271238d50fa825442650f9ab3af4244365ee1b3851ff'
+      )
+    }
+  })
+
+  it('decodes CBOR with 78-byte variation', () => {
+    // Some authenticators produce 78-byte keys
+    const key78Bytes = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 171, 8, 195, 219, 141, 226, 108, 106, 113, 234, 53, 216,
+      147, 85, 132, 185, 16, 78, 73, 167, 74, 232, 103, 153, 13, 71, 49, 224, 25, 12, 109, 167, 34,
+      88, 32, 175, 158, 40, 142, 171, 234, 228, 164, 131, 185, 29, 87, 158, 239, 249, 206, 246, 43,
+      196, 243, 153, 32, 53, 83, 19, 224, 196, 175, 49, 105, 90, 127,
+      // 1 extra byte
+      0,
+    ])
+
+    const decoded = decodeCBORWithExtensions<Map<number, ArrayBuffer>>(key78Bytes)
+
+    expect(decoded instanceof Map).toBe(true)
+    expect(decoded.size).toBe(5)
+    expect(decoded.get(-2)).toBeDefined()
+    expect(decoded.get(-3)).toBeDefined()
+  })
+
+  it('decodes another production user key with credProtect (key slot 1)', () => {
+    // Real production key from user f20775c9-90b1-4cf9-9a56-c2dfb260cc67, key slot 1
+    const keyWithCredProtect = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 238, 51, 207, 123, 157, 18, 154, 99, 161, 88, 226, 61,
+      255, 121, 35, 179, 252, 235, 38, 139, 118, 149, 132, 67, 35, 137, 181, 91, 158, 209, 172, 156,
+      34, 88, 32, 132, 50, 197, 125, 226, 173, 219, 121, 112, 66, 18, 244, 8, 243, 143, 125, 184,
+      195, 194, 95, 193, 141, 81, 103, 104, 161, 159, 204, 243, 134, 229, 200,
+      // credProtect extension
+      161, 107, 99, 114, 101, 100, 80, 114, 111, 116, 101, 99, 116, 2,
+    ])
+
+    const decoded = decodeCBORWithExtensions<Map<number, ArrayBuffer>>(keyWithCredProtect)
+
+    expect(decoded instanceof Map).toBe(true)
+    expect(decoded.size).toBe(5)
+
+    // Verify X coordinate
+    const xBuffer = decoded.get(-2)
+    expect(xBuffer).toBeDefined()
+    if (xBuffer) {
+      expect(Buffer.from(xBuffer).toString('hex')).toBe(
+        'ee33cf7b9d129a63a158e23dff7923b3fceb268b769584432389b55b9ed1ac9c'
+      )
+    }
+
+    // Verify Y coordinate
+    const yBuffer = decoded.get(-3)
+    expect(yBuffer).toBeDefined()
+    if (yBuffer) {
+      expect(Buffer.from(yBuffer).toString('hex')).toBe(
+        '8432c57de2addb79704212f408f38f7db8c3c25fc18d516768a19fccf386e5c8'
+      )
+    }
+  })
+
+  it('throws error for completely invalid CBOR', () => {
+    const invalidData = new Uint8Array([255, 255, 255, 255, 255])
+
+    expect(() => decodeCBORWithExtensions(invalidData)).toThrow()
+  })
+
+  it('throws error for CBOR that is too short to be a valid COSE key', () => {
+    // Only 10 bytes - too short to be any valid COSE key
+    const tooShort = new Uint8Array([165, 1, 2, 3, 38, 32, 1, 33, 88, 32])
+
+    expect(() => decodeCBORWithExtensions(tooShort)).toThrow()
+  })
+
+  it('handles CBOR with large extension data', () => {
+    // Standard 77-byte key + larger extension (20 bytes)
+    const keyWithLargeExtension = new Uint8Array([
+      165, 1, 2, 3, 38, 32, 1, 33, 88, 32, 175, 156, 10, 134, 77, 217, 255, 18, 193, 117, 115, 81,
+      207, 211, 56, 163, 209, 114, 58, 53, 165, 10, 166, 23, 208, 11, 121, 253, 16, 242, 74, 39, 34,
+      88, 32, 204, 37, 178, 31, 50, 223, 114, 22, 160, 11, 39, 18, 56, 213, 15, 168, 37, 68, 38, 80,
+      249, 171, 58, 244, 36, 67, 101, 238, 27, 56, 81, 255,
+      // Larger extension data (20 bytes)
+      161, 107, 99, 114, 101, 100, 80, 114, 111, 116, 101, 99, 116, 2, 1, 2, 3, 4, 5, 6,
+    ])
+
+    const decoded = decodeCBORWithExtensions<Map<number, ArrayBuffer>>(keyWithLargeExtension)
+
+    // Should successfully decode despite larger extension
+    expect(decoded instanceof Map).toBe(true)
+    expect(decoded.size).toBe(5)
+    expect(decoded.get(-2)).toBeDefined()
+    expect(decoded.get(-3)).toBeDefined()
   })
 })

@@ -14,6 +14,90 @@ import { assert } from './assert'
  */
 const DER_ECPUBKEY_PREFIX = '0x3059301306072a8648ce3d020106082a8648ce3d03010703420004'
 
+/**
+ * Decodes CBOR data that may contain WebAuthn extensions after the main structure.
+ *
+ * WebAuthn authenticators (especially YubiKeys and hardware security keys) may append
+ * extension data after the primary COSE public key structure. Common extensions include:
+ * - credProtect: Credential protection policy (typically adds 14 bytes)
+ * - hmac-secret: HMAC secret support
+ * - credBlob: Credential blob storage
+ *
+ * The cbor2 library strictly rejects any data after the first complete CBOR item.
+ * This function handles that by attempting to decode progressively shorter slices
+ * until it finds the main CBOR structure, effectively separating the primary data
+ * from any trailing extensions.
+ *
+ * For COSE keys (CBOR-encoded EC2 public keys), the structure is typically:
+ * - 77 bytes: Standard P-256 key (most common)
+ * - 78 bytes: P-256 key with minor variations
+ * - 91 bytes: P-256 key + credProtect extension (77 + 14)
+ *
+ * @param buffer - The CBOR encoded data (may include extensions)
+ * @returns An object containing the decoded main structure and any extension data
+ */
+export function decodeCBORWithExtensions<T>(buffer: Uint8Array): T {
+  try {
+    // Try normal decode first (handles standard data without extensions)
+    return cbor.decode<T>(buffer)
+  } catch (e) {
+    if (e instanceof Error && e.message === 'Extra data in input') {
+      // Try common COSE key lengths first for performance
+      const commonLengths = [77, 78, 80, 85]
+      for (const len of commonLengths) {
+        if (buffer.length > len) {
+          try {
+            const mainData = cbor.decode<T>(buffer.slice(0, len))
+            const extensionData = buffer.slice(len)
+
+            // Try to decode the extension to understand what it is
+            try {
+              const extension = cbor.decode(extensionData)
+              console.info(
+                `[passkeys] Decoded CBOR with ${buffer.length - len} bytes of extensions:`,
+                extension
+              )
+            } catch {
+              console.info(
+                `[passkeys] Decoded CBOR with ${buffer.length - len} bytes of unparseable extension data`
+              )
+            }
+
+            return mainData
+          } catch {
+            // This length didn't work, try next
+          }
+        }
+      }
+
+      // Fallback: progressively try shorter lengths to find where the main structure ends
+      for (let len = buffer.length - 1; len > 50; len--) {
+        try {
+          const mainData = cbor.decode<T>(buffer.slice(0, len))
+          const extensionData = buffer.slice(len)
+          console.warn(
+            `[passkeys] Found CBOR boundary at ${len} bytes via search (${buffer.length - len} bytes of extensions)`
+          )
+
+          // Try to decode and log the extension
+          try {
+            const extension = cbor.decode(extensionData)
+            console.info('[passkeys] Extension data:', extension)
+          } catch {
+            // Extension couldn't be decoded
+          }
+
+          return mainData
+        } catch {
+          // Continue searching
+        }
+      }
+    }
+    // Re-throw if we can't handle it
+    throw e
+  }
+}
+
 export function isDERPubKey(pubKeyHex: Hex): boolean {
   return (
     pubKeyHex.startsWith(DER_ECPUBKEY_PREFIX) &&
@@ -102,7 +186,7 @@ export function COSEECDHAtoDER(COSEPublicKey: Uint8Array): Hex {
 // Takes COSE encoded public key and return x and y coordinates
 // https://www.rfc-editor.org/rfc/rfc8152.html#section-13.1
 export function COSEECDHAtoXY(COSEPublicKey: Uint8Array): [Hex, Hex] {
-  const coseStruct = cbor.decode<Map<number, ArrayBuffer>>(COSEPublicKey)
+  const coseStruct = decodeCBORWithExtensions<Map<number, ArrayBuffer>>(COSEPublicKey)
   const x = coseStruct.get(-2)
   const y = coseStruct.get(-3)
   assert(x !== undefined && y !== undefined, 'Invalid COSE public key')
@@ -112,7 +196,7 @@ export function COSEECDHAtoXY(COSEPublicKey: Uint8Array): [Hex, Hex] {
 // Parses Webauthn MakeCredential authData
 export function parseCreateResponse(result: RegistrationResponseJSON) {
   const rawAttestationObject = base64urlnopad.decode(result.response.attestationObject)
-  const attestationObject = cbor.decode<{
+  const attestationObject = decodeCBORWithExtensions<{
     fmt: string
     attStmt: {
       alg: number
