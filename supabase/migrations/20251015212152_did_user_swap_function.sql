@@ -32,6 +32,8 @@ END;
 $function$
 ;
 
+ALTER FUNCTION "public"."did_user_swap"() OWNER TO "postgres";
+
 REVOKE ALL ON FUNCTION "public"."did_user_swap"() FROM PUBLIC;
 
 GRANT ALL ON FUNCTION "public"."did_user_swap"() TO "anon";
