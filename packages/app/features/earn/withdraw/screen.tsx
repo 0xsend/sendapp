@@ -1,5 +1,5 @@
 import { Fade, Paragraph, Spinner, Stack, SubmitButton, useAppToast, XStack, YStack } from '@my/ui'
-import { baseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
+import { sendBaseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { CalculatedBenefits } from 'app/features/earn/components/CalculatedBenefits'
@@ -180,7 +180,7 @@ export function WithdrawForm() {
 
       setUseropState('Sending transaction...')
 
-      const userOpHash = await baseMainnetBundlerClient.sendUserOperation({
+      const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
       })
 
@@ -188,7 +188,7 @@ export function WithdrawForm() {
 
       const receipt = await withRetry(
         () =>
-          baseMainnetBundlerClient.waitForUserOperationReceipt({
+          sendBaseMainnetBundlerClient.waitForUserOperationReceipt({
             hash: userOpHash,
             timeout: 10000,
           }),

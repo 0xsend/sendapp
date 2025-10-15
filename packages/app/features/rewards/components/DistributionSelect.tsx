@@ -9,10 +9,10 @@ import {
   Sheet,
   XStack,
 } from '@my/ui'
-import { ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
 import { memo, useRef, useState } from 'react'
 import type { UseDistributionsResultData } from 'app/utils/distributions'
-import { IconCheckCircle, IconX } from 'app/components/icons'
+import { IconX } from 'app/components/icons'
 import { Platform } from 'react-native'
 import { useThemeName } from 'tamagui'
 
@@ -50,9 +50,7 @@ const DistributionItem = ({
         >
           {children}
         </Select.ItemText>
-        {isActive && (
-          <IconCheckCircle size="$0.9" color={'$primary'} $theme-light={{ color: '$color12' }} />
-        )}
+        {isActive && <Check size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />}
       </XStack>
     </Select.Item>
   )

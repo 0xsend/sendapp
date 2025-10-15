@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { IconAccount, IconBadgeCheckSolid, IconInfoCircle } from 'app/components/icons'
+import { IconAccount, IconInfoCircle } from 'app/components/icons'
 import {
   type DistributionsVerificationsQuery,
   type UseDistributionsResultData,
@@ -21,7 +21,7 @@ import {
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
-import { type PropsWithChildren, useMemo, useState } from 'react'
+import { type PropsWithChildren, useMemo } from 'react'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { DistributionSelect } from '../components/DistributionSelect'
@@ -34,11 +34,7 @@ import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
-import { CantonWalletStatus } from '../components/CantonWalletStatus'
-import { CantonWalletForm } from '../components/CantonWalletForm'
-
-// Canton wallet minimum SEND balance requirement (1000 SEND)
-const CANTON_WALLET_MIN_SEND_BALANCE = 1000n * BigInt(10 ** 18)
+import { Check } from '@tamagui/lucide-icons'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -168,7 +164,6 @@ const DistributionRequirementsCard = ({
 }) => {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const verifications = verificationsQuery.data
-  const [isCantonFormExpanded, setIsCantonFormExpanded] = useState(false)
   const {
     data: snapshotBalance,
     isLoading: isLoadingSnapshotBalance,
@@ -190,11 +185,6 @@ const DistributionRequirementsCard = ({
   const sendTagPurchased = verifications?.verification_values?.some(
     (v) => v.type === 'tag_registration' && v.weight > 0n
   )
-
-  const canConnectCantonWallet = useMemo(() => {
-    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_MIN_SEND_BALANCE
-    return sendTagPurchased && hasMinSavings && hasMinCantonBalance
-  }, [sendTagPurchased, hasMinSavings, snapshotBalance])
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
@@ -240,11 +230,7 @@ const DistributionRequirementsCard = ({
           <XStack ai="center" gap="$2">
             <Paragraph>Sendtag Purchased</Paragraph>
             {sendTagPurchased ? (
-              <IconBadgeCheckSolid
-                size={'$1.5'}
-                color={'$primary'}
-                $theme-light={{ color: '$color12' }}
-              />
+              <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
             ) : (
               <Theme name="red">
                 <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -276,11 +262,7 @@ const DistributionRequirementsCard = ({
                   )
                 default:
                   return (
-                    <IconBadgeCheckSolid
-                      size={'$1.5'}
-                      color={'$primary'}
-                      $theme-light={{ color: '$color12' }}
-                    />
+                    <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
                   )
               }
             })()}
@@ -307,7 +289,7 @@ const DistributionRequirementsCard = ({
                     )
                   default:
                     return (
-                      <IconBadgeCheckSolid
+                      <Check
                         size={'$1.5'}
                         color={'$primary'}
                         $theme-light={{ color: '$color12' }}
@@ -317,17 +299,8 @@ const DistributionRequirementsCard = ({
               })()}
             </XStack>
           ) : null}
-          <CantonWalletStatus
-            canConnectCantonWallet={canConnectCantonWallet}
-            isExpanded={isCantonFormExpanded}
-            onToggle={() => setIsCantonFormExpanded(!isCantonFormExpanded)}
-          />
         </YStack>
       </Stack>
-      <CantonWalletForm
-        isVisible={isCantonFormExpanded}
-        onSuccess={() => setIsCantonFormExpanded(false)}
-      />
     </FadeCard>
   )
 }
@@ -424,13 +397,7 @@ const TaskCard = ({
 
   const statusConfig = {
     completed: {
-      icon: (
-        <IconBadgeCheckSolid
-          size={'$1.5'}
-          color={'$primary'}
-          $theme-light={{ color: '$color12' }}
-        />
-      ),
+      icon: <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
       text: isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed',
     },
     pending: {

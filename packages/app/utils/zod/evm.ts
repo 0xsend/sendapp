@@ -42,6 +42,31 @@ export const UserOperationSchema = z.object({
 export type UserOperation = z.infer<typeof UserOperationSchema>
 
 /**
+ * Zod schema for UserOperation input to ERC-7677 paymaster (gas limits optional)
+ */
+export const UserOperationERC7677InputSchema = z.object({
+  sender: address,
+  nonce: z.bigint(),
+  factory: address.optional(),
+  factoryData: hex.optional(),
+  callData: hex,
+  callGasLimit: z.bigint().optional(), // Optional - ERC-7677 paymaster will estimate
+  verificationGasLimit: z.bigint().optional(), // Optional - ERC-7677 paymaster will estimate
+  preVerificationGas: z.bigint().optional(), // Optional - ERC-7677 paymaster will estimate
+  maxFeePerGas: z.bigint(),
+  maxPriorityFeePerGas: z.bigint(),
+  paymaster: address.optional(),
+  paymasterVerificationGasLimit: z.bigint().optional(),
+  paymasterPostOpGasLimit: z.bigint().optional(),
+  paymasterData: hex.optional(),
+  signature: hex,
+  initCode: z.never().optional(),
+  paymasterAndData: z.never().optional(),
+})
+
+export type UserOperationERC7677Input = z.infer<typeof UserOperationERC7677InputSchema>
+
+/**
  * Zod schema for SendAccountCall
  */
 export const SendAccountCallSchema = z.object({

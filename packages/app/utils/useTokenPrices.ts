@@ -5,6 +5,7 @@ import {
   eurcAddress,
   mamoAddress,
   masqAddress,
+  lateNightOnBaseAddress,
   moonwellAddress,
   morphoAddress,
   sendTokenAddress,
@@ -51,7 +52,8 @@ const normalizeCoingeckoPrices = (marketData: MarketData) => {
   const byId = new Map(marketData.map((d) => [d.id, d.current_price ?? 0]))
   return allCoins.reduce(
     (acc, coin) => {
-      acc[coin.token] = byId.get(coin.coingeckoTokenId) ?? 0
+      // Skip coins without CoinGecko ID - they'll get prices from DexScreener
+      acc[coin.token] = coin.coingeckoTokenId ? (byId.get(coin.coingeckoTokenId) ?? 0) : 0
       return acc
     },
     {} as Record<string, number>
@@ -72,6 +74,7 @@ export const fetchDexScreenerPrices = async () => {
     eurcAddress['8453'],
     mamoAddress['8453'],
     masqAddress['8453'],
+    lateNightOnBaseAddress['8453'],
   ]
 
   const res = await fetch(`https://api.dexscreener.com/tokens/v1/base/${tokensToFetch.join(',')}`)
@@ -123,6 +126,9 @@ const normalizeDexScreenerPrices = (prices: z.infer<typeof DexScreenerTokenPrice
         case 'MASQ':
           acc[masqAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
           break
+        case 'latenightonbase':
+          acc[lateNightOnBaseAddress[baseMainnet.id]] = price.priceUsd ? Number(price.priceUsd) : 0
+          break
         default:
           break
       }
@@ -147,16 +153,39 @@ export const useTokenPrices = (
     select: normalizeCoingeckoPrices,
   })
 
+  // Check if CoinGecko has missing prices (returns 0 for tokens not in their database)
+  const hasMissingPrices =
+    cgQuery.isSuccess &&
+    cgQuery.data &&
+    Object.values(cgQuery.data).some((price) => price === 0 || price === null)
+
   const dexQuery = useQuery<Record<(typeof allCoins)[number]['token'], number>, Error>({
     queryKey: ['tokenPrices', 'dexscreener'],
     enabled:
-      !isAuthRoute && (source === 'dexscreener' || (source === 'coingecko' && cgQuery.isError)),
+      !isAuthRoute &&
+      (source === 'dexscreener' ||
+        (source === 'coingecko' && (cgQuery.isError || hasMissingPrices))),
     staleTime: 1000 * 60,
     queryFn: fetchDexScreenerPrices,
   })
 
-  // Fallback: if CoinGecko errors, immediately use DexScreener (no need to wait for success)
+  // Fallback: if CoinGecko errors or has missing prices, use DexScreener
+  // If both sources have data, merge them with DexScreener taking precedence for tokens with 0 price from CoinGecko
   const useDex = source === 'dexscreener' || (source === 'coingecko' && cgQuery.isError)
+
+  if (source === 'coingecko' && cgQuery.isSuccess && dexQuery.isSuccess && hasMissingPrices) {
+    // Merge: use DexScreener prices for tokens where CoinGecko returned 0
+    const mergedData = { ...cgQuery.data }
+    for (const [token, price] of Object.entries(cgQuery.data)) {
+      if (price === 0 || price === null) {
+        mergedData[token] = dexQuery.data[token] ?? 0
+      }
+    }
+    return {
+      ...cgQuery,
+      data: mergedData,
+    }
+  }
 
   return useDex ? dexQuery : cgQuery
 }

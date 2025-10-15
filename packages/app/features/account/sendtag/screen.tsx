@@ -13,7 +13,8 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { IconCheckCircle, IconPlus, IconSlash, IconX } from 'app/components/icons'
+import { IconPlus, IconSlash, IconX } from 'app/components/icons'
+import { Check } from '@tamagui/lucide-icons'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -173,9 +174,7 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
           {tag.name}
         </Paragraph>
       </XStack>
-      {isMain && (
-        <IconCheckCircle size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />
-      )}
+      {isMain && <Check size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />}
     </XStack>
   )
 }
@@ -254,7 +253,7 @@ function MainTagSelectionSheet({
                       {tag.name}
                     </Paragraph>
                     {isCurrentMain ? (
-                      <IconCheckCircle size="$1" color={isDark ? '$black' : '$color12'} />
+                      <Check size="$1" color={isDark ? '$black' : '$color12'} />
                     ) : null}
                   </XStack>
                 )

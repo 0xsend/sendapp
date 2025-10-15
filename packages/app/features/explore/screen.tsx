@@ -18,6 +18,12 @@ export const ExploreScreen = ({ images }: { images: Record<string, string> }) =>
         title={'Get Rewarded'}
         subtitle={'Earn SEND while engaging, referring, and growing the network'}
       />
+      <LinkBanner
+        href={'/canton-wallet'}
+        imgUrl={images.cantonWallet || ''}
+        title={'Canton Wallet'}
+        subtitle={'Your gateway to the Canton Ecosystem'}
+      />
       {Platform.OS === 'web' && (
         <LinkBanner
           href={'/sendpot'}

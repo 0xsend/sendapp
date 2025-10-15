@@ -2349,6 +2349,130 @@ export const iEntryPointSimulationsAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// LateNightOnBase
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const lateNightOnBaseAbi = [
+  {
+    type: 'event',
+    inputs: [
+      { name: 'owner', type: 'address', indexed: true },
+      { name: 'spender', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true },
+      { name: 'to', type: 'address', indexed: true },
+      { name: 'value', type: 'uint256', indexed: false },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'sender', type: 'address' },
+      { name: 'recipient', type: 'address' },
+      { name: 'amount', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const lateNightOnBaseAddress = {
+  8453: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+  84532: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+  845337: '0x8C32bcFC720FEC35443748A96030cE866d0665ff',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const lateNightOnBaseConfig = {
+  address: lateNightOnBaseAddress,
+  abi: lateNightOnBaseAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAMO
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9341,6 +9465,218 @@ export const watchIEntryPointSimulationsUserOperationRevertReasonEvent =
 export const watchIEntryPointSimulationsWithdrawnEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: iEntryPointSimulationsAbi,
   eventName: 'Withdrawn',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBase = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBaseAllowance = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBaseBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBaseDecimals = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBaseName = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBaseSymbol = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const readLateNightOnBaseTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const writeLateNightOnBase = /*#__PURE__*/ createWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const writeLateNightOnBaseApprove = /*#__PURE__*/ createWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const writeLateNightOnBaseTransfer = /*#__PURE__*/ createWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const writeLateNightOnBaseTransferFrom = /*#__PURE__*/ createWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const prepareWriteLateNightOnBase = /*#__PURE__*/ createSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const prepareWriteLateNightOnBaseApprove = /*#__PURE__*/ createSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const prepareWriteLateNightOnBaseTransfer = /*#__PURE__*/ createSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const prepareWriteLateNightOnBaseTransferFrom = /*#__PURE__*/ createSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const watchLateNightOnBaseEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const watchLateNightOnBaseApprovalEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const watchLateNightOnBaseTransferEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  eventName: 'Transfer',
 })
 
 /**
@@ -18729,6 +19065,218 @@ export const useWatchIEntryPointSimulationsWithdrawnEvent =
     abi: iEntryPointSimulationsAbi,
     eventName: 'Withdrawn',
   })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBase = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"allowance"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBaseAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"balanceOf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBaseBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"decimals"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBaseDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"name"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBaseName = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"symbol"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBaseSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"totalSupply"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useReadLateNightOnBaseTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWriteLateNightOnBase = /*#__PURE__*/ createUseWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWriteLateNightOnBaseApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWriteLateNightOnBaseTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWriteLateNightOnBaseTransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useSimulateLateNightOnBase = /*#__PURE__*/ createUseSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"approve"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useSimulateLateNightOnBaseApprove = /*#__PURE__*/ createUseSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useSimulateLateNightOnBaseTransfer = /*#__PURE__*/ createUseSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `functionName` set to `"transferFrom"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useSimulateLateNightOnBaseTransferFrom = /*#__PURE__*/ createUseSimulateContract({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link lateNightOnBaseAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWatchLateNightOnBaseEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `eventName` set to `"Approval"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWatchLateNightOnBaseApprovalEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  eventName: 'Approval',
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link lateNightOnBaseAbi}__ and `eventName` set to `"Transfer"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x8C32bcFC720FEC35443748A96030cE866d0665ff)
+ */
+export const useWatchLateNightOnBaseTransferEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: lateNightOnBaseAbi,
+  address: lateNightOnBaseAddress,
+  eventName: 'Transfer',
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link mamoAbi}__

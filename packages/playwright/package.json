@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "cbor2": "^1.12.0",
-    "permissionless": "^0.1.14",
+    "permissionless": "^0.1.49",
     "pg": "^8.12.0",
     "typescript": "~5.9.2"
   }
