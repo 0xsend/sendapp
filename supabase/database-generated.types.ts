@@ -1839,6 +1839,10 @@ export type Database = {
         Args: { send_account_id: string; tag_name: string }
         Returns: number
       }
+      did_user_swap: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       distribution_hodler_addresses: {
         Args: { distribution_id: number }
         Returns: {

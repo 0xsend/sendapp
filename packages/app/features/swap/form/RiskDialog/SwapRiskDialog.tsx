@@ -35,10 +35,29 @@ const SwapRiskDialog = () => {
   }
 
   useEffect(() => {
+    // Don't show dialog while loading or refetching
+    // This prevents flash when returning from a completed swap with stale cache
+    if (didUserSwap.isLoading || didUserSwap.isFetching) {
+      return
+    }
+
+    // Show dialog only if:
+    // 1. User hasn't confirmed in this session AND
+    // 2. User hasn't swapped before (data === false) OR there's an error
     if (!isConfirmed && (didUserSwap.data === false || didUserSwap.error)) {
       setIsOpen(true)
     }
-  }, [didUserSwap.data, didUserSwap.error, isConfirmed])
+    // Close dialog if user has swapped before (even if they confirmed in this session)
+    if (didUserSwap.data === true) {
+      setIsOpen(false)
+    }
+  }, [
+    didUserSwap.data,
+    didUserSwap.error,
+    didUserSwap.isLoading,
+    didUserSwap.isFetching,
+    isConfirmed,
+  ])
 
   // Shared content component to avoid duplication
   const dialogContent = (
