@@ -77,6 +77,9 @@ module.exports = {
       },
     ],
   ],
+  experiments: {
+    reactCompiler: true,
+  },
   extra: {
     eas: {
       projectId: '21a964cb-0d04-42e5-bc00-7f8bf0fd5064',

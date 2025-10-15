@@ -57,6 +57,7 @@
     "@testing-library/react": "^14.1.2",
     "@types/next-seo": "^2.1.2",
     "@types/node": "^20",
+    "babel-plugin-react-compiler": "^1.0.0",
     "dotenv-cli": "^7.3.0",
     "eslint-config-next": "^14.0.4",
     "jest": "^29",

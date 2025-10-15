@@ -146,6 +146,7 @@ export default () => {
         '@tamagui/toast',
       ],
       scrollRestoration: true,
+      reactCompiler: true,
     },
     output: process.env.NODE_ENV === 'production' ? 'standalone' : null,
     async redirects() {
