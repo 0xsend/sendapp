@@ -35,7 +35,6 @@
     "@tamagui/themes": "^1.135.2",
     "@tamagui/toast": "^1.135.2",
     "@ts-react/form": "^1.8.3",
-    "expo": "^54.0.0",
     "expo-blur": "~15.0.7",
     "expo-linear-gradient": "~15.0.7",
     "moti": "^0.29.0",

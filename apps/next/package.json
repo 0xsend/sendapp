@@ -32,7 +32,6 @@
     "@trpc/server": "^11.2.0",
     "@vercel/og": "^0.6.8",
     "app": "workspace:*",
-    "expo": "^54.0.0",
     "expo-sharing": "~14.0.7",
     "next": "15.3.1",
     "next-seo": "^6.8.0",
