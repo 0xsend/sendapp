@@ -20,6 +20,7 @@ import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { toNiceError } from 'app/utils/toNiceError'
 import { Platform } from 'react-native'
+import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
@@ -134,6 +135,7 @@ export const SwapSummaryScreen = () => {
         queryClient.refetchQueries({ queryKey: [useLiquidityPools.queryKey] }),
         queryClient.refetchQueries({ queryKey: [useSwapRouters.queryKey] }),
         queryClient.invalidateQueries({ queryKey: ['token_activity_feed', outCoin?.token] }),
+        queryClient.invalidateQueries({ queryKey: [useDidUserSwap.queryKey] }),
       ])
 
       if (Platform.OS === 'web') {

@@ -6294,7 +6294,7 @@ __metadata:
   resolution: "@my/supabase@workspace:supabase"
   dependencies:
     dotenv-cli: "npm:^7.3.0"
-    supabase: "npm:2.39.2"
+    supabase: "npm:2.48.3"
     type-fest: "npm:^4.32.0"
   languageName: unknown
   linkType: soft
@@ -14016,6 +14016,7 @@ __metadata:
     permissionless: "npm:^0.1.49"
     react-hook-form: "npm:^7.48.2"
     react-native: "npm:0.76.9"
+    react-native-device-info: "npm:10.13.0"
     react-native-passkeys: "npm:~0.3.3"
     react-native-qrcode-svg: "npm:^6.3.2"
     react-native-svg: "npm:15.10.1"
@@ -21922,7 +21923,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.3.7, glob@npm:^10.4.2":
+"glob@npm:^10.2.2, glob@npm:^10.3.10, glob@npm:^10.4.2":
   version: 10.4.5
   resolution: "glob@npm:10.4.5"
   dependencies:
@@ -26541,13 +26542,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minizlib@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "minizlib@npm:3.0.1"
+"minizlib@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "minizlib@npm:3.1.0"
   dependencies:
-    minipass: "npm:^7.0.4"
-    rimraf: "npm:^5.0.5"
-  checksum: 10/622cb85f51e5c206a080a62d20db0d7b4066f308cb6ce82a9644da112367c3416ae7062017e631eb7ac8588191cfa4a9a279b8651c399265202b298e98c4acef
+    minipass: "npm:^7.1.2"
+  checksum: 10/f47365cc2cb7f078cbe7e046eb52655e2e7e97f8c0a9a674f4da60d94fb0624edfcec9b5db32e8ba5a99a5f036f595680ae6fe02a262beaa73026e505cc52f99
   languageName: node
   linkType: hard
 
@@ -26587,15 +26587,6 @@ __metadata:
   bin:
     mkdirp: bin/cmd.js
   checksum: 10/d71b8dcd4b5af2fe13ecf3bd24070263489404fe216488c5ba7e38ece1f54daf219e72a833a3a2dc404331e870e9f44963a33399589490956bff003a3404d3b2
-  languageName: node
-  linkType: hard
-
-"mkdirp@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "mkdirp@npm:3.0.1"
-  bin:
-    mkdirp: dist/cjs/src/bin.js
-  checksum: 10/16fd79c28645759505914561e249b9a1f5fe3362279ad95487a4501e4467abeb714fd35b95307326b8fd03f3c7719065ef11a6f97b7285d7888306d1bd2232ba
   languageName: node
   linkType: hard
 
@@ -30108,6 +30099,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-device-info@npm:10.13.0":
+  version: 10.13.0
+  resolution: "react-native-device-info@npm:10.13.0"
+  peerDependencies:
+    react-native: "*"
+  checksum: 10/1ad1a3fbc4617984b782407a58301d15e9bce99126c6dd6b36e1effc9ec565be4cd3b330bcea5a7b56f7ac01d2a60a40528da95dbe7981009de9b77d5157cf68
+  languageName: node
+  linkType: hard
+
 "react-native-drawer-layout@npm:^4.1.6":
   version: 4.1.6
   resolution: "react-native-drawer-layout@npm:4.1.6"
@@ -31148,17 +31148,6 @@ __metadata:
   bin:
     rimraf: bin.js
   checksum: 10/063ffaccaaaca2cfd0ef3beafb12d6a03dd7ff1260d752d62a6077b5dfff6ae81bea571f655bb6b589d366930ec1bdd285d40d560c0dae9b12f125e54eb743d5
-  languageName: node
-  linkType: hard
-
-"rimraf@npm:^5.0.5":
-  version: 5.0.9
-  resolution: "rimraf@npm:5.0.9"
-  dependencies:
-    glob: "npm:^10.3.7"
-  bin:
-    rimraf: dist/esm/bin.mjs
-  checksum: 10/443669809ca3d402ca7565fd9f5b994b5669d8f8b33a23e3a00a66c3a2e4c529d8a5a47c9e7c42f2c7a0c70d21ff8bb1c86493b12027139a3de47fc33fe60084
   languageName: node
   linkType: hard
 
@@ -33220,17 +33209,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supabase@npm:2.39.2":
-  version: 2.39.2
-  resolution: "supabase@npm:2.39.2"
+"supabase@npm:2.48.3":
+  version: 2.48.3
+  resolution: "supabase@npm:2.48.3"
   dependencies:
     bin-links: "npm:^5.0.0"
     https-proxy-agent: "npm:^7.0.2"
     node-fetch: "npm:^3.3.2"
-    tar: "npm:7.4.3"
+    tar: "npm:7.5.1"
   bin:
     supabase: bin/supabase
-  checksum: 10/206b74a224049c9b4c7b1459821f1a5ef828cd94964432e54b3be59726bc4dc62821a9cad1e5d246c994cab41498e3c7522f7c5982c49d51418c70f95d8194ad
+  checksum: 10/3a468a849099710bde3dae61fdabf1bec1e39c48947307f8652749c816acc3d513dad2d6d33c52fe95fb416961864b54312cd2f30a59b798cd15620e2a3bca36
   languageName: node
   linkType: hard
 
@@ -33539,17 +33528,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:7.4.3":
-  version: 7.4.3
-  resolution: "tar@npm:7.4.3"
+"tar@npm:7.5.1":
+  version: 7.5.1
+  resolution: "tar@npm:7.5.1"
   dependencies:
     "@isaacs/fs-minipass": "npm:^4.0.0"
     chownr: "npm:^3.0.0"
     minipass: "npm:^7.1.2"
-    minizlib: "npm:^3.0.1"
-    mkdirp: "npm:^3.0.1"
+    minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
-  checksum: 10/12a2a4fc6dee23e07cc47f1aeb3a14a1afd3f16397e1350036a8f4cdfee8dcac7ef5978337a4e7b2ac2c27a9a6d46388fc2088ea7c80cb6878c814b1425f8ecf
+  checksum: 10/4848cd2fa2fcaf0734cf54e14bc685056eb43a74d7cc7f954c3ac88fea88c85d95b1d7896619f91aab6f2234c5eec731c18aaa201a78fcf86985bdc824ed7a00
   languageName: node
   linkType: hard
 

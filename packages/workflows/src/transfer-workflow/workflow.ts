@@ -15,9 +15,9 @@ const {
   getEventFromTransferActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
-  startToCloseTimeout: '10 minutes',
+  startToCloseTimeout: '1 minute',
   retry: {
-    maximumAttempts: 20,
+    maximumAttempts: 10,
   },
 })
 
@@ -27,9 +27,9 @@ const {
   sendUserOpActivity,
   waitForTransactionReceiptActivity,
 } = proxyActivities<ReturnType<typeof createUserOpActivities>>({
-  startToCloseTimeout: '2 minutes',
+  startToCloseTimeout: '20 seconds',
   retry: {
-    maximumAttempts: 20,
+    maximumAttempts: 6,
   },
 })
 
