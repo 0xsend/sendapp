@@ -61,7 +61,7 @@
   "dependencies": {
     "@my/supabase": "workspace:*",
     "@my/wagmi": "workspace:*",
-    "@supabase/supabase-js": "^2.49.8",
+    "@supabase/supabase-js": "^2.49.9",
     "@temporalio/activity": "^1.11.7",
     "@temporalio/workflow": "^1.11.7",
     "@wagmi/core": "^2.16.7",
