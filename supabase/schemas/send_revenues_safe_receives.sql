@@ -44,13 +44,19 @@ CREATE UNIQUE INDEX "u_send_revenues_safe_receives" ON "public"."send_revenues_s
 
 -- RLS
 ALTER TABLE "public"."send_revenues_safe_receives" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Send revenues safe receives can be read by the user who created" ON "public"."send_revenues_safe_receives" FOR SELECT USING ((("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "chain_addresses"."address"
-   FROM "public"."chain_addresses"
-  WHERE ("chain_addresses"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-UNION
- SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
+CREATE POLICY "Send revenues safe receives can be read by the user who created" ON "public"."send_revenues_safe_receives" FOR SELECT USING ((
+  (("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY (
+     SELECT "chain_addresses"."address"
+       FROM "public"."chain_addresses"
+      WHERE ("chain_addresses"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
+  ))
+  OR
+  ("sender" = ANY (
+     SELECT "send_accounts"."address_bytes"
+       FROM "public"."send_accounts"
+      WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
+  ))
+));
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_revenues_safe_receives" TO "anon";
