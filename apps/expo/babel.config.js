@@ -1,7 +1,9 @@
 module.exports = (api) => {
   api.cache(true)
   return {
-    presets: [['babel-preset-expo', { jsxRuntime: 'automatic' }]],
+    presets: [
+      ['babel-preset-expo', { jsxRuntime: 'automatic', unstable_transformImportMeta: true }],
+    ],
     plugins: [
       // Move transform-inline-environment-variables to the beginning
       // This ensures environment variables are transformed early
