@@ -27,7 +27,7 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
   images,
 }) => {
   const { session } = useUser()
-  const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
+  const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>(images)
   const [carouselProgress, setCarouselProgress] = useState(0)
   const queryClient = useQueryClient()
   const [{ referral }] = useAuthScreenParams()
@@ -56,10 +56,6 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
       void setReferralCodeMutateAsync(referral)
     }
   }, [referral, setReferralCodeMutateAsync])
-
-  useEffect(() => {
-    if (carouselImages.length === 0) setCarouselImages(images)
-  }, [carouselImages, images])
 
   useEffect(() => {
     void cancelAndRemoveAccountsQueries()
