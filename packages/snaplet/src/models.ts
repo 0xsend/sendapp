@@ -10,6 +10,9 @@ import { hexToBytes } from 'viem'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
 import { pravatar, tagName } from './utils'
 
+// Store for generating consistent address and address_bytes pairs
+let lastGeneratedAddress: string | null = null
+
 export const models: SeedClientOptions['models'] = {
   users: {
     data: {
@@ -48,9 +51,23 @@ export const models: SeedClientOptions['models'] = {
   },
   send_accounts: {
     data: {
-      address: () => privateKeyToAddress(generatePrivateKey()),
+      address: () => {
+        const address = privateKeyToAddress(generatePrivateKey())
+        lastGeneratedAddress = address
+        return address
+      },
       chain_id: 845337,
       init_code: () => Buffer.from(crypto.randomBytes(32)),
+      address_bytes: () => {
+        // Compute address_bytes from the last generated address
+        if (!lastGeneratedAddress) return null
+
+        // Match the database logic: decode(replace(address::text,'0x',''),'hex')
+        if (lastGeneratedAddress.match(/^0x[A-Fa-f0-9]{40}$/)) {
+          return Buffer.from(lastGeneratedAddress.replace('0x', ''), 'hex')
+        }
+        return null
+      },
     },
   },
   send_account_tags: {

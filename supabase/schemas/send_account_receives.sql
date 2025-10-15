@@ -102,11 +102,19 @@ CREATE OR REPLACE TRIGGER "send_account_receives_insert_activity_trigger" AFTER 
 
 -- RLS
 ALTER TABLE "public"."send_account_receives" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_receives" FOR SELECT USING (((("lower"("concat"('0x', "encode"("sender", 'hex'::text))))::citext OPERATOR(=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))) OR (("lower"("concat"('0x', "encode"("log_addr", 'hex'::text))))::citext OPERATOR(=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
+CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_receives" FOR SELECT USING ((
+  ("sender" = ANY (
+    SELECT "send_accounts"."address_bytes"
+      FROM "public"."send_accounts"
+     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
+  ))
+  OR
+  ("log_addr" = ANY (
+    SELECT "send_accounts"."address_bytes"
+      FROM "public"."send_accounts"
+     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
+  ))
+));
 
 -- Grants
 GRANT ALL ON FUNCTION "public"."send_account_receives_delete_activity_trigger"() TO "anon";

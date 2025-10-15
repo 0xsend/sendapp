@@ -866,6 +866,7 @@ export type Database = {
       send_accounts: {
         Row: {
           address: string
+          address_bytes: string | null
           chain_id: number
           created_at: string
           deleted_at: string | null
@@ -877,6 +878,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          address_bytes?: string | null
           chain_id: number
           created_at?: string
           deleted_at?: string | null
@@ -888,6 +890,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          address_bytes?: string | null
           chain_id?: number
           created_at?: string
           deleted_at?: string | null
@@ -1847,6 +1850,7 @@ export type Database = {
         Args: { distribution_id: number }
         Returns: {
           address: string
+          address_bytes: string | null
           chain_id: number
           created_at: string
           deleted_at: string | null

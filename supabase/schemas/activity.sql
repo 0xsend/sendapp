@@ -117,7 +117,7 @@ user_earn_balances AS (
         COALESCE(MAX(seb.assets), 0) AS earn_balance
     FROM send_accounts sa
     INNER JOIN send_earn_balances seb ON (
-        decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
+        sa.address_bytes = seb.owner
     )
     GROUP BY sa.user_id
 ),
@@ -301,7 +301,7 @@ user_earn_balances AS (
     FROM send_accounts sa
     JOIN birthday_profiles bp ON bp.id = sa.user_id
     INNER JOIN send_earn_balances seb ON (
-        decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
+        sa.address_bytes = seb.owner
     )
     GROUP BY sa.user_id
 ),

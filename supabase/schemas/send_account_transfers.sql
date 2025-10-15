@@ -174,10 +174,18 @@ CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER
 -- RLS
 ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users can see their own transfers" ON "public"."send_account_transfers" FOR SELECT USING (((("lower"("concat"('0x', "encode"("f", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))) OR (("lower"("concat"('0x', "encode"("t", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))))));
+CREATE POLICY "users can see their own transfers" ON "public"."send_account_transfers" FOR SELECT USING ((
+  ("f" = ANY (
+    SELECT "send_accounts"."address_bytes"
+      FROM "public"."send_accounts"
+     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
+  ))
+  OR
+  ("t" = ANY (
+    SELECT "send_accounts"."address_bytes"
+      FROM "public"."send_accounts"
+     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
+  ))
+));
 
 -- Grants

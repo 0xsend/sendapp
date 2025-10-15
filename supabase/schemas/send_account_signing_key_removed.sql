@@ -107,7 +107,7 @@ CREATE OR REPLACE TRIGGER "send_account_signing_key_removed_trigger_insert_activ
 
 -- RLS
 ALTER TABLE "public"."send_account_signing_key_removed" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "users can see own signing key removed" ON "public"."send_account_signing_key_removed" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::text))))::citext OPERATOR(=) ANY ( SELECT "send_accounts"."address"
+CREATE POLICY "users can see own signing key removed" ON "public"."send_account_signing_key_removed" FOR SELECT USING (("account" = ANY ( SELECT "send_accounts"."address_bytes"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 
