@@ -15,6 +15,8 @@ import superjson from 'superjson'
 import type { Address, Hex } from 'viem'
 import { baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { bootstrap } from '../utils'
+import type { WaitForUserOperationReceiptErrorType } from 'viem/account-abstraction'
+import { isRetryableUserOpError, isRetryableBundlerError, isNonRetryableError } from './errors'
 
 export type UserOpActivities = {
   simulateUserOperationActivity: (userOp: UserOperation<'v0.7'>) => Promise<void>
@@ -103,9 +105,40 @@ export const createUserOpActivities = (
         const hashBytea = hexToBytea(hash)
         return hashBytea
       } catch (error) {
-        log.error('sendUserOpActivity failed', { error })
-        // Throw non retryable error for now
-        // This should retry a few times
+        log.error('sendUserOpActivity failed', {
+          error: error.message,
+          errorName: error.name,
+          errorCode: error.code,
+          sender: userOp.sender,
+        })
+
+        // Check if this is a retryable bundler error
+        if (isRetryableBundlerError(error)) {
+          log.info('Retrying sendUserOp due to retryable bundler error', {
+            errorName: error.name,
+            errorMessage: error.message,
+          })
+          throw ApplicationFailure.retryable(
+            'Retryable bundler error occurred',
+            error.name,
+            error.message
+          )
+        }
+
+        // Check if this is a non-retryable error
+        if (isNonRetryableError(error)) {
+          log.error('Non-retryable error in sendUserOp', {
+            errorName: error.name,
+            errorMessage: error.message,
+          })
+          throw ApplicationFailure.nonRetryable(
+            error.message || 'Non-retryable bundler error',
+            error.name || 'UnknownError',
+            error.details
+          )
+        }
+
+        // Default to non-retryable for unknown errors
         throw ApplicationFailure.nonRetryable(
           'Failed to send user operation',
           error.code,
@@ -131,6 +164,7 @@ export const createUserOpActivities = (
 
         const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt({
           hash: hexHash,
+          timeout: 30_000,
         })
         log.info('waitForTransactionReceiptActivity', {
           bundlerReceipt: superjson.stringify(bundlerReceipt),
@@ -141,9 +175,33 @@ export const createUserOpActivities = (
           )
         }
         return bundlerReceipt
-      } catch (error) {
-        log.error('waitForTransactionReceipt failed', { error })
-        throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
+      } catch (e) {
+        const error = e as WaitForUserOperationReceiptErrorType
+
+        log.error('waitForTransactionReceipt failed', {
+          error: error.message,
+          errorName: error.name,
+          hash: byteaToHex(hash),
+          sender,
+        })
+
+        if (isRetryableUserOpError(error)) {
+          log.info('Retrying waitForTransactionReceipt due to retryable error', {
+            errorName: error.name,
+            errorMessage: error.message,
+          })
+          throw ApplicationFailure.retryable('Retryable error occurred', error.name, error.message)
+        }
+
+        // NON-RETRYABLE ERRORS - Permanent/Client issues that won't succeed on retry
+        log.error('waitForTransactionReceipt failed with non-retryable error', {
+          errorName: error.name,
+          errorMessage: error.message,
+        })
+        throw ApplicationFailure.nonRetryable(
+          error.message || 'Unknown error',
+          error.name || 'UnknownError'
+        )
       }
     },
 
@@ -153,9 +211,11 @@ export const createUserOpActivities = (
     async waitForUserOperationReceiptActivity(
       params: WaitForUserOperationReceiptParameters & { sender: Address }
     ) {
+      // Extract variables outside try block for use in catch block
+      const { sender, ...waitParams } = params
+
       try {
         // Select bundler based on sender address
-        const { sender, ...waitParams } = params
         const bundlerClient = getBundlerClient(sender)
 
         log.info('Waiting for userOp receipt', {
@@ -174,9 +234,33 @@ export const createUserOpActivities = (
           )
         }
         return bundlerReceipt
-      } catch (error) {
-        log.error('waitForUserOperationReceipt failed', { error })
-        throw ApplicationFailure.nonRetryable(error.message, error.code, error.details)
+      } catch (e) {
+        const error = e as WaitForUserOperationReceiptErrorType
+
+        log.error('waitForUserOperationReceipt failed', {
+          error: error.message,
+          errorName: error.name,
+          hash: waitParams.hash,
+          sender,
+        })
+
+        if (isRetryableUserOpError(error)) {
+          log.info('Retrying waitForUserOperationReceipt due to retryable error', {
+            errorName: error.name,
+            errorMessage: error.message,
+          })
+          throw ApplicationFailure.retryable('Retryable error occurred', error.name, error.message)
+        }
+
+        // NON-RETRYABLE ERRORS - Permanent/Client issues that won't succeed on retry
+        log.error('waitForUserOperationReceipt failed with non-retryable error', {
+          errorName: error.name,
+          errorMessage: error.message,
+        })
+        throw ApplicationFailure.nonRetryable(
+          error.message || 'Unknown error',
+          error.name || 'UnknownError'
+        )
       }
     },
   }
