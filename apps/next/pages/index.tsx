@@ -70,13 +70,11 @@ export const Page: NextPageWithLayout<InferGetServerSidePropsType<typeof getServ
     <>
       <NextSeo {...seo} />
       {session ? (
-        <Sheet.SheetIosBackgroundScale>
-          <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
-            <SendEarnProvider>
-              <HomeScreen />
-            </SendEarnProvider>
-          </HomeLayout>
-        </Sheet.SheetIosBackgroundScale>
+        <HomeLayout TopNav={<TopNav header="Home" showLogo={true} backFunction="home" />}>
+          <SendEarnProvider>
+            <HomeScreen />
+          </SendEarnProvider>
+        </HomeLayout>
       ) : (
         <AuthCarouselContext.Provider
           value={{

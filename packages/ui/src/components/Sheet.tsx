@@ -50,24 +50,24 @@ export const SheetIosBackgroundScale = YStack.styleable(({ children, ...props })
       isBackgroundScaleApplied={isBackgroundScaleApplied}
       onBackgroundScaleChange={setIsBackgroundScaleApplied}
     >
-      <YStack h="100%" bg="$aztec2Dark">
-        <YStack
-          h="100%"
-          bg="$background"
-          animation={isBackgroundScaleApplied ? '200ms' : '200ms'}
-          br={isBackgroundScaleApplied ? 20 : 0}
-          scale={isBackgroundScaleApplied ? 0.9 : 1}
-          y={isBackgroundScaleApplied ? -60 : 0}
-          animateOnly={['transform', 'opacity']}
-          transformOrigin="bottom"
-          $platform-web={{
-            transition: `border-radius  200ms ease ${isBackgroundScaleApplied ? '0ms' : '100ms'}`,
-            willChange: 'transform',
-          }}
-          {...props}
-        >
-          {children}
-        </YStack>
+      <YStack
+        h="100%"
+        bg="$background"
+        animation={isBackgroundScaleApplied ? '200ms' : '200ms'}
+        br={isBackgroundScaleApplied ? 20 : 0}
+        scale={isBackgroundScaleApplied ? 0.9 : 1}
+        y={isBackgroundScaleApplied ? -60 : 0}
+        animateOnly={['transform', 'opacity']}
+        transformOrigin="bottom"
+        $platform-web={{
+          transition: `border-radius  200ms ease ${isBackgroundScaleApplied ? '0ms' : '100ms'}`,
+          willChange: 'transform',
+          height: '100%',
+          minHeight: '100%',
+        }}
+        {...props}
+      >
+        {children}
       </YStack>
     </SheetIosModalContext.Provider>
   )
