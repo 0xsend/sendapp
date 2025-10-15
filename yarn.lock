@@ -14016,6 +14016,7 @@ __metadata:
     permissionless: "npm:^0.1.49"
     react-hook-form: "npm:^7.48.2"
     react-native: "npm:0.76.9"
+    react-native-device-info: "npm:10.13.0"
     react-native-passkeys: "npm:~0.3.3"
     react-native-qrcode-svg: "npm:^6.3.2"
     react-native-svg: "npm:15.10.1"
@@ -30095,6 +30096,15 @@ __metadata:
   peerDependencies:
     react-native-randombytes: ">=2.0.0 <4.0.0"
   checksum: 10/d5f2a435b51f96483bbcbd933ee25ec371451286524ffd25e4eb4ec739f0dced98852be0c95299c6dee60118a695443c02b9b1330ed54942e48585972d6abe09
+  languageName: node
+  linkType: hard
+
+"react-native-device-info@npm:10.13.0":
+  version: 10.13.0
+  resolution: "react-native-device-info@npm:10.13.0"
+  peerDependencies:
+    react-native: "*"
+  checksum: 10/1ad1a3fbc4617984b782407a58301d15e9bce99126c6dd6b36e1effc9ec565be4cd3b330bcea5a7b56f7ac01d2a60a40528da95dbe7981009de9b77d5157cf68
   languageName: node
   linkType: hard
 
