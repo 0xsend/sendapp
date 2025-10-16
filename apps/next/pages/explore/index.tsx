@@ -10,8 +10,8 @@ export const Page: NextPageWithLayout = () => {
       <NextSeo title="Send | Explore" />
       <ExploreScreen
         images={{
-          rewards: 'https://ghassets.send.app/app_images/explore_rewards.jpg',
-          cantonWallet: 'https://ghassets.send.app/app_images/explore_canton.jpg',
+          rewards: 'https://ghassets.send.app/app_images/explore_rewards_2.jpeg',
+          cantonWallet: 'https://ghassets.send.app/app_images/explore_canton_2.jpeg',
           sendpot: 'https://ghassets.send.app/app_images/sendpot.jpg',
         }}
       />

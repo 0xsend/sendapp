@@ -5,33 +5,35 @@ export const ExploreScreen = ({ images }: { images: Record<string, string> }) =>
   return (
     <YStack
       w={'100%'}
-      gap="$5"
+      gap="$3.5"
       pb={'$3.5'}
-      mt={Platform.OS === 'web' ? undefined : '$3'}
+      mt={'$3'}
       $gtLg={{
         w: '50%',
+        mt: 0,
+        gap: '$5',
       }}
     >
       <LinkBanner
         href={'/rewards'}
         imgUrl={images.rewards || ''}
-        title={'Get Rewarded'}
-        subtitle={'Earn SEND while engaging, referring, and growing the network'}
-      />
-      <LinkBanner
-        href={'/canton-wallet'}
-        imgUrl={images.cantonWallet || ''}
-        title={'Canton Wallet'}
-        subtitle={'Your gateway to the Canton Ecosystem'}
+        title={'Rewards'}
+        subtitle={'Make money move for you'}
       />
       {Platform.OS === 'web' && (
         <LinkBanner
           href={'/sendpot'}
           imgUrl={images.sendpot || ''}
-          title={'SENDPOT'}
-          subtitle={'Challenge your luck, win big prizes'}
+          title={'Sendpot'}
+          subtitle={'Spin. Win. Brag.'}
         />
       )}
+      <LinkBanner
+        href={'/canton-wallet'}
+        imgUrl={images.cantonWallet || ''}
+        title={'Canton Wallet'}
+        subtitle={'Get in first. Stay ahead.'}
+      />
     </YStack>
   )
 }
