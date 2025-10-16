@@ -17,6 +17,15 @@ import { IconSwap } from 'app/components/icons'
 import { allCoinsDict, usdcCoin } from 'app/data/coins'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
 import SwapRiskDialog from 'app/features/swap/form/RiskDialog/SwapRiskDialog'
+import {
+  calculatePriceImpactFromEstimate,
+  formatPriceImpact,
+  getPriceImpactAnalysis,
+  getPriceImpactColor,
+  getPriceImpactLevel,
+  getPriceImpactMessage,
+} from 'app/features/swap/utils/priceImpact'
+import { PriceImpactInfo } from 'app/features/swap/components/PriceImpactInfo'
 import { useCoin, useCoins } from 'app/provider/coins'
 import { useSwapScreenParams } from 'app/routers/params'
 import { api } from 'app/utils/api'
@@ -130,6 +139,24 @@ export const SwapFormScreen = () => {
     quoteSide === 'EXACT_OUT' ? estimate?.amountOutUsd : displaySummary?.amountOutUsd
   )
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+
+  // Calculate price impact
+  const priceImpact =
+    quoteSide === 'EXACT_IN' && displaySummary
+      ? getPriceImpactAnalysis(displaySummary)
+      : quoteSide === 'EXACT_OUT' && estimate
+        ? (() => {
+            const percent = calculatePriceImpactFromEstimate(
+              estimate.amountInUsd,
+              estimate.amountOutUsd
+            )
+            return {
+              percent,
+              level: getPriceImpactLevel(percent),
+              formatted: formatPriceImpact(percent),
+            }
+          })()
+        : null
 
   const canSubmit =
     !isLoadingCoins &&
@@ -525,7 +552,7 @@ export const SwapFormScreen = () => {
             <YStack gap="$3.5">
               <YStack gap="$5">
                 <YStack gap="$5">
-                  <YStack gap="$5" position={'relative'}>
+                  <YStack gap="$5">
                     <FadeCard borderColor={insufficientAmount ? '$error' : 'transparent'} bw={1}>
                       <XStack ai="center" gap="$2">
                         <ArrowUp
@@ -669,7 +696,7 @@ export const SwapFormScreen = () => {
                         </XStack>
                       </XStack>
                     </FadeCard>
-                    <FadeCard>
+                    <FadeCard position={'relative'}>
                       <XStack ai="center" gap="$2">
                         <ArrowDown
                           size={'$1'}
@@ -699,76 +726,118 @@ export const SwapFormScreen = () => {
                           }}
                         />
                       </XStack>
-                      <XStack height={'$2'} ai={'center'}>
-                        {(() => {
-                          switch (true) {
-                            case (quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
-                              isLoadingCoins:
-                              return <Spinner color="$color11" />
-                            case !outCoin || !outAmountUsd:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  $0
-                                </Paragraph>
-                              )
-                            case outCoin?.symbol === 'USDC':
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                </Paragraph>
-                              )
-                            default:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                </Paragraph>
-                              )
-                          }
-                        })()}
-                      </XStack>
-                    </FadeCard>
-                    <YStack
-                      position={'absolute'}
-                      top={0}
-                      left={0}
-                      right={0}
-                      bottom={0}
-                      justifyContent="center"
-                      alignItems="center"
-                      style={{
-                        pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
-                      }}
-                    >
-                      <YStack bc={'$color0'} borderRadius={9999} pointerEvents={'auto'}>
-                        <Button
-                          // @ts-expect-error tamagui is tripping here
-                          type={'button'}
-                          testID={'flipTokensButton'}
-                          bc={'$color0'}
-                          circular={true}
-                          size={'$5'}
-                          borderWidth={0}
-                          hoverStyle={hoverStyles}
-                          onPress={handleFlipTokens}
-                        >
-                          <Button.Icon>
-                            <IconSwap size={'$1'} />
-                          </Button.Icon>
-                        </Button>
+                      <YStack gap="$1.5">
+                        <XStack ai={'center'} jc={'space-between'} flexWrap="wrap" gap="$2">
+                          <XStack height={'$2'} ai={'center'}>
+                            {(() => {
+                              switch (true) {
+                                case (quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
+                                  isLoadingCoins:
+                                  return <Spinner color="$color11" />
+                                case !outCoin || !outAmountUsd:
+                                  return (
+                                    <Paragraph
+                                      size={'$5'}
+                                      color={'$lightGrayTextField'}
+                                      $theme-light={{ color: '$darkGrayTextField' }}
+                                    >
+                                      $0
+                                    </Paragraph>
+                                  )
+                                case outCoin?.symbol === 'USDC':
+                                  return (
+                                    <Paragraph
+                                      size={'$5'}
+                                      color={'$lightGrayTextField'}
+                                      $theme-light={{ color: '$darkGrayTextField' }}
+                                    >
+                                      {outAmountUsd ? `$${outAmountUsd}` : '$0'}
+                                    </Paragraph>
+                                  )
+                                default:
+                                  return (
+                                    <Paragraph
+                                      size={'$5'}
+                                      color={'$lightGrayTextField'}
+                                      $theme-light={{ color: '$darkGrayTextField' }}
+                                    >
+                                      {outAmountUsd ? `$${outAmountUsd}` : '$0'}
+                                    </Paragraph>
+                                  )
+                              }
+                            })()}
+                          </XStack>
+                          {priceImpact && (
+                            <XStack ai={'center'} gap="$1.5">
+                              <Paragraph
+                                size={'$4'}
+                                color={'$lightGrayTextField'}
+                                $theme-light={{ color: '$darkGrayTextField' }}
+                              >
+                                Price Impact:
+                              </Paragraph>
+                              <Paragraph
+                                testID="priceImpactValue"
+                                size={'$4'}
+                                color={getPriceImpactColor(priceImpact.level, isDarkTheme)}
+                              >
+                                {priceImpact.formatted}
+                              </Paragraph>
+                            </XStack>
+                          )}
+                        </XStack>
+                        {priceImpact && priceImpact.level !== 'normal' && (
+                          <XStack ai="center" jc="flex-end" gap="$1.5">
+                            <Paragraph
+                              testID="priceImpactWarning"
+                              size={'$3'}
+                              color={getPriceImpactColor(priceImpact.level, isDarkTheme)}
+                            >
+                              {getPriceImpactMessage(priceImpact.level)}
+                            </Paragraph>
+                            <PriceImpactInfo
+                              color={getPriceImpactColor(priceImpact.level, isDarkTheme)}
+                            />
+                          </XStack>
+                        )}
                       </YStack>
-                    </YStack>
+                      <YStack
+                        position={'absolute'}
+                        top={0}
+                        left={0}
+                        right={0}
+                        bottom={0}
+                        justifyContent="flex-start"
+                        alignItems="center"
+                        style={{
+                          pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
+                        }}
+                      >
+                        <YStack
+                          bc={'$color0'}
+                          borderRadius={9999}
+                          pointerEvents={'auto'}
+                          // @ts-expect-error need this detailed calc here
+                          transform={[{ translateY: 'calc(-50% - 12px)' }]}
+                        >
+                          <Button
+                            // @ts-expect-error tamagui is tripping here
+                            type={'button'}
+                            testID={'flipTokensButton'}
+                            bc={'$color0'}
+                            circular={true}
+                            size={'$5'}
+                            borderWidth={0}
+                            hoverStyle={hoverStyles}
+                            onPress={handleFlipTokens}
+                          >
+                            <Button.Icon>
+                              <IconSwap size={'$1'} />
+                            </Button.Icon>
+                          </Button>
+                        </YStack>
+                      </YStack>
+                    </FadeCard>
                   </YStack>
                 </YStack>
                 <FadeCard>
