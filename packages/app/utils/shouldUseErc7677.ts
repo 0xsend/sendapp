@@ -4,7 +4,6 @@ import { isAddressEqual, type Address } from 'viem'
  * Hardcoded allowlist of addresses that should use the ERC-7677 bundler/paymaster
  */
 const ERC7677_ADDRESS_ALLOWLIST = [
-  '0x189aD18aF2732550D06413810737B20eA9A4F1aD',
   '0x937Ac573608Af4E2F9f5ADc9ceF42b3c61681439',
   '0x5ab1d2bB1823A195c821b3B0d817e57d58BDA9f3',
 ] as const
