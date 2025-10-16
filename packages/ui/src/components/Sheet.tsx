@@ -50,7 +50,7 @@ export const SheetIosBackgroundScale = YStack.styleable(({ children, ...props })
       isBackgroundScaleApplied={isBackgroundScaleApplied}
       onBackgroundScaleChange={setIsBackgroundScaleApplied}
     >
-      <YStack h="100%" bg="$aztec2Dark">
+      <YStack h="100%" bg="$aztec11" $theme-dark={{ bg: '$aztec5' }}>
         <YStack
           h="100%"
           bg="$background"
