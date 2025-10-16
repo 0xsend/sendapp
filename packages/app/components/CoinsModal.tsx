@@ -53,7 +53,14 @@ export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => 
           <Sheet.Frame pb={100} elevation="$5" bc="$color1">
             <Adapt.Contents />
           </Sheet.Frame>
-          <Sheet.Overlay animation="100ms" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
+          <Sheet.Overlay
+            animation="100ms"
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+            $theme-dark={{
+              o: 0,
+            }}
+          />
         </Sheet>
       </Adapt>
       {children}
