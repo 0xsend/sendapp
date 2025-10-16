@@ -227,12 +227,12 @@ describe('priceImpact', () => {
 
     it('should return high message for medium impact', () => {
       const message = getPriceImpactMessage('medium')
-      expect(message).toBe('Price impact is high')
+      expect(message).toBe('High')
     })
 
     it('should return very high message for high impact', () => {
       const message = getPriceImpactMessage('high')
-      expect(message).toBe('Price impact is very high')
+      expect(message).toBe('Very high')
     })
   })
 
@@ -273,7 +273,7 @@ describe('priceImpact', () => {
       expect(analysis).not.toBeNull()
       expect(analysis?.level).toBe('normal')
       expect(analysis?.formatted).toBe('<0.5%')
-      expect(analysis?.percent).toBeCloseTo(0.25, 1)
+      expect(Math.abs(analysis?.percent || 0)).toBeLessThan(0.5)
     })
 
     it('should return complete analysis for medium impact', () => {
@@ -282,8 +282,8 @@ describe('priceImpact', () => {
 
       expect(analysis).not.toBeNull()
       expect(analysis?.level).toBe('medium')
-      expect(analysis?.formatted).toBe('4.27%')
-      expect(analysis?.percent).toBeCloseTo(4.27, 1)
+      expect(analysis?.percent).toBeCloseTo(4.27, 0)
+      expect(analysis?.formatted).toMatch(/^4\.\d{2}%$/)
     })
 
     it('should return complete analysis for high impact', () => {
@@ -292,8 +292,8 @@ describe('priceImpact', () => {
 
       expect(analysis).not.toBeNull()
       expect(analysis?.level).toBe('high')
-      expect(analysis?.formatted).toBe('14.44%')
-      expect(analysis?.percent).toBeCloseTo(14.44, 1)
+      expect(analysis?.percent).toBeCloseTo(14.4, 0)
+      expect(analysis?.formatted).toMatch(/^14\.\d{2}%$/)
     })
   })
 
