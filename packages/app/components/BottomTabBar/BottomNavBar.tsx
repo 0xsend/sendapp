@@ -1,10 +1,4 @@
-import {
-  IconArrowUp,
-  IconChart,
-  IconCompass,
-  IconDeviceReset,
-  IconHome,
-} from 'app/components/icons'
+import { IconArrowUp, IconChart, IconClock, IconCompass, IconHome } from 'app/components/icons'
 import { XStack } from '@my/ui'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
@@ -17,7 +11,7 @@ export const TABS = [
     key: 'index',
   },
   {
-    Icon: IconDeviceReset,
+    Icon: IconClock,
     href: '/activity',
     key: 'activity',
   },
