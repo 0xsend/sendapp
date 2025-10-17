@@ -44,15 +44,7 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
         {isLoading ? (
-          <Shimmer
-            br={100}
-            w={35}
-            h={35}
-            easing={Easing.inOut(Easing.quad)}
-            speed={2}
-            scope="local"
-            als="flex-end"
-          />
+          <Shimmer br={100} w={35} h={35} als="flex-end" />
         ) : (
           <XStack ai="center" jc="space-between">
             {data?.friends && <OverlappingFriendAvatars friends={data.friends} />}

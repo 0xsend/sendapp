@@ -139,7 +139,7 @@ const StablesBalanceCardBalance = () => {
         </BigHeading>
       ) : (
         <View w={80} h={64} o={1} zi={1}>
-          <Shimmer easing={Easing.inOut(Easing.quad)} speed={2} scope="local" br={5} />
+          <Shimmer br={5} />
         </View>
       )}
     </AnimatePresence>

@@ -169,16 +169,7 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
       {(() => {
         switch (true) {
           case loading:
-            return (
-              <Shimmer
-                w={80}
-                h={34}
-                easing={Easing.inOut(Easing.quad)}
-                speed={2}
-                scope="local"
-                br={5}
-              />
-            )
+            return <Shimmer w={80} h={34} br={5} />
           case isPriceHidden:
             return '******'
           default:
@@ -298,10 +289,7 @@ function InvestmentsAggregate() {
     return Math.round(weightedPercentage * 100) / 100
   }, [totalValue, assetValues])
 
-  if (isLoading)
-    return (
-      <Shimmer w={40} h={20} easing={Easing.inOut(Easing.quad)} speed={2} scope="local" br={5} />
-    )
+  if (isLoading) return <Shimmer w={40} h={20} br={5} />
 
   const formatted = `${aggregatePercentage > 0 ? '+' : ''}${aggregatePercentage}%`
 
@@ -361,10 +349,7 @@ function InvestmentsWeeklyDelta() {
     }, 0)
   }, [marketData, coins])
 
-  if (isLoading)
-    return (
-      <Shimmer w={120} h={20} easing={Easing.inOut(Easing.quad)} speed={2} scope="local" br={5} />
-    )
+  if (isLoading) return <Shimmer w={120} h={20} br={5} />
 
   if (coins.length === 0)
     return (

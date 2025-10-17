@@ -115,16 +115,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
           {(() => {
             switch (true) {
               case isLoading:
-                return (
-                  <Shimmer
-                    w={80}
-                    h={34}
-                    easing={Easing.inOut(Easing.quad)}
-                    speed={2}
-                    scope="local"
-                    br={5}
-                  />
-                )
+                return <Shimmer w={80} h={34} br={5} />
               case isPriceHidden:
                 return '******'
               default:

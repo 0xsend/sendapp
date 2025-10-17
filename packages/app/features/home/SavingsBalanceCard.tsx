@@ -62,22 +62,8 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
       <Card.Footer padded size="$4" pt={0} fd="column" gap={Platform.OS === 'web' ? '$2' : '$1'}>
         {isLoading ? (
           <YStack gap="$2" zi={1}>
-            <Shimmer
-              w={80}
-              easing={Easing.inOut(Easing.quad)}
-              h={34}
-              speed={2}
-              scope="local"
-              br={5}
-            />
-            <Shimmer
-              w={100}
-              easing={Easing.inOut(Easing.quad)}
-              h={20}
-              speed={2}
-              scope="local"
-              br={5}
-            />
+            <Shimmer w={80} h={34} br={5} />
+            <Shimmer w={100} h={20} br={5} />
           </YStack>
         ) : (
           <YStack>
