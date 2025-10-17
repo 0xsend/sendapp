@@ -397,11 +397,12 @@ const InvestSheetItemNative = ({ coin, onPress }: { coin: coin; onPress: () => v
   )
 }
 
-export const StablesBody = YStack.styleable((props) => {
+export const StablesBody = YStack.styleable((props, ref) => {
   const media = useMedia()
 
   return (
     <YStack
+      ref={ref}
       key={media.gtLg ? 'stables-body-lg' : 'stables-body-xs'}
       {...(media.gtLg && {
         animation: '100ms',
