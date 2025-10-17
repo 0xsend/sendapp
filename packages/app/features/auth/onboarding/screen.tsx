@@ -17,10 +17,7 @@ import {
   YStack,
   useAppToast,
 } from '@my/ui'
-import {
-  PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
-  PASSKEY_DIAGNOSTIC_TOAST_MESSAGE,
-} from 'app/utils/passkeyDiagnostic'
+import { PASSKEY_DIAGNOSTIC_ERROR_MESSAGE } from 'app/utils/passkeyDiagnostic'
 import { useUser } from 'app/utils/useUser'
 import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -38,6 +35,7 @@ import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { Platform } from 'react-native'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
+import { useTranslation } from 'react-i18next'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -54,13 +52,18 @@ export function OnboardingScreen() {
   const [diagnosticStatus, setDiagnosticStatus] = useState<
     'idle' | 'running' | 'success' | 'failure'
   >('idle')
-  const [diagnosticMessage, setDiagnosticMessage] = useState<string | null>(null)
-  const passkeyDiagnosticErrorMessage = PASSKEY_DIAGNOSTIC_ERROR_MESSAGE
+  const [diagnosticMessageType, setDiagnosticMessageType] = useState<
+    'success' | 'failureDetailed' | null
+  >(null)
   const PASSKEY_TOAST_ID = 'passkey-integrity'
   const isClient = useIsClient()
   const { data: firstSendtag } = useFirstSendtagQuery()
   const { data: referralCode } = useReferralCodeQuery()
   const { redirect } = useAuthRedirect()
+  const { t } = useTranslation('onboarding')
+  const passkeyDiagnosticErrorMessage = t('passkey.status.failureDetailed', {
+    defaultValue: PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
+  })
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -83,11 +86,13 @@ export function OnboardingScreen() {
       jc: 'center' as const,
     }
 
-    const indicatorMessage =
-      diagnosticMessage ??
-      (diagnosticStatus === 'running'
-        ? "Checking your passkey's signing integrity..."
-        : 'Passkey integrity check complete.')
+    const indicatorMessageKey = (() => {
+      if (diagnosticMessageType === 'failureDetailed') return 'passkey.status.failureDetailed'
+      if (diagnosticMessageType === 'success') return 'passkey.status.success'
+      if (diagnosticStatus === 'running') return 'passkey.status.checking'
+      return 'passkey.status.complete'
+    })()
+    const indicatorMessage = t(indicatorMessageKey)
 
     return (
       <YStack {...baseProps}>
@@ -113,12 +118,12 @@ export function OnboardingScreen() {
             disabled={!canRetryDiagnostic}
             testID="passkey-diagnostic-retry"
           >
-            Retry integrity check
+            {t('passkey.retry')}
           </Button>
         )}
       </YStack>
     )
-  }, [diagnosticStatus, diagnosticMessage, canRetryDiagnostic, form])
+  }, [diagnosticStatus, diagnosticMessageType, canRetryDiagnostic, form, t])
 
   const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
   const { mutateAsync: registerFirstSendtagMutateAsync } =
@@ -255,7 +260,7 @@ export function OnboardingScreen() {
       await validateSendtagMutateAsync({ name })
 
       setDiagnosticStatus('idle')
-      setDiagnosticMessage(null)
+      setDiagnosticMessageType(null)
 
       const createdSendAccount = await createSendAccount({
         user,
@@ -263,26 +268,26 @@ export function OnboardingScreen() {
         passkeyDiagnosticCallbacks: {
           onStart: () => {
             setDiagnosticStatus('running')
-            setDiagnosticMessage("Checking your passkey's signing integrity...")
+            setDiagnosticMessageType(null)
             toast.hide()
-            toast.show("Checking your passkey's signing integrity...", {
+            toast.show(t('passkey.status.checking'), {
               id: PASSKEY_TOAST_ID,
               duration: 6000,
             })
           },
           onSuccess: () => {
             setDiagnosticStatus('success')
-            setDiagnosticMessage('Passkey integrity check passed.')
+            setDiagnosticMessageType('success')
             toast.hide()
-            toast.show('Passkey integrity check passed.', {
+            toast.show(t('passkey.status.success'), {
               id: PASSKEY_TOAST_ID,
             })
           },
           onFailure: () => {
             setDiagnosticStatus('failure')
-            setDiagnosticMessage(passkeyDiagnosticErrorMessage)
+            setDiagnosticMessageType('failureDetailed')
             toast.hide()
-            toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
+            toast.error(t('passkey.toastFailure'), {
               id: PASSKEY_TOAST_ID,
               duration: 8000,
             })
@@ -314,9 +319,9 @@ export function OnboardingScreen() {
         (error as Error).message.includes('REQUEST_REJECTION_FAILED')
       ) {
         setDiagnosticStatus('failure')
-        setDiagnosticMessage(passkeyDiagnosticErrorMessage)
+        setDiagnosticMessageType('failureDetailed')
         toast.hide()
-        toast.error(PASSKEY_DIAGNOSTIC_TOAST_MESSAGE, {
+        toast.error(t('passkey.toastFailure'), {
           id: PASSKEY_TOAST_ID,
           duration: 8000,
         })
@@ -331,7 +336,7 @@ export function OnboardingScreen() {
       if (error.response?.status === 401 || error.response?.status === 403) {
         form.setError('root', {
           type: 'custom',
-          message: 'Session expired. Redirecting to sign in...',
+          message: t('errors.sessionExpired'),
         })
         setTimeout(() => {
           replace('/')
@@ -339,13 +344,13 @@ export function OnboardingScreen() {
         return
       }
 
-      const message = formatErrorMessage(error).trim() || 'Unknown error'
+      const message = formatErrorMessage(error).trim() || t('errors.unknown')
 
       // Check for "No user id" which means token is invalid
       if (message.includes('No user id')) {
         form.setError('root', {
           type: 'custom',
-          message: 'Session expired. Redirecting to sign in...',
+          message: t('errors.sessionExpired'),
         })
         setTimeout(() => {
           replace('/')
@@ -358,7 +363,7 @@ export function OnboardingScreen() {
         message,
       })
       setDiagnosticStatus('idle')
-      setDiagnosticMessage(null)
+      setDiagnosticMessageType(null)
     }
   }
 
@@ -369,7 +374,7 @@ export function OnboardingScreen() {
     <YStack f={1} jc={'center'} ai={'center'} gap={'$5'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
-          Finish your account
+          {t('title')}
         </Paragraph>
         <Paragraph
           size={'$4'}
@@ -378,7 +383,7 @@ export function OnboardingScreen() {
           $theme-light={{ color: '$darkGrayTextField' }}
           numberOfLines={2}
         >
-          Choose your Sendtag — your unique username on Send
+          {t('subtitle')}
         </Paragraph>
       </YStack>
       <FadeCard
@@ -400,7 +405,7 @@ export function OnboardingScreen() {
               }}
               props={{
                 name: {
-                  placeholder: 'Input desired Sendtag',
+                  placeholder: t('form.placeholder'),
                   color: '$color12',
                   fontWeight: '500',
                   bw: 0,
@@ -474,7 +479,7 @@ export function OnboardingScreen() {
                       onPress={() => form.handleSubmit(handleSubmit)()}
                       disabled={!canSubmit || diagnosticStatus === 'failure'}
                     >
-                      <SubmitButton.Text>finish account</SubmitButton.Text>
+                      <SubmitButton.Text>{t('form.submit')}</SubmitButton.Text>
                     </SubmitButton>
                     {diagnosticIndicator}
                   </>

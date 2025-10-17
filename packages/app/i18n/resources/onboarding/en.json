@@ -1,0 +1,22 @@
+{
+  "title": "Finish your account",
+  "subtitle": "Choose your Sendtag — your unique username on Send",
+  "form": {
+    "placeholder": "Input desired Sendtag",
+    "submit": "finish account"
+  },
+  "passkey": {
+    "status": {
+      "checking": "Checking your passkey's signing integrity...",
+      "complete": "Passkey integrity check complete.",
+      "success": "Passkey integrity check passed.",
+      "failureDetailed": "Passkey health check failed. Try creating your passkey on a device with iCloud Keychain or Google Password Manager."
+    },
+    "retry": "Retry integrity check",
+    "toastFailure": "Passkey integrity check failed."
+  },
+  "errors": {
+    "sessionExpired": "Session expired. Redirecting to sign in...",
+    "unknown": "Unknown error"
+  }
+}

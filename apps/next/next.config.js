@@ -83,6 +83,9 @@ const plugins = [
 export default () => {
   /** @type {import('next').NextConfig} */
   let config = {
+    env: {
+      EXPO_OS: process.env.EXPO_OS ?? 'web',
+    },
     images: {
       remotePatterns: [
         // Derived from a single source of truth
