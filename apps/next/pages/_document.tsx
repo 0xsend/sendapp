@@ -8,6 +8,7 @@ import NextDocument, {
 } from 'next/document'
 import { Children } from 'react'
 import { AppRegistry } from 'react-native'
+import Script from 'next/script'
 
 import { config } from '@my/ui'
 
@@ -46,7 +47,11 @@ export default class Document extends NextDocument {
       <Html>
         <Head>
           {DEV && !!process.env.NEXT_PUBLIC_REACT_SCAN_ENABLED ? (
-            <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+            <Script
+              id="react-scan"
+              src="https://unpkg.com/react-scan/dist/auto.global.js"
+              strategy="afterInteractive"
+            />
           ) : null}
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta name="mobile-web-app-capable" content="yes" />
