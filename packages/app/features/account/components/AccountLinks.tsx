@@ -11,6 +11,7 @@ import {
   IconQuestionCircle,
   IconSlash,
   IconStarOutline,
+  IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
@@ -41,6 +42,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       fingerprint: <IconFingerprint {...iconProps} />,
       slash: <IconSlash {...iconProps} />,
       starOutline: <IconStarOutline {...iconProps} />,
+      worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
       infoCircle: <IconInfoCircle {...iconProps} />,
       questionCircle: <IconQuestionCircle {...iconProps} />,
@@ -62,6 +64,9 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               href="/account/personal-info"
               icon={icons.idCard}
             />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text="Language" href="/account/language" icon={icons.worldSearch} />
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink text="Link In Bio" href="/account/link-in-bio" icon={icons.xLogo} />
