@@ -2,4 +2,5 @@
 module.exports = {
   extends: ['custom'],
   plugins: ['@next/next'],
+  ignorePatterns: ['./public', './.next', './.tamagui'],
 }
