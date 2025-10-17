@@ -13,6 +13,9 @@ const {
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
   getEventFromTransferActivity,
+  readBalanceActivity,
+  persistBalanceActivity,
+  upsertSendTokenHodlerVerificationActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '1 minute',
@@ -134,6 +137,39 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
     from,
     to,
   })
+
+  // After confirmation, read and persist balances for SEND-only
+  if (token) {
+    const fromRead = await readBalanceActivity({ token, account: from })
+    if (fromRead) {
+      await persistBalanceActivity({
+        userId: fromRead.userId,
+        token: fromRead.token,
+        balance: fromRead.balance,
+        address: fromRead.address,
+        chainId: fromRead.chainId,
+      })
+      await upsertSendTokenHodlerVerificationActivity({
+        userId: fromRead.userId,
+        balance: fromRead.balance,
+      })
+    }
+
+    const toRead = await readBalanceActivity({ token, account: to })
+    if (toRead) {
+      await persistBalanceActivity({
+        userId: toRead.userId,
+        token: toRead.token,
+        balance: toRead.balance,
+        address: toRead.address,
+        chainId: toRead.chainId,
+      })
+      await upsertSendTokenHodlerVerificationActivity({
+        userId: toRead.userId,
+        balance: toRead.balance,
+      })
+    }
+  }
 
   await updateTemporalSendAccountTransferActivity({
     workflow_id: workflowId,
