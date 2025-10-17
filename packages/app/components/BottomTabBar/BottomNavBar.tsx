@@ -1,24 +1,14 @@
 import {
   IconArrowUp,
+  IconChart,
+  IconCompass,
   IconDeviceReset,
   IconHome,
-  IconSwap,
-  IconWorldSearch,
 } from 'app/components/icons'
 import { XStack } from '@my/ui'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 import { BottomNavBarContent } from 'app/components/BottomTabBar/BottomNavBarContent'
-import { memo } from 'react'
-import type { IconProps } from '@tamagui/helpers-icon'
-import { YStack } from '@my/ui'
-
-const IconSwapHorizontal = memo<IconProps>((props) => (
-  <YStack transform={[{ rotate: '90deg' }]}>
-    <IconSwap {...props} />
-  </YStack>
-))
-IconSwapHorizontal.displayName = 'IconSwapHorizontal'
 
 export const TABS = [
   {
@@ -27,9 +17,9 @@ export const TABS = [
     key: 'index',
   },
   {
-    Icon: IconWorldSearch,
-    href: '/explore',
-    key: 'explore',
+    Icon: IconDeviceReset,
+    href: '/activity',
+    key: 'activity',
   },
   {
     Icon: IconArrowUp,
@@ -37,14 +27,14 @@ export const TABS = [
     key: 'send',
   },
   {
-    Icon: IconSwapHorizontal,
+    Icon: IconChart,
     href: '/trade',
     key: 'trade',
   },
   {
-    Icon: IconDeviceReset,
-    href: '/activity',
-    key: 'activity',
+    Icon: IconCompass,
+    href: '/explore',
+    key: 'explore',
   },
 ]
 
