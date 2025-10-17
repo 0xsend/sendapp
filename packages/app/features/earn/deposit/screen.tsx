@@ -27,7 +27,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
-import { useCallback, useEffect, useMemo, useState, memo } from 'react'
+import { useCallback, useEffect, useMemo, useState, memo, useRef } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -153,10 +153,33 @@ export function DepositForm() {
   const [parsedAmount] = useAmount()
   const formAmount = form.watch('amount')
   const { allBalances, coinBalances } = useSendEarnCoin(coin.data ?? undefined)
-  const hasExistingDeposit = useMemo(
+
+  // Use ref to stabilize hasExistingDeposit - once determined, it shouldn't change
+  const hasExistingDepositRef = useRef<boolean | undefined>(undefined)
+  const currentHasExistingDeposit = useMemo(
     () => (coinBalances.data ?? []).some((b) => b.assets > 0n) ?? false,
     [coinBalances.data]
   )
+
+  // Once we determine hasExistingDeposit, remember it
+  if (coinBalances.data !== undefined && hasExistingDepositRef.current === undefined) {
+    hasExistingDepositRef.current = currentHasExistingDeposit
+  }
+  const hasExistingDeposit = hasExistingDepositRef.current ?? currentHasExistingDeposit
+
+  const hasHadCoinBalancesData = useRef(false)
+  const lastCoinSymbol = useRef(coin.data?.symbol)
+
+  // Reset the ref if the coin changes
+  if (lastCoinSymbol.current !== coin.data?.symbol) {
+    hasHadCoinBalancesData.current = false
+    lastCoinSymbol.current = coin.data?.symbol
+  }
+
+  if (coinBalances.data !== undefined) {
+    hasHadCoinBalancesData.current = true
+  }
+
   const areTermsAccepted = form.watch('areTermsAccepted')
 
   // QUERY DEPOSIT USEROP
@@ -439,6 +462,20 @@ export function DepositForm() {
     return null
   }
 
+  // Use ref to track if we've ever had coinBalances data in this render cycle
+  // Once we have data, we never show the spinner again even if data becomes undefined temporarily
+
+  // Show loading spinner only on initial load:
+  // 1. sendAccount isn't ready (allBalances query will be disabled)
+  // 2. We don't have balance data yet
+  // 3. Coin data is loading
+  // 4. coinBalances hasn't loaded yet (first time only)
+  const isInitialCoinBalancesLoad = !hasHadCoinBalancesData.current && coinBalances.isLoading
+
+  if (sendAccount.isLoading || !allBalances.data || coin.isLoading || isInitialCoinBalancesLoad) {
+    return <Spinner size="large" />
+  }
+
   log('DepositForm', {
     coin,
     coinBalance,
@@ -587,18 +624,22 @@ export function DepositForm() {
                 formattedApy={formattedApy}
                 monthlyEarning={monthlyEarning}
               />
-              {/* Only show referred by if there is no existing deposit */}
-              {!coinBalances.isLoading && !hasExistingDeposit && <ReferredBy />}
-              {hasExistingDeposit ? null : (
-                <Shake
-                  shakeKey={form.formState.errors.areTermsAccepted ? 'areTermsAccepted' : undefined}
-                  baseStyle={{ width: '100%' }}
-                >
-                  <XStack gap={'$3'} ai={'center'}>
-                    {areTermsAccepted}
-                    <EarnTerms hasError={!!form.formState.errors.areTermsAccepted} />
-                  </XStack>
-                </Shake>
+              {/* Only show referred by and terms checkbox if user has no existing deposit */}
+              {!hasExistingDeposit && (
+                <>
+                  <ReferredBy />
+                  <Shake
+                    shakeKey={
+                      form.formState.errors.areTermsAccepted ? 'areTermsAccepted' : undefined
+                    }
+                    baseStyle={{ width: '100%' }}
+                  >
+                    <XStack gap={'$3'} ai={'center'}>
+                      {areTermsAccepted}
+                      <EarnTerms hasError={!!form.formState.errors.areTermsAccepted} />
+                    </XStack>
+                  </Shake>
+                </>
               )}
             </YStack>
           )}

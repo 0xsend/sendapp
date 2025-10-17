@@ -105,13 +105,30 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
     return allCurrentAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n
   }, [allCurrentAssets.data])
 
+  // Determine if we're in initial loading state (no data and queries are loading)
+  const isInitialLoading = useMemo(() => {
+    const hasNoData = !allBalances.data || !vaultAssets.data || !allCurrentAssets.data
+    return (
+      hasNoData && (allBalances.isLoading || vaultAssets.isLoading || allCurrentAssets.isLoading)
+    )
+  }, [
+    allBalances.data,
+    allBalances.isLoading,
+    vaultAssets.data,
+    vaultAssets.isLoading,
+    allCurrentAssets.data,
+    allCurrentAssets.isLoading,
+  ])
+
   // Function to get balances for a specific coin
   const getCoinBalances = useCallback(
     (coin: erc20Coin | undefined) => {
-      if (!coin?.token || !allBalances.data || !vaultAssets.data || !allCurrentAssets.data) {
+      const hasNoData = !allBalances.data || !vaultAssets.data || !allCurrentAssets.data
+
+      if (!coin?.token || hasNoData) {
         return {
           data: undefined,
-          isLoading: allBalances.isLoading || vaultAssets.isLoading || allCurrentAssets.isLoading,
+          isLoading: isInitialLoading,
           isSuccess: false,
           error: allBalances.error || vaultAssets.error || allCurrentAssets.error,
         }
@@ -148,9 +165,7 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
       vaultAssets.data,
       allCurrentAssets.data,
       balancesWithShares,
-      allBalances.isLoading,
-      vaultAssets.isLoading,
-      allCurrentAssets.isLoading,
+      isInitialLoading,
       allBalances.error,
       vaultAssets.error,
       allCurrentAssets.error,
@@ -215,7 +230,11 @@ export const useSendEarn = () => {
 // Convenience hook for getting coin-specific data
 export const useSendEarnCoin = (coin: erc20Coin | undefined) => {
   const context = useSendEarn()
-  const coinBalances = context.getCoinBalances(coin)
+
+  // Memoize coinBalances to prevent unnecessary recalculations
+  const coinBalances = useMemo(() => {
+    return context.getCoinBalances(coin)
+  }, [context.getCoinBalances, coin])
 
   return {
     ...context,

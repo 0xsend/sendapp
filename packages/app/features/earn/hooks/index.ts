@@ -177,7 +177,7 @@ export function sendEarnBalancesQueryOptions(
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances', { sendAccount }] as const,
+    queryKey: ['send_earn_balances'] as const,
     queryFn: async () => fetchSendEarnBalances(supabase),
     enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
@@ -215,7 +215,7 @@ export function sendEarnBalancesTimelineQueryOptions(
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances_timeline', { sendAccount }] as const,
+    queryKey: ['send_earn_balances_timeline'] as const,
     queryFn: async () => fetchSendEarnBalancesTimeline(supabase),
     enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
@@ -263,7 +263,7 @@ export function sendEarnBalancesAtBlockQueryOptions(
 ) {
   return queryOptions({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['send_earn_balances_at_block', { block_num, sendAccount }] as const,
+    queryKey: ['send_earn_balances_at_block', { block_num }] as const,
     queryFn: async () => fetchSendEarnBalancesAtBlock(supabase, block_num),
     enabled: sendAccount.isFetched && !!sendAccount.data?.address,
     staleTime: 30_000,
@@ -470,15 +470,14 @@ export function myAffiliateVaultQueryOptions({
   sendAccount: ReturnType<typeof useSendAccount>
 }) {
   return queryOptions({
-    queryKey: ['myAffiliateVault', { sendAccount }] as const,
-    enabled: sendAccount.isFetched,
-    queryFn: async ({ queryKey: [, { sendAccount }], signal }): Promise<AffiliateVault | null> => {
-      throwIf(sendAccount.error)
-      assert(!!sendAccount.data, 'No send account found')
+    queryKey: ['myAffiliateVault', { address: sendAccount.data?.address }] as const,
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address,
+    queryFn: async ({ queryKey: [, { address }], signal }): Promise<AffiliateVault | null> => {
+      assert(!!address, 'No send account found')
       const { data, error } = await supabase
         .from('send_earn_new_affiliate')
         .select('affiliate, send_earn_affiliate, send_earn_affiliate_vault(send_earn, log_addr)')
-        .eq('affiliate', hexToBytea(sendAccount.data?.address))
+        .eq('affiliate', hexToBytea(address))
         .not('send_earn_affiliate_vault', 'is', null)
         .abortSignal(signal)
         .limit(1)
@@ -535,17 +534,17 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
   return useQuery({
     queryKey: [
       'myEarnRewards',
-      { sendAccount, myAffiliateVault, balance, assets, vaultShares },
+      { address: sendAccount.data?.address, myAffiliateVault, balance, assets, vaultShares },
     ] as const,
     queryKeyHashFn: hashFn,
-    enabled: sendAccount.isFetched && myAffiliateVault.isFetched,
+    enabled: sendAccount.isFetched && !!sendAccount.data?.address && myAffiliateVault.isFetched,
     queryFn: async ({
-      queryKey: [, { sendAccount, myAffiliateVault, balance, assets, vaultShares }],
+      queryKey: [, { address, myAffiliateVault, balance, assets, vaultShares }],
     }: {
       queryKey: [
         string,
         {
-          sendAccount: ReturnType<typeof useSendAccount>
+          address: `0x${string}` | undefined
           myAffiliateVault: ReturnType<typeof useMyAffiliateVault>
           balance: UseQueryReturnType<bigint | null | undefined>
           assets: ReturnType<typeof useVaultConvertSharesToAssets>
@@ -553,12 +552,11 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
         },
       ]
     }): Promise<{ shares: bigint; assets: bigint; vault: AffiliateVault } | null> => {
-      throwIf(sendAccount.error)
       throwIf(myAffiliateVault.error)
       throwIf(balance.error)
       throwIf(assets.error)
 
-      assert(!!sendAccount.data, 'No send account found')
+      assert(!!address, 'No send account found')
 
       if (!myAffiliateVault.data) return null
       if (!balance.data) return null

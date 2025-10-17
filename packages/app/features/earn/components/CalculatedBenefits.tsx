@@ -1,4 +1,4 @@
-import { Card, Paragraph, Separator, XStack, YStack } from '@my/ui'
+import { FadeCard, Paragraph, Separator, XStack, YStack } from '@my/ui'
 import { Row } from 'app/features/earn/components/Row'
 import { memo } from 'react'
 
@@ -25,7 +25,7 @@ export const CalculatedBenefits = memo(
         <Paragraph size={'$7'} fontWeight={'600'}>
           Benefits
         </Paragraph>
-        <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+        <FadeCard w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
           <YStack gap={'$3.5'}>
             <XStack gap={'$2.5'} jc={'space-between'}>
               <Paragraph size={'$6'}>{showStaticInfo ? 'APY' : 'Deposit APY'}</Paragraph>
@@ -69,7 +69,7 @@ export const CalculatedBenefits = memo(
               />
             </YStack>
           </YStack>
-        </Card>
+        </FadeCard>
       </YStack>
     )
   }

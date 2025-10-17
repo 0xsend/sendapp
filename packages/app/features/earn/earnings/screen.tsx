@@ -38,11 +38,18 @@ export const EarningsFeed = () => {
     })
   const wasPendingRef = useRef(false) // Ref to track if a pending deposit was seen previously
 
+  // Use ref to prevent list from disappearing when data temporarily becomes undefined
+  const lastValidData = useRef(data)
+  if (data?.pages && data.pages.length > 0) {
+    lastValidData.current = data
+  }
+  const stableData = data ?? lastValidData.current
+
   useEffect(() => {
     // Only proceed if data is available
-    if (!data?.pages) return
+    if (!stableData?.pages) return
 
-    const activities = data.pages.flat()
+    const activities = stableData.pages.flat()
 
     // Check if there's currently a pending temporal deposit
     const isCurrentlyPending = activities.some(
@@ -60,12 +67,12 @@ export const EarningsFeed = () => {
 
     // Update the ref to store the current pending state for the next effect run
     wasPendingRef.current = isCurrentlyPending
-  }, [data, invalidateQueries])
+  }, [stableData, invalidateQueries])
 
   const sections = useMemo(() => {
-    if (!data?.pages) return []
+    if (!stableData?.pages) return []
 
-    const activities = data.pages.flat()
+    const activities = stableData.pages.flat()
     const groups = activities.reduce<Record<string, typeof activities>>((acc, activity) => {
       const isToday = new Date(activity.created_at).toDateString() === new Date().toDateString()
       const dateKey = isToday
@@ -88,10 +95,13 @@ export const EarningsFeed = () => {
       data,
       index,
     }))
-  }, [data?.pages])
+  }, [stableData?.pages])
 
   if (!coin.isSuccess || !coin.data) return null
-  if (isLoading) return <Spinner size="small" />
+
+  // Show spinner only on initial load (when we have no data at all)
+  if (isLoading && !stableData?.pages) return <Spinner size="small" />
+
   if (error) return <Paragraph>{error.message}</Paragraph>
   if (!sections.length) return <Paragraph>No earnings activity</Paragraph>
 
@@ -166,16 +176,24 @@ export const EarningsFeed = () => {
 function TotalEarning() {
   const coin = useERC20AssetCoin()
   const { coinBalances } = useSendEarnCoin(coin.data || undefined)
+
+  // Use ref to prevent card from disappearing when coinBalances.data temporarily becomes undefined
+  const lastValidCoinBalancesData = useRef(coinBalances.data)
+  if (coinBalances.data !== undefined) {
+    lastValidCoinBalancesData.current = coinBalances.data
+  }
+  const stableCoinBalancesData = coinBalances.data ?? lastValidCoinBalancesData.current
+
   const totalDeposits = useMemo(() => {
-    if (!coinBalances.data) return 0n
-    const totalCurrentAssets = coinBalances.data.reduce((acc, balance) => {
+    if (!stableCoinBalancesData) return 0n
+    const totalCurrentAssets = stableCoinBalancesData.reduce((acc, balance) => {
       return acc + balance.assets
     }, 0n)
     return totalCurrentAssets
-  }, [coinBalances.data])
+  }, [stableCoinBalancesData])
 
   const { formattedTotal, displayString } = useMemo(() => {
-    if (!coin.data || !coinBalances.data) {
+    if (!coin.data || !stableCoinBalancesData) {
       return {
         formattedPrincipal: '0',
         formattedYield: '0',
@@ -185,7 +203,7 @@ function TotalEarning() {
       }
     }
 
-    const totalAssets = coinBalances.data.reduce((acc, balance) => {
+    const totalAssets = stableCoinBalancesData.reduce((acc, balance) => {
       return acc + balance.currentAssets
     }, 0n)
     const yieldAmount = totalAssets - totalDeposits
@@ -197,9 +215,11 @@ function TotalEarning() {
       yieldAmount > 0n ? `${formattedPrincipal} + ${formattedYield}` : formattedPrincipal
 
     return { formattedPrincipal, formattedYield, formattedTotal, displayString, yieldAmount }
-  }, [coinBalances.data, totalDeposits, coin.data])
+  }, [stableCoinBalancesData, totalDeposits, coin.data])
 
-  if (!coinBalances.isSuccess || !coin.isSuccess || !coin.data) return null
+  // Only hide card if we've never had data (initial load with no balance)
+  const hasBalance = stableCoinBalancesData && stableCoinBalancesData.length > 0
+  if (!coin.isSuccess || !coin.data || !hasBalance) return null
 
   return (
     <Fade>

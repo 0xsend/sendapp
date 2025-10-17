@@ -76,6 +76,7 @@ export const useUser = () => {
     queryKey: ['profile', user?.id],
     enabled: !!user?.id,
     queryFn,
+    staleTime: 30_000,
   })
 
   const avatarUrl = useMemo(() => {

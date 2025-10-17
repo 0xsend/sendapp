@@ -107,6 +107,7 @@ export function useReferrer() {
       return fetchReferrer({ supabase, profile, referralCode: referralCode.data ?? '', signal })
     },
     enabled: !!profile && referralCode.isFetched,
+    staleTime: 30_000,
   })
 }
 
@@ -137,5 +138,6 @@ export function useReferredBy() {
       }
       return data
     },
+    staleTime: 30_000,
   })
 }
