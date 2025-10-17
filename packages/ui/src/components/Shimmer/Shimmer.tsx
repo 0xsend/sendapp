@@ -13,7 +13,7 @@ const LINEAR_GRADIENTS_WHITE = [
   { color: '#fff', opacity: 0 },
 ]
 
-function gradientCoordsFromAngle(degrees: number): {
+export function gradientCoordsFromAngle(degrees: number): {
   start: { x: number; y: number }
   end: { x: number; y: number }
 } {
@@ -26,8 +26,8 @@ function gradientCoordsFromAngle(degrees: number): {
   }
 }
 
-const DEFAULT_GRADIENT_START = gradientCoordsFromAngle(5).start
-const DEFAULT_GRADIENT_END = gradientCoordsFromAngle(0).end
+const DEFAULT_GRADIENT_START = gradientCoordsFromAngle(10).start
+const DEFAULT_GRADIENT_END = gradientCoordsFromAngle(10).end
 
 interface ShimmerProps {
   style?: ViewStyle | ViewStyle[]
@@ -38,6 +38,7 @@ interface ShimmerProps {
   speed?: number
   delay?: number
   disableAnimation?: boolean
+  scope?: 'global' | 'local'
 }
 
 const ShimmerFrame = styled(View, {
@@ -46,6 +47,10 @@ const ShimmerFrame = styled(View, {
   position: 'relative',
   height: '100%',
   width: '100%',
+  bg: '$aztec4',
+  '$theme-light': {
+    bg: '$gray3',
+  },
 })
 
 export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
@@ -57,13 +62,13 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
     speed = 1,
     delay = 0,
     disableAnimation = false,
+    scope = 'global',
     ...rest
   }: ShimmerProps) => {
     const shimmer = useContext(ShimmerContext)
 
     const [offset, setOffset] = useState(0)
     const [componentWidth, setComponentWidth] = useState(0)
-    const [order, setOrder] = useState(0)
 
     useEffect(() => {
       let shimerIncreased = false
@@ -72,7 +77,7 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
         if (delay > 0) {
           timer = setTimeout(() => {
             shimerIncreased = true
-            setOrder(shimmer?.increaseActiveShimmers())
+            shimmer?.increaseActiveShimmers()
           }, delay)
         } else {
           shimerIncreased = true
@@ -107,7 +112,9 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
       const easedProgress = easing(localProgress)
 
       const remappedRange =
-        -(componentWidth + offset) + ((screenWidth + componentWidth) * easedProgress) / 1
+        scope === 'local'
+          ? -componentWidth + 2 * componentWidth * easedProgress
+          : -(componentWidth + offset) + (screenWidth + componentWidth) * easedProgress
 
       return {
         opacity: localProgress ? 1 : 0,
@@ -117,7 +124,7 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
           },
         ],
       }
-    }, [componentWidth, offset, easing, speed, screenWidth, shimmer, order])
+    }, [componentWidth, offset, easing, speed, screenWidth, shimmer, scope])
 
     return (
       <ShimmerFrame onLayout={measure} {...rest}>

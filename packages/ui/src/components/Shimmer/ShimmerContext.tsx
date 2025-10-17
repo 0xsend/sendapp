@@ -12,8 +12,8 @@ import { createStyledContext, useEvent } from 'tamagui'
 
 interface ShimmerContextType {
   progress: SharedValue<number>
-  increaseActiveShimmers: () => number
-  decreaseActiveShimmers: () => number
+  increaseActiveShimmers: () => void
+  decreaseActiveShimmers: () => void
   gradientConfig?: GradientConfig
 }
 
