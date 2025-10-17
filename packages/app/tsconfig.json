@@ -5,6 +5,7 @@
     "concerns",
     "features",
     "components",
+    "i18n",
     "data",
     "provider",
     "utils",

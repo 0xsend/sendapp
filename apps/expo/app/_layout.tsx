@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { loadThemePromise, Provider } from 'app/provider'
+import { getI18n, initSharedI18n } from 'app/i18n'
 import { supabase } from 'app/utils/supabase/client.native'
 import { SplashScreen } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
@@ -37,6 +38,7 @@ export default function RootLayout() {
   const [themeLoaded, setThemeLoaded] = useState(false)
   const [sessionLoadAttempted, setSessionLoadAttempted] = useState(false)
   const [initialSession, setInitialSession] = useState<Session | null>(null)
+  const [i18nReady, setI18nReady] = useState(false)
   const scheme = useColorScheme()
 
   useEffect(() => {
@@ -66,23 +68,34 @@ export default function RootLayout() {
     })
   }, [])
 
+  useEffect(() => {
+    initSharedI18n()
+      .then(() => {
+        setI18nReady(true)
+      })
+      .catch((error) => {
+        console.error('[i18n] failed to initialize', error)
+        setI18nReady(true)
+      })
+  }, [])
+
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded && sessionLoadAttempted && themeLoaded) {
+    if (fontsLoaded && sessionLoadAttempted && themeLoaded && i18nReady) {
       // Only workaround I found on github issues or stack overflow that works
       // https://stackoverflow.com/questions/64780275/at-using-expo-after-splash-screen-blinkflash-with-white-screen
       await new Promise((resolve) => setTimeout(resolve, 0))
       await SplashScreen.hideAsync()
     }
-  }, [fontsLoaded, sessionLoadAttempted, themeLoaded])
+  }, [fontsLoaded, sessionLoadAttempted, themeLoaded, i18nReady])
 
-  if (!themeLoaded || !fontsLoaded || !sessionLoadAttempted) {
+  if (!themeLoaded || !fontsLoaded || !sessionLoadAttempted || !i18nReady) {
     return null
   }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-        <Provider initialSession={initialSession}>
+        <Provider initialSession={initialSession} i18n={getI18n()}>
           <StackNavigator />
         </Provider>
       </View>
