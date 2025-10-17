@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useDeferredValue, useEffect, useState } from 'react'
 import { StyleSheet, type ViewStyle, type LayoutChangeEvent } from 'react-native'
 import { styled, useWindowDimensions, View } from 'tamagui'
 import Animated, { Easing, useAnimatedStyle, type EasingFunction } from 'react-native-reanimated'
@@ -8,7 +8,7 @@ import { MyLinearGradient } from './LinearGradient'
 const LINEAR_GRADIENTS_WHITE = [
   { color: '#fff', opacity: 0 },
   { color: '$gray11', opacity: 0.1 },
-  { color: '$gray11', opacity: 0.3 },
+  { color: '$gray11', opacity: 0.2 },
   { color: '$gray11', opacity: 0.1 },
   { color: '#fff', opacity: 0 },
 ]
@@ -49,7 +49,7 @@ const ShimmerFrame = styled(View, {
   width: '100%',
   bg: '$aztec4',
   '$theme-light': {
-    bg: '$gray3',
+    bg: '$gray2',
   },
 })
 
@@ -58,7 +58,7 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
     linearGradients = LINEAR_GRADIENTS_WHITE,
     gradientStart = DEFAULT_GRADIENT_START,
     gradientEnd = DEFAULT_GRADIENT_END,
-    easing = Easing.linear,
+    easing = Easing.inOut(Easing.quad),
     speed = 1,
     delay = 0,
     disableAnimation = false,
@@ -70,10 +70,17 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
     const [offset, setOffset] = useState(0)
     const [componentWidth, setComponentWidth] = useState(0)
 
+    const [_renderGradient, setRenderGradient] = useState(false)
+    const renderGradient = useDeferredValue(_renderGradient)
+
+    useEffect(() => {
+      setRenderGradient(true)
+    }, [])
+
     useEffect(() => {
       let shimerIncreased = false
       let timer: NodeJS.Timeout | null = null
-      if (!disableAnimation) {
+      if (!disableAnimation && renderGradient) {
         if (delay > 0) {
           timer = setTimeout(() => {
             shimerIncreased = true
@@ -92,7 +99,7 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
           shimmer?.decreaseActiveShimmers()
         }
       }
-    }, [shimmer, delay, disableAnimation])
+    }, [shimmer, delay, disableAnimation, renderGradient])
 
     const measure = useCallback(
       (event: LayoutChangeEvent) => {
@@ -128,14 +135,16 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
 
     return (
       <ShimmerFrame onLayout={measure} {...rest}>
-        <Animated.View style={[gradientStyle, StyleSheet.absoluteFillObject]}>
-          <MyLinearGradient
-            colors={shimmer?.gradientConfig?.colors ?? linearGradients}
-            start={shimmer?.gradientConfig?.start ?? gradientStart}
-            end={shimmer?.gradientConfig?.end ?? gradientEnd}
-            style={StyleSheet.absoluteFill}
-          />
-        </Animated.View>
+        {renderGradient && (
+          <Animated.View style={[gradientStyle, StyleSheet.absoluteFillObject]}>
+            <MyLinearGradient
+              colors={shimmer?.gradientConfig?.colors ?? linearGradients}
+              start={shimmer?.gradientConfig?.start ?? gradientStart}
+              end={shimmer?.gradientConfig?.end ?? gradientEnd}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+        )}
       </ShimmerFrame>
     )
   }

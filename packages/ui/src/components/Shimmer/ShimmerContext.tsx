@@ -57,7 +57,6 @@ const ShimmerProvider: FunctionComponent<ShimmerProviderProps> = ({
 
   const increaseActiveShimmers = useEvent(() => {
     setActiveShimmers((prev) => prev + 1)
-    return activeShimmers + 1
   })
 
   const decreaseActiveShimmers = useEvent(() => {
