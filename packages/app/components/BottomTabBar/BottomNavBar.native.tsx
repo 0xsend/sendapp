@@ -1,4 +1,4 @@
-import { IconArrowUp, IconChart, IconDeviceReset, IconHome } from 'app/components/icons'
+import { IconArrowUp, IconChart, IconClock, IconHome } from 'app/components/icons'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
@@ -24,7 +24,7 @@ const TABS = [
     key: 'trade/index',
   },
   {
-    Icon: IconDeviceReset,
+    Icon: IconClock,
     href: '/(tabs)/activity',
     key: 'activity/index',
   },

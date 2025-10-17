@@ -18,8 +18,8 @@ import {
   IconAccount,
   IconArrowUp,
   IconChart,
+  IconClock,
   IconCompass,
-  IconDeviceReset,
   IconHome,
   IconSendLogo,
 } from 'app/components/icons'
@@ -41,7 +41,7 @@ const links = [
     href: '/',
   },
   {
-    icon: <IconDeviceReset size={'$1'} scale={1.2} />,
+    icon: <IconClock size={'$1'} scale={1.2} />,
     text: 'Activity',
     href: '/activity',
   },
