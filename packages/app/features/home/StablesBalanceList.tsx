@@ -114,7 +114,7 @@ const TokenBalance = ({ coin }: { coin: CoinWithBalance }) => {
           case isLoadingTokenPrices || balanceInUSD === undefined:
             return '$0.00'
           case isPriceHidden:
-            return '///////'
+            return '******'
           default:
             return `$${formatAmount(balanceInUSD, 12, 2)}`
         }
