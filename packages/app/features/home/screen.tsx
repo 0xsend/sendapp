@@ -47,7 +47,6 @@ import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
 
 export function HomeScreen() {
-  const media = useMedia()
   const router = useRouter()
   const supabase = useSupabase()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
@@ -57,13 +56,7 @@ export function HomeScreen() {
       <AnimatePresence>
         {(() => {
           switch (true) {
-            case isSendAccountLoading:
-              return (
-                <Stack f={1} h={'100%'} ai={'center'} jc={'center'}>
-                  <Spinner size="large" />
-                </Stack>
-              )
-            case !sendAccount:
+            case !sendAccount && !isSendAccountLoading:
               return (
                 <Stack f={1} h={'100%'} ai={'center'} jc={'center'} gap="$4">
                   <H1 theme="red">No send account found</H1>
@@ -80,21 +73,7 @@ export function HomeScreen() {
                 </Stack>
               )
             default:
-              return (
-                <HomeBody
-                  key="home-body"
-                  animation="200ms"
-                  animateOnly={['opacity', 'transform']}
-                  enterStyle={{
-                    opacity: 0,
-                    y: media.gtLg ? 0 : 300,
-                  }}
-                  exitStyle={{
-                    opacity: 0,
-                    y: media.gtLg ? 0 : 300,
-                  }}
-                />
-              )
+              return <HomeBody key="home-body" />
           }
         })()}
       </AnimatePresence>
@@ -103,15 +82,8 @@ export function HomeScreen() {
 }
 
 function HomeBody(props: XStackProps) {
-  const { coin: selectedCoin, isLoading } = useCoinFromTokenParam()
+  const { coin: selectedCoin } = useCoinFromTokenParam()
   const [queryParams] = useRootScreenParams()
-
-  if (isLoading)
-    return (
-      <Stack w="100%" h="100%" jc={'center'} ai={'center'}>
-        <Spinner size="large" />
-      </Stack>
-    )
 
   return (
     <IsPriceHiddenProvider>
@@ -323,7 +295,7 @@ export function InvestmentsBody() {
             ) : (
               <YStack ai={'center'} gap={'$2'}>
                 <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  {isPriceHidden ? '///////' : `${sign}$${formattedDeltaUSD}`}
+                  {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD}`}
                 </Paragraph>
                 {/* Small neutral pill to mirror style (no color change) */}
                 <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>

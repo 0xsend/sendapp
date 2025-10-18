@@ -14,6 +14,7 @@ import { WagmiProvider } from './wagmi'
 import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 import { ActivityDetailsProvider } from './activity-details'
 import { GlobalDatePickerProvider } from './datepicker'
+import { ShimmerProvider } from '@my/ui'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 
@@ -27,8 +28,10 @@ export function Provider({
   return (
     <AuthProvider initialSession={initialSession}>
       <Providers>
-        <Concerns>{children}</Concerns>
-        {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
+        <ShimmerProvider duration={2000}>
+          <Concerns>{children}</Concerns>
+          {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
+        </ShimmerProvider>
       </Providers>
     </AuthProvider>
   )

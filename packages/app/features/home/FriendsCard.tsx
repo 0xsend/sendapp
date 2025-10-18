@@ -3,7 +3,7 @@ import {
   Card,
   type CardProps,
   Paragraph,
-  Spinner,
+  Shimmer,
   ThemeableStack,
   XStack,
   type XStackProps,
@@ -16,6 +16,7 @@ import { IconAccount } from 'app/components/icons'
 import { HomeBodyCard } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
+import { Easing } from 'react-native-reanimated'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
@@ -43,7 +44,7 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
         {isLoading ? (
-          <Spinner size="small" />
+          <Shimmer br={100} w={35} h={35} als="flex-end" />
         ) : (
           <XStack ai="center" jc="space-between">
             {data?.friends && <OverlappingFriendAvatars friends={data.friends} />}

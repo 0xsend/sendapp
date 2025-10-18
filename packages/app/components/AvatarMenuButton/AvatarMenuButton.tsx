@@ -1,16 +1,12 @@
-import { Avatar, LinkableAvatar, Spinner } from '@my/ui'
+import { Avatar, LinkableAvatar } from '@my/ui'
 import { IconAccount } from 'app/components/icons'
-import { useUser, type UseUserReturn } from 'app/utils/useUser'
+import type { UseUserReturn } from 'app/utils/useUser'
 
 interface AvatarMenuButtonProps {
   profile?: UseUserReturn['profile']
 }
 
 const AvatarMenuButton = ({ profile }: AvatarMenuButtonProps) => {
-  const { isLoading } = useUser()
-
-  if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
-
   return (
     <LinkableAvatar
       elevation={5}
