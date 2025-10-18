@@ -47,7 +47,6 @@ import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
 
 export function HomeScreen() {
-  const media = useMedia()
   const router = useRouter()
   const supabase = useSupabase()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
@@ -74,21 +73,7 @@ export function HomeScreen() {
                 </Stack>
               )
             default:
-              return (
-                <HomeBody
-                  key="home-body"
-                  animation="smoothResponsive"
-                  animateOnly={['opacity', 'transform']}
-                  enterStyle={{
-                    opacity: 0.4,
-                    y: media.gtLg ? 0 : 50,
-                  }}
-                  exitStyle={{
-                    opacity: 0.4,
-                    y: media.gtLg ? 0 : 50,
-                  }}
-                />
-              )
+              return <HomeBody key="home-body" />
           }
         })()}
       </AnimatePresence>
