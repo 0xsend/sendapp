@@ -46,7 +46,7 @@ import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useConfirmedTags } from 'app/utils/tags'
 
-const CANTON_WALLET_MIN_SEND_BALANCE = 1000n * BigInt(10 ** 18)
+const CANTON_WALLET_MIN_SEND_BALANCE = 2000n * BigInt(10 ** 18)
 
 export function CantonWalletVerification() {
   const { profile, isLoading: isUserLoading } = useUser()
