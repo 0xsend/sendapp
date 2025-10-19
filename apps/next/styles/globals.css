@@ -17,6 +17,11 @@ body {
   :root {
     height: 100vh;
     /* Use vh for PWA mode */
+    /* iOS 26 fullscreen support */
+    height: 100dvh;
+    /* Dynamic viewport height for iOS 26 */
+    min-height: 100vh;
+    /* Fallback for older browsers */
   }
 }
 
