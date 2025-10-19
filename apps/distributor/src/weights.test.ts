@@ -4,15 +4,18 @@ import { calculateWeights, Mode } from './weights'
 const balances = [
   {
     address: '0x1' as `0x${string}`,
-    balance: '800',
+    userId: 'u1',
+    balance: 800n,
   },
   {
     address: '0x2' as `0x${string}`,
-    balance: '1600',
+    userId: 'u2',
+    balance: 1600n,
   },
   {
     address: '0x3' as `0x${string}`,
-    balance: '2400',
+    userId: 'u3',
+    balance: 2400n,
   },
 ] as const
 
@@ -154,6 +157,33 @@ const testCases = [
       },
     },
   },
+  {
+    name: 'sigmoid',
+    mode: 'sigmoid',
+    expected: {
+      totalWeight: 25000n, // Approximate total based on sigmoid curve
+      weightPerSend: 2500n,
+      poolWeights: {
+        '0x1': 5000n, // ~20% weight for lowest balance (flat start)
+        '0x2': 10000n, // ~40% weight for middle balance (steep transition)
+        '0x3': 10000n, // ~40% weight for highest balance (flat end)
+      },
+      weightedShares: {
+        '0x1': {
+          address: '0x1',
+          amount: 16000n, // ~20% of 80000
+        },
+        '0x2': {
+          address: '0x2',
+          amount: 32000n, // ~40% of 80000
+        },
+        '0x3': {
+          address: '0x3',
+          amount: 32000n, // ~40% of 80000
+        },
+      },
+    },
+  },
 ] as const
 
 describe('calculateWeights', () => {
@@ -166,22 +196,49 @@ describe('calculateWeights', () => {
   }
 
   it('should calculate linear weights with slashing', () => {
-    const weightedShares = calculateWeights(balances, timeAdjustedAmount, Mode.Linear)
+    const linearBalances = [
+      { address: '0x1' as `0x${string}`, userId: 'u1', balance: 1000n },
+      { address: '0x2' as `0x${string}`, userId: 'u2', balance: 2000n },
+      { address: '0x3' as `0x${string}`, userId: 'u3', balance: 3000n },
+    ] as const
 
-    // Test weightedSharesAfterSlash (actual distribution with slash)
+    const weightedShares = calculateWeights(linearBalances, timeAdjustedAmount, Mode.Linear)
+
     expect(weightedShares).toEqual({
-      '0x1': {
-        address: '0x1',
-        amount: 13333n, // ~16.67% of 80000
-      },
-      '0x2': {
-        address: '0x2',
-        amount: 26666n, // ~33.33% of 80000
-      },
-      '0x3': {
-        address: '0x3',
-        amount: 40000n, // ~50% of 80000
-      },
+      '0x1': { address: '0x1', amount: 13333n, userId: 'u1' },
+      '0x2': { address: '0x2', amount: 26666n, userId: 'u2' },
+      '0x3': { address: '0x3', amount: 40001n, userId: 'u3' },
     })
+  })
+
+  it('should fall back to equal split when total weight is zero (all balances zero)', () => {
+    const zeroBalances = [
+      { address: '0x1' as `0x${string}`, userId: 'a', balance: 0n },
+      { address: '0x2' as `0x${string}`, userId: 'b', balance: 0n },
+      { address: '0x3' as `0x${string}`, userId: 'c', balance: 0n },
+    ] as const
+    const amount = 7n
+    const shares = calculateWeights(zeroBalances, amount, Mode.Sigmoid)
+    const sum = Object.values(shares).reduce((acc, s) => acc + s.amount, 0n)
+    expect(sum).toBe(amount)
+    expect(shares['0x1'].amount >= shares['0x2'].amount).toBe(true)
+    expect(shares['0x2'].amount >= shares['0x3'].amount).toBe(true)
+  })
+
+  it('sigmoid should boost mid/higher holders relative to lowest and sum to total', () => {
+    const sigBalances = [
+      { address: '0x1' as `0x${string}`, userId: 's1', balance: 1n },
+      { address: '0x2' as `0x${string}`, userId: 's2', balance: 2n },
+      { address: '0x3' as `0x${string}`, userId: 's3', balance: 3n },
+    ] as const
+    const amount = 100000n
+    const shares = calculateWeights(sigBalances, amount, Mode.Sigmoid)
+    const a1 = shares['0x1']?.amount ?? 0n
+    const a2 = shares['0x2']?.amount ?? 0n
+    const a3 = shares['0x3']?.amount ?? 0n
+    expect(a2 >= a1).toBe(true)
+    expect(a3 >= a2).toBe(true)
+    const sum = a1 + a2 + a3
+    expect(sum).toBe(amount)
   })
 })

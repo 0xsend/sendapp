@@ -463,7 +463,7 @@ export class DistributorV2Worker {
     const initialWeightedShares = calculateWeights(
       initialSlashedBalances,
       timeAdjustedAmount,
-      Mode.EaseInOut
+      Mode.Sigmoid
     )
 
     initialHodlerShares = initialSlashedBalances.map(({ address, userId }) => ({
@@ -714,7 +714,7 @@ export class DistributorV2Worker {
       }
 
       // Calculate weighted shares
-      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.EaseInOut)
+      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.Sigmoid)
 
       hodlerShares = slashedBalances.map(({ address, userId }) => ({
         address,
