@@ -193,7 +193,7 @@ const TokenDetailsBalance = ({
           color={'$color12'}
         >
           {isPriceHidden
-            ? '//////'
+            ? '******'
             : isLoadingTokenPrices || mainUSDBalance === undefined
               ? ''
               : `$${formatAmount(mainUSDBalance, 9, 2)}`}
@@ -205,7 +205,7 @@ const TokenDetailsBalance = ({
       {/* USD delta under main balance */}
       {!isStableCoin && !isLoadingMarketData && changePercent24h !== null ? (
         <Paragraph color={'$color10'} fontWeight={'400'} size={'$5'}>
-          {`${isPriceHidden ? '///////' : `${sign}$${formattedDeltaUSD} today`}`}
+          {`${isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD} today`}`}
         </Paragraph>
       ) : null}
     </YStack>
