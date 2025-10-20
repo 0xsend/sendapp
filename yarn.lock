@@ -36154,6 +36154,7 @@ __metadata:
   resolution: "workers@workspace:apps/workers"
   dependencies:
     "@my/supabase": "workspace:*"
+    "@my/temporal": "workspace:*"
     "@my/wagmi": "workspace:*"
     "@my/workflows": "workspace:*"
     "@supabase/supabase-js": "npm:^2.49.8"

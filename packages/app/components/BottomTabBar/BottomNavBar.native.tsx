@@ -1,20 +1,11 @@
-import { IconArrowUp, IconDeviceReset, IconHome, IconSwap } from 'app/components/icons'
+import { IconArrowUp, IconChart, IconClock, IconHome } from 'app/components/icons'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
-import { useEffect, useRef, memo } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 import { BottomNavBarContent } from 'app/components/BottomTabBar/BottomNavBarContent'
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
-import type { IconProps } from '@tamagui/helpers-icon'
-import { View } from 'react-native'
-
-const IconSwapHorizontal = memo<IconProps>((props) => (
-  <View style={{ transform: [{ rotate: '90deg' }] }}>
-    <IconSwap {...props} />
-  </View>
-))
-IconSwapHorizontal.displayName = 'IconSwapHorizontal'
 
 const TABS = [
   {
@@ -28,12 +19,12 @@ const TABS = [
     key: 'send/index',
   },
   {
-    Icon: IconSwapHorizontal,
+    Icon: IconChart,
     href: '/(tabs)/trade',
     key: 'trade/index',
   },
   {
-    Icon: IconDeviceReset,
+    Icon: IconClock,
     href: '/(tabs)/activity',
     key: 'activity/index',
   },

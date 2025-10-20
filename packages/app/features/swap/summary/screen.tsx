@@ -15,17 +15,21 @@ import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEFAULT_SLIPPAGE, SWAP_ROUTE_SUMMARY_QUERY_KEY } from 'app/features/swap/constants'
+import { getPriceImpactAnalysis, getPriceImpactColor } from 'app/features/swap/utils/priceImpact'
 import { baseMainnet } from '@my/wagmi'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { toNiceError } from 'app/utils/toNiceError'
 import { Platform } from 'react-native'
 import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
   const [swapParams] = useSwapScreenParams()
   const { isLoading: isLoadingCoins } = useCoins()
+  const { resolvedTheme } = useThemeSetting()
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
   const { outToken, inToken, inAmount, slippage } = swapParams
   const { coin: outCoin } = useCoin(outToken)
   const { coin: inCoin } = useCoin(inToken)
@@ -84,6 +88,8 @@ export const SwapSummaryScreen = () => {
     12,
     outCoin?.formatDecimals
   )
+
+  const priceImpact = getPriceImpactAnalysis(routeSummary)
 
   const initLoading =
     isLoadingCoins || isSendAccountLoading || isEncodeRouteLoading || isLoadingUserOp
@@ -278,6 +284,20 @@ export const SwapSummaryScreen = () => {
                 })()}
               />
               <Row label={'Send Fee'} value={'0.75%'} />
+              {priceImpact && (
+                <Row
+                  testID={'priceImpact'}
+                  label={'Price Impact'}
+                  value={
+                    <Paragraph
+                      size={'$5'}
+                      color={getPriceImpactColor(priceImpact.level, isDarkTheme)}
+                    >
+                      {priceImpact.formatted}
+                    </Paragraph>
+                  }
+                />
+              )}
               <Row
                 testID={'slippage'}
                 label={'Max Slippage'}

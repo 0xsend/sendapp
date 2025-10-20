@@ -5,6 +5,9 @@ import type { createDepositActivities } from './activities'
 
 const activities = proxyActivities<ReturnType<typeof createDepositActivities>>({
   startToCloseTimeout: '10 minutes', // Increased timeout for potentially longer indexing/referral steps
+  retry: {
+    maximumAttempts: 20,
+  },
 })
 
 interface DepositWorkflowInput {
