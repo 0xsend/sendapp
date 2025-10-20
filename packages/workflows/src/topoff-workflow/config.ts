@@ -9,12 +9,17 @@ export interface AccountConfig {
 }
 
 /**
+ * Bundler address for self-transaction (restart)
+ */
+export const BUNDLER_ADDRESS: Address = '0x9d1478044F781Ca722ff257e70D05e4Ad673f443'
+
+/**
  * Configuration for all accounts that need automated top-offs
  * Runs every 15 minutes to check and top off balances
  */
 export const TOPOFF_ACCOUNTS: AccountConfig[] = [
   {
-    address: '0x9d1478044F781Ca722ff257e70D05e4Ad673f443',
+    address: BUNDLER_ADDRESS,
     name: 'Bundler',
     type: 'eth_transfer', // Bundler is just an EOA so that's why its an eth_transfer
     minThreshold: parseEther('0.10'),
@@ -42,12 +47,6 @@ export const TOPOFF_ACCOUNTS: AccountConfig[] = [
     targetBalance: parseUnits('100', 6), // 100 USDC
   },
 ]
-
-/**
- * Bundler address for self-transaction (restart)
- */
-export const BUNDLER_ADDRESS: Address = '0x9d1478044F781Ca722ff257e70D05e4Ad673f443'
-
 /**
  * Schedule interval (cron expression for every 15 minutes)
  */

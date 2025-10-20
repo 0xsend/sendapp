@@ -1,17 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import type { Address, Hex } from 'viem'
 import { parseEther, parseUnits } from 'viem'
-import {
-  calculateTotalETHNeeded,
-  calculateTotalUSDCNeeded,
-  checkAndTopOffAccount,
-  checkEthBalance,
-  checkFundingWalletEthBalance,
-  checkPaymasterDeposit,
-  checkUSDCBalance,
-  checkUsdcBalanceOf,
-  sendUsdc,
-} from './activities'
+import { createTopoffActivities } from './activities'
 import type { AccountConfig } from './config'
 
 // Mock dependencies
@@ -68,11 +58,17 @@ const mockedFetch = global.fetch as jest.MockedFunction<typeof fetch>
 describe('Top-Off Workflow Activities', () => {
   const mockFundingPrivateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
+  let activities: ReturnType<typeof createTopoffActivities>
+
   beforeEach(() => {
     jest.clearAllMocks()
     process.env.FUNDING_TOPOFF_PRIVATE_KEY = mockFundingPrivateKey
     process.env.NEXT_PUBLIC_KYBER_SWAP_BASE_URL = 'https://aggregator-api.kyberswap.com'
     process.env.NEXT_PUBLIC_KYBER_CLIENT_ID = 'test-client'
+
+    activities = createTopoffActivities({
+      FUNDING_TOPOFF_PRIVATE_KEY: mockFundingPrivateKey,
+    })
   })
 
   describe('checkEthBalance', () => {
@@ -82,7 +78,7 @@ describe('Top-Off Workflow Activities', () => {
 
       mockedBaseMainnetClient.getBalance.mockResolvedValueOnce(mockBalance)
 
-      const balance = await checkEthBalance(mockAddress)
+      const balance = await activities.checkEthBalance(mockAddress)
 
       expect(balance).toBe(mockBalance)
       expect(mockedBaseMainnetClient.getBalance).toHaveBeenCalledWith({ address: mockAddress })
@@ -95,7 +91,7 @@ describe('Top-Off Workflow Activities', () => {
 
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(mockDeposit)
 
-      const balance = await checkPaymasterDeposit(tokenPaymasterAddress[8453])
+      const balance = await activities.checkPaymasterDeposit(tokenPaymasterAddress[8453])
 
       expect(balance).toBe(mockDeposit)
       expect(mockedBaseMainnetClient.readContract).toHaveBeenCalledWith({
@@ -110,7 +106,7 @@ describe('Top-Off Workflow Activities', () => {
 
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(mockDeposit)
 
-      const balance = await checkPaymasterDeposit(sendVerifyingPaymasterAddress[8453])
+      const balance = await activities.checkPaymasterDeposit(sendVerifyingPaymasterAddress[8453])
 
       expect(balance).toBe(mockDeposit)
       expect(mockedBaseMainnetClient.readContract).toHaveBeenCalledWith({
@@ -123,7 +119,7 @@ describe('Top-Off Workflow Activities', () => {
     it('should throw error for unknown paymaster address', async () => {
       const unknownAddress = '0x0000000000000000000000000000000000000000' as Address
 
-      await expect(checkPaymasterDeposit(unknownAddress)).rejects.toThrow(
+      await expect(activities.checkPaymasterDeposit(unknownAddress)).rejects.toThrow(
         'Unknown paymaster address'
       )
     })
@@ -135,7 +131,7 @@ describe('Top-Off Workflow Activities', () => {
 
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(mockBalance)
 
-      const balance = await checkUSDCBalance()
+      const balance = await activities.checkUSDCBalance()
 
       expect(balance).toBe(mockBalance)
       expect(mockedBaseMainnetClient.readContract).toHaveBeenCalledWith({
@@ -154,7 +150,7 @@ describe('Top-Off Workflow Activities', () => {
 
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(mockBalance)
 
-      const balance = await checkUsdcBalanceOf(testAddress)
+      const balance = await activities.checkUsdcBalanceOf(testAddress)
 
       expect(balance).toBe(mockBalance)
       expect(mockedBaseMainnetClient.readContract).toHaveBeenCalledWith({
@@ -181,7 +177,7 @@ describe('Top-Off Workflow Activities', () => {
         blockNumber: 123n,
       } as never)
 
-      const txHash = await sendUsdc(toAddress, amount)
+      const txHash = await activities.sendUsdc(toAddress, amount)
 
       expect(txHash).toBe(mockTxHash)
       expect(mockWalletClient.writeContract).toHaveBeenCalledWith({
@@ -223,7 +219,7 @@ describe('Top-Off Workflow Activities', () => {
       mockedBaseMainnetClient.getBalance.mockResolvedValueOnce(parseEther('0.3')) // Account 1
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(parseEther('0.05')) // Account 2
 
-      const totalNeeded = await calculateTotalETHNeeded(mockConfigs)
+      const totalNeeded = await activities.calculateTotalETHNeeded(mockConfigs)
 
       // Account 1 needs: 2 - 0.3 = 1.7 ETH
       // Account 2 needs: 1 - 0.05 = 0.95 ETH
@@ -247,7 +243,7 @@ describe('Top-Off Workflow Activities', () => {
       // Mock balance above threshold
       mockedBaseMainnetClient.getBalance.mockResolvedValueOnce(parseEther('1'))
 
-      const totalNeeded = await calculateTotalETHNeeded(mockConfigs)
+      const totalNeeded = await activities.calculateTotalETHNeeded(mockConfigs)
 
       expect(totalNeeded).toBe(0n)
     })
@@ -275,7 +271,7 @@ describe('Top-Off Workflow Activities', () => {
       // Mock USDC balance below threshold (15 USDC)
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(parseUnits('15', 6))
 
-      const totalNeeded = await calculateTotalUSDCNeeded(mockConfigs)
+      const totalNeeded = await activities.calculateTotalUSDCNeeded(mockConfigs)
 
       // Preburn needs: 100 - 15 = 85 USDC
       const expectedTotal = parseUnits('85', 6)
@@ -297,7 +293,7 @@ describe('Top-Off Workflow Activities', () => {
       // Mock balance above threshold (50 USDC)
       mockedBaseMainnetClient.readContract.mockResolvedValueOnce(parseUnits('50', 6))
 
-      const totalNeeded = await calculateTotalUSDCNeeded(mockConfigs)
+      const totalNeeded = await activities.calculateTotalUSDCNeeded(mockConfigs)
 
       expect(totalNeeded).toBe(0n)
     })
@@ -313,7 +309,7 @@ describe('Top-Off Workflow Activities', () => {
         },
       ]
 
-      const totalNeeded = await calculateTotalUSDCNeeded(mockConfigs)
+      const totalNeeded = await activities.calculateTotalUSDCNeeded(mockConfigs)
 
       expect(totalNeeded).toBe(0n)
       expect(mockedBaseMainnetClient.readContract).not.toHaveBeenCalled()
@@ -332,7 +328,7 @@ describe('Top-Off Workflow Activities', () => {
 
       mockedBaseMainnetClient.getBalance.mockResolvedValueOnce(parseEther('1'))
 
-      const result = await checkAndTopOffAccount(mockConfig)
+      const result = await activities.checkAndTopOffAccount(mockConfig)
 
       expect(result.topped).toBe(false)
       expect(result.txHash).toBeUndefined()
@@ -357,7 +353,7 @@ describe('Top-Off Workflow Activities', () => {
         blockNumber: 123n,
       } as never)
 
-      const result = await checkAndTopOffAccount(mockConfig)
+      const result = await activities.checkAndTopOffAccount(mockConfig)
 
       expect(result.topped).toBe(true)
       expect(result.txHash).toBe('0xtxhash')
@@ -388,7 +384,7 @@ describe('Top-Off Workflow Activities', () => {
         blockNumber: 123n,
       } as never)
 
-      const result = await checkAndTopOffAccount(mockConfig)
+      const result = await activities.checkAndTopOffAccount(mockConfig)
 
       expect(result.topped).toBe(true)
       expect(result.txHash).toBe('0xusdctx')
