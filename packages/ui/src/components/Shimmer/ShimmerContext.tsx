@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, type FunctionComponent } from 'react'
+import { useEffect, useState, type FunctionComponent } from 'react'
 import {
   cancelAnimation,
   ReduceMotion,
@@ -19,13 +19,21 @@ interface ShimmerContextType {
 
 const ShimmerContext = createStyledContext<ShimmerContextType>()
 
+export const useShimmer = () => {
+  const ctx = ShimmerContext.useStyledContext()
+  if (!ctx) {
+    throw new Error('useShimmer must be used within a ShimmerProvider')
+  }
+  return ctx as ShimmerContextType
+}
+
 interface ShimmerProviderProps {
   children?: React.ReactNode
   duration?: number
   gradientConfig?: GradientConfig
 }
 
-const ShimmerProvider: FunctionComponent<ShimmerProviderProps> = ({
+export const ShimmerProvider: FunctionComponent<ShimmerProviderProps> = ({
   children,
   duration = 3000,
   gradientConfig,
@@ -74,4 +82,3 @@ const ShimmerProvider: FunctionComponent<ShimmerProviderProps> = ({
     </ShimmerContext.Provider>
   )
 }
-export { ShimmerContext, ShimmerProvider }

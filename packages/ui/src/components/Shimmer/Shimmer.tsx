@@ -1,8 +1,8 @@
-import { useCallback, useContext, useDeferredValue, useEffect, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useState } from 'react'
 import { StyleSheet, type ViewStyle, type LayoutChangeEvent } from 'react-native'
 import { styled, useWindowDimensions, View } from 'tamagui'
 import Animated, { Easing, useAnimatedStyle, type EasingFunction } from 'react-native-reanimated'
-import { ShimmerContext } from './ShimmerContext'
+import { useShimmer } from './ShimmerContext'
 import { MyLinearGradient } from './LinearGradient'
 
 const LINEAR_GRADIENTS_WHITE = [
@@ -65,7 +65,7 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
     scope = 'global',
     ...rest
   }: ShimmerProps) => {
-    const shimmer = useContext(ShimmerContext)
+    const shimmer = useShimmer()
 
     const [offset, setOffset] = useState(0)
     const [componentWidth, setComponentWidth] = useState(0)
