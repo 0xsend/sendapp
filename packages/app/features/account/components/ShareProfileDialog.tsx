@@ -11,7 +11,6 @@ import {
   YStack,
 } from '@my/ui'
 import { IconSend } from 'app/components/icons'
-import { useConfirmedTags } from 'app/utils/tags'
 import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native'
@@ -28,10 +27,9 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
   onClose,
 }) {
   const { profile } = useUser()
-  const tags = useConfirmedTags()
   const toast = useAppToast()
 
-  const sendtag = useMemo(() => tags?.[0]?.name, [tags])
+  const sendtag = useMemo(() => profile?.main_tag?.name, [profile?.main_tag?.name])
   const hostname = useMemo(() => (isWeb ? window.location.hostname : 'send.app'), [])
   const profileUrl = useMemo(() => {
     if (!profile?.send_id) return ''
