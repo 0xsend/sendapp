@@ -25,7 +25,11 @@ import { byteaToHex } from 'app/utils/byteaToHex'
 export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
-  const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
+  const { data: sendAccount } = useSendAccount()
+  const {
+    query: { data: prices, isLoading: isPricesLoading },
+    enabled: isPricesEnabled,
+  } = useTokenPrices()
   const { data: distributions, isLoading: isDistributionLoading } = useDistributionShares()
 
   const [currentDistribution, pastDistributions] = useMemo(() => {
@@ -53,8 +57,9 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
     )
   }, [pastDistributions])
 
-  const { data: dropsIsClaimedResults, isLoading: isDropsClaimedLoading } =
-    useSendMerkleDropsAreClaimed(merkleDrops)
+  const {
+    query: { data: dropsIsClaimedResults, isLoading: isDropsClaimedLoading },
+  } = useSendMerkleDropsAreClaimed(merkleDrops)
 
   const currentShares = BigInt(currentDistribution?.distribution_shares?.[0]?.amount ?? 0n)
 
@@ -90,7 +95,12 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
   }, [unclaimedShares, sendPrice, currentShares])
 
   const isLoading =
-    isPricesLoading || isDistributionLoading || isDropsClaimedLoading || isPriceHiddenLoading
+    isPricesLoading ||
+    isDistributionLoading ||
+    isDropsClaimedLoading ||
+    isPriceHiddenLoading ||
+    !sendAccount ||
+    !isPricesEnabled
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
