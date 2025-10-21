@@ -36,7 +36,9 @@ const TokenBalanceItem = ({
   tokensMarketData?: MarketData
   isLoadingTokensMarketData: boolean
 }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
+  } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(
     coin,
     coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]
@@ -149,7 +151,9 @@ const TokenUSDBalance = ({
 }: {
   coin: CoinWithBalance
 }) => {
-  const { data: tokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices },
+  } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(
     coin,
     coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]

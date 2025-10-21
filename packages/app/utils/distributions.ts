@@ -411,10 +411,11 @@ export function useSendMerkleDropsAreClaimed(merkleDrops: MerkleDropClaimParams[
       }) as const
   )
 
-  return useReadContracts({
+  const enabled = contracts.length > 0
+  const query = useReadContracts({
     contracts,
     query: {
-      enabled: contracts.length > 0,
+      enabled,
       refetchInterval: Number.POSITIVE_INFINITY,
       refetchOnMount: false,
       refetchOnReconnect: false,
@@ -422,6 +423,11 @@ export function useSendMerkleDropsAreClaimed(merkleDrops: MerkleDropClaimParams[
     },
     multicallAddress: multicall3Address[baseMainnetClient.chain.id],
   })
+
+  return {
+    query,
+    enabled,
+  }
 }
 useSendMerkleDropsAreClaimed.queryKey = useSendMerkleDropsAreClaimedQueryKey
 
