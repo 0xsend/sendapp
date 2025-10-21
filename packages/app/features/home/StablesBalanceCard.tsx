@@ -22,10 +22,10 @@ import { useRootScreenParams } from 'app/routers/params'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { useThemeSetting } from 'app/provider/theme'
-import { Easing, Platform } from 'react-native'
+import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { useRef, type PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 const StablesBalanceCardHomeScreenHeader = () => {
   const [queryParams] = useRootScreenParams()
@@ -86,18 +86,13 @@ const StablesBalanceCardFooter = ({ children }: PropsWithChildren) => {
 const StablesBalanceCardBalance = () => {
   const { isPriceHidden, isPriceHiddenLoading, toggleIsPriceHidden } = useIsPriceHidden()
 
-  const { dollarBalances } = useSendAccountBalances()
+  const { dollarBalances, isLoading } = useSendAccountBalances()
   const dollarTotal = Object.entries(dollarBalances ?? {})
     .filter(([address]) =>
       stableCoins.some((coin) => coin.token.toLowerCase() === address.toLowerCase())
     )
     .reduce((total, [, balance]) => total + balance, 0)
   const formattedBalance = formatAmount(dollarTotal, 9, 0)
-
-  const lastValidDollarBalance = useRef(dollarBalances)
-  if (dollarBalances !== undefined) {
-    lastValidDollarBalance.current = dollarBalances
-  }
 
   if (isPriceHidden && !isPriceHiddenLoading) {
     return (
@@ -119,7 +114,11 @@ const StablesBalanceCardBalance = () => {
 
   return (
     <AnimatePresence>
-      {lastValidDollarBalance.current ? (
+      {isLoading ? (
+        <View w={80} h={64} o={1} zi={1}>
+          <Shimmer br={5} />
+        </View>
+      ) : (
         <BigHeading
           animateOnly={['opacity']}
           animation="fast"
@@ -137,10 +136,6 @@ const StablesBalanceCardBalance = () => {
         >
           ${formattedBalance}
         </BigHeading>
-      ) : (
-        <View w={80} h={64} o={1} zi={1}>
-          <Shimmer br={5} />
-        </View>
       )}
     </AnimatePresence>
   )

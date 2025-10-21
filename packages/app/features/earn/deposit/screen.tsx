@@ -418,7 +418,7 @@ export function DepositForm() {
   ])
 
   // use deposit vault if it exists, or the default vault for the asset
-  const baseApy = useSendEarnAPY({ vault: vault.data ?? platformVault })
+  const { query: baseApy } = useSendEarnAPY({ vault: vault.data ?? platformVault })
 
   // Memoize formatted APY to prevent unnecessary re-renders
   const formattedApy = useMemo(() => {

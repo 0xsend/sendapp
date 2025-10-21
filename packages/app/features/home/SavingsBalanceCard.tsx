@@ -10,14 +10,16 @@ import { formatUnits } from 'viem'
 import { useLink } from 'solito/link'
 import { HomeBodyCard } from './screen'
 import { usdcCoin } from 'app/data/coins'
-import { Easing, Platform } from 'react-native'
+import { Platform } from 'react-native'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
+  const { data: sendAccount } = useSendAccount()
 
   // Use the SendEarnProvider pattern
   const {
-    totalAssets: { totalCurrentValue, vaults },
+    totalAssets: { totalCurrentValue, vaults, currentAssetsQueryEnabled },
   } = useSendEarnCoin(usdcCoin)
 
   const hasExistingDeposit = totalCurrentValue > 0n
@@ -30,7 +32,10 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const linkProps = useLink({ href })
 
   // Only fetch APY if user has existing deposits
-  const { data: apyData, isLoading: isApyLoading } = useSendEarnAPY({
+  const {
+    query: { data: apyData, isLoading: isApyLoading },
+    enabled: apyEnabled,
+  } = useSendEarnAPY({
     vault: hasExistingDeposit && vaults?.[0] ? vaults[0] : undefined,
   })
 
@@ -39,7 +44,12 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
     return formatUSDCValue(totalCurrentValue)
   }, [hasExistingDeposit, totalCurrentValue])
 
-  const isLoading = (hasExistingDeposit && isApyLoading) || isPriceHiddenLoading
+  const isLoading =
+    isApyLoading ||
+    isPriceHiddenLoading ||
+    !sendAccount ||
+    !apyEnabled ||
+    !currentAssetsQueryEnabled
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
