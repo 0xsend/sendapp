@@ -44,12 +44,9 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
     return formatUSDCValue(totalCurrentValue)
   }, [hasExistingDeposit, totalCurrentValue])
 
-  const isLoading =
-    isApyLoading ||
-    isPriceHiddenLoading ||
-    !sendAccount ||
-    !apyEnabled ||
-    !currentAssetsQueryEnabled
+  const isLoading = isApyLoading || isPriceHiddenLoading || !sendAccount
+  // !apyEnabled ||
+  // !currentAssetsQueryEnabled
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
