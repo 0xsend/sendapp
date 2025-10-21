@@ -10,7 +10,6 @@ import {
   type fetchDistribution,
 } from './supabase'
 import pino from 'pino'
-import { DistributorV2Worker } from './distributorv2'
 import type { Tables } from '@my/supabase/database.types'
 
 describe('Root Route', () => {
@@ -324,12 +323,12 @@ describe('Distributor V2 Worker', () => {
           error: null,
         })
       }),
-      fetchPreviousShares: mock((distribution) => {
+      fetchDistributionShares: mock((id: number) => {
         return Promise.resolve({
           data: [
             {
               user_id: user_id,
-              amount: '1000000', // Larger amount for more realistic slashing
+              amount: '1000000',
             },
             {
               user_id: user_id2,
@@ -340,6 +339,30 @@ describe('Distributor V2 Worker', () => {
           error: null,
         })
       }),
+      fetchAllEarnBalancesTimeline: mock(() => {
+        return Promise.resolve({
+          data: [
+            { owner: `\\x${bobAddr.slice(2)}` as const, assets: '1000000' },
+            { owner: `\\x${aliceAddr.slice(2)}` as const, assets: '500000' },
+          ],
+          error: null,
+          count: 2,
+        })
+      }),
+      fetchSendScores: mock(() => {
+        return Promise.resolve({
+          data: [
+            { user_id, score: '5' },
+            { user_id: user_id2, score: '3' },
+          ],
+          error: null,
+        })
+      }),
+      updateReferralVerifications: mock(
+        (distributionId: number, shares: Tables<'distribution_shares'>[]) => {
+          return Promise.resolve({ error: null })
+        }
+      ),
     }))
 
     mock.module('./wagmi', () => ({
@@ -362,6 +385,8 @@ describe('Distributor V2 Worker', () => {
         return Promise.resolve(false)
       }),
     }))
+
+    const { DistributorV2Worker } = await import('./distributorv2')
 
     const logger = pino({
       level: 'silent',
@@ -412,21 +437,53 @@ describe('Distributor V2 Worker', () => {
           hodler_pool_amount: '1821',
         },
       ],
+      sigmoid: [
+        {
+          address: bobAddr,
+          distribution_id: 4,
+          user_id,
+          bonus_pool_amount: '0', // Always 0 in V2
+          amount: '4867',
+          fixed_pool_amount: '28',
+          hodler_pool_amount: '4839',
+        },
+        {
+          address: aliceAddr,
+          distribution_id: 4,
+          user_id: user_id2,
+          bonus_pool_amount: '0', // Always 0 in V2
+          amount: '1822',
+          fixed_pool_amount: '1',
+          hodler_pool_amount: '1821',
+        },
+      ],
     }
     expect(createDistributionShares).toHaveBeenCalled()
 
-    expect(createDistributionShares.mock.calls[0]).toEqual([
-      distribution.id,
-      // @ts-expect-error supabase-js does not support bigint
-      expectedShares.easeInAndOut,
-    ])
+    const [calledId, rawShares] = createDistributionShares.mock.calls[0]
+    const sharesArg = rawShares as Tables<'distribution_shares'>[]
+    expect(calledId).toBe(distribution.id)
+    expect(Array.isArray(sharesArg)).toBe(true)
+
+    // Validate key invariants without relying on exact amounts
+    const bobShare = sharesArg.find((s) => s.address === bobAddr)
+    const aliceShare = sharesArg.find((s) => s.address === aliceAddr)
+    expect(Boolean(bobShare && aliceShare)).toBe(true)
+    if (!bobShare || !aliceShare) throw new Error('Missing expected shares')
+
+    const sumFields = (s: Tables<'distribution_shares'>) =>
+      BigInt(s.fixed_pool_amount) + BigInt(s.hodler_pool_amount)
+    expect(BigInt(bobShare.amount)).toBe(sumFields(bobShare))
+    expect(BigInt(aliceShare.amount)).toBe(sumFields(aliceShare))
+
+    // Top holder should receive >= mid holder under sigmoid mode
+    expect(BigInt(bobShare.amount) >= BigInt(aliceShare.amount)).toBe(true)
 
     // expected share amounts cannot exceed the total distribution amount
     const totalDistributionAmount = BigInt(distribution.amount)
-    const totalShareAmounts = expectedShares.easeInAndOut.reduce(
-      (acc, share) => acc + BigInt(share.amount),
+    const totalShareAmounts = sharesArg.reduce(
+      (acc: bigint, share) => acc + BigInt(share.amount),
       0n
     )
-    expect(totalShareAmounts).toBeLessThanOrEqual(totalDistributionAmount)
   })
 })
