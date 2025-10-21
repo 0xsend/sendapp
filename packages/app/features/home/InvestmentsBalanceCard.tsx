@@ -33,7 +33,6 @@ import { formatUnits } from 'viem'
 import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { HomeBodyCard } from './screen'
 import { Platform } from 'react-native'
-import { Easing } from 'react-native-reanimated'
 import { useRouter } from 'solito/router'
 
 const InvestmentsBalanceCardContent = (props: CardProps) => {
@@ -327,7 +326,8 @@ function InvestmentsAggregate() {
 }
 
 function InvestmentsWeeklyDelta() {
-  const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
+  const { investmentCoins, isLoading: isLoadingCoins } = useCoins()
+  const coins = investmentCoins.filter((c) => c?.balance && c.balance > 0n)
   const { data: marketData, isLoading, isError } = useTokensMarketData()
   const { isPriceHidden } = useIsPriceHidden()
 
@@ -349,7 +349,7 @@ function InvestmentsWeeklyDelta() {
     }, 0)
   }, [marketData, coins])
 
-  if (isLoading) return <Shimmer w={120} h={20} br={5} />
+  if (isLoading || isLoadingCoins) return <Shimmer w={120} h={20} br={5} />
 
   if (coins.length === 0)
     return (
