@@ -52,7 +52,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
 
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
+  } = useTokenPrices()
 
   const isLoading = isLoadingProfile || isLoadingTokenPrices
 

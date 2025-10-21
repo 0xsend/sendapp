@@ -144,12 +144,16 @@ type priceSource = 'coingecko' | 'dexscreener'
 // If no argument is passed, it uses a fallback approach
 export const useTokenPrices = (
   source: priceSource = 'coingecko'
-): UseQueryResult<Record<allCoins[number]['token'], number>, Error> => {
+): {
+  query: UseQueryResult<Record<allCoins[number]['token'], number>, Error>
+  enabled: boolean
+} => {
   const pathname = usePathname()
   const isAuthRoute = pathname.startsWith('/auth')
 
+  const cgQueryEnabled = !isAuthRoute && source === 'coingecko'
   const cgQuery = useTokensMarketData<Record<(typeof allCoins)[number]['token'], number>>({
-    enabled: !isAuthRoute && source === 'coingecko',
+    enabled: cgQueryEnabled,
     select: normalizeCoingeckoPrices,
   })
 
@@ -159,12 +163,13 @@ export const useTokenPrices = (
     cgQuery.data &&
     Object.values(cgQuery.data).some((price) => price === 0 || price === null)
 
+  const dexQueryEnabled =
+    !isAuthRoute &&
+    (source === 'dexscreener' || (source === 'coingecko' && (cgQuery.isError || hasMissingPrices)))
+
   const dexQuery = useQuery<Record<(typeof allCoins)[number]['token'], number>, Error>({
     queryKey: ['tokenPrices', 'dexscreener'],
-    enabled:
-      !isAuthRoute &&
-      (source === 'dexscreener' ||
-        (source === 'coingecko' && (cgQuery.isError || hasMissingPrices))),
+    enabled: dexQueryEnabled,
     staleTime: 1000 * 60,
     queryFn: fetchDexScreenerPrices,
   })
@@ -182,10 +187,16 @@ export const useTokenPrices = (
       }
     }
     return {
-      ...cgQuery,
-      data: mergedData,
+      query: {
+        ...cgQuery,
+        data: mergedData,
+      },
+      enabled: cgQueryEnabled && dexQueryEnabled,
     }
   }
 
-  return useDex ? dexQuery : cgQuery
+  return {
+    query: useDex ? dexQuery : cgQuery,
+    enabled: useDex ? dexQueryEnabled : cgQueryEnabled,
+  }
 }

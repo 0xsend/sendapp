@@ -29,7 +29,7 @@ const CoinsContext = createContext<CoinsContextType | undefined>(undefined)
 export function CoinsProvider({ children }: { children: React.ReactNode }) {
   const { balances, isLoading: isLoadingBalances, ethQuery, tokensQuery } = useSendAccountBalances()
   // Defer any external price fetching until session is present (handled inside useTokenPrices)
-  const pricesQuery = useTokenPrices()
+  const { query: pricesQuery } = useTokenPrices()
 
   const isLoading = isLoadingBalances || pricesQuery.isLoading
 

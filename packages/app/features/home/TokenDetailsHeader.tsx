@@ -123,7 +123,9 @@ const TokenDetailsBalance = ({
   changePercent24h: number | null
   isLoadingMarketData: boolean
 }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
+  } = useTokenPrices()
   const { isPriceHidden, toggleIsPriceHidden } = useIsPriceHidden()
 
   const media = useMedia()
