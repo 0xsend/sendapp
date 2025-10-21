@@ -10,10 +10,6 @@ const CardContext = createStyledContext({
 export const CardFrame = styled(ThemeableStack, {
   name: 'Card',
   context: CardContext,
-  '$theme-dark': {
-    shadowColor: '$shadowColor',
-    shadowOpacity: 1,
-  },
   variants: {
     unstyled: {
       false: {
@@ -38,18 +34,6 @@ export const CardFrame = styled(ThemeableStack, {
         },
         '$platform-web': {
           transition: 'box-shadow 150ms ease',
-        },
-        '$theme-dark': {
-          elevation: '$0.75',
-          hoverStyle: {
-            shadowOpacity: 1,
-          },
-          pressStyle: {
-            shadowOpacity: 1,
-          },
-          focusStyle: {
-            shadowOpacity: 1,
-          },
         },
       },
     },
