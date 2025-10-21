@@ -35,7 +35,10 @@ export function useSendEarnAPY({
   vault,
 }: {
   vault: `0x${string}` | undefined
-}): UseQueryReturnType<{ baseApy: number }, Error> {
+}): {
+  query: UseQueryReturnType<{ baseApy: number }, Error>
+  enabled: boolean
+} {
   // first fetch details about the send earn vault
   const sendEarnVault = useSendEarnVault(vault)
 
@@ -44,7 +47,9 @@ export function useSendEarnAPY({
   // then fetch the underlying vault
   const underlyingVault = useUnderlyingVault(underlyingVaultAddress)
 
-  return useQuery({
+  const enabled = sendEarnVault.isSuccess && underlyingVault.isSuccess
+
+  const query: UseQueryReturnType<{ baseApy: number }, Error> = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       'sendEarnAPY',
@@ -55,7 +60,7 @@ export function useSendEarnAPY({
       },
     ] as const,
     queryKeyHashFn: hashFn,
-    enabled: sendEarnVault.isSuccess && underlyingVault.isSuccess,
+    enabled,
     staleTime: 30_000,
     queryFn: (): { baseApy: number } => {
       throwIf(sendEarnVault.error)
@@ -73,6 +78,11 @@ export function useSendEarnAPY({
       }
     },
   })
+
+  return {
+    query,
+    enabled,
+  }
 }
 
 /**
@@ -307,7 +317,7 @@ export function useVaultConvertSharesToAssets({
 }: {
   vaults: `0x${string}`[] | undefined
   shares: bigint[] | undefined
-}): UseQueryReturnType<bigint[] | undefined> {
+}): { query: UseQueryReturnType<bigint[] | undefined>; enabled: boolean } {
   const assets: UseQueryReturnType<bigint[] | undefined> = useReadContracts({
     allowFailure: false,
     contracts: vaults?.map((vault, i) => ({
@@ -319,9 +329,10 @@ export function useVaultConvertSharesToAssets({
     query: { enabled: vaults !== undefined && shares !== undefined },
   })
   log('useVaultConvertSharesToAssets', { assets, vaults, shares })
-  return useQuery({
+  const enabled = assets.isFetched
+  const query: UseQueryReturnType<bigint[] | undefined> = useQuery({
     queryKey: ['vaultConvertSharesToAssets', { assets, vaults, shares }] as const,
-    enabled: assets.isFetched,
+    enabled,
     queryFn: async ({ queryKey: [, { assets, vaults, shares }] }) => {
       throwIf(assets.error)
       assert(!!vaults, 'Vaults list is undefined')
@@ -331,6 +342,7 @@ export function useVaultConvertSharesToAssets({
       return assets.data
     },
   })
+  return { query, enabled }
 }
 
 const SendEarnCoinBalanceSchema = z.object({
@@ -389,7 +401,7 @@ export function useSendEarnCoinBalances(
     return balancesForCoin?.map((b) => b.shares)
   }, [balancesForCoin])
   // convert shares to assets
-  const assets = useVaultConvertSharesToAssets({
+  const { query: assets } = useVaultConvertSharesToAssets({
     vaults: vaultsWithBalance,
     shares,
   })
@@ -529,7 +541,7 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
     }
   }, [myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn, balance.data, split.data])
 
-  const assets = useVaultConvertSharesToAssets(vaultShares)
+  const { query: assets } = useVaultConvertSharesToAssets(vaultShares)
   log('useMyAffiliateRewards', { balance, myAffiliateVault, split, vaultShares, assets })
 
   return useQuery({
@@ -548,7 +560,7 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
           sendAccount: ReturnType<typeof useSendAccount>
           myAffiliateVault: ReturnType<typeof useMyAffiliateVault>
           balance: UseQueryReturnType<bigint | null | undefined>
-          assets: ReturnType<typeof useVaultConvertSharesToAssets>
+          assets: ReturnType<typeof useVaultConvertSharesToAssets>['query']
           vaultShares: { shares: bigint[] | undefined; vaults: `0x${string}`[] | undefined }
         },
       ]
