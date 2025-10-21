@@ -329,14 +329,20 @@ describe('Distributor V2 Worker', () => {
           data: [
             {
               user_id: user_id,
-              amount: '1000000', // Larger amount for more realistic slashing
+              amount: '2000000000000000000000', // Larger amount for more realistic slashing
             },
             {
               user_id: user_id2,
-              amount: '500000',
+              amount: '1000000000000000000000',
             },
           ],
           count: 2,
+          error: null,
+        })
+      }),
+      fetchEarnBalancesTimeline: mock(() => {
+        return Promise.resolve({
+          data: [],
           error: null,
         })
       }),
@@ -348,13 +354,13 @@ describe('Distributor V2 Worker', () => {
           {
             user_id,
             address: bobAddr,
-            balance: '1000000',
+            balance: '2000000000000000000000', // 2000 ETH in wei
           },
           // alice has half of the balance of bob
           {
             user_id: user_id2,
             address: aliceAddr,
-            balance: '500000',
+            balance: '1000000000000000000000', // 1000 ETH in wei
           },
         ])
       }),

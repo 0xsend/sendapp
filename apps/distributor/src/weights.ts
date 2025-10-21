@@ -22,70 +22,82 @@ const EASE_IN_OUT_CONFIG = {
 // Configuration for Sigmoid curve
 const SIGMOID_CONFIG = {
   // Steepness factor - higher values create steeper middle section
-  steepness: 8, // Controls how steep the middle transition is
+  steepness: 12, // Controls how steep the middle transition is
   // Center point - where the steepest part of the curve occurs
-  center: 0.6, // Balanced position - not too early, not too late
+  center: 0.5, // Middle of the steep transition range (11% to 89%)
 } as const
 
 export const PERC_DENOM = 1000000000000000000n
-
-/**
- * Calculates cumulative balance-based ranks for holders.
- * Groups holders by balance value and assigns ranks based on cumulative balance percentage.
- * This ensures holders with identical balances get the same curve position.
- *
- * @param balances Array of holder balances
- * @param totalBalance Total balance across all holders
- * @returns Map from balance value to cumulative rank (0-1 range)
- */
-function calculateCumulativeBalanceRanks(
-  balances: readonly { balance: bigint }[],
-  totalBalance: bigint
-): Map<bigint, bigint> {
-  if (totalBalance === 0n) {
-    return new Map()
-  }
-
-  // Group holders by balance value
-  const balanceGroups = new Map<bigint, { count: number; totalBalance: bigint }>()
-
-  for (const { balance } of balances) {
-    const existing = balanceGroups.get(balance)
-    if (existing) {
-      existing.count++
-      existing.totalBalance += balance
-    } else {
-      balanceGroups.set(balance, { count: 1, totalBalance: balance })
-    }
-  }
-
-  // Sort balance groups by balance value (ascending) without Number() casts
-  const sortedGroups = Array.from(balanceGroups.entries()).sort((a, b) =>
-    a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0
-  )
-
-  // Calculate cumulative ranks (1e18-scaled bigint in [0, PERC_DENOM])
-  const rankMap = new Map<bigint, bigint>()
-  let cumulativeBalance = 0n
-
-  for (const [balance, group] of sortedGroups) {
-    // Calculate the midpoint of this group's cumulative range using BigInt arithmetic
-    const groupStartCumulative = (cumulativeBalance * PERC_DENOM) / totalBalance
-    cumulativeBalance += group.totalBalance
-    const groupEndCumulative = (cumulativeBalance * PERC_DENOM) / totalBalance
-
-    // Use the midpoint as the rank for this balance group (scaled)
-    const groupMidpointScaled = (groupStartCumulative + groupEndCumulative) / 2n
-    rankMap.set(balance, groupMidpointScaled)
-  }
-
-  return rankMap
-}
 
 export function calculatePercentageWithBips(value: bigint, bips: bigint) {
   const bps = bips * PERC_DENOM
   const percentage = value * (bps / PERC_DENOM)
   return percentage / PERC_DENOM
+}
+
+/**
+ * Creates groups of identical balances and maps each balance to its rank.
+ * Balances are assumed to be sorted by balance in descending order (highest first).
+ *
+ * @param balances Array of balances sorted by balance (18 decimal bigints)
+ * @returns Object containing balance groups and rank mapping
+ */
+function createBalanceGroupsAndRanks(
+  balances: readonly {
+    address: `0x${string}`
+    userId: string
+    balance: bigint
+  }[]
+): {
+  balanceGroups: bigint[][]
+  rankMap: Map<bigint, number>
+} {
+  if (balances.length === 0) {
+    return { balanceGroups: [], rankMap: new Map() }
+  }
+
+  // Group balances by their formatted value (non-18 decimal)
+  const balanceGroups: bigint[][] = []
+  const rankMap = new Map<bigint, number>()
+
+  let currentGroup: bigint[] = []
+  let currentBalance = balances[0]?.balance
+
+  if (!currentBalance) {
+    return { balanceGroups: [], rankMap: new Map() }
+  }
+
+  for (const { balance } of balances) {
+    if (balance === currentBalance) {
+      // Same balance, add to current group
+      currentGroup.push(balance)
+    } else {
+      // Different balance, start new group
+      if (currentGroup.length > 0) {
+        balanceGroups.push([...currentGroup])
+      }
+      currentGroup = [balance]
+      currentBalance = balance
+    }
+  }
+
+  // Add the last group
+  if (currentGroup.length > 0) {
+    balanceGroups.push(currentGroup)
+  }
+
+  // Create rank mapping - each unique balance gets the index of its group as its rank
+  for (let i = 0; i < balanceGroups.length; i++) {
+    const group = balanceGroups[i]
+    if (group && group.length > 0) {
+      const groupBalance = group[0]
+      if (groupBalance !== undefined) {
+        rankMap.set(groupBalance, i)
+      }
+    }
+  }
+
+  return { balanceGroups, rankMap }
 }
 
 /**
@@ -104,19 +116,18 @@ export function calculateWeights(
   const totalBalance = balances.reduce((acc, { balance }) => acc + balance, 0n)
 
   if (mode === Mode.EaseInOut || mode === Mode.Sigmoid) {
-    // For EaseInOut and Sigmoid modes, use cumulative balance-based ranking
-    // This ensures holders with identical balances get the same curve position
-    const balanceRankMap = calculateCumulativeBalanceRanks(balances, totalBalance)
+    // Create proper ranking based on grouped identical balances
+    const { balanceGroups, rankMap } = createBalanceGroupsAndRanks(balances)
+    const n = balanceGroups.length
 
     for (const { address, balance } of balances) {
-      const cumulativeRankScaled = balanceRankMap.get(balance) ?? 0n
-      poolWeights[address] = calculateWeightByMode(
-        balance,
-        totalBalance,
-        balances.length,
-        mode,
-        cumulativeRankScaled
-      )
+      const rank = rankMap.get(balance) ?? 0
+      let rankNormalized = 0n
+      if (n > 1) {
+        // Normalize rank to 0-1 range: rank / (n-1)
+        rankNormalized = (BigInt(rank) * PERC_DENOM) / BigInt(n - 1)
+      }
+      poolWeights[address] = calculateWeightByMode(balance, totalBalance, n, mode, rankNormalized)
     }
   } else {
     // For other modes, rank doesn't matter
@@ -181,13 +192,23 @@ function handleRoundingErrors(shares: Record<string, WeightedShare>, targetAmoun
 
   const difference = targetAmount - totalDistributed // may be positive or negative
   const allShares = Object.values(shares)
+
+  if (allShares.length === 0) return
+
   let idxOfLargest = 0
   for (let i = 1; i < allShares.length; i++) {
-    if (allShares[i].amount > allShares[idxOfLargest].amount) idxOfLargest = i
+    const currentShare = allShares[i]
+    const largestShare = allShares[idxOfLargest]
+    if (currentShare && largestShare && currentShare.amount > largestShare.amount) {
+      idxOfLargest = i
+    }
   }
+
   const targetShare = allShares[idxOfLargest]
-  targetShare.amount += difference
-  if (targetShare.amount < 0n) targetShare.amount = 0n
+  if (targetShare) {
+    targetShare.amount += difference
+    if (targetShare.amount < 0n) targetShare.amount = 0n
+  }
 }
 
 function calculateWeightByMode(
@@ -195,7 +216,7 @@ function calculateWeightByMode(
   totalBalance: bigint,
   numBalances: number,
   mode: Mode,
-  rankScaled = 0n
+  rankNormalized = 0n
 ): bigint {
   switch (mode) {
     case Mode.Linear:
@@ -207,9 +228,9 @@ function calculateWeightByMode(
     case Mode.Exponential:
       return calculateExponentialWeight(balance, totalBalance, numBalances)
     case Mode.EaseInOut:
-      return calculateCubicBezierWeight(balance, rankScaled, numBalances)
+      return calculateCubicBezierWeight(balance, rankNormalized, numBalances)
     case Mode.Sigmoid:
-      return calculateSigmoidWeight(balance, rankScaled, numBalances)
+      return calculateSigmoidWeight(balance, rankNormalized, numBalances)
     default:
       throw new Error(`Unknown weight mode: ${mode}`)
   }
@@ -246,21 +267,21 @@ function calculateExponentialWeight(
  * - Middle ~60% of holders get enhanced weights
  *
  * @param balance The holder's actual balance
- * @param cumulativeRankScaled The holder's cumulative rank scaled to 1e18
+ * @param rankNormalized The holder's rank normalized to 0-1 range (scaled by 1e18)
  * @param totalHolders Total number of holders (unused in new implementation)
  * @returns The weighted balance after applying the curve multiplier
  */
 function calculateCubicBezierWeight(
   balance: bigint,
-  cumulativeRankScaled: bigint,
+  rankNormalized: bigint,
   totalHolders: number
 ): bigint {
   if (totalHolders === 0) {
     return 0n
   }
 
-  // Use cumulative rank directly (already 1e18-scaled)
-  let t_bn = cumulativeRankScaled
+  // Use normalized rank directly (already 1e18-scaled, range 0-1)
+  let t_bn = rankNormalized
   if (t_bn < 0n) t_bn = 0n
   if (t_bn > PERC_DENOM) t_bn = PERC_DENOM
   const inv_t = PERC_DENOM - t_bn
@@ -292,15 +313,16 @@ function calculateCubicBezierWeight(
 /**
  * Calculates weight using a sigmoid curve based on holder rank, using fixed-point BigInt math.
  * S-curve: flatter tails, steeper middle.
+ * The sigmoid function outputs values between 0 and 1, which are then applied as multipliers to balances.
  *
  * @param balance The holder's actual balance
- * @param cumulativeRankScaled The holder's cumulative rank scaled to 1e18
+ * @param rankNormalized The holder's rank normalized to 0-1 range (scaled by 1e18)
  * @param totalHolders Total number of holders (unused in new implementation)
  * @returns The weighted balance after applying the sigmoid multiplier
  */
 function calculateSigmoidWeight(
   balance: bigint,
-  cumulativeRankScaled: bigint,
+  rankNormalized: bigint,
   totalHolders: number
 ): bigint {
   if (totalHolders === 0) {
@@ -308,8 +330,8 @@ function calculateSigmoidWeight(
   }
 
   // y = -steepness * (x - center) ; all values scaled by PERC_DENOM
-  const centerScaled = (PERC_DENOM * 3n) / 5n // 0.6 * 1e18
-  const diff = cumulativeRankScaled - centerScaled
+  const centerScaled = (PERC_DENOM * BigInt(Math.round(SIGMOID_CONFIG.center * 100))) / 100n // 0.5 * 1e18
+  const diff = rankNormalized - centerScaled
   const yScaled = -1n * BigInt(SIGMOID_CONFIG.steepness) * diff
 
   // exp(yScaled/ONE) with fixed-point BigInt using range reduction and series
@@ -344,5 +366,9 @@ function calculateSigmoidWeight(
   const eTerm = expFixed(yScaled)
   const sigmoidScaled = (PERC_DENOM * PERC_DENOM) / (PERC_DENOM + eTerm)
 
-  return (balance * sigmoidScaled) / PERC_DENOM
+  // Ensure sigmoid output is between 0 and PERC_DENOM (0 and 1)
+  const clampedSigmoid =
+    sigmoidScaled < 0n ? 0n : sigmoidScaled > PERC_DENOM ? PERC_DENOM : sigmoidScaled
+
+  return (balance * clampedSigmoid) / PERC_DENOM
 }
