@@ -55,16 +55,9 @@ contract DeployTokenPaymasterScript is Script, Helper {
         UniswapHelperConfig memory uhc = UniswapHelperConfig({minSwapAmount: 1, slippage: 5, uniswapPoolFee: 500});
         vm.startBroadcast();
 
-        TokenPaymaster paymaster = new TokenPaymaster{salt: salt}(
-            IERC20Metadata(token),
-            IEntryPoint(entryPoint),
-            IERC20(weth),
-            ISwapRouter(uniswap),
-            tpc,
-            ohc,
-            uhc,
-            msg.sender
-        );
+        TokenPaymaster paymaster = new TokenPaymaster{
+            salt: salt
+        }(IERC20Metadata(token), IEntryPoint(entryPoint), IERC20(weth), ISwapRouter(uniswap), tpc, ohc, uhc, msg.sender);
 
         // solhint-disable no-console
         console2.log("Deployed TokenPaymaster at address: ", address(paymaster));

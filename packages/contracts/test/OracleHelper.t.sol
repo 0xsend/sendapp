@@ -246,7 +246,8 @@ contract OracleHelperTest is Test {
 
         uint256 tokenOracleDecimalPower = 10 ** tokenOracle.decimals();
         uint256 nativeOracleDecimalPower = 10 ** nativeAssetOracle.decimals();
-        uint256 expectedPrice = PRICE_DENOM * (uint256(linkUsd.answer) * nativeOracleDecimalPower)
+        uint256 expectedPrice =
+            PRICE_DENOM * (uint256(linkUsd.answer) * nativeOracleDecimalPower)
             / (uint256(ethUsd.answer) * tokenOracleDecimalPower);
         uint256 expectedTokensPerEth = 1 ether * PRICE_DENOM / expectedPrice / 10 ** (18 - token.decimals());
 
@@ -279,7 +280,8 @@ contract OracleHelperTest is Test {
 
         uint256 tokenOracleDecimalPower = 10 ** tokenOracle.decimals();
         uint256 nativeOracleDecimalPower = 10 ** nativeAssetOracle.decimals();
-        uint256 expectedPrice = PRICE_DENOM * (uint256(usdcUsd.answer) * nativeOracleDecimalPower)
+        uint256 expectedPrice =
+            PRICE_DENOM * (uint256(usdcUsd.answer) * nativeOracleDecimalPower)
             / (uint256(ethUsd.answer) * tokenOracleDecimalPower);
         uint256 expectedTokensPerEth = 1 ether * PRICE_DENOM / expectedPrice / 10 ** (18 - token.decimals());
 

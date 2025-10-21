@@ -59,9 +59,9 @@ contract VerifierTest is BaseSepoliaForkTest {
         this.createAndSelectFork();
         implementation = address(new SendVerifier{salt: 0}());
         address initOwner = address(this);
-        SendVerifierProxy proxy = new SendVerifierProxy{salt: 0}(
-            implementation, abi.encodeWithSelector(SendVerifier.init.selector, initOwner)
-        );
+        SendVerifierProxy proxy = new SendVerifierProxy{
+            salt: 0
+        }(implementation, abi.encodeWithSelector(SendVerifier.init.selector, initOwner));
         verifier = SendVerifier(address(proxy));
 
         uint8 version = 1;
