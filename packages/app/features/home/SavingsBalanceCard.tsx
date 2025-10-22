@@ -73,7 +73,7 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
             <Shimmer w={100} h={20} br={5} />
           </YStack>
         ) : (
-          <YStack>
+          <YStack gap="$3">
             <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
               {isPriceHidden ? '******' : `$${totalAssets}`}
             </Paragraph>
