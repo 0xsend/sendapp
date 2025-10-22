@@ -26,11 +26,7 @@ import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
-import { useRecentSenders } from 'app/features/send/suggestions/useRecentSenders'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
-import { useFavouriteSenders } from 'app/features/send/suggestions/useFavouriteSenders'
-import { useTodayBirthdaySenders } from 'app/features/send/suggestions/useTodayBirthdaySenders'
-import { useTopSenders } from 'app/features/send/suggestions/useTopSenders'
 import { Platform } from 'react-native'
 
 export const SendScreen = () => {
@@ -40,10 +36,6 @@ export const SendScreen = () => {
     isLoading,
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
-  const recentSendersQuery = useRecentSenders()
-  const favouriteSendersQuery = useFavouriteSenders()
-  const topSendersQuery = useTopSenders()
-  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
   const [{ search }] = useRootScreenParams()
 
   if (isLoading) return <Spinner size="large" color={'$color12'} />
@@ -61,14 +53,7 @@ export const SendScreen = () => {
           <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }}>
             <Search autoFocus={Platform.OS === 'web'} />
           </YStack>
-          {!search && (
-            <SendSuggestions
-              recentSendersQuery={recentSendersQuery}
-              favouriteSendersQuery={favouriteSendersQuery}
-              todayBirthdaySendersQuery={todayBirthdaySendersQuery}
-              topSendersQuery={topSendersQuery}
-            />
-          )}
+          {!search && <SendSuggestions />}
           <SendSearchBody />
         </YStack>
       </TagSearchProvider>

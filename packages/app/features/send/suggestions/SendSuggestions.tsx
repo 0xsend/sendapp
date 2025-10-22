@@ -6,18 +6,17 @@ import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
 } from 'app/features/send/suggestions/SendSuggestion.types'
+import { useRecentSenders } from './useRecentSenders'
+import { useFavouriteSenders } from './useFavouriteSenders'
+import { useTopSenders } from './useTopSenders'
+import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
 
-export const SendSuggestions = ({
-  recentSendersQuery,
-  favouriteSendersQuery,
-  topSendersQuery,
-  todayBirthdaySendersQuery,
-}: {
-  recentSendersQuery: SendSuggestionsQueryResult
-  favouriteSendersQuery: SendSuggestionsQueryResult
-  topSendersQuery: SendSuggestionsQueryResult
-  todayBirthdaySendersQuery: SendSuggestionsQueryResult
-}) => {
+export const SendSuggestions = () => {
+  const recentSendersQuery = useRecentSenders()
+  const favouriteSendersQuery = useFavouriteSenders()
+  const topSendersQuery = useTopSenders()
+  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
+
   return (
     <>
       <SuggestionsList query={recentSendersQuery} title={'Recent Activity'} />
