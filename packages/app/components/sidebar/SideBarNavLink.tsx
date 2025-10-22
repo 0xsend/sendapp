@@ -1,5 +1,6 @@
 import { SizableText, View, type LinkProps } from '@my/ui'
-import { Link as SolitoLink } from 'solito/link'
+// import { Link as SolitoLink } from 'solito/link'
+import Link from 'next/link'
 import type { ReactElement } from 'react'
 import { cloneElement, isValidElement } from 'react'
 import { usePathname } from 'app/utils/usePathname'
@@ -29,28 +30,26 @@ export function SideBarNavLink({
       : null
 
   return (
-    <SolitoLink href={props.disabled ? '' : href}>
-      <View>
-        <SizableText
-          fd="row"
-          fontSize={'$7'}
-          testID={`sidebar-nav-${text.toLowerCase()}`}
-          gap="$3.5"
-          display="flex"
-          alignItems="center"
-          px={'$3.5'}
-          py={'$4'}
-          br={'$4'}
-          bc={isActiveRoute ? hoverStyles.backgroundColor : 'transparent'}
-          hoverStyle={hoverStyles}
-          color={isActiveRoute ? '$color12' : '$lightGrayTextField'}
-          $theme-light={{ color: isActiveRoute ? '$color12' : '$darkGrayTextField' }}
-          {...props}
-        >
-          {renderedIcon}
-          {text}
-        </SizableText>
-      </View>
-    </SolitoLink>
+    <Link href={href}>
+      <SizableText
+        fd="row"
+        fontSize={'$7'}
+        testID={`sidebar-nav-${text.toLowerCase()}`}
+        gap="$3.5"
+        display="flex"
+        alignItems="center"
+        px={'$3.5'}
+        py={'$4'}
+        br={'$4'}
+        bc={isActiveRoute ? hoverStyles.backgroundColor : 'transparent'}
+        hoverStyle={hoverStyles}
+        color={isActiveRoute ? '$color12' : '$lightGrayTextField'}
+        $theme-light={{ color: isActiveRoute ? '$color12' : '$darkGrayTextField' }}
+        {...props}
+      >
+        {renderedIcon}
+        {text}
+      </SizableText>
+    </Link>
   )
 }
