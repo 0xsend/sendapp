@@ -36,6 +36,7 @@ export const BottomNavBarContent = ({
 
           return (
             <LinkableButton
+              prefetch
               key={tab.href}
               href={tab.href}
               chromeless

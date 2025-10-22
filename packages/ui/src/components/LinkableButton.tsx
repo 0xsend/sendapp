@@ -5,7 +5,7 @@ import { useLink, type LinkProps } from 'solito/link'
 import type { TamaguiElement } from '@tamagui/core'
 
 import { getButtonSized } from '@tamagui/get-button-sized'
-
+import { usePrefetch } from '../hooks/usePrefetch'
 const BUTTON_NAME = 'Button'
 
 const LinkableButtonFrame = styled(Button, {
@@ -88,8 +88,9 @@ const LinkableButtonFrame = styled(Button, {
 })
 
 const LinkableButton_ = forwardRef<TamaguiElement, LinkableButtonProps>(
-  ({ href, ...props }, ref) => {
+  ({ href, prefetch, ...props }, ref) => {
     const { onPress: linkOnPress, ...linkProps } = useLink({ href })
+    usePrefetch(prefetch && href?.toString())
     return (
       <LinkableButtonFrame
         ref={ref}
