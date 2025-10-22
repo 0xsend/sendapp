@@ -2,10 +2,13 @@ import { SizableText, View, type LinkProps } from '@my/ui'
 // import { Link as SolitoLink } from 'solito/link'
 import Link from 'next/link'
 import type { ReactElement } from 'react'
-import { cloneElement, isValidElement } from 'react'
+import { cloneElement, isValidElement, useEffect } from 'react'
 import { usePathname } from 'app/utils/usePathname'
+import { useRouter } from 'next/navigation'
+
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { IconProps } from '@tamagui/helpers-icon'
+import { Platform } from 'react-native'
 
 export function SideBarNavLink({
   icon,
@@ -28,6 +31,15 @@ export function SideBarNavLink({
           '$theme-light': { color: isActiveRoute ? '$color12' : '$darkGrayTextField' },
         })
       : null
+
+  if (Platform.OS === 'web') {
+    const router = useRouter()
+    useEffect(() => {
+      if (href) {
+        router.prefetch(href.toString())
+      }
+    }, [href, router])
+  }
 
   return (
     <Link href={href} prefetch>
