@@ -90,7 +90,7 @@ const LinkableButtonFrame = styled(Button, {
 const LinkableButton_ = forwardRef<TamaguiElement, LinkableButtonProps>(
   ({ href, prefetch, ...props }, ref) => {
     const { onPress: linkOnPress, ...linkProps } = useLink({ href })
-    usePrefetch(prefetch && href?.toString())
+    usePrefetch(prefetch ? href?.toString() : undefined)
     return (
       <LinkableButtonFrame
         ref={ref}
