@@ -30,7 +30,7 @@ export function SideBarNavLink({
       : null
 
   return (
-    <Link href={href}>
+    <Link href={href} prefetch>
       <SizableText
         fd="row"
         fontSize={'$7'}
