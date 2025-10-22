@@ -100,6 +100,67 @@ CREATE UNIQUE INDEX "u_send_account_receives" ON "public"."send_account_receives
 CREATE OR REPLACE TRIGGER "send_account_receives_delete_activity_trigger" AFTER DELETE ON "public"."send_account_receives" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_receives_delete_activity_trigger"();
 CREATE OR REPLACE TRIGGER "send_account_receives_insert_activity_trigger" AFTER INSERT ON "public"."send_account_receives" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_receives_insert_activity_trigger"();
 
+-- Trigger: update token_balances on ETH/SEND receives (for deposits)
+-- Adds NEW.value to the recipient balance when a Send Account receives; token is NULL (native) for now.
+CREATE OR REPLACE FUNCTION public.send_account_receives_update_token_balances()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $function$
+DECLARE
+  _to_user_id uuid;
+  _to_address citext;
+  _from_is_send boolean := false;
+BEGIN
+  -- Recipient address is NEW.log_addr
+  SELECT sa.user_id
+    INTO _to_user_id
+  FROM public.send_accounts sa
+  WHERE sa.address = concat('0x', encode(NEW.log_addr, 'hex'))::citext
+    AND sa.chain_id = NEW.chain_id::int
+  LIMIT 1;
+
+  -- Sender is a Send Account? If yes, this is an internal transfer; let workflow handle it.
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.send_accounts sa
+    WHERE sa.address = concat('0x', encode(NEW.sender, 'hex'))::citext
+      AND sa.chain_id = NEW.chain_id::int
+  ) INTO _from_is_send;
+
+  -- Only update balances for deposits: recipient is a Send Account, sender is NOT a Send Account
+  IF _to_user_id IS NOT NULL AND NOT _from_is_send THEN
+    _to_address := concat('0x', encode(NEW.log_addr, 'hex'))::citext;
+
+    INSERT INTO public.token_balances (user_id, address, chain_id, token, balance, updated_at)
+    VALUES (
+      _to_user_id,
+      _to_address,
+      NEW.chain_id::int,
+      NULL,
+      NEW.value,
+      to_timestamp(NEW.block_time) at time zone 'UTC'
+    )
+    ON CONFLICT (user_id, token_key)
+    DO UPDATE SET
+      balance    = public.token_balances.balance + EXCLUDED.balance,
+      address    = EXCLUDED.address,
+      chain_id   = EXCLUDED.chain_id,
+      updated_at = EXCLUDED.updated_at;
+  END IF;
+
+  RETURN NEW;
+END;
+$function$;
+
+ALTER FUNCTION public.send_account_receives_update_token_balances() OWNER TO postgres;
+
+CREATE OR REPLACE TRIGGER send_account_receives_trigger_update_token_balances
+AFTER INSERT ON public.send_account_receives
+FOR EACH ROW
+EXECUTE FUNCTION public.send_account_receives_update_token_balances();
+
 -- RLS
 ALTER TABLE "public"."send_account_receives" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_receives" FOR SELECT USING (((("lower"("concat"('0x', "encode"("sender", 'hex'::text))))::citext OPERATOR(=) ANY ( SELECT "send_accounts"."address"
