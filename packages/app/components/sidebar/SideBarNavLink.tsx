@@ -37,7 +37,9 @@ export function SideBarNavLink({
       py={'$4'}
       br={'$4'}
       bc={isActiveRoute ? hoverStyles.backgroundColor : 'transparent'}
-      hoverStyle={hoverStyles}
+      hoverStyle={{
+        bg: hoverStyles.backgroundColor,
+      }}
       color={isActiveRoute ? '$color12' : '$lightGrayTextField'}
       $theme-light={{ color: isActiveRoute ? '$color12' : '$darkGrayTextField' }}
       {...props}
