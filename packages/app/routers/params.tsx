@@ -90,7 +90,23 @@ const useToken = () => {
 }
 
 const useSearch = () => {
-  const [search, setSearchParam] = useRootParam('search')
+  const [search, setSearchParam] = useRootParam('search', {
+    initial: undefined,
+    parse: (value) => {
+      if (value === undefined) return undefined
+      const searchValue = Array.isArray(value) ? value[0] : value
+      if (!searchValue) return undefined
+
+      // Filter out any characters that are not letters, numbers, or underscores
+      const filteredValue = searchValue.replace(/[^a-zA-Z0-9_]/g, '')
+      return filteredValue || undefined
+    },
+    stringify: (value) => {
+      if (!value) return ''
+      // Ensure the value is filtered when stringifying to URL
+      return value.replace(/[^a-zA-Z0-9_]/g, '')
+    },
+  })
 
   return [search, setSearchParam] as const
 }
