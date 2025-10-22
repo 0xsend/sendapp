@@ -620,10 +620,10 @@ ALTER TABLE "public"."send_earn_withdraw" ENABLE ROW LEVEL SECURITY;
 -- Policies
 CREATE POLICY "send_earn_create viewable by authenticated users" ON "public"."send_earn_create" FOR SELECT TO "authenticated" USING (true);
 CREATE POLICY "send_earn_new_affiliate viewable by authenticated users" ON "public"."send_earn_new_affiliate" FOR SELECT TO "authenticated" USING (true);
-CREATE POLICY "users can see their own send_earn_deposit" ON "public"."send_earn_deposit" FOR SELECT USING ((("lower"("concat"('0x', "encode"("owner", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
+CREATE POLICY "users can see their own send_earn_deposit" ON "public"."send_earn_deposit" FOR SELECT USING (("owner" = ANY ( SELECT "send_accounts"."address_bytes"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
-CREATE POLICY "users can see their own send_earn_withdraw" ON "public"."send_earn_withdraw" FOR SELECT USING ((("lower"("concat"('0x', "encode"("owner", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
+CREATE POLICY "users can see their own send_earn_withdraw" ON "public"."send_earn_withdraw" FOR SELECT USING (("owner" = ANY ( SELECT "send_accounts"."address_bytes"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 

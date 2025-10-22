@@ -38,8 +38,21 @@ type Override = {
       file_size_limit?: string;
       allowed_mime_types?: string;
       owner_id?: string;
+      type?: string;
       objects?: string;
       prefixes?: string;
+    };
+  }
+  buckets_analytics?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      type?: string;
+      format?: string;
+      created_at?: string;
+      updated_at?: string;
+      iceberg_namespaces?: string;
+      iceberg_tables?: string;
     };
   }
   canton_party_verifications?: {
@@ -162,6 +175,32 @@ type Override = {
       request_id?: string;
     };
   }
+  iceberg_namespaces?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      bucket_id?: string;
+      name?: string;
+      created_at?: string;
+      updated_at?: string;
+      buckets_analytics?: string;
+      iceberg_tables?: string;
+    };
+  }
+  iceberg_tables?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      namespace_id?: string;
+      bucket_id?: string;
+      name?: string;
+      location?: string;
+      created_at?: string;
+      updated_at?: string;
+      buckets_analytics?: string;
+      iceberg_namespaces?: string;
+    };
+  }
   leaderboard_referrals_all_time?: {
     name?: string;
     fields?: {
@@ -200,6 +239,61 @@ type Override = {
     fields?: {
       version?: string;
       inserted_at?: string;
+    };
+  }
+  oauth_authorizations?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      authorization_id?: string;
+      client_id?: string;
+      user_id?: string;
+      redirect_uri?: string;
+      scope?: string;
+      state?: string;
+      resource?: string;
+      code_challenge?: string;
+      code_challenge_method?: string;
+      response_type?: string;
+      status?: string;
+      authorization_code?: string;
+      created_at?: string;
+      expires_at?: string;
+      approved_at?: string;
+      oauth_clients?: string;
+      users?: string;
+    };
+  }
+  oauth_clients?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      client_secret_hash?: string;
+      registration_type?: string;
+      redirect_uris?: string;
+      grant_types?: string;
+      client_name?: string;
+      client_uri?: string;
+      logo_uri?: string;
+      created_at?: string;
+      updated_at?: string;
+      deleted_at?: string;
+      client_type?: string;
+      oauth_authorizations?: string;
+      oauth_consents?: string;
+    };
+  }
+  oauth_consents?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      client_id?: string;
+      scopes?: string;
+      granted_at?: string;
+      revoked_at?: string;
+      oauth_clients?: string;
+      users?: string;
     };
   }
   objects?: {
@@ -427,6 +521,7 @@ type Override = {
       updated_at?: string;
       deleted_at?: string;
       main_tag_id?: string;
+      address_bytes?: string;
       users?: string;
       tags?: string;
       send_account_credentials?: string;
@@ -716,6 +811,8 @@ type Override = {
       private_only?: string;
       migrations_ran?: string;
       broadcast_adapter?: string;
+      max_presence_events_per_second?: string;
+      max_payload_size_in_kb?: string;
       extensions?: string;
     };
   }
@@ -757,6 +854,8 @@ type Override = {
       is_sso_user?: string;
       deleted_at?: string;
       is_anonymous?: string;
+      oauth_authorizations?: string;
+      oauth_consents?: string;
       leaderboard_referrals_all_time?: string;
       canton_party_verifications?: string;
       chain_addresses?: string;
@@ -824,6 +923,12 @@ export interface Fingerprint {
     fileSizeLimit?: FingerprintNumberField;
     objects?: FingerprintRelationField;
     prefixes?: FingerprintRelationField;
+  }
+  bucketsAnalytics?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    icebergNamespacesByBucketId?: FingerprintRelationField;
+    icebergTablesByBucketId?: FingerprintRelationField;
   }
   cantonPartyVerifications?: {
     createdAt?: FingerprintDateField;
@@ -903,6 +1008,18 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     requestId?: FingerprintNumberField;
   }
+  icebergNamespaces?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    bucket?: FingerprintRelationField;
+    icebergTablesByNamespaceId?: FingerprintRelationField;
+  }
+  icebergTables?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    bucket?: FingerprintRelationField;
+    namespace?: FingerprintRelationField;
+  }
   leaderboardReferralsAllTimes?: {
     referrals?: FingerprintNumberField;
     rewardsUsdc?: FingerprintNumberField;
@@ -921,6 +1038,26 @@ export interface Fingerprint {
   }
   migrations?: {
     insertedAt?: FingerprintDateField;
+  }
+  oauthAuthorizations?: {
+    createdAt?: FingerprintDateField;
+    expiresAt?: FingerprintDateField;
+    approvedAt?: FingerprintDateField;
+    client?: FingerprintRelationField;
+    user?: FingerprintRelationField;
+  }
+  oauthClients?: {
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    deletedAt?: FingerprintDateField;
+    oauthAuthorizationsByClientId?: FingerprintRelationField;
+    oauthConsentsByClientId?: FingerprintRelationField;
+  }
+  oauthConsents?: {
+    grantedAt?: FingerprintDateField;
+    revokedAt?: FingerprintDateField;
+    client?: FingerprintRelationField;
+    user?: FingerprintRelationField;
   }
   objects?: {
     createdAt?: FingerprintDateField;
@@ -1185,6 +1322,8 @@ export interface Fingerprint {
     maxJoinsPerSecond?: FingerprintNumberField;
     jwtJwks?: FingerprintJsonField;
     migrationsRan?: FingerprintNumberField;
+    maxPresenceEventsPerSecond?: FingerprintNumberField;
+    maxPayloadSizeInKb?: FingerprintNumberField;
     extensions?: FingerprintRelationField;
   }
   users?: {
@@ -1205,6 +1344,8 @@ export interface Fingerprint {
     bannedUntil?: FingerprintDateField;
     reauthenticationSentAt?: FingerprintDateField;
     deletedAt?: FingerprintDateField;
+    oauthAuthorizations?: FingerprintRelationField;
+    oauthConsents?: FingerprintRelationField;
     leaderboardReferralsAllTimes?: FingerprintRelationField;
     cantonPartyVerifications?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;

@@ -25,9 +25,13 @@ user_earn_balances AS (
         COALESCE(MAX(seb.assets), 0) AS earn_balance
     FROM send_accounts sa
     JOIN user_scores us ON us.user_id = sa.user_id
-    INNER JOIN send_earn_balances seb ON (
-        decode(replace(sa.address::text, '0x', ''), 'hex') = seb.owner
-    )
+    LEFT JOIN (
+        SELECT
+            owner,
+            SUM(assets) AS assets
+        FROM send_earn_balances
+        GROUP BY owner
+    ) seb ON sa.address_bytes = seb.owner
     GROUP BY sa.user_id
 ),
 valid_users AS (

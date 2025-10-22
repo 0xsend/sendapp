@@ -52,7 +52,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
 
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
+  } = useTokenPrices()
 
   const isLoading = isLoadingProfile || isLoadingTokenPrices
 
@@ -169,6 +171,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             </XStack>
             <XStack gap="$2" flexWrap="wrap" w="100%">
               {otherUserProfile?.all_tags?.map((tag) => {
+                const isMainTag = tag === otherUserProfile?.main_tag_name
                 return (
                   <XStack
                     key={tag}
@@ -177,6 +180,13 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                     bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
                     borderRadius={4}
                     alignSelf="flex-start"
+                    {...(isMainTag && {
+                      borderWidth: 1,
+                    })}
+                    borderColor={isMainTag ? '$primary' : 'transparent'}
+                    $theme-light={{
+                      borderColor: isMainTag ? '$color12' : 'transparent',
+                    }}
                   >
                     <Paragraph color="$color12" fontSize="$3" fontWeight="400">
                       /{tag}

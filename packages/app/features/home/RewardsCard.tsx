@@ -1,4 +1,4 @@
-import { Card, type CardProps, Paragraph, Spinner, XStack } from '@my/ui'
+import { Card, type CardProps, Paragraph, Shimmer, XStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useMemo } from 'react'
@@ -9,6 +9,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useQuery } from '@tanstack/react-query'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { Easing } from 'react-native-reanimated'
 import {
   baseMainnetClient,
   type sendMerkleDropAddress,
@@ -23,8 +24,12 @@ import { byteaToHex } from 'app/utils/byteaToHex'
 
 export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
-  const { isPriceHidden } = useIsPriceHidden()
-  const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
+  const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
+  const { data: sendAccount } = useSendAccount()
+  const {
+    query: { data: prices, isLoading: isPricesLoading },
+    enabled: isPricesEnabled,
+  } = useTokenPrices()
   const { data: distributions, isLoading: isDistributionLoading } = useDistributionShares()
 
   const [currentDistribution, pastDistributions] = useMemo(() => {
@@ -52,8 +57,9 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
     )
   }, [pastDistributions])
 
-  const { data: dropsIsClaimedResults, isLoading: isDropsClaimedLoading } =
-    useSendMerkleDropsAreClaimed(merkleDrops)
+  const {
+    query: { data: dropsIsClaimedResults, isLoading: isDropsClaimedLoading },
+  } = useSendMerkleDropsAreClaimed(merkleDrops)
 
   const currentShares = BigInt(currentDistribution?.distribution_shares?.[0]?.amount ?? 0n)
 
@@ -88,7 +94,13 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
     return totalValue > 1 ? formatAmount(totalValue, 3, 0) : formatAmount(totalValue, 1, 2)
   }, [unclaimedShares, sendPrice, currentShares])
 
-  const isLoading = isPricesLoading || isDistributionLoading || isDropsClaimedLoading
+  const isLoading =
+    isPricesLoading ||
+    isDistributionLoading ||
+    isDropsClaimedLoading ||
+    isPriceHiddenLoading ||
+    !sendAccount ||
+    !isPricesEnabled
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
@@ -112,10 +124,10 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
         <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
           {(() => {
             switch (true) {
-              case isPriceHidden:
-                return '///////'
               case isLoading:
-                return <Spinner size={'large'} color={'$color12'} />
+                return <Shimmer w={80} h={34} br={5} />
+              case isPriceHidden:
+                return '******'
               default:
                 return `$${totalRewardsValue}`
             }

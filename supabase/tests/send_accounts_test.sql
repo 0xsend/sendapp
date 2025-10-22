@@ -281,7 +281,8 @@ SELECT throws_ok(
             NULL, -- main_tag_id
             now(),
             now(),
-            NULL
+            NULL, -- deleted_at
+            '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea  -- address_bytes
           )::send_accounts
         ),
         tests.new_webauthn_credential(),

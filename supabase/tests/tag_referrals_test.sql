@@ -34,10 +34,10 @@ VALUES (
     'https://example.com/bob2.jpg',
     true
 )
-ON CONFLICT (id) DO UPDATE SET 
-    name = EXCLUDED.name, 
-    about = EXCLUDED.about, 
-    avatar_url = EXCLUDED.avatar_url, 
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    about = EXCLUDED.about,
+    avatar_url = EXCLUDED.avatar_url,
     is_public = EXCLUDED.is_public;
 
 -- Clean up any existing tags from previous test runs to avoid conflicts
@@ -204,7 +204,7 @@ SELECT
 -- Verify user cannot have two referrers
 SELECT
     confirm_tags('{redroses}'::citext[], (
-            SELECT id FROM send_accounts 
+            SELECT id FROM send_accounts
             WHERE user_id = tests.get_supabase_uid('alice')
         ), (
             SELECT
@@ -271,7 +271,7 @@ SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
     confirm_tags('{wonderland}'::citext[], (
-            SELECT id FROM send_accounts 
+            SELECT id FROM send_accounts
             WHERE user_id = tests.get_supabase_uid('alice')
         ), (
             SELECT
@@ -300,7 +300,7 @@ SELECT
     set_config('role', 'service_role', TRUE);
 SELECT
     confirm_tags('{whiterabbit}'::citext[], (
-            SELECT id FROM send_accounts 
+            SELECT id FROM send_accounts
             WHERE user_id = tests.get_supabase_uid('alice')
         ), (
             SELECT

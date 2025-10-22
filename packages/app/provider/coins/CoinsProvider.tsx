@@ -27,9 +27,11 @@ type CoinsContextType = {
 const CoinsContext = createContext<CoinsContextType | undefined>(undefined)
 
 export function CoinsProvider({ children }: { children: React.ReactNode }) {
-  const { balances, isLoading, ethQuery, tokensQuery } = useSendAccountBalances()
+  const { balances, isLoading: isLoadingBalances, ethQuery, tokensQuery } = useSendAccountBalances()
   // Defer any external price fetching until session is present (handled inside useTokenPrices)
-  const pricesQuery = useTokenPrices()
+  const { query: pricesQuery } = useTokenPrices()
+
+  const isLoading = isLoadingBalances || pricesQuery.isLoading
 
   const coins = useMemo(() => {
     // Create coins array regardless of balances

@@ -6,6 +6,10 @@ type Enum_auth_aal_level = 'aal1' | 'aal2' | 'aal3';
 type Enum_auth_code_challenge_method = 'plain' | 's256';
 type Enum_auth_factor_status = 'unverified' | 'verified';
 type Enum_auth_factor_type = 'phone' | 'totp' | 'webauthn';
+type Enum_auth_oauth_authorization_status = 'approved' | 'denied' | 'expired' | 'pending';
+type Enum_auth_oauth_client_type = 'confidential' | 'public';
+type Enum_auth_oauth_registration_type = 'dynamic' | 'manual';
+type Enum_auth_oauth_response_type = 'code';
 type Enum_auth_one_time_token_type = 'confirmation_token' | 'email_change_token_current' | 'email_change_token_new' | 'phone_change_token' | 'reauthentication_token' | 'recovery_token';
 type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
@@ -19,6 +23,7 @@ type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_o
 type Enum_public_verification_value_mode = 'aggregate' | 'individual';
 type Enum_realtime_action = 'DELETE' | 'ERROR' | 'INSERT' | 'TRUNCATE' | 'UPDATE';
 type Enum_realtime_equality_op = 'eq' | 'gt' | 'gte' | 'in' | 'lt' | 'lte' | 'neq';
+type Enum_storage_buckettype = 'ANALYTICS' | 'STANDARD';
 type Enum_temporal_transfer_status = 'cancelled' | 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 interface Table_net_http_response {
   id: number | null;
@@ -64,6 +69,14 @@ interface Table_storage_buckets {
   file_size_limit: number | null;
   allowed_mime_types: string[] | null;
   owner_id: string | null;
+  type: Enum_storage_buckettype;
+}
+interface Table_storage_buckets_analytics {
+  id: string;
+  type: Enum_storage_buckettype;
+  format: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_public_canton_party_verifications {
   id: string;
@@ -181,6 +194,22 @@ interface Table_net_http_request_queue {
   body: string | null;
   timeout_milliseconds: number;
 }
+interface Table_storage_iceberg_namespaces {
+  id: string;
+  bucket_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_storage_iceberg_tables {
+  id: string;
+  namespace_id: string;
+  bucket_id: string;
+  name: string;
+  location: string;
+  created_at: string;
+  updated_at: string;
+}
 interface Table_auth_identities {
   provider_id: string;
   user_id: string;
@@ -281,6 +310,46 @@ interface Table_storage_migrations {
 interface Table_supabase_functions_migrations {
   version: string;
   inserted_at: string;
+}
+interface Table_auth_oauth_authorizations {
+  id: string;
+  authorization_id: string;
+  client_id: string;
+  user_id: string | null;
+  redirect_uri: string;
+  scope: string;
+  state: string | null;
+  resource: string | null;
+  code_challenge: string | null;
+  code_challenge_method: Enum_auth_code_challenge_method | null;
+  response_type: Enum_auth_oauth_response_type;
+  status: Enum_auth_oauth_authorization_status;
+  authorization_code: string | null;
+  created_at: string;
+  expires_at: string;
+  approved_at: string | null;
+}
+interface Table_auth_oauth_clients {
+  id: string;
+  client_secret_hash: string | null;
+  registration_type: Enum_auth_oauth_registration_type;
+  redirect_uris: string;
+  grant_types: string;
+  client_name: string | null;
+  client_uri: string | null;
+  logo_uri: string | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  client_type: Enum_auth_oauth_client_type;
+}
+interface Table_auth_oauth_consents {
+  id: string;
+  user_id: string;
+  client_id: string;
+  scopes: string;
+  granted_at: string;
+  revoked_at: string | null;
 }
 interface Table_storage_objects {
   id: string;
@@ -741,6 +810,7 @@ interface Table_auth_sessions {
   user_agent: string | null;
   ip: string | null;
   tag: string | null;
+  oauth_client_id: string | null;
 }
 interface Table_shovel_sources {
   name: string | null;
@@ -759,6 +829,7 @@ interface Table_auth_sso_providers {
   resource_id: string | null;
   created_at: string | null;
   updated_at: string | null;
+  disabled: boolean | null;
 }
 interface Table_realtime_subscription {
   id: number;
@@ -842,6 +913,8 @@ interface Table_realtime_tenants {
   private_only: boolean;
   migrations_ran: number | null;
   broadcast_adapter: string | null;
+  max_presence_events_per_second: number | null;
+  max_payload_size_in_kb: number | null;
 }
 interface Table_auth_users {
   instance_id: string | null;
@@ -906,6 +979,9 @@ interface Schema_auth {
   mfa_amr_claims: Table_auth_mfa_amr_claims;
   mfa_challenges: Table_auth_mfa_challenges;
   mfa_factors: Table_auth_mfa_factors;
+  oauth_authorizations: Table_auth_oauth_authorizations;
+  oauth_clients: Table_auth_oauth_clients;
+  oauth_consents: Table_auth_oauth_consents;
   one_time_tokens: Table_auth_one_time_tokens;
   refresh_tokens: Table_auth_refresh_tokens;
   saml_providers: Table_auth_saml_providers;
@@ -994,6 +1070,9 @@ interface Schema_shovel {
 }
 interface Schema_storage {
   buckets: Table_storage_buckets;
+  buckets_analytics: Table_storage_buckets_analytics;
+  iceberg_namespaces: Table_storage_iceberg_namespaces;
+  iceberg_tables: Table_storage_iceberg_tables;
   migrations: Table_storage_migrations;
   objects: Table_storage_objects;
   prefixes: Table_storage_prefixes;
@@ -1078,6 +1157,19 @@ interface Tables_relationships {
     };
     parentDestinationsTables:  | {};
     childDestinationsTables: "storage.objects" | "storage.prefixes" | "storage.s3_multipart_uploads" | "storage.s3_multipart_uploads_parts" | {};
+    
+  };
+  "storage.buckets_analytics": {
+    parent: {
+
+    };
+    children: {
+       iceberg_namespaces_bucket_id_fkey: "storage.iceberg_namespaces";
+       iceberg_tables_bucket_id_fkey: "storage.iceberg_tables";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "storage.iceberg_namespaces" | "storage.iceberg_tables" | {};
+    
   };
   "public.canton_party_verifications": {
     parent: {
@@ -1173,6 +1265,29 @@ interface Tables_relationships {
     childDestinationsTables: "auth.saml_relay_states" | {};
     
   };
+  "storage.iceberg_namespaces": {
+    parent: {
+       iceberg_namespaces_bucket_id_fkey: "storage.buckets_analytics";
+    };
+    children: {
+       iceberg_tables_namespace_id_fkey: "storage.iceberg_tables";
+    };
+    parentDestinationsTables: "storage.buckets_analytics" | {};
+    childDestinationsTables: "storage.iceberg_tables" | {};
+    
+  };
+  "storage.iceberg_tables": {
+    parent: {
+       iceberg_tables_bucket_id_fkey: "storage.buckets_analytics";
+       iceberg_tables_namespace_id_fkey: "storage.iceberg_namespaces";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "storage.buckets_analytics" | "storage.iceberg_namespaces" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "auth.identities": {
     parent: {
        identities_user_id_fkey: "auth.users";
@@ -1237,6 +1352,43 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "auth.mfa_challenges" | {};
+    
+  };
+  "auth.oauth_authorizations": {
+    parent: {
+       oauth_authorizations_client_id_fkey: "auth.oauth_clients";
+       oauth_authorizations_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.oauth_clients" | "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "auth.oauth_clients": {
+    parent: {
+
+    };
+    children: {
+       oauth_authorizations_client_id_fkey: "auth.oauth_authorizations";
+       oauth_consents_client_id_fkey: "auth.oauth_consents";
+       sessions_oauth_client_id_fkey: "auth.sessions";
+    };
+    parentDestinationsTables:  | {};
+    childDestinationsTables: "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.sessions" | {};
+    
+  };
+  "auth.oauth_consents": {
+    parent: {
+       oauth_consents_client_id_fkey: "auth.oauth_clients";
+       oauth_consents_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.oauth_clients" | "auth.users" | {};
+    childDestinationsTables:  | {};
     
   };
   "storage.objects": {
@@ -1426,13 +1578,14 @@ interface Tables_relationships {
   };
   "auth.sessions": {
     parent: {
+       sessions_oauth_client_id_fkey: "auth.oauth_clients";
        sessions_user_id_fkey: "auth.users";
     };
     children: {
        mfa_amr_claims_session_id_fkey: "auth.mfa_amr_claims";
        refresh_tokens_session_id_fkey: "auth.refresh_tokens";
     };
-    parentDestinationsTables: "auth.users" | {};
+    parentDestinationsTables: "auth.oauth_clients" | "auth.users" | {};
     childDestinationsTables: "auth.mfa_amr_claims" | "auth.refresh_tokens" | {};
     
   };
@@ -1502,6 +1655,8 @@ interface Tables_relationships {
     children: {
        identities_user_id_fkey: "auth.identities";
        mfa_factors_user_id_fkey: "auth.mfa_factors";
+       oauth_authorizations_user_id_fkey: "auth.oauth_authorizations";
+       oauth_consents_user_id_fkey: "auth.oauth_consents";
        one_time_tokens_user_id_fkey: "auth.one_time_tokens";
        sessions_user_id_fkey: "auth.sessions";
        leaderboard_referrals_all_time_user_id_fkey: "private.leaderboard_referrals_all_time";
@@ -1519,7 +1674,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {

@@ -96,7 +96,9 @@ const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
 
 const TokenBalance = ({ coin }: { coin: CoinWithBalance }) => {
   const { balance, symbol } = coin
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
+  } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(coin, symbol === 'USDC' ? 1 : tokenPrices?.[coin.token])
 
   const { isPriceHidden } = useIsPriceHidden()
@@ -114,7 +116,7 @@ const TokenBalance = ({ coin }: { coin: CoinWithBalance }) => {
           case isLoadingTokenPrices || balanceInUSD === undefined:
             return '$0.00'
           case isPriceHidden:
-            return '///////'
+            return '******'
           default:
             return `$${formatAmount(balanceInUSD, 12, 2)}`
         }

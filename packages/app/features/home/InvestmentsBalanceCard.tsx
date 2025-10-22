@@ -3,7 +3,6 @@ import {
   type CardProps,
   Paragraph,
   type ParagraphProps,
-  Spinner,
   Theme,
   ThemeableStack,
   withStaticProperties,
@@ -14,6 +13,7 @@ import {
   type ButtonProps,
   Button,
   View,
+  Shimmer,
 } from '@my/ui'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
@@ -26,7 +26,7 @@ import {
 } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { IconCoin, IconError } from 'app/components/icons'
 import { useCoins } from 'app/provider/coins'
 import { formatUnits } from 'viem'
@@ -135,16 +135,27 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
   const media = useMedia()
   const [queryParams] = useRootScreenParams()
   const isInvestmentsScreen = queryParams.token === 'investments'
-  const { isPriceHidden } = useIsPriceHidden()
-  const { dollarBalances, isLoading } = useSendAccountBalances()
+  const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
+  const { dollarBalances } = useSendAccountBalances()
 
-  const dollarTotal = Object.entries(dollarBalances ?? {})
+  /**
+   *  Why this ? to avoid ui flickering when balance is switching from undefined to defined multiple times
+   *  */
+
+  const lastValidDollarBalance = useRef(dollarBalances)
+  if (dollarBalances !== undefined) {
+    lastValidDollarBalance.current = dollarBalances
+  }
+
+  const dollarTotal = Object.entries(lastValidDollarBalance.current ?? {})
     .filter(([address]) =>
       investmentCoins.some((coin) => coin.token.toLowerCase() === address.toLowerCase())
     )
     .reduce((total, [, balance]) => total + balance, 0)
 
   const formattedBalance = formatAmount(dollarTotal, 6, 0)
+
+  const loading = isPriceHiddenLoading || !lastValidDollarBalance.current
 
   return (
     <Paragraph
@@ -156,10 +167,10 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
     >
       {(() => {
         switch (true) {
+          case loading:
+            return <Shimmer w={80} h={34} br={5} />
           case isPriceHidden:
-            return '///////'
-          case isLoading || !dollarBalances:
-            return <Spinner size={'large'} color={'$color12'} />
+            return '******'
           default:
             return `$${formattedBalance}`
         }
@@ -169,9 +180,7 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
 }
 
 function InvestmentsPreview(props: XStackProps) {
-  const { investmentCoins, isLoading } = useCoins()
-
-  if (isLoading) return <Spinner size="small" />
+  const { investmentCoins } = useCoins()
 
   // Get SEND token
   const sendCoin = investmentCoinsList.find((coin) => coin.symbol === 'SEND')
@@ -279,7 +288,7 @@ function InvestmentsAggregate() {
     return Math.round(weightedPercentage * 100) / 100
   }, [totalValue, assetValues])
 
-  if (isLoading) return <Spinner alignSelf={'flex-start'} size="small" />
+  if (isLoading) return <Shimmer w={40} h={20} br={5} />
 
   const formatted = `${aggregatePercentage > 0 ? '+' : ''}${aggregatePercentage}%`
 
@@ -317,7 +326,8 @@ function InvestmentsAggregate() {
 }
 
 function InvestmentsWeeklyDelta() {
-  const coins = useCoins().investmentCoins.filter((c) => c?.balance && c.balance > 0n)
+  const { investmentCoins, isLoading: isLoadingCoins } = useCoins()
+  const coins = investmentCoins.filter((c) => c?.balance && c.balance > 0n)
   const { data: marketData, isLoading, isError } = useTokensMarketData()
   const { isPriceHidden } = useIsPriceHidden()
 
@@ -339,7 +349,7 @@ function InvestmentsWeeklyDelta() {
     }, 0)
   }, [marketData, coins])
 
-  if (isLoading) return null
+  if (isLoading || isLoadingCoins) return <Shimmer w={120} h={20} br={5} />
 
   if (coins.length === 0)
     return (
@@ -362,7 +372,7 @@ function InvestmentsWeeklyDelta() {
   const formattedDeltaUSD = localizeAmount(Math.abs(deltaUSD).toFixed(2))
   return (
     <Paragraph color={'$color10'} fontWeight={400} size={'$5'}>
-      {isPriceHidden ? '///////' : `${sign}$${formattedDeltaUSD} this week`}
+      {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD} this week`}
     </Paragraph>
   )
 }

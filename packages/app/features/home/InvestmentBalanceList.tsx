@@ -36,7 +36,9 @@ const TokenBalanceItem = ({
   tokensMarketData?: MarketData
   isLoadingTokensMarketData: boolean
 }) => {
-  const { data: tokenPrices, isLoading: isLoadingTokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
+  } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(
     coin,
     coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]
@@ -73,7 +75,7 @@ const TokenBalanceItem = ({
             $theme-light={{ color: '$darkGrayTextField' }}
           >
             {isPriceHidden
-              ? '//////'
+              ? '******'
               : `${formatAmount(
                   (Number(coin.balance) / 10 ** coin.decimals).toString(),
                   10,
@@ -100,7 +102,7 @@ const TokenBalanceItem = ({
                   coin.balance === 0n:
                   return '---'
                 case isPriceHidden:
-                  return '///////'
+                  return '******'
                 default:
                   return `${changePercent24h >= 0 ? '+' : ''}${changePercent24h.toFixed(2)}%`
               }
@@ -149,7 +151,9 @@ const TokenUSDBalance = ({
 }: {
   coin: CoinWithBalance
 }) => {
-  const { data: tokenPrices } = useTokenPrices()
+  const {
+    query: { data: tokenPrices },
+  } = useTokenPrices()
   const balanceInUSD = convertBalanceToFiat(
     coin,
     coin.symbol === 'USDC' ? 1 : tokenPrices?.[coin.token]
@@ -159,7 +163,7 @@ const TokenUSDBalance = ({
   if (coin.balance === undefined) return <></>
   return (
     <Paragraph fontSize={'$8'} fontWeight={'500'} col="$color12" lineHeight={24}>
-      {isPriceHidden ? '//////' : `$${formatAmount(balanceInUSD, 12, 2) || 0}`}
+      {isPriceHidden ? '******' : `$${formatAmount(balanceInUSD, 12, 2) || 0}`}
     </Paragraph>
   )
 }

@@ -40,6 +40,7 @@ type SendEarnContextType = {
     shares: bigint[]
     currentAssets: UseQueryReturnType<bigint[] | undefined>
     totalCurrentValue: bigint
+    currentAssetsQueryEnabled: boolean
   }
 
   // Affiliate rewards
@@ -91,10 +92,11 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
   const vaultAssets = useUnderlyingVaultsAsset(vaultsWithBalance)
 
   // Convert all shares to current asset values
-  const allCurrentAssets = useVaultConvertSharesToAssets({
-    vaults: vaultsWithBalance,
-    shares: sharesWithBalance,
-  })
+  const { query: allCurrentAssets, enabled: allCurrentAssetsQueryEnabled } =
+    useVaultConvertSharesToAssets({
+      vaults: vaultsWithBalance,
+      shares: sharesWithBalance,
+    })
 
   // Affiliate data
   const affiliateRewards = useMyAffiliateRewards()
@@ -163,9 +165,16 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
       vaults: vaultsWithBalance,
       shares: sharesWithBalance,
       currentAssets: allCurrentAssets,
+      currentAssetsQueryEnabled: allCurrentAssetsQueryEnabled,
       totalCurrentValue,
     }),
-    [vaultsWithBalance, sharesWithBalance, allCurrentAssets, totalCurrentValue]
+    [
+      vaultsWithBalance,
+      sharesWithBalance,
+      allCurrentAssets,
+      allCurrentAssetsQueryEnabled,
+      totalCurrentValue,
+    ]
   )
 
   // Overall loading state

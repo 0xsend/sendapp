@@ -321,7 +321,7 @@ export function WithdrawForm() {
   useInitializeFormAmount(form)
 
   // use deposit vault if it exists, or the default vault for the asset
-  const baseApy = useSendEarnAPY({ vault: vault?.data ? vault.data : undefined })
+  const { query: baseApy } = useSendEarnAPY({ vault: vault?.data ? vault.data : undefined })
 
   // Memoize formatted APY to prevent unnecessary re-renders
   const formattedApy = useMemo(() => {

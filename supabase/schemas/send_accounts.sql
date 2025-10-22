@@ -1,3 +1,5 @@
+-- NOTE[verification-spec]: address_bytes added per /tmp/verification-balance-materialization-spec.md
+--   GENERATED ALWAYS AS (decode(replace(address::text,'0x',''),'hex')) STORED
 -- Table
 CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
@@ -9,7 +11,14 @@ CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
     "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "updated_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     "deleted_at" timestamp with time zone,
-    CONSTRAINT "chain_addresses_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")))
+    CONSTRAINT "chain_addresses_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext"))),
+    "address_bytes" "bytea" GENERATED ALWAYS AS (
+        CASE
+            WHEN ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")
+                THEN decode(replace(address::text,'0x',''),'hex')
+            ELSE NULL::bytea
+        END
+    ) STORED
 );
 
 ALTER TABLE "public"."send_accounts" OWNER TO "postgres";
@@ -24,6 +33,8 @@ CREATE INDEX "idx_send_accounts_address_user" ON "public"."send_accounts" USING 
 CREATE UNIQUE INDEX "send_accounts_address_key" ON "public"."send_accounts" USING "btree" ("address", "chain_id");
 CREATE INDEX "send_accounts_user_id_index" ON "public"."send_accounts" USING "btree" ("user_id");
 CREATE INDEX "idx_send_accounts_main_tag_id" ON "public"."send_accounts" USING "btree" ("main_tag_id");
+CREATE INDEX "idx_send_accounts_address_bytes" ON "public"."send_accounts" USING "btree" ( "address_bytes");
+CREATE UNIQUE INDEX "send_accounts_address_bytes_key" ON "public"."send_accounts" USING "btree" ("address_bytes", "chain_id");
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."send_accounts"

@@ -56,7 +56,7 @@ CREATE UNIQUE INDEX "u_send_account_created" ON "public"."send_account_created" 
 -- RLS
 ALTER TABLE "public"."send_account_created" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING ((("lower"("concat"('0x', "encode"("account", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "send_accounts"."address"
+CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING (("account" = ANY ( SELECT "send_accounts"."address_bytes"
    FROM "public"."send_accounts"
   WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
 

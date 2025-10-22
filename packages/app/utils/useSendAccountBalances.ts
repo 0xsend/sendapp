@@ -21,7 +21,7 @@ type BalanceOfResult =
   | undefined
 
 export const useSendAccountBalances = () => {
-  const pricesQuery = useTokenPrices()
+  const { query: pricesQuery } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
 
   const tokenContracts = useMemo(
@@ -60,7 +60,8 @@ export const useSendAccountBalances = () => {
     chainId: baseMainnet.id,
   })
 
-  const isLoading = tokensQuery.isLoading || ethQuery.isLoading
+  const isLoading =
+    tokensQuery.isLoading || ethQuery.isLoading || pricesQuery.isLoading || !sendAccount
 
   const balances = useMemo(() => {
     if (isLoading) return undefined

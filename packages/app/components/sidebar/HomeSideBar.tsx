@@ -90,7 +90,7 @@ function HomeSideBar({ ...props }: YStackProps) {
 HomeSideBar.displayName = 'HomeSideBar'
 
 const DesktopAccountMenuEntry = () => {
-  const { profile, isLoadingProfile } = useUser()
+  const { profile } = useUser()
   const hoverStyles = useHoverStyles()
   const location = usePathname()
   const parts = location.split('/').filter(Boolean)
@@ -108,9 +108,6 @@ const DesktopAccountMenuEntry = () => {
       br={'$4'}
       bw={0}
       backgroundColor={isActiveRoute ? hoverStyles.backgroundColor : 'transparent'}
-      opacity={isLoadingProfile ? 0 : 1}
-      animateOnly={['opacity']}
-      animation="200ms"
       hoverStyle={hoverStyles}
       pressStyle={hoverStyles}
       focusStyle={hoverStyles}

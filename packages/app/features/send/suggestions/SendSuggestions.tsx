@@ -6,18 +6,17 @@ import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
 } from 'app/features/send/suggestions/SendSuggestion.types'
+import { useRecentSenders } from './useRecentSenders'
+import { useFavouriteSenders } from './useFavouriteSenders'
+import { useTopSenders } from './useTopSenders'
+import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
 
-export const SendSuggestions = ({
-  recentSendersQuery,
-  favouriteSendersQuery,
-  topSendersQuery,
-  todayBirthdaySendersQuery,
-}: {
-  recentSendersQuery: SendSuggestionsQueryResult
-  favouriteSendersQuery: SendSuggestionsQueryResult
-  topSendersQuery: SendSuggestionsQueryResult
-  todayBirthdaySendersQuery: SendSuggestionsQueryResult
-}) => {
+export const SendSuggestions = () => {
+  const recentSendersQuery = useRecentSenders()
+  const favouriteSendersQuery = useFavouriteSenders()
+  const topSendersQuery = useTopSenders()
+  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
+
   return (
     <>
       <SuggestionsList query={recentSendersQuery} title={'Recent Activity'} />
@@ -77,11 +76,14 @@ const SenderSuggestion = ({ item, index }: { item: SendSuggestionItem; index: nu
   const [sendParams] = useSendScreenParams()
   const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
 
-  const href = item?.tags?.[0]
+  // Prefer main_tag_name, fallback to first tag in tags array
+  const tagToUse = item?.main_tag_name || item?.tags?.[0]
+
+  const href = tagToUse
     ? `/send${Platform.OS === 'web' ? '' : '/form'}?${new URLSearchParams({
         ..._sendParams,
         idType: 'tag',
-        recipient: item.tags[0],
+        recipient: tagToUse,
       }).toString()}`
     : `/send${Platform.OS === 'web' ? '' : '/form'}?${new URLSearchParams({
         ..._sendParams,
@@ -89,8 +91,8 @@ const SenderSuggestion = ({ item, index }: { item: SendSuggestionItem; index: nu
         recipient: item?.send_id,
       }).toString()}`
 
-  const label = item?.tags?.[0]
-    ? `/${item.tags[0]}`
+  const label = tagToUse
+    ? `/${tagToUse}`
     : item?.name
       ? item.name
       : item?.send_id

@@ -1,4 +1,4 @@
-import { Card, type CardProps, Paragraph, Spinner } from '@my/ui'
+import { Card, type CardProps, Paragraph, Shimmer, YStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
 import { ChevronRight } from '@tamagui/lucide-icons'
@@ -11,14 +11,15 @@ import { useLink } from 'solito/link'
 import { HomeBodyCard } from './screen'
 import { usdcCoin } from 'app/data/coins'
 import { Platform } from 'react-native'
+import { useSendAccount } from 'app/utils/send-accounts'
 
 export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
-  const { isPriceHidden } = useIsPriceHidden()
+  const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
+  const { data: sendAccount } = useSendAccount()
 
   // Use the SendEarnProvider pattern
   const {
-    coinBalances,
-    totalAssets: { totalCurrentValue, vaults },
+    totalAssets: { totalCurrentValue, vaults, currentAssetsQueryEnabled },
   } = useSendEarnCoin(usdcCoin)
 
   const hasExistingDeposit = totalCurrentValue > 0n
@@ -31,7 +32,10 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const linkProps = useLink({ href })
 
   // Only fetch APY if user has existing deposits
-  const { data: apyData, isLoading: isApyLoading } = useSendEarnAPY({
+  const {
+    query: { data: apyData, isLoading: isApyLoading },
+    enabled: apyEnabled,
+  } = useSendEarnAPY({
     vault: hasExistingDeposit && vaults?.[0] ? vaults[0] : undefined,
   })
 
@@ -40,8 +44,9 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
     return formatUSDCValue(totalCurrentValue)
   }, [hasExistingDeposit, totalCurrentValue])
 
-  // Single loader for both values
-  const isLoading = coinBalances.isLoading || (hasExistingDeposit && isApyLoading)
+  const isLoading = isApyLoading || isPriceHiddenLoading || !sendAccount
+  // !apyEnabled ||
+  // !currentAssetsQueryEnabled
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
@@ -63,18 +68,21 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
       </Card.Header>
       <Card.Footer padded size="$4" pt={0} fd="column" gap={Platform.OS === 'web' ? '$2' : '$1'}>
         {isLoading ? (
-          <Spinner size={'large'} color={'$color12'} />
+          <YStack gap="$2" zi={1}>
+            <Shimmer w={80} h={34} br={5} />
+            <Shimmer w={100} h={20} br={5} />
+          </YStack>
         ) : (
-          <>
+          <YStack gap="$3">
             <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
-              {isPriceHidden ? '///////' : `$${totalAssets}`}
+              {isPriceHidden ? '******' : `$${totalAssets}`}
             </Paragraph>
             <Paragraph color={'$color10'}>
               {hasExistingDeposit && apyData?.baseApy
                 ? `Earning ${apyData.baseApy.toFixed(2)}%`
                 : 'Up to 10% Interest'}
             </Paragraph>
-          </>
+          </YStack>
         )}
       </Card.Footer>
     </HomeBodyCard>

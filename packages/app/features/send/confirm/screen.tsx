@@ -91,7 +91,9 @@ export function SendConfirm() {
 
   const isUSDCSelected = selectedCoin?.label === 'USDC'
   const { coin: usdc } = useCoin('USDC')
-  const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
+  const {
+    query: { data: prices, isLoading: isPricesLoading },
+  } = useTokenPrices()
 
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
     idType ?? 'tag',
@@ -299,6 +301,8 @@ export function SendConfirm() {
                     return shorten(recipient, 5, 4)
                   case !!profile?.name:
                     return profile?.name
+                  case !!profile?.main_tag_name:
+                    return `/${profile.main_tag_name}`
                   case !!profile?.all_tags?.[0]:
                     return `/${profile.all_tags[0]}`
                   case !!profile?.sendid:

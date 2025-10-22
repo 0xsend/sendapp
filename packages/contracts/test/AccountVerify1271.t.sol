@@ -46,7 +46,9 @@ contract AccountVerify1271Test is BaseSepoliaForkTest {
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
                     // solhint-disable-next-line
-                    challenge: abi.encodePacked(bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)),
+                    challenge: abi.encodePacked(
+                        bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)
+                    ),
                     r: 0x3f033e5c93d0310f33632295f64d526f7569c4cb30895f50d60de5fe9e0e6a9a,
                     s: 0x2adcff2bd06fc3cdd03e21e5e4c197913e96e75cad0bc6e9c9c14607af4f3a37
                 })
@@ -72,7 +74,9 @@ contract AccountVerify1271Test is BaseSepoliaForkTest {
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
                     // solhint-disable-next-line
-                    challenge: abi.encodePacked(bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)),
+                    challenge: abi.encodePacked(
+                        bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)
+                    ),
                     r: 0x3f033e5c93d0310f33632295f64d526f7569c4cb30895f50d60de5fe9e0e6a9a,
                     s: s
                 })
@@ -92,7 +96,9 @@ contract AccountVerify1271Test is BaseSepoliaForkTest {
             abi.encode( // signature
                 Utils.rawSignatureToSignature({
                     // solhint-disable-next-line
-                    challenge: abi.encodePacked(bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)),
+                    challenge: abi.encodePacked(
+                        bytes32(0x15fa6f8c855db1dccbb8a42eef3a7b83f11d29758e84aed37312527165d5eec5)
+                    ),
                     r: 0x3f033e5c93d0310f33632295f64d526f7569c4cb30895f50d60de5fe9e0e6a9a,
                     s: s
                 })

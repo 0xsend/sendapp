@@ -278,11 +278,12 @@ export class DistributorV2Worker {
         }
 
         return balances
-          .map((balance) => ({
-            ...balance,
-            address: normalizeAddress(balance.address), // Normalize the address
+          .map(({ user_id, address, balance }) => ({
+            user_id,
+            address: normalizeAddress(address), // Normalize the address
+            balance: BigInt(balance),
           }))
-          .filter(({ balance }) => BigInt(balance) >= BigInt(distribution.hodler_min_balance))
+          .filter(({ balance }) => balance >= BigInt(distribution.hodler_min_balance))
       })
 
     log.info(
@@ -463,7 +464,7 @@ export class DistributorV2Worker {
     const initialWeightedShares = calculateWeights(
       initialSlashedBalances,
       timeAdjustedAmount,
-      Mode.EaseInOut
+      Mode.Sigmoid
     )
 
     initialHodlerShares = initialSlashedBalances.map(({ address, userId }) => ({
@@ -714,7 +715,7 @@ export class DistributorV2Worker {
       }
 
       // Calculate weighted shares
-      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.EaseInOut)
+      const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.Sigmoid)
 
       hodlerShares = slashedBalances.map(({ address, userId }) => ({
         address,
