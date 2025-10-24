@@ -164,7 +164,7 @@ export const createUserOpActivities = (
 
         const bundlerReceipt = await bundlerClient.waitForUserOperationReceipt({
           hash: hexHash,
-          timeout: 30_000,
+          timeout: 120_000, // 2 minutes - allows for slow block times
         })
         log.info('waitForTransactionReceiptActivity', {
           bundlerReceipt: superjson.stringify(bundlerReceipt),
