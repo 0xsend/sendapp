@@ -2,11 +2,24 @@ import { ApplicationFailure, log, proxyActivities, workflowInfo } from '@tempora
 import { byteaToHex } from 'app/utils/byteaToHex'
 import type { UserOperation } from 'permissionless'
 import type { createDepositActivities } from './activities'
+import type { createUserOpActivities } from '../userop-workflow/activities'
 
 const activities = proxyActivities<ReturnType<typeof createDepositActivities>>({
   startToCloseTimeout: '10 minutes', // Increased timeout for potentially longer indexing/referral steps
   retry: {
     maximumAttempts: 20,
+  },
+})
+
+const { waitForUserOperationReceiptActivity } = proxyActivities<
+  ReturnType<typeof createUserOpActivities>
+>({
+  startToCloseTimeout: '5 minutes',
+  retry: {
+    maximumAttempts: 3,
+    backoffCoefficient: 1.5,
+    initialInterval: '10 seconds',
+    maximumInterval: '60 seconds',
   },
 })
 
@@ -75,12 +88,11 @@ export async function DepositWorkflow({ userOp }: DepositWorkflowInput) {
 
     // Wait for Receipt
     log.debug(`Waiting for transaction receipt for hash: ${userOpHashBytea}`)
-    const { success: receiptSuccess, receipt } =
-      await activities.waitForUserOperationReceiptActivity({
-        hash: byteaToHex(userOpHashBytea),
-        timeout: 60_000,
-        sender: userOp.sender,
-      })
+    const { success: receiptSuccess, receipt } = await waitForUserOperationReceiptActivity({
+      hash: byteaToHex(userOpHashBytea),
+      timeout: 60_000,
+      sender: userOp.sender,
+    })
     log.debug(
       `Transaction receipt received: txHash=${receipt.transactionHash}, block=${receipt.blockNumber}`
     )
