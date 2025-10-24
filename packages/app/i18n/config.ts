@@ -6,10 +6,14 @@ import type { Locale } from 'expo-localization'
 import { getStoredLocale, setStoredLocale } from '../utils/i18n/localeStorage'
 import commonEn from './resources/common/en.json'
 import commonEs from './resources/common/es.json'
+import homeEn from './resources/home/en.json'
+import homeEs from './resources/home/es.json'
 import onboardingEn from './resources/onboarding/en.json'
 import onboardingEs from './resources/onboarding/es.json'
 import settingsEn from './resources/settings/en.json'
 import settingsEs from './resources/settings/es.json'
+import splashEn from './resources/splash/en.json'
+import splashEs from './resources/splash/es.json'
 
 export const DEFAULT_NAMESPACE = 'common'
 export const DEFAULT_LOCALE = 'en'
@@ -17,13 +21,17 @@ export const DEFAULT_LOCALE = 'en'
 export const resources = {
   en: {
     [DEFAULT_NAMESPACE]: commonEn,
+    home: homeEn,
     onboarding: onboardingEn,
     settings: settingsEn,
+    splash: splashEn,
   },
   es: {
     [DEFAULT_NAMESPACE]: commonEs,
+    home: homeEs,
     onboarding: onboardingEs,
     settings: settingsEs,
+    splash: splashEs,
   },
 } as const
 

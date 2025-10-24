@@ -20,12 +20,14 @@ import { HomeBodyCard } from './screen'
 
 import { type MerkleDropClaimParams, useSendMerkleDropsAreClaimed } from 'app/utils/distributions'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import { useTranslation } from 'react-i18next'
 
 export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
   const { isPriceHidden } = useIsPriceHidden()
   const { data: prices, isLoading: isPricesLoading } = useTokenPrices()
   const { data: distributions, isLoading: isDistributionLoading } = useDistributionShares()
+  const { t } = useTranslation('home')
 
   const [currentDistribution, pastDistributions] = useMemo(() => {
     if (!distributions) return [null, []]
@@ -99,7 +101,7 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Rewards
+          {t('cards.rewards.title')}
         </Paragraph>
         <XStack flex={1} />
         <ChevronRight

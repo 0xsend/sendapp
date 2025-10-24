@@ -16,12 +16,14 @@ import { IconAccount } from 'app/components/icons'
 import { HomeBodyCard } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })
   const limit = 3
   const { data, isLoading } = useFriends(limit)
   const hoverStyles = useHoverStyles()
+  const { t } = useTranslation('home')
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
@@ -32,7 +34,7 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Referrals
+          {t('cards.referrals.title')}
         </Paragraph>
         <XStack flex={1} />
         <ChevronRight

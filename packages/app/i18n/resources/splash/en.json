@@ -1,0 +1,12 @@
+{
+  "headline": {
+    "line1": "Welcome",
+    "line2": "to Send",
+    "subtitle": "Sign in with your passkey"
+  },
+  "actions": {
+    "signIn": "SIGN-IN",
+    "signInLoading": "SIGNING IN...",
+    "signUp": "SIGN-UP"
+  }
+}

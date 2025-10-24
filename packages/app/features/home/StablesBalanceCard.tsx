@@ -25,9 +25,11 @@ import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
 import type { PropsWithChildren } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const StablesBalanceCardHomeScreenHeader = () => {
   const [queryParams] = useRootScreenParams()
+  const { t } = useTranslation('home')
 
   const isStableCoin = stableCoins.some(
     (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
@@ -44,7 +46,7 @@ const StablesBalanceCardHomeScreenHeader = () => {
         color={'$lightGrayTextField'}
         $theme-light={{ color: '$darkGrayTextField' }}
       >
-        Cash Balance
+        {t('cards.stables.title')}
       </Paragraph>
       <XStack flex={1} />
       <View animateOnly={['transform']} animation="fast" rotate={isChevronLeft ? '180deg' : '0deg'}>
@@ -60,6 +62,7 @@ const StablesBalanceCardHomeScreenHeader = () => {
 }
 
 const StablesBalanceCardStablesScreenHeader = () => {
+  const { t } = useTranslation('home')
   return (
     <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
       <Paragraph
@@ -68,7 +71,7 @@ const StablesBalanceCardStablesScreenHeader = () => {
         color={'$lightGrayTextField'}
         $theme-light={{ color: '$darkGrayTextField' }}
       >
-        Total Balance
+        {t('cards.stables.totalTitle')}
       </Paragraph>
     </Card.Header>
   )
@@ -138,6 +141,7 @@ const StablesBalanceCardActions = () => {
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const hoverStyles = useHoverStyles()
   const [queryParams] = useRootScreenParams()
+  const { t } = useTranslation('home')
 
   const { dollarBalances } = useSendAccountBalances()
 
@@ -161,7 +165,7 @@ const StablesBalanceCardActions = () => {
           <LinkableButton.Icon>
             <IconPlus size="$1" color={isDarkTheme ? '$primary' : '$color12'} />
           </LinkableButton.Icon>
-          <LinkableButton.Text size={'$5'}>Add Money</LinkableButton.Text>
+          <LinkableButton.Text size={'$5'}>{t('actions.addMoney')}</LinkableButton.Text>
         </XStack>
         <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
       </LinkableButton>
@@ -181,7 +185,7 @@ const StablesBalanceCardActions = () => {
             <LinkableButton.Icon>
               <IconArrowUp size={'$1'} color={isDarkTheme ? '$primary' : '$color12'} />
             </LinkableButton.Icon>
-            <LinkableButton.Text size={'$5'}>Send</LinkableButton.Text>
+            <LinkableButton.Text size={'$5'}>{t('actions.send')}</LinkableButton.Text>
           </XStack>
           <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
         </LinkableButton>

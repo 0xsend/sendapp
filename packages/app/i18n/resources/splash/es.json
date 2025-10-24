@@ -1,0 +1,12 @@
+{
+  "headline": {
+    "line1": "Bienvenido",
+    "line2": "a Send",
+    "subtitle": "Inicia sesión con tu passkey"
+  },
+  "actions": {
+    "signIn": "INICIAR SESIÓN",
+    "signInLoading": "INICIANDO SESIÓN...",
+    "signUp": "REGISTRARSE"
+  }
+}

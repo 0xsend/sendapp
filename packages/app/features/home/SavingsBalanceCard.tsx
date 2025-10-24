@@ -11,9 +11,11 @@ import { useLink } from 'solito/link'
 import { HomeBodyCard } from './screen'
 import { usdcCoin } from 'app/data/coins'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden } = useIsPriceHidden()
+  const { t } = useTranslation('home')
 
   // Use the SendEarnProvider pattern
   const {
@@ -52,7 +54,7 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Save
+          {t('cards.savings.title')}
         </Paragraph>
 
         <ChevronRight
@@ -71,8 +73,8 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
             </Paragraph>
             <Paragraph color={'$color10'}>
               {hasExistingDeposit && apyData?.baseApy
-                ? `Earning ${apyData.baseApy.toFixed(2)}%`
-                : 'Up to 10% Interest'}
+                ? t('cards.savings.earning', { percent: apyData.baseApy.toFixed(2) })
+                : t('cards.savings.fallback')}
             </Paragraph>
           </>
         )}

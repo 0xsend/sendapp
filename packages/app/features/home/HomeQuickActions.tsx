@@ -14,6 +14,7 @@ import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useSendEarnCoin } from '../earn/providers/SendEarnProvider'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type HomeQuickActionsProps = XStackProps
 
@@ -47,6 +48,7 @@ const Send = () => {
   const { coin } = useCoinFromTokenParam()
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const { t } = useTranslation('home')
 
   const getSendUrl = () => {
     if (!coin) {
@@ -80,7 +82,7 @@ const Send = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Send
+          {t('actions.send')}
         </ButtonText>
       </YStack>
     </QuickActionButton>
@@ -91,6 +93,7 @@ const Trade = () => {
   const { coin } = useCoinFromTokenParam()
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const { t } = useTranslation('home')
 
   const getTradeUrl = () => {
     if (!coin) {
@@ -126,7 +129,7 @@ const Trade = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Invest
+          {t('actions.invest')}
         </ButtonText>
       </YStack>
     </QuickActionButton>
@@ -136,6 +139,7 @@ const Trade = () => {
 const Deposit = () => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const { t } = useTranslation('home')
 
   return (
     <QuickActionButton href={'/deposit'}>
@@ -160,7 +164,7 @@ const Deposit = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Deposit
+          {t('actions.deposit')}
         </ButtonText>
       </YStack>
     </QuickActionButton>
@@ -170,6 +174,7 @@ const Deposit = () => {
 const Earn = () => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const { t } = useTranslation('home')
 
   // Determine navigation target based on deposit status
   const {
@@ -205,7 +210,7 @@ const Earn = () => {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          Earn
+          {t('actions.earn')}
         </ButtonText>
       </YStack>
     </QuickActionButton>
