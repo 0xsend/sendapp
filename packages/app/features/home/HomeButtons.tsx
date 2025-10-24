@@ -1,8 +1,10 @@
 import { IconPlus } from 'app/components/icons'
 import { useRootScreenParams } from 'app/routers/params'
 import { XStack, LinkableButton } from '@my/ui'
+import { useTranslation } from 'react-i18next'
 
 export const DepositButton = () => {
+  const { t } = useTranslation('home')
   return (
     <LinkableButton
       theme="green"
@@ -18,7 +20,7 @@ export const DepositButton = () => {
           <IconPlus size={'$1.5'} $theme-dark={{ color: '$color0' }} />
         </XStack>
         <LinkableButton.Text fontWeight={'500'} tt={'uppercase'} $theme-dark={{ col: '$color0' }}>
-          Deposit
+          {t('actions.deposit')}
         </LinkableButton.Text>
       </XStack>
     </LinkableButton>
@@ -26,6 +28,7 @@ export const DepositButton = () => {
 }
 
 export const GhostDepositButton = () => {
+  const { t } = useTranslation('home')
   return (
     <LinkableButton
       theme="green"
@@ -53,7 +56,7 @@ export const GhostDepositButton = () => {
           <IconPlus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </XStack>
         <LinkableButton.Text fontWeight={'400'} col={'$color12'} tt="uppercase" size={'$5'}>
-          Deposit
+          {t('actions.deposit')}
         </LinkableButton.Text>
       </XStack>
     </LinkableButton>
@@ -61,6 +64,7 @@ export const GhostDepositButton = () => {
 }
 
 export const SendButton = () => {
+  const { t } = useTranslation('home')
   const [{ token }] = useRootScreenParams()
   const href = token ? `/send?sendToken=${token}` : '/send'
   return (
@@ -88,7 +92,7 @@ export const SendButton = () => {
             tt="uppercase"
             size={'$5'}
           >
-            Send
+            {t('actions.send')}
           </LinkableButton.Text>
         </XStack>
       </LinkableButton>

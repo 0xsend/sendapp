@@ -11,6 +11,7 @@ import { useTokenChartData } from './charts/shared/useTokenChartData'
 import { useScrubState } from './charts/shared/useScrubState.native'
 import type { Timeframe } from './charts/shared/timeframes'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useTranslation } from 'react-i18next'
 
 export function TokenChartSection() {
   const [tf, setTf] = useState<Timeframe>('1W')
@@ -36,7 +37,7 @@ export function TokenChartSection() {
   }
 
   return (
-    <ChartCardSection title="Price Overview" tf={tf}>
+    <ChartCardSection title={t('token.priceOverview')} tf={tf}>
       <YStack onLayout={onLayoutContainer}>
         <ChartSection
           coin={coin}
@@ -109,6 +110,7 @@ function ChartSection({
     return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
   })()
 
+  const { t } = useTranslation('home')
   return (
     <ChartLineSection
       points={points}
@@ -117,7 +119,7 @@ function ChartSection({
       stroke={stroke}
       childrenBeforePath={
         isLoading ? null : isError ? (
-          <Paragraph color={'$color10'}>Failed to load chart data</Paragraph>
+          <Paragraph color={'$color10'}>{t('token.chartError')}</Paragraph>
         ) : (
           <ChartScrubReadout
             fallbackPrice={last}
@@ -176,3 +178,4 @@ function ChartExtremeLabelsWithActive({ decimals }: { decimals: number }) {
   const { active } = useScrubState()
   return <ChartExtremeLabels decimals={decimals} active={active} />
 }
+const { t } = useTranslation('home')

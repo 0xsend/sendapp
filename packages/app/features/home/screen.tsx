@@ -49,11 +49,14 @@ import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
 import { dynamic } from 'app/utils/dynamic'
+import { ActivityRewardsScreenLazy } from 'app/features/rewards/activity/screen'
+import { useTranslation } from 'react-i18next'
 
 export function HomeScreen() {
   const router = useRouter()
   const supabase = useSupabase()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
+  const { t } = useTranslation('home')
 
   return (
     <YStack f={1}>
@@ -63,17 +66,21 @@ export function HomeScreen() {
             case !sendAccount && !isSendAccountLoading:
               return (
                 <Stack f={1} h={'100%'} ai={'center'} jc={'center'} gap="$4">
-                  <H1 theme="red">No send account found</H1>
-                  <Paragraph>This should never happen.</Paragraph>
+                  <H1 theme="red">{t('fallback.missingAccount.title')}</H1>
+                  <Paragraph>{t('fallback.missingAccount.description')}</Paragraph>
                   <Button
                     onPress={() => {
                       router.push('/_sitemap')
                     }}
                   >
-                    Sitemap
+                    {t('fallback.missingAccount.sitemap')}
                   </Button>
-                  <Button onPress={() => router.push('/auth/onboarding')}>Go To Onboarding</Button>
-                  <Button onPress={() => supabase.auth.signOut()}>Sign Out</Button>
+                  <Button onPress={() => router.push('/auth/onboarding')}>
+                    {t('fallback.missingAccount.onboarding')}
+                  </Button>
+                  <Button onPress={() => supabase.auth.signOut()}>
+                    {t('fallback.missingAccount.signOut')}
+                  </Button>
                 </Stack>
               )
             default:

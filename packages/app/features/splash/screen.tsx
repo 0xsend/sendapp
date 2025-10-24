@@ -25,8 +25,10 @@ import { useLink } from 'solito/link'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useSignIn } from 'app/utils/send-accounts'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
+import { useTranslation } from 'react-i18next'
 
 export function SplashScreen({ hidden }: { hidden: boolean }) {
+  const { t } = useTranslation('splash')
   return (
     <XStack
       flex={1}
@@ -52,13 +54,13 @@ export function SplashScreen({ hidden }: { hidden: boolean }) {
         <IconSendLogo size="$4" color="$white" $gtMd={{ color: '$color12' }} />
         <YStack gap={'$0.9'}>
           <H1 textTransform={'uppercase'} $gtLg={{ size: '$14' }} size={'$12'} fontWeight={'900'}>
-            Welcome
+            {t('headline.line1')}
           </H1>
           <H1 textTransform={'uppercase'} $gtLg={{ size: '$14' }} size={'$12'} fontWeight={'900'}>
-            to Send
+            {t('headline.line2')}
           </H1>
           <Paragraph size={'$6'} color={'$color10'}>
-            Sign in with your passkey
+            {t('headline.subtitle')}
           </Paragraph>
         </YStack>
         <AuthButtons />
@@ -249,6 +251,7 @@ function AuthButtons() {
   const [isSigningIn, setIsSigningIn] = useState(false)
   const { mutateAsync: signInMutateAsync } = useSignIn()
   const { redirect } = useAuthRedirect()
+  const { t } = useTranslation('splash')
 
   const handleSignIn = async () => {
     setIsSigningIn(true)
@@ -280,7 +283,7 @@ function AuthButtons() {
         disabled={isSigningIn}
         $gtMd={{ w: '$12' }}
       >
-        <ButtonText>{isSigningIn ? 'SIGNING IN...' : 'SIGN-IN'}</ButtonText>
+        <ButtonText>{isSigningIn ? t('actions.signInLoading') : t('actions.signIn')}</ButtonText>
       </SubmitButton>
       <Button
         {...signUpLink}
@@ -292,7 +295,7 @@ function AuthButtons() {
         $gtMd={{ w: '$12' }}
       >
         <Button.Text color="$white" $gtMd={{ color: '$color12' }}>
-          SIGN-UP
+          {t('actions.signUp')}
         </Button.Text>
       </Button>
     </XStack>
