@@ -4,9 +4,10 @@ import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { type PropsWithChildren, useEffect, useMemo } from 'react'
-import { H4, Paragraph, Spinner, YStack } from '@my/ui'
+import { H4, Paragraph, Spinner, YStack, XStack, Text } from '@my/ui'
 import { SectionList } from 'react-native'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { Events } from 'app/utils/zod/activity'
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -85,35 +86,37 @@ export default function ActivityFeed({
       keyExtractor={(activity) =>
         `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
       }
-      renderItem={({ item: activity, index, section }) => (
-        <YStack
-          bc="$color1"
-          px="$2"
-          $gtLg={{
-            px: '$3.5',
-          }}
-          {...(index === 0 && {
-            pt: '$2',
-            $gtLg: {
-              pt: '$3.5',
+      renderItem={({ item: activity, index, section }) => {
+        return (
+          <YStack
+            bc="$color1"
+            px="$2"
+            $gtLg={{
               px: '$3.5',
-            },
-            borderTopLeftRadius: '$4',
-            borderTopRightRadius: '$4',
-          })}
-          {...(index === section.data.length - 1 && {
-            pb: '$2',
-            $gtLg: {
-              pb: '$3.5',
-              px: '$3.5',
-            },
-            borderBottomLeftRadius: '$4',
-            borderBottomRightRadius: '$4',
-          })}
-        >
-          <TokenActivityRow activity={activity} onPress={onActivityPress} />
-        </YStack>
-      )}
+            }}
+            {...(index === 0 && {
+              pt: '$2',
+              $gtLg: {
+                pt: '$3.5',
+                px: '$3.5',
+              },
+              borderTopLeftRadius: '$4',
+              borderTopRightRadius: '$4',
+            })}
+            {...(index === section.data.length - 1 && {
+              pb: '$2',
+              $gtLg: {
+                pb: '$3.5',
+                px: '$3.5',
+              },
+              borderBottomLeftRadius: '$4',
+              borderBottomRightRadius: '$4',
+            })}
+          >
+            <TokenActivityRow activity={activity} onPress={onActivityPress} />
+          </YStack>
+        )
+      }}
       renderSectionHeader={({ section: { title, index } }) => (
         <RowLabel first={index === 0}>{title}</RowLabel>
       )}
