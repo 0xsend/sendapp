@@ -440,6 +440,7 @@ export type Database = {
             | null
           main_tag: Database["public"]["Tables"]["tags"]["Row"] | null
           tags: Database["public"]["Tables"]["tags"]["Row"] | null
+          verified_at: string | null
         }
         Insert: {
           about?: string | null
@@ -1704,6 +1705,7 @@ export type Database = {
           chain_id: number | null
           id: string | null
           is_public: boolean | null
+          is_verified: boolean | null
           links_in_bio:
             | Database["public"]["Tables"]["link_in_bio"]["Row"][]
             | null
@@ -1714,6 +1716,7 @@ export type Database = {
           send_id: number | null
           sendid: number | null
           tag: string | null
+          verified_at: string | null
           x_username: string | null
         }
         Relationships: []
@@ -2120,6 +2123,10 @@ export type Database = {
           vault: string
         }[]
       }
+      send_token_balance: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       tag_search: {
         Args: { limit_val: number; offset_val: number; query: string }
         Returns: {
@@ -2164,6 +2171,10 @@ export type Database = {
       user_referrals_count: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      verified_at: {
+        Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: string
       }
     }
     Enums: {
@@ -2231,6 +2242,7 @@ export type Database = {
           | null
         banner_url: string | null
         is_verified: boolean | null
+        verified_at: string | null
       }
       tag_search_result: {
         avatar_url: string | null
@@ -2238,6 +2250,7 @@ export type Database = {
         send_id: number | null
         phone: string | null
         is_verified: boolean | null
+        verified_at: string | null
       }
     }
   }
