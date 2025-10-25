@@ -96,7 +96,7 @@ export default () => {
     },
     modularizeImports: {
       '@tamagui/lucide-icons': {
-        transform: '@tamagui/lucide-icons/dist/esm/icons/{{kebabCase member}}',
+        transform: '@tamagui/lucide-icons/icons/{{member}}',
         skipDefaultConversion: true,
       },
     },
@@ -146,6 +146,7 @@ export default () => {
         '@tamagui/toast',
       ],
       scrollRestoration: true,
+      reactCompiler: true,
     },
     output: process.env.NODE_ENV === 'production' ? 'standalone' : null,
     async redirects() {
