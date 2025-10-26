@@ -107,9 +107,11 @@ CREATE OR REPLACE TRIGGER "send_account_signing_key_removed_trigger_insert_activ
 
 -- RLS
 ALTER TABLE "public"."send_account_signing_key_removed" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "users can see own signing key removed" ON "public"."send_account_signing_key_removed" FOR SELECT USING (("account" = ANY ( SELECT "send_accounts"."address_bytes"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
+CREATE POLICY "users can see own signing key removed" ON "public"."send_account_signing_key_removed" FOR SELECT USING (EXISTS (
+  SELECT 1 FROM "public"."send_accounts"
+  WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+    AND "send_accounts"."address_bytes" = "send_account_signing_key_removed"."account"
+));
 
 -- Grants
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_removed_trigger_delete_activity"() TO "anon";

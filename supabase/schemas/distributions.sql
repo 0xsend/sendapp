@@ -1026,6 +1026,7 @@ GRANT ALL ON TABLE "public"."send_slash" TO "service_role";
 ALTER TABLE ONLY "public"."distributions" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Enable read access to public" ON "public"."distribution_verification_values" FOR SELECT TO "authenticated" USING (true);
 CREATE POLICY "Enable read access to public" ON "public"."distributions" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "Allow anonymous read access to distributions" ON "public"."distributions" FOR SELECT TO "anon" USING (true);
 
 -- distribution_shares table
 ALTER TABLE ONLY "public"."distribution_shares" ENABLE ROW LEVEL SECURITY;

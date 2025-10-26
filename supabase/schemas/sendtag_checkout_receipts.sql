@@ -49,9 +49,11 @@ CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_sendtag_checkou
 
 -- RLS
 ALTER TABLE "public"."sendtag_checkout_receipts" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "users can see their own sendtag_checkout_receipts" ON "public"."sendtag_checkout_receipts" FOR SELECT USING (("sender" = ANY ( SELECT "send_accounts"."address_bytes"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
+CREATE POLICY "users can see their own sendtag_checkout_receipts" ON "public"."sendtag_checkout_receipts" FOR SELECT USING (EXISTS (
+  SELECT 1 FROM "public"."send_accounts"
+  WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+    AND "send_accounts"."address_bytes" = "sendtag_checkout_receipts"."sender"
+));
 
 -- Grants
 GRANT ALL ON TABLE "public"."sendtag_checkout_receipts" TO "anon";
