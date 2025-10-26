@@ -185,6 +185,237 @@ if (!dryRun) {
     `)
 
     console.log(`Updated ${updateResult.rowCount} send accounts with main tag IDs`)
+
+    // Seed sendpot data
+    console.log('Seeding sendpot data...')
+
+    // Get some send_account addresses to use for winners and ticket purchases
+    const sendAccountsResult = await client.query(`
+      SELECT address_bytes, user_id
+      FROM send_accounts
+      ORDER BY id
+      LIMIT 10
+    `)
+
+    const sendAccounts = sendAccountsResult.rows
+
+    if (sendAccounts.length > 0) {
+      // Insert jackpot runs
+      // First run: alice wins at block 100
+      const aliceAddress = sendAccounts[0].address_bytes
+
+      await client.query(
+        `
+        INSERT INTO sendpot_jackpot_runs (
+          chain_id, log_addr, block_time, tx_hash, time, winner,
+          winning_ticket, win_amount, tickets_purchased_total_bps,
+          ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6,
+          $7, $8, $9,
+          $10, $11, $12, $13, $14, $15
+        )
+      `,
+        [
+          8453, // chain_id
+          Buffer.from('cafebabe'.repeat(5)), // log_addr
+          1000000000, // block_time
+          Buffer.from('deadbeef'.repeat(8)), // tx_hash
+          1000000000, // time
+          aliceAddress, // winner
+          5, // winning_ticket
+          1000000000000000000n, // win_amount (1 ETH)
+          100000n, // tickets_purchased_total_bps (1000 tickets = 1.0, so 100000 = 10.0)
+          'ig_sendpot', // ig_name
+          'src_base', // src_name
+          100, // block_num
+          0, // tx_idx
+          0, // log_idx
+          0, // abi_idx
+        ]
+      )
+
+      // Insert ticket purchases for the first run (blocks 50-99)
+      for (let i = 0; i < 5; i++) {
+        const buyer = sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes
+        const recipient =
+          sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes
+        const referrer = sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes
+
+        await client.query(
+          `
+          INSERT INTO sendpot_user_ticket_purchases (
+            chain_id, log_addr, block_time, tx_hash, referrer, value,
+            recipient, buyer, tickets_purchased_total_bps,
+            ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6,
+            $7, $8, $9,
+            $10, $11, $12, $13, $14, $15
+          )
+        `,
+          [
+            8453, // chain_id
+            Buffer.from('cafebabe'.repeat(5)), // log_addr
+            1000000000 - (50 - i) * 1000, // block_time
+            Buffer.from(`deadbeef${i}`.repeat(8)), // tx_hash
+            referrer, // referrer
+            1000000000000000n * BigInt(i + 1), // value
+            recipient, // recipient
+            buyer, // buyer
+            10000n * BigInt(i + 1), // tickets_purchased_total_bps
+            'ig_sendpot', // ig_name
+            'src_base', // src_name
+            50 + i, // block_num
+            i, // tx_idx
+            0, // log_idx
+            0, // abi_idx
+          ]
+        )
+      }
+
+      // Second run: pending (no winner yet) at block 200
+      await client.query(
+        `
+        INSERT INTO sendpot_jackpot_runs (
+          chain_id, log_addr, block_time, tx_hash, time, winner,
+          winning_ticket, win_amount, tickets_purchased_total_bps,
+          ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6,
+          $7, $8, $9,
+          $10, $11, $12, $13, $14, $15
+        )
+      `,
+        [
+          8453, // chain_id
+          Buffer.from('cafebabe'.repeat(5)), // log_addr
+          2000000000, // block_time
+          Buffer.from('deadbeef'.repeat(8)), // tx_hash
+          2000000000, // time
+          null, // winner (NULL for pending)
+          null, // winning_ticket (NULL for pending)
+          0n, // win_amount (0 for pending)
+          200000n, // tickets_purchased_total_bps
+          'ig_sendpot', // ig_name
+          'src_base', // src_name
+          200, // block_num
+          0, // tx_idx
+          0, // log_idx
+          0, // abi_idx
+        ]
+      )
+
+      // Insert ticket purchases for the second run (blocks 150-199)
+      for (let i = 0; i < 8; i++) {
+        const buyer = sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes
+        const recipient =
+          sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes
+        const referrer = sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes
+
+        await client.query(
+          `
+          INSERT INTO sendpot_user_ticket_purchases (
+            chain_id, log_addr, block_time, tx_hash, referrer, value,
+            recipient, buyer, tickets_purchased_total_bps,
+            ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6,
+            $7, $8, $9,
+            $10, $11, $12, $13, $14, $15
+          )
+        `,
+          [
+            8453, // chain_id
+            Buffer.from('cafebabe'.repeat(5)), // log_addr
+            2000000000 - (50 - i) * 1000, // block_time
+            Buffer.from(`baadcafe${i}`.repeat(8)), // tx_hash
+            referrer, // referrer
+            2000000000000000n * BigInt(i + 1), // value
+            recipient, // recipient
+            buyer, // buyer
+            15000n * BigInt(i + 1), // tickets_purchased_total_bps
+            'ig_sendpot', // ig_name
+            'src_base', // src_name
+            150 + i, // block_num
+            i, // tx_idx
+            0, // log_idx
+            0, // abi_idx
+          ]
+        )
+      }
+
+      console.log('Seeded sendpot data: 2 jackpot runs and ticket purchases')
+
+      // Add additional sendpot data using direct SQL
+      console.log('Adding additional sendpot data...')
+
+      await client.query(
+        `
+        -- Insert a third jackpot run (pending, no winner)
+        INSERT INTO sendpot_jackpot_runs (
+          chain_id, log_addr, block_time, tx_hash, time, winner,
+          winning_ticket, win_amount, tickets_purchased_total_bps,
+          ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+        )
+        VALUES (
+          8453,
+          $1::bytea,
+          3000000000,
+          $2::bytea,
+          3000000000,
+          NULL,
+          NULL,
+          0,
+          150000,
+          'ig_sendpot',
+          'src_base',
+          300,
+          0,
+          0,
+          0
+        )
+      `,
+        [Buffer.from('11111111'.repeat(5)), Buffer.from('22222222'.repeat(8))]
+      )
+
+      // Insert ticket purchases for the third run
+      await client.query(
+        `
+        INSERT INTO sendpot_user_ticket_purchases (
+          chain_id, log_addr, block_time, tx_hash, referrer, value,
+          recipient, buyer, tickets_purchased_total_bps,
+          ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+        )
+        SELECT 
+          8453,
+          $1::bytea,
+          3000000000 - (row_number() OVER (ORDER BY sa.id) * 1000),
+          $2::bytea,
+          sa2.address_bytes,
+          (row_number() OVER (ORDER BY sa.id))::numeric * 500000000000000,
+          sa.address_bytes,
+          sa.address_bytes,
+          (row_number() OVER (ORDER BY sa.id))::numeric * 25000,
+          'ig_sendpot',
+          'src_base',
+          (row_number() OVER (ORDER BY sa.id)) + 250,
+          0,
+          0,
+          0
+        FROM send_accounts sa
+        CROSS JOIN LATERAL (
+          SELECT address_bytes FROM send_accounts 
+          ORDER BY RANDOM() LIMIT 1
+        ) sa2
+        ORDER BY sa.id
+        LIMIT 10
+      `,
+        [Buffer.from('33333333'.repeat(5)), Buffer.from('44444444'.repeat(8))]
+      )
+
+      console.log('Added additional sendpot data')
+    }
   } finally {
     await client.end()
   }
