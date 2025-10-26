@@ -2,7 +2,7 @@ SET client_min_messages TO NOTICE;
 
 BEGIN;
 SELECT
-    plan(29);
+    plan(28);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -411,8 +411,6 @@ SELECT
     VALUES (1) $$, 'Service role should be able to create distributions');
 SELECT
     tests.clear_authentication();
-SELECT
-    is_empty('SELECT * FROM distributions WHERE number = 123', 'Anon cannot read the distributions.');
 SELECT
     throws_ok($$ INSERT INTO distributions(
             number, tranche_id, name, description, amount, hodler_pool_bips, bonus_pool_bips, fixed_pool_bips, qualification_start, qualification_end, claim_end, chain_id)

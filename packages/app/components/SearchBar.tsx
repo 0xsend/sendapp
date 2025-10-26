@@ -555,11 +555,20 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
   useEffect(() => {
     if (!query) {
       form.setValue('query', '')
+    } else {
+      // The query is already filtered by the parse function in useSearch
+      form.setValue('query', query)
     }
   }, [query, form.setValue])
 
   const handleClearClick = () => {
     form.setValue('query', '')
+  }
+
+  const handleTextChange = (text: string) => {
+    // Filter out any characters that are not letters, numbers, or underscores
+    const filteredText = text.replace(/[^a-zA-Z0-9_]/g, '')
+    form.setValue('query', filteredText)
   }
 
   return (
@@ -608,6 +617,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                   outlineWidth: 0,
                 },
                 fontSize: 17,
+                onChangeText: handleTextChange,
                 iconBefore: (
                   <IconSearch
                     ml={Platform.OS === 'web' ? 0 : '$3'}

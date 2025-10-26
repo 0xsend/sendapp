@@ -175,17 +175,17 @@ CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER
 ALTER TABLE "public"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "users can see their own transfers" ON "public"."send_account_transfers" FOR SELECT USING ((
-  ("f" = ANY (
-    SELECT "send_accounts"."address_bytes"
-      FROM "public"."send_accounts"
-     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-  ))
+  EXISTS (
+    SELECT 1 FROM "public"."send_accounts"
+    WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+      AND "send_accounts"."address_bytes" = "send_account_transfers"."f"
+  )
   OR
-  ("t" = ANY (
-    SELECT "send_accounts"."address_bytes"
-      FROM "public"."send_accounts"
-     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-  ))
+  EXISTS (
+    SELECT 1 FROM "public"."send_accounts"
+    WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+      AND "send_accounts"."address_bytes" = "send_account_transfers"."t"
+  )
 ));
 
 -- Grants

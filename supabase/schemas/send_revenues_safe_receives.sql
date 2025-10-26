@@ -45,17 +45,17 @@ CREATE UNIQUE INDEX "u_send_revenues_safe_receives" ON "public"."send_revenues_s
 -- RLS
 ALTER TABLE "public"."send_revenues_safe_receives" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Send revenues safe receives can be read by the user who created" ON "public"."send_revenues_safe_receives" FOR SELECT USING ((
-  (("lower"("concat"('0x', "encode"("sender", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY (
-     SELECT "chain_addresses"."address"
-       FROM "public"."chain_addresses"
-      WHERE ("chain_addresses"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-  ))
+  EXISTS (
+    SELECT 1 FROM "public"."chain_addresses"
+    WHERE "chain_addresses"."user_id" = (SELECT auth.uid())
+      AND "chain_addresses"."address" = (lower(concat('0x', encode("send_revenues_safe_receives"."sender", 'hex'::text))))::citext
+  )
   OR
-  ("sender" = ANY (
-     SELECT "send_accounts"."address_bytes"
-       FROM "public"."send_accounts"
-      WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-  ))
+  EXISTS (
+    SELECT 1 FROM "public"."send_accounts"
+    WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+      AND "send_accounts"."address_bytes" = "send_revenues_safe_receives"."sender"
+  )
 ));
 
 -- Grants

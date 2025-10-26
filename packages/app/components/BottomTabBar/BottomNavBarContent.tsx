@@ -24,18 +24,34 @@ export const BottomNavBarContent = ({
       start={[0, 0]}
       end={[0, 1]}
       colors={[`${theme.background.val}00`, '$background']}
-      display={'flex'}
+      display="flex"
       flex={1}
-      ai={'center'}
-      jc={'center'}
-      overflow={'visible'}
+      ai="center"
+      jc="center"
+      px="$3"
+      overflow="visible"
     >
-      <Card elevation={5} fd="row" gap="$7" br={'$6'} ai={'center'} jc={'center'} py={'$3'} px="$7">
+      <Card
+        fs={1}
+        elevation={5}
+        fd="row"
+        gap="$7"
+        br="$6"
+        ai="center"
+        jc="center"
+        py="$3"
+        px="$7"
+        maw="100%"
+        $xxs={{
+          gap: '$5',
+        }}
+      >
         {tabs.map((tab) => {
           const isActiveRoute = currentRoute === tab.key
 
           return (
             <LinkableButton
+              prefetch
               key={tab.href}
               href={tab.href}
               chromeless

@@ -111,9 +111,11 @@ CREATE OR REPLACE TRIGGER "send_account_signing_key_added_trigger_insert_activit
 
 -- RLS
 ALTER TABLE "public"."send_account_signing_key_added" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Send account signing key added can be read by the user who crea" ON "public"."send_account_signing_key_added" FOR SELECT USING (("account" IN ( SELECT "send_accounts"."address_bytes"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
+CREATE POLICY "Send account signing key added can be read by the user who crea" ON "public"."send_account_signing_key_added" FOR SELECT USING (EXISTS (
+  SELECT 1 FROM "public"."send_accounts"
+  WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+    AND "send_accounts"."address_bytes" = "send_account_signing_key_added"."account"
+));
 
 -- Grants
 GRANT ALL ON FUNCTION "public"."send_account_signing_key_added_trigger_delete_activity"() TO "anon";

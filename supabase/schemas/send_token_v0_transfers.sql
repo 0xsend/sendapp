@@ -69,6 +69,8 @@ CREATE INDEX "send_token_v0_transfers_composite" ON "public"."send_token_v0_tran
 CREATE INDEX "send_token_v0_transfers_f" ON "public"."send_token_v0_transfers" USING "btree" ("f");
 CREATE INDEX "send_token_v0_transfers_t" ON "public"."send_token_v0_transfers" USING "btree" ("t");
 CREATE UNIQUE INDEX "u_send_token_v0_transfers" ON "public"."send_token_v0_transfers" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
+CREATE INDEX "idx_send_token_v0_transfers_f_block_time" ON "public"."send_token_v0_transfers" USING "btree" ("f", "block_time");
+CREATE INDEX "idx_send_token_v0_transfers_t_block_time" ON "public"."send_token_v0_transfers" USING "btree" ("t", "block_time");
 
 -- RLS
 ALTER TABLE "public"."send_token_v0_transfers" ENABLE ROW LEVEL SECURITY;
@@ -80,7 +82,7 @@ for select
 to public
 using ((EXISTS ( SELECT 1
    FROM send_accounts
-  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND ((send_accounts.address = (lower(concat('0x', encode(send_token_v0_transfers.f, 'hex'::text))))::citext) OR (send_accounts.address = (lower(concat('0x', encode(send_token_v0_transfers.t, 'hex'::text))))::citext))))));
+  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND ((send_accounts.address_bytes = send_token_v0_transfers.f) OR (send_accounts.address_bytes = send_token_v0_transfers.t))))));
 
 
 

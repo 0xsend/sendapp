@@ -1,6 +1,3 @@
--- NOTE[verification-spec]: address_bytes added per /tmp/verification-balance-materialization-spec.md
---   GENERATED ALWAYS AS (decode(replace(address::text,'0x',''),'hex')) STORED
--- Table
 CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "user_id" "uuid" DEFAULT "auth"."uid"() NOT NULL,
@@ -35,6 +32,7 @@ CREATE INDEX "send_accounts_user_id_index" ON "public"."send_accounts" USING "bt
 CREATE INDEX "idx_send_accounts_main_tag_id" ON "public"."send_accounts" USING "btree" ("main_tag_id");
 CREATE INDEX "idx_send_accounts_address_bytes" ON "public"."send_accounts" USING "btree" ( "address_bytes");
 CREATE UNIQUE INDEX "send_accounts_address_bytes_key" ON "public"."send_accounts" USING "btree" ("address_bytes", "chain_id");
+CREATE INDEX "idx_send_accounts_user_address_bytes" ON "public"."send_accounts" USING "btree" ("user_id", "address_bytes");
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."send_accounts"

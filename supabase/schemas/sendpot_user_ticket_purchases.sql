@@ -46,9 +46,11 @@ CREATE UNIQUE INDEX "u_sendpot_user_ticket_purchases" ON "public"."sendpot_user_
 
 -- RLS
 ALTER TABLE "public"."sendpot_user_ticket_purchases" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "users can see their own ticket purchases" ON "public"."sendpot_user_ticket_purchases" FOR SELECT USING ((("lower"("concat"('0x', "encode"("recipient", 'hex'::"text"))))::"public"."citext" OPERATOR("public".=) ANY ( SELECT "sa"."address"
-   FROM "public"."send_accounts" "sa"
-  WHERE ("sa"."user_id" = (SELECT auth.uid())))));
+CREATE POLICY "users can see their own ticket purchases" ON "public"."sendpot_user_ticket_purchases" FOR SELECT USING (EXISTS (
+  SELECT 1 FROM "public"."send_accounts" "sa"
+  WHERE "sa"."user_id" = (SELECT auth.uid())
+    AND "sa"."address_bytes" = "sendpot_user_ticket_purchases"."recipient"
+));
 
 -- Grants
 GRANT ALL ON TABLE "public"."sendpot_user_ticket_purchases" TO "anon";
