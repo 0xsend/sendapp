@@ -10,7 +10,7 @@ export function useFriends(limit: number) {
     queryKey: [QUERY_KEY, limit] as const,
     queryFn: async () => {
       const { data, count, error } = await supabase
-        .rpc('get_friends', {}, { count: 'exact' })
+        .rpc('get_friends', undefined, { count: 'exact' })
         .select('*')
         .limit(limit)
 
