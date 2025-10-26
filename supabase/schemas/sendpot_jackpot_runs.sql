@@ -56,7 +56,7 @@ GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "service_role";
 
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) RETURNS TABLE("jackpot_run_id" integer, "jackpot_block_num" numeric, "jackpot_block_time" numeric, "winner" "bytea", "win_amount" numeric, "total_tickets" numeric)
+CREATE OR REPLACE FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) RETURNS TABLE("jackpot_run_id" integer, "jackpot_block_num" numeric, "jackpot_block_time" numeric, "winner" "bytea", "win_amount" numeric, "total_tickets" numeric, "winner_tag_name" "public"."citext")
     LANGUAGE "sql"
     AS $$
 WITH cte AS (
@@ -84,7 +84,15 @@ SELECT
     FROM public.sendpot_user_ticket_purchases utp
     WHERE utp.block_num >= c.prev_block_num
       AND utp.block_num < c.jackpot_block_num
-  ) AS total_tickets
+  ) AS total_tickets,
+  (
+    SELECT t.name
+    FROM public.send_accounts sa
+    JOIN public.tags t ON t.id = sa.main_tag_id
+    WHERE sa.address_bytes = c.winner
+      AND t.status = 'confirmed'
+    LIMIT 1
+  ) AS winner_tag_name
 FROM cte c
 ORDER BY c.jackpot_block_num DESC
 LIMIT num_runs;
