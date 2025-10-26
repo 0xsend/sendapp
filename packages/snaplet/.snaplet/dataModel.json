@@ -8796,6 +8796,14 @@
           "nullNotDistinct": false
         },
         {
+          "name": "send_accounts_address_bytes_key",
+          "fields": [
+            "address_bytes",
+            "chain_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
           "name": "send_accounts_address_key",
           "fields": [
             "address",

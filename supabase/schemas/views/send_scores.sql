@@ -253,36 +253,67 @@ create or replace view "public"."send_scores_current" as  WITH dws AS (
              JOIN send_slash ss ON ((ss.distribution_id = d.id)))
           WHERE (((now() AT TIME ZONE 'UTC'::text) >= d.qualification_start) AND ((now() AT TIME ZONE 'UTC'::text) < d.qualification_end))
          LIMIT 1
-        ), window_transfers AS (
-         SELECT u.f,
-            u.t,
-            sum(u.v) AS transfer_sum
-           FROM ( SELECT stt.f,
-                    stt.t,
-                    stt.v
-                   FROM (send_token_transfers stt
-                     CROSS JOIN dws dws_1)
-                  WHERE ((stt.block_time >= dws_1.start_time) AND (stt.block_time <= dws_1.end_time))
-                UNION ALL
-                 SELECT stv.f,
-                    stv.t,
-                    (stv.v * '10000000000000000'::numeric)
-                   FROM (send_token_v0_transfers stv
-                     CROSS JOIN dws dws_1)
-                  WHERE ((stv.block_time >= dws_1.start_time) AND (stv.block_time <= dws_1.end_time))) u
-          WHERE (u.t IS NOT NULL)
-          GROUP BY u.f, u.t
-        ), sender_accounts AS (
-         SELECT DISTINCT sa.user_id,
+        ), authorized_accounts AS (
+         SELECT sa.user_id,
             sa.address_bytes
            FROM send_accounts sa
-           INNER JOIN window_transfers wt_1 ON ((sa.address_bytes = wt_1.f))
           WHERE
                 CASE
                     WHEN (CURRENT_USER = ANY (ARRAY['postgres'::name, 'service_role'::name])) THEN true
                     WHEN ((CURRENT_USER = 'authenticated'::name) AND (auth.uid() IS NOT NULL)) THEN (sa.user_id = auth.uid())
                     ELSE false
                 END
+        ), eligible_earn_accounts AS (
+         SELECT DISTINCT ebt.owner
+           FROM (send_earn_balances_timeline ebt
+             CROSS JOIN dws dws_1)
+          WHERE (ebt.assets >= (dws_1.earn_min_balance)::numeric)
+        ), actual_senders AS (
+         SELECT DISTINCT f AS address_bytes
+         FROM (
+           SELECT stt.f
+           FROM send_token_transfers stt
+           CROSS JOIN dws dws_1
+           WHERE (stt.block_time >= dws_1.start_time) AND (stt.block_time <= dws_1.end_time)
+           UNION ALL
+           SELECT stv.f
+           FROM send_token_v0_transfers stv
+           CROSS JOIN dws dws_1
+           WHERE (stv.block_time >= dws_1.start_time) AND (stv.block_time <= dws_1.end_time)
+         ) all_senders
+         WHERE f IS NOT NULL
+        ), sender_accounts AS (
+         SELECT aa.user_id, aa.address_bytes
+         FROM authorized_accounts aa
+         WHERE EXISTS (
+           SELECT 1 FROM actual_senders act WHERE act.address_bytes = aa.address_bytes
+         )
+        ), window_transfers AS (
+         SELECT u.f,
+            u.t,
+            sum(u.v) AS transfer_sum
+           FROM (
+             SELECT stt.f,
+                    stt.t,
+                    stt.v
+               FROM send_token_transfers stt
+               CROSS JOIN dws dws_1
+              WHERE ((stt.block_time >= dws_1.start_time) AND (stt.block_time <= dws_1.end_time))
+                AND stt.t IS NOT NULL
+AND stt.f IN (SELECT address_bytes FROM sender_accounts)
+                AND ((dws_1.earn_min_balance = 0) OR (stt.t IN (SELECT owner FROM eligible_earn_accounts)))
+             UNION ALL
+             SELECT stv.f,
+                    stv.t,
+                    (stv.v * '10000000000000000'::numeric)
+               FROM send_token_v0_transfers stv
+               CROSS JOIN dws dws_1
+              WHERE ((stv.block_time >= dws_1.start_time) AND (stv.block_time <= dws_1.end_time))
+                AND stv.t IS NOT NULL
+AND stv.f IN (SELECT address_bytes FROM sender_accounts)
+                AND ((dws_1.earn_min_balance = 0) OR (stv.t IN (SELECT owner FROM eligible_earn_accounts)))
+           ) u
+          GROUP BY u.f, u.t
         ), filtered_window_transfers AS (
          SELECT wt_1.f,
             wt_1.t,
@@ -311,12 +342,7 @@ create or replace view "public"."send_scores_current" as  WITH dws AS (
            FROM ((sender_accounts s
              CROSS JOIN dws dws_1)
              LEFT JOIN prev_shares ps ON ((ps.user_id = s.user_id)))
-        ), eligible_earn_accounts AS (
-         SELECT DISTINCT ebt.owner
-           FROM (send_earn_balances_timeline ebt
-             CROSS JOIN dws dws_1)
-          WHERE (ebt.assets >= (dws_1.earn_min_balance)::numeric)
-        )
+)
  SELECT sc.user_id,
     sc.distribution_id,
     sum(LEAST(fwt.transfer_sum, sc.send_ceiling)) AS score,
@@ -325,8 +351,6 @@ create or replace view "public"."send_scores_current" as  WITH dws AS (
    FROM ((filtered_window_transfers fwt
      CROSS JOIN dws)
      JOIN send_ceiling sc ON ((sc.address = fwt.f)))
-  WHERE ((dws.earn_min_balance = 0) OR (fwt.t IN ( SELECT eligible_earn_accounts.owner
-           FROM eligible_earn_accounts)))
   GROUP BY sc.user_id, sc.distribution_id
  HAVING (sum(LEAST(fwt.transfer_sum, sc.send_ceiling)) > (0)::numeric);
 
