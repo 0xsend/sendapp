@@ -94,7 +94,7 @@ export const DrawingHistory = () => {
       if (noWinner) {
         winnerDisplayText = 'None'
       } else if (winnerTagName) {
-        winnerDisplayText = winnerTagName
+        winnerDisplayText = `/${winnerTagName}`
         winnerLink = `https://send.app/${winnerTagName}`
       } else {
         winnerDisplayText = winnerAddress.substring(0, 10)
@@ -212,7 +212,7 @@ export const DrawingHistory = () => {
                 <Anchor
                   href={item.winnerLink}
                   target="_blank"
-                  color="$blue10"
+                  color="$color12"
                   textDecorationLine="none"
                 >
                   {item.winnerFormatted}
