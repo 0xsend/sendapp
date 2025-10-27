@@ -83,6 +83,7 @@ interface Table_public_canton_party_verifications {
   user_id: string;
   canton_wallet_address: string;
   created_at: string;
+  updated_at: string | null;
 }
 interface Table_public_chain_addresses {
   address: string;
