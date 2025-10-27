@@ -17,7 +17,7 @@ export const Page: NextPageWithLayout = () => {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Earn" backFunction="router" />}>{children}</HomeLayout>
+  <HomeLayout TopNav={<TopNav header="Earn" backFunction="home" />}>{children}</HomeLayout>
 )
 
 export default Page

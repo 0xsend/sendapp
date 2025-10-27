@@ -56,9 +56,11 @@ CREATE UNIQUE INDEX "u_send_account_created" ON "public"."send_account_created" 
 -- RLS
 ALTER TABLE "public"."send_account_created" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING (("account" = ANY ( SELECT "send_accounts"."address_bytes"
-   FROM "public"."send_accounts"
-  WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid")))));
+CREATE POLICY "users can see their own account created" ON "public"."send_account_created" FOR SELECT USING (EXISTS (
+  SELECT 1 FROM "public"."send_accounts"
+  WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+    AND "send_accounts"."address_bytes" = "send_account_created"."account"
+));
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_account_created" TO "anon";

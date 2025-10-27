@@ -21,15 +21,23 @@ const {
   },
 })
 
-const {
-  simulateUserOperationActivity,
-  getBaseBlockNumberActivity,
-  sendUserOpActivity,
-  waitForTransactionReceiptActivity,
-} = proxyActivities<ReturnType<typeof createUserOpActivities>>({
-  startToCloseTimeout: '20 seconds',
+const { simulateUserOperationActivity, getBaseBlockNumberActivity, sendUserOpActivity } =
+  proxyActivities<ReturnType<typeof createUserOpActivities>>({
+    startToCloseTimeout: '20 seconds',
+    retry: {
+      maximumAttempts: 6,
+    },
+  })
+
+const { waitForTransactionReceiptActivity } = proxyActivities<
+  ReturnType<typeof createUserOpActivities>
+>({
+  startToCloseTimeout: '5 minutes',
   retry: {
-    maximumAttempts: 6,
+    maximumAttempts: 3,
+    backoffCoefficient: 1.5,
+    initialInterval: '10 seconds',
+    maximumInterval: '60 seconds',
   },
 })
 

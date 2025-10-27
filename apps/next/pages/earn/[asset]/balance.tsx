@@ -24,7 +24,7 @@ export const getServerSideProps: GetServerSideProps = (context) => {
 }
 
 Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Earnings Balance" backFunction="router" />} fullHeight>
+  <HomeLayout TopNav={<TopNav header="Earnings Balance" backFunction="root" />} fullHeight>
     {children}
   </HomeLayout>
 )

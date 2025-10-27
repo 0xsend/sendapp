@@ -103,17 +103,17 @@ CREATE OR REPLACE TRIGGER "send_account_receives_insert_activity_trigger" AFTER 
 -- RLS
 ALTER TABLE "public"."send_account_receives" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see their own ETH receives" ON "public"."send_account_receives" FOR SELECT USING ((
-  ("sender" = ANY (
-    SELECT "send_accounts"."address_bytes"
-      FROM "public"."send_accounts"
-     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-  ))
+  EXISTS (
+    SELECT 1 FROM "public"."send_accounts"
+    WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+      AND "send_accounts"."address_bytes" = "send_account_receives"."sender"
+  )
   OR
-  ("log_addr" = ANY (
-    SELECT "send_accounts"."address_bytes"
-      FROM "public"."send_accounts"
-     WHERE ("send_accounts"."user_id" = ( SELECT "auth"."uid"() AS "uid"))
-  ))
+  EXISTS (
+    SELECT 1 FROM "public"."send_accounts"
+    WHERE "send_accounts"."user_id" = (SELECT auth.uid())
+      AND "send_accounts"."address_bytes" = "send_account_receives"."log_addr"
+  )
 ));
 
 -- Grants
