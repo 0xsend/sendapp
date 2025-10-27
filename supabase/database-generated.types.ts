@@ -1987,6 +1987,7 @@ export type Database = {
           total_tickets: number
           win_amount: number
           winner: string
+          winner_tag_name: string
         }[]
       }
       insert_challenge: {
