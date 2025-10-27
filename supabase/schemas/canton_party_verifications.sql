@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS "public"."canton_party_verifications" (
     "id" uuid NOT NULL DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL,
     "canton_wallet_address" text NOT NULL,
-    "created_at" timestamp with time zone NOT NULL DEFAULT now()
+    "created_at" timestamp with time zone NOT NULL DEFAULT now(),
+    "updated_at" timestamp with time zone DEFAULT NULL
 );
 
 ALTER TABLE "public"."canton_party_verifications" OWNER TO "postgres";
@@ -46,6 +47,12 @@ CREATE POLICY "Users can insert their own canton verification"
 CREATE POLICY "Users can read their own canton verification"
     ON "public"."canton_party_verifications"
     FOR SELECT USING ((SELECT auth.uid()) = "user_id");
+
+CREATE POLICY "Users can update their own canton verification"
+    ON "public"."canton_party_verifications"
+    FOR UPDATE
+    USING ((SELECT auth.uid()) = "user_id")
+    WITH CHECK ((SELECT auth.uid()) = "user_id");
 
 -- Grants
 GRANT ALL ON TABLE "public"."canton_party_verifications" TO "anon";

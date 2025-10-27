@@ -62,6 +62,7 @@ type Override = {
       user_id?: string;
       canton_wallet_address?: string;
       created_at?: string;
+      updated_at?: string;
       users?: string;
     };
   }
@@ -932,6 +933,7 @@ export interface Fingerprint {
   }
   cantonPartyVerifications?: {
     createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
   }
   chainAddresses?: {

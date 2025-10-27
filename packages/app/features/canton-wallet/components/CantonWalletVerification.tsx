@@ -32,7 +32,7 @@ import {
   IconSlash,
   IconX,
 } from 'app/components/icons'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, Pencil, Copy } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import {
   type UseDistributionsResultData,
@@ -217,12 +217,17 @@ function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationC
 function CantonWalletVerifiedCard({ address }: { address: string }) {
   const toast = useAppToast()
   const hoverStyles = useHoverStyles()
+  const [isEditing, setIsEditing] = useState(false)
 
   const copyCantonAddress = useCallback(async () => {
     await Clipboard.setStringAsync(address)
       .then(() => toast.show('Copied Canton Wallet Address'))
       .catch(() => toast.error('Unable to copy'))
   }, [address, toast])
+
+  if (isEditing) {
+    return <CantonWalletEditCard currentAddress={address} onCancel={() => setIsEditing(false)} />
+  }
 
   return (
     <FadeCard br={'$6'} jc={'space-between'} w={'100%'}>
@@ -246,24 +251,263 @@ function CantonWalletVerifiedCard({ address }: { address: string }) {
           <Check size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </XStack>
       </XStack>
-      <Button
-        chromeless
-        unstyled
-        onPress={copyCantonAddress}
-        cursor="pointer"
-        flex={1}
-        hoverStyle={{
-          backgroundColor: '$backgroundTransparent',
-        }}
-        pressStyle={{
-          backgroundColor: 'transparent',
-        }}
-        focusStyle={{
-          backgroundColor: 'transparent',
-        }}
-      >
-        <Paragraph style={{ wordBreak: 'break-all' }}>{address}</Paragraph>{' '}
-      </Button>
+      <XStack gap="$2" width="100%">
+        <Paragraph
+          flex={1}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          size="$5"
+          color="$color12"
+          lineHeight={30}
+        >
+          {address}
+        </Paragraph>
+        <Button
+          chromeless
+          unstyled
+          borderColor={'$warning'}
+          borderWidth={0}
+          borderRadius={'$4'}
+          padding={'$1'}
+          cursor="pointer"
+          onPress={() => setIsEditing(true)}
+          icon={<Pencil size={'$1'} color="$warning" $theme-light={{ color: '$orange8' }} />}
+        />
+        <Button
+          chromeless
+          unstyled
+          borderColor={'$primary'}
+          borderWidth={0}
+          borderRadius={'$4'}
+          padding={'$1'}
+          cursor="pointer"
+          onPress={copyCantonAddress}
+          icon={<Copy size={'$1'} color="$primary" $theme-light={{ color: '$color12' }} />}
+        />
+      </XStack>
+    </FadeCard>
+  )
+}
+
+interface CantonWalletEditCardProps {
+  currentAddress: string
+  onCancel: () => void
+}
+
+function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCardProps) {
+  const { profile } = useUser()
+  const { data: sendAccount } = useSendAccount()
+  const supabase = useSupabase()
+  const queryClient = useQueryClient()
+  const toast = useAppToast()
+  const theme = useThemeName()
+  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const hoverStyles = useHoverStyles()
+
+  const form = useForm<CantonWalletFormData>({
+    defaultValues: { address: currentAddress },
+  })
+
+  const formAddress = form.watch('address')
+
+  const webauthnCreds = useMemo(
+    () =>
+      sendAccount?.send_account_credentials
+        ?.filter((c) => !!c.webauthn_credentials)
+        ?.map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? [],
+    [sendAccount?.send_account_credentials]
+  )
+
+  const allowedCredentials = useMemo(
+    () => webauthnCredToAllowedCredentials(webauthnCreds),
+    [webauthnCreds]
+  )
+
+  const { mutateAsync: getChallenge } = api.challenge.getChallenge.useMutation({ retry: false })
+  const { mutateAsync: validateSignature } = api.challenge.validateSignature.useMutation({
+    retry: false,
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: CantonWalletFormData) => {
+      const challengeData = await getChallenge()
+
+      const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
+        challengeData.challenge as `0x${string}`,
+        allowedCredentials
+      )
+
+      const encodedWebAuthnSigBytes = hexToBytes(encodedWebAuthnSig)
+      const newEncodedWebAuthnSigBytes = new Uint8Array(encodedWebAuthnSigBytes.length + 1)
+      newEncodedWebAuthnSigBytes[0] = keySlot
+      newEncodedWebAuthnSigBytes.set(encodedWebAuthnSigBytes, 1)
+
+      await validateSignature({
+        recoveryType: RecoveryOptions.WEBAUTHN,
+        signature: bytesToHex(newEncodedWebAuthnSigBytes),
+        challengeId: challengeData.id,
+        identifier: `${accountName}.${keySlot}`,
+      })
+
+      if (!profile?.id) {
+        throw new Error('User not authenticated')
+      }
+
+      const { data: result, error } = await supabase
+        .from('canton_party_verifications')
+        .update({
+          canton_wallet_address: data.address,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', profile.id)
+        .select()
+        .single()
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      return result
+    },
+    onSuccess: () => {
+      toast.show('Canton Wallet Address Updated')
+      form.reset()
+      onCancel()
+      void queryClient.invalidateQueries({ queryKey: ['profile'] })
+    },
+    onError: (error) => {
+      console.error('Update failed:', error)
+      toast.error('Update failed')
+    },
+  })
+
+  const handleUpdate = async () => {
+    const values = form.getValues()
+    const { data, error } = CantonWalletSchema.safeParse(values)
+
+    if (error || !data) {
+      setErrorMessage(error?.errors?.[0]?.message ?? 'Invalid input')
+      return
+    }
+
+    await updateMutation.mutateAsync(data)
+  }
+
+  const handleClearClick = () => {
+    form.setValue('address', '')
+    setErrorMessage(null)
+  }
+
+  return (
+    <FadeCard br={'$6'} jc={'space-between'} w={'100%'}>
+      <XStack ai="center" gap="$3" w="100%">
+        <XStack
+          w={40}
+          h={40}
+          ai="center"
+          jc="center"
+          br="$3"
+          backgroundColor={hoverStyles.backgroundColor}
+        >
+          <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
+        </XStack>
+        <Paragraph size="$5" flex={1} fontWeight="600" color="$color12">
+          Edit Canton Wallet Address
+        </Paragraph>
+      </XStack>
+
+      <YStack gap="$2" w="100%">
+        <FormProvider {...form}>
+          <SchemaForm
+            form={form}
+            onSubmit={handleUpdate}
+            schema={CantonWalletSchema}
+            defaultValues={{ address: currentAddress }}
+            props={{
+              address: {
+                placeholder: 'Enter Canton Wallet Address',
+                pr: '$8',
+                fontWeight: 'normal',
+                br: '$4',
+                bw: 0,
+                height: 48,
+                hoverStyle: {
+                  bw: 0,
+                },
+                '$theme-dark': {
+                  placeholderTextColor: '$silverChalice',
+                  backgroundColor: '#2b3639',
+                },
+                '$theme-light': {
+                  placeholderTextColor: '$darkGrayTextField',
+                  backgroundColor: '#f2f2f2',
+                },
+                focusStyle: {
+                  boc: borderColor,
+                  bw: 1,
+                  outlineWidth: 0,
+                },
+                fontSize: 13,
+                fieldsetProps: {
+                  width: '100%',
+                },
+                iconAfter: formAddress && (
+                  <Button
+                    chromeless
+                    unstyled
+                    cursor={'pointer'}
+                    mr={Platform.OS === 'web' ? 0 : '$3'}
+                    icon={<IconX color={'$primary'} $theme-light={{ color: '$black' }} size="$1" />}
+                    onPress={handleClearClick}
+                  />
+                ),
+              },
+            }}
+            formProps={{
+              width: '100%',
+              f: 1,
+              $gtSm: {
+                maxWidth: '100%',
+              },
+            }}
+          >
+            {({ address }) => (
+              <>
+                <Paragraph size="$3" color="$warning" $theme-light={{ color: '$orange8' }}>
+                  Changing your canton wallet address will pause all $CC rewards for 24 hours
+                </Paragraph>
+                <YStack gap="$3" w="100%" ai={'flex-start'}>
+                  <XStack w={'100%'}>{address}</XStack>
+                  <XStack width="100%" justifyContent={'space-between'}>
+                    <Button
+                      w={'49%'}
+                      onPress={onCancel}
+                      height={44}
+                      borderRadius={'$4'}
+                      backgroundColor={hoverStyles.backgroundColor}
+                      focusStyle={{ outlineWidth: 0 }}
+                      hoverStyle={{ outlineWidth: 0 }}
+                    >
+                      <Button.Text>Cancel</Button.Text>
+                    </Button>
+                    <SubmitButton
+                      w={'49%'}
+                      onPress={handleUpdate}
+                      height={44}
+                      disabled={updateMutation.isPending}
+                      icon={updateMutation.isPending ? <Spinner size="small" /> : undefined}
+                    >
+                      <SubmitButton.Text tt={undefined}>Save</SubmitButton.Text>
+                    </SubmitButton>
+                  </XStack>
+                </YStack>
+                {errorMessage && <Paragraph color={'$error'}>{errorMessage}</Paragraph>}
+              </>
+            )}
+          </SchemaForm>
+        </FormProvider>
+      </YStack>
     </FadeCard>
   )
 }

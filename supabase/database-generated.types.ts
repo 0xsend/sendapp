@@ -76,18 +76,21 @@ export type Database = {
           canton_wallet_address: string
           created_at: string
           id: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           canton_wallet_address: string
           created_at?: string
           id?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           canton_wallet_address?: string
           created_at?: string
           id?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -429,17 +432,51 @@ export type Database = {
           referral_code: string | null
           send_id: number
           x_username: string | null
-          canton_party_verifications:
-            | Database["public"]["Tables"]["canton_party_verifications"]["Row"]
-            | null
-          distribution_shares:
-            | Database["public"]["Tables"]["distribution_shares"]["Row"]
-            | null
-          links_in_bio:
-            | Database["public"]["Tables"]["link_in_bio"]["Row"]
-            | null
-          main_tag: Database["public"]["Tables"]["tags"]["Row"] | null
-          tags: Database["public"]["Tables"]["tags"]["Row"] | null
+          canton_party_verifications: {
+            canton_wallet_address: string
+            created_at: string
+            id: string
+            updated_at: string | null
+            user_id: string
+          } | null
+          distribution_shares: {
+            address: string
+            amount: number
+            bonus_pool_amount: number
+            created_at: string
+            distribution_id: number
+            fixed_pool_amount: number
+            hodler_pool_amount: number
+            id: number
+            index: number
+            updated_at: string
+            user_id: string
+          } | null
+          links_in_bio: {
+            created_at: string
+            domain: string | null
+            domain_name: Database["public"]["Enums"]["link_in_bio_domain_names"]
+            handle: string | null
+            id: number
+            updated_at: string
+            user_id: string
+          } | null
+          main_tag: {
+            created_at: string
+            id: number
+            name: string
+            status: Database["public"]["Enums"]["tag_status"]
+            updated_at: string
+            user_id: string | null
+          } | null
+          tags: {
+            created_at: string
+            id: number
+            name: string
+            status: Database["public"]["Enums"]["tag_status"]
+            updated_at: string
+            user_id: string | null
+          } | null
         }
         Insert: {
           about?: string | null
@@ -1052,9 +1089,28 @@ export type Database = {
           src_name: string
           tx_hash: string
           tx_idx: number
-          send_earn_affiliate_vault:
-            | Database["public"]["Tables"]["send_earn_create"]["Row"]
-            | null
+          send_earn_affiliate_vault: {
+            abi_idx: number
+            block_num: number
+            block_time: number
+            caller: string
+            chain_id: number
+            collections: string
+            event_id: string
+            fee: number
+            fee_recipient: string
+            id: number
+            ig_name: string
+            initial_owner: string
+            log_addr: string
+            log_idx: number
+            salt: string
+            send_earn: string
+            src_name: string
+            tx_hash: string
+            tx_idx: number
+            vault: string
+          } | null
         }
         Insert: {
           abi_idx: number
@@ -1794,32 +1850,15 @@ export type Database = {
           canton_wallet_address: string
           created_at: string
           id: string
+          updated_at: string | null
           user_id: string
         }
-      }
-      citext: {
-        Args: { "": boolean } | { "": string } | { "": unknown }
-        Returns: string
-      }
-      citext_hash: {
-        Args: { "": string }
-        Returns: number
-      }
-      citextin: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      citextout: {
-        Args: { "": string }
-        Returns: unknown
-      }
-      citextrecv: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      citextsend: {
-        Args: { "": string }
-        Returns: string
+        SetofOptions: {
+          from: "profiles"
+          to: "canton_party_verifications"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       confirm_tags: {
         Args: {
@@ -1842,10 +1881,7 @@ export type Database = {
         Args: { send_account_id: string; tag_name: string }
         Returns: number
       }
-      did_user_swap: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      did_user_swap: { Args: never; Returns: boolean }
       distribution_hodler_addresses: {
         Args: { distribution_id: number }
         Returns: {
@@ -1860,6 +1896,12 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "send_accounts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       distribution_shares: {
         Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
@@ -1876,17 +1918,26 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "profiles"
+          to: "distribution_shares"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       favourite_senders: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+        SetofOptions: {
+          from: "*"
+          to: "activity_feed_user"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
-      generate_referral_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_referral_code: { Args: never; Returns: string }
       get_affiliate_referrals: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           created_at: string
@@ -1895,7 +1946,7 @@ export type Database = {
         }[]
       }
       get_affiliate_stats_summary: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           created_at: string
           id: string
@@ -1904,7 +1955,7 @@ export type Database = {
         }[]
       }
       get_friends: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avatar_url: string
           birthday: string
@@ -1916,12 +1967,9 @@ export type Database = {
           x_username: string
         }[]
       }
-      get_pending_jackpot_tickets_purchased: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      get_pending_jackpot_tickets_purchased: { Args: never; Returns: number }
       get_send_scores_history: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           distribution_id: number
           score: number
@@ -1942,12 +1990,18 @@ export type Database = {
         }[]
       }
       insert_challenge: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           challenge: string
           created_at: string
           expires_at: string
           id: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "challenges"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       insert_create_passkey_verifications: {
@@ -1995,7 +2049,7 @@ export type Database = {
         Returns: undefined
       }
       leaderboard_referrals_all_time: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           referrals: number
           rewards_usdc: number
@@ -2013,6 +2067,12 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "profiles"
+          to: "link_in_bio"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       main_tag: {
         Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
@@ -2024,6 +2084,12 @@ export type Database = {
           updated_at: string
           user_id: string | null
         }
+        SetofOptions: {
+          from: "profiles"
+          to: "tags"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       profile_lookup: {
         Args: {
@@ -2031,6 +2097,12 @@ export type Database = {
           lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
         }
         Returns: Database["public"]["CompositeTypes"]["profile_lookup_result"][]
+        SetofOptions: {
+          from: "*"
+          to: "profile_lookup_result"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       query_webauthn_credentials_by_phone: {
         Args: { phone_number: string }
@@ -2048,10 +2120,22 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "webauthn_credentials"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       recent_senders: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+        SetofOptions: {
+          from: "*"
+          to: "activity_feed_user"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       referrer_lookup: {
         Args: { referral_code?: string }
@@ -2060,10 +2144,7 @@ export type Database = {
           referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
       }
-      refresh_send_scores_history: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      refresh_send_scores_history: { Args: never; Returns: undefined }
       register_first_sendtag: {
         Args: {
           _referral_code?: string
@@ -2092,6 +2173,12 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "webauthn_credentials"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       send_earn_affiliate_vault: {
         Args: {
@@ -2118,7 +2205,13 @@ export type Database = {
           tx_hash: string
           tx_idx: number
           vault: string
-        }[]
+        }
+        SetofOptions: {
+          from: "send_earn_new_affiliate"
+          to: "send_earn_create"
+          isOneToOne: true
+          isSetofReturn: true
+        }
       }
       tag_search: {
         Args: { limit_val: number; offset_val: number; query: string }
@@ -2138,14 +2231,32 @@ export type Database = {
           updated_at: string
           user_id: string | null
         }[]
+        SetofOptions: {
+          from: "profiles"
+          to: "tags"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       today_birthday_senders: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+        SetofOptions: {
+          from: "*"
+          to: "activity_feed_user"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       top_senders: {
         Args: { limit_count?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+        SetofOptions: {
+          from: "*"
+          to: "activity_feed_user"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       update_distribution_shares: {
         Args: {
@@ -2161,10 +2272,7 @@ export type Database = {
         }
         Returns: undefined
       }
-      user_referrals_count: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      user_referrals_count: { Args: never; Returns: number }
     }
     Enums: {
       key_type_enum: "ES256"
