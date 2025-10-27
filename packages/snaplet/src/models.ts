@@ -108,6 +108,37 @@ export const models: SeedClientOptions['models'] = {
       v: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
     },
   },
+  sendpot_jackpot_runs: {
+    data: {
+      src_name: 'base_logs',
+      ig_name: 'sendpot_jackpot_runs',
+      chain_id: 854337,
+      abi_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      tx_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      log_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      block_num: (ctx) => copycat.int(ctx.seed, { min: 100, max: 1000 }),
+      block_time: Math.floor(Date.now() / 1000),
+      time: Math.floor(Date.now() / 1000),
+      tx_hash: () => Buffer.from(hexToBytes(generatePrivateKey())),
+      log_addr: () => Buffer.from(hexToBytes('0x0a0a5611b9a1071a1d8a308882065c48650baee8b')),
+    },
+  },
+  sendpot_user_ticket_purchases: {
+    data: {
+      src_name: 'base_logs',
+      ig_name: 'sendpot_user_ticket_purchases',
+      chain_id: 854337,
+      abi_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      tx_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100 }),
+      log_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      block_num: (ctx) => copycat.int(ctx.seed, { min: 50, max: 500 }),
+      block_time: Math.floor(Date.now() / 1000),
+      tx_hash: () => Buffer.from(hexToBytes(generatePrivateKey())),
+      log_addr: () => Buffer.from(hexToBytes('0x0a0a5611b9a1071a1d8a308882065c48650baee8b')),
+      referrer: () => Buffer.from(hexToBytes('0x0000000000000000000000000000000000000000')),
+      tickets_purchased_total_bps: (ctx) => copycat.int(ctx.seed, { min: 10000, max: 50000 }),
+    },
+  },
 }
 
 export const leaderboardReferralsAllTimes: leaderboard_referrals_all_timeInputs = {
