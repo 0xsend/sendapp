@@ -120,7 +120,7 @@ export function OnboardingScreen() {
     )
   }, [diagnosticStatus, diagnosticMessage, canRetryDiagnostic, form])
 
-  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
+  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag({ isFirstTag: true })
   const { mutateAsync: registerFirstSendtagMutateAsync } =
     api.tag.registerFirstSendtag.useMutation()
 
