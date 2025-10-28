@@ -234,7 +234,7 @@ export const SignUpScreen = () => {
       return false
     }) as Exclude<Window['onunhandledrejection'], null>
 
-    if (typeof window !== 'undefined') {
+    if (process.env.TAMAGUI_TARGET === 'web') {
       window.addEventListener('error', errorHandler, { capture: true })
       window.addEventListener('unhandledrejection', rejectionHandler, { capture: true })
       previousOnError = window.onerror
@@ -251,7 +251,7 @@ export const SignUpScreen = () => {
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
+      if (process.env.TAMAGUI_TARGET === 'web') {
         window.removeEventListener('error', errorHandler, { capture: true } as EventListenerOptions)
         window.removeEventListener('unhandledrejection', rejectionHandler, {
           capture: true,
