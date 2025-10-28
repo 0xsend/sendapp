@@ -3,12 +3,12 @@ import { test as snapletTest } from '@my/playwright/fixtures/snaplet'
 import { mergeTests, type Page } from '@playwright/test'
 import debug from 'debug'
 import { getAuthSessionFromContext } from './fixtures/auth'
-import { expect, test as addSendtagsTest } from './fixtures/sendtags/add'
+import { expect } from './fixtures/sendtags/add'
 import { AddSendtagsPage } from './fixtures/sendtags/add/page'
-import { type CheckoutPage, test as checkoutTest } from './fixtures/sendtags/checkout'
+import { test as checkoutTest } from './fixtures/sendtags/checkout'
 import { lookupBalance, testBaseClient } from './fixtures/viem'
 import { usdcAddress } from '@my/wagmi'
-import { price, total } from 'app/data/sendtags'
+import { price } from 'app/data/sendtags'
 import { assert } from 'app/utils/assert'
 import type { ActivityMatch } from './fixtures/send-accounts/matchers/activity-feed'
 
@@ -87,8 +87,8 @@ test('sendtag complete happy path - create, confirm, and change main tag', async
   await checkoutPage.goto()
 
   // The checkout page shows the total price and purchase button
-  // Since the tag is 6+ characters, it should cost 2 USDC
-  await expect(page.getByText('2 USDC')).toBeVisible()
+  // Since the tag is 6+ characters, it should cost 4 USDC
+  await expect(page.getByText('4 USDC')).toBeVisible()
   await expect(page.getByText('Total', { exact: false })).toBeVisible()
 
   // Look up initial USDC balance

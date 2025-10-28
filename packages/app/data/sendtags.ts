@@ -20,15 +20,15 @@ export function total(pendingTags: { name: string }[]) {
 export function price(length: number) {
   switch (length) {
     case 5:
-      return parseUnits('4', usdcCoin.decimals) // 4 USDC
-    case 4:
       return parseUnits('8', usdcCoin.decimals) // 8 USDC
+    case 4:
+      return parseUnits('16', usdcCoin.decimals) // 16 USDC
     case 3:
     case 2:
     case 1:
-      return parseUnits('16', usdcCoin.decimals) // 16 USDC
+      return parseUnits('32', usdcCoin.decimals) // 32 USDC
     default:
-      return parseUnits('2', usdcCoin.decimals) // 2 USDC for 6+ characters
+      return parseUnits('4', usdcCoin.decimals) // 4 USDC for 6+ characters
   }
 }
 
@@ -42,15 +42,15 @@ export function price(length: number) {
 export function reward(length: number) {
   switch (length) {
     case 5:
-      return parseUnits('1', usdcCoin.decimals) // 1 USDC
-    case 4:
       return parseUnits('2', usdcCoin.decimals) // 2 USDC
+    case 4:
+      return parseUnits('4', usdcCoin.decimals) // 4 USDC
     case 3:
     case 2:
     case 1:
-      return parseUnits('4', usdcCoin.decimals) // 4 USDC
+      return parseUnits('8', usdcCoin.decimals) // 8 USDC
     default:
-      return parseUnits('.5', usdcCoin.decimals) // .50 USDC for 6+ characters
+      return parseUnits('1', usdcCoin.decimals) // 1 USDC for 6+ characters
   }
 }
 
