@@ -38,13 +38,14 @@ import {
   type UseDistributionsResultData,
   useMonthlyDistributions,
   useSnapshotBalance,
+  useDistributionVerifications,
+  type DistributionsVerificationsQuery,
 } from 'app/utils/distributions'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { usdcCoin } from 'app/data/coins'
 import formatAmount from 'app/utils/formatAmount'
 import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useConfirmedTags } from 'app/utils/tags'
 
 const CANTON_WALLET_MIN_SEND_BALANCE = 2000n * BigInt(10 ** 18)
 
@@ -53,7 +54,9 @@ export function CantonWalletVerification() {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
   const distribution = distributions?.[0]
-  const isLoading = isLoadingDistributions || isLoadingSendAccount || isUserLoading
+  const verificationsQuery = useDistributionVerifications(distribution?.number)
+  const isLoading =
+    isLoadingDistributions || isLoadingSendAccount || isUserLoading || verificationsQuery.isLoading
 
   if (isLoading) {
     return <Spinner color="$color12" size="large" alignSelf={'flex-start'} />
@@ -72,6 +75,7 @@ export function CantonWalletVerification() {
       profile={profile}
       sendAccount={sendAccount}
       distribution={distribution}
+      verifications={verificationsQuery.data}
     />
   )
 }
@@ -80,14 +84,15 @@ interface CantonWalletVerificationContentProps {
   profile: ReturnType<typeof useUser>['profile']
   sendAccount: Tables<'send_accounts'>
   distribution: UseDistributionsResultData[number]
+  verifications: DistributionsVerificationsQuery['data']
 }
 
 function CantonWalletVerificationContent({
   profile,
   sendAccount,
   distribution,
+  verifications,
 }: CantonWalletVerificationContentProps) {
-  const confirmedTags = useConfirmedTags()
   const snapshotBalanceQuery = useSnapshotBalance({
     distribution,
     sendAccount,
@@ -108,7 +113,9 @@ function CantonWalletVerificationContent({
 
   const hasMinSavings = totalAssets >= BigInt(distribution.earn_min_balance)
 
-  const sendTagPurchased = confirmedTags.length > 0
+  const sendTagPurchased = verifications?.verification_values?.some(
+    (v) => v.type === 'tag_registration' && v.weight > 0n
+  )
 
   const cantonWalletAddress = profile?.canton_party_verifications?.canton_wallet_address
 
@@ -141,8 +148,8 @@ function CantonWalletVerificationContent({
       <YStack gap="$3.5">
         <VerificationCard
           icon={<IconSlash size={'$1'} color={'$color12'} />}
-          label="Sendtag"
-          isCompleted={sendTagPurchased}
+          label="Purchased Sendtag"
+          isCompleted={sendTagPurchased ?? false}
           isLoading={false}
         />
         <VerificationCard
@@ -158,7 +165,10 @@ function CantonWalletVerificationContent({
           isLoading={isLoadingSnapshotBalance}
         />
         {cantonWalletAddress ? (
-          <CantonWalletVerifiedCard address={cantonWalletAddress} />
+          <CantonWalletVerifiedCard
+            address={cantonWalletAddress}
+            canEdit={canConnectCantonWallet ?? false}
+          />
         ) : canConnectCantonWallet ? (
           <CantonWalletFormCard />
         ) : (
@@ -214,7 +224,7 @@ function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationC
   )
 }
 
-function CantonWalletVerifiedCard({ address }: { address: string }) {
+function CantonWalletVerifiedCard({ address, canEdit }: { address: string; canEdit: boolean }) {
   const toast = useAppToast()
   const hoverStyles = useHoverStyles()
   const [isEditing, setIsEditing] = useState(false)
@@ -262,17 +272,19 @@ function CantonWalletVerifiedCard({ address }: { address: string }) {
         >
           {address}
         </Paragraph>
-        <Button
-          chromeless
-          unstyled
-          borderColor={'$warning'}
-          borderWidth={0}
-          borderRadius={'$4'}
-          padding={'$1'}
-          cursor="pointer"
-          onPress={() => setIsEditing(true)}
-          icon={<Pencil size={'$1'} color="$warning" $theme-light={{ color: '$orange8' }} />}
-        />
+        {canEdit && (
+          <Button
+            chromeless
+            unstyled
+            borderColor={'$warning'}
+            borderWidth={0}
+            borderRadius={'$4'}
+            padding={'$1'}
+            cursor="pointer"
+            onPress={() => setIsEditing(true)}
+            icon={<Pencil size={'$1'} color="$warning" $theme-light={{ color: '$orange8' }} />}
+          />
+        )}
         <Button
           chromeless
           unstyled
