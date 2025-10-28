@@ -1,14 +1,15 @@
-import { SendtagSchema } from 'app/utils/zod/sendtag'
+import { SendtagSchema, FirstSendtagSchema } from 'app/utils/zod/sendtag'
 import { SendtagAvailability } from '@my/api/src/routers/tag/types'
 import { api } from 'app/utils/api'
 import { useMutation } from '@tanstack/react-query'
 
-export const useValidateSendtag = () => {
+export const useValidateSendtag = (options?: { isFirstTag?: boolean }) => {
   const { mutateAsync: checkAvailability } = api.tag.checkAvailability.useMutation()
+  const schema = options?.isFirstTag ? FirstSendtagSchema : SendtagSchema
 
   return useMutation({
     mutationFn: async ({ name }: { name: string }) => {
-      const { data, error } = SendtagSchema.safeParse({ name })
+      const { data, error } = schema.safeParse({ name })
 
       if (error || !data) {
         throw new Error(error.errors[0]?.message ?? 'Invalid Sendtag')
