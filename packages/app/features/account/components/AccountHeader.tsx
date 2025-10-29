@@ -8,7 +8,6 @@ import {
   Tooltip,
   XStack,
   YStack,
-  Theme,
 } from '@my/ui'
 import type { YStackProps } from 'tamagui'
 import {
