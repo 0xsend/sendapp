@@ -103,12 +103,7 @@ export const AppReviewLoginScreen = () => {
                   focusStyle: {
                     outlineWidth: 0,
                   },
-                  '$theme-dark': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
-                  '$theme-light': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
+                  placeholderTextColor: '$color4',
                   fontSize: '$5',
                   onFocus: () => setIsEmailFocused(true),
                   onBlur: () => setIsEmailFocused(false),
@@ -129,12 +124,7 @@ export const AppReviewLoginScreen = () => {
                   focusStyle: {
                     outlineWidth: 0,
                   },
-                  '$theme-dark': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
-                  '$theme-light': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
+                  placeholderTextColor: '$color4',
                   fontSize: '$5',
                   onFocus: () => setIsPasswordFocused(true),
                   onBlur: () => setIsPasswordFocused(false),

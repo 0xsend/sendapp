@@ -410,12 +410,7 @@ export function OnboardingScreen() {
                   focusStyle: {
                     outlineWidth: 0,
                   },
-                  '$theme-dark': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
-                  '$theme-light': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
+                  placeholderTextColor: '$color4',
                   fontSize: '$5',
                   onFocus: () => setIsInputFocused(true),
                   onBlur: () => setIsInputFocused(false),

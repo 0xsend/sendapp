@@ -107,12 +107,7 @@ export const AddSendtagsForm = () => {
                       focusStyle: {
                         outlineWidth: 0,
                       },
-                      '$theme-dark': {
-                        placeholderTextColor: '$darkGrayTextField',
-                      },
-                      '$theme-light': {
-                        placeholderTextColor: '$darkGrayTextField',
-                      },
+                      placeholderTextColor: '$color4',
                       fieldsetProps: { width: '100%' },
                       fontSize: '$8',
                       onFocus: () => setIsInputFocused(true),

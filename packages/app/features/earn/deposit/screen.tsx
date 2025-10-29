@@ -486,12 +486,7 @@ export function DepositForm() {
               },
               placeholder: '0',
               fontFamily: '$mono',
-              '$theme-dark': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
-              '$theme-light': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
+              placeholderTextColor: '$color4',
               inputMode: coin.data?.decimals ? 'decimal' : 'numeric',
               onChangeText: (amount: string) => {
                 const localizedAmount = localizeAmount(amount)

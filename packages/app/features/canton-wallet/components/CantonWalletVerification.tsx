@@ -447,12 +447,11 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                 hoverStyle: {
                   bw: 0,
                 },
+                placeholderTextColor: '$color4',
                 '$theme-dark': {
-                  placeholderTextColor: '$silverChalice',
                   backgroundColor: '#2b3639',
                 },
                 '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
                   backgroundColor: '#f2f2f2',
                 },
                 focusStyle: {
@@ -692,12 +691,11 @@ function CantonWalletFormCard() {
                 hoverStyle: {
                   bw: 0,
                 },
+                placeholderTextColor: '$color4',
                 '$theme-dark': {
-                  placeholderTextColor: '$silverChalice',
                   backgroundColor: '#2b3639',
                 },
                 '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
                   backgroundColor: '#f2f2f2',
                 },
                 focusStyle: {

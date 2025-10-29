@@ -432,12 +432,7 @@ export const SwapFormScreen = () => {
               },
               placeholder: '0',
               fontFamily: '$mono',
-              '$theme-dark': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
-              '$theme-light': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
+              placeholderTextColor: '$color4',
               inputMode: inCoin?.decimals ? 'decimal' : 'numeric',
               onChangeText: (amount) => {
                 const localizedInAmount = localizeAmount(amount)
@@ -485,12 +480,7 @@ export const SwapFormScreen = () => {
               },
               placeholder: '0',
               fontFamily: '$mono',
-              '$theme-dark': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
-              '$theme-light': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
+              placeholderTextColor: '$color4',
               fieldsetProps: {
                 width: '60%',
               },
@@ -981,12 +971,7 @@ export const Slippage = ({
               w={100}
               br={'$4'}
               placeholder={isFocused ? '' : 'Custom'}
-              $theme-dark={{
-                placeholderTextColor: '$color12',
-              }}
-              $theme-light={{
-                placeholderTextColor: '$color12',
-              }}
+              placeholderTextColor={'$color12'}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               value={customSlippage || ''}

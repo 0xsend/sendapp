@@ -116,7 +116,7 @@ export const LinkInBioScreen = () => {
                       placeholder={
                         domain_name === 'WhatsApp' ? 'Whatsapp Phone Number' : domain_name
                       }
-                      placeholderTextColor={'$color10'}
+                      placeholderTextColor={'$color4'}
                       value={currentHandle}
                       onChangeText={(value) => updateDomainHandle(domain_name, value)}
                       autoCapitalize="none"
