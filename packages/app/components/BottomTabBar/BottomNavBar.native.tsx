@@ -1,4 +1,4 @@
-import { IconArrowUp, IconChart, IconClock, IconHome } from 'app/components/icons'
+import { IconArrowUp, IconClock, IconCompass, IconHome } from 'app/components/icons'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
@@ -10,8 +10,13 @@ import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 const TABS = [
   {
     Icon: IconHome,
-    href: '/(tabs)/',
-    key: 'index',
+    href: '/(tabs)/home',
+    key: 'home/index',
+  },
+  {
+    Icon: IconClock,
+    href: '/(tabs)/activity',
+    key: 'activity/index',
   },
   {
     Icon: IconArrowUp,
@@ -19,14 +24,9 @@ const TABS = [
     key: 'send/index',
   },
   {
-    Icon: IconChart,
-    href: '/(tabs)/trade',
-    key: 'trade/index',
-  },
-  {
-    Icon: IconClock,
-    href: '/(tabs)/activity',
-    key: 'activity/index',
+    Icon: IconCompass,
+    href: '/(tabs)/explore',
+    key: 'explore/index',
   },
 ]
 

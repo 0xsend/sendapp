@@ -206,12 +206,7 @@ export function SendAmountForm() {
                 },
                 placeholder: '0',
                 fontFamily: '$mono',
-                '$theme-dark': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
+                placeholderTextColor: '$color4',
                 inputMode: coin?.decimals ? 'decimal' : 'numeric',
                 onChangeText: (amount) => {
                   const localizedAmount = localizeAmount(amount)
@@ -237,12 +232,7 @@ export function SendAmountForm() {
                 fontSize: 17,
                 fontStyle: 'normal',
                 minHeight: 40,
-                '$theme-dark': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
+                placeholderTextColor: '$color4',
                 focusStyle: {
                   boc: noteBorderActiveColor,
                   bw: 1,

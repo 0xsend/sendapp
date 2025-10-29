@@ -19,7 +19,11 @@ export default function StackNavigator() {
         headerTintColor: isDark ? config.tokens.color.primary.val : theme.color12.val,
         headerLeft: () => (
           <Pressable onPress={() => router.back()}>
-            <IconArrowLeft size={'$1.5'} color={isDark ? '$primary' : '$color12'} />
+            <IconArrowLeft
+              size={'$1.5'}
+              color={isDark ? '$primary' : '$color12'}
+              $platform-ios={{ marginLeft: 6 }}
+            />
           </Pressable>
         ),
         headerTitleAlign: 'left',

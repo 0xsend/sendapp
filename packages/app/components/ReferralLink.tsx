@@ -28,17 +28,12 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
   const icons = useMemo(
     () => ({
       copy: (
-        <Copy
-          size={16}
-          flexShrink={0}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
+        <Copy size={16} flexShrink={0} color={'$primary'} $theme-light={{ color: '$color12' }} />
       ),
       checkCheck: (
         <CheckCheck
           size={16}
-          $theme-dark={{ color: '$primary' }}
+          color={'$primary'}
           $theme-light={{ color: '$color12' }}
           key="referral-link-icon"
           animation="bouncy"

@@ -152,14 +152,7 @@ export const NoteField = forwardRef<
             disabled={disabled}
             borderWidth={0}
             borderRadius={'$4'}
-            $theme-dark={{
-              // placeholderTextColor fails in test env for some reason
-              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Dark' } : {}),
-            }}
-            $theme-light={{
-              // placeholderTextColor fails in test env for some reason
-              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$gray10Light' } : {}),
-            }}
+            placeholderTextColor={'$color4'}
             // @todo use the theme colors if we ever have the palette scales
             // bc={'$color2'}
             // color={'$color12'}

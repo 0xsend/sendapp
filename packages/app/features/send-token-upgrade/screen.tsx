@@ -108,11 +108,7 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
       <Fade f={1} ai="center" jc="center" gap="$6" w="100%" maw="100%" h="100%" mt="$12">
         <YStack f={1} ai="center" jc="center" px="$4" gap="$6" w="100%" maw="100%">
           <Stack mb="$2">
-            <IconUpgrade
-              size="$6"
-              $theme-dark={{ color: '$primary' }}
-              $theme-light={{ color: '$color12' }}
-            />
+            <IconUpgrade size="$6" color={'$primary'} $theme-light={{ color: '$color12' }} />
           </Stack>
 
           <YStack ai="center" gap="$2">
@@ -145,7 +141,7 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
               <Paragraph
                 fontSize="$4"
                 textDecorationLine="underline"
-                $theme-dark={{ color: '$primary' }}
+                color={'$primary'}
                 $theme-light={{ color: '$color12' }}
               >
                 Read more about the Upgrade

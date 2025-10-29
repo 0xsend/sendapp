@@ -50,11 +50,7 @@ export const GhostDepositButton = () => {
     >
       <XStack w={'100%'} gap={'$2.5'} ai={'center'} jc="center">
         <XStack alignItems={'center'} justifyContent={'center'} zIndex={2}>
-          <IconPlus
-            size={'$1.5'}
-            $theme-dark={{ color: '$primary' }}
-            $theme-light={{ color: '$color12' }}
-          />
+          <IconPlus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </XStack>
         <LinkableButton.Text fontWeight={'400'} col={'$color12'} tt="uppercase" size={'$5'}>
           Deposit

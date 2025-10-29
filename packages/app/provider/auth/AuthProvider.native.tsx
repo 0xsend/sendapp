@@ -107,7 +107,6 @@ const replaceRoute = (href: string) => {
   if (Platform.OS === 'ios') {
     setTimeout(() => {
       router.dismissAll()
-      router.replace(href)
     }, 1)
   } else {
     setImmediate(() => {

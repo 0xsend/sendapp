@@ -446,12 +446,7 @@ export function WithdrawForm() {
               },
               placeholder: '0',
               fontFamily: '$mono',
-              '$theme-dark': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
-              '$theme-light': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
+              placeholderTextColor: '$color4',
               inputMode: 'decimal',
               onChangeText: (amount) => {
                 const localizedAmount = localizeAmount(amount)
