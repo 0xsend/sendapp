@@ -1,9 +1,10 @@
 import getBaseUrl from './getBaseUrl'
+import { Platform } from 'react-native'
 
 export const getReferralHref = (referralCode: string) => {
   let baseUrl = getBaseUrl()
 
-  if (!baseUrl && typeof window !== 'undefined') {
+  if (!baseUrl && Platform.OS === 'web' && typeof window !== 'undefined') {
     const { protocol, hostname, port } = window.location
     baseUrl = `${protocol}//${hostname}${port ? `:${port}` : ''}`
   }
