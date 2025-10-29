@@ -89,11 +89,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
       )
     }
 
-    return (
-      <Theme name="red">
-        <IconInfoCircle bc={'$color0'} color={'$color8'} size={'$1.5'} br={9999} />
-      </Theme>
-    )
+    return <IconInfoCircle color={'$error'} size={'$1.5'} br={9999} />
   }
 
   const avatarContent = useMemo(() => {
