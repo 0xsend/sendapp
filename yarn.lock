@@ -9683,6 +9683,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tamagui/constants@patch:@tamagui/constants@npm%3A1.135.4#~/.yarn/patches/@tamagui-constants-npm-1.135.4-3972aa7dc7.patch":
+  version: 1.135.4
+  resolution: "@tamagui/constants@patch:@tamagui/constants@npm%3A1.135.4#~/.yarn/patches/@tamagui-constants-npm-1.135.4-3972aa7dc7.patch::version=1.135.4&hash=67647e"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/ed584a655f81713311dce324dc889b8d79be39bddbcb4f4cd4eaa977d30365e207a9d7171cf9eacf71234cf0fdecbbce38143212a1f289671c6ec75b2dfbe59a
+  languageName: node
+  linkType: hard
+
 "@tamagui/core@npm:1.135.4":
   version: 1.135.4
   resolution: "@tamagui/core@npm:1.135.4"
