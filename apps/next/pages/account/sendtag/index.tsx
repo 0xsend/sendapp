@@ -1,5 +1,4 @@
 import { NextSeo } from 'next-seo'
-import { userProtectedGetSSP } from 'utils/userProtected'
 import type { NextPageWithLayout } from '../../_app'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { SendTagScreen } from 'app/features/account/sendtag/screen'
@@ -16,8 +15,6 @@ export const Page: NextPageWithLayout = () => {
     </>
   )
 }
-
-export const getServerSideProps = userProtectedGetSSP()
 
 Page.getLayout = (children) => (
   <HomeLayout TopNav={<TopNav header="Sendtags" backFunction={'router'} />}>{children}</HomeLayout>

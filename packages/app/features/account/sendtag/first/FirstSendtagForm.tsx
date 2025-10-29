@@ -29,7 +29,7 @@ export const FirstSendtagForm = () => {
   const validationError = form.formState.errors.root
   const canSubmit = !!formName && !validationError
 
-  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
+  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag({ isFirstTag: true })
   const { mutateAsync: registerFirstSendtagMutateAsync } =
     api.tag.registerFirstSendtag.useMutation()
 

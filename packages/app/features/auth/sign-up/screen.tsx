@@ -85,7 +85,7 @@ export const SignUpScreen = () => {
   const canSubmit = formName && formIsAgreedToTerms && captchaToken
   const canRetryDiagnostic = diagnosticStatus === 'failure' && formState === FormState.Idle
 
-  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag()
+  const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag({ isFirstTag: true })
   const { mutateAsync: signInMutateAsync } = useSignIn()
   const { mutateAsync: signUpMutateAsync } = api.auth.signUp.useMutation({ retry: false })
   const { mutateAsync: registerFirstSendtagMutateAsync } =

@@ -26,7 +26,7 @@ import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useSignIn } from 'app/utils/send-accounts'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 
-export function SplashScreen() {
+export function SplashScreen({ hidden }: { hidden: boolean }) {
   return (
     <XStack
       flex={1}
@@ -37,6 +37,7 @@ export function SplashScreen() {
       $platform-web={{
         height: '100svh',
       }}
+      display={hidden ? 'none' : 'flex'}
     >
       {/* Top section with carousel */}
 

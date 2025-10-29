@@ -95,7 +95,7 @@ export const tagRouter = createTRPCRouter({
   registerFirstSendtag: protectedProcedure
     .input(
       z.object({
-        name: z.string(),
+        name: z.string().min(5, 'First Sendtag must be at least 5 characters').max(20),
         sendAccountId: z.string().uuid(),
         referralCode: z.string().optional().nullable(),
       })
