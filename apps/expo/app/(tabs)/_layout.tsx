@@ -20,12 +20,16 @@ const TABS = [
     ),
   },
   {
+    key: 'activity/index',
+    title: 'Activity',
+  },
+  {
     key: 'send/index',
     title: 'Send',
   },
   {
-    key: 'activity/index',
-    title: 'Activity',
+    key: 'explore/index',
+    title: 'Explore',
   },
 ]
 

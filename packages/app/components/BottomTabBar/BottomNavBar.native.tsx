@@ -1,4 +1,4 @@
-import { IconArrowUp, IconClock, IconHome } from 'app/components/icons'
+import { IconArrowUp, IconClock, IconCompass, IconHome } from 'app/components/icons'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
@@ -14,14 +14,19 @@ const TABS = [
     key: 'home/index',
   },
   {
+    Icon: IconClock,
+    href: '/(tabs)/activity',
+    key: 'activity/index',
+  },
+  {
     Icon: IconArrowUp,
     href: `/(tabs)/send?${new URLSearchParams({ sendToken: sendTokenAddress[baseMainnet.id] })}`,
     key: 'send/index',
   },
   {
-    Icon: IconClock,
-    href: '/(tabs)/activity',
-    key: 'activity/index',
+    Icon: IconCompass,
+    href: '/(tabs)/explore',
+    key: 'explore/index',
   },
 ]
 
