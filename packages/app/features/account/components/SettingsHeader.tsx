@@ -32,11 +32,7 @@ export const SettingsHeader = ({ children }: PropsWithChildren) => {
         $gtLg={{ display: 'flex' }}
       >
         <Button.Icon>
-          <IconX
-            size={'$1.5'}
-            $theme-dark={{ color: '$primary' }}
-            $theme-light={{ color: '$color12' }}
-          />
+          <IconX size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </Button.Icon>
       </Button>
     </XStack>

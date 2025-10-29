@@ -137,11 +137,7 @@ const AddMoneyButton = () => {
         py="$3.5"
         $gtSm={{ py: '$4' }}
       >
-        <IconPlus
-          size={'$1.5'}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
+        <IconPlus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         <ButtonText
           fontSize={isSmallScreen ? '$4' : '$5'}
           px="$1"
@@ -174,11 +170,7 @@ const WithdrawButton = ({ coin }: { coin: CoinWithBalance }) => {
         py="$3.5"
         $gtSm={{ py: '$4' }}
       >
-        <IconArrowUp
-          size={'$1.5'}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
+        <IconArrowUp size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         <ButtonText
           fontSize={isSmallScreen ? '$4' : '$5'}
           px="$1"

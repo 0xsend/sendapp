@@ -145,11 +145,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
             </XStack>
             {Platform.OS === 'web' && (
               <Stack onPress={closeActivityDetails} cursor={'pointer'}>
-                <IconX
-                  size={'$1.5'}
-                  $theme-dark={{ color: '$primary' }}
-                  $theme-light={{ color: '$color12' }}
-                />
+                <IconX size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
               </Stack>
             )}
           </XStack>
