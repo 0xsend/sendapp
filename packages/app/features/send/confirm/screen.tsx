@@ -241,6 +241,10 @@ export function SendConfirm() {
           exact: false,
         })
 
+        if (Platform.OS !== 'web') {
+          router.back()
+        }
+
         redirect(profile?.sendid)
       }
     } catch (e) {
