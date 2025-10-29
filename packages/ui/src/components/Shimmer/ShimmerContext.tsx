@@ -1,4 +1,4 @@
-import { useEffect, useState, type FunctionComponent } from 'react'
+import { useCallback, useEffect, useState, type FunctionComponent } from 'react'
 import {
   cancelAnimation,
   ReduceMotion,
@@ -8,7 +8,7 @@ import {
   type SharedValue,
 } from 'react-native-reanimated'
 import type { GradientConfig } from './LinearGradient'
-import { createStyledContext, useEvent } from 'tamagui'
+import { createStyledContext } from 'tamagui'
 
 interface ShimmerContextType {
   progress: SharedValue<number>
@@ -63,13 +63,13 @@ export const ShimmerProvider: FunctionComponent<ShimmerProviderProps> = ({
     }
   }, [activeShimmers, isShimmerActive, progress, duration])
 
-  const increaseActiveShimmers = useEvent(() => {
+  const increaseActiveShimmers = useCallback(() => {
     setActiveShimmers((prev) => prev + 1)
-  })
+  }, [])
 
-  const decreaseActiveShimmers = useEvent(() => {
+  const decreaseActiveShimmers = useCallback(() => {
     setActiveShimmers((prev) => Math.max(prev - 1, 0))
-  })
+  }, [])
 
   return (
     <ShimmerContext.Provider

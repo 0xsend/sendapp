@@ -225,7 +225,7 @@ export const StablesBalanceCardContent = (props: CardProps) => {
       size={'$5'}
       br="$7"
       p={'$1.5'}
-      materialInteractive
+      materialInteractive={process.env.TAMAGUI_TARGET === 'web'}
       {...props}
     >
       {props.children}
