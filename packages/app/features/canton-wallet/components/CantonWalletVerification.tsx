@@ -313,7 +313,8 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
   const queryClient = useQueryClient()
   const toast = useAppToast()
   const theme = useThemeName()
-  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
+  const isDark = theme?.startsWith('dark')
+  const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
 
@@ -447,13 +448,8 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                 hoverStyle: {
                   bw: 0,
                 },
-                placeholderTextColor: '$color4',
-                '$theme-dark': {
-                  backgroundColor: '#2b3639',
-                },
-                '$theme-light': {
-                  backgroundColor: '#f2f2f2',
-                },
+                placeholderTextColor: isDark ? '$silverChalice' : '$darkGrayTextField',
+                backgroundColor: isDark ? '#2b3639' : '#f2f2f2',
                 focusStyle: {
                   boc: borderColor,
                   bw: 1,
@@ -503,6 +499,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                       <Button.Text>Cancel</Button.Text>
                     </Button>
                     <SubmitButton
+                      p={0}
                       w={'49%'}
                       onPress={handleUpdate}
                       height={44}
@@ -557,7 +554,8 @@ function CantonWalletFormCard() {
   const queryClient = useQueryClient()
   const toast = useAppToast()
   const theme = useThemeName()
-  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
+  const isDark = theme?.startsWith('dark')
+  const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
 
@@ -691,13 +689,8 @@ function CantonWalletFormCard() {
                 hoverStyle: {
                   bw: 0,
                 },
-                placeholderTextColor: '$color4',
-                '$theme-dark': {
-                  backgroundColor: '#2b3639',
-                },
-                '$theme-light': {
-                  backgroundColor: '#f2f2f2',
-                },
+                placeholderTextColor: isDark ? '$silverChalice' : '$darkGrayTextField',
+                backgroundColor: isDark ? '#2b3639' : '#f2f2f2',
                 focusStyle: {
                   boc: borderColor,
                   bw: 1,
@@ -732,6 +725,7 @@ function CantonWalletFormCard() {
                 <XStack gap="$3" w="100%" ai={'flex-start'}>
                   <XStack w={'70%'}>{address}</XStack>
                   <SubmitButton
+                    p={0}
                     onPress={handleVerify}
                     width={'30%'}
                     height={44}
