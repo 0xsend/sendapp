@@ -1,14 +1,16 @@
-import { useRouter } from 'solito/router'
+import { useRouter } from 'expo-router'
 import { useCallback } from 'react'
 
 export default function useAuthRedirect() {
   const router = useRouter()
 
   const redirect = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (redirectUrl?: string) => {
-      router.replace(redirectUrl || '/')
+      router.dismissAll()
+      router.replace('/(tabs)/home')
     },
-    [router.replace]
+    [router.replace, router.dismissAll]
   )
 
   return { redirect }

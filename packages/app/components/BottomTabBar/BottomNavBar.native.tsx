@@ -10,8 +10,8 @@ import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 const TABS = [
   {
     Icon: IconHome,
-    href: '/(tabs)/',
-    key: 'index',
+    href: '/(tabs)/home',
+    key: 'home/index',
   },
   {
     Icon: IconArrowUp,

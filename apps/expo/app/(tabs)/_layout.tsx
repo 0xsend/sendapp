@@ -12,7 +12,7 @@ import { useColorScheme } from 'react-native'
 
 const TABS = [
   {
-    key: 'index',
+    key: 'home/index',
     title: () => (
       <XStack ai="center" jc="flex-start">
         <IconSendLogo size={'$2'} color={'$color12'} />
