@@ -1,14 +1,20 @@
-import { Button, ButtonText, Theme, useMedia, XStack, YStack } from '@my/ui'
+import { Button, ButtonText, Theme, useAppToast, useMedia, XStack, YStack } from '@my/ui'
 import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { Minus, Plus } from '@tamagui/lucide-icons'
 import type { LinkableButtonProps } from '@my/ui'
 import { type CoinWithBalance, stableCoins, usdcCoin } from 'app/data/coins'
 import { useLink } from 'solito/link'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { Platform } from 'react-native'
 
-const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
+const QuickActionButton = ({
+  href,
+  children,
+  onPress,
+}: LinkableButtonProps & { onPress?: () => void }) => {
   const hoverStyles = useHoverStyles()
   const linkProps = useLink({ href })
+  const isIOS = Platform.OS === 'ios'
 
   return (
     <Button
@@ -18,7 +24,8 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
       hoverStyle={hoverStyles}
       focusStyle={hoverStyles}
       w="100%"
-      {...linkProps}
+      opacity={isIOS ? 0.6 : 1}
+      {...(isIOS && onPress ? { onPress } : linkProps)}
     >
       {children}
     </Button>
@@ -28,11 +35,21 @@ const QuickActionButton = ({ href, children }: LinkableButtonProps) => {
 const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const toast = useAppToast()
+  const isIOS = Platform.OS === 'ios'
 
   const getBuyUrl = () => `/trade?inToken=${usdcCoin.token}&outToken=${coin.token}`
 
+  const handlePress = () => {
+    toast.show('Temporarily disabled', {
+      burntOptions: {
+        preset: 'none',
+      },
+    })
+  }
+
   return (
-    <QuickActionButton href={getBuyUrl()}>
+    <QuickActionButton href={getBuyUrl()} onPress={isIOS ? handlePress : undefined}>
       <YStack
         testID={'buy-quick-action'}
         gap="$2"
@@ -43,11 +60,7 @@ const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
         $gtSm={{ py: '$4' }}
       >
         <Theme name="green">
-          <Plus
-            size={'$1.5'}
-            $theme-dark={{ color: '$primary' }}
-            $theme-light={{ color: '$color12' }}
-          />
+          <Plus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </Theme>
         <ButtonText
           fontSize={isSmallScreen ? '$4' : '$5'}
@@ -67,11 +80,21 @@ const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
 const SellButton = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
+  const toast = useAppToast()
+  const isIOS = Platform.OS === 'ios'
 
   const getSellUrl = () => `/trade?inToken=${coin.token}&outToken=${usdcCoin.token}`
 
+  const handlePress = () => {
+    toast.show('Temporarily disabled', {
+      burntOptions: {
+        preset: 'none',
+      },
+    })
+  }
+
   return (
-    <QuickActionButton href={getSellUrl()}>
+    <QuickActionButton href={getSellUrl()} onPress={isIOS ? handlePress : undefined}>
       <YStack
         testID={'sell-quick-action'}
         gap="$2"
@@ -82,11 +105,7 @@ const SellButton = ({ coin }: { coin: CoinWithBalance }) => {
         $gtSm={{ py: '$4' }}
       >
         <Theme name="red">
-          <Minus
-            size={'$1.5'}
-            $theme-dark={{ color: '$primary' }}
-            $theme-light={{ color: '$color12' }}
-          />
+          <Minus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </Theme>
         <ButtonText
           fontSize={isSmallScreen ? '$4' : '$5'}
