@@ -264,9 +264,8 @@ export function InvestmentsBody() {
                   }}
                   animation="100ms"
                   animateOnly={['transform']}
-                  size="$3"
+                  size="$2.5"
                   circular
-                  bordered
                 >
                   <Button.Icon scaleIcon={2}>
                     <IconX color="$color10" />
