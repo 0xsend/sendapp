@@ -242,9 +242,18 @@ export function InvestmentsBody() {
             </CoinsModal.Trigger>
           }
         >
-          <CoinsModal.Content w={modalContainerWidth - 24}>
-            <XStack p="$3" px="$4" pr="$3" ai="center" jc="space-between" w="100%">
-              <H2 size="$8" col="$gray11" fow="300">
+          <CoinsModal.Content y={-3} w={modalContainerWidth - 24}>
+            <XStack
+              bbw={1}
+              bbc="$gray3"
+              p="$2"
+              pl="$3.5"
+              py="$2"
+              ai="center"
+              jc="space-between"
+              w="100%"
+            >
+              <H2 size="$7" col="$gray11" fow="300">
                 New Investments
               </H2>
               <CoinsModal.Close asChild>
@@ -255,29 +264,30 @@ export function InvestmentsBody() {
                   }}
                   animation="100ms"
                   animateOnly={['transform']}
-                  size="$3"
+                  size="$2.5"
                   circular
-                  bg="$backgroundHover"
                 >
                   <Button.Icon scaleIcon={2}>
-                    <IconX color="$color12" />
+                    <IconX color="$color10" />
                   </Button.Icon>
                 </Button>
               </CoinsModal.Close>
             </XStack>
-            <CoinsModal.Items>
-              {investmentCoins.map((coin) =>
-                Platform.OS === 'web' ? (
-                  <InvestSheetItemWeb key={coin.symbol} coin={coin} />
-                ) : (
-                  <InvestSheetItemNative
-                    key={coin.symbol}
-                    coin={coin}
-                    onPress={() => setIsSheetOpen(false)}
-                  />
-                )
-              )}
-            </CoinsModal.Items>
+            <YStack py="$2.5" w="100%">
+              <CoinsModal.Items>
+                {investmentCoins.map((coin) =>
+                  Platform.OS === 'web' ? (
+                    <InvestSheetItemWeb key={coin.symbol} coin={coin} />
+                  ) : (
+                    <InvestSheetItemNative
+                      key={coin.symbol}
+                      coin={coin}
+                      onPress={() => setIsSheetOpen(false)}
+                    />
+                  )
+                )}
+              </CoinsModal.Items>
+            </YStack>
           </CoinsModal.Content>
         </CoinsModal>
       </InvestmentsPortfolioCard>
