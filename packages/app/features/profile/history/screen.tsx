@@ -303,7 +303,7 @@ const DateText = ({ children, sent }: PropsWithChildren & { sent: boolean }) => 
       display={'flex'}
       size={'$2'}
       ta={sent ? 'right' : 'left'}
-      color={'$color4'}
+      color={'$darkGrayTextField'}
       $theme-light={{ color: '$silverChalice' }}
     >
       {children}
