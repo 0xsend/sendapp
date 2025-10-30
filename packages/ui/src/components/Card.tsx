@@ -39,7 +39,7 @@ export const CardFrame = styled(ThemeableStack, {
             hoverStyle: {
               elevation: '$1',
               shadowOpacity: 0.3,
-              scale: 1.008,
+              scale: 1.005,
             },
             pressStyle: {
               elevation: '$0.75',
@@ -49,7 +49,7 @@ export const CardFrame = styled(ThemeableStack, {
             focusVisibleStyle: {
               elevation: '$1',
               shadowOpacity: 0.3,
-              scale: 1.008,
+              scale: 1.005,
             },
             '$platform-web': {
               transition:
