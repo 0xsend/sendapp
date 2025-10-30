@@ -48,6 +48,7 @@ import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const CANTON_WALLET_MIN_SEND_BALANCE = 3000n * BigInt(10 ** 18)
+const CANTON_WALLET_FORM_THRESHOLD = 2000n * BigInt(10 ** 18)
 
 export function CantonWalletVerification() {
   const { profile, isLoading: isUserLoading } = useUser()
@@ -120,7 +121,7 @@ function CantonWalletVerificationContent({
   const cantonWalletAddress = profile?.canton_party_verifications?.canton_wallet_address
 
   const canConnectCantonWallet = useMemo(() => {
-    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_MIN_SEND_BALANCE
+    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_FORM_THRESHOLD
     return sendTagPurchased && hasMinSavings && hasMinCantonBalance
   }, [sendTagPurchased, hasMinSavings, snapshotBalance])
 
