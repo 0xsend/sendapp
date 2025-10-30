@@ -106,12 +106,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
 
               placeholder: '0',
               fontFamily: '$mono',
-              '$theme-dark': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
-              '$theme-light': {
-                placeholderTextColor: '$darkGrayTextField',
-              },
+              placeholderTextColor: '$color4',
               inputMode: 'decimal',
               onChangeText: (depositAmount) => {
                 const localizedDepositAmount = localizeAmount(depositAmount)

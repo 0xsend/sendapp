@@ -210,7 +210,7 @@ export function OnboardingScreen() {
       return false
     }) as Exclude<Window['onunhandledrejection'], null>
 
-    if (typeof window !== 'undefined') {
+    if (process.env.TAMAGUI_TARGET === 'web') {
       window.addEventListener('error', errorHandler, { capture: true })
       window.addEventListener('unhandledrejection', rejectionHandler, { capture: true })
       previousOnError = window.onerror
@@ -227,7 +227,7 @@ export function OnboardingScreen() {
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
+      if (process.env.TAMAGUI_TARGET === 'web') {
         window.removeEventListener('error', errorHandler, { capture: true } as EventListenerOptions)
         window.removeEventListener('unhandledrejection', rejectionHandler, {
           capture: true,
@@ -410,12 +410,7 @@ export function OnboardingScreen() {
                   focusStyle: {
                     outlineWidth: 0,
                   },
-                  '$theme-dark': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
-                  '$theme-light': {
-                    placeholderTextColor: '$darkGrayTextField',
-                  },
+                  placeholderTextColor: '$color4',
                   fontSize: '$5',
                   onFocus: () => setIsInputFocused(true),
                   onBlur: () => setIsInputFocused(false),

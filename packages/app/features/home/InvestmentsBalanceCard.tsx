@@ -56,7 +56,11 @@ const InvestmentsBalanceCardContent = (props: CardProps) => {
   }
 
   return (
-    <HomeBodyCard materialInteractive onPress={toggleSubScreen} {...props}>
+    <HomeBodyCard
+      materialInteractive={process.env.TAMAGUI_TARGET === 'web'}
+      onPress={toggleSubScreen}
+      {...props}
+    >
       {props.children}
     </HomeBodyCard>
   )

@@ -42,6 +42,7 @@ export const { templates, maskOptions } = (() => {
     borderColorFocus: 7,
     borderColorPress: 7,
     placeholderColor: 7,
+    outlineColor: 0,
   }
 
   const templates = {

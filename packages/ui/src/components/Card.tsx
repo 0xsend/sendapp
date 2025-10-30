@@ -10,18 +10,21 @@ const CardContext = createStyledContext({
 export const CardFrame = styled(ThemeableStack, {
   name: 'Card',
   context: CardContext,
-  '$theme-dark': {
-    shadowColor: '$shadowColor',
-    shadowOpacity: 1,
-  },
+  '$theme-dark':
+    process.env.TAMAGUI_TARGET === 'web'
+      ? {
+          shadowColor: '$shadowColor',
+          shadowOpacity: 1,
+        }
+      : {},
   variants: {
     unstyled: {
       false: {
         size: '$true',
         backgroundColor: '$background',
         position: 'relative',
-        elevation: '$0.75',
-        shadowOpacity: 0.3,
+        elevation: process.env.TAMAGUI_TARGET === 'web' ? '$0.75' : '$0.25',
+        shadowOpacity: process.env.TAMAGUI_TARGET === 'web' ? 0.3 : 0.1,
       },
     },
     materialInteractive: {

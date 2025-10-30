@@ -605,12 +605,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 hoverStyle: {
                   bw: 0,
                 },
-                '$theme-dark': {
-                  placeholderTextColor: '$silverChalice',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                },
+                placeholderTextColor: '$color4',
                 focusStyle: {
                   boc: borderColor,
                   bw: 1,

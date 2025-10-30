@@ -43,7 +43,7 @@ export function ProfileTopNav() {
             <ButtonOg.Icon>
               <IconArrowLeft
                 size={'$1.5'}
-                $theme-dark={{ color: '$primary' }}
+                color={'$primary'}
                 $theme-light={{ color: '$color12' }}
               />
             </ButtonOg.Icon>

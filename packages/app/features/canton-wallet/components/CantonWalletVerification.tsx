@@ -47,7 +47,8 @@ import formatAmount from 'app/utils/formatAmount'
 import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 
-const CANTON_WALLET_MIN_SEND_BALANCE = 2000n * BigInt(10 ** 18)
+const CANTON_WALLET_MIN_SEND_BALANCE = 3000n * BigInt(10 ** 18)
+const CANTON_WALLET_FORM_THRESHOLD = 2000n * BigInt(10 ** 18)
 
 export function CantonWalletVerification() {
   const { profile, isLoading: isUserLoading } = useUser()
@@ -120,7 +121,7 @@ function CantonWalletVerificationContent({
   const cantonWalletAddress = profile?.canton_party_verifications?.canton_wallet_address
 
   const canConnectCantonWallet = useMemo(() => {
-    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_MIN_SEND_BALANCE
+    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_FORM_THRESHOLD
     return sendTagPurchased && hasMinSavings && hasMinCantonBalance
   }, [sendTagPurchased, hasMinSavings, snapshotBalance])
 
@@ -313,7 +314,8 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
   const queryClient = useQueryClient()
   const toast = useAppToast()
   const theme = useThemeName()
-  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
+  const isDark = theme?.startsWith('dark')
+  const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
 
@@ -447,14 +449,8 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                 hoverStyle: {
                   bw: 0,
                 },
-                '$theme-dark': {
-                  placeholderTextColor: '$silverChalice',
-                  backgroundColor: '#2b3639',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                  backgroundColor: '#f2f2f2',
-                },
+                placeholderTextColor: isDark ? '$silverChalice' : '$darkGrayTextField',
+                backgroundColor: isDark ? '#2b3639' : '#f2f2f2',
                 focusStyle: {
                   boc: borderColor,
                   bw: 1,
@@ -504,6 +500,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                       <Button.Text>Cancel</Button.Text>
                     </Button>
                     <SubmitButton
+                      p={0}
                       w={'49%'}
                       onPress={handleUpdate}
                       height={44}
@@ -558,7 +555,8 @@ function CantonWalletFormCard() {
   const queryClient = useQueryClient()
   const toast = useAppToast()
   const theme = useThemeName()
-  const borderColor = theme?.startsWith('dark') ? '$primary' : '$color12'
+  const isDark = theme?.startsWith('dark')
+  const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
 
@@ -692,14 +690,8 @@ function CantonWalletFormCard() {
                 hoverStyle: {
                   bw: 0,
                 },
-                '$theme-dark': {
-                  placeholderTextColor: '$silverChalice',
-                  backgroundColor: '#2b3639',
-                },
-                '$theme-light': {
-                  placeholderTextColor: '$darkGrayTextField',
-                  backgroundColor: '#f2f2f2',
-                },
+                placeholderTextColor: isDark ? '$silverChalice' : '$darkGrayTextField',
+                backgroundColor: isDark ? '#2b3639' : '#f2f2f2',
                 focusStyle: {
                   boc: borderColor,
                   bw: 1,
@@ -734,6 +726,7 @@ function CantonWalletFormCard() {
                 <XStack gap="$3" w="100%" ai={'flex-start'}>
                   <XStack w={'70%'}>{address}</XStack>
                   <SubmitButton
+                    p={0}
                     onPress={handleVerify}
                     width={'30%'}
                     height={44}

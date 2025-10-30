@@ -117,12 +117,7 @@ export const DateField = (
                   fontSize={'$5'}
                   fontStyle={field.value ? 'normal' : 'italic'}
                   fontWeight={field.value ? 'bold' : 'normal'}
-                  $theme-dark={{
-                    ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
-                  }}
-                  $theme-light={{
-                    ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
-                  }}
+                  placeholderTextColor={'$color4'}
                   value={displayedValue}
                   onBlur={field.onBlur}
                   ref={field.ref}

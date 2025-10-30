@@ -79,7 +79,7 @@
   "devDependencies": {
     "@babel/core": "^7.24",
     "@expo/metro-config": "~0.19.0",
-    "@tamagui/babel-plugin": "1.126.5",
+    "@tamagui/babel-plugin": "^1.135.4",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "babel-preset-expo": "~12.0.4",
     "eslint-config-custom": "workspace:*",

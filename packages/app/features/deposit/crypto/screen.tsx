@@ -86,7 +86,7 @@ export function DepositCryptoScreen() {
                   <Copy
                     flexShrink={0}
                     size="$1"
-                    $theme-dark={{ color: '$primary' }}
+                    color={'$primary'}
                     $theme-light={{ color: '$color12' }}
                   />
                 )}

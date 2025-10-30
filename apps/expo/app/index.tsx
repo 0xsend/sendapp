@@ -44,7 +44,7 @@ export default function Index() {
 
   // If user is logged in, redirect to the home screen inside the tabs layout
   if (session) {
-    return <Redirect href="/(tabs)/" />
+    return <Redirect href="/(tabs)/home" />
   }
 
   // If user is not logged in, show the splash screen
@@ -73,7 +73,7 @@ export default function Index() {
           px="$0"
         >
           <YStack flex={1} jc="center" ai="center" f={1} backgroundColor="black">
-            <SplashScreen />
+            <SplashScreen hidden={false} />
           </YStack>
         </Container>
       </AuthCarouselContext.Provider>

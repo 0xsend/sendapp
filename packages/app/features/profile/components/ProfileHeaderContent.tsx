@@ -55,11 +55,7 @@ export const ProfileHeaderContent = ({
         </Paragraph>
       </XStack>
       {profile && (
-        <IconArrowRight
-          size={'$1.5'}
-          $theme-dark={{ color: '$primary' }}
-          $theme-light={{ color: '$color12' }}
-        />
+        <IconArrowRight size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
       )}
     </Card>
   )

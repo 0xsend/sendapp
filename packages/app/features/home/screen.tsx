@@ -10,7 +10,6 @@ import {
   Stack,
   styled,
   Theme,
-  useEvent,
   useMedia,
   XStack,
   type XStackProps,
@@ -33,7 +32,7 @@ import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { coin } from 'app/data/coins'
 import { investmentCoins } from 'app/data/coins'
@@ -188,9 +187,9 @@ export function InvestmentsBody() {
 
   const [modalContainerWidth, setModalContainerWidth] = useState(0)
 
-  const onModalContainerLayout = useEvent((e: LayoutChangeEvent) => {
+  const onModalContainerLayout = useCallback((e: LayoutChangeEvent) => {
     setModalContainerWidth(Math.floor(e.nativeEvent.layout.width))
-  })
+  }, [])
 
   return (
     <YStack
@@ -403,10 +402,10 @@ const InvestSheetItemWeb = ({ coin }: { coin: coin }) => {
 const InvestSheetItemNative = ({ coin, onPress }: { coin: coin; onPress: () => void }) => {
   const router = useRouter()
 
-  const handlePress = useEvent(() => {
+  const handlePress = useCallback(() => {
     onPress()
     router.push({ pathname: '/token', query: { token: coin.token } })
-  })
+  }, [coin.token, onPress, router])
 
   return <CoinsModal.Item key={coin.symbol} onPress={handlePress} coin={coin} />
 }
@@ -462,7 +461,7 @@ export const HomeBodyCard = styled(Card, {
   f: 1,
   mah: 150,
   p: '$1.5',
-  materialInteractive: true,
+  materialInteractive: process.env.TAMAGUI_TARGET === 'web',
 })
 
 export const HomeBodyCardRow = styled(XStack, {

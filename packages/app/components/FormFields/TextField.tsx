@@ -69,12 +69,7 @@ export const TextField = (
             borderRadius={'$4'}
             fontSize={'$5'}
             fontWeight={field.value ? 'bold' : 'normal'}
-            $theme-dark={{
-              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$white' } : {}),
-            }}
-            $theme-light={{
-              ...(process.env.NODE_ENV !== 'test' ? { placeholderTextColor: '$black' } : {}),
-            }}
+            placeholderTextColor={'$color4'}
             spellCheck={isEmail ? false : undefined}
             autoCapitalize={isEmail ? 'none' : undefined}
             keyboardType={isEmail ? 'email-address' : undefined}

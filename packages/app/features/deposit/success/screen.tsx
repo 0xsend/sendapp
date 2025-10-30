@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import { useLink } from 'solito/link'
 
 export function DepositSuccessScreen() {
-  const linkProps = useLink({ href: Platform.OS === 'web' ? '/deposit' : '/(tabs)/' })
+  const linkProps = useLink({ href: Platform.OS === 'web' ? '/deposit' : '/(tabs)/home' })
 
   return (
     <YStack

@@ -37,11 +37,7 @@ function ActiveEarnings() {
     () => !!affiliateRewards.data?.vault?.send_earn_affiliate,
     [affiliateRewards.data]
   )
-  const buttons: {
-    Icon: NamedExoticComponent<IconProps>
-    label: string
-    href: string
-  }[] = useMemo(() => {
+  const buttons = useMemo(() => {
     if (!coin || !coin.data) return []
     return (
       [
@@ -63,8 +59,12 @@ function ActiveEarnings() {
             }
           : null,
       ] as const
-    ).filter((b): b is NonNullable<typeof b> => b !== null)
-  }, [coin, isAffiliate])
+    ).filter(Boolean)
+  }, [coin, isAffiliate]) as {
+    Icon: NamedExoticComponent<IconProps>
+    label: string
+    href: string
+  }[]
 
   if (!coin.isLoading && !coin.data) {
     push('/earn')
