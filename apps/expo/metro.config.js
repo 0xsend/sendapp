@@ -2,7 +2,7 @@
 /**
  * @type {import('expo/metro-config')}
  */
-const { getDefaultConfig } = require('@expo/metro-config')
+const { getDefaultConfig } = require('expo/metro-config')
 const path = require('node:path')
 const fs = require('node:fs')
 

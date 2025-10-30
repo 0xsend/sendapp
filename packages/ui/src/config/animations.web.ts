@@ -1,7 +1,9 @@
-import { createAnimations } from '@tamagui/animations-moti'
+import { createAnimations } from '@tamagui/animations-react-native'
 import { Easing } from 'react-native'
 import { delayAnimations200ms } from './delay200ms'
 
+// Web-specific animations using react-native-web animations
+// This works on web through react-native-web's Animated API
 export const animations = createAnimations({
   '100ms': {
     type: 'timing',
@@ -39,7 +41,6 @@ export const animations = createAnimations({
     easing: Easing.inOut(Easing.quad),
   },
   '10000ms': {
-    // debug animation, don't actually use this
     type: 'timing',
     duration: 10000,
   },
@@ -92,9 +93,6 @@ export const animations = createAnimations({
     mass: 0.9,
     stiffness: 390,
   },
-  // TODO(TAM-49): the animation config prop inline isn't passing delay, need to
-  // fix on tamagui side then we can remove this and just use quicker + add
-  // delay inline
   quickishDelayed: {
     type: 'spring',
     damping: 18,
@@ -130,7 +128,6 @@ export const animations = createAnimations({
     type: 'timing',
     duration: 80,
   },
-
   responsive: {
     type: 'spring',
     stiffness: 1000,

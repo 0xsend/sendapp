@@ -16,7 +16,6 @@ import { IconAccount } from 'app/components/icons'
 import { HomeBodyCard } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
-import { Easing } from 'react-native-reanimated'
 
 export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
   const linkProps = useLink({ href })

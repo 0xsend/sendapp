@@ -53,6 +53,14 @@ const plugins = [
   (nextConfig) => {
     return {
       webpack: (webpackConfig, options) => {
+        // Add .web.ts and .web.tsx to resolve extensions before .ts and .tsx
+        webpackConfig.resolve.extensions = [
+          '.web.tsx',
+          '.web.ts',
+          '.web.js',
+          '.web.jsx',
+          ...(webpackConfig.resolve.extensions || []),
+        ]
         webpackConfig.resolve.alias = {
           ...webpackConfig.resolve.alias,
           'react-native-svg': '@tamagui/react-native-svg',
@@ -104,6 +112,7 @@ export default () => {
       'solito',
       'react-native-web',
       'react-native-reanimated',
+      'react-native-worklets',
       'react-native-gesture-handler',
       'react-native-svg',
       'expo-application',

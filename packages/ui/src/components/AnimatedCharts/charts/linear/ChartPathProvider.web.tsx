@@ -1,6 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Dimensions } from 'react-native'
-import { useSharedValue } from 'react-native-reanimated'
 import {
   type CallbackType,
   ChartContext,
@@ -8,7 +7,7 @@ import {
   type PathData,
   type PathScales,
   type Point,
-} from '../../helpers/ChartContext'
+} from '../../helpers/ChartContext.web'
 import { findYExtremes } from '../../helpers/extremesHelpers'
 import { usePrevious } from '../../helpers/usePrevious'
 
@@ -32,8 +31,6 @@ function detectStablecoin(yValues: number[]): boolean {
   const threshold = 0.01
   const closeToOneCount = yValues.filter((y) => Math.abs(y - 1.0) < threshold).length
 
-  // If at least 95% of points are close to 1.0, consider it a stablecoin
-  // this handles cases where there are random deviations from the 1.0 line
   return closeToOneCount / yValues.length > 0.95
 }
 
@@ -115,7 +112,6 @@ function createPath({ data, width, height, yRange }: CallbackType): PathData {
     })
   }
 
-  // Build a simple linear path (M x,y L x,y ...)
   let path = ''
   for (let i = 0; i < sortedPoints.length; i++) {
     const p = sortedPoints[i]
@@ -125,7 +121,6 @@ function createPath({ data, width, height, yRange }: CallbackType): PathData {
   }
   path = path.trim()
 
-  // parsed path not used without redash; keep null placeholder
   const parsed = null
 
   return {
@@ -140,6 +135,7 @@ function createPath({ data, width, height, yRange }: CallbackType): PathData {
   }
 }
 
+// Web version using regular React state instead of Reanimated shared values
 export const ChartPathProvider = React.memo<ChartPathProviderProps>(
   ({
     children,
@@ -152,32 +148,23 @@ export const ChartPathProvider = React.memo<ChartPathProviderProps>(
     endPadding = 0,
   }) => {
     const chartPathWidth = width - endPadding
-    // path interpolation animation progress
-    const progress = useSharedValue(1)
 
-    // animated scale of the dot
-    const dotScale = useSharedValue(1)
-
-    // gesture state
-    const isActive = useSharedValue(false)
-
-    // current (according to finger position) item of data fields
-    const originalX = useSharedValue('')
-    const originalY = useSharedValue('')
-
-    // gesture event state
-    const state = useSharedValue(0)
-
-    // position of the dot
-    const positionX = useSharedValue(0)
-    const positionY = useSharedValue(-1)
+    // Use regular state instead of shared values on web
+    const [progress] = useState({ value: 1 })
+    const [dotScale] = useState({ value: 1 })
+    const [isActive] = useState({ value: false })
+    const [originalX] = useState({ value: '' })
+    const [originalY] = useState({ value: '' })
+    const [state] = useState({ value: 0 })
+    const [positionX] = useState({ value: 0 })
+    const [positionY] = useState({ value: -1 })
 
     const currentPath = useMemo(() => {
       return data.points.length > 1
         ? createPath({ data, height, width: chartPathWidth, yRange })
         : null
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data, height, chartPathWidth, yRange])
+
     const previousPath = usePrevious(currentPath) ?? null
 
     const value = useMemo(() => {
