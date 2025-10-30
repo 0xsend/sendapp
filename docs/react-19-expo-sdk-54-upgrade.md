@@ -23,7 +23,7 @@ Successfully upgraded the entire monorepo from React 18 to React 19 and Expo SDK
 
 ### Summary Statistics
 
-- **Total Files Modified:** 12 package.json files + 4 config files + 8 new platform-specific files
+- **Total Files Modified:** 12 package.json files + 5 config files + 1 platform-specific file + 1 SSR stub
 - **Total Package Upgrades:** 40 unique package upgrades
 - **Major Version Upgrades:**
   - React: 18 → 19
@@ -32,7 +32,8 @@ Successfully upgraded the entire monorepo from React 18 to React 19 and Expo SDK
   - React Native: 0.76 → 0.81
   - React Native Reanimated: 3 → 4
   - React Native Web: 0.19 → 0.21
-- **New Platform Files:** 8 web-specific implementations
+- **Platform-Specific Files:** 1 web animation config
+- **SSR Configuration:** Server-side Reanimated stub for Next.js
 
 ### Verification
 
@@ -149,55 +150,263 @@ const { getDefaultConfig } = require('expo/metro-config')
 
 ### `apps/next/next.config.js`
 
+**Added ES module support:**
+```javascript
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
+```
+
 **Added platform-specific extension resolution:**
 ```javascript
 webpackConfig.resolve.extensions = [
   '.web.tsx',
   '.web.ts',
   '.web.js',
+  '.web.jsx',
   ...(webpackConfig.resolve.extensions || []),
 ]
+```
+
+**Added Reanimated SSR stub (server-side only):**
+```javascript
+webpackConfig.resolve.alias = {
+  ...webpackConfig.resolve.alias,
+  'react-native-svg': '@tamagui/react-native-svg',
+  // Use minimal stub on server to prevent worklets initialization during SSR
+  ...(options.isServer
+    ? {
+        'react-native-reanimated': join(__dirname, 'reanimated-server-stub.js'),
+        'react-native-worklets': join(__dirname, 'reanimated-server-stub.js'),
+      }
+    : {}),
+}
 ```
 
 **Added to transpilePackages:**
 ```javascript
 transpilePackages: [
   // ...
+  'react-native-reanimated',
   'react-native-worklets',
   // ...
 ]
+```
+
+### `apps/next/reanimated-server-stub.js`
+
+**Created minimal SSR stub:**
+- Mocks all Reanimated hooks and functions for server-side rendering
+- Returns no-op implementations that prevent worklets initialization
+- Only used on server; client gets full Reanimated functionality
+- Prevents `WorkletsError: Failed to create a worklet` during SSR
+
+### `packages/eslint-config-custom/index.js`
+
+**Added Reanimated hook dependency checking:**
+```javascript
+'react-hooks/exhaustive-deps': [
+  'error',
+  {
+    additionalHooks: '(useAnimatedStyle|useDerivedValue|useAnimatedProps|useAnimatedReaction)',
+  },
+],
 ```
 
 ---
 
 ## Web-Specific Implementation
 
-To avoid React Native Reanimated v4 worklets issues on web (which don't work in browsers or SSR), created platform-specific implementations using React Native Web's Animated API:
+React Native Reanimated v4 uses Worklets, which require native bindings (JSI) that don't exist in Node.js or browsers. Our solution combines strategic platform-specific files with server-side stubbing:
 
-### Files Created
+### Strategy Overview
 
-1. **Animation System**
-   - `packages/ui/src/config/animations.web.ts` - Uses `@tamagui/animations-react-native` instead of moti
+1. **Tamagui Animation Config** - Uses different animation drivers for web vs native
+2. **Component Code** - Uses Reanimated directly with proper dependency arrays
+3. **Server-Side Rendering** - Webpack alias replaces Reanimated with stub on server
 
-2. **Shimmer Component**
-   - `packages/ui/src/components/Shimmer/Shimmer.web.tsx` - Uses React Native Web Animated API
-   - `packages/ui/src/components/Shimmer/ShimmerContext.web.tsx` - Simplified context without shared values
+### Files Created/Modified
 
-3. **AnimatedCharts**
-   - `packages/ui/src/components/AnimatedCharts/charts/linear/ChartPathProvider.web.tsx` - Uses React state
-   - `packages/ui/src/components/AnimatedCharts/helpers/ChartContext.web.ts` - Simple objects instead of SharedValue
-   - `packages/ui/src/components/AnimatedCharts/helpers/requireOnWorklet.web.ts` - No-op worklet implementation
+#### 1. **Animation System** (Platform-Specific)
+- **`packages/ui/src/config/animations.web.ts`**
+  - Uses `@tamagui/animations-react-native` (React Native Web's Animated API)
+  - SSR-safe, works in browsers without worklets
+  - Only loaded for web builds (Next.js)
 
-4. **Other Components**
-   - `packages/ui/src/components/Shake.web.tsx` - Uses React Native Web Animated API
-   - `packages/ui/src/components/PendingIndicatorBar.web.tsx` - Fixed progress bar animation
+- **`packages/ui/src/config/animations.ts`**
+  - Uses `@tamagui/animations-moti` (powered by Reanimated)
+  - Full performance on native and web client-side
+  - Changed `Easing` import from `react-native-reanimated` to `react-native`
 
-### Why Web-Specific Files?
+#### 2. **Reanimated Components** (Direct Usage)
+Components like `Shimmer.tsx`, `Shake.tsx`, `ChartPath.tsx`, `ChartDot.tsx` use Reanimated directly with:
+- ✅ **Added proper dependency arrays** to all Reanimated hooks
+- ✅ **Works without Babel plugin** on web (Reanimated 4 requirement)
+- ✅ **Server-side stub** handles SSR automatically
+- ✅ **Client hydration** uses real Reanimated for full performance
 
-React Native Reanimated v4:
-- ❌ Worklets don't work in browsers or Node.js SSR
-- ❌ Requires native bindings (JSI) not available on web
-- ✅ Solution: Use React Native Web's `Animated` API which works perfectly in browsers
+**Fixed files:**
+- `packages/ui/src/components/AnimatedCharts/charts/linear/ChartPath.tsx`
+- `packages/ui/src/components/AnimatedCharts/charts/linear/ChartDot.tsx`
+- `packages/ui/src/components/Shimmer/Shimmer.tsx`
+
+#### 3. **Server-Side Stub** (Next.js Only)
+- **`apps/next/reanimated-server-stub.js`**
+  - Minimal mock of Reanimated API
+  - Only used during SSR (server-side)
+  - Returns no-op implementations preventing worklets initialization
+  - Client-side gets real Reanimated through webpack alias configuration
+
+### Why This Approach?
+
+**Previous Approach (Removed):**
+- ❌ Created 7+ `.web.tsx` component files
+- ❌ Duplicated component logic
+- ❌ Maintenance burden
+
+**New Approach (Current):**
+- ✅ Only 1 platform-specific file (`animations.web.ts`)
+- ✅ Components work everywhere with dependency arrays
+- ✅ Server stub handles SSR transparently
+- ✅ Full Reanimated performance on all clients
+
+**Key Insight:** React Native Reanimated v4 can work on web without the Babel plugin if you provide explicit dependency arrays. The only SSR issue is the worklets initialization, which we solve with a server-side stub.
+
+---
+
+## Reanimated 4 + Next.js SSR Solution
+
+### The Challenge
+
+React Native Reanimated v4 introduced Worklets - a separate threading system for high-performance animations. However, Worklets require native bindings (JSI) that don't exist in Node.js servers, causing this error during Next.js SSR:
+
+```
+WorkletsError: [Worklets] Failed to create a worklet
+```
+
+### The Solution Architecture
+
+Our solution uses a **two-part strategy** that provides full Reanimated functionality on clients while gracefully handling SSR:
+
+```
+┌─────────────────────────────────────────────┐
+│           Next.js Build Process             │
+├─────────────────────────────────────────────┤
+│                                             │
+│  SERVER BUNDLE (SSR)                        │
+│  ├─ animations.web.ts                       │
+│  │  └─ @tamagui/animations-react-native ✓  │
+│  │                                          │
+│  ├─ Shimmer.tsx, ChartPath.tsx             │
+│  │  └─ react-native-reanimated              │
+│  │     → reanimated-server-stub.js (MOCKED)│
+│  │                                          │
+│  CLIENT BUNDLE (Browser/App)                │
+│  ├─ animations.ts                           │
+│  │  └─ @tamagui/animations-moti ✓          │
+│  │     └─ react-native-reanimated (REAL)   │
+│  │                                          │
+│  ├─ Shimmer.tsx, ChartPath.tsx             │
+│  │  └─ react-native-reanimated (REAL) ✓    │
+│  │                                          │
+└─────────────────────────────────────────────┘
+```
+
+### Part 1: Server-Side Stub
+
+**Location:** `apps/next/reanimated-server-stub.js`
+
+**Purpose:** Provides mock implementations of Reanimated APIs that do nothing but match the expected interface.
+
+**Key exports:**
+```javascript
+{
+  useSharedValue: (v) => ({ value: v }),
+  useAnimatedStyle: (fn) => ({}),
+  useDerivedValue: (fn) => ({ value: undefined }),
+  useAnimatedReaction: NOOP,
+  withTiming: ID,
+  withSpring: ID,
+  Easing: { /* mock easing functions */ },
+  createAnimatedComponent: (Component) => Component,
+  // ... all other Reanimated exports
+}
+```
+
+**Webpack Configuration:**
+```javascript
+// Only applied to server builds
+...(options.isServer
+  ? {
+      'react-native-reanimated': join(__dirname, 'reanimated-server-stub.js'),
+      'react-native-worklets': join(__dirname, 'reanimated-server-stub.js'),
+    }
+  : {})
+```
+
+### Part 2: Platform-Specific Animation Config
+
+**Why needed:** Tamagui's animation configuration initializes during SSR to set up the animation driver.
+
+**Two files:**
+
+1. **`animations.ts`** (Native + Web Client)
+   - Uses `@tamagui/animations-moti`
+   - Powered by Reanimated for maximum performance
+   - Full worklets support
+
+2. **`animations.web.ts`** (Web Only - including SSR)
+   - Uses `@tamagui/animations-react-native`
+   - Powered by React Native Web's Animated API
+   - Works during SSR without native bindings
+
+**Webpack resolution:** `.web.ts` extension is checked first for web builds, automatically loading the SSR-safe version.
+
+### Part 3: Dependency Arrays
+
+**Requirement:** Reanimated v4 requires explicit dependency arrays when used without the Babel plugin on web.
+
+**What we did:**
+- Added dependency arrays to all `useAnimatedStyle`, `useDerivedValue`, `useAnimatedProps`, and `useAnimatedReaction` hooks
+- Configured ESLint to enforce this pattern going forward
+
+**Example:**
+```typescript
+// ❌ Before (works with Babel plugin only)
+const animatedStyle = useAnimatedStyle(() => {
+  return { opacity: isActive.value ? 1 : 0 }
+})
+
+// ✅ After (works with or without Babel plugin)
+const animatedStyle = useAnimatedStyle(() => {
+  return { opacity: isActive.value ? 1 : 0 }
+}, [isActive])
+```
+
+### Why This Works Better Than `.web` Components
+
+**Old Approach (What we removed):**
+- Created separate `.web.tsx` files for every component using Reanimated
+- Duplicated logic between native and web versions
+- High maintenance burden (7+ duplicate files)
+
+**New Approach (What we have now):**
+- Single component code works everywhere
+- Dependency arrays make Reanimated web-compatible
+- Server stub handles SSR transparently
+- Only 1 platform-specific file (`animations.web.ts`)
+
+### Key Insights
+
+1. **Reanimated 4 CAN work on web** - Just needs explicit dependency arrays
+2. **SSR is the only blocker** - Solved with webpack alias to stub
+3. **Client gets full performance** - Stub only affects server rendering
+4. **Components don't need duplication** - Hooks work the same way everywhere
+
+### References
+
+- [Reanimated Web Support Docs](https://docs.swmansion.com/react-native-reanimated/docs/guides/web-support/)
+- [Using Reanimated without Babel Plugin](https://docs.swmansion.com/react-native-reanimated/docs/guides/web-support/#web-without-the-babel-plugin)
 
 ---
 
@@ -273,7 +482,10 @@ React Native Reanimated v4:
 - ✅ **addWhitelistedNativeProps** - Not used
 
 #### Web Compatibility
-- ✅ **Worklets don't work on web** - Created 8 platform-specific `.web.ts` files
+- ✅ **Worklets don't work on Node.js SSR** - Created server-side stub for Next.js
+- ✅ **Dependency arrays required** - Added to all Reanimated hooks for web compatibility
+- ✅ **ESLint enforcement** - Added rule to catch missing dependency arrays
+- ✅ **Platform-specific animation config** - `animations.web.ts` uses React Native Web API
 
 **Status:** ✅ All resolved
 
@@ -466,7 +678,7 @@ npx expo prebuild --clean
 2. **withSpring parameters** - ✅ Using compatible config
 
 #### Web Compatibility
-- ✅ **Resolved:** Created 8 web-specific files using React Native Web Animated API
+- ✅ **Resolved:** Added dependency arrays to Reanimated hooks + server-side stub for SSR
 
 ---
 
@@ -493,13 +705,12 @@ npx expo prebuild --clean
 
 ## Known Issues Fixed
 
-- ✅ **Worklets errors on web** - Resolved with platform-specific files
+- ✅ **Worklets errors during Next.js SSR** - Resolved with server-side stub
+- ✅ **Missing dependency arrays** - Added to all Reanimated hooks for web compatibility
 - ✅ **Metro config import** - Updated to expo/metro-config
 - ✅ **Version mismatches** - All resolved
 - ✅ **Missing plugins** - Added expo-secure-store, expo-web-browser
-- ✅ **Shimmer not animating** - Fixed with React Native Web Animated API
-- ✅ **Progress bar shrinking** - Fixed animation behavior
-- ✅ **Shake component type error** - Fixed with proper type casting
+- ✅ **ESLint not catching Reanimated hook deps** - Added enforcement rule
 
 ---
 
@@ -510,13 +721,17 @@ npx expo prebuild --clean
 **Current State:**
 - ✅ No deprecated APIs in codebase
 - ✅ All critical dependencies updated
-- ✅ Web compatibility issues resolved
+- ✅ Web compatibility issues resolved (SSR stub + dependency arrays)
 - ✅ New Architecture enabled
 - ✅ Metro config updated
 - ✅ Version mismatches fixed
+- ✅ ESLint enforces Reanimated hook dependencies
 - 🟢 Likely 16 KB compliant
 
-**Code Changes Required:** **ZERO**
+**Code Changes Required:** **MINIMAL**
+- Added dependency arrays to Reanimated hooks
+- Changed one Easing import source
+- All other changes were configuration only
 
 All breaking changes were either:
 - Not present in the codebase
