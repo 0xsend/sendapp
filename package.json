@@ -48,8 +48,7 @@
     "babel-loader": "^8.3.0",
     "istanbul-lib-coverage@npm:^3.2.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
     "istanbul-lib-coverage@npm:^3.0.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
-    "istanbul-lib-coverage@npm:^3.2.2": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
-    "@tamagui/constants@npm:1.135.4": "patch:@tamagui/constants@npm%3A1.135.4#~/.yarn/patches/@tamagui-constants-npm-1.135.4-3972aa7dc7.patch"
+    "istanbul-lib-coverage@npm:^3.2.2": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch"
   },
   "dependencies": {
     "@babel/runtime": "^7.27.3",
