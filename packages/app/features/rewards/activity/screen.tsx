@@ -666,7 +666,7 @@ const ClaimableRewardsCard = ({
   )
 
   return (
-    <YStack w={'100%'} gap="$5" $sm={{ display: Platform.OS === 'web' ? 'none' : undefined }}>
+    <YStack w={'100%'} gap="$5" display={'none'} $gtSm={{ display: 'flex' }}>
       <H3 fontWeight={'600'} color={'$color12'}>
         {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
       </H3>
