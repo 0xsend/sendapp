@@ -381,6 +381,7 @@ export function InvestmentsBody() {
           $gtSm={{
             p: '$4',
           }}
+          materialInteractive
         >
           {isLoading ? (
             <YStack p="$3.5" ai="center">
@@ -456,6 +457,7 @@ export const StablesBody = YStack.styleable((props) => {
         $gtSm={{
           p: '$4',
         }}
+        materialInteractive
       >
         <StablesBalanceList />
       </Card>
