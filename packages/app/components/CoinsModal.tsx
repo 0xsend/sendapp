@@ -85,14 +85,9 @@ const Item = ({ coin, ...props }: { coin: coin } & XStackProps) => {
       px="$3.5"
       {...props}
     >
-      <XStack gap={'$2'} ai={'center'}>
+      <XStack gap="$3" ai="center">
         <IconCoin symbol={coin.symbol} />
-        <Paragraph
-          fontSize={'$5'}
-          fontWeight={'500'}
-          textTransform={'uppercase'}
-          color={'$color12'}
-        >
+        <Paragraph fontSize="$5" fontWeight="500" color="$color11">
           {coin.label}
         </Paragraph>
       </XStack>
@@ -125,11 +120,10 @@ const ConisModalContent = styled(Popover.Content, {
   '$theme-dark': {
     shadowOpacity: 0.3,
   },
+  animateOnly: ['transform', 'opacity', 'filter'],
   w: '100%',
   p: 0,
   ov: 'hidden',
-  bw: 1,
-  boc: '$aztec3',
   br: '$6',
   animation: [
     'responsive',
