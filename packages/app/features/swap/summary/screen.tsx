@@ -10,7 +10,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { api } from 'app/utils/api'
 import { useSwap } from 'app/features/swap/hooks/useSwap'
 import { useSendUserOpMutation } from 'app/utils/sendUserOp'
-import { type ReactNode, useCallback, useEffect } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo } from 'react'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -23,6 +23,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { Platform } from 'react-native'
 import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { useUser } from 'app/utils/useUser'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
@@ -37,6 +38,13 @@ export const SwapSummaryScreen = () => {
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { tokensQuery, ethQuery } = useCoinFromSendTokenParam()
   const queryClient = useQueryClient()
+  const { distributionShares } = useUser()
+
+  // Compute if user is verified
+  const isVerified = useMemo(
+    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
+    [distributionShares]
+  )
 
   const {
     mutateAsync: encodeRouteMutateAsync,
@@ -90,6 +98,13 @@ export const SwapSummaryScreen = () => {
   )
 
   const priceImpact = getPriceImpactAnalysis(routeSummary)
+
+  // Calculate fee percentage from routeSummary
+  const feePercentage = useMemo(() => {
+    if (!routeSummary?.extraFee?.feeAmount) return isVerified ? '0.60' : '0.75'
+    const feeBps = Number(routeSummary.extraFee.feeAmount)
+    return (feeBps / 100).toFixed(2)
+  }, [routeSummary?.extraFee?.feeAmount, isVerified])
 
   const initLoading =
     isLoadingCoins || isSendAccountLoading || isEncodeRouteLoading || isLoadingUserOp
@@ -283,7 +298,18 @@ export const SwapSummaryScreen = () => {
                   }
                 })()}
               />
-              <Row label={'Send Fee'} value={'0.75%'} />
+              <Row
+                label={'Send Fee'}
+                value={
+                  <Paragraph
+                    size={'$5'}
+                    color={isVerified ? '$primary' : '$color12'}
+                    $theme-light={{ color: isVerified ? '$olive' : '$color12' }}
+                  >
+                    {feePercentage}%
+                  </Paragraph>
+                }
+              />
               {priceImpact && (
                 <Row
                   testID={'priceImpact'}

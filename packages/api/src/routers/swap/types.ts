@@ -8,6 +8,7 @@ export const KyberGetSwapRouteRequestSchema = z.object({
   tokenIn: z.string(),
   tokenOut: z.string(),
   amountIn: z.string(),
+  isVerified: z.boolean().optional(),
 })
 
 export type KyberGetSwapRouteRequest = z.infer<typeof KyberGetSwapRouteRequestSchema>
@@ -89,6 +90,7 @@ export const EstimateAmountInFromAmountOutRequestSchema = z.object({
   tokenIn: z.string(),
   tokenOut: z.string(),
   amountOut: z.string(),
+  isVerified: z.boolean().optional(),
 })
 export type EstimateAmountInFromAmountOutRequest = z.infer<
   typeof EstimateAmountInFromAmountOutRequestSchema
