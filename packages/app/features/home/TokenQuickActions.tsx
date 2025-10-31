@@ -1,10 +1,9 @@
-import { Button, ButtonText, Theme, useAppToast, useMedia, XStack, YStack } from '@my/ui'
+import { Text, Card, Theme, useAppToast, useMedia, XStack, YStack } from '@my/ui'
 import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { Minus, Plus } from '@tamagui/lucide-icons'
 import type { LinkableButtonProps } from '@my/ui'
 import { type CoinWithBalance, stableCoins, usdcCoin } from 'app/data/coins'
 import { useLink } from 'solito/link'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
 
 const QuickActionButton = ({
@@ -12,23 +11,19 @@ const QuickActionButton = ({
   children,
   onPress,
 }: LinkableButtonProps & { onPress?: () => void }) => {
-  const hoverStyles = useHoverStyles()
   const linkProps = useLink({ href })
   const isIOS = Platform.OS === 'ios'
 
   return (
-    <Button
-      elevation={1}
+    <Card
+      materialInteractive
       f={1}
       height={'auto'}
-      hoverStyle={hoverStyles}
-      focusStyle={hoverStyles}
       w="100%"
-      opacity={isIOS ? 0.6 : 1}
       {...(isIOS && onPress ? { onPress } : linkProps)}
     >
       {children}
-    </Button>
+    </Card>
   )
 }
 
@@ -62,7 +57,7 @@ const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
         <Theme name="green">
           <Plus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </Theme>
-        <ButtonText
+        <Text
           fontSize={isSmallScreen ? '$4' : '$5'}
           px="$1"
           ta="center"
@@ -71,7 +66,7 @@ const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
           ellipsizeMode="tail"
         >
           Buy
-        </ButtonText>
+        </Text>
       </YStack>
     </QuickActionButton>
   )
@@ -107,7 +102,7 @@ const SellButton = ({ coin }: { coin: CoinWithBalance }) => {
         <Theme name="red">
           <Minus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         </Theme>
-        <ButtonText
+        <Text
           fontSize={isSmallScreen ? '$4' : '$5'}
           px="$1"
           ta="center"
@@ -116,7 +111,7 @@ const SellButton = ({ coin }: { coin: CoinWithBalance }) => {
           ellipsizeMode="tail"
         >
           Sell
-        </ButtonText>
+        </Text>
       </YStack>
     </QuickActionButton>
   )
@@ -138,7 +133,7 @@ const AddMoneyButton = () => {
         $gtSm={{ py: '$4' }}
       >
         <IconPlus size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-        <ButtonText
+        <Text
           fontSize={isSmallScreen ? '$4' : '$5'}
           px="$1"
           ta="center"
@@ -147,7 +142,7 @@ const AddMoneyButton = () => {
           ellipsizeMode="tail"
         >
           Add Money
-        </ButtonText>
+        </Text>
       </YStack>
     </QuickActionButton>
   )
@@ -171,7 +166,7 @@ const WithdrawButton = ({ coin }: { coin: CoinWithBalance }) => {
         $gtSm={{ py: '$4' }}
       >
         <IconArrowUp size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-        <ButtonText
+        <Text
           fontSize={isSmallScreen ? '$4' : '$5'}
           px="$1"
           ta="center"
@@ -180,7 +175,7 @@ const WithdrawButton = ({ coin }: { coin: CoinWithBalance }) => {
           ellipsizeMode="tail"
         >
           Withdraw
-        </ButtonText>
+        </Text>
       </YStack>
     </QuickActionButton>
   )

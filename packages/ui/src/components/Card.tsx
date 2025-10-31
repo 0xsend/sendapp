@@ -1,6 +1,7 @@
 import { ThemeableStack } from '@tamagui/stacks'
 import type { GetProps, SizeTokens } from '@tamagui/web'
-import { createStyledContext, styled, withStaticProperties } from '@tamagui/web'
+import type { ViewProps } from 'tamagui'
+import { createStyledContext, isWeb, styled, withStaticProperties } from '@tamagui/web'
 
 const CardContext = createStyledContext({
   size: '$true' as SizeTokens,
@@ -20,6 +21,7 @@ export const CardFrame = styled(ThemeableStack, {
   variants: {
     unstyled: {
       false: {
+        //@ts-ignore
         size: '$true',
         backgroundColor: '$background',
         position: 'relative',
@@ -28,33 +30,51 @@ export const CardFrame = styled(ThemeableStack, {
       },
     },
     materialInteractive: {
-      true: {
-        cursor: 'pointer',
-        focusable: true,
-        hoverStyle: {
-          elevation: '$1',
-          shadowOpacity: 0.3,
-        },
-        pressStyle: {
-          elevation: '$0.75',
-          shadowOpacity: 0.3,
-        },
-        '$platform-web': {
-          transition: 'box-shadow 150ms ease',
-        },
-        '$theme-dark': {
-          elevation: '$0.75',
-          hoverStyle: {
-            shadowOpacity: 1,
-          },
-          pressStyle: {
-            shadowOpacity: 1,
-          },
-          focusStyle: {
-            shadowOpacity: 1,
-          },
-        },
-      },
+      true: (isWeb
+        ? {
+            cursor: 'pointer',
+            tag: 'button',
+            role: 'button',
+            focusable: true,
+            hoverStyle: {
+              elevation: '$1',
+              shadowOpacity: 0.3,
+              scale: 1.005,
+            },
+            pressStyle: {
+              elevation: '$0.75',
+              shadowOpacity: 0.3,
+              scale: 1,
+            },
+            focusVisibleStyle: {
+              elevation: '$1',
+              shadowOpacity: 0.3,
+              scale: 1.005,
+            },
+            '$platform-web': {
+              transition:
+                'box-shadow 150ms ease-out, background-color 150ms ease-out, transform 150ms ease-out',
+              willChange: 'transform',
+            },
+            '$theme-dark': {
+              elevation: '$0.75',
+              hoverStyle: {
+                shadowOpacity: 1,
+                backgroundColor: '$aztec3',
+                scale: 1.008,
+              },
+              pressStyle: {
+                shadowOpacity: 1,
+                scale: 1,
+              },
+              focusVisibleStyle: {
+                shadowOpacity: 1,
+                backgroundColor: '$aztec3',
+                scale: 1.008,
+              },
+            },
+          }
+        : {}) as ViewProps,
     },
 
     size: {
@@ -67,6 +87,7 @@ export const CardFrame = styled(ThemeableStack, {
   } as const,
 
   defaultVariants: {
+    //@ts-ignore
     unstyled: process.env.TAMAGUI_HEADLESS === '1',
   },
 })
