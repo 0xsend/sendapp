@@ -6,6 +6,7 @@ import { FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { useEffect, useState } from 'react'
 import { useAppReviewSignIn } from './useAppReviewSignIn'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
+import { Platform } from 'react-native'
 
 const AppReviewSignInSchema = z.object({
   email: z.string().email(),
@@ -50,7 +51,7 @@ export const AppReviewLoginScreen = () => {
   }
 
   return (
-    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'}>
+    <YStack f={1} jc={'center'} ai={'center'} gap={'$5'} w={'100%'}>
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph w={'100%'} size={'$8'} fontWeight={600} ta={'center'}>
           App Review Login
@@ -66,16 +67,16 @@ export const AppReviewLoginScreen = () => {
           password credentials.
         </Paragraph>
       </YStack>
-      <YStack w={'100%'} ai={'center'}>
-        <FadeCard
-          fadeProps={{
-            width: '100%',
-            maxWidth: 550,
-          }}
-          borderColor={validationError ? '$error' : 'transparent'}
-          bw={1}
-        >
-          <FormProvider {...form}>
+      <FadeCard
+        fadeProps={{
+          width: '100%',
+          maxWidth: 550,
+        }}
+        borderColor={validationError ? '$error' : 'transparent'}
+        bw={1}
+      >
+        <FormProvider {...form}>
+          <YStack w={'100%'} ai={'center'}>
             <SchemaForm
               form={form}
               schema={AppReviewSignInSchema}
@@ -83,11 +84,16 @@ export const AppReviewLoginScreen = () => {
               defaultValues={{ email: '', password: '' }}
               formProps={{
                 w: '100%',
-                f: 0,
+                // f: 0,
                 footerProps: { p: 0 },
                 $gtSm: {
                   maxWidth: '100%',
                 },
+                ...(Platform.OS !== 'web' && {
+                  minHeight: 'auto',
+                  height: 'auto',
+                  flex: 0,
+                }),
                 style: { justifyContent: 'space-between' },
               }}
               props={{
@@ -137,7 +143,7 @@ export const AppReviewLoginScreen = () => {
               {({ email, password }) => (
                 <>
                   <YStack gap={'$3'}>
-                    <YStack position="relative">
+                    <XStack position="relative">
                       {email}
                       <XStack
                         position="absolute"
@@ -150,8 +156,8 @@ export const AppReviewLoginScreen = () => {
                           backgroundColor: isEmailFocused ? '$color12' : '$silverChalice',
                         }}
                       />
-                    </YStack>
-                    <YStack position="relative">
+                    </XStack>
+                    <XStack position="relative">
                       {password}
                       <XStack
                         position="absolute"
@@ -164,7 +170,7 @@ export const AppReviewLoginScreen = () => {
                           backgroundColor: isPasswordFocused ? '$color12' : '$silverChalice',
                         }}
                       />
-                    </YStack>
+                    </XStack>
                   </YStack>
                   {validationError && (
                     <Paragraph color={'$error'}>{validationError.message}</Paragraph>
@@ -178,9 +184,9 @@ export const AppReviewLoginScreen = () => {
                 </>
               )}
             </SchemaForm>
-          </FormProvider>
-        </FadeCard>
-      </YStack>
+          </YStack>
+        </FormProvider>
+      </FadeCard>
     </YStack>
   )
 }

@@ -126,7 +126,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
               maxWidth: '100%',
             },
             // Add Android-specific height handling
-            ...(Platform.OS === 'android' && {
+            ...(Platform.OS !== 'web' && {
               minHeight: 'auto',
               height: 'auto',
               flex: 0,

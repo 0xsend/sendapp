@@ -435,7 +435,7 @@ export function OnboardingScreen() {
                 $gtSm: {
                   maxWidth: '100%',
                 },
-                ...(Platform.OS === 'android' && {
+                ...(Platform.OS !== 'web' && {
                   minHeight: 'auto',
                   height: 'auto',
                   flex: 0,
