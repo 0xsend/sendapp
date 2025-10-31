@@ -71,7 +71,7 @@ export const CoinField = ({
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
         <Select
-          native={true}
+          native={native}
           id={id}
           value={field.value}
           onValueChange={field.onChange}
