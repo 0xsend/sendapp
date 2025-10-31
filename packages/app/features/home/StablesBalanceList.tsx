@@ -6,7 +6,6 @@ import type { CoinWithBalance } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import formatAmount from 'app/utils/formatAmount'
 import { Fragment } from 'react'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
@@ -27,7 +26,6 @@ export const StablesBalanceList = () => {
 }
 
 const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
-  const hoverStyles = useHoverStyles()
   const linkProps = useLink({
     href: {
       pathname: Platform.OS === 'web' ? '/' : '/token',
@@ -63,15 +61,7 @@ const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
 
   if (Platform.OS === 'web') {
     return (
-      <Link
-        display="flex"
-        jc={'space-between'}
-        ai={'center'}
-        p={'$3.5'}
-        br={'$4'}
-        hoverStyle={hoverStyles}
-        {...linkProps}
-      >
+      <Link display="flex" jc={'space-between'} ai={'center'} p={'$3.5'} br={'$4'} {...linkProps}>
         <XStack f={1} gap={'$3.5'} ai={'center'}>
           {content}
         </XStack>
@@ -80,15 +70,7 @@ const TokenBalanceItem = ({ coin }: { coin: CoinWithBalance }) => {
   }
 
   return (
-    <XStack
-      gap={'$3.5'}
-      jc={'space-between'}
-      ai={'center'}
-      p={'$3.5'}
-      br={'$4'}
-      hoverStyle={hoverStyles}
-      {...linkProps}
-    >
+    <XStack gap={'$3.5'} jc={'space-between'} ai={'center'} p={'$3.5'} br={'$4'} {...linkProps}>
       {content}
     </XStack>
   )

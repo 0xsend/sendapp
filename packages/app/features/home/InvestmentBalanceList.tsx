@@ -4,7 +4,6 @@ import type { CoinWithBalance } from 'app/data/coins'
 
 import formatAmount from 'app/utils/formatAmount'
 import { Fragment } from 'react'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { convertBalanceToFiat } from 'app/utils/convertBalanceToUSD'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { type MarketData, useTokensMarketData } from 'app/utils/coin-gecko'
@@ -51,7 +50,6 @@ const TokenBalanceItem = ({
   const changeText = changePercent24h?.toFixed(2) || ''
   const isNeutral = changeText === '0.00' || changeText === '-0.00'
   const { isPriceHidden } = useIsPriceHidden()
-  const hoverStyles = useHoverStyles()
   const href = {
     pathname: Platform.OS === 'web' ? '/' : '/token',
     query: { token: coin.token },
@@ -115,15 +113,7 @@ const TokenBalanceItem = ({
 
   if (Platform.OS === 'web') {
     return (
-      <Link
-        display="flex"
-        hoverStyle={hoverStyles}
-        jc={'space-between'}
-        ai={'center'}
-        p={'$3.5'}
-        br={'$4'}
-        href={href}
-      >
+      <Link display="flex" jc={'space-between'} ai={'center'} p={'$3.5'} br={'$4'} href={href}>
         <XStack f={1} gap={'$3.5'} ai={'center'} testID={`token-balance-list-${coin.label}`}>
           {content}
         </XStack>
