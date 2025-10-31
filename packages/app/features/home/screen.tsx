@@ -245,17 +245,8 @@ export function InvestmentsBody() {
             }
           >
             <CoinsModal.Content y={-3} w={modalContainerWidth - 24}>
-              <XStack
-                bbw={1}
-                bbc="$gray3"
-                p="$2"
-                pl="$3.5"
-                py="$2"
-                ai="center"
-                jc="space-between"
-                w="100%"
-              >
-                <H2 size="$7" col="$gray11" fow="300">
+              <XStack bbw={1} bbc="$gray6" p="$3" pl="$3.5" ai="center" jc="space-between" w="100%">
+                <H2 size="$7" col="$aztec11" fow="300">
                   New Investments
                 </H2>
                 <CoinsModal.Close asChild>
