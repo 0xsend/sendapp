@@ -34,7 +34,7 @@ export const AppReviewLoginScreen = () => {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, form.clearErrors])
+  }, [form])
 
   const handleSubmit = async (formData: z.infer<typeof AppReviewSignInSchema>) => {
     try {

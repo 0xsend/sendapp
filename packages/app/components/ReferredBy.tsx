@@ -33,7 +33,7 @@ export function ReferredBy() {
       (text: string) => {
         mutation.mutate(text)
       },
-      [mutation.mutate]
+      [mutation]
     ),
     300,
     { leading: false },

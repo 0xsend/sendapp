@@ -118,6 +118,7 @@ export function OnboardingScreen() {
         )}
       </YStack>
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diagnosticStatus, diagnosticMessage, canRetryDiagnostic, form])
 
   const { mutateAsync: validateSendtagMutateAsync } = useValidateSendtag({ isFirstTag: true })
@@ -154,7 +155,7 @@ export function OnboardingScreen() {
     if (firstSendtag) {
       form.setValue('name', firstSendtag)
     }
-  }, [firstSendtag, form.setValue])
+  }, [firstSendtag, form])
 
   useEffect(() => {
     const subscription = form.watch(() => {
@@ -162,7 +163,7 @@ export function OnboardingScreen() {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, form.clearErrors])
+  }, [form])
 
   useEffect(() => {
     const isUserRejectError = (value: unknown) => {
@@ -241,7 +242,7 @@ export function OnboardingScreen() {
     }
   }, [])
 
-  async function handleSubmit({ name }: z.infer<typeof OnboardingSchema>) {
+  const handleSubmit = async ({ name }: z.infer<typeof OnboardingSchema>) => {
     try {
       // First, validate token
       const isTokenValid = await validateToken()

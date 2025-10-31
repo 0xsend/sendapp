@@ -52,7 +52,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
     if (coinbaseStatus === 'success' && Platform.OS === 'web') {
       router.push('/deposit/success')
     }
-  }, [coinbaseStatus, router.push])
+  }, [coinbaseStatus, router])
 
   const renderContent = () => {
     switch (true) {

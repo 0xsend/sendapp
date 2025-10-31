@@ -10,7 +10,7 @@ export default function useAuthRedirect() {
       router.dismissAll()
       router.replace('/(tabs)/home')
     },
-    [router.replace, router.dismissAll]
+    [router]
   )
 
   return { redirect }

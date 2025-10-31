@@ -52,7 +52,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
     return () => {
       subscription.unsubscribe()
     }
-  }, [form.watch, depositParams, setDepositParams])
+  }, [form, depositParams, setDepositParams])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (

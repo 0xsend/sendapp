@@ -105,7 +105,7 @@ export const PersonalInfoScreen = () => {
       xUsername: profile?.x_username ?? '',
       birthday,
     })
-  }, [profile?.x_username, user?.phone, form.reset, birthday])
+  }, [profile?.x_username, user?.phone, form, birthday])
 
   const verificationCode = (
     <FadeCard>

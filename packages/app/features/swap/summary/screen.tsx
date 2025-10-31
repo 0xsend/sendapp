@@ -133,7 +133,7 @@ export const SwapSummaryScreen = () => {
     } catch (e) {
       console.error(e)
     }
-  }, [sendAccount, routeSummary, encodeRouteMutateAsync, slippage, sendAccount?.address])
+  }, [sendAccount, routeSummary, encodeRouteMutateAsync, slippage])
 
   const submit = async () => {
     if (!userOp) {
@@ -179,7 +179,7 @@ export const SwapSummaryScreen = () => {
     if (encodeRouteStatus === 'idle') {
       void encodeRoute()
     }
-  }, [routeSummary, swapParams, router.push, encodeRoute, encodeRouteStatus])
+  }, [routeSummary, swapParams, router, encodeRoute, encodeRouteStatus])
 
   if (initLoading) {
     return <Spinner size="large" color={'$color12'} />
