@@ -166,6 +166,7 @@ export const CoinField = ({
                 boc={'transparent'}
                 f={1}
                 maxHeight={isTouchable ? 'unset' : 275}
+                // @ts-expect-error - overflowY is needed for Y-axis specific scroll behavior
                 overflowY={isTouchable ? 'hidden' : 'scroll'}
               >
                 <Select.Group disabled={disabled} space="$0" p={'$2'}>
