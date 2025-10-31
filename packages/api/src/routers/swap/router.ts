@@ -20,8 +20,13 @@ import {
 const log = debug('api:routers:swap')
 
 const CHAIN = 'base'
-const SWAP_FEE = '75' // 0.75% feeAmount is the percentage of fees that we will take with base unit = 10000
+const SWAP_FEE_VERIFIED = '60' // 0.60% for verified users (basis points where 10000 = 100%)
+const SWAP_FEE_UNVERIFIED = '75' // 0.75% for unverified users (basis points where 10000 = 100%)
 const KYBER_NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+
+const getSwapFee = (isVerified?: boolean): string => {
+  return isVerified ? SWAP_FEE_VERIFIED : SWAP_FEE_UNVERIFIED
+}
 
 const getHeaders = () => {
   if (!process.env.NEXT_PUBLIC_KYBER_CLIENT_ID) {
@@ -35,13 +40,19 @@ const adjustTokenIfNeed = (token: string) => {
   return token === 'eth' ? KYBER_NATIVE_TOKEN_ADDRESS : token
 }
 
-const fetchKyberSwapRoute = async ({ tokenIn, tokenOut, amountIn }: KyberGetSwapRouteRequest) => {
+const fetchKyberSwapRoute = async ({
+  tokenIn,
+  tokenOut,
+  amountIn,
+  isVerified,
+}: KyberGetSwapRouteRequest) => {
   try {
+    const swapFee = getSwapFee(isVerified)
     const url = new URL(`${process.env.NEXT_PUBLIC_KYBER_SWAP_BASE_URL}/${CHAIN}/api/v1/routes`)
     url.searchParams.append('tokenIn', adjustTokenIfNeed(tokenIn))
     url.searchParams.append('tokenOut', adjustTokenIfNeed(tokenOut))
     url.searchParams.append('amountIn', amountIn)
-    url.searchParams.append('feeAmount', SWAP_FEE)
+    url.searchParams.append('feeAmount', swapFee)
     url.searchParams.append('chargeFeeBy', 'currency_out')
     url.searchParams.append('isInBps', 'true')
     url.searchParams.append('feeReceiver', sendSwapsRevenueSafeAddress[baseMainnetClient.chain.id])
@@ -174,9 +185,9 @@ const getDecimalsFromCoins = (token: string) => {
 export const swapRouter = createTRPCRouter({
   fetchSwapRoute: protectedProcedure
     .input(KyberGetSwapRouteRequestSchema)
-    .query(async ({ input: { tokenIn, tokenOut, amountIn } }) => {
-      log('calling fetchSwapRoute with input: ', { tokenIn, tokenOut, amountIn })
-      return await fetchKyberSwapRoute({ tokenIn, tokenOut, amountIn })
+    .query(async ({ input: { tokenIn, tokenOut, amountIn, isVerified } }) => {
+      log('calling fetchSwapRoute with input: ', { tokenIn, tokenOut, amountIn, isVerified })
+      return await fetchKyberSwapRoute({ tokenIn, tokenOut, amountIn, isVerified })
     }),
   encodeSwapRoute: protectedProcedure
     .input(KyberEncodeRouteRequestSchema)
@@ -191,8 +202,8 @@ export const swapRouter = createTRPCRouter({
     }),
   estimateAmountInFromAmountOut: protectedProcedure
     .input(EstimateAmountInFromAmountOutRequestSchema)
-    .query(async ({ input: { tokenIn, tokenOut, amountOut } }) => {
-      log('estimateAmountInFromAmountOut input', { tokenIn, tokenOut, amountOut })
+    .query(async ({ input: { tokenIn, tokenOut, amountOut, isVerified } }) => {
+      log('estimateAmountInFromAmountOut input', { tokenIn, tokenOut, amountOut, isVerified })
       try {
         const desiredOut = BigInt(amountOut)
         if (desiredOut <= 0n) {
@@ -204,6 +215,7 @@ export const swapRouter = createTRPCRouter({
           tokenIn,
           tokenOut,
           amountIn: probeIn.toString(),
+          isVerified,
         })
         const outProbe = BigInt(probe.routeSummary.amountOut || '0')
         if (outProbe === 0n) {

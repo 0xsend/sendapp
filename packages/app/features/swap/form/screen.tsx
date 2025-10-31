@@ -32,12 +32,13 @@ import { api } from 'app/utils/api'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
 import { type BRAND, z } from 'zod'
 import { Platform } from 'react-native'
+import { useUser } from 'app/utils/useUser'
 
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
@@ -60,6 +61,13 @@ export const SwapFormScreen = () => {
   const hoverStyles = useHoverStyles()
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
+  const { distributionShares } = useUser()
+
+  // Compute if user is verified
+  const isVerified = useMemo(
+    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
+    [distributionShares]
+  )
 
   // Track which side the user is editing
   const [quoteSide, setQuoteSide] = useState<'EXACT_IN' | 'EXACT_OUT'>('EXACT_IN')
@@ -108,6 +116,7 @@ export const SwapFormScreen = () => {
       tokenIn: inCoin?.token || '',
       tokenOut: outCoin?.token || '',
       amountOut: amountOutForQuery || '',
+      isVerified,
     },
     {
       enabled: Boolean(inCoin && outCoin && quoteSide === 'EXACT_OUT' && amountOutForQuery),
@@ -124,6 +133,7 @@ export const SwapFormScreen = () => {
       tokenIn: inCoin?.token || '',
       tokenOut: outCoin?.token || '',
       amountIn: inAmount || '',
+      isVerified,
     },
     {
       enabled: Boolean(quoteSide === 'EXACT_IN' && inCoin && outCoin && inAmount),
