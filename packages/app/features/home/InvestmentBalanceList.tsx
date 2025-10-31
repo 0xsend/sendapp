@@ -1,4 +1,4 @@
-import { Link, Paragraph, XStack, YStack } from '@my/ui'
+import { Card, isWeb, Link, Paragraph, XStack, YStack } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 
@@ -111,18 +111,28 @@ const TokenBalanceItem = ({
     </>
   )
 
-  if (Platform.OS === 'web') {
+  if (isWeb) {
     return (
-      <Link display="flex" jc={'space-between'} ai={'center'} p={'$3.5'} br={'$4'} href={href}>
-        <XStack f={1} gap={'$3.5'} ai={'center'} testID={`token-balance-list-${coin.label}`}>
-          {content}
-        </XStack>
-      </Link>
+      <Card
+        p="$2"
+        w="100%"
+        $gtSm={{
+          p: '$2',
+        }}
+        materialInteractive
+      >
+        <Link display="flex" jc={'space-between'} ai={'center'} p={'$3.5'} br={'$4'} href={href}>
+          <XStack f={1} gap={'$3.5'} ai={'center'} testID={`token-balance-list-${coin.label}`}>
+            {content}
+          </XStack>
+        </Link>
+      </Card>
     )
   }
 
   return (
-    <XStack
+    <Card
+      fd="row"
       gap={'$3.5'}
       testID={`token-balance-list-${coin.label}`}
       jc={'space-between'}
@@ -132,7 +142,7 @@ const TokenBalanceItem = ({
       {...linkProps}
     >
       {content}
-    </XStack>
+    </Card>
   )
 }
 
