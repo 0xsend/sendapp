@@ -20,6 +20,7 @@ const QuickActionButton = ({
       f={1}
       height={'auto'}
       w="100%"
+      opacity={isIOS && onPress ? 0.6 : 1}
       {...(isIOS && onPress ? { onPress } : linkProps)}
     >
       {children}
