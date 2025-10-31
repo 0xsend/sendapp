@@ -322,6 +322,7 @@ const Vibes = ({
   const isDark = useThemeName()?.startsWith('dark')
   const sendTokenPrice = tokenPrices?.[sendTokenAddress[baseMainnet.id]] ?? 0
   return (
+    // @ts-expect-error - overflowX is needed for X-axis specific scroll behavior
     <XStack jc="flex-start" gap={'$2'} p={2} overflowX={media.gtMd ? 'visible' : 'scroll'}>
       <Vibe
         amount={dollarToTokenAmount({

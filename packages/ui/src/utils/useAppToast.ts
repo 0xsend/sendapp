@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useToastController } from '@tamagui/toast'
 import { Platform } from 'react-native'
 
@@ -42,9 +42,12 @@ export const useAppToast = () => {
     [show]
   )
 
-  return {
-    show,
-    hide: toast.hide,
-    error,
-  }
+  return useMemo(
+    () => ({
+      show,
+      hide: toast.hide,
+      error,
+    }),
+    [show, toast.hide, error]
+  )
 }

@@ -39,7 +39,7 @@ export const LoginWithPhoneScreen = () => {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, form.clearErrors])
+  }, [form])
 
   const handleSubmit = async (formData: z.infer<typeof SignInWithPhoneSchema>) => {
     try {

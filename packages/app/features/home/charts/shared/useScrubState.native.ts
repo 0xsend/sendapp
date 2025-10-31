@@ -10,6 +10,7 @@ export function useScrubState() {
 
   useAnimatedReaction(
     () => ({ active: isActive.value, ox: originalX.value, oy: originalY.value }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     (v) => {
       runOnJS(setActive)(!!v.active)
       if (v.active && v.oy !== '') {
@@ -19,7 +20,8 @@ export function useScrubState() {
         runOnJS(setPrice)(null)
         runOnJS(setTs)(null)
       }
-    }
+    },
+    [isActive.value, originalX.value, originalY.value]
   )
 
   return { active, price, ts, onScrub: undefined as unknown as never }

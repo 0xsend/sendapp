@@ -9,7 +9,6 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useQuery } from '@tanstack/react-query'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
-import { Easing } from 'react-native-reanimated'
 import {
   baseMainnetClient,
   type sendMerkleDropAddress,

@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { View, Platform } from 'react-native'
-import { GestureDetector, Gesture } from 'react-native-gesture-handler'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { Platform, View } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
   FadeIn,
+  interpolate,
+  interpolateColor,
   runOnJS,
   useAnimatedProps,
   useAnimatedReaction,
+  useDerivedValue,
   useSharedValue,
   type WithSpringConfig,
   withTiming,
   type WithTimingConfig,
-  interpolateColor,
-  useDerivedValue,
-  interpolate,
 } from 'react-native-reanimated'
 import Svg, { Path, type PathProps } from 'react-native-svg'
 import type { ChartData, PathData } from '../../helpers/ChartContext'
@@ -174,10 +174,10 @@ const ChartPathInner = React.memo(
     const pressY = useSharedValue(0)
     const strokeColorAnimated = useDerivedValue(() => {
       return interpolateColor(selectedStrokeProgress.value, [0, 1], [stroke, selectedStroke])
-    })
+    }, [selectedStrokeProgress, stroke, selectedStroke])
     const strokeWidthAnimated = useDerivedValue(() => {
       return interpolate(selectedStrokeProgress.value, [0, 1], [strokeWidth, selectedStrokeWidth])
-    })
+    }, [selectedStrokeProgress, strokeWidth, selectedStrokeWidth])
 
     useAnimatedReaction(
       () => isActive.value,
@@ -193,7 +193,8 @@ const ChartPathInner = React.memo(
             timingFeedbackConfig || timingFeedbackDefaultConfig
           )
         }
-      }
+      },
+      [isActive, selectedStrokeProgress, timingFeedbackConfig]
     )
 
     const setOriginData = useCallback(
@@ -321,7 +322,8 @@ const ChartPathInner = React.memo(
           }
           updatePosition({ x: pressX.value, y: pressY.value })
         }
-      }
+      },
+      [armed, isActive, hapticsEnabled, updatePosition, pressX, pressY]
     )
 
     const resetGestureState = useCallback(() => {
@@ -351,7 +353,7 @@ const ChartPathInner = React.memo(
         strokeWidth: strokeWidthAnimated.value,
         stroke: strokeColorAnimated.value,
       }
-    }, [currentPath])
+    }, [currentPath, strokeWidth, stroke, strokeWidthAnimated, strokeColorAnimated])
 
     // Map wrapper props to GH2 (hitSlop, shouldCancelWhenOutside)
     const handlerProps = (panGestureHandlerProps ?? {}) as GH2HandlerProps

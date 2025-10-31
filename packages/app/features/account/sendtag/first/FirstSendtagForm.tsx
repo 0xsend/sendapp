@@ -39,7 +39,7 @@ export const FirstSendtagForm = () => {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, form.clearErrors])
+  }, [form])
 
   const handleSubmit = async ({ name }: z.infer<typeof SendtagSchemaWithoutRestrictions>) => {
     try {

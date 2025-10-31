@@ -20,7 +20,7 @@ export const api: CreateTRPCNext<AppRouter, NextPageContext> = createTRPCNext<Ap
             transformer: SuperJSON,
             // Omit credentials so responses can be cached by CDN
             fetch(url, opts) {
-              return fetch(url, { ...opts, credentials: 'omit' })
+              return fetch(url, { ...opts, credentials: 'omit' } as RequestInit)
             },
           }),
           // All other procedures remain batched over POST

@@ -590,8 +590,7 @@ const RemovePasskeyConfirmation = ({
             maxWidth: '100%',
           },
           px: '$0',
-          // Add Android-specific height handling
-          ...(Platform.OS === 'android' && {
+          ...(Platform.OS !== 'web' && {
             minHeight: 'auto',
             height: 'auto',
             flex: 0,

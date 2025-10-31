@@ -101,7 +101,8 @@ const ChartDot = React.memo(
         } else {
           startPulseAnimation()
         }
-      }
+      },
+      [isActive, stopPulseAnimation, startPulseAnimation]
     )
 
     useEffect(() => {
@@ -116,20 +117,20 @@ const ChartDot = React.memo(
         opacity: isActive.value ? 1 : 0,
         transform: [{ translateX }, { translateY }, { scale }],
       }
-    }, [size])
+    }, [positionX, positionY, magicNudgeNumber, isActive, springConfig, size])
 
     const dotPulseAnimatedStyle = useAnimatedStyle(() => {
       return {
         opacity: pulseOpacity.value,
         transform: [{ scale: pulseScale.value }],
       }
-    })
+    }, [pulseOpacity, pulseScale])
 
     const lastPointDotAnimatedStyle = useAnimatedStyle(() => {
       return {
         backgroundColor: isActive.value ? selectedStroke : stroke,
       }
-    })
+    }, [isActive, selectedStroke, stroke])
 
     const lastPointDotStyle = useAnimatedStyle(() => {
       if (!lastPoint) {
@@ -147,7 +148,7 @@ const ChartDot = React.memo(
         transform: [{ translateX }, { translateY }],
         opacity: 1,
       }
-    }, [lastPoint])
+    }, [lastPoint, magicNudgeNumber, timingAnimationConfig])
 
     const styles: Record<string, ViewStyle> = useMemo(() => {
       return {

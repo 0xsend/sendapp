@@ -8,6 +8,7 @@ module.exports = {
   version: '1.0.0',
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
+  newArchEnabled: true,
   updates: {
     fallbackToCacheTimeout: 0,
   },
@@ -39,9 +40,11 @@ module.exports = {
         android: {
           compileSdkVersion: 35,
           targetSdkVersion: 35,
+          newArchEnabled: true,
         },
         ios: {
           deploymentTarget: '15.1',
+          newArchEnabled: true,
         },
       },
     ],
@@ -66,6 +69,8 @@ module.exports = {
       },
     ],
     'expo-font',
+    'expo-secure-store',
+    'expo-web-browser',
     [
       '@intercom/intercom-react-native',
       {

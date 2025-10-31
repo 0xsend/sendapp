@@ -79,7 +79,7 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
 
     useEffect(() => {
       let shimerIncreased = false
-      let timer: NodeJS.Timeout | null = null
+      let timer: ReturnType<typeof setTimeout> | null = null
       if (!disableAnimation && renderGradient) {
         if (delay > 0) {
           timer = setTimeout(() => {

@@ -52,7 +52,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
     return () => {
       subscription.unsubscribe()
     }
-  }, [form.watch, depositParams, setDepositParams])
+  }, [form, depositParams, setDepositParams])
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
@@ -126,7 +126,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
               maxWidth: '100%',
             },
             // Add Android-specific height handling
-            ...(Platform.OS === 'android' && {
+            ...(Platform.OS !== 'web' && {
               minHeight: 'auto',
               height: 'auto',
               flex: 0,

@@ -31,7 +31,7 @@ export const useUser = () => {
       replace('/')
       return false
     }
-  }, [supabase.auth.getUser, supabase.auth.signOut, replace])
+  }, [supabase.auth, replace])
 
   // Run validation on mount if we have a session
   useQuery({

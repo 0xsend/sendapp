@@ -44,8 +44,9 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
   const depositLinkProps = useLink({ href: '/deposit' })
   const theme = useThemeName()
-  const pendingTags = usePendingTags() ?? []
-  const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
+  const pendingTagsRaw = usePendingTags()
+  const pendingTags = useMemo(() => pendingTagsRaw ?? [], [pendingTagsRaw])
+  const amountDue = useMemo(() => total(pendingTags), [pendingTags])
   const {
     data: referrerProfile,
     isLoading: isLoadingReferrer,
@@ -105,6 +106,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       // check it against the receipts
       submitTxToDb(byteaToHex(event.tx_hash as `\\x${string}`))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     sender,
     isLoadingReceipts,
@@ -214,12 +216,13 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
           setSubmitting(false)
         })
     },
-    [attempts, refetchReceipts, confirm.mutateAsync, onConfirmed, updateProfile, referralCode]
+    [attempts, refetchReceipts, confirm, onConfirmed, updateProfile, referralCode]
   )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: otherwise it infinite loops
   useEffect(() => {
     if (txReceipt) submitTxToDb(txReceipt.transactionHash)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txReceipt])
 
   useEffect(() => {

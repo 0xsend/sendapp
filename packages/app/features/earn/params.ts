@@ -85,5 +85,5 @@ export function useInitializeFormAmount(form: {
       // reset param amount if error
       setAmount(undefined, { webBehavior: 'replace' })
     }
-  }, [form.setValue, formAmount, amount, setAmount, coin.data?.decimals])
+  }, [form, formAmount, amount, setAmount, coin.data?.decimals])
 }

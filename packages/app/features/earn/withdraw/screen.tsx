@@ -299,15 +299,7 @@ export function WithdrawForm() {
         { webBehavior: 'replace' }
       )
     },
-    [
-      form.clearErrors,
-      form.setError,
-      setParams,
-      coin.data?.decimals,
-      params,
-      depositBalance,
-      mutation.isSuccess,
-    ]
+    [form, setParams, coin.data?.decimals, params, depositBalance, mutation.isSuccess]
   )
 
   // validate and sanitize amount
@@ -316,7 +308,7 @@ export function WithdrawForm() {
       validateAndSanitizeAmount({ amount: _amount })
     })
     return () => subscription.unsubscribe()
-  }, [form.watch, validateAndSanitizeAmount])
+  }, [form, validateAndSanitizeAmount])
 
   useInitializeFormAmount(form)
 

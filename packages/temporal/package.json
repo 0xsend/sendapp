@@ -34,11 +34,11 @@
   "peerDependencies": {
     "@bufbuild/protobuf": "^2.2.3",
     "@temporalio/common": "^1.11.1",
-    "typescript": "^5.5.3"
+    "typescript": "~5.9.2"
   },
   "devDependencies": {
     "esbuild": "^0.25.5",
     "temporal": "^0.7.1",
-    "typescript": "^5.8.3"
+    "typescript": "~5.9.2"
   }
 }

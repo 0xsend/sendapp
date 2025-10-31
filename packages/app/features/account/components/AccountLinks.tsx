@@ -31,7 +31,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
 
   const handleSignOut = useCallback(() => {
     void supabase.auth.signOut()
-  }, [supabase.auth.signOut])
+  }, [supabase.auth])
 
   const icons = useMemo(
     () => ({

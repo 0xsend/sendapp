@@ -279,7 +279,7 @@ export const SwapFormScreen = () => {
       form.clearErrors('slippage')
       form.setValue('slippage', value)
     },
-    [form.clearErrors, form.setValue]
+    [form]
   )
 
   // Debounced writer for EXACT_OUT URL param updates
@@ -319,7 +319,7 @@ export const SwapFormScreen = () => {
       subscription.unsubscribe()
       onFormChange.cancel()
     }
-  }, [form.watch, onFormChange])
+  }, [form, onFormChange])
 
   // When editing inAmount, derive outAmount from swap route (write only on change)
   useEffect(() => {
@@ -336,15 +336,7 @@ export const SwapFormScreen = () => {
     if (nextOutDisplay !== prevOutDisplay) {
       form.setValue('outAmount', nextOutDisplay)
     }
-  }, [
-    swapRoute,
-    outCoin?.decimals,
-    form.setValue,
-    form.getValues,
-    formInAmount,
-    outCoin?.formatDecimals,
-    quoteSide,
-  ])
+  }, [swapRoute, outCoin?.decimals, form, formInAmount, outCoin?.formatDecimals, quoteSide])
 
   // When editing outAmount, estimate required inAmount (server computed)
   useEffect(() => {
@@ -372,8 +364,7 @@ export const SwapFormScreen = () => {
     estimate,
     outCoin,
     inCoin,
-    form.setValue,
-    form.getValues,
+    form,
     quoteSide,
     writeExactOutParams,
     swapParams,
@@ -389,7 +380,7 @@ export const SwapFormScreen = () => {
       writeExactOutParams.cancel?.()
       updateDebouncedOutWei.cancel?.()
     }
-  }, [queryClient.removeQueries, writeExactOutParams, updateDebouncedOutWei])
+  }, [queryClient, writeExactOutParams, updateDebouncedOutWei])
 
   return (
     <YStack

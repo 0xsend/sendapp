@@ -77,8 +77,9 @@ export function useSendtagCheckout() {
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
   const chainId = baseMainnetClient.chain.id
-  const pendingTags = usePendingTags() ?? []
-  const amountDue = useMemo(() => total(pendingTags ?? []), [pendingTags])
+  const pendingTagsRaw = usePendingTags()
+  const pendingTags = useMemo(() => pendingTagsRaw ?? [], [pendingTagsRaw])
+  const amountDue = useMemo(() => total(pendingTags), [pendingTags])
   const { data: referrer } = useReferrer()
   const { data: reward } = useReferralReward({ tags: pendingTags })
   const referrerAddress = (referrer?.address ?? zeroAddress) as `0x${string}`

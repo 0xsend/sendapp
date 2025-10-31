@@ -39,17 +39,16 @@
     "clean": "yarn workspaces foreach --all -pi run clean"
   },
   "resolutions": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-refresh": "^0.14.0",
-    "react-native-svg": "15.10.1",
-    "react-native-web": "~0.19.13",
+    "react-native-svg": "15.12.1",
+    "react-native-web": "^0.21.0",
     "@babel/core": "^7.24",
     "babel-loader": "^8.3.0",
     "istanbul-lib-coverage@npm:^3.2.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
     "istanbul-lib-coverage@npm:^3.0.0": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
-    "istanbul-lib-coverage@npm:^3.2.2": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch",
-    "@tamagui/constants@npm:1.135.4": "patch:@tamagui/constants@npm%3A1.135.4#~/.yarn/patches/@tamagui-constants-npm-1.135.4-3972aa7dc7.patch"
+    "istanbul-lib-coverage@npm:^3.2.2": "patch:istanbul-lib-coverage@npm%3A3.2.2#~/.yarn/patches/istanbul-lib-coverage-npm-3.2.2-5c0526e059.patch"
   },
   "dependencies": {
     "@babel/runtime": "^7.27.3",
@@ -60,7 +59,7 @@
     "eslint": "^8.46.0",
     "node-gyp": "^9.3.1",
     "turbo": "^2.5.3",
-    "typescript": "^5.8.3"
+    "typescript": "~5.9.2"
   },
   "packageManager": "yarn@4.3.1",
   "devDependencies": {

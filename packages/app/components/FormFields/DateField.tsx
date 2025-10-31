@@ -35,10 +35,11 @@ export const DateField = (
     error,
     formState: { isSubmitting },
   } = useTsController<Date>()
+  const { customDateFormatter } = props
 
   const displayedValue = useMemo(() => {
-    if (props.customDateFormatter) {
-      return props.customDateFormatter(field.value)
+    if (customDateFormatter) {
+      return customDateFormatter(field.value)
     }
 
     if (!field.value) {
@@ -46,7 +47,7 @@ export const DateField = (
     }
 
     return field.value.toLocaleString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })
-  }, [props.customDateFormatter, field.value])
+  }, [customDateFormatter, field.value])
 
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>

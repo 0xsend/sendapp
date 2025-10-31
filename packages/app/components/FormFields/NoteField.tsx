@@ -26,8 +26,8 @@ const MIN_NOTE_ROWS = 1
 const MAX_NOTE_ROWS = 4
 const LINE_HEIGHT = 24
 const BASE_NOTE_HEIGHT = 60 // For web
-const ANDROID_MIN_HEIGHT = 56 // Minimal height for Android (single line with proper padding)
-const ANDROID_LINE_HEIGHT = 20 // Android-specific line height
+const NATIVE_MIN_HEIGHT = 56 // Minimal height for native (single line with proper padding)
+const NATIVE_LINE_HEIGHT = 20 // native-specific line height
 
 function adjustNoteFieldHeightForWeb(noteField: HTMLTextAreaElement) {
   noteField.rows = MIN_NOTE_ROWS
@@ -35,10 +35,10 @@ function adjustNoteFieldHeightForWeb(noteField: HTMLTextAreaElement) {
   noteField.rows = Math.min(MAX_NOTE_ROWS, MIN_NOTE_ROWS + rows)
 }
 
-function calculateAndroidHeight(contentHeight: number): number {
+function calculateNativeHeight(contentHeight: number): number {
   // Use content height directly, but ensure minimum and cap at maximum
-  const maxHeight = MAX_NOTE_ROWS * ANDROID_LINE_HEIGHT + 16 // Padding for 4 lines
-  return Math.max(ANDROID_MIN_HEIGHT, Math.min(contentHeight, maxHeight))
+  const maxHeight = MAX_NOTE_ROWS * NATIVE_LINE_HEIGHT + 16 // Padding for 4 lines
+  return Math.max(NATIVE_MIN_HEIGHT, Math.min(contentHeight, maxHeight))
 }
 
 export const NoteField = forwardRef<
@@ -65,8 +65,8 @@ export const NoteField = forwardRef<
   const ref = useRef<TamaguiElement>(null)
   const composedRefs = useComposedRefs<TamaguiElement>(forwardedRef, field.ref, ref)
 
-  // Android-specific height management
-  const [androidHeight, setAndroidHeight] = useState<number>(ANDROID_MIN_HEIGHT)
+  // native-specific height management
+  const [nativeHeight, setNativeHeight] = useState<number>(NATIVE_MIN_HEIGHT)
 
   useEffect(() => {
     if (ref.current && isWeb && field.value !== undefined) {
@@ -80,44 +80,35 @@ export const NoteField = forwardRef<
     }
   }, [field.value])
 
-  // Reset Android height when field is cleared
+  // Reset native height when field is cleared
   useEffect(() => {
-    if (Platform.OS === 'android' && (!field.value || field.value.trim().length === 0)) {
-      setAndroidHeight(ANDROID_MIN_HEIGHT)
+    if (Platform.OS !== 'web' && (!field.value || field.value.trim().length === 0)) {
+      setNativeHeight(NATIVE_MIN_HEIGHT)
     }
   }, [field.value])
 
-  const handleAndroidContentSizeChange = (event: {
+  const handleNativeContentSizeChange = (event: {
     nativeEvent: { contentSize: { height: number } }
   }) => {
-    if (Platform.OS === 'android' && field.value) {
-      const newHeight = calculateAndroidHeight(event.nativeEvent.contentSize.height)
-      setAndroidHeight(newHeight)
+    if (Platform.OS !== 'web' && field.value) {
+      const newHeight = calculateNativeHeight(event.nativeEvent.contentSize.height)
+      setNativeHeight(newHeight)
     }
   }
 
-  // Separate Android-specific props to override passed props
-  const androidSpecificProps =
-    Platform.OS === 'android'
+  // Separate native-specific props to override passed props
+  const nativeSpecificProps =
+    Platform.OS !== 'web'
       ? {
           multiline: true,
           textAlignVertical: 'top' as const,
-          height: androidHeight,
-          minHeight: androidHeight, // Override any minHeight passed from parent
-          maxHeight: MAX_NOTE_ROWS * ANDROID_LINE_HEIGHT + 16,
-          onContentSizeChange: handleAndroidContentSizeChange,
-          // Ensure proper flex behavior on Android
+          height: nativeHeight,
+          minHeight: nativeHeight, // Override any minHeight passed from parent
+          maxHeight: MAX_NOTE_ROWS * NATIVE_LINE_HEIGHT + 16,
+          onContentSizeChange: handleNativeContentSizeChange,
+          // Ensure proper flex behavior on native
           flex: undefined, // Remove flex to prevent layout conflicts
           alignSelf: 'stretch' as const, // Ensure full width
-        }
-      : {}
-
-  // iOS-specific props (maintain existing behavior)
-  const iosSpecificProps =
-    Platform.OS === 'ios'
-      ? {
-          multiline: true,
-          textAlignVertical: 'top' as const,
         }
       : {}
 
@@ -174,8 +165,7 @@ export const NoteField = forwardRef<
             {...props}
             // Then override with platform-specific props (these take precedence)
             {...webSpecificProps}
-            {...iosSpecificProps}
-            {...androidSpecificProps}
+            {...nativeSpecificProps}
           />
           {props.iconAfter && <IconAfter {...props.iconAfterProps}>{props.iconAfter}</IconAfter>}
         </Shake>

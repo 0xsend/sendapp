@@ -19,7 +19,7 @@ export const createTrpcClient = () =>
           url: `${getBaseUrl()}/api/trpc`,
           transformer: SuperJSON,
           fetch(url, opts) {
-            return fetch(url, { ...opts, credentials: 'omit' })
+            return fetch(url, { ...opts, credentials: 'omit' } as RequestInit)
           },
         }),
         // Everything else stays batched with Authorization headers

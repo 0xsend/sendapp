@@ -2,7 +2,7 @@
 /**
  * @type {import('expo/metro-config')}
  */
-const { getDefaultConfig } = require('@expo/metro-config')
+const { getDefaultConfig } = require('expo/metro-config')
 const path = require('node:path')
 const fs = require('node:fs')
 
@@ -36,6 +36,10 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(workspaceRoot, 'node_modules'),
 ]
+
+// Disable package.json exports to fix Supabase ws module error in RN 0.79+/Expo SDK 53+
+// See: https://github.com/supabase/supabase-js/issues/1403
+config.resolver.unstable_enablePackageExports = false
 
 // Add support for package.json exports field and fix module resolution issues
 config.resolver.resolverMainFields = ['react-native', 'browser', 'main']

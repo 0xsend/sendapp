@@ -97,7 +97,7 @@ export function SendAmountForm() {
       subscription.unsubscribe()
       onFormChange.cancel()
     }
-  }, [form.watch, onFormChange])
+  }, [form, onFormChange])
 
   const parsedAmount = BigInt(sendParams.amount ?? '0')
   const formAmount = form.watch('amount')

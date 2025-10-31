@@ -73,7 +73,7 @@ export const CountryCodeField = ({
   useEffect(() => {
     if (!country?.dialCode || field.value === country.dialCode) return
     field.onChange(country.dialCode)
-  }, [country?.dialCode, field.onChange, field.value])
+  }, [country?.dialCode, field])
 
   // FlatList callbacks
   const handleCountrySelect = useCallback((selectedCountry: Country) => {

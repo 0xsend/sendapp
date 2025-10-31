@@ -343,14 +343,7 @@ export function DepositForm() {
         )
       }
     },
-    [
-      form.clearErrors,
-      form.setError,
-      setParams,
-      coin.data?.decimals,
-      params,
-      depositMutation.isSuccess,
-    ]
+    [form, setParams, coin.data?.decimals, params, depositMutation.isSuccess]
   )
 
   // validate and sanitize amount
@@ -360,7 +353,7 @@ export function DepositForm() {
     })
 
     return () => subscription.unsubscribe()
-  }, [form.watch, validateAndSanitizeAmount])
+  }, [form, validateAndSanitizeAmount])
 
   useInitializeFormAmount(form)
 
@@ -398,7 +391,7 @@ export function DepositForm() {
         </SubmitButton>
       </YStack>
     ),
-    [calls.error, uop.error, sendAccount.error, areTermsAccepted, form.setError, canSubmit]
+    [calls.error, uop.error, sendAccount.error, areTermsAccepted, form, canSubmit]
   )
 
   // RESET FORM ERRORS for terms or auto accept if user has existing deposit
@@ -409,13 +402,7 @@ export function DepositForm() {
     if (areTermsAccepted && form.formState.errors.areTermsAccepted) {
       form.clearErrors('areTermsAccepted')
     }
-  }, [
-    form.clearErrors,
-    areTermsAccepted,
-    form.formState.errors.areTermsAccepted,
-    hasExistingDeposit,
-    form.setValue,
-  ])
+  }, [form, areTermsAccepted, hasExistingDeposit])
 
   // use deposit vault if it exists, or the default vault for the asset
   const { query: baseApy } = useSendEarnAPY({ vault: vault.data ?? platformVault })

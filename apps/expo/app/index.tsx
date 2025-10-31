@@ -39,7 +39,7 @@ export default function Index() {
       setTimeout(() => {
         void NavigationBar.setBackgroundColorAsync('#000000')
       }, 0)
-    }, [queryClient.clear])
+    }, [queryClient])
   )
 
   // If user is logged in, redirect to the home screen inside the tabs layout

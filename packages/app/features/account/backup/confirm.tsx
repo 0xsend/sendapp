@@ -259,6 +259,11 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
             als: 'flex-start',
           },
           px: '$0',
+          ...(Platform.OS !== 'web' && {
+            minHeight: 'auto',
+            height: 'auto',
+            flex: 0,
+          }),
         }}
         schema={z.object({})}
         onSubmit={onSubmit}
