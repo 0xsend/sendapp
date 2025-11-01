@@ -52,7 +52,7 @@
     "@tamagui/constants@npm:1.135.4": "patch:@tamagui/constants@npm%3A1.135.4#~/.yarn/patches/@tamagui-constants-npm-1.135.4-3972aa7dc7.patch"
   },
   "dependencies": {
-    "@babel/runtime": "^7.27.3",
+    "@babel/runtime": "^7.27.6",
     "@manypkg/cli": "^0.19.1",
     "@nderscore/tamagui-typescript-plugin": "^0.6.0",
     "@typescript/native-preview": "latest",
