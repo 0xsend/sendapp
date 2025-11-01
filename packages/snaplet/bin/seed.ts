@@ -185,6 +185,129 @@ if (!dryRun) {
     `)
 
     console.log(`Updated ${updateResult.rowCount} send accounts with main tag IDs`)
+
+    console.log('Seeding sendpot data...')
+
+    // Get some send_account addresses to use for winners and ticket purchases
+    const sendAccountsResult = await client.query(`
+      SELECT address_bytes, user_id
+      FROM send_accounts
+      ORDER BY id
+      LIMIT 10
+    `)
+
+    const sendAccounts = sendAccountsResult.rows
+
+    if (sendAccounts.length > 0) {
+      const aliceAddress = sendAccounts[0].address_bytes
+      const nowSeconds = Math.floor(Date.now() / 1000)
+      const zeroReferrer = Buffer.from('0000000000000000000000000000000000000000', 'hex')
+
+      // Generate ticket purchases for all three runs
+      const ticketPurchasesForRun1 = Array.from({ length: 5 }, (_, i) => ({
+        block_num: 50 + i,
+        block_time: nowSeconds - 200000 - (50 - i) * 1000,
+        tx_hash: Buffer.from(
+          hexToBytes(
+            `0xdeadbeef${i}cafe1234567890abcdef1234567890abcdef1234567890abcdef`.padEnd(
+              64,
+              '0'
+            ) as `0x${string}`
+          )
+        ),
+        tx_idx: i,
+        referrer: zeroReferrer,
+        recipient: sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes,
+        buyer: sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes,
+        tickets_purchased_total_bps: 10000 * (i + 1),
+      }))
+
+      const ticketPurchasesForRun2 = Array.from({ length: 8 }, (_, i) => ({
+        block_num: 150 + i,
+        block_time: nowSeconds - 100000 - (50 - i) * 1000,
+        tx_hash: Buffer.from(
+          hexToBytes(
+            `0xbaadcafe${i}1234567890abcdef1234567890abcdef1234567890abcdef`.padEnd(
+              64,
+              '0'
+            ) as `0x${string}`
+          )
+        ),
+        tx_idx: i,
+        referrer: zeroReferrer,
+        recipient: sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes,
+        buyer: sendAccounts[Math.floor(Math.random() * sendAccounts.length)].address_bytes,
+        tickets_purchased_total_bps: 15000 * (i + 1),
+      }))
+
+      const ticketPurchasesForRun3 = sendAccounts.slice(0, 10).map((account, i) => ({
+        block_num: 250 + i,
+        block_time: nowSeconds - 50000 - i * 1000,
+        tx_hash: Buffer.from(
+          hexToBytes(
+            `0xf00dcafe${i}1234567890abcdef1234567890abcdef1234567890abcdef`.padEnd(
+              64,
+              '0'
+            ) as `0x${string}`
+          )
+        ),
+        tx_idx: i,
+        referrer: zeroReferrer,
+        recipient: account.address_bytes,
+        buyer: account.address_bytes,
+        tickets_purchased_total_bps: 25000 * (i + 1),
+      }))
+
+      // Seed using Snaplet seed client
+      await seed.sendpot_jackpot_runs([
+        // First run: alice wins at block 100
+        {
+          block_num: 100,
+          block_time: nowSeconds - 200000,
+          time: nowSeconds - 200000,
+          tx_hash: Buffer.from(
+            hexToBytes('0xdeadbeefcafe1234567890abcdef1234567890abcdef1234567890abcdef12')
+          ),
+          winner: aliceAddress,
+          winning_ticket: 5,
+          win_amount: 1000000000000000000, // 1 ETH
+          tickets_purchased_total_bps: 140000,
+        },
+        // Second run: pending (no winner) at block 200
+        {
+          block_num: 200,
+          block_time: nowSeconds - 100000,
+          time: nowSeconds - 100000,
+          tx_hash: Buffer.from(
+            hexToBytes('0xbaadcafef00d1234567890abcdef1234567890abcdef1234567890abcdef12')
+          ),
+          winner: Buffer.from(hexToBytes('0x0000000000000000000000000000000000000000')),
+          winning_ticket: 4,
+          win_amount: 0,
+          tickets_purchased_total_bps: 0,
+        },
+        // Third run: pending (no winner) at block 300
+        {
+          block_num: 300,
+          block_time: nowSeconds - 50000,
+          time: nowSeconds - 50000,
+          tx_hash: Buffer.from(hexToBytes('0xcafef00d1234567890abcdef1234567890abcdef123456')),
+          winner: Buffer.from(hexToBytes('0x0000000000000000000000000000000000000000')),
+          winning_ticket: 1,
+          win_amount: 0,
+          tickets_purchased_total_bps: 0,
+        },
+      ])
+
+      // Seed ticket purchases
+      await seed.sendpot_user_ticket_purchases([
+        ...ticketPurchasesForRun1,
+        ...ticketPurchasesForRun2,
+        ...ticketPurchasesForRun3,
+      ])
+
+      console.log('Seeded sendpot data: 3 jackpot runs and ticket purchases')
+    }
   } finally {
     await client.end()
   }

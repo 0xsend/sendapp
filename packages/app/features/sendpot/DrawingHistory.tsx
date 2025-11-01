@@ -1,4 +1,4 @@
-import { H2, H4, Paragraph, XStack, YStack, Separator, Spinner } from '@my/ui'
+import { H2, H4, Paragraph, XStack, YStack, Separator, Spinner, Anchor } from '@my/ui'
 import { useState, useEffect, useMemo } from 'react'
 import { FlatList } from 'react-native'
 import {
@@ -7,6 +7,7 @@ import {
 } from '@my/wagmi/contracts/base-jackpot'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { formatUnits } from 'viem'
+import { baseMainnet } from '@my/wagmi'
 
 import type { Functions } from '@my/supabase/database.types'
 import { calculateTicketsFromBps, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
@@ -20,6 +21,8 @@ export type DrawingHistoryEntry = {
   prizePool: number
   winner?: string
   winnerFormatted?: string
+  winnerTagName?: string
+  winnerLink?: string
   totalTicketsPurchased: number
   result?: 'won' | 'lost' | 'pending'
 }
@@ -83,13 +86,29 @@ export const DrawingHistory = () => {
 
       const winnerAddress = byteaToHex(run.winner as `\\x${string}`)
       const noWinner = winnerAddress === NO_WINNER_ADDRESS
-      console.log(winnerAddress)
+      const winnerTagName = run.winner_tag_name as string | undefined
+
+      let winnerLink: string | undefined
+      let winnerDisplayText: string
+
+      if (noWinner) {
+        winnerDisplayText = 'None'
+      } else if (winnerTagName) {
+        winnerDisplayText = `/${winnerTagName}`
+        winnerLink = `https://send.app/${winnerTagName}`
+      } else {
+        winnerDisplayText = winnerAddress.substring(0, 10)
+        winnerLink = `${baseMainnet.blockExplorers.default.url}/address/${winnerAddress}`
+      }
+
       historicalEntries.push({
         id: `draw-${run.jackpot_run_id}`,
         drawDate: formatBlockTimeToDate(run.jackpot_block_time),
         prizePool: historicalPrizePool,
         winner: noWinner ? 'None' : winnerAddress,
-        winnerFormatted: noWinner ? 'None' : winnerAddress.substring(0, 10),
+        winnerFormatted: winnerDisplayText,
+        winnerTagName,
+        winnerLink,
         totalTicketsPurchased: userTicketsBps,
         result: resultStatus,
       })
@@ -186,6 +205,18 @@ export const DrawingHistory = () => {
             ) : item.result === 'won' ? (
               <Paragraph fos="$4" color="$green10Dark" ta="right">
                 Winner: You Won!
+              </Paragraph>
+            ) : item.winnerLink ? (
+              <Paragraph fos="$4" color="$color10" ta="right">
+                Winner:{' '}
+                <Anchor
+                  href={item.winnerLink}
+                  target="_blank"
+                  color="$color12"
+                  textDecorationLine="none"
+                >
+                  {item.winnerFormatted}
+                </Anchor>
               </Paragraph>
             ) : (
               <Paragraph fos="$4" color="$color10" ta="right">
