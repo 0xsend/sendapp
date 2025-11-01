@@ -23,7 +23,7 @@ module.exports = {
       ITSAppUsesNonExemptEncryption: false,
       LSApplicationCategoryType: 'public.app-category.finance',
     },
-    icon: './assets/icons/ios-light-icon.png',
+    icon: './assets/icons/ios-icon.icon',
   },
   android: {
     adaptiveIcon: {
