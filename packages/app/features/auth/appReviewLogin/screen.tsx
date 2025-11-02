@@ -84,7 +84,6 @@ export const AppReviewLoginScreen = () => {
               defaultValues={{ email: '', password: '' }}
               formProps={{
                 w: '100%',
-                // f: 0,
                 footerProps: { p: 0 },
                 $gtSm: {
                   maxWidth: '100%',

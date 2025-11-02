@@ -1,6 +1,7 @@
 import {
   Adapt,
   Button,
+  FieldError,
   Fieldset,
   getFontSize,
   isTouchable,
@@ -9,6 +10,7 @@ import {
   ScrollView,
   Select,
   type SelectProps,
+  Shake,
   Sheet,
   Spinner,
   Theme,
@@ -26,7 +28,7 @@ import { IconCoin } from '../icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Dimensions, Platform } from 'react-native'
+import { Platform, Dimensions } from 'react-native'
 
 export const CoinField = ({
   native = false,
@@ -70,138 +72,140 @@ export const CoinField = ({
   return (
     <Theme name={error ? 'red' : themeName} forceClassName>
       <Fieldset>
-        <Select
-          native={native}
-          id={id}
-          value={field.value}
-          onValueChange={field.onChange}
-          onOpenChange={setIsOpen}
-          defaultValue={usdcAddress[baseMainnet.id]}
-          open={isOpen}
-          {...props}
-        >
-          <Select.Trigger
-            testID={'SelectCoinTrigger'}
-            br={999}
-            borderWidth={0}
-            scaleSpace={0.5}
-            scaleIcon={1.5}
-            padding={'$2'}
-            bc={hoverStyles.backgroundColor}
-            focusStyle={{
-              bc: 'transparent',
-            }}
-            hoverStyle={hoverStyles}
-            $gtSm={{ p: '$2.5' }}
-            iconAfter={
-              isOpen ? (
-                <ChevronUp color={'$primary'} $theme-light={{ color: '$color12' }} />
-              ) : (
-                <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
-              )
-            }
-            $platform-web={{ width: 'fit-content' }}
+        <Shake shakeKey={error?.errorMessage}>
+          <Select
+            native={native}
+            id={id}
+            value={field.value}
+            onValueChange={field.onChange}
+            onOpenChange={setIsOpen}
+            defaultValue={usdcAddress[baseMainnet.id]}
+            open={isOpen}
+            {...props}
           >
-            <XStack gap={'$2'} ai={'center'}>
-              {pickedCoinSymbol && <IconCoin symbol={pickedCoinSymbol} size={'$2'} />}
-              <Select.Value
-                testID={'SelectCoinValue'}
-                size={'$5'}
-                color={'$color12'}
-                placeholder={'Token'}
-                $gtSm={{
-                  size: '$5',
-                }}
-              />
-            </XStack>
-          </Select.Trigger>
-
-          <Adapt when="sm" platform="touch">
-            <Sheet
-              native
-              modal
-              dismissOnSnapToBottom
-              snapPoints={snapPoints}
-              snapPointsMode={snapPointsMode}
-              disableDrag={!useFitContent}
-              animation={'quick'}
-            >
-              <Sheet.Frame maw={738} bc={'$color1'} px={'$3.5'} py={'$6'}>
-                <XStack ai="center" jc="space-between" w="100%" px="$4">
-                  <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                    Select Currency
-                  </Paragraph>
-                  <Button
-                    chromeless
-                    unstyled
-                    icon={<IconX color={'$color12'} size={'$1.5'} />}
-                    onPress={() => setIsOpen(false)}
-                  />
-                </XStack>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                  <Adapt.Contents />
-                </ScrollView>
-              </Sheet.Frame>
-              <Sheet.Overlay />
-            </Sheet>
-          </Adapt>
-
-          <Select.Content zIndex={200000}>
-            <Select.Viewport
-              disableScroll
-              backgroundColor={'$color1'}
-              btrr={0}
-              boc="transparent"
-              x={'-50%'}
-              $gtLg={{
-                x: 0,
+            <Select.Trigger
+              testID={'SelectCoinTrigger'}
+              br={999}
+              borderWidth={0}
+              scaleSpace={0.5}
+              scaleIcon={1.5}
+              padding={'$2'}
+              bc={hoverStyles.backgroundColor}
+              focusStyle={{
+                bc: 'transparent',
               }}
-              br={'$6'}
-              overflow={'hidden'}
+              hoverStyle={hoverStyles}
+              $gtSm={{ p: '$2.5' }}
+              iconAfter={
+                isOpen ? (
+                  <ChevronUp color={'$primary'} $theme-light={{ color: '$color12' }} />
+                ) : (
+                  <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
+                )
+              }
+              $platform-web={{ width: 'fit-content' }}
             >
-              <XStack
-                als="flex-start"
-                w={320}
-                $sm={{ w: isTouchable ? '100%' : 320 }}
-                boc={'transparent'}
-                f={1}
-                maxHeight={isTouchable ? 'unset' : 275}
-                // @ts-expect-error - overflowY is needed for Y-axis specific scroll behavior
-                overflowY={isTouchable ? 'hidden' : 'scroll'}
-              >
-                <Select.Group disabled={disabled} space="$0" p={'$2'}>
-                  {/*<Select.Label>{label}</Select.Label>*/}
-                  {filteredCoins.map((coin, i) => {
-                    return (
-                      <CoinFieldItem
-                        active={coin.token === field.value}
-                        coin={coin}
-                        index={i}
-                        key={coin.token}
-                      />
-                    )
-                  })}
-                </Select.Group>
-                {/* special icon treatment for native */}
-                {native && isWeb && (
-                  <YStack
-                    position="absolute"
-                    right={0}
-                    top={0}
-                    bottom={0}
-                    alignItems="center"
-                    justifyContent="center"
-                    width={'$4'}
-                    pointerEvents="none"
-                  >
-                    <ChevronDown size={getFontSize((props.size ?? '$true') as number)} />
-                  </YStack>
-                )}
+              <XStack gap={'$2'} ai={'center'}>
+                {pickedCoinSymbol && <IconCoin symbol={pickedCoinSymbol} size={'$2'} />}
+                <Select.Value
+                  testID={'SelectCoinValue'}
+                  size={'$5'}
+                  color={'$color12'}
+                  placeholder={'Token'}
+                  $gtSm={{
+                    size: '$5',
+                  }}
+                />
               </XStack>
-            </Select.Viewport>
-          </Select.Content>
-        </Select>
-        {/*<FieldError message={error?.errorMessage} />*/}
+            </Select.Trigger>
+
+            <Adapt when="sm" platform="touch">
+              <Sheet
+                native
+                modal
+                dismissOnSnapToBottom
+                snapPoints={snapPoints}
+                snapPointsMode={snapPointsMode}
+                disableDrag={!useFitContent}
+                animation={'quick'}
+              >
+                <Sheet.Frame maw={738} bc={'$color1'} px={'$3.5'} py={'$6'}>
+                  <XStack ai="center" jc="space-between" w="100%" px="$4">
+                    <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
+                      Select Currency
+                    </Paragraph>
+                    <Button
+                      chromeless
+                      unstyled
+                      icon={<IconX color={'$color12'} size={'$1.5'} />}
+                      onPress={() => setIsOpen(false)}
+                    />
+                  </XStack>
+                  <ScrollView showsVerticalScrollIndicator={false}>
+                    <Adapt.Contents />
+                  </ScrollView>
+                </Sheet.Frame>
+                <Sheet.Overlay />
+              </Sheet>
+            </Adapt>
+
+            <Select.Content zIndex={200000}>
+              <Select.Viewport
+                disableScroll
+                backgroundColor={'$color1'}
+                btrr={0}
+                boc="transparent"
+                x={'-50%'}
+                $gtLg={{
+                  x: 0,
+                }}
+                br={'$6'}
+                overflow={'hidden'}
+              >
+                <XStack
+                  als="flex-start"
+                  w={320}
+                  $sm={{ w: isTouchable ? '100%' : 320 }}
+                  boc={'transparent'}
+                  f={1}
+                  maxHeight={isTouchable ? 'unset' : 275}
+                  // @ts-expect-error - overflowY is needed for Y-axis specific scroll behavior
+                  overflowY={isTouchable ? 'hidden' : 'scroll'}
+                >
+                  <Select.Group disabled={disabled} space="$0" p={'$2'}>
+                    {/* <Select.Label>{label}</Select.Label> */}
+                    {filteredCoins.map((coin, i) => {
+                      return (
+                        <CoinFieldItem
+                          active={coin.token === field.value}
+                          coin={coin}
+                          index={i}
+                          key={coin.token}
+                        />
+                      )
+                    })}
+                  </Select.Group>
+                  {/* special icon treatment for native */}
+                  {native && isWeb && (
+                    <YStack
+                      position="absolute"
+                      right={0}
+                      top={0}
+                      bottom={0}
+                      alignItems="center"
+                      justifyContent="center"
+                      width={'$4'}
+                      pointerEvents="none"
+                    >
+                      <ChevronDown size={getFontSize((props.size ?? '$true') as number)} />
+                    </YStack>
+                  )}
+                </XStack>
+              </Select.Viewport>
+            </Select.Content>
+          </Select>
+        </Shake>
+        <FieldError message={error?.errorMessage} />
       </Fieldset>
     </Theme>
   )

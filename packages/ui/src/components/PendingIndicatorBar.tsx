@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { isWeb, Stack, styled, useTheme } from 'tamagui'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { isWeb, Stack, styled } from 'tamagui'
 import { usePwa, useSafeAreaInsets } from '../utils'
 
 const getTimeout = (progress: number): number => {
@@ -19,30 +18,10 @@ const getTimeout = (progress: number): number => {
 const LoadingBar = ({ visible }: { visible: boolean }) => {
   const [render, setRender] = useState(visible)
   const [progress, setProgress] = useState(0)
-  const animatedProgress = useSharedValue(visible ? 0 : 0)
-  const animatedOpacity = useSharedValue(visible ? 1 : 0)
+
+  const translate = 100 - progress * 100
 
   const insets = useSafeAreaInsets()
-  const theme = useTheme()
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      width: `${animatedProgress.value * 100}%`,
-      opacity: animatedOpacity.value,
-    }
-  }, [animatedProgress, animatedOpacity])
-
-  useEffect(() => {
-    animatedProgress.value = withTiming(progress, { duration: 300 })
-  }, [progress, animatedProgress])
-
-  useEffect(() => {
-    if (!render || (render && progress === 0)) {
-      animatedOpacity.value = withTiming(0, { duration: 200 })
-    } else {
-      animatedOpacity.value = withTiming(1, { duration: 200 })
-    }
-  }, [render, progress, animatedOpacity])
 
   useEffect(() => {
     if (render) {
@@ -90,17 +69,17 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
 
   return (
     <Stack w="100%" h={insets.bottom > 0 ? '$0.75' : '$0.5'} overflow="hidden" position="relative">
-      <Animated.View
-        style={[
-          {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            backgroundColor: theme.primary.get(),
-          },
-          animatedStyle,
-        ]}
+      <Stack
+        position="absolute"
+        top={0}
+        left={0}
+        bottom={0}
+        width="100%"
+        bc="$primary"
+        opacity={!render || (render && progress === 0) ? 0 : 1}
+        animation="fastHeavy"
+        x={`-${translate}%`}
+        animateOnly={['transform']}
       />
     </Stack>
   )

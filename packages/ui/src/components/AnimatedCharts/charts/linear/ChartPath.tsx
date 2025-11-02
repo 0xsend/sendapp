@@ -174,10 +174,10 @@ const ChartPathInner = React.memo(
     const pressY = useSharedValue(0)
     const strokeColorAnimated = useDerivedValue(() => {
       return interpolateColor(selectedStrokeProgress.value, [0, 1], [stroke, selectedStroke])
-    }, [selectedStrokeProgress, stroke, selectedStroke])
+    })
     const strokeWidthAnimated = useDerivedValue(() => {
       return interpolate(selectedStrokeProgress.value, [0, 1], [strokeWidth, selectedStrokeWidth])
-    }, [selectedStrokeProgress, strokeWidth, selectedStrokeWidth])
+    })
 
     useAnimatedReaction(
       () => isActive.value,
@@ -193,8 +193,7 @@ const ChartPathInner = React.memo(
             timingFeedbackConfig || timingFeedbackDefaultConfig
           )
         }
-      },
-      [isActive, selectedStrokeProgress, timingFeedbackConfig]
+      }
     )
 
     const setOriginData = useCallback(
@@ -322,8 +321,7 @@ const ChartPathInner = React.memo(
           }
           updatePosition({ x: pressX.value, y: pressY.value })
         }
-      },
-      [armed, isActive, hapticsEnabled, updatePosition, pressX, pressY]
+      }
     )
 
     const resetGestureState = useCallback(() => {
@@ -353,7 +351,7 @@ const ChartPathInner = React.memo(
         strokeWidth: strokeWidthAnimated.value,
         stroke: strokeColorAnimated.value,
       }
-    }, [currentPath, strokeWidth, stroke, strokeWidthAnimated, strokeColorAnimated])
+    }, [currentPath])
 
     // Map wrapper props to GH2 (hitSlop, shouldCancelWhenOutside)
     const handlerProps = (panGestureHandlerProps ?? {}) as GH2HandlerProps

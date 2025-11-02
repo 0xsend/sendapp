@@ -63,7 +63,7 @@ const CarouselProgressSegment = ({
     return {
       width: `${progressValue}%`,
     }
-  }, [currentSlide, index, progress.value])
+  }, [currentSlide])
 
   return (
     <Progress key={title} f={1} h={1} backgroundColor={'$color3'} direction="ltr" miw={0} value={0}>
