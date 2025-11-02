@@ -1,14 +1,11 @@
 /** @type {import('next').NextConfig} */
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import withPlaiceholder from '@plaiceholder/next'
 import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 const withBundleAnalyzer = require('@next/bundle-analyzer')
 const { withTamagui } = require('@tamagui/next-plugin')
 import { allowedImageHosts } from './config/allowedImageHosts.js'
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const boolVals = {
   true: true,
@@ -46,24 +43,19 @@ const plugins = [
         if (options.isServer) {
           webpackConfig.externals = [...(webpackConfig.externals || []), '@temporalio/client']
         }
-        // Add .web.ts and .web.tsx to resolve extensions before .ts and .tsx
-        webpackConfig.resolve.extensions = [
-          '.web.tsx',
-          '.web.ts',
-          '.web.js',
-          '.web.jsx',
-          ...(webpackConfig.resolve.extensions || []),
-        ]
+        if (typeof nextConfig.webpack === 'function') {
+          return nextConfig.webpack(webpackConfig, options)
+        }
+        return webpackConfig
+      },
+    }
+  },
+  (nextConfig) => {
+    return {
+      webpack: (webpackConfig, options) => {
         webpackConfig.resolve.alias = {
           ...webpackConfig.resolve.alias,
           'react-native-svg': '@tamagui/react-native-svg',
-          // Use minimal stub on server to prevent worklets initialization during SSR
-          ...(options.isServer
-            ? {
-                'react-native-reanimated': join(__dirname, 'reanimated-server-stub.js'),
-                'react-native-worklets': join(__dirname, 'reanimated-server-stub.js'),
-              }
-            : {}),
         }
         if (typeof nextConfig.webpack === 'function') {
           return nextConfig.webpack(webpackConfig, options)
@@ -112,7 +104,6 @@ export default () => {
       'solito',
       'react-native-web',
       'react-native-reanimated',
-      'react-native-worklets',
       'react-native-gesture-handler',
       'react-native-svg',
       'expo-application',
