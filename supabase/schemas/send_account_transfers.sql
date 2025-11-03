@@ -28,28 +28,29 @@ $$;
 ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
 
 -- Delete temporal activity function
-CREATE OR REPLACE FUNCTION "public"."send_account_transfers_delete_temporal_activity"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION public.send_account_transfers_delete_temporal_activity()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 declare
     paymaster bytea = '\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea;
-    workflow_ids text[];
 begin
     -- Check if it's from or to paymaster
     if (NEW.f is not null and NEW.f = paymaster) or
        (NEW.t is not null and NEW.t = paymaster) then
         return NEW;
     end if;
-    -- Only proceed with deletions if we have workflow IDs
     delete from public.activity a
+    using temporal.send_account_transfers t_sat
     where a.event_name = 'temporal_send_account_transfers'
-      and a.event_id in (select t_sat.workflow_id
-                         from temporal.send_account_transfers t_sat
-                         where t_sat.created_at_block_num <= NEW.block_num
-                           and t_sat.status != 'failed');
+      and a.event_id = t_sat.workflow_id
+      and t_sat.created_at_block_num <= NEW.block_num
+      and t_sat.status IN ('initialized', 'submitted', 'sent', 'confirmed', 'cancelled');
     return NEW;
 end;
-$$;
+$function$
+;
 ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
 
 -- Activity trigger functions
@@ -80,9 +81,16 @@ declare
     _t_user_id uuid;
     _data jsonb;
 begin
-    -- select send app info for from address
-    select user_id into _f_user_id from send_accounts where address = concat('0x', encode(NEW.f, 'hex'))::citext;
-    select user_id into _t_user_id from send_accounts where address = concat('0x', encode(NEW.t, 'hex'))::citext;
+    select user_id into _f_user_id
+    from send_accounts
+    where address_bytes = NEW.f
+      and chain_id = NEW.chain_id::integer
+    limit 1;
+    select user_id into _t_user_id
+    from send_accounts
+    where address_bytes = NEW.t
+      and chain_id = NEW.chain_id::integer
+    limit 1;
 
     -- cast v to text to avoid losing precision when converting to json when sending to clients
     _data := json_build_object(

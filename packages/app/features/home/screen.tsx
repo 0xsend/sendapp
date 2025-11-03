@@ -11,6 +11,7 @@ import {
   styled,
   Theme,
   useMedia,
+  View,
   XStack,
   type XStackProps,
   YStack,
@@ -206,191 +207,180 @@ export function InvestmentsBody() {
         },
       })}
       ai="center"
-      $gtXs={{ gap: '$3' }}
-      gap={'$3.5'}
+      $gtXs={{ gap: '$4' }}
+      gap="$3.5"
       f={1}
     >
-      <InvestmentsPortfolioCard
-        onLayout={onModalContainerLayout}
-        padded
-        size="$6"
-        w="100%"
-        mah={220}
-        gap="$5"
-      >
-        <Card.Header p={0}>
-          <Paragraph
-            fontSize={'$5'}
-            fontWeight="400"
-            color={'$lightGrayTextField'}
-            $theme-light={{ color: '$darkGrayTextField' }}
-          >
-            Portfolio Value
-          </Paragraph>
-        </Card.Header>
-
-        <InvestmentsBalanceCard.Body />
-
-        <CoinsModal
-          open={isSheetOpen}
-          onOpenChange={setIsSheetOpen}
-          trigger={
-            <CoinsModal.Trigger asChild>
-              <Button theme="neon_active" br="$4" jc="center" ai="center" pos="relative" mah={32}>
-                <Button.Text color="$black">INVEST</Button.Text>
-              </Button>
-            </CoinsModal.Trigger>
-          }
+      <YStack w="100%" $gtXs={{ gap: '$3' }} gap="$3.5">
+        <InvestmentsPortfolioCard
+          onLayout={onModalContainerLayout}
+          padded
+          size="$6"
+          w="100%"
+          mah={220}
+          gap="$5"
         >
-          <CoinsModal.Content y={-3} w={modalContainerWidth - 24}>
-            <XStack
-              bbw={1}
-              bbc="$gray3"
-              p="$2"
-              pl="$3.5"
-              py="$2"
-              ai="center"
-              jc="space-between"
-              w="100%"
+          <Card.Header p={0}>
+            <Paragraph
+              fontSize={'$5'}
+              fontWeight="400"
+              color={'$lightGrayTextField'}
+              $theme-light={{ color: '$darkGrayTextField' }}
             >
-              <H2 size="$7" col="$gray11" fow="300">
-                New Investments
-              </H2>
-              <CoinsModal.Close asChild>
-                <Button
-                  pressStyle={{
-                    scale: 0.9,
-                    bg: '$backgroundHover',
-                  }}
-                  animation="100ms"
-                  animateOnly={['transform']}
-                  size="$2.5"
-                  circular
-                >
-                  <Button.Icon scaleIcon={2}>
-                    <IconX color="$color10" />
-                  </Button.Icon>
-                </Button>
-              </CoinsModal.Close>
-            </XStack>
-            <YStack py="$2.5" w="100%">
-              <CoinsModal.Items>
-                {investmentCoins.map((coin) =>
-                  Platform.OS === 'web' ? (
-                    <InvestSheetItemWeb key={coin.symbol} coin={coin} />
-                  ) : (
-                    <InvestSheetItemNative
-                      key={coin.symbol}
-                      coin={coin}
-                      onPress={() => setIsSheetOpen(false)}
-                    />
-                  )
-                )}
-              </CoinsModal.Items>
-            </YStack>
-          </CoinsModal.Content>
-        </CoinsModal>
-      </InvestmentsPortfolioCard>
-
-      {/* Summary cards under the header */}
-      <XStack w={'100%'} gap={'$3'}>
-        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
-          <YStack gap={'$2'} jc={'center'} ai={'center'}>
-            <Paragraph color={'$color10'} size={'$4'}>
-              Today
+              Portfolio Value
             </Paragraph>
-            {isLoadingMarket ? (
-              <Spinner size={'small'} />
-            ) : (
-              <YStack ai={'center'} gap={'$2'}>
-                <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD}`}
-                </Paragraph>
-                {/* Small neutral pill to mirror style (no color change) */}
-                <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
-                  <XStack
-                    bc={'$color2'}
-                    $theme-dark={{
-                      bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.2)' : 'rgba(229, 115, 115, 0.2)',
+          </Card.Header>
+
+          <InvestmentsBalanceCard.Body />
+
+          <CoinsModal
+            open={isSheetOpen}
+            onOpenChange={setIsSheetOpen}
+            trigger={
+              <CoinsModal.Trigger asChild>
+                <Button theme="neon_active" br="$4" jc="center" ai="center" pos="relative" mah={32}>
+                  <Button.Text color="$black">INVEST</Button.Text>
+                </Button>
+              </CoinsModal.Trigger>
+            }
+          >
+            <CoinsModal.Content y={-3} w={modalContainerWidth - 24}>
+              <XStack bbw={1} bbc="$gray6" p="$3" pl="$3.5" ai="center" jc="space-between" w="100%">
+                <H2 size="$7" col="$aztec11" fow="300">
+                  New Investments
+                </H2>
+                <CoinsModal.Close asChild>
+                  <Button
+                    pressStyle={{
+                      scale: 0.9,
+                      bg: '$backgroundHover',
                     }}
-                    $theme-light={{
-                      bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.16)' : 'rgba(229, 115, 115, 0.16)',
-                    }}
-                    px={'$1.5'}
-                    br={'$2'}
+                    animation="100ms"
+                    animateOnly={['transform']}
+                    size="$2.5"
+                    circular
                   >
-                    <Paragraph fontSize={'$2'} fontWeight={400}>
-                      {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
-                    </Paragraph>
-                  </XStack>
-                </Theme>
+                    <Button.Icon scaleIcon={2}>
+                      <IconX color="$color10" />
+                    </Button.Icon>
+                  </Button>
+                </CoinsModal.Close>
+              </XStack>
+              <YStack py="$2.5" w="100%">
+                <CoinsModal.Items>
+                  {investmentCoins.map((coin) =>
+                    Platform.OS === 'web' ? (
+                      <InvestSheetItemWeb key={coin.symbol} coin={coin} />
+                    ) : (
+                      <InvestSheetItemNative
+                        key={coin.symbol}
+                        coin={coin}
+                        onPress={() => setIsSheetOpen(false)}
+                      />
+                    )
+                  )}
+                </CoinsModal.Items>
               </YStack>
-            )}
-          </YStack>
-        </Card>
-        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
-          <YStack gap={'$2'} jc={'center'} ai={'center'}>
-            {/* <Paragraph color={'$color10'} size={'$4'}>
+            </CoinsModal.Content>
+          </CoinsModal>
+        </InvestmentsPortfolioCard>
+
+        {/* Summary cards under the header */}
+        <XStack w={'100%'} gap={'$3'}>
+          <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+            <YStack gap={'$2'} jc={'center'} ai={'center'}>
+              <Paragraph color={'$color10'} size={'$4'}>
+                Today
+              </Paragraph>
+              {isLoadingMarket ? (
+                <Spinner size={'small'} />
+              ) : (
+                <YStack ai={'center'} gap={'$2'}>
+                  <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+                    {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD}`}
+                  </Paragraph>
+                  {/* Small neutral pill to mirror style (no color change) */}
+                  <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
+                    <XStack
+                      bc={'$color2'}
+                      $theme-dark={{
+                        bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.2)' : 'rgba(229, 115, 115, 0.2)',
+                      }}
+                      $theme-light={{
+                        bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.16)' : 'rgba(229, 115, 115, 0.16)',
+                      }}
+                      px={'$1.5'}
+                      br={'$2'}
+                    >
+                      <Paragraph fontSize={'$2'} fontWeight={400}>
+                        {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
+                      </Paragraph>
+                    </XStack>
+                  </Theme>
+                </YStack>
+              )}
+            </YStack>
+          </Card>
+          <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+            <YStack gap={'$2'} jc={'center'} ai={'center'}>
+              {/* <Paragraph color={'$color10'} size={'$4'}>
               Total Return
             </Paragraph> */}
-            {isLoadingMarket ? (
-              <Spinner size={'small'} />
-            ) : (
-              <YStack ai={'center'} gap={'$2'}>
-                {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+              {isLoadingMarket ? (
+                <Spinner size={'small'} />
+              ) : (
+                <YStack ai={'center'} gap={'$2'}>
+                  {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   —
                 </Paragraph> */}
-                <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
-                  {/* <Paragraph fontSize={'$2'} fontWeight={400}>
+                  <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
+                    {/* <Paragraph fontSize={'$2'} fontWeight={400}>
                     —
                   </Paragraph> */}
-                </XStack>
-              </YStack>
-            )}
-          </YStack>
-        </Card>
-        <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
-          <YStack gap={'$2'} jc={'center'} ai={'center'}>
-            {/* <Paragraph color={'$color10'} size={'$4'}>
+                  </XStack>
+                </YStack>
+              )}
+            </YStack>
+          </Card>
+          <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
+            <YStack gap={'$2'} jc={'center'} ai={'center'}>
+              {/* <Paragraph color={'$color10'} size={'$4'}>
               Investment
             </Paragraph> */}
-            {isLoadingMarket ? (
-              <Spinner size={'small'} />
-            ) : (
-              <YStack ai={'center'} gap={'$2'}>
-                {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+              {isLoadingMarket ? (
+                <Spinner size={'small'} />
+              ) : (
+                <YStack ai={'center'} gap={'$2'}>
+                  {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
                   —
                 </Paragraph> */}
-                <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
-                  {/* <Paragraph fontSize={'$2'} fontWeight={400}>
+                  <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
+                    {/* <Paragraph fontSize={'$2'} fontWeight={400}>
                     —
                   </Paragraph> */}
-                </XStack>
-              </YStack>
-            )}
-          </YStack>
-        </Card>
-      </XStack>
-
+                  </XStack>
+                </YStack>
+              )}
+            </YStack>
+          </Card>
+        </XStack>
+      </YStack>
       {/* Holdings list */}
-      <YStack w={'100%'} gap={'$2'}>
-        <H4 size="$7">Your Holdings</H4>
-        <Card
-          width="100%"
-          p="$2"
-          $gtSm={{
-            p: '$4',
-          }}
-          materialInteractive
-        >
+      <YStack w="100%" gap="$2">
+        <H4 size="$8" fow="400" col="$gray11">
+          Your Holdings
+        </H4>
+        <View gap="$2.5" width="100%">
           {isLoading ? (
             <YStack p="$3.5" ai="center">
               <Spinner />
             </YStack>
           ) : (
-            <InvestmentsBalanceList coins={myInvestmentCoins} />
+            <>
+              <InvestmentsBalanceList coins={myInvestmentCoins} />
+            </>
           )}
-        </Card>
+        </View>
       </YStack>
     </YStack>
   )
