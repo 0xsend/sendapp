@@ -108,7 +108,9 @@ BEGIN
     IF current_setting('role') = 'authenticated' AND auth.uid() IS NOT NULL THEN
         RETURN QUERY SELECT * FROM private.send_scores_history WHERE send_scores_history.user_id = auth.uid();
     -- Admin callers see all scores
-    ELSIF current_setting('role') = 'none' THEN  -- covers both postgres and service_role
+    -- Check both 'service_role' explicitly (when current_setting returns it) and 'none' (when called from SECURITY DEFINER contexts)
+    ELSIF current_setting('role')::text = 'service_role'
+       OR current_setting('role') = 'none' THEN  -- 'none' covers both postgres and service_role in SECURITY DEFINER contexts
         RETURN QUERY SELECT * FROM private.send_scores_history;
     ELSE
         RETURN;

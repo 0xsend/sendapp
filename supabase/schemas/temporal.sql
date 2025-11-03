@@ -11,17 +11,18 @@ END;
 $$;
 ALTER FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "temporal"."temporal_transfer_before_insert"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
-    AS $$
+CREATE OR REPLACE FUNCTION temporal.temporal_transfer_before_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
 DECLARE
   _user_id uuid;
-  _address text;
+  _address_bytes bytea;
 BEGIN
   IF NEW.data ? 'f' THEN
-    _address := concat('0x', encode((NEW.data->>'f')::bytea, 'hex'));
+    _address_bytes := (NEW.data->>'f')::bytea;
   ELSIF NEW.data ? 'sender' THEN
-    _address := concat('0x', encode((NEW.data->>'sender')::bytea, 'hex'));
+    _address_bytes := (NEW.data->>'sender')::bytea;
   ELSE
     RAISE NOTICE E'No sender address. workflow_id: %\n', NEW.workflow_id;
     RETURN NEW;
@@ -29,10 +30,11 @@ BEGIN
 
   SELECT user_id INTO _user_id
   FROM send_accounts
-  WHERE address = _address::citext;
+  WHERE address_bytes = _address_bytes
+  LIMIT 1;
 
   IF _user_id IS NULL THEN
-    RAISE NOTICE E'No user found for address: %, workflow_id: %\n', _address, NEW.workflow_id;
+    RAISE NOTICE E'No user found for address bytes, workflow_id: %\n', NEW.workflow_id;
     RETURN NEW;
   END IF;
 
@@ -40,7 +42,10 @@ BEGIN
 
   RETURN NEW;
 END;
-$$;
+$function$
+;
+
+
 ALTER FUNCTION "temporal"."temporal_transfer_before_insert"() OWNER TO "postgres";
 
 -- Update transfer activities table with note tx is indexed
@@ -220,6 +225,9 @@ ALTER TABLE ONLY "temporal"."send_earn_deposits"
 
 -- Indexes
 CREATE INDEX "send_account_transfers_status_created_at_block_num_idx" ON "temporal"."send_account_transfers" USING "btree" ("status", "created_at_block_num" DESC);
+-- Index for efficient range queries on created_at_block_num (used by delete temporal activity trigger)
+-- Only indexes non-failed statuses since failed transfers don't need activity cleanup
+CREATE INDEX "send_account_transfers_created_at_block_num_idx" ON "temporal"."send_account_transfers" USING "btree" ("created_at_block_num" DESC) WHERE "status" IN ('initialized', 'submitted', 'sent', 'confirmed', 'cancelled');
 CREATE INDEX "send_account_transfers_user_id_workflow_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("user_id", "workflow_id");
 CREATE INDEX "send_account_transfers_workflow_id_created_at_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id", "created_at" DESC);
 CREATE INDEX "send_account_transfers_workflow_id_updated_at_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id", "updated_at" DESC);
@@ -243,9 +251,11 @@ ALTER TABLE "temporal"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see their own temporal transfers" ON "temporal"."send_account_transfers" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
 
 -- Functions
-CREATE OR REPLACE FUNCTION "temporal"."temporal_transfer_after_upsert"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$
+CREATE OR REPLACE FUNCTION temporal.temporal_transfer_after_upsert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 DECLARE
   _to_user_id uuid;
   _data jsonb;
@@ -278,20 +288,24 @@ BEGIN
     END IF;
 
     -- Do nothing if we have already indexed the transfer and its not failed
-    IF NEW.status != 'failed' AND NEW.created_at_block_num <= (
-        SELECT block_num
-        FROM public.send_account_transfers
-        ORDER BY block_num DESC
-        LIMIT 1
-    ) THEN
-        RETURN NEW;
+    -- Use the index on block_num for efficient lookup
+    IF NEW.status != 'failed' AND NEW.created_at_block_num IS NOT NULL THEN
+        IF EXISTS (
+            SELECT 1
+            FROM public.send_account_transfers
+            WHERE block_num >= NEW.created_at_block_num
+            LIMIT 1
+        ) THEN
+            RETURN NEW;
+        END IF;
     END IF;
 
     -- token transfers
     IF NEW.data ? 't' THEN
         SELECT user_id INTO _to_user_id
         FROM send_accounts
-        WHERE address = concat('0x', encode((NEW.data->>'t')::bytea, 'hex'))::citext;
+        WHERE address_bytes = (NEW.data->>'t')::bytea
+        LIMIT 1;
 
         _data := jsonb_build_object(
             'status', NEW.status,
@@ -308,7 +322,8 @@ BEGIN
     ELSE
         SELECT user_id INTO _to_user_id
         FROM send_accounts
-        WHERE address = concat('0x', encode((NEW.data->>'log_addr')::bytea, 'hex'))::citext;
+        WHERE address_bytes = (NEW.data->>'log_addr')::bytea
+        LIMIT 1;
 
         _data := jsonb_build_object(
             'status', NEW.status,
@@ -343,7 +358,9 @@ BEGIN
         data = EXCLUDED.data;
     RETURN NEW;
 END;
-$$;
+$function$
+;
+
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_add_note_activity_temporal_trans" BEFORE UPDATE ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"();
