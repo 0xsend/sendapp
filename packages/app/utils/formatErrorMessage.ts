@@ -16,11 +16,11 @@ const extractCloudflareErrorInfo = (
     typeof responseJSON === 'string' ? responseJSON : JSON.stringify(responseJSON || '')
 
   const errorCodeMatch = responseBody.match(/Error code:\s*(10\d{2})/i)
-  if (errorCodeMatch) {
+  if (errorCodeMatch?.[1]) {
     errorCode = errorCodeMatch[1]
   } else {
     const cfErrorCodeMatch = responseBody.match(/cf-error-code['"]?>(\d{4})/i)
-    if (cfErrorCodeMatch?.[1].startsWith('10')) {
+    if (cfErrorCodeMatch?.[1]?.startsWith('10')) {
       errorCode = cfErrorCodeMatch[1]
     }
   }
@@ -57,7 +57,7 @@ export const formatErrorMessage = (error: unknown) => {
   type Httpish = {
     message?: string
     status?: number
-    response?: { status?: number; url?: string }
+    response?: { status?: number; url?: string; headers?: Headers }
     config?: { url?: string }
     meta?: { response?: Response; responseJSON?: unknown }
   }
@@ -69,7 +69,7 @@ export const formatErrorMessage = (error: unknown) => {
   const url = response?.url || e?.config?.url || ''
   const urlLower = url.toLowerCase()
 
-  const headers = response?.headers as Headers | undefined
+  const headers = response && 'headers' in response ? response.headers : undefined
   const cfError = extractCloudflareErrorInfo(statusCode, headers, e?.meta?.responseJSON)
   if (cfError) {
     return cfError.message
