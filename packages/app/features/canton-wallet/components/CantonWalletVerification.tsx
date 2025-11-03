@@ -440,7 +440,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
             defaultValues={{ address: currentAddress }}
             props={{
               address: {
-                placeholder: 'Enter Canton Wallet Address',
+                placeholder: 'Canton Wallet Address',
                 pr: '$8',
                 fontWeight: 'normal',
                 br: '$4',
@@ -477,6 +477,11 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
               f: 1,
               $gtSm: {
                 maxWidth: '100%',
+              },
+              '$platform-native': {
+                minHeight: 'auto',
+                height: 'auto',
+                flex: 0,
               },
             }}
           >
@@ -681,7 +686,7 @@ function CantonWalletFormCard() {
             defaultValues={{ address: '' }}
             props={{
               address: {
-                placeholder: 'Enter Canton Wallet Address',
+                placeholder: 'Canton Wallet Address',
                 pr: '$8',
                 fontWeight: 'normal',
                 br: '$4',
@@ -718,6 +723,11 @@ function CantonWalletFormCard() {
               f: 1,
               $gtSm: {
                 maxWidth: '100%',
+              },
+              '$platform-native': {
+                minHeight: 'auto',
+                height: 'auto',
+                flex: 0,
               },
             }}
           >

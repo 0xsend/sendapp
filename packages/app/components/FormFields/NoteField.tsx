@@ -102,7 +102,7 @@ export const NoteField = forwardRef<
       ? {
           multiline: true,
           textAlignVertical: 'top' as const,
-          height: nativeHeight,
+          height: Platform.OS === 'android' ? nativeHeight : undefined,
           minHeight: nativeHeight, // Override any minHeight passed from parent
           maxHeight: MAX_NOTE_ROWS * NATIVE_LINE_HEIGHT + 16,
           onContentSizeChange: handleNativeContentSizeChange,
