@@ -559,7 +559,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
       // The query is already filtered by the parse function in useSearch
       form.setValue('query', query)
     }
-  }, [query, form.setValue])
+  }, [query, form])
 
   const handleClearClick = () => {
     form.setValue('query', '')

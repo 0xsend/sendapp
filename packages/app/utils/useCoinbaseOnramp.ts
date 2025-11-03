@@ -25,7 +25,7 @@ export default function useCoinbaseOnramp({
   defaultPaymentMethod = 'CARD',
 }: OnrampConfig) {
   const popupRef = useRef<Window | null>(null)
-  const [popupChecker, setPopupChecker] = useState<NodeJS.Timeout | null>(null)
+  const [popupChecker, setPopupChecker] = useState<ReturnType<typeof setTimeout> | null>(null)
   const [isSuccess, setIsSuccess] = useState(false)
   // Use a ref to track payment submission status that will be accessible in the Promise closure
   const paymentSubmittedRef = useRef(false)

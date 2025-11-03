@@ -523,14 +523,7 @@ const MultiplierCards = ({
 
 const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   return (
-    <FadeCard
-      br={'$6'}
-      p="$6"
-      jc={'center'}
-      ai={'center'}
-      mih={112}
-      style={{ width: 'fit-content' }}
-    >
+    <FadeCard br={'$6'} p="$6" jc={'center'} ai={'center'} mih={112}>
       <XStack
         ai="center"
         w={'100%'}

@@ -1,6 +1,6 @@
 import { YStack } from '@my/ui'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useRouter } from 'solito/router'
 import { CheckoutForm } from './checkout-form'
 import { useUser } from 'app/utils/useUser'
@@ -10,7 +10,8 @@ export const CheckoutScreen = () => {
   const { isLoading } = useUser()
   const confirmedTags = useConfirmedTags()
   const router = useRouter()
-  const pendingTags = usePendingTags() ?? []
+  const pendingTagsRaw = usePendingTags()
+  const pendingTags = useMemo(() => pendingTagsRaw ?? [], [pendingTagsRaw])
 
   useEffect(() => {
     if (confirmedTags?.length === 5 || (!isLoading && pendingTags.length === 0)) {

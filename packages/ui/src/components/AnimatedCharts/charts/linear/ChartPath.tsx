@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { View, Platform } from 'react-native'
-import { GestureDetector, Gesture } from 'react-native-gesture-handler'
+import React, { useCallback, useEffect, useMemo } from 'react'
+import { Platform, View } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
   FadeIn,
+  interpolate,
+  interpolateColor,
   runOnJS,
   useAnimatedProps,
   useAnimatedReaction,
+  useDerivedValue,
   useSharedValue,
   type WithSpringConfig,
   withTiming,
   type WithTimingConfig,
-  interpolateColor,
-  useDerivedValue,
-  interpolate,
 } from 'react-native-reanimated'
 import Svg, { Path, type PathProps } from 'react-native-svg'
 import type { ChartData, PathData } from '../../helpers/ChartContext'
