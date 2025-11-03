@@ -16,13 +16,13 @@ INSERT INTO send_accounts (user_id, address, chain_id, init_code)
 VALUES (
     tests.get_supabase_uid('test_user_from'),
     '0x1234567890ABCDEF1234567890ABCDEF12345678',
-    1,
+    8453,
     '\\x00112233445566778899AABBCCDDEEFF'
 ),
 (
     tests.get_supabase_uid('test_user_to'),
     '0xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA',
-    1,
+    8453,
     '\\x00112233445566778899AABBCCDDEEFF'
 );
 
@@ -79,9 +79,9 @@ SELECT results_eq(
     $$,
     $$
         VALUES (
-            '\xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'::citext,
-            '\x1234567890ABCDEF1234567890ABCDEF12345678'::citext,
-            '\xB0B7D5E8A4B6D534B3F608E9D27871F85A4E98DA'::citext,
+            '\xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'::citext,
+            '\x1234567890abcdef1234567890abcdef12345678'::citext,
+            '\xb0b7d5e8a4b6d534b3f608e9d27871f85a4e98da'::citext,
             100::text,
             '\x1234'::citext,
             '1'::text,
