@@ -244,7 +244,7 @@ export function SendConfirm() {
         })
 
         // Refetch inter-user activity feed cache - forces immediate refetch and applies results
-        await queryClient.refetchQueries({
+        await queryClient.resetQueries({
           queryKey: ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
           exact: false,
         })
