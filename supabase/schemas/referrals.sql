@@ -442,14 +442,21 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 -- Functions
 
 CREATE OR REPLACE FUNCTION public.get_friends()
- RETURNS TABLE(avatar_url text, name text, sendid int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, created_at timestamp with time zone)
+ RETURNS TABLE(avatar_url text, name text, sendid int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, created_at timestamp with time zone, is_verified boolean)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
 BEGIN
     RETURN QUERY
-        WITH ordered_referrals AS(
+        WITH current_distribution_id AS (
+            SELECT id FROM distributions
+            WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+              AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            ORDER BY qualification_start DESC
+            LIMIT 1
+        ),
+        ordered_referrals AS(
             SELECT
                 DISTINCT ON (r.referred_id)
                 p.avatar_url,
@@ -476,6 +483,7 @@ BEGIN
                 CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
                 t.name AS tag,
                 t.created_at,
+                CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified,
                 COALESCE((
                              SELECT
                                  SUM(amount)
@@ -488,6 +496,8 @@ BEGIN
                     LEFT JOIN affiliate_stats a ON a.user_id = r.referred_id
                     LEFT JOIN profiles p ON p.id = r.referred_id
                     LEFT JOIN tags t ON t.user_id = r.referred_id
+                    LEFT JOIN distribution_shares ds ON ds.user_id = p.id
+                        AND ds.distribution_id = (SELECT id FROM current_distribution_id)
             WHERE
                 r.referrer_id = (SELECT auth.uid())
                 AND t.status = 'confirmed'::tag_status
@@ -502,7 +512,8 @@ BEGIN
             o.links_in_bio,
             o.birthday,
             o.tag,
-            o.created_at
+            o.created_at,
+            o.is_verified
         FROM
             ordered_referrals o
         ORDER BY

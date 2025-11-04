@@ -1960,6 +1960,7 @@ export type Database = {
           avatar_url: string
           birthday: string
           created_at: string
+          is_verified: boolean
           links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
           name: string
           sendid: number
