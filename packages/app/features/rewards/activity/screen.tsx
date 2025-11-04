@@ -52,8 +52,11 @@ export function ActivityRewardsScreen() {
   const distribution = queryParams.distribution
   const { data: distributions, isLoading } = useMonthlyDistributions()
   const selectedDistributionIndex =
-    distributions !== undefined && distributions.length <= (distribution ?? 0)
-      ? distributions?.findIndex((d) => d.number === distribution)
+    distribution !== undefined && distributions !== undefined
+      ? Math.max(
+          0,
+          distributions.findIndex((d) => d.number === distribution)
+        )
       : 0
 
   const verificationsQuery = useDistributionVerifications(
