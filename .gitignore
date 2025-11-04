@@ -74,3 +74,6 @@ var/**
 
 **/.claude/settings.local.json
 .direnv
+
+tilt_config.json
+
