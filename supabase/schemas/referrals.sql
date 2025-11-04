@@ -91,7 +91,7 @@ begin
     where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
         (lookup_type = 'tag' and t.name = identifier::citext) or
         (lookup_type = 'refcode' and p.referral_code = identifier) or
-        (lookup_type = 'address' and sa.address = identifier) or
+        (lookup_type = 'address' and sa.address = identifier::citext) or
         (p.is_public and lookup_type = 'phone' and a.phone::text = identifier))
     and (p.is_public
      or ( select auth.uid() ) is not null

@@ -56,9 +56,10 @@ GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendpot_jackpot_runs_id_seq" TO "service_role";
 
 -- Functions
-CREATE OR REPLACE FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) RETURNS TABLE("jackpot_run_id" integer, "jackpot_block_num" numeric, "jackpot_block_time" numeric, "winner" "bytea", "win_amount" numeric, "total_tickets" numeric, "winner_tag_name" "public"."citext")
-    LANGUAGE "sql"
-    AS $$
+CREATE OR REPLACE FUNCTION public.get_user_jackpot_summary(num_runs integer)
+ RETURNS TABLE(jackpot_run_id integer, jackpot_block_num numeric, jackpot_block_time numeric, winner bytea, win_amount numeric, total_tickets numeric, winner_tag_name citext)
+ LANGUAGE sql
+AS $function$
 WITH cte AS (
   SELECT
     r.id AS jackpot_run_id,
@@ -85,18 +86,21 @@ SELECT
     WHERE utp.block_num >= c.prev_block_num
       AND utp.block_num < c.jackpot_block_num
   ) AS total_tickets,
-  (
-    SELECT t.name
-    FROM public.send_accounts sa
-    JOIN public.tags t ON t.id = sa.main_tag_id
-    WHERE sa.address_bytes = c.winner
-      AND t.status = 'confirmed'
-    LIMIT 1
-  ) AS winner_tag_name
+  pl.winner_tag_name
 FROM cte c
+LEFT JOIN LATERAL (
+  SELECT COALESCE(pl.main_tag_name, pl.all_tags[1])::public.citext AS winner_tag_name
+  FROM public.profile_lookup(
+    'address'::public.lookup_type_enum,
+    concat('0x', encode(c.winner, 'hex'))::text
+  ) pl
+  LIMIT 1
+) pl ON c.winner IS NOT NULL
 ORDER BY c.jackpot_block_num DESC
 LIMIT num_runs;
-$$;
+$function$
+;
+
 
 ALTER FUNCTION "public"."get_user_jackpot_summary"("num_runs" integer) OWNER TO "postgres";
 
