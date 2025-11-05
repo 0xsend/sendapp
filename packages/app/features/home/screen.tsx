@@ -48,7 +48,7 @@ import { formatUnits } from 'viem'
 import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
-import dynamic from 'next/dynamic'
+import { dynamic } from './utils/dynamic'
 
 export function HomeScreen() {
   const router = useRouter()
