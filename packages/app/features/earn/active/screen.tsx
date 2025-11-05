@@ -1,11 +1,11 @@
 import {
   Card,
-  Fade,
   Paragraph,
   PrimaryButton,
   Separator,
   Spinner,
   Stack,
+  View,
   XStack,
   YStack,
 } from '@my/ui'
@@ -23,6 +23,7 @@ import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { coinToParam, useERC20AssetCoin } from '../params'
 import { Platform } from 'react-native'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useHomeRightPanel } from 'app/features/home/screen'
 
 const log = debug('app:earn:active')
 
@@ -31,6 +32,7 @@ export function ActiveEarningsScreen() {
 }
 function ActiveEarnings() {
   const { push } = useRouter()
+  const { setPage, page, isInsideRightPanel } = useHomeRightPanel()
   const coin = useERC20AssetCoin()
   const { affiliateRewards } = useSendEarnCoin(coin.data || undefined)
   const isAffiliate = useMemo(
@@ -67,8 +69,14 @@ function ActiveEarnings() {
   }[]
 
   if (!coin.isLoading && !coin.data) {
-    push('/earn')
-    return null
+    if (isInsideRightPanel) {
+      if (page?.pathname && page?.pathname !== '/earn') {
+        setPage({ pathname: '/earn' })
+      }
+    } else {
+      push('/earn')
+      return null
+    }
   }
 
   log('ActiveEarnings', { coin })
@@ -79,7 +87,7 @@ function ActiveEarnings() {
       gap={'$4'}
       jc={'space-between'}
       f={Platform.OS === 'web' ? undefined : 1}
-      $gtLg={{ w: '50%', pb: '$3.5' }}
+      $group-gtLg={{ w: '50%', pb: '$3.5' }}
     >
       <YStack w={'100%'} gap={'$4'}>
         <TotalValue />
@@ -123,66 +131,64 @@ function TotalValue() {
   const isLoading = coinBalances.isLoading || coin.isLoading
 
   return (
-    <Fade>
-      <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
-        <YStack gap={'$3.5'}>
-          <XStack ai={'center'} gap={'$2'}>
-            <IconCoin symbol={coin.data?.symbol || ''} size={'$2'} />
-            <Paragraph size={'$7'} fontWeight={600} lineHeight={28}>
-              {coin.data?.symbol || ''}
-            </Paragraph>
-          </XStack>
-          <YStack gap={'$2'}>
-            {isLoading ? (
-              <Spinner size={'large'} alignSelf="flex-start" flexShrink={1} />
-            ) : (
-              <Paragraph
-                fontWeight={'600'}
-                size={(() => {
+    <Card w={'100%'} p={'$5'} gap={'$7'} $gtLg={{ p: '$7' }}>
+      <YStack gap={'$3.5'}>
+        <XStack ai={'center'} gap={'$2'}>
+          <IconCoin symbol={coin.data?.symbol || ''} size={'$2'} />
+          <Paragraph size={'$7'} fontWeight={600} lineHeight={28}>
+            {coin.data?.symbol || ''}
+          </Paragraph>
+        </XStack>
+        <YStack gap={'$2'}>
+          {isLoading ? (
+            <Spinner size={'large'} alignSelf="flex-start" flexShrink={1} />
+          ) : (
+            <Paragraph
+              fontWeight={'600'}
+              size={(() => {
+                switch (true) {
+                  case totalValue.length > 16:
+                    return '$9'
+                  default:
+                    return '$11'
+                }
+              })()}
+              $gtLg={{
+                size: (() => {
                   switch (true) {
                     case totalValue.length > 16:
                       return '$9'
+                    case totalValue.length > 8:
+                      return '$10'
                     default:
                       return '$11'
                   }
-                })()}
-                $gtLg={{
-                  size: (() => {
-                    switch (true) {
-                      case totalValue.length > 16:
-                        return '$9'
-                      case totalValue.length > 8:
-                        return '$10'
-                      default:
-                        return '$11'
-                    }
-                  })(),
-                }}
-                style={{
-                  lineHeight: 62,
-                }}
-              >
-                {totalValue}
-              </Paragraph>
-            )}
-            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          </YStack>
-          {[coin.isError, coinBalances.error].some((e) => e) ? (
-            <Paragraph size={'$5'} color={'$error'}>
-              {[coin.error, coinBalances.error].map((e) => toNiceError(e)).join('. ')}
-            </Paragraph>
-          ) : (
-            <Paragraph
-              size={'$5'}
-              color={'$lightGrayTextField'}
-              $theme-light={{ color: '$darkGrayTextField' }}
+                })(),
+              }}
+              style={{
+                lineHeight: 62,
+              }}
             >
-              Total Value
+              {totalValue}
             </Paragraph>
           )}
+          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
         </YStack>
-      </Card>
-    </Fade>
+        {[coin.isError, coinBalances.error].some((e) => e) ? (
+          <Paragraph size={'$5'} color={'$error'}>
+            {[coin.error, coinBalances.error].map((e) => toNiceError(e)).join('. ')}
+          </Paragraph>
+        ) : (
+          <Paragraph
+            size={'$5'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            Total Value
+          </Paragraph>
+        )}
+      </YStack>
+    </Card>
   )
 }
 
@@ -222,29 +228,27 @@ function ActiveEarningBreakdown() {
   if (!coin.isSuccess || !coin.data) return null
 
   return (
-    <Fade>
-      <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
+    <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
+      <BreakdownRow
+        symbol={coin.data.symbol}
+        label={'Deposits'}
+        value={formatCoinAmount({ amount: totalDeposits, coin: coin.data })}
+      />
+      <BreakdownRow
+        symbol={coin.data.symbol}
+        label={'Earnings'}
+        value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
+      />
+      {affiliateRewards.data && affiliateRewards.data.assets > 0n ? (
         <BreakdownRow
           symbol={coin.data.symbol}
-          label={'Deposits'}
-          value={formatCoinAmount({ amount: totalDeposits, coin: coin.data })}
+          label={'Rewards'}
+          value={formatCoinAmount({ amount: affiliateRewards.data.assets, coin: coin.data })}
         />
-        <BreakdownRow
-          symbol={coin.data.symbol}
-          label={'Earnings'}
-          value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
-        />
-        {affiliateRewards.data && affiliateRewards.data.assets > 0n ? (
-          <BreakdownRow
-            symbol={coin.data.symbol}
-            label={'Rewards'}
-            value={formatCoinAmount({ amount: affiliateRewards.data.assets, coin: coin.data })}
-          />
-        ) : null}
-        {/* TODO: add SEND rewards if we ever want to track them here */}
-        {/* <BreakdownRow symbol={'SEND'} label={'Rewards'} value={'15,000'} /> */}
-      </Card>
-    </Fade>
+      ) : null}
+      {/* TODO: add SEND rewards if we ever want to track them here */}
+      {/* <BreakdownRow symbol={'SEND'} label={'Rewards'} value={'15,000'} /> */}
+    </Card>
   )
 }
 
@@ -296,7 +300,7 @@ const EarningButton = memo(
     const hoverStyles = useHoverStyles()
 
     return (
-      <Fade flexGrow={1} flexShrink={1}>
+      <View fg={1} fs={1}>
         <Link href={href}>
           <XStack
             jc={'center'}
@@ -304,6 +308,14 @@ const EarningButton = memo(
             br={'$6'}
             backgroundColor={'$color1'}
             elevation={'$0.75'}
+            $theme-light={
+              process.env.TAMAGUI_TARGET === 'web'
+                ? {
+                    elevation: '$0.75',
+                    shadowOpacity: 0.3,
+                  }
+                : {}
+            }
             hoverStyle={hoverStyles}
           >
             <Stack
@@ -325,7 +337,7 @@ const EarningButton = memo(
             </Stack>
           </XStack>
         </Link>
-      </Fade>
+      </View>
     )
   }
 )
