@@ -2,6 +2,8 @@ import { XStack, YStack, Card } from '@my/ui'
 import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
 import SendpotRiskDialog from './SendpotRiskDialog'
+import { ClaimWinnings } from './ClaimWinnings'
+
 export function SendPotScreen() {
   return (
     <XStack
@@ -19,6 +21,7 @@ export function SendPotScreen() {
         gap="$5"
       >
         <JackpotCard />
+        <ClaimWinnings />
         <YStack w={'100%'}>
           <Card bc={'$color1'} width="100%" p="$4">
             <DrawingHistory />
