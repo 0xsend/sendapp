@@ -48,6 +48,7 @@ import { usdcCoin } from 'app/data/coins'
 import formatAmount from 'app/utils/formatAmount'
 import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useCantonWallet } from 'app/utils/useCantonWallet'
 
 // Configuration for Canton Wallet verification requirements
 // Enable/disable requirements and set minimum amounts here
@@ -104,7 +105,7 @@ interface CantonWalletVerificationContentProps {
   verifications: DistributionsVerificationsQuery['data']
 }
 
-function CantonWalletVerificationContent({
+export function CantonWalletVerificationContent({
   profile,
   sendAccount,
   distribution,
@@ -186,48 +187,88 @@ function CantonWalletVerificationContent({
       <Paragraph fontSize={'$7'} fontWeight={'600'} color={'$color12'}>
         Get an invite to Canton Wallet
       </Paragraph>
-      <YStack gap="$3.5">
-        {CANTON_WALLET_REQUIREMENTS.sendTag.enabled && (
-          <VerificationCard
-            icon={<IconSlash size={'$1'} color={'$color12'} />}
-            label="Purchased Sendtag"
-            isCompleted={sendTagPurchased ?? false}
-            isLoading={false}
-            href="/account/sendtag/add"
-          />
-        )}
-        {CANTON_WALLET_REQUIREMENTS.savingsVault.enabled && (
-          <VerificationCard
-            icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
-            label={`Deposit $${minSavingsBalance} to Savings Vault`}
-            isCompleted={hasMinSavings}
-            isLoading={isLoadingSendEarnBalances}
-            href="/earn/usdc/deposit"
-          />
-        )}
-        {CANTON_WALLET_REQUIREMENTS.sendBalance.enabled && (
-          <VerificationCard
-            icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
-            label={`Hold ${minSendBalance} $SEND Minimum`}
-            isCompleted={
-              (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
-            }
-            isLoading={isLoadingSnapshotBalance}
-            href={isNative ? '/deposit/crypto' : '/trade'}
-          />
-        )}
-        {cantonWalletAddress ? (
+      <YStack gap="$6">
+        {/*
+          Maintain a $6 gap between sections to mirror the latest mocks; manual QA can
+          visually confirm spacing without relying on snapshot tests.
+        */}
+        {cantonWalletAddress || canConnectCantonWallet ? (
           <>
-            <CantonWalletVerifiedCard
-              address={cantonWalletAddress}
-              canEdit={canConnectCantonWallet ?? false}
-            />
-            <CantonWalletDiscoverableCard />
+            {/* Surface Canton first when verified or eligible for clarity during manual QA. */}
+            {cantonWalletAddress ? (
+              <>
+                <CantonWalletVerifiedCard
+                  address={cantonWalletAddress}
+                  canEdit={canConnectCantonWallet ?? false}
+                />
+                <CantonWalletDiscoverableCard />
+              </>
+            ) : (
+              <CantonWalletFormCard />
+            )}
+            {CANTON_WALLET_REQUIREMENTS.sendTag.enabled && (
+              <VerificationCard
+                icon={<IconSlash size={'$1'} color={'$color12'} />}
+                label="Purchased Sendtag"
+                isCompleted={sendTagPurchased ?? false}
+                isLoading={false}
+                href="/account/sendtag/add"
+              />
+            )}
+            {CANTON_WALLET_REQUIREMENTS.savingsVault.enabled && (
+              <VerificationCard
+                icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
+                label={`Deposit $${minSavingsBalance} to Savings Vault`}
+                isCompleted={hasMinSavings}
+                isLoading={isLoadingSendEarnBalances}
+                href="/earn/usdc/deposit"
+              />
+            )}
+            {CANTON_WALLET_REQUIREMENTS.sendBalance.enabled && (
+              <VerificationCard
+                icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
+                label={`Hold ${minSendBalance} $SEND Minimum`}
+                isCompleted={
+                  (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
+                }
+                isLoading={isLoadingSnapshotBalance}
+                href={isNative ? '/deposit/crypto' : '/trade'}
+              />
+            )}
           </>
-        ) : canConnectCantonWallet ? (
-          <CantonWalletFormCard />
         ) : (
-          <CantonWalletPendingCard />
+          <>
+            {CANTON_WALLET_REQUIREMENTS.sendTag.enabled && (
+              <VerificationCard
+                icon={<IconSlash size={'$1'} color={'$color12'} />}
+                label="Purchased Sendtag"
+                isCompleted={sendTagPurchased ?? false}
+                isLoading={false}
+                href="/account/sendtag/add"
+              />
+            )}
+            {CANTON_WALLET_REQUIREMENTS.savingsVault.enabled && (
+              <VerificationCard
+                icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
+                label={`Deposit $${minSavingsBalance} to Savings Vault`}
+                isCompleted={hasMinSavings}
+                isLoading={isLoadingSendEarnBalances}
+                href="/earn/usdc/deposit"
+              />
+            )}
+            {CANTON_WALLET_REQUIREMENTS.sendBalance.enabled && (
+              <VerificationCard
+                icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
+                label={`Hold ${minSendBalance} $SEND Minimum`}
+                isCompleted={
+                  (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
+                }
+                isLoading={isLoadingSnapshotBalance}
+                href={isNative ? '/deposit/crypto' : '/trade'}
+              />
+            )}
+            <CantonWalletPendingCard />
+          </>
         )}
       </YStack>
     </YStack>
@@ -584,6 +625,17 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
           </SchemaForm>
         </FormProvider>
       </YStack>
+      <Anchor
+        href="https://cantonwallet.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        color="$primary"
+        $theme-light={{ color: '$color12' }}
+        textAlign="center"
+        fontSize={'$5'}
+      >
+        Create Canton Wallet Account
+      </Anchor>
     </FadeCard>
   )
 }
@@ -626,6 +678,7 @@ function CantonWalletFormCard() {
   const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
+  const { generatePriorityToken, isGenerating } = useCantonWallet()
 
   const form = useForm<CantonWalletFormData>({
     defaultValues: { address: '' },
@@ -720,26 +773,50 @@ function CantonWalletFormCard() {
   }
 
   return (
-    <FadeCard br={'$6'} jc={'space-between'} w={'100%'}>
-      <XStack ai="center" gap="$3" w="100%">
-        <XStack
-          w={40}
-          h={40}
-          ai="center"
-          jc="center"
-          br="$3"
-          backgroundColor={hoverStyles.backgroundColor}
-        >
-          <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
+    <FadeCard br={'$6'} jc={'space-between'} w={'100%'} gap="$6">
+      <YStack gap="$4" w="100%">
+        <XStack ai="center" gap="$3" w="100%">
+          <XStack
+            w={40}
+            h={40}
+            ai="center"
+            jc="center"
+            br="$3"
+            backgroundColor={hoverStyles.backgroundColor}
+          >
+            <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
+          </XStack>
+          <Paragraph size="$5" flex={1} fontWeight="600" color="$color12">
+            Connect Canton Wallet
+          </Paragraph>
+          <XStack ai={'center'} jc="space-between">
+            <IconInfoCircle color={'$error'} size={'$1.5'} />
+          </XStack>
         </XStack>
-        <Paragraph size="$5" flex={1} fontWeight="600" color="$color12">
-          Canton Wallet Verified
+
+        <YStack gap="$4" w="100%">
+          <Paragraph size="$3" color="$color11" lineHeight="$1">
+            Get early access to Canton Wallet with a priority invite token. Use it to sign up and
+            verify your address here to start earning rewards.
+          </Paragraph>
+
+          <SubmitButton
+            onPress={generatePriorityToken}
+            disabled={isGenerating}
+            icon={isGenerating ? <Spinner size="small" /> : undefined}
+            width="100%"
+            height={52}
+          >
+            {/* 52px height matches the refreshed visual spec; validate visually during manual QA. */}
+            <SubmitButton.Text tt={undefined}>Claim Priority Invite</SubmitButton.Text>
+          </SubmitButton>
+        </YStack>
+      </YStack>
+
+      <YStack gap="$4" w="100%" borderTopWidth={1} borderTopColor="$borderColor" pt="$5">
+        <Paragraph size="$4" fontWeight="600" color="$color12">
+          Already have a Canton Wallet?
         </Paragraph>
-        <XStack ai={'center'} jc="space-between">
-          <IconInfoCircle color={'$error'} size={'$1.5'} />
-        </XStack>
-      </XStack>
-      <YStack gap="$2" w="100%">
         <FormProvider {...form}>
           <SchemaForm
             form={form}
@@ -769,7 +846,7 @@ function CantonWalletFormCard() {
                 fieldsetProps: {
                   width: '100%',
                 },
-                iconAfter: formAddress && (
+                iconAfter: formAddress ? (
                   <Button
                     chromeless
                     unstyled
@@ -778,7 +855,7 @@ function CantonWalletFormCard() {
                     icon={<IconX color={'$primary'} $theme-light={{ color: '$black' }} size="$1" />}
                     onPress={handleClearClick}
                   />
-                ),
+                ) : null,
               },
             }}
             formProps={{
@@ -809,23 +886,12 @@ function CantonWalletFormCard() {
                     <SubmitButton.Text tt={undefined}>Verify</SubmitButton.Text>
                   </SubmitButton>
                 </XStack>
-                {errorMessage && <Paragraph color={'$error'}>{errorMessage}</Paragraph>}
+                {errorMessage ? <Paragraph color={'$error'}>{errorMessage}</Paragraph> : null}
               </>
             )}
           </SchemaForm>
         </FormProvider>
       </YStack>
-      <Anchor
-        href="https://cantonwallet.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        color="$primary"
-        $theme-light={{ color: '$color12' }}
-        textAlign="center"
-        fontSize={'$5'}
-      >
-        Create Canton Wallet Account
-      </Anchor>
     </FadeCard>
   )
 }

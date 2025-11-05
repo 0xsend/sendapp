@@ -1,12 +1,32 @@
-# CLAUDE.md
+# Developer Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This guide provides essential information for developers and AI assistants working on the Send App codebase.
+
+---
+
+## SECURITY NOTICE
+
+**THIS IS AN OPEN-SOURCE PROJECT**
+
+All code, commits, and pull requests in this repository are publicly visible. Before committing or pushing any changes:
+
+- **NEVER commit API keys, secrets, private keys, or credentials**
+- **NEVER commit sensitive user data or personally identifiable information (PII)**
+- **NEVER commit internal documentation, private URLs, or confidential information**
+- **ALWAYS review your changes carefully before pushing**
+- **ALWAYS use environment variables for configuration and secrets**
+- **ALWAYS assume anything you commit will be public forever**
+
+When in doubt, ask before committing. Git history is permanent, and even deleted commits can be recovered.
+
+---
 
 ## Architecture Overview
 
 Send is a next-generation payments app built as a monorepo with cross-platform support (React Native + Next.js). The architecture consists of:
 
 ### Tech Stack
+
 - **Monorepo**: Yarn workspaces with Turborepo
 - **Cross-platform**: Tamagui for shared styles, Solito for routing
 - **Database/Auth**: Supabase (PostgreSQL + Auth)
@@ -16,6 +36,7 @@ Send is a next-generation payments app built as a monorepo with cross-platform s
 - **Development**: Tilt for orchestration
 
 ### Key Directories
+
 - `/apps/next`: Next.js web app
 - `/apps/expo`: React Native mobile app
 - `/apps/distributor`: SEND token distribution service
@@ -27,6 +48,7 @@ Send is a next-generation payments app built as a monorepo with cross-platform s
 ## Common Commands
 
 ### Development
+
 ```bash
 # Start all services with Tilt (recommended)
 tilt up
@@ -45,6 +67,7 @@ yarn native
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 yarn test
@@ -63,6 +86,7 @@ cd packages/<package-name> && yarn test path/to/test.test.ts
 ```
 
 ### Linting & Formatting
+
 ```bash
 # Check code with Biome
 npx @biomejs/biome check
@@ -105,6 +129,7 @@ cd supabase && yarn supabase start
 **Important**: Always stop the database before modifying schema files. The CI pipeline includes schema drift detection to ensure migrations stay in sync with declarative schemas.
 
 ### Smart Contracts
+
 ```bash
 # Build contracts
 yarn contracts build
@@ -118,23 +143,20 @@ yarn contracts forge script <script_name> --fork-url http://localhost:8546 --bro
 
 ## Development Process
 
-The development process should be agile and iterative and focus on very tight feedback loops.
+The development process should be agile and iterative with tight feedback loops:
 
-Keep the context in mind. The context is the current state of the code, the desired state, and the results.
+1. **Observe**: Understand the current code state and the desired outcome
+2. **Orient**: Write code and tests to achieve the desired state
+3. **Run**: Execute tests and verify functionality
+4. **Reflect**: Evaluate if the desired state was achieved
+5. **Repeat**: Iterate until complete
 
-Focus on keeping it simple and small. When the context grows, suggest summarizing the context and starting a new iteration.
+**Best Practices:**
 
-Create a TODO list when working on complex tasks to track progress and remain on track.
-
-### Development Loop
-
-A loop focuses on observing the current state, orienting the code to the desired state, running the code, and observing the results:
-
-1. **Observe**: Read the code, understand the problem, and understand the desired state.
-2. **Orient**: Write the code and tests to achieve the desired state.
-3. **Run**: Execute the process and tests.
-4. **Reflect**: Did the code achieve the desired state? Did it fail?
-5. **Repeat**: Repeat until the desired state is achieved. Avoid getting stuck in a loop. If progress is blocked, explain the problem and ask for clarification.
+- Keep changes small and focused
+- Create task lists for complex features to track progress
+- Seek clarification when blocked rather than making assumptions
+- Maintain context awareness throughout development
 
 ## Code Style
 
@@ -151,10 +173,12 @@ Assume the style is enforced by a linter and formatter.
 This project uses a platform-specific extension pattern to handle web vs. native differences:
 
 1. **File naming convention**:
+
    - Base component: `ComponentName.tsx` - shared logic or web-specific implementation
    - Native override: `ComponentName.native.tsx` - React Native specific implementation
 
 2. **When to create platform-specific files**:
+
    - When UI components need different native implementations
    - When using platform-specific APIs or components
    - When optimizing for different platform performance characteristics
@@ -169,7 +193,11 @@ When developing new features, consider whether platform-specific implementations
 
 ### Comments
 
-Focus comments solely on explaining the code's functionality and design choices, not the history of how the code was changed during our session. Ensure final code does not contain comments related to the debugging steps or conversational edits.
+Comments should explain the code's functionality and design choices. Avoid including:
+
+- Historical context about how the code evolved during development
+- Debugging notes or conversational remarks
+- Obvious descriptions of what the code does (the code should be self-documenting)
 
 ## Git Commit Conventions
 
@@ -210,7 +238,7 @@ feat(auth): add new passkey authentication flow
 Added a new authentication flow using passkeys instead of traditional passwords.
 ```
 
-Always include the Claude signature at the end of your commit messages:
+**For AI-assisted commits**, include the Claude signature:
 
 ```
 🤖 Generated with [Claude Code](https://claude.ai/code)
@@ -220,16 +248,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Documentation
 
-Documentation is a critical component of software development.
-Use a root `/docs` folder to store all documentation files.
-Keep it well organized, structured, and easy to navigate.
-Assume it could be published using a static site generator.
+Documentation is a critical component of software development. Store documentation files in the `/docs` folder with clear organization suitable for static site generation.
 
-### Grooming, Refining, and Updating
+**Guidelines:**
 
-Read the relevant documentation files and update them as needed.
-
-Update the documentation after tasks.
+- Update documentation when making significant changes
+- Keep documentation synchronized with code changes
+- Write clear, concise explanations of features and architecture
+- Include code examples and usage patterns where helpful
 
 ## Testing
 
@@ -249,7 +275,7 @@ Most packages located under the `/packages` directory utilize **Jest** for testi
    ```bash
    yarn test | cat
    ```
-   *(Note: Piping to `cat` can help with formatting or handling specific terminal output behaviors.)*
+   _(Note: Piping to `cat` can help with formatting or handling specific terminal output behaviors.)_
 
 ### Supabase (`/supabase`)
 
@@ -263,21 +289,24 @@ yarn supabase test
 
 **Important Considerations:**
 
-* If you have made changes to:
+- If you have made changes to:
+
   - Database schema files in `/supabase/schemas/`
   - Database migrations in `/supabase/migrations/`
-  
+
   You **must** reset the test database before running tests to ensure the schema is up-to-date:
+
   ```bash
   cd supabase && yarn supabase reset
   ```
 
-* When using declarative schemas, remember to:
+- When using declarative schemas, remember to:
+
   1. Stop the database before modifying schema files
   2. Generate migrations after schema changes
   3. Start the database to apply changes
 
-* Ensure your local Supabase instance is running:
+- Ensure your local Supabase instance is running:
   ```bash
   cd supabase && yarn supabase start
   ```
@@ -296,7 +325,8 @@ The Next.js application located at `/apps/next` uses **Playwright** for end-to-e
    ```bash
    yarn playwright test
    ```
-* Ensure the Next.js application is running (usually via `yarn dev` in the `/apps/next` directory) before executing Playwright tests against it.
+
+- Ensure the Next.js application is running (usually via `yarn dev` in the `/apps/next` directory) before executing Playwright tests against it.
 
 ### Other Apps (`/apps/*`)
 
@@ -311,129 +341,3 @@ This project uses Biome for linting and formatting. Run lint checks with:
 ```bash
 npx @biomejs/biome check
 ```
-
-## Continuous Improvement
-
-You should proactively identify opportunities to improve the development lifecycle. Your goal is to help the development team work more efficiently, maintain high code quality, and continuously evolve their processes.
-
-### When to Suggest Improvements
-
-You should suggest improvements in these scenarios:
-
-1. When you notice **repetitive tasks** that could be automated
-2. When you observe **inefficiencies** in the development workflow
-3. When you identify **inconsistencies** in coding practices or documentation
-4. When you recognize **opportunities for optimization** in the build process, testing strategy, or deployment pipeline
-5. When you see **potential enhancements** to the project rules themselves
-6. When industry **best practices** have evolved since the current processes were established
-
-### Types of Improvements to Consider
-
-#### 1. Development Workflow Enhancements
-- Suggest automation for repetitive tasks
-- Recommend tools or extensions that could improve productivity
-- Identify opportunities to streamline the development process
-- Propose improvements to the project structure or organization
-
-#### 2. Code Quality Improvements
-- Suggest additional linting rules or code quality checks
-- Recommend refactoring strategies for complex or hard-to-maintain code
-- Propose patterns or practices to improve code readability and maintainability
-- Identify opportunities to reduce technical debt
-
-#### 3. Testing Strategy Optimization
-- Recommend improvements to test coverage or testing approaches
-- Suggest tools or frameworks that could enhance the testing process
-- Identify areas where additional testing would be beneficial
-- Propose strategies to make tests more reliable or efficient
-
-#### 4. Documentation Enhancements
-- Suggest improvements to documentation structure or content
-- Identify areas where additional documentation would be helpful
-- Recommend tools or practices to keep documentation up-to-date
-- Propose standards for documentation to ensure consistency
-
-## Task Management
-
-When working on complex projects, it's important to break down tasks effectively.
-
-### Task Breakdown Process
-
-1. **Initial Task Analysis**
-   - Begin by thoroughly understanding the full scope of the user's request
-   - Identify all major components and dependencies of the task
-   - Consider potential challenges, edge cases, and prerequisites
-
-2. **Strategic Task Decomposition**
-   - Break the overall task into logical, discrete subtasks
-   - Prioritize subtasks based on dependencies (what must be completed first)
-   - Aim for subtasks that can be completed within a single session (15-30 minutes of work)
-   - Consider natural breaking points where context switching makes sense
-
-3. **Creating a Task Roadmap**
-   - Present a clear, numbered list of subtasks to the user
-   - Explain dependencies between subtasks
-   - Provide time estimates for each subtask when possible
-   - Use diagrams to visualize task flow and dependencies when helpful
-
-4. **Getting User Approval**
-   - Ask for user feedback on the proposed task breakdown
-   - Adjust the plan based on user priorities or additional requirements
-   - Confirm which subtask to begin with
-
-### Best Practices for Effective Task Management
-
-1. **Maintain Continuity**
-   - Use consistent terminology between tasks
-   - Reference previous decisions and their rationale
-   - Maintain the same architectural approach unless explicitly changing direction
-
-2. **Preserve Context**
-   - Include relevant code snippets when discussing implementation
-   - Summarize key discussions from the previous interactions
-   - Reference specific files and line numbers when applicable
-
-3. **Set Clear Next Actions**
-   - Begin with clear, actionable next steps
-   - Prioritize remaining tasks
-   - Highlight any decisions that need to be made
-
-4. **Document Assumptions**
-   - Clearly state any assumptions made during implementation
-   - Note areas where user input might be needed
-   - Identify potential alternative approaches
-
-## Memory Management
-
-Remember that your effectiveness depends on the clarity and accuracy of the project information presented to you. For complex, ongoing projects, maintaining clear documentation and context is essential.
-
-When providing information about the current state of the project, always include:
-
-1. **Project Context**
-   - The overall goal and purpose of the project
-   - Key architectural decisions and patterns
-   - Technology stack and dependencies
-
-2. **Implementation Details**
-   - Files created or modified in the current session
-   - Specific functions, classes, or components implemented
-   - Design patterns being followed
-   - Testing approach
-
-3. **Progress Tracking**
-   - Checklist of completed items
-   - Checklist of remaining items
-   - Any blockers or challenges encountered
-
-4. **User Preferences**
-   - Coding style preferences mentioned by the user
-   - Specific approaches requested by the user
-   - Priority areas identified by the user
-
-# important-instruction-reminders
-Do what has been asked; nothing more, nothing less.
-NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
-ALWAYS proactively create or update documentation files (*.md) or README files.
-ALWAYS ask before removing files or code.
-ALWAYS remove unnecessary files.

@@ -1,5 +1,6 @@
 {
   "adapter": "pg",
   "targetDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
-  "sourceDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres"
+  "sourceDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
+  "projectDescription": "This project is about managing a platform or service that involves activities, affiliate stats, buckets, analytics, verifications, challenges, distributions, integrations, leaderboards, link tracking, liquidity pools, profiles, referrals, object storage, receipts, user accounts, transactions, secrets, seed data, sending and receiving payments, transfers, revenues, tagging, task updates, authentication through WebAuthn, among other related functionalities."
 }
