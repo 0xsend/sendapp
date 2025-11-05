@@ -51,6 +51,7 @@ export function HomeLayout({
                 },
               }}
               pb={height}
+              group
               $gtLg={{ pt: '$5', pb: '$0' }}
               height={fullHeight ? '100%' : 'auto'}
             >

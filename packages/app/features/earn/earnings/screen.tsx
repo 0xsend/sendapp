@@ -11,7 +11,7 @@ import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
 
 export const EarningsBalance = () => {
   return (
-    <YStack w={'100%'} gap={'$4'} pb={'$3'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} gap={'$4'} pb={'$3'} $group-gtLg={{ w: '50%' }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         overflow={'visible'}
