@@ -1,7 +1,9 @@
 import {
   Fade,
+  isWeb,
   Paragraph,
   Shake,
+  Shimmer,
   Spinner,
   Stack,
   SubmitButton,
@@ -41,6 +43,7 @@ import {
   useInitializeFormAmount,
   useParams,
 } from '../params'
+import { useHomeRightPanel } from 'app/features/home/screen'
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
@@ -80,7 +83,7 @@ const DepositBalanceDisplay = memo(
     }
 
     return (
-      <XStack gap={'$2'} flexDirection={'column'} $gtSm={{ flexDirection: 'row' }}>
+      <XStack gap={'$2'} flexDirection={'column'} $$group-gtSm={{ flexDirection: 'row' }}>
         <XStack gap={'$2'}>
           <Paragraph
             testID="earning-form-balance"
@@ -144,6 +147,7 @@ DepositBenefitsDisplay.displayName = 'DepositBenefitsDisplay'
 export function DepositForm() {
   const form = useForm<DepositFormSchema>()
   const router = useRouter()
+  const { isInsideRightPanel, page, setPage } = useHomeRightPanel()
   const { tokensQuery } = useSendAccountBalances()
   const coin = useERC20AssetCoin()
   const coinBalance = useCoin(coin.data?.symbol)
@@ -206,9 +210,16 @@ export function DepositForm() {
         router.back()
       }
 
-      router.replace({
-        pathname: `/earn/${coinToParam(coin.data)}/balance`,
-      })
+      if (isInsideRightPanel) {
+        setPage({
+          pathname: '/earn/[asset]/balance',
+          query: { asset: coinToParam(coin.data) },
+        })
+      } else {
+        router.replace({
+          pathname: `/earn/${coinToParam(coin.data)}/balance`,
+        })
+      }
     },
     onSettled: () => {
       log('sendEarn.deposit.onSettled')
@@ -422,8 +433,14 @@ export function DepositForm() {
   }, [baseApy.data, parsedAmount, coin.data?.decimals])
 
   if (!coin.isLoading && !coin.data) {
-    router.push('/earn')
-    return null
+    if (isInsideRightPanel) {
+      if (page?.pathname && page?.pathname !== '/earn') {
+        setPage({ pathname: '/earn' })
+      }
+    } else {
+      router.push('/earn')
+      return null
+    }
   }
 
   log('DepositForm', {
@@ -443,7 +460,7 @@ export function DepositForm() {
       gap={'$4'}
       pb={'$3'}
       f={Platform.OS === 'web' ? undefined : 1}
-      $gtLg={{ w: '50%' }}
+      $group-gtLg={{ w: '50%' }}
     >
       <Paragraph size={'$7'} fontWeight={'500'}>
         Deposit Amount
@@ -522,47 +539,53 @@ export function DepositForm() {
         >
           {({ amount, areTermsAccepted }) => (
             <YStack width={'100%'} gap={'$5'}>
-              <Fade>
-                <YStack
-                  gap="$5"
-                  $gtSm={{ p: '$7' }}
-                  bg={'$color1'}
-                  br={'$6'}
-                  p={'$5'}
-                  borderColor={insufficientAmount ? '$error' : 'transparent'}
-                  bw={1}
-                  elevation={'$0.75'}
-                >
-                  <XStack ai={'center'} position="relative" jc={'space-between'}>
-                    {amount}
-                    <XStack ai={'center'} gap={'$2'}>
-                      <IconCoin symbol={'USDC'} size={'$2'} />
-                      <Paragraph size={'$6'}>{coin.data?.symbol}</Paragraph>
-                    </XStack>
-                    <XStack
-                      position="absolute"
-                      bottom={-8}
-                      left={0}
-                      right={0}
-                      height={1}
-                      backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
-                      $theme-light={{
-                        backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
-                      }}
+              <YStack
+                gap="$5"
+                $gtSm={{ p: '$7' }}
+                bg={'$color1'}
+                br={'$6'}
+                p={'$5'}
+                borderColor={insufficientAmount ? '$error' : 'transparent'}
+                bw={1}
+                elevation="$0.75"
+                $theme-light={
+                  isWeb
+                    ? {
+                        elevation: '$0.75',
+                        shadowOpacity: 0.3,
+                      }
+                    : {}
+                }
+              >
+                <XStack ai={'center'} position="relative" jc={'space-between'}>
+                  {amount}
+                  <XStack ai={'center'} gap={'$2'}>
+                    <IconCoin symbol={'USDC'} size={'$2'} />
+                    <Paragraph size={'$6'}>{coin.data?.symbol}</Paragraph>
+                  </XStack>
+                  <XStack
+                    position="absolute"
+                    bottom={-8}
+                    left={0}
+                    right={0}
+                    height={1}
+                    backgroundColor={isInputFocused ? '$primary' : '$silverChalice'}
+                    $theme-light={{
+                      backgroundColor: isInputFocused ? '$color12' : '$silverChalice',
+                    }}
+                  />
+                </XStack>
+                <XStack jc="space-between" ai={'flex-start'}>
+                  <Stack>
+                    <DepositBalanceDisplay
+                      coinBalance={coinBalance.coin?.balance}
+                      coinDecimals={coin.data?.decimals}
+                      insufficientAmount={insufficientAmount}
+                      isLoading={coin.isLoading || coinBalance.isLoading}
                     />
-                  </XStack>
-                  <XStack jc="space-between" ai={'flex-start'}>
-                    <Stack>
-                      <DepositBalanceDisplay
-                        coinBalance={coinBalance.coin?.balance}
-                        coinDecimals={coin.data?.decimals}
-                        insufficientAmount={insufficientAmount}
-                        isLoading={coin.isLoading || coinBalance.isLoading}
-                      />
-                    </Stack>
-                  </XStack>
-                </YStack>
-              </Fade>
+                  </Stack>
+                </XStack>
+              </YStack>
               <DepositBenefitsDisplay
                 isError={baseApy.isError}
                 error={baseApy.error}
@@ -570,7 +593,18 @@ export function DepositForm() {
                 monthlyEarning={monthlyEarning}
               />
               {/* Only show referred by if there is no existing deposit */}
-              {!coinBalances.isLoading && !hasExistingDeposit && <ReferredBy />}
+              {coinBalances.isLoading ? (
+                <Shimmer
+                  $theme-light={{ bg: '$background' }}
+                  br="$6"
+                  componentName="Card"
+                  f={1}
+                  h={150}
+                  bg="$background"
+                />
+              ) : (
+                !hasExistingDeposit && <ReferredBy />
+              )}
               {hasExistingDeposit ? null : (
                 <Shake
                   shakeKey={form.formState.errors.areTermsAccepted ? 'areTermsAccepted' : undefined}

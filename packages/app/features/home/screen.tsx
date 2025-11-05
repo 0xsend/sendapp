@@ -2,10 +2,13 @@ import {
   AnimatePresence,
   Button,
   Card,
+  createStyledContext,
   H1,
   H2,
   H4,
+  isWeb,
   Paragraph,
+  Shimmer,
   Spinner,
   Stack,
   styled,
@@ -33,18 +36,19 @@ import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { useCallback, useMemo, useState } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { coin } from 'app/data/coins'
 import { investmentCoins } from 'app/data/coins'
 import { CoinsModal } from 'app/components/CoinsModal'
 import { Link } from 'solito/link'
-import { type LayoutChangeEvent, Platform } from 'react-native'
+import type { LayoutChangeEvent } from 'react-native'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { formatUnits } from 'viem'
 import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
+import { dynamic } from './utils/dynamic'
 
 export function HomeScreen() {
   const router = useRouter()
@@ -81,70 +85,316 @@ export function HomeScreen() {
   )
 }
 
+/**
+ * RightPanelPage mimics Next.js/Solito router syntax for consistency
+ *
+ * Example usage:
+ *   setPage({ pathname: '/earn/[asset]', query: { asset: 'usdc' } })
+ *   setPage({ pathname: '/earn/[asset]/deposit', query: { asset: 'eth' } })
+ */
+type RightPanelPage = {
+  pathname: '/earn' | '/earn/[asset]' | '/earn/[asset]/deposit' | '/earn/[asset]/balance'
+  query?: { [key: string]: string | undefined }
+} | null
+
+const HomeRightPanelContext = createStyledContext<{
+  page: RightPanelPage
+  setPage: (page: RightPanelPage) => void
+  togglePage: (page: RightPanelPage) => void
+  isInsideRightPanel: boolean
+}>({
+  page: null,
+  setPage: () => {},
+  togglePage: () => {},
+  isInsideRightPanel: false,
+})
+
+export const useHomeRightPanel = () => {
+  return HomeRightPanelContext.useStyledContext()
+}
+
+export const useHomeRightPanelParams = () => {
+  const { page } = useHomeRightPanel()
+  return page?.query || {}
+}
+
+const HomeRightPanelProvider = ({ children }: PropsWithChildren) => {
+  const [queryParams, setParams] = useRootScreenParams()
+  const [rightPanelPage, setRightPanelPage] = useState<RightPanelPage>(null)
+
+  const handleSetRightPanelPage = useCallback(
+    (page: RightPanelPage) => {
+      setRightPanelPage(page)
+      // clear the token query param to close some panels which opens based on the token query param
+      setParams({
+        ...queryParams,
+        token: undefined,
+      })
+    },
+    [queryParams, setParams]
+  )
+  const handleTogglePage = useCallback(
+    (page: RightPanelPage) => {
+      const isSamePage = page && rightPanelPage && page.pathname === rightPanelPage.pathname
+      handleSetRightPanelPage(isSamePage ? null : page)
+    },
+    [handleSetRightPanelPage, rightPanelPage]
+  )
+
+  useEffect(() => {
+    if (queryParams.token) {
+      // when the token query param is set, close other panels which opens based on pathname
+      setRightPanelPage(null)
+    }
+  }, [queryParams.token])
+
+  return (
+    <HomeRightPanelContext.Provider
+      page={rightPanelPage}
+      setPage={handleSetRightPanelPage}
+      togglePage={handleTogglePage}
+      isInsideRightPanel={true}
+    >
+      {children}
+    </HomeRightPanelContext.Provider>
+  )
+}
+
 function HomeBody(props: XStackProps) {
-  const { coin: selectedCoin } = useCoinFromTokenParam()
   const [queryParams] = useRootScreenParams()
 
   return (
-    <IsPriceHiddenProvider>
-      <XStack
-        w={'100%'}
-        $gtLg={{ gap: '$5', pb: '$3.5' }}
-        $lg={{ f: 1, pt: '$3' }}
-        minHeight={'100%'}
-        {...props}
-      >
-        <YStack
-          $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
-          width="100%"
-          display={!queryParams.token || Platform.OS !== 'web' ? 'flex' : 'none'}
-          gap="$3"
-          ai={'center'}
+    <HomeRightPanelProvider>
+      <IsPriceHiddenProvider>
+        <XStack
+          w={'100%'}
+          $gtLg={{ gap: '$5', pb: '$3.5' }}
+          $lg={{ f: 1, pt: '$3' }}
+          minHeight={'100%'}
+          {...props}
         >
-          <StablesBalanceCard>
-            <StablesBalanceCard.HomeScreenHeader />
-            <StablesBalanceCard.Footer>
-              <StablesBalanceCard.Balance />
-              <StablesBalanceCard.Actions />
-            </StablesBalanceCard.Footer>
-          </StablesBalanceCard>
-          <SavingsBalanceCard w="100%" />
-          <InvestmentsBalanceCard padded gap="$3" w="100%">
-            <InvestmentsBalanceCard.HomeScreenHeader />
-            <Card.Footer jc="space-between" ai="center">
-              <YStack gap="$3">
-                <XStack ai="center" gap={'$3'} w="100%">
-                  <InvestmentsBalanceCard.Balance />
-                  <InvestmentsBalanceCard.Aggregate />
-                </XStack>
-                <InvestmentsBalanceCard.WeeklyDelta />
-              </YStack>
-              <InvestmentsBalanceCard.Preview />
-            </Card.Footer>
-          </InvestmentsBalanceCard>
-          <HomeBodyCardRow>
-            <RewardsCard w="55%" href={'/rewards'} f={1} />
-            <FriendsCard href="/account/affiliate" f={1} />
-          </HomeBodyCardRow>
-        </YStack>
-        <AnimatePresence>
-          {(() => {
-            switch (true) {
-              case Platform.OS !== 'web':
-                return null
-              case selectedCoin !== undefined:
-                return <TokenDetails />
-              case queryParams.token === 'investments':
-                return <InvestmentsBody />
-              case queryParams.token === 'stables':
-                return <StablesBody />
-              default:
-                return null
-            }
-          })()}
-        </AnimatePresence>
-      </XStack>
-    </IsPriceHiddenProvider>
+          <YStack
+            $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
+            width="100%"
+            display={!queryParams.token || !isWeb ? 'flex' : 'none'}
+            gap="$3"
+            ai={'center'}
+          >
+            <StablesBalanceCard>
+              <StablesBalanceCard.HomeScreenHeader />
+              <StablesBalanceCard.Footer>
+                <StablesBalanceCard.Balance />
+                <StablesBalanceCard.Actions />
+              </StablesBalanceCard.Footer>
+            </StablesBalanceCard>
+            <SavingsBalanceCard w="100%" />
+            <InvestmentsBalanceCard padded gap="$3" w="100%">
+              <InvestmentsBalanceCard.HomeScreenHeader />
+              <Card.Footer jc="space-between" ai="center">
+                <YStack gap="$3">
+                  <XStack ai="center" gap={'$3'} w="100%">
+                    <InvestmentsBalanceCard.Balance />
+                    <InvestmentsBalanceCard.Aggregate />
+                  </XStack>
+                  <InvestmentsBalanceCard.WeeklyDelta />
+                </YStack>
+                <InvestmentsBalanceCard.Preview />
+              </Card.Footer>
+            </InvestmentsBalanceCard>
+            <HomeBodyCardRow>
+              <RewardsCard w="55%" href={'/rewards'} f={1} />
+              <FriendsCard href="/account/affiliate" f={1} />
+            </HomeBodyCardRow>
+          </YStack>
+          <RightPanel />
+        </XStack>
+      </IsPriceHiddenProvider>
+    </HomeRightPanelProvider>
+  )
+}
+
+const EarnScreenLazy = dynamic(
+  () => import('app/features/earn/screen').then((mod) => mod.EarnScreen),
+  {
+    loading: () => <Spinner size="large" color={'$color12'} />,
+  }
+)
+
+const ActiveEarnScreenLazy = dynamic(
+  () => import('app/features/earn/active/screen').then((mod) => mod.ActiveEarningsScreen),
+  {
+    loading: () => (
+      <YStack gap="$4" ai="stretch" f={1} w="100%">
+        <Shimmer
+          ov="hidden"
+          br="$6"
+          h={230}
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+        <XStack gap="$4" h={55} ai="stretch" jc="space-between">
+          <Shimmer
+            ov="hidden"
+            f={1}
+            br="$6"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+          <Shimmer
+            ov="hidden"
+            f={1}
+            br="$6"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+        </XStack>
+        <Shimmer
+          ov="hidden"
+          br="$6"
+          h={165}
+          y={5}
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+      </YStack>
+    ),
+  }
+)
+
+const EarnDepositScreenLazy = dynamic(
+  () => import('app/features/earn/deposit/screen').then((mod) => mod.DepositScreen),
+  {
+    loading: () => (
+      <YStack ai="stretch" gap="$3" f={1} w="100%">
+        <Shimmer
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+          ov="hidden"
+          br="$1"
+          als="flex-start"
+          w={150}
+          h={30}
+        />
+        <Shimmer
+          $theme-light={{ bg: '$background' }}
+          bg="$background"
+          componentName="Card"
+          ov="hidden"
+          br="$7"
+          h={170}
+        />
+        <Shimmer
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+          componentName="Card"
+          ov="hidden"
+          br="$1"
+          mt="$2.5"
+          als="flex-start"
+          w={150}
+          h={30}
+        />
+        <Shimmer
+          $theme-light={{ bg: '$background' }}
+          bg="$background"
+          componentName="Card"
+          ov="hidden"
+          br="$7"
+          h={220}
+        />
+        <Shimmer
+          $theme-light={{ bg: '$background' }}
+          bg="$background"
+          componentName="Card"
+          ov="hidden"
+          br="$7"
+          h={160}
+          y={10}
+        />
+        <Shimmer
+          $theme-light={{ bg: '$background' }}
+          bg="$background"
+          componentName="Card"
+          ov="hidden"
+          br="$3"
+          h={50}
+          y={60}
+        />
+      </YStack>
+    ),
+  }
+)
+
+const EarnBalanceScreenLazy = dynamic(
+  () => import('app/features/earn/earnings/screen').then((mod) => mod.EarningsBalance),
+  {
+    loading: () => <Spinner size="large" color={'$color12'} />,
+  }
+)
+
+const RightPanel = () => {
+  const { coin: selectedCoin } = useCoinFromTokenParam()
+  const [queryParams] = useRootScreenParams()
+  const { page, setPage } = useHomeRightPanel()
+
+  const { gtLg } = useMedia()
+
+  useEffect(() => {
+    if (!gtLg && page?.pathname) {
+      setPage(null)
+    }
+  }, [gtLg, page?.pathname, setPage])
+
+  console.log('page', page)
+
+  const content = useMemo(() => {
+    if (!isWeb) return null
+
+    if (page?.pathname === '/earn') {
+      return <EarnScreenLazy />
+    }
+    if (page?.pathname === '/earn/[asset]') {
+      return <ActiveEarnScreenLazy />
+    }
+    if (page?.pathname === '/earn/[asset]/deposit') {
+      return <EarnDepositScreenLazy />
+    }
+    if (page?.pathname === '/earn/[asset]/balance') {
+      return <EarnBalanceScreenLazy />
+    }
+    if (selectedCoin !== undefined) {
+      return <TokenDetails />
+    }
+    if (queryParams.token === 'investments') {
+      return <InvestmentsBody />
+    }
+    if (queryParams.token === 'stables') {
+      return <StablesBody />
+    }
+    return null
+  }, [selectedCoin, queryParams.token, page])
+
+  return (
+    <View f={1} group>
+      <AnimatePresence exitBeforeEnter>
+        <View
+          key={page?.pathname || queryParams.token || 'default'}
+          fd="row"
+          f={1}
+          animation="100ms"
+          animateOnly={['transform', 'opacity']}
+          enterStyle={{ opacity: 0, x: -30 }}
+          exitStyle={{ opacity: 0, x: -20 }}
+        >
+          {content}
+        </View>
+      </AnimatePresence>
+    </View>
   )
 }
 
@@ -195,17 +445,6 @@ export function InvestmentsBody() {
   return (
     <YStack
       key={media.gtLg ? 'investments-body-lg' : 'investments-body-xs'}
-      {...(media.gtLg && {
-        animation: '100ms',
-        enterStyle: {
-          o: 0,
-          x: -30,
-        },
-        exitStyle: {
-          o: 0,
-          x: -20,
-        },
-      })}
       ai="center"
       $gtXs={{ gap: '$4' }}
       gap="$3.5"
@@ -269,7 +508,7 @@ export function InvestmentsBody() {
               <YStack py="$2.5" w="100%">
                 <CoinsModal.Items>
                   {investmentCoins.map((coin) =>
-                    Platform.OS === 'web' ? (
+                    isWeb ? (
                       <InvestSheetItemWeb key={coin.symbol} coin={coin} />
                     ) : (
                       <InvestSheetItemNative
@@ -417,17 +656,6 @@ export const StablesBody = YStack.styleable((props) => {
   return (
     <YStack
       key={media.gtLg ? 'stables-body-lg' : 'stables-body-xs'}
-      {...(media.gtLg && {
-        animation: '100ms',
-        enterStyle: {
-          o: 0,
-          x: -30,
-        },
-        exitStyle: {
-          o: 0,
-          x: -20,
-        },
-      })}
       $gtXs={{ gap: '$3' }}
       gap={'$3.5'}
       f={1}

@@ -53,7 +53,7 @@ export const CardFrame = styled(ThemeableStack, {
             },
             '$platform-web': {
               transition:
-                'box-shadow 150ms ease-out, background-color 150ms ease-out, transform 150ms ease-out',
+                'box-shadow 150ms linear, background-color 150ms linear, transform 50ms ease-out',
               willChange: 'transform',
             },
             '$theme-dark': {
@@ -61,7 +61,7 @@ export const CardFrame = styled(ThemeableStack, {
               hoverStyle: {
                 shadowOpacity: 1,
                 backgroundColor: '$aztec3',
-                scale: 1.008,
+                scale: 1.005,
               },
               pressStyle: {
                 shadowOpacity: 1,
@@ -70,7 +70,7 @@ export const CardFrame = styled(ThemeableStack, {
               focusVisibleStyle: {
                 shadowOpacity: 1,
                 backgroundColor: '$aztec3',
-                scale: 1.008,
+                scale: 1.005,
               },
             },
           }
