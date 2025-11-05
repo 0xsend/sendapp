@@ -144,15 +144,6 @@ export function SendAmountForm() {
     form.clearErrors('note')
   }
 
-  const renderAfterContent = useCallback(
-    ({ submit }: { submit: () => void }) => (
-      <SubmitButton onPress={submit} disabled={!canSubmit}>
-        <SubmitButton.Text>CONTINUE</SubmitButton.Text>
-      </SubmitButton>
-    ),
-    [canSubmit]
-  )
-
   const noteBorderActiveColor = form.formState.errors.note ? '$error' : 'transparent'
 
   return (
@@ -279,112 +270,122 @@ export function SendAmountForm() {
                   : undefined,
               note: sendParams.note || '',
             }}
-            renderAfter={renderAfterContent}
           >
             {({ amount, token, note }) => (
-              <YStack gap="$5">
-                <Card
-                  gap="$5"
-                  $gtSm={{ p: '$7' }}
-                  bc={'$color1'}
-                  br={'$6'}
-                  p={'$5'}
-                  borderColor={insufficientAmount || belowMinimum ? '$error' : 'transparent'}
-                  bw={1}
-                >
-                  <XStack ai={'center'} position="relative" jc={'space-between'}>
-                    {amount}
-                    {token}
-                    <XStack
-                      position="absolute"
-                      bottom={-8}
-                      left={0}
-                      right={0}
-                      height={1}
-                      backgroundColor={isAmountInputFocused ? '$primary' : '$darkGrayTextField'}
-                      $theme-light={{
-                        backgroundColor: isAmountInputFocused ? '$color12' : '$lightGrayTextField',
-                      }}
-                    />
-                  </XStack>
-                  <XStack jc="space-between" ai={'flex-start'}>
-                    <Stack>
-                      {(() => {
-                        switch (true) {
-                          case isLoadingCoins:
-                            return <Spinner size="small" />
-                          case !coin?.balance:
-                            return null
-                          default:
-                            return (
-                              <XStack
-                                gap={'$2'}
-                                flexDirection={'column'}
-                                $gtSm={{ flexDirection: 'row' }}
-                              >
-                                <XStack gap={'$2'}>
-                                  <Paragraph
-                                    testID="SendFormBalance"
-                                    color={
-                                      insufficientAmount || belowMinimum
-                                        ? '$error'
-                                        : '$silverChalice'
-                                    }
-                                    size={'$5'}
-                                    $theme-light={{
-                                      color:
+              <YStack gap="$5" f={1} justifyContent={'space-between'}>
+                <YStack gap="$5">
+                  <Card
+                    gap="$5"
+                    $gtSm={{ p: '$7' }}
+                    bc={'$color1'}
+                    br={'$6'}
+                    p={'$5'}
+                    borderColor={insufficientAmount || belowMinimum ? '$error' : 'transparent'}
+                    bw={1}
+                  >
+                    <XStack ai={'center'} position="relative" jc={'space-between'}>
+                      {amount}
+                      {token}
+                      <XStack
+                        position="absolute"
+                        bottom={-8}
+                        left={0}
+                        right={0}
+                        height={1}
+                        backgroundColor={isAmountInputFocused ? '$primary' : '$darkGrayTextField'}
+                        $theme-light={{
+                          backgroundColor: isAmountInputFocused
+                            ? '$color12'
+                            : '$lightGrayTextField',
+                        }}
+                      />
+                    </XStack>
+                    <XStack jc="space-between" ai={'flex-start'}>
+                      <Stack>
+                        {(() => {
+                          switch (true) {
+                            case isLoadingCoins:
+                              return <Spinner size="small" />
+                            case !coin?.balance:
+                              return null
+                            default:
+                              return (
+                                <XStack
+                                  gap={'$2'}
+                                  flexDirection={'column'}
+                                  $gtSm={{ flexDirection: 'row' }}
+                                >
+                                  <XStack gap={'$2'}>
+                                    <Paragraph
+                                      testID="SendFormBalance"
+                                      color={
                                         insufficientAmount || belowMinimum
                                           ? '$error'
-                                          : '$darkGrayTextField',
-                                    }}
-                                  >
-                                    Balance:
-                                  </Paragraph>
-                                  <Paragraph
-                                    color={
-                                      insufficientAmount || belowMinimum ? '$error' : '$color12'
-                                    }
-                                    size={'$5'}
-                                    fontWeight={'600'}
-                                  >
-                                    {formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
-                                  </Paragraph>
+                                          : '$silverChalice'
+                                      }
+                                      size={'$5'}
+                                      $theme-light={{
+                                        color:
+                                          insufficientAmount || belowMinimum
+                                            ? '$error'
+                                            : '$darkGrayTextField',
+                                      }}
+                                    >
+                                      Balance:
+                                    </Paragraph>
+                                    <Paragraph
+                                      color={
+                                        insufficientAmount || belowMinimum ? '$error' : '$color12'
+                                      }
+                                      size={'$5'}
+                                      fontWeight={'600'}
+                                    >
+                                      {formatAmount(
+                                        formatUnits(coin.balance, coin.decimals),
+                                        12,
+                                        4
+                                      )}
+                                    </Paragraph>
+                                  </XStack>
+                                  {insufficientAmount && (
+                                    <Paragraph color={'$error'} size={'$5'}>
+                                      Insufficient funds
+                                    </Paragraph>
+                                  )}
+                                  {belowMinimum && coin?.minXfrAmt !== undefined && (
+                                    <Paragraph
+                                      color={'$error'}
+                                      size={'$5'}
+                                      testID="SendFormMinimumError"
+                                    >
+                                      Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
+                                      {coin.symbol}
+                                    </Paragraph>
+                                  )}
                                 </XStack>
-                                {insufficientAmount && (
-                                  <Paragraph color={'$error'} size={'$5'}>
-                                    Insufficient funds
-                                  </Paragraph>
-                                )}
-                                {belowMinimum && coin?.minXfrAmt !== undefined && (
-                                  <Paragraph
-                                    color={'$error'}
-                                    size={'$5'}
-                                    testID="SendFormMinimumError"
-                                  >
-                                    Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
-                                    {coin.symbol}
-                                  </Paragraph>
-                                )}
-                              </XStack>
-                            )
-                        }
-                      })()}
-                    </Stack>
-                  </XStack>
-                </Card>
-                <YStack gap={'$2'}>
-                  <Card unstyled>{note}</Card>
-                  {(isNoteInputFocused || noteValidationError) && (
-                    <Paragraph
-                      color={noteValidationError ? '$error' : '$lightGrayTextField'}
-                      $theme-light={{ color: '$darkGrayTextField' }}
-                    >
-                      {noteValidationError
-                        ? noteValidationError.message
-                        : `Max: ${MAX_NOTE_LENGTH} characters`}
-                    </Paragraph>
-                  )}
+                              )
+                          }
+                        })()}
+                      </Stack>
+                    </XStack>
+                  </Card>
+                  <YStack gap={'$2'}>
+                    <Card unstyled>{note}</Card>
+                    {(isNoteInputFocused || noteValidationError) && (
+                      <Paragraph
+                        color={noteValidationError ? '$error' : '$lightGrayTextField'}
+                        $theme-light={{ color: '$darkGrayTextField' }}
+                      >
+                        {noteValidationError
+                          ? noteValidationError.message
+                          : `Max: ${MAX_NOTE_LENGTH} characters`}
+                      </Paragraph>
+                    )}
+                  </YStack>
                 </YStack>
+                <SubmitButton onPress={() => form.handleSubmit(onSubmit)()}>
+                  <SubmitButton.Text>CONTINUE</SubmitButton.Text>
+                </SubmitButton>
               </YStack>
             )}
           </SchemaForm>

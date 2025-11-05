@@ -202,8 +202,8 @@ function HomeBody(props: XStackProps) {
               </Card.Footer>
             </InvestmentsBalanceCard>
             <HomeBodyCardRow>
-              <RewardsCard w="55%" href={'/rewards'} />
-              <FriendsCard href="/account/affiliate" />
+              <RewardsCard w="55%" href={'/rewards'} f={1} />
+              <FriendsCard href="/account/affiliate" f={1} />
             </HomeBodyCardRow>
           </YStack>
           <RightPanel />
@@ -688,7 +688,6 @@ StablesBody.displayName = 'StablesBody'
 export const HomeBodyCard = styled(Card, {
   size: '$5',
   br: '$7',
-  f: 1,
   mah: 150,
   p: '$1.5',
   materialInteractive: process.env.TAMAGUI_TARGET === 'web',

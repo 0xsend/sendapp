@@ -15,7 +15,7 @@ import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } fro
 import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { IconBirthday } from 'app/components/icons'
+import { IconBirthday, IconBadgeCheckSolid } from 'app/components/icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useReferrer } from 'app/utils/useReferrer'
@@ -25,7 +25,14 @@ import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
-  'avatar_url' | 'x_username' | 'links_in_bio' | 'birthday' | 'tag' | 'name' | 'sendid'
+  | 'avatar_url'
+  | 'x_username'
+  | 'links_in_bio'
+  | 'birthday'
+  | 'tag'
+  | 'name'
+  | 'sendid'
+  | 'is_verified'
 >
 
 export default function FriendsScreen() {
@@ -189,10 +196,21 @@ const FriendMobileRow = ({
               </Avatar.Fallback>
             </Avatar>
             <YStack gap={'$2'} f={1}>
-              <Paragraph lineHeight={20}>
-                {label}
-                {referral.sendid === referrer?.sendid ? ' (Invited you to Send)' : ''}
-              </Paragraph>
+              <XStack ai="center" gap="$2">
+                <Paragraph lineHeight={20}>
+                  {label}
+                  {referral.sendid === referrer?.sendid ? ' (Invited you to Send)' : ''}
+                </Paragraph>
+                {referral.is_verified ? (
+                  <IconBadgeCheckSolid
+                    size={'$1.5'}
+                    mih={'$1.5'}
+                    miw={'$1.5'}
+                    color={'$primary'}
+                    $theme-light={{ color: '$color12' }}
+                  />
+                ) : null}
+              </XStack>
               <XStack gap={'$2'} alignItems={'center'}>
                 <IconBirthday size={'$1'} />
                 <Paragraph lineHeight={20}>{birthday}</Paragraph>
@@ -254,10 +272,21 @@ const FriendDesktopRow = ({
               </Avatar>
             </Avatar.Fallback>
           </Avatar>
-          <Paragraph lineHeight={20}>
-            /{referral.tag}
-            {referral.tag === referrer?.tag ? ' (Invited you to Send)' : ''}
-          </Paragraph>
+          <XStack ai="center" gap="$2">
+            <Paragraph lineHeight={20}>
+              /{referral.tag}
+              {referral.tag === referrer?.tag ? ' (Invited you to Send)' : ''}
+            </Paragraph>
+            {referral.is_verified ? (
+              <IconBadgeCheckSolid
+                size={'$1.5'}
+                mih={'$1.5'}
+                miw={'$1.5'}
+                color={'$primary'}
+                $theme-light={{ color: '$color12' }}
+              />
+            ) : null}
+          </XStack>
         </XStack>
         <Paragraph w={'25%'} ta={'right'}>
           {birthday}
