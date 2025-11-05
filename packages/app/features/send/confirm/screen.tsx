@@ -238,13 +238,13 @@ export function SendConfirm() {
       })
 
       if (workflowId) {
-        await queryClient.invalidateQueries({
-          queryKey: ['token_activity_feed', { address: selectedCoin.token }],
+        // Don't await - fire and forget to avoid iOS hanging on cache operations
+        void queryClient.invalidateQueries({
+          queryKey: ['activity_feed'],
           exact: false,
         })
 
-        // Refetch inter-user activity feed cache - forces immediate refetch and applies results
-        await queryClient.resetQueries({
+        void queryClient.resetQueries({
           queryKey: ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
           exact: false,
         })
