@@ -60,7 +60,7 @@ export default function useRedirectAfterSend() {
       default:
         // Fallback to the original behavior
         router.back()
-        router.replace({ pathname })
+        router.push({ pathname })
         break
     }
   }
