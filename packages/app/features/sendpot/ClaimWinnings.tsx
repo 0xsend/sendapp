@@ -5,7 +5,10 @@ import {
   YStack,
   Card,
   Spinner,
-  H3,
+  Label,
+  BigHeading,
+  Stack,
+  styled,
   useAppToast,
 } from '@my/ui'
 import { useMemo, useCallback } from 'react'
@@ -17,6 +20,14 @@ import { useReadBaseJackpotTokenDecimals } from '@my/wagmi/contracts/base-jackpo
 import { toNiceError } from 'app/utils/toNiceError'
 import { useQueryClient } from '@tanstack/react-query'
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
+
+const GreenSquare = styled(Stack, {
+  name: 'Surface',
+  w: 11,
+  h: 11,
+  theme: 'green_active',
+  bc: '$background',
+})
 
 export const ClaimWinnings = () => {
   const toast = useAppToast()
@@ -92,81 +103,102 @@ export const ClaimWinnings = () => {
   const combinedError = prepareError || withdrawError
   const canClaim = !isLoading && !isWithdrawing && !isPreparing && hasClaimableWinnings && !!userOp
 
-  // Don't show the card if there are no winnings to claim
-  if (!isLoading && !hasClaimableWinnings) {
-    return null
-  }
-
   return (
-    <Card padding={'$5'} w={'100%'} $gtLg={{ padding: '$6' }}>
-      <YStack gap={'$4'} w={'100%'}>
-        <YStack gap={'$2'}>
-          <H3 color="$color11" fontWeight={'500'} textTransform={'uppercase'}>
-            You Won!
-          </H3>
-          <XStack gap={'$2.5'} ai="baseline">
-            <Paragraph
-              fontSize={48}
-              $gtSm={{ fontSize: 56 }}
+    <Card
+      padding={'$5'}
+      w={'100%'}
+      jc="space-between"
+      $gtLg={{ padding: '$6', height: 'auto', minHeight: 244 }}
+      minHeight={184}
+    >
+      <XStack w={'100%'} zIndex={4} h="100%">
+        <YStack gap={'$2'} w={'100%'}>
+          <YStack gap={'$2.5'} jc="space-between">
+            <XStack ai={'center'} gap="$2.5" width={'100%'}>
+              <XStack ai={'center'} gap="$2.5">
+                <GreenSquare />
+                <Label
+                  fontSize={'$4'}
+                  zIndex={1}
+                  fontWeight={'500'}
+                  textTransform={'uppercase'}
+                  lineHeight={0}
+                  color={'$color10'}
+                >
+                  You Won!
+                </Label>
+              </XStack>
+            </XStack>
+          </YStack>
+          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto">
+            <BigHeading
+              $platform-web={{ width: 'fit-content' }}
+              fontSize={64}
+              $gtSm={{ fontSize: 80 }}
+              $gtMd={{ fontSize: 96 }}
               fontWeight={'600'}
               color={'$green10'}
+              zIndex={1}
             >
               {isLoading ? <Spinner /> : formattedWinnings}
-            </Paragraph>
-            <Paragraph fontSize={'$6'} fontWeight={'500'} color={'$green10'}>
+            </BigHeading>
+            <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ marginTop: '$4' }}>
               SEND
             </Paragraph>
           </XStack>
+
+          <XStack w="100%" mt="$2">
+            <Stack f={1} w="100%" maw={350} gap="$2">
+              <Button
+                onPress={handleClaim}
+                theme={'green'}
+                br="$4"
+                px={'$3.5'}
+                h={'$4.5'}
+                disabled={!canClaim}
+                disabledStyle={{ opacity: 0.5 }}
+                animation="200ms"
+                enterStyle={{
+                  opacity: 0,
+                }}
+                exitStyle={{
+                  opacity: 0,
+                }}
+              >
+                {isWithdrawing || isPreparing ? (
+                  <>
+                    <Button.Icon>
+                      <Spinner size="small" color="$color12" mr={'$2'} />
+                    </Button.Icon>
+                    <Button.Text
+                      fontWeight={'400'}
+                      $theme-dark={{ col: '$color0' }}
+                      tt="uppercase"
+                      size={'$5'}
+                    >
+                      {isWithdrawing ? 'Claiming...' : 'Preparing...'}
+                    </Button.Text>
+                  </>
+                ) : (
+                  <Button.Text
+                    fontWeight={'400'}
+                    $theme-dark={{ col: '$color0' }}
+                    tt="uppercase"
+                    size={'$5'}
+                  >
+                    Claim Winnings
+                  </Button.Text>
+                )}
+              </Button>
+              {combinedError && (
+                <Paragraph color="$red10Dark" fontSize="$3" textAlign="center">
+                  {toNiceError(combinedError)}
+                </Paragraph>
+              )}
+            </Stack>
+          </XStack>
         </YStack>
-
-        <XStack w="100%" gap="$2">
-          <Button
-            onPress={handleClaim}
-            theme={'green'}
-            br="$4"
-            px={'$3.5'}
-            h={'$4.5'}
-            disabled={!canClaim}
-            disabledStyle={{ opacity: 0.5 }}
-            f={1}
-            maw={350}
-          >
-            {isWithdrawing || isPreparing ? (
-              <>
-                <Button.Icon>
-                  <Spinner size="small" color="$color12" mr={'$2'} />
-                </Button.Icon>
-                <Button.Text fontWeight={'400'} tt="uppercase" size={'$5'} color={'$black'}>
-                  {isWithdrawing ? 'Claiming...' : 'Preparing...'}
-                </Button.Text>
-              </>
-            ) : (
-              <Button.Text fontWeight={'400'} tt="uppercase" size={'$5'} color={'$black'}>
-                Claim Winnings
-              </Button.Text>
-            )}
-          </Button>
-        </XStack>
-
-        {combinedError && (
-          <Paragraph color="$error" fontSize="$3" textAlign="left">
-            {toNiceError(combinedError)}
-          </Paragraph>
-        )}
-
-        {usdcFees && (
-          <Paragraph color="$color10" fontSize="$3" textAlign="left">
-            Est. gas fee:{' '}
-            {Number.parseFloat(
-              formatUnits(
-                usdcFees.baseFee + usdcFees.gasFees,
-                typeof usdcFees.decimals === 'number' ? usdcFees.decimals : 6
-              )
-            ).toFixed(2)}{' '}
-            USDC
-          </Paragraph>
-        )}
-      </YStack>
+      </XStack>
     </Card>
   )
 }

@@ -3,8 +3,11 @@ import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
 import SendpotRiskDialog from './SendpotRiskDialog'
 import { ClaimWinnings } from './ClaimWinnings'
+import { useClaimableWinnings } from './hooks/useClaimableWinnings'
 
 export function SendPotScreen() {
+  const { hasClaimableWinnings, isLoading } = useClaimableWinnings()
+
   return (
     <XStack
       w={'100%'}
@@ -20,8 +23,7 @@ export function SendPotScreen() {
         maxWidth={600}
         gap="$5"
       >
-        <JackpotCard />
-        <ClaimWinnings />
+        {!isLoading && hasClaimableWinnings ? <ClaimWinnings /> : <JackpotCard />}
         <YStack w={'100%'}>
           <Card bc={'$color1'} width="100%" p="$4">
             <DrawingHistory />
