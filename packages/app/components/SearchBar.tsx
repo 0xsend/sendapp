@@ -553,22 +553,27 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
   }, [form, setRootParams, queryParams])
 
   useEffect(() => {
-    if (!query) {
-      form.setValue('query', '')
-    } else {
-      // The query is already filtered by the parse function in useSearch
-      form.setValue('query', query)
+    const currentValue = form.getValues('query')
+    const newValue = query ?? ''
+
+    // Only update if the value actually changed to prevent circular updates
+    if (currentValue !== newValue) {
+      form.setValue('query', newValue, { shouldValidate: true, shouldDirty: true })
     }
   }, [query, form])
 
   const handleClearClick = () => {
-    form.setValue('query', '')
+    form.setValue('query', '', { shouldValidate: true, shouldDirty: true })
   }
 
   const handleTextChange = (text: string) => {
     // Filter out any characters that are not letters, numbers, or underscores
     const filteredText = text.replace(/[^a-zA-Z0-9_]/g, '')
-    form.setValue('query', filteredText)
+    form.setValue('query', filteredText, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    })
   }
 
   return (
