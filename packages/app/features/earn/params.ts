@@ -1,9 +1,10 @@
 import { type coin, coinsBySymbol, type erc20Coin, erc20Coins } from 'app/data/coins'
 import debug from 'debug'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { createParam } from 'solito'
 import { formatUnits } from 'viem'
 import { useQuery, type UseQueryReturnType } from 'wagmi/query'
+import { useHomeRightPanel, useHomeRightPanelParams } from 'app/features/home/screen'
 
 const log = debug('app:earn:params')
 
@@ -40,11 +41,26 @@ export const useAmount = () => {
 
 /**
  * Hook to fetch the ERC20 coin asset for the current route.
+ * Checks both URL params (for full-page navigation) and RightPanel context (for right panel display).
  */
 export const useERC20AssetCoin = (): UseQueryReturnType<erc20Coin | null | undefined, Error> => {
-  const [asset] = useAsset()
+  const [urlAsset] = useAsset()
+  const { isInsideRightPanel } = useHomeRightPanel()
+  const rightPanelParams = useHomeRightPanelParams()
+
+  // Why this ? to avoid setting asset to undefined during closing the earn right panel in home screen
+  const asset = rightPanelParams.asset || urlAsset
+  const assetRef = useRef(asset)
+  if (isInsideRightPanel) {
+    if (asset && asset !== assetRef.current) {
+      assetRef.current = asset
+    }
+  } else {
+    assetRef.current = asset
+  }
+
   return useQuery({
-    queryKey: ['coinAsset', asset] as const,
+    queryKey: ['coinAsset', assetRef.current] as const,
     queryFn: async ({ queryKey: [, asset] }): Promise<erc20Coin | null> => {
       if (!asset) return null
       const symbol = asset.toUpperCase()
