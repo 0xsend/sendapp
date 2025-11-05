@@ -1,4 +1,4 @@
-import { Button, Fade, FadeCard, Input, Paragraph, Spinner, useDebounce, XStack } from '@my/ui'
+import { Button, Card, Fade, Input, Paragraph, Spinner, useDebounce, XStack } from '@my/ui'
 import { Check } from '@tamagui/lucide-icons'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconX } from 'app/components/icons'
@@ -62,7 +62,7 @@ export function ReferredBy() {
   }
 
   return (
-    <FadeCard
+    <Card
       borderColor={
         referrerError ||
         (referralCodeFromStorage && referralCode && !referrer && !isLoadingReferrer)
@@ -152,6 +152,6 @@ export function ReferredBy() {
             return <Paragraph>Got a referral? Enter the code to get rewards!</Paragraph>
         }
       })()}
-    </FadeCard>
+    </Card>
   )
 }
