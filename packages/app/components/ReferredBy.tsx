@@ -70,6 +70,10 @@ export function ReferredBy() {
           : 'transparent'
       }
       bw={1}
+      w={'100%'}
+      gap={'$3.5'}
+      br={'$5'}
+      p={'$5'}
       $gtLg={{ p: '$7', gap: '$3.5' }}
     >
       <XStack gap="$2" position="relative" ai={'center'} jc={'space-between'}>
