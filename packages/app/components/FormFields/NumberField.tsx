@@ -39,6 +39,7 @@ export const NumberField = (props: InputProps) => {
             inputMode="numeric"
             value={field.value?.toString() || '0'}
             bc={'$color2'}
+            lineHeight={22}
             onChangeText={(text) => {
               const num = Number(text)
               if (Number.isNaN(num)) {

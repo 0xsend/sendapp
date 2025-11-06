@@ -101,6 +101,7 @@ export const LoginWithPhoneScreen = () => {
                   testID: 'phone-number-input',
                   placeholder: 'Input phone number',
                   color: '$color12',
+                  lineHeight: 21,
                   fontWeight: '500',
                   bw: 0,
                   br: 0,

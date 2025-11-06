@@ -65,6 +65,7 @@ export const TextAreaField = (
               width={'100%'}
               borderWidth={0}
               borderRadius={'$4'}
+              lineHeight={18}
               placeholderTextColor={'$color4'}
               // @todo use the theme colors if we ever have the palette scales
               // bc={'$color2'}

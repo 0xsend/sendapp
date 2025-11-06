@@ -437,6 +437,7 @@ export function WithdrawForm() {
                 outlineWidth: 0,
               },
               placeholder: '0',
+              lineHeight: 30,
               fontFamily: '$mono',
               placeholderTextColor: '$color4',
               inputMode: 'decimal',

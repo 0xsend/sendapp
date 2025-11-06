@@ -109,7 +109,7 @@ export const FirstSendtagForm = () => {
               br: 0,
               p: 0,
               pl: '$2.5',
-
+              lineHeight: 21,
               focusStyle: {
                 outlineWidth: 0,
               },

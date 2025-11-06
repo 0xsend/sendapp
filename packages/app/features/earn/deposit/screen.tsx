@@ -489,6 +489,7 @@ export function DepositForm() {
                 outlineWidth: 0,
               },
               placeholder: '0',
+              lineHeight: 40,
               fontFamily: '$mono',
               placeholderTextColor: '$color4',
               inputMode: coin.data?.decimals ? 'decimal' : 'numeric',

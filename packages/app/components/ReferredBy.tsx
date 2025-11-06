@@ -81,6 +81,7 @@ export function ReferredBy() {
           value={referralCode || ''}
           onChangeText={(text) => setReferralCode(text)}
           placeholder={'Referral Code'}
+          lineHeight={20}
           col={'$color12'}
           bw={0}
           br={0}

@@ -144,6 +144,7 @@ export const NoteField = forwardRef<
             borderWidth={0}
             borderRadius={'$4'}
             placeholderTextColor={'$color4'}
+            lineHeight={LINE_HEIGHT}
             // @todo use the theme colors if we ever have the palette scales
             // bc={'$color2'}
             // color={'$color12'}

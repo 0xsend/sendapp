@@ -192,6 +192,7 @@ export function SendAmountForm() {
                 bw: 0,
                 br: 0,
                 p: 1,
+                lineHeight: 30,
                 focusStyle: {
                   outlineWidth: 0,
                 },
