@@ -103,9 +103,7 @@ export const CoinField = ({
                   <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
                 )
               }
-              style={{
-                width: 'fit-content',
-              }}
+              $platform-web={{ width: 'fit-content' }}
             >
               <XStack gap={'$2'} ai={'center'}>
                 {pickedCoinSymbol && <IconCoin symbol={pickedCoinSymbol} size={'$2'} />}
@@ -171,6 +169,7 @@ export const CoinField = ({
                   boc={'transparent'}
                   f={1}
                   maxHeight={isTouchable ? 'unset' : 275}
+                  // @ts-expect-error - overflowY is needed for Y-axis specific scroll behavior
                   overflowY={isTouchable ? 'hidden' : 'scroll'}
                 >
                   <Select.Group disabled={disabled} space="$0" p={'$2'}>

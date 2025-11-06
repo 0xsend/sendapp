@@ -52,8 +52,11 @@ export function ActivityRewardsScreen() {
   const distribution = queryParams.distribution
   const { data: distributions, isLoading } = useMonthlyDistributions()
   const selectedDistributionIndex =
-    distributions !== undefined && distributions.length <= (distribution ?? 0)
-      ? distributions?.findIndex((d) => d.number === distribution)
+    distribution !== undefined && distributions !== undefined
+      ? Math.max(
+          0,
+          distributions.findIndex((d) => d.number === distribution)
+        )
       : 0
 
   const verificationsQuery = useDistributionVerifications(
@@ -523,14 +526,7 @@ const MultiplierCards = ({
 
 const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
   return (
-    <FadeCard
-      br={'$6'}
-      p="$6"
-      jc={'center'}
-      ai={'center'}
-      mih={112}
-      style={{ width: 'fit-content' }}
-    >
+    <FadeCard br={'$6'} p="$6" jc={'center'} ai={'center'} mih={112}>
       <XStack
         ai="center"
         w={'100%'}

@@ -3,11 +3,22 @@ import { config, Paragraph, useTheme, XStack } from '@my/ui'
 import { useIsDarkTheme } from 'apps-expo/utils/layout/useIsDarkTheme'
 import { Platform, Pressable } from 'react-native'
 import { IconArrowLeft } from 'app/components/icons'
+import { useMemo } from 'react'
 
 export default function StackNavigator() {
   const theme = useTheme()
   const isDark = useIsDarkTheme()
   const router = useRouter()
+
+  const iosMajorVersion = useMemo(() => {
+    if (Platform.OS !== 'ios') return null
+
+    const versionString = Platform.Version.split('.')[0]
+
+    if (!versionString) return null
+
+    return Number.parseInt(versionString)
+  }, [])
 
   return (
     <Stack
@@ -17,15 +28,18 @@ export default function StackNavigator() {
           backgroundColor: theme.background.val,
         },
         headerTintColor: isDark ? config.tokens.color.primary.val : theme.color12.val,
-        headerLeft: () => (
-          <Pressable onPress={() => router.back()}>
-            <IconArrowLeft
-              size={'$1.5'}
-              color={isDark ? '$primary' : '$color12'}
-              $platform-ios={{ marginLeft: 6 }}
-            />
-          </Pressable>
-        ),
+        headerLeft:
+          Platform.OS === 'ios' && iosMajorVersion && iosMajorVersion > 18
+            ? undefined
+            : () => (
+                <Pressable onPress={() => router.back()}>
+                  <IconArrowLeft
+                    size={'$1.5'}
+                    color={isDark ? '$primary' : '$color12'}
+                    $platform-ios={{ marginLeft: 6 }}
+                  />
+                </Pressable>
+              ),
         headerTitleAlign: 'left',
         headerTitle: ({ children }) => (
           <XStack flex={1} ai="center" jc="flex-start" pl={Platform.OS === 'android' ? '$2' : 0}>

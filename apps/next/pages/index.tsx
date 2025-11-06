@@ -43,16 +43,31 @@ export const Page: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (!session && carouselImages.length === 0) {
-      fetch('/api/carousel-images')
-        .then((res) => res.json())
+      // Omit credentials to ensure CDN caching works (like CoinGecko endpoints)
+      fetch('/api/carousel-images', { credentials: 'omit' })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch: ${res.status}`)
+          }
+          return res.json()
+        })
         .then((data) => {
-          if (data.images) {
-            setCarouselImages(data.images)
+          if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+            // Filter out any null images and ensure base64 is present
+            const validImages = data.images.filter(
+              (img: GetPlaiceholderImage) => img !== null && img?.base64 !== undefined
+            )
+            if (validImages.length > 0) {
+              console.log('[Carousel] Loaded images with blur data:', validImages.length)
+              setCarouselImages(validImages)
+            } else {
+              console.warn('[Carousel] No valid images with blur data found')
+            }
           }
         })
         .catch((error) => {
-          console.error('Failed to load carousel images:', error)
-          setCarouselImages([])
+          console.error('[Carousel] Failed to load carousel images:', error)
+          // Don't set empty array - keep it empty so we can retry or show a fallback
         })
     }
   }, [session, carouselImages.length])

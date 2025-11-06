@@ -8,7 +8,7 @@ export default function useAuthRedirect() {
     (redirectUrl?: string) => {
       router.replace(redirectUrl || '/')
     },
-    [router.replace]
+    [router]
   )
 
   return { redirect }

@@ -1,4 +1,4 @@
-import { Card, type CardProps, Paragraph, Shimmer, YStack } from '@my/ui'
+import { Card, type CardProps, Paragraph, Shimmer, useMedia, View, YStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
 import { ChevronRight } from '@tamagui/lucide-icons'
@@ -8,7 +8,7 @@ import { useSendEarnCoin } from '../earn/providers/SendEarnProvider'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { formatUnits } from 'viem'
 import { useLink } from 'solito/link'
-import { HomeBodyCard } from './screen'
+import { HomeBodyCard, useHomeRightPanel } from './screen'
 import { usdcCoin } from 'app/data/coins'
 import { Platform } from 'react-native'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -16,6 +16,8 @@ import { useSendAccount } from 'app/utils/send-accounts'
 export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
   const { data: sendAccount } = useSendAccount()
+  const { gtMd } = useMedia()
+  const { togglePage, page } = useHomeRightPanel()
 
   // Use the SendEarnProvider pattern
   const {
@@ -30,6 +32,16 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
     [hasExistingDeposit]
   )
   const linkProps = useLink({ href })
+
+  // Home right panel for desktop view
+  const rightPanelPage = useMemo(
+    () =>
+      ({
+        pathname: hasExistingDeposit ? '/earn/[asset]' : '/earn/[asset]/deposit',
+        query: { asset: 'usdc' },
+      }) as const,
+    [hasExistingDeposit]
+  )
 
   // Only fetch APY if user has existing deposits
   const {
@@ -48,8 +60,15 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   // !apyEnabled ||
   // !currentAssetsQueryEnabled
 
+  const homeBodyProps = gtMd
+    ? {
+        onPress: () => {
+          togglePage(rightPanelPage)
+        },
+      }
+    : linkProps
   return (
-    <HomeBodyCard {...linkProps} {...props}>
+    <HomeBodyCard {...homeBodyProps} {...props}>
       <Card.Header padded pb="$4" jc="space-between" fd="row">
         <Paragraph
           fontSize={'$5'}
@@ -60,11 +79,28 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
           Save
         </Paragraph>
 
-        <ChevronRight
-          size={'$1'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        />
+        <View
+          animateOnly={['transform']}
+          animation="fast"
+          rotate={
+            page?.pathname?.startsWith('/earn') && page?.query?.asset === 'usdc' ? '180deg' : '0deg'
+          }
+        >
+          <ChevronRight
+            size={'$1'}
+            color={
+              page?.pathname?.startsWith('/earn') && page?.query?.asset === 'usdc'
+                ? '$primary'
+                : '$lightGrayTextField'
+            }
+            $theme-light={{
+              color:
+                page?.pathname?.startsWith('/earn') && page?.query?.asset === 'usdc'
+                  ? '$color12'
+                  : '$darkGrayTextField',
+            }}
+          />
+        </View>
       </Card.Header>
       <Card.Footer padded size="$4" pt={0} fd="column" gap={Platform.OS === 'web' ? '$2' : '$1'}>
         {isLoading ? (

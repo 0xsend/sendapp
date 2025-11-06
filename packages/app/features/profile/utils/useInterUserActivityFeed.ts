@@ -9,6 +9,9 @@ import { throwIf } from 'app/utils/throwIf'
 import { type Activity, EventArraySchema, Events } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
 
+const PENDING_TRANSFERS_INTERVAL = 3_000 // 1 second
+const MAX_PENDING_TIME = 30_000 // 2 minutes - stop aggressive polling after this
+
 /**
  * Infinite query to fetch ERC-20 token activity feed between the current user and another profile.
  *
@@ -74,7 +77,33 @@ export function useInterUserActivityFeed(params: {
       return firstPageParam - 1
     },
     queryFn: fetchInterUserActivityFeed,
-    refetchInterval,
+    refetchInterval: ({ state: { data } }) => {
+      const { pages } = data ?? {}
+      if (!pages || !pages[0]) return refetchInterval
+      const activities = pages.flat()
+
+      // Find pending temporal transfers
+      const pendingTransfers = activities.filter(
+        (a) =>
+          a.event_name === Events.TemporalSendAccountTransfers &&
+          !['cancelled', 'failed'].includes(a.data.status)
+      )
+
+      if (pendingTransfers.length === 0) {
+        return refetchInterval // No pending transfers, use normal interval
+      }
+
+      // Check if any pending transfer is still fresh
+      const now = Date.now()
+      const hasFreshPendingTransfer = pendingTransfers.some((transfer) => {
+        const createdAt = new Date(transfer.created_at).getTime()
+        const age = now - createdAt
+        return age < MAX_PENDING_TIME
+      })
+
+      // Poll aggressively only if there's a fresh pending transfer
+      return hasFreshPendingTransfer ? PENDING_TRANSFERS_INTERVAL : refetchInterval
+    },
     enabled: !!currentUserId && !!otherUserId,
   })
 }

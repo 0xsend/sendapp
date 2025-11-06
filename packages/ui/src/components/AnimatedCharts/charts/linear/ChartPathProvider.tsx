@@ -4,7 +4,6 @@ import { useSharedValue } from 'react-native-reanimated'
 import {
   type CallbackType,
   ChartContext,
-  CurveType,
   type DataType,
   type PathData,
   type PathScales,

@@ -395,7 +395,7 @@ export function useUserOp({
       assert(!!uopQo?.queryFn, 'No queryFn found')
       return uopQo?.queryFn(args)
     },
-    [uopQo?.queryFn, gasFeesError, nonceError]
+    [uopQo, gasFeesError, nonceError]
   )
 
   return useWagmiQuery({

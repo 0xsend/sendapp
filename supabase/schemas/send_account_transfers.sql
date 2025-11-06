@@ -34,11 +34,11 @@ CREATE OR REPLACE FUNCTION public.send_account_transfers_delete_temporal_activit
  SECURITY DEFINER
 AS $function$
 declare
-    paymaster bytea = '\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea;
+    ignored_addresses bytea[] := ARRAY['\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea, '\x592e1224d203be4214b15e205f6081fbbacfcd2d'::bytea, '\x36f43082d01df4801af2d95aeed1a0200c5510ae'::bytea];
 begin
-    -- Check if it's from or to paymaster
-    if (NEW.f is not null and NEW.f = paymaster) or
-       (NEW.t is not null and NEW.t = paymaster) then
+    -- Check if it's from or to any ignored address (e.g., paymaster)
+    if (NEW.f is not null and NEW.f = ANY (ignored_addresses)) or
+       (NEW.t is not null and NEW.t = ANY (ignored_addresses)) then
         return NEW;
     end if;
     delete from public.activity a

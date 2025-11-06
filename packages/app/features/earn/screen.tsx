@@ -10,6 +10,7 @@ import { formatUnits } from 'viem'
 import type { SendEarnBalance } from './hooks'
 import { useSendEarn } from './providers/SendEarnProvider'
 import { useThemeName } from 'tamagui'
+import { usePathname } from 'app/utils/usePathname'
 
 const log = debug('app:earn:screen')
 
@@ -29,7 +30,7 @@ export function EarnScreen() {
   const balancesData = allBalances.data ?? null
 
   return (
-    <YStack w={'100%'} $gtLg={{ w: '50%' }}>
+    <YStack w={'100%'} $group-gtLg={{ w: '50%' }}>
       <DetailsSection hasActiveDeposits={hasActiveDeposits} balances={balancesData} />
     </YStack>
   )
@@ -81,34 +82,35 @@ Badge.displayName = 'Badge'
 const EarningsCallToAction = memo(() => {
   const { push } = useRouter()
 
-  return (
-    <Fade>
-      <Card
-        elevation={'$0.75'}
-        w={'100%'}
-        p={'$5'}
-        gap={'$7'}
-        ai={'flex-start'}
-        $gtLg={{ p: '$7' }}
-      >
-        <Badge text={'Earnings'} />
-        <YStack gap={'$3.5'}>
-          <Paragraph size={'$7'} fontWeight={'500'}>
-            Boost Your Savings Instantly
-          </Paragraph>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <YStack gap={'$2'}>
-            <ListItem>High APY: up to 12% on your deposits</ListItem>
-            <ListItem>Full Flexibility: Access your funds anytime</ListItem>
-            <ListItem>Rewards: Bonus SEND tokens</ListItem>
-          </YStack>
+  const pathname = usePathname()
+
+  const notInEarnScreen = !pathname.startsWith('/earn')
+
+  const content = (
+    <Card w="100%" p="$5" gap="$7" ai="flex-start" $gtLg={{ p: '$7' }}>
+      <Badge text={'Earnings'} />
+      <YStack gap={'$3.5'}>
+        <Paragraph size={'$7'} fontWeight={'500'}>
+          Boost Your Savings Instantly
+        </Paragraph>
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <YStack gap={'$2'}>
+          <ListItem>High APY: up to 12% on your deposits</ListItem>
+          <ListItem>Full Flexibility: Access your funds anytime</ListItem>
+          <ListItem>Rewards: Bonus SEND tokens</ListItem>
         </YStack>
-        <PrimaryButton onPress={() => push('/earn/usdc/deposit')}>
-          <PrimaryButton.Text>START EARNING</PrimaryButton.Text>
-        </PrimaryButton>
-      </Card>
-    </Fade>
+      </YStack>
+      <PrimaryButton onPress={() => push('/earn/usdc/deposit')}>
+        <PrimaryButton.Text>START EARNING</PrimaryButton.Text>
+      </PrimaryButton>
+    </Card>
   )
+
+  if (notInEarnScreen) {
+    return content
+  }
+
+  return <Fade>{content}</Fade>
 })
 EarningsCallToAction.displayName = 'EarningsCallToAction'
 
@@ -130,80 +132,88 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
     [balances]
   )
 
-  return (
-    <Fade>
-      <Card
-        elevation={'$0.75'}
-        w={'100%'}
-        p={'$5'}
-        gap={'$5'}
-        ai={'flex-start'}
-        $gtLg={{ p: '$7', gap: '$7' }}
-      >
-        <Badge text={'Active Earnings'} />
-        <YStack gap={'$3'} w={'100%'}>
-          <YStack gap={'$2'}>
+  const pathname = usePathname()
+
+  const notInEarnScreen = !pathname.startsWith('/earn')
+
+  const content = (
+    <Card
+      key="earnings-summary"
+      w="100%"
+      p="$5"
+      gap="$5"
+      ai="flex-start"
+      $gtLg={{ p: '$7', gap: '$7' }}
+    >
+      <Badge text={'Active Earnings'} />
+      <YStack gap={'$3'} w={'100%'}>
+        <YStack gap={'$2'}>
+          <Paragraph
+            size={'$5'}
+            color={'$lightGrayTextField'}
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            Total Value
+          </Paragraph>
+          <XStack ai={'center'} jc={'space-between'}>
             <Paragraph
-              size={'$5'}
-              color={'$lightGrayTextField'}
-              $theme-light={{ color: '$darkGrayTextField' }}
-            >
-              Total Value
-            </Paragraph>
-            <XStack ai={'center'} jc={'space-between'}>
-              <Paragraph
-                fontWeight={'600'}
-                size={(() => {
+              fontWeight={'600'}
+              size={(() => {
+                switch (true) {
+                  case totalAssets.length > 14:
+                    return '$8'
+                  case totalAssets.length > 8:
+                    return '$9'
+                  default:
+                    return '$11'
+                }
+              })()}
+              $gtLg={{
+                size: (() => {
                   switch (true) {
-                    case totalAssets.length > 14:
-                      return '$8'
-                    case totalAssets.length > 8:
+                    case totalAssets.length > 16:
                       return '$9'
+                    case totalAssets.length > 8:
+                      return '$10'
                     default:
                       return '$11'
                   }
-                })()}
-                $gtLg={{
-                  size: (() => {
-                    switch (true) {
-                      case totalAssets.length > 16:
-                        return '$9'
-                      case totalAssets.length > 8:
-                        return '$10'
-                      default:
-                        return '$11'
-                    }
-                  })(),
-                }}
-                style={{
-                  lineHeight: 55,
-                }}
-              >
-                {totalAssets}
+                })(),
+              }}
+              style={{
+                lineHeight: 55,
+              }}
+            >
+              {totalAssets}
+            </Paragraph>
+            <XStack ai={'center'} gap={'$2'}>
+              <IconCoin symbol={'USDC'} size={totalAssets.length > 16 ? '$1.5' : '$2.5'} />
+              <Paragraph size={'$7'} fontWeight={600} lineHeight={26}>
+                USDC
               </Paragraph>
-              <XStack ai={'center'} gap={'$2'}>
-                <IconCoin symbol={'USDC'} size={totalAssets.length > 16 ? '$1.5' : '$2.5'} />
-                <Paragraph size={'$7'} fontWeight={600} lineHeight={26}>
-                  USDC
-                </Paragraph>
-              </XStack>
             </XStack>
-          </YStack>
-          <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <YStack gap={'$2'}>
-            <Row label={'Deposits'} value={`${totalDeposits} USDC`} />
-            {/* Rewards section commented out since it won't be live on launch
+          </XStack>
+        </YStack>
+        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
+        <YStack gap={'$2'}>
+          <Row label={'Deposits'} value={`${totalDeposits} USDC`} />
+          {/* Rewards section commented out since it won't be live on launch
             <Row label={'Earnings'} value={`+${formatUSDCValue(0n)} USDC`} />
             <Row label={'Rewards'} value={`+0 SEND`} />
             */}
-          </YStack>
         </YStack>
-        <PrimaryButton onPress={() => push('/earn/usdc')}>
-          <PrimaryButton.Text>VIEW DETAILS</PrimaryButton.Text>
-        </PrimaryButton>
-      </Card>
-    </Fade>
+      </YStack>
+      <PrimaryButton onPress={() => push('/earn/usdc')}>
+        <PrimaryButton.Text>VIEW DETAILS</PrimaryButton.Text>
+      </PrimaryButton>
+    </Card>
   )
+
+  if (notInEarnScreen) {
+    return content
+  }
+
+  return <Fade>{content}</Fade>
 }
 
 const DetailsSection = ({
