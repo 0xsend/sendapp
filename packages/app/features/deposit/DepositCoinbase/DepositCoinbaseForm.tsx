@@ -105,6 +105,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
               },
 
               placeholder: '0',
+              lineHeight: 42,
               fontFamily: '$mono',
               placeholderTextColor: '$color4',
               inputMode: 'decimal',

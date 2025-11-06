@@ -350,8 +350,6 @@ const RightPanel = () => {
     }
   }, [gtLg, page?.pathname, setPage])
 
-  console.log('page', page)
-
   const content = useMemo(() => {
     if (!isWeb) return null
 

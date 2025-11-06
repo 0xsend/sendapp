@@ -457,6 +457,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                   outlineWidth: 0,
                 },
                 fontSize: 13,
+                lineHeight: 16,
                 fieldsetProps: {
                   width: '100%',
                 },
@@ -703,6 +704,7 @@ function CantonWalletFormCard() {
                   outlineWidth: 0,
                 },
                 fontSize: 13,
+                lineHeight: 16,
                 fieldsetProps: {
                   width: '100%',
                 },

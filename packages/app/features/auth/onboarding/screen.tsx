@@ -402,6 +402,7 @@ export function OnboardingScreen() {
               props={{
                 name: {
                   placeholder: 'Input desired Sendtag',
+                  lineHeight: 21,
                   color: '$color12',
                   fontWeight: '500',
                   bw: 0,
