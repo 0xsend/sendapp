@@ -6,9 +6,9 @@ import {
   Paragraph,
   PrimaryButton,
   QRCode,
-  Separator,
   Sheet,
   useAppToast,
+  View,
   XStack,
   YStack,
 } from '@my/ui'
@@ -75,52 +75,52 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
     })
 
   const dialogContent = (
-    <>
-      <XStack>
+    <YStack ai="stretch">
+      <XStack jc="space-between" mx="$-4" mt="$-4" p="$3" pb="$2" pl="$4">
         <H2 size="$8" fontWeight={400}>
           Share Profile
         </H2>
         <Button
           onPress={() => setIsOpen(false)}
           size="$3"
-          x="20%"
-          y="-20%"
           circular
+          x={4}
+          y={-4}
           pressStyle={{
             scale: 0.9,
           }}
           animation="100ms"
           animateOnly={['transform']}
-          pos="absolute"
-          r={0}
-          t={0}
+          elevate={isWeb}
         >
           <X scale={0.8} col="$aztec11" />
         </Button>
       </XStack>
-      <Separator boc="$aztec6" $theme-light={{ boc: '$gray7' }} />
-      {profileUrl && (
-        <YStack ai="center" gap="$3" pt="$3">
-          <QRCode value={profileUrl} size={240} centerComponent={<IconSend size={'$5'} />} />
-          <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
-            {profileUrl}
-          </Paragraph>
+      <View mx="$-4" h={1} bg="$aztec6" $theme-light={{ bg: '$gray7' }} />
+      <YStack>
+        {profileUrl && (
+          <YStack ai="center" gap="$3" pt="$3">
+            <QRCode value={profileUrl} size={240} centerComponent={<IconSend size={'$5'} />} />
+            <Paragraph size={'$4'} color={'$color10'} ta={'center'} numberOfLines={1}>
+              {profileUrl}
+            </Paragraph>
+          </YStack>
+        )}
+        <YStack
+          justifyContent="space-between"
+          marginTop="$4"
+          gap="$4"
+          $gtLg={{ flexDirection: 'row-reverse' }}
+        >
+          <PrimaryButton onPress={handleCopyLink} f={Platform.OS === 'web' ? 1 : undefined}>
+            <PrimaryButton.Icon>
+              <Copy size={16} color={'$black'} />
+            </PrimaryButton.Icon>
+            <PrimaryButton.Text>copy link</PrimaryButton.Text>
+          </PrimaryButton>
         </YStack>
-      )}
-      <YStack
-        justifyContent="space-between"
-        marginTop="$4"
-        gap="$4"
-        $gtLg={{ flexDirection: 'row-reverse' }}
-      >
-        <PrimaryButton onPress={handleCopyLink} f={Platform.OS === 'web' ? 1 : undefined}>
-          <PrimaryButton.Icon>
-            <Copy size={16} color={'$black'} />
-          </PrimaryButton.Icon>
-          <PrimaryButton.Text>copy link</PrimaryButton.Text>
-        </PrimaryButton>
       </YStack>
-    </>
+    </YStack>
   )
 
   return (
@@ -141,7 +141,7 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
           enterStyle={{ x: 0, y: -100, opacity: 0, scale: 0.9 }}
           exitStyle={{ x: 0, y: -100, opacity: 0, scale: 0.95 }}
           width="85%"
-          br="$5"
+          br="$8"
           gap="$3.5"
           p="$4"
           px="$4"
