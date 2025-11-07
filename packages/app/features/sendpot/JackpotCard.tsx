@@ -1,34 +1,16 @@
-import {
-  Label,
-  Paragraph,
-  XStack,
-  YStack,
-  Stack,
-  BigHeading,
-  styled,
-  Card,
-  H3,
-  Spinner,
-  LinkableButton,
-} from '@my/ui'
-import { useCallback, useEffect, useState, useMemo } from 'react'
-import { Timer } from '@tamagui/lucide-icons'
+import { FadeCard, Paragraph, PrimaryButton, Spinner, XStack, YStack } from '@my/ui'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { CalendarClock, Timer } from '@tamagui/lucide-icons'
 import { useGeoBlock } from '../../utils/useOFACGeoBlock'
 import {
-  useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotLastJackpotEndTime,
+  useReadBaseJackpotLpPoolTotal,
   useReadBaseJackpotRoundDurationInSeconds,
   useReadBaseJackpotTokenDecimals,
 } from '@my/wagmi/contracts/base-jackpot'
 import { formatUnits } from 'viem'
-
-const GreenSquare = styled(Stack, {
-  name: 'Surface',
-  w: 11,
-  h: 11,
-  theme: 'green_active',
-  bc: '$background',
-})
+import { IconCoin } from 'app/components/icons'
+import { useRouter } from 'solito/router'
 
 const zeroTime = { days: 0, hours: 0, minutes: 0, seconds: 0 }
 
@@ -40,6 +22,7 @@ export const JackpotCard = () => {
     useReadBaseJackpotRoundDurationInSeconds()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
   const { data: isGeoBlocked, isLoading: isLoadingGeoBlock } = useGeoBlock()
+  const router = useRouter()
 
   const jackpotEndTime = useMemo(() => {
     if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
@@ -86,14 +69,12 @@ export const JackpotCard = () => {
   const jackpotEndTimeString = useMemo(() => {
     if (!jackpotEndTime) return 'Loading...'
     const date = new Date(jackpotEndTime)
-    return date.toLocaleString('en-US', {
+    return date.toLocaleString(undefined, {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit',
-      second: '2-digit',
-      timeZoneName: 'short',
     })
   }, [jackpotEndTime])
 
@@ -114,108 +95,54 @@ export const JackpotCard = () => {
   const isLoading = isLoadingPoolTotal || isLoadingEndTime || isLoadingDuration || isLoadingDecimals
   const isBuyButtonDisabled = isLoadingGeoBlock || isGeoBlocked
 
+  const handleOnPress = () => {
+    if (isBuyButtonDisabled) {
+      return
+    }
+    router.push('/sendpot/buy-tickets')
+  }
+
+  if (isLoading) {
+    return <Spinner size={'large'} color={'$color12'} />
+  }
+
   return (
-    <Card
-      padding={'$5'}
-      w={'100%'}
-      jc="space-between"
-      $gtLg={{ padding: '$6', height: 'auto', minHeight: 244 }}
-      minHeight={184}
-    >
-      <XStack w={'100%'} zIndex={4} h="100%">
-        <YStack gap={'$2'} w={'100%'}>
-          <YStack gap={'$2.5'} jc="space-between">
-            <XStack ai={'center'} gap="$2.5" width={'100%'}>
-              <XStack ai={'center'} gap="$2.5">
-                <GreenSquare />
-                <Label
-                  fontSize={'$4'}
-                  zIndex={1}
-                  fontWeight={'500'}
-                  textTransform={'uppercase'}
-                  lineHeight={0}
-                  color={'$color10'}
-                >
-                  Current Sendpot
-                </Label>
-              </XStack>
-            </XStack>
-          </YStack>
-          <XStack style={{ color: 'white' }} gap={'$2.5'} mt="auto">
-            <BigHeading
-              $platform-web={{ width: 'fit-content' }}
-              fontSize={64}
-              $gtSm={{ fontSize: 80 }}
-              $gtMd={{ fontSize: 96 }}
-              fontWeight={'600'}
-              color={'$color12'}
-              zIndex={1}
-            >
-              {isLoading ? <Spinner /> : formattedJackpotAmount}
-            </BigHeading>
-            <Paragraph fontSize={'$6'} fontWeight={'500'} zIndex={1} $sm={{ marginTop: '$4' }}>
-              SEND
+    <FadeCard gap={'$7'} $gtLg={{ p: '$7', gap: '$7' }}>
+      <Paragraph fontSize={'$8'} fontWeight="600" $gtLg={{ fontSize: '$9' }}>
+        Current Sendpot
+      </Paragraph>
+      <XStack alignItems={'center'} gap={'$2'} justifyContent={'center'}>
+        <Paragraph fontSize={'$11'} fontWeight={600} $gtLg={{ fontSize: '$12' }}>
+          {formattedJackpotAmount}
+        </Paragraph>
+        <IconCoin symbol="SEND" size={'$4'} minWidth={'$4'} />
+      </XStack>
+      <YStack gap={'$3'}>
+        <XStack justifyContent={'space-between'} alignItems={'center'} gap={'$2'} flexWrap={'wrap'}>
+          <XStack alignItems={'center'} gap={'$2'}>
+            <CalendarClock />
+            <Paragraph fontSize={'$5'}>{jackpotEndTimeString}</Paragraph>
+          </XStack>
+          <XStack alignItems={'center'} gap={'$2'}>
+            <Timer />
+            <Paragraph fontSize={'$5'}>
+              {timeRemaining === zeroTime
+                ? '--:--:--:--'
+                : `${formatNumber(timeRemaining.days)}:${formatNumber(
+                    timeRemaining.hours
+                  )}:${formatNumber(timeRemaining.minutes)}:${formatNumber(timeRemaining.seconds)}`}
             </Paragraph>
           </XStack>
-          <YStack gap="$2" mt="$2">
-            <XStack ai="center" gap="$2">
-              <Timer size="$1.5" color="$color10" />
-              <H3 color="$color10">
-                {isLoading ? (
-                  <Spinner size="small" />
-                ) : timeRemaining === zeroTime ? (
-                  '--:--:--:--'
-                ) : (
-                  `${formatNumber(timeRemaining.days)}:${formatNumber(
-                    timeRemaining.hours
-                  )}:${formatNumber(timeRemaining.minutes)}:${formatNumber(timeRemaining.seconds)}`
-                )}
-              </H3>
-            </XStack>
-            <XStack ai="center">
-              <Paragraph color="$color10" fontSize="$4" textAlign="left">
-                Drawing occurs on: {isLoading ? 'Loading...' : jackpotEndTimeString}
-              </Paragraph>
-            </XStack>
-          </YStack>
-          <XStack w="100%" mt="$2">
-            <Stack f={1} w="100%" maw={350} gap="$2">
-              <LinkableButton
-                href="/sendpot/buy-tickets"
-                disabled={isBuyButtonDisabled}
-                theme={'green'}
-                br="$4"
-                px={'$3.5'}
-                h={'$4.5'}
-                key="sendpot-buy-tickets-button"
-                animation="200ms"
-                enterStyle={{
-                  opacity: 0,
-                }}
-                exitStyle={{
-                  opacity: 0,
-                }}
-              >
-                <XStack w={'100%'} ai={'center'} jc="center" h="100%" gap="$2">
-                  <LinkableButton.Text
-                    fontWeight={'400'}
-                    $theme-dark={{ col: '$color0' }}
-                    tt="uppercase"
-                    size={'$5'}
-                  >
-                    Buy ticket
-                  </LinkableButton.Text>
-                </XStack>
-              </LinkableButton>
-              {isGeoBlocked && (
-                <Paragraph color="$red10Dark" fontSize="$3" textAlign="center">
-                  Ticket purchases are not available in your region currently.
-                </Paragraph>
-              )}
-            </Stack>
-          </XStack>
-        </YStack>
-      </XStack>
-    </Card>
+        </XStack>
+        <PrimaryButton onPress={handleOnPress} disabled={isBuyButtonDisabled}>
+          <PrimaryButton.Text>Buy ticket</PrimaryButton.Text>
+        </PrimaryButton>
+        {isGeoBlocked && (
+          <Paragraph color="$error" fontSize="$3" textAlign="center">
+            Ticket purchases are not available in your region currently.
+          </Paragraph>
+        )}
+      </YStack>
+    </FadeCard>
   )
 }

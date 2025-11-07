@@ -3,16 +3,16 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { useMemo } from 'react'
 
 export const useClaimableWinnings = () => {
-  const { data: sendAccount } = useSendAccount()
+  const { data: sendAccount, isLoading: isLoadingAccount } = useSendAccount()
   const userAddress = useMemo(() => sendAccount?.address, [sendAccount?.address])
 
   const {
     data: usersInfo,
-    isLoading,
+    isLoading: isLoadingWinnings,
     error,
     refetch,
   } = useReadBaseJackpotUsersInfo(
-    { userAddress: userAddress! },
+    { userAddress: userAddress },
     {
       query: {
         enabled: !!userAddress,
@@ -34,7 +34,7 @@ export const useClaimableWinnings = () => {
   return {
     winningsClaimable,
     hasClaimableWinnings,
-    isLoading,
+    isLoading: isLoadingAccount || isLoadingWinnings || !userAddress,
     error,
     refetch,
   }
