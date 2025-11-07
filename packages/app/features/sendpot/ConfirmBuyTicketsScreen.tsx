@@ -1,12 +1,12 @@
 import {
   Button,
+  FadeCard,
   Paragraph,
+  Separator,
   Spinner,
+  useAppToast,
   XStack,
   YStack,
-  Separator,
-  FadeCard,
-  useAppToast,
 } from '@my/ui'
 import { createParam } from 'solito'
 import { useRouter } from 'solito/router'
@@ -24,7 +24,6 @@ import {
   useReadBaseJackpotTokenDecimals,
 } from '@my/wagmi/contracts/base-jackpot'
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
-import { baseMainnetClient } from '@my/wagmi'
 
 const currencySymbol = 'SEND'
 
@@ -112,11 +111,7 @@ export function ConfirmBuyTicketsScreen() {
       return
     }
 
-    // Get blockchain time instead of system time to handle time-forwarded Anvil
-    const block = await baseMainnetClient.getBlock()
-    const blockTimestamp = Number(block.timestamp)
-    const validUntil = blockTimestamp + 14 * 24 * 60 * 60 // 2 weeks from blockchain time
-    await purchaseAsync({ webauthnCreds, validUntil })
+    await purchaseAsync({ webauthnCreds })
   }
 
   const ticketPriceBn = ticketPrice ? (ticketPrice as bigint) : 0n
