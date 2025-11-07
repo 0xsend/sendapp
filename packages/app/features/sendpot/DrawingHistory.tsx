@@ -206,7 +206,7 @@ export const DrawingHistory = () => {
             ) : item.result === 'won' ? (
               <Paragraph fos="$4" color="$color10" ta="right">
                 Winner:{' '}
-                <Text color={'$primary'} $theme-light={{ color: '$color12' }}>
+                <Text color={'$primary'} $theme-light={{ color: '$olive' }}>
                   You Won!
                 </Text>
               </Paragraph>

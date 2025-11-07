@@ -24,6 +24,7 @@ import {
   useReadBaseJackpotTokenDecimals,
 } from '@my/wagmi/contracts/base-jackpot'
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
+import { baseMainnetClient } from '@my/wagmi'
 
 const currencySymbol = 'SEND'
 
@@ -75,18 +76,12 @@ export function ConfirmBuyTicketsScreen() {
       onSuccess: () => {
         console.log('Purchase successful')
         queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
-        toast.show('Purchase Successful', {
-          message: `Successfully bought ${numberOfTickets} ticket${
-            numberOfTickets > 1 ? 's' : ''
-          }.`,
-        })
+        toast.show('Purchase Successful')
         router.push('/sendpot')
       },
       onError: (error) => {
         console.error('Purchase mutation failed:', error)
-        toast.error('Purchase Failed', {
-          message: toNiceError(error),
-        })
+        toast.error('Purchase Failed')
       },
     }
   )
@@ -117,7 +112,11 @@ export function ConfirmBuyTicketsScreen() {
       return
     }
 
-    await purchaseAsync({ webauthnCreds })
+    // Get blockchain time instead of system time to handle time-forwarded Anvil
+    const block = await baseMainnetClient.getBlock()
+    const blockTimestamp = Number(block.timestamp)
+    const validUntil = blockTimestamp + 14 * 24 * 60 * 60 // 2 weeks from blockchain time
+    await purchaseAsync({ webauthnCreds, validUntil })
   }
 
   const ticketPriceBn = ticketPrice ? (ticketPrice as bigint) : 0n
