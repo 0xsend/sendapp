@@ -12,7 +12,7 @@ export const useClaimableWinnings = () => {
     error,
     refetch,
   } = useReadBaseJackpotUsersInfo(
-    { userAddress: userAddress },
+    { userAddress: userAddress as `0x${string}` },
     {
       query: {
         enabled: !!userAddress,
