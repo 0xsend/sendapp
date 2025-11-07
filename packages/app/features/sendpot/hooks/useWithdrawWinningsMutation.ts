@@ -1,13 +1,13 @@
-import { useMemo, useCallback } from 'react'
-import { encodeFunctionData, type Address, isAddress } from 'viem'
-import { useQueryClient, type UseMutationOptions } from '@tanstack/react-query'
+import { useCallback, useMemo } from 'react'
+import { encodeFunctionData, isAddress } from 'viem'
+import { type UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { baseJackpotAbi, baseJackpotAddress } from '@my/wagmi/contracts/base-jackpot'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useUserOp } from 'app/utils/userop'
 import type { GetUserOperationReceiptReturnType } from 'permissionless'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { assert } from 'app/utils/assert'
-import { useSendUserOpMutation, type SendUserOpArgs } from 'app/utils/sendUserOp'
+import { type SendUserOpArgs, useSendUserOpMutation } from 'app/utils/sendUserOp'
 import debug from 'debug'
 
 const log = debug('app:sendpot:useWithdrawWinnings')
@@ -103,6 +103,7 @@ export function useWithdrawWinnings(
               log('Withdrawal successful:', data)
               queryClient.invalidateQueries({ queryKey: ['userJackpotSummary'] })
               queryClient.invalidateQueries({ queryKey: ['sendAccountBalances'] })
+              queryClient.invalidateQueries({ queryKey: ['activity_feed'], exact: false })
               options?.onSuccess?.(data, variables, context)
             },
             onError: (error, variables, context) => {

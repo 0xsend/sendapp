@@ -18,6 +18,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useQueryClient } from '@tanstack/react-query'
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
 import { IconCoin } from 'app/components/icons/IconCoin'
+import { useRouter } from 'solito/router'
 
 export const ClaimWinnings = () => {
   const toast = useAppToast()
@@ -29,6 +30,7 @@ export const ClaimWinnings = () => {
     isLoading: isLoadingWinnings,
   } = useClaimableWinnings()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
+  const router = useRouter()
 
   const {
     isPreparing,
@@ -43,6 +45,7 @@ export const ClaimWinnings = () => {
       console.log('Withdrawal successful')
       queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
       toast.show('Claim Successful')
+      router.push('/activity')
     },
     onError: (error) => {
       console.error('Withdrawal mutation failed:', error)
