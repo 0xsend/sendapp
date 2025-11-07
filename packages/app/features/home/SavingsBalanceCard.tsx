@@ -16,7 +16,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
   const { data: sendAccount } = useSendAccount()
-  const { gtMd } = useMedia()
+  const { gtLg } = useMedia()
   const { togglePage, page } = useHomeRightPanel()
 
   // Use the SendEarnProvider pattern
@@ -60,7 +60,7 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   // !apyEnabled ||
   // !currentAssetsQueryEnabled
 
-  const homeBodyProps = gtMd
+  const homeBodyProps = gtLg
     ? {
         onPress: () => {
           togglePage(rightPanelPage)
