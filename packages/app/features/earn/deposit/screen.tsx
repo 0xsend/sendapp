@@ -83,7 +83,7 @@ const DepositBalanceDisplay = memo(
     }
 
     return (
-      <XStack gap={'$2'} flexDirection={'column'} $$group-gtSm={{ flexDirection: 'row' }}>
+      <XStack gap={'$2'} flexDirection={'column'} $group-gtSm={{ flexDirection: 'row' }}>
         <XStack gap={'$2'}>
           <Paragraph
             testID="earning-form-balance"
@@ -489,6 +489,7 @@ export function DepositForm() {
                 outlineWidth: 0,
               },
               placeholder: '0',
+              lineHeight: 40,
               fontFamily: '$mono',
               placeholderTextColor: '$color4',
               inputMode: coin.data?.decimals ? 'decimal' : 'numeric',

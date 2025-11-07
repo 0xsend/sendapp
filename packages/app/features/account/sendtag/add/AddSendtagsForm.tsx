@@ -99,6 +99,7 @@ export const AddSendtagsForm = () => {
                       autoFocus: Platform.OS === 'web',
                       'aria-label': 'Sendtag name',
                       placeholder: 'Enter Sendtag name',
+                      lineHeight: 30,
                       color: '$color12',
                       fontWeight: '500',
                       bw: 0,

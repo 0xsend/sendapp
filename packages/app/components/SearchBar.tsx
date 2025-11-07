@@ -617,6 +617,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                   outlineWidth: 0,
                 },
                 fontSize: 17,
+                lineHeight: 20,
                 onChangeText: handleTextChange,
                 iconBefore: (
                   <IconSearch

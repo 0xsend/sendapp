@@ -450,6 +450,7 @@ export const SignUpScreen = () => {
                 name: {
                   testID: 'sendtag-input',
                   placeholder: 'Enter your desired Sendtag',
+                  lineHeight: 21,
                   color: '$color12',
                   fontWeight: '500',
                   bw: 0,

@@ -19,7 +19,7 @@ import {
 } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from 'app/components/ReferralLink'
-import { lazy, memo, Suspense, useCallback, useMemo, useState } from 'react'
+import { lazy, memo, Suspense, useCallback, useMemo } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Link } from 'solito/link'
 import { Platform, Share } from 'react-native'
@@ -28,9 +28,14 @@ const ShareProfileDialog = lazy(() =>
   import('./ShareProfileDialog').then((module) => ({ default: module.ShareProfileDialog }))
 )
 
+const icons = {
+  account: <IconAccount color={'$primary'} $theme-light={{ color: '$color12' }} />,
+  share: <IconShare size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
+  qrFull: <IconQRFull size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
+}
+
 export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   const { profile, distributionShares } = useUser()
-  const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const hoverStyles = useHoverStyles()
 
   const avatar_url = useMemo(() => profile?.avatar_url, [profile?.avatar_url])
@@ -42,15 +47,6 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   const referralHref = useMemo(
     () => (referralCode ? `https://send.app?referral=${referralCode}` : ''),
     [referralCode]
-  )
-
-  const icons = useMemo(
-    () => ({
-      account: <IconAccount color={'$primary'} $theme-light={{ color: '$color12' }} />,
-      share: <IconShare size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
-      qrFull: <IconQRFull size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
-    }),
-    []
   )
 
   const isVerified = useMemo(
@@ -65,14 +61,6 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
       message: referralHref,
     }).catch(() => null)
   }, [referralHref])
-
-  const handleOpenDialog = useCallback(() => {
-    setShareDialogOpen(true)
-  }, [])
-
-  const handleCloseDialog = useCallback(() => {
-    setShareDialogOpen(false)
-  }, [])
 
   // Verification status icon component
   const VerificationIcon = () => {
@@ -107,7 +95,17 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
         </Avatar.Fallback>
       </>
     )
-  }, [avatar_url, icons.account])
+  }, [avatar_url])
+
+  const shareProfileButton = useMemo(
+    () => (
+      <Button elevation="$0.75" f={1} py="$5" h="auto" br="$5" bw={0} hoverStyle={hoverStyles}>
+        <Button.Icon>{icons.qrFull}</Button.Icon>
+        <Button.Text size="$5">Share Profile</Button.Text>
+      </Button>
+    ),
+    [hoverStyles]
+  )
 
   return (
     <YStack gap={'$3.5'} {...props}>
@@ -198,26 +196,11 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
             <Button.Icon>{icons.share}</Button.Icon>
             <Button.Text size={'$5'}>Invite Friends</Button.Text>
           </Button>
-          <Button
-            elevation={'$0.75'}
-            f={1}
-            py={'$5'}
-            h={'auto'}
-            br={'$5'}
-            bw={0}
-            hoverStyle={hoverStyles}
-            onPress={handleOpenDialog}
-          >
-            <Button.Icon>{icons.qrFull}</Button.Icon>
-            <Button.Text size={'$5'}>Share Profile</Button.Text>
-          </Button>
+          <Suspense fallback={shareProfileButton}>
+            <ShareProfileDialog>{shareProfileButton}</ShareProfileDialog>
+          </Suspense>
         </XStack>
       </Fade>
-      {shareDialogOpen && (
-        <Suspense fallback={null}>
-          <ShareProfileDialog isOpen={shareDialogOpen} onClose={handleCloseDialog} />
-        </Suspense>
-      )}
     </YStack>
   )
 })

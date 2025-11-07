@@ -1,5 +1,5 @@
-import { H2, H4, Paragraph, XStack, YStack, Separator, Spinner, Anchor } from '@my/ui'
-import { useState, useEffect, useMemo } from 'react'
+import { Anchor, H4, Paragraph, Separator, Spinner, Text, XStack, YStack } from '@my/ui'
+import { useEffect, useMemo, useState } from 'react'
 import { FlatList } from 'react-native'
 import {
   useReadBaseJackpotLpPoolTotal,
@@ -14,6 +14,7 @@ import { calculateTicketsFromBps, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useUserPendingJackpotTickets } from './hooks/useUserPendingJackpotTickets'
 import { useUserJackpotSummary } from './hooks/useUserJackpotSummary'
+import { IconCoin } from 'app/components/icons'
 
 export type DrawingHistoryEntry = {
   id: string
@@ -74,9 +75,10 @@ export const DrawingHistory = () => {
     for (const run of summaryResults) {
       const userTicketsBps = run.total_tickets ?? 0
       let resultStatus: 'won' | 'lost' | undefined = undefined
+      const winnerAddress = byteaToHex(run.winner as `\\x${string}`)
 
       if (userAddressLower && run.winner) {
-        resultStatus = run.winner.toLowerCase() === userAddressLower ? 'won' : 'lost'
+        resultStatus = winnerAddress.toLowerCase() === userAddressLower ? 'won' : 'lost'
       }
 
       const historicalPrizePool =
@@ -84,7 +86,6 @@ export const DrawingHistory = () => {
           ? Number.parseFloat(formatUnits(BigInt(run.win_amount), decimals))
           : 0
 
-      const winnerAddress = byteaToHex(run.winner as `\\x${string}`)
       const noWinner = winnerAddress === NO_WINNER_ADDRESS
       const winnerTagName = run.winner_tag_name as string | undefined
 
@@ -175,8 +176,8 @@ export const DrawingHistory = () => {
       isCurrent && (isLoadingPoolTotal || isLoadingDecimals || isLoadingSendAccount)
 
     return (
-      <YStack gap="$2" py="$3" px="$3.5" bc="$color1" br="$4" mb="$3">
-        <XStack width="100%">
+      <YStack gap="$2" py="$3" bc="$color1" br="$4" mb="$3">
+        <XStack width="100%" alignItems={'center'}>
           <YStack flex={1} gap="$1">
             {/* Left side: Date, user’s tickets */}
             <H4 fontWeight="600" mt="$1">
@@ -200,11 +201,14 @@ export const DrawingHistory = () => {
             {/* Right side: Winner, pool */}
             {isCurrent ? (
               <Paragraph fos="$4" color="$color10" ta="right">
-                Winner: (Pending)
+                Winner: <Text color={'$color12'}>(Pending)</Text>
               </Paragraph>
             ) : item.result === 'won' ? (
-              <Paragraph fos="$4" color="$green10Dark" ta="right">
-                Winner: You Won!
+              <Paragraph fos="$4" color="$color10" ta="right">
+                Winner:{' '}
+                <Text color={'$primary'} $theme-light={{ color: '$olive' }}>
+                  You Won!
+                </Text>
               </Paragraph>
             ) : item.winnerLink ? (
               <Paragraph fos="$4" color="$color10" ta="right">
@@ -220,20 +224,29 @@ export const DrawingHistory = () => {
               </Paragraph>
             ) : (
               <Paragraph fos="$4" color="$color10" ta="right">
-                Winner: {item.winnerFormatted}
+                Winner: <Text color={'$color12'}>{item.winnerFormatted}</Text>
               </Paragraph>
             )}
 
-            <Paragraph fos="$4" color="$color10" ta="right">
-              Total Pool:{' '}
-              {itemIsLoadingCurrent && isCurrent ? (
-                <Spinner size="small" />
-              ) : displayPrizePool !== undefined ? (
-                `${displayPrizePool.toLocaleString(undefined, { maximumFractionDigits: 0 })} SEND`
-              ) : (
-                '... SEND'
-              )}
-            </Paragraph>
+            <XStack gap={'$2'} alignItems={'center'}>
+              <Paragraph fos="$4" color="$color10" ta="right">
+                Total Pool:
+              </Paragraph>
+              <XStack gap={'$1'}>
+                <Paragraph>
+                  {itemIsLoadingCurrent && isCurrent ? (
+                    <Spinner size="small" />
+                  ) : displayPrizePool !== undefined ? (
+                    <Text color="$color12">
+                      {displayPrizePool.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </Text>
+                  ) : (
+                    <Text>...</Text>
+                  )}
+                </Paragraph>
+                <IconCoin symbol="SEND" size={'$1'} />
+              </XStack>
+            </XStack>
           </YStack>
         </XStack>
       </YStack>
@@ -242,12 +255,12 @@ export const DrawingHistory = () => {
 
   return (
     <YStack gap="$4" w="100%">
-      <XStack ai="center" jc="space-between">
-        <H2 fontWeight="600">Drawing History</H2>
-      </XStack>
-      <Separator />
+      <Paragraph fontSize={'$8'} fontWeight="600" $gtLg={{ fontSize: '$9' }}>
+        Drawing History
+      </Paragraph>
+      <Separator boc={'$color4'} />
       {isLoadingInitialData && drawingHistory.length === 0 ? (
-        <YStack ai="center" jc="center" p="$4">
+        <YStack ai="center" jc="center">
           <Spinner />
         </YStack>
       ) : drawingHistory.length > 0 ? (
@@ -258,7 +271,7 @@ export const DrawingHistory = () => {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <YStack ai="center" jc="center" p="$4">
+        <YStack ai="center" jc="center">
           <Paragraph color="$color10">No drawing history available.</Paragraph>
         </YStack>
       )}

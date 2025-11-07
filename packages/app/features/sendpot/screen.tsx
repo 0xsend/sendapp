@@ -1,8 +1,17 @@
-import { XStack, YStack, Card } from '@my/ui'
+import { FadeCard, Spinner, XStack, YStack } from '@my/ui'
 import { JackpotCard } from './JackpotCard'
 import { DrawingHistory } from './DrawingHistory'
 import SendpotRiskDialog from './SendpotRiskDialog'
+import { ClaimWinnings } from './ClaimWinnings'
+import { useClaimableWinnings } from './hooks/useClaimableWinnings'
+
 export function SendPotScreen() {
+  const { hasClaimableWinnings, isLoading } = useClaimableWinnings()
+
+  if (isLoading) {
+    return <Spinner size="large" color="$color12" />
+  }
+
   return (
     <XStack
       w={'100%'}
@@ -18,11 +27,11 @@ export function SendPotScreen() {
         maxWidth={600}
         gap="$5"
       >
-        <JackpotCard />
+        {hasClaimableWinnings ? <ClaimWinnings /> : <JackpotCard />}
         <YStack w={'100%'}>
-          <Card bc={'$color1'} width="100%" p="$4">
+          <FadeCard>
             <DrawingHistory />
-          </Card>
+          </FadeCard>
         </YStack>
         <SendpotRiskDialog />
       </YStack>

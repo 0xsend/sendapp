@@ -99,6 +99,7 @@ export const AppReviewLoginScreen = () => {
                 email: {
                   testID: 'email-input',
                   placeholder: 'Email address',
+                  lineHeight: 21,
                   color: '$color12',
                   fontWeight: '500',
                   bw: 0,
@@ -119,6 +120,7 @@ export const AppReviewLoginScreen = () => {
                 password: {
                   testID: 'password-input',
                   placeholder: 'Password',
+                  lineHeight: 21,
                   color: '$color12',
                   fontWeight: '500',
                   bw: 0,

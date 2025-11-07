@@ -70,6 +70,10 @@ export function ReferredBy() {
           : 'transparent'
       }
       bw={1}
+      w={'100%'}
+      gap={'$3.5'}
+      br={'$5'}
+      p={'$5'}
       $gtLg={{ p: '$7', gap: '$3.5' }}
     >
       <XStack gap="$2" position="relative" ai={'center'} jc={'space-between'}>
@@ -77,6 +81,7 @@ export function ReferredBy() {
           value={referralCode || ''}
           onChangeText={(text) => setReferralCode(text)}
           placeholder={'Referral Code'}
+          lineHeight={20}
           col={'$color12'}
           bw={0}
           br={0}
