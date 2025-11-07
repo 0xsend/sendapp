@@ -1,12 +1,12 @@
 import {
   Button,
+  FadeCard,
   Paragraph,
+  Separator,
   Spinner,
+  useAppToast,
   XStack,
   YStack,
-  Separator,
-  FadeCard,
-  useAppToast,
 } from '@my/ui'
 import { createParam } from 'solito'
 import { useRouter } from 'solito/router'
@@ -75,18 +75,12 @@ export function ConfirmBuyTicketsScreen() {
       onSuccess: () => {
         console.log('Purchase successful')
         queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
-        toast.show('Purchase Successful', {
-          message: `Successfully bought ${numberOfTickets} ticket${
-            numberOfTickets > 1 ? 's' : ''
-          }.`,
-        })
+        toast.show('Purchase Successful')
         router.push('/sendpot')
       },
       onError: (error) => {
         console.error('Purchase mutation failed:', error)
-        toast.error('Purchase Failed', {
-          message: toNiceError(error),
-        })
+        toast.error('Purchase Failed')
       },
     }
   )
