@@ -3,9 +3,11 @@ import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
-import { allCoins } from '../data/coins'
+import { allCoins, cantonCoin } from '../data/coins'
 import { useMemo, useCallback } from 'react'
 import type { Address, Hex } from 'viem'
+import { useUser } from './useUser'
+import { api } from './api'
 
 type BalanceOfResult =
   | {
@@ -23,11 +25,12 @@ type BalanceOfResult =
 export const useSendAccountBalances = () => {
   const { query: pricesQuery } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
+  const { profile } = useUser()
 
   const tokenContracts = useMemo(
     () =>
       allCoins
-        .filter((coin) => coin.token !== 'eth')
+        .filter((coin) => coin.token !== 'eth' && coin.token !== cantonCoin.token)
         .map((coin) => ({
           address: coin.token as Hex,
           abi: erc20Abi,
@@ -60,6 +63,33 @@ export const useSendAccountBalances = () => {
     chainId: baseMainnet.id,
   })
 
+  // Canton balance from external Canton wallet API via Lighthouse (authenticated tRPC)
+  // This query is isolated - failures won't block other balances from loading
+  const cantonWalletAddress = profile?.canton_party_verifications?.canton_wallet_address
+  const cantonBalanceQuery = api.canton.getBalance.useQuery(undefined, {
+    enabled: !!sendAccount && !!cantonWalletAddress,
+    staleTime: 45000,
+    refetchInterval: 45000,
+    retry: 1, // Only retry once to avoid blocking
+    retryDelay: 1000, // Quick retry
+    select: (data) => {
+      if (!data) return undefined
+
+      const balanceStr = data.total_unlocked_coin
+
+      // Parse decimal string to bigint with 10 decimals
+      // e.g., "72307.5319725725" -> 723075319725725n
+      const [integerPart, decimalPart = ''] = balanceStr.split('.')
+      const paddedDecimal = decimalPart.padEnd(10, '0').slice(0, 10)
+      const balanceBigInt = BigInt(integerPart + paddedDecimal)
+
+      return balanceBigInt
+    },
+  })
+
+  const cantonBalance = cantonBalanceQuery.data
+
+  // Canton balance query deliberately excluded from isLoading to prevent blocking other balances
   const isLoading =
     tokensQuery.isLoading || ethQuery.isLoading || pricesQuery.isLoading || !sendAccount
 
@@ -70,6 +100,10 @@ export const useSendAccountBalances = () => {
       (acc, coin) => {
         if (coin.token === 'eth') {
           acc[coin.symbol] = ethQuery.data?.value
+          return acc
+        }
+        if (coin.token === cantonCoin.token) {
+          acc[coin.token] = cantonBalance
           return acc
         }
         const idx = tokenContracts.findIndex((c) => c.address === coin.token)
@@ -83,7 +117,7 @@ export const useSendAccountBalances = () => {
       },
       {} as Record<string, bigint | undefined>
     )
-  }, [isLoading, ethQuery, tokensQuery, tokenContracts, unpackResult])
+  }, [isLoading, ethQuery, tokensQuery, tokenContracts, unpackResult, cantonBalance])
 
   const dollarBalances = useMemo(() => {
     const { data: tokenPrices } = pricesQuery

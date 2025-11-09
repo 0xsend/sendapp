@@ -186,33 +186,10 @@ const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {
 function InvestmentsPreview(props: XStackProps) {
   const { investmentCoins } = useCoins()
 
-  // Get SEND token
-  const sendCoin = investmentCoinsList.find((coin) => coin.symbol === 'SEND')
-  if (!sendCoin) return null
-
-  // Filter coins that have a balance > 0 (excluding SEND to handle separately)
-  const ownedCoins = investmentCoins.filter(
-    (coin) => coin.balance && coin.balance > 0n && coin.symbol !== 'SEND'
-  )
-
-  // Get SEND token with its actual balance or 0
-  const sendCoinWithBalance = investmentCoins.find((coin) => coin.symbol === 'SEND') || {
-    ...sendCoin,
-    balance: 0n,
-  }
-
-  // Sort owned coins by balance (highest first)
-  const sortedOwnedCoins = ownedCoins.sort((a, b) =>
-    (b?.balance ?? 0n) > (a?.balance ?? 0n) ? 1 : -1
-  )
-
-  // Always start with SEND token, then add other owned tokens
-  const allCoinsToShow = [sendCoinWithBalance, ...sortedOwnedCoins]
-
-  // Show up to 3 tokens total (SEND + 2 others max)
+  // Show up to 3 tokens with balance > 0, preserving the original order from investmentCoinsList
   const maxDisplay = 3
-  const coinsToShow = allCoinsToShow.slice(0, maxDisplay)
-  const remainingCount = allCoinsToShow.length - maxDisplay
+  const coinsToShow = investmentCoins.slice(0, maxDisplay)
+  const remainingCount = Math.max(0, investmentCoins.length - maxDisplay)
 
   return (
     <XStack ai="center" {...props}>

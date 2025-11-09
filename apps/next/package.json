@@ -20,6 +20,7 @@
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",
     "@my/wagmi": "workspace:*",
+    "@nktkas/hyperliquid": "^0.25.9",
     "@plaiceholder/next": "^3.0.0",
     "@supabase/auth-helpers-react": "^0.5.0",
     "@supabase/supabase-js": "^2.49.8",

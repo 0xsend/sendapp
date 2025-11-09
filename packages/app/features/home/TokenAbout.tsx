@@ -51,6 +51,11 @@ export const TokenAbout = () => {
     return null
   }
 
+  // Don't render if there's no description
+  if (!isLoading && !about) {
+    return null
+  }
+
   return (
     <YStack gap={'$3'}>
       <H4 fontWeight={600} size={'$7'}>

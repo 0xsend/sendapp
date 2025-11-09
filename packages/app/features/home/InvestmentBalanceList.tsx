@@ -85,6 +85,8 @@ const TokenBalanceItem = ({
               switch (true) {
                 case isLoadingTokenPrices || balanceInUSD === undefined:
                   return isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField'
+                case changePercent24h === null:
+                  return isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField'
                 case changePercent24h !== null && changePercent24h >= 0:
                   return '$olive'
                 default:

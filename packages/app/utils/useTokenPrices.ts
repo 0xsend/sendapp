@@ -14,7 +14,7 @@ import {
 } from '@my/wagmi'
 import { z } from 'zod'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { allCoins } from 'app/data/coins'
+import { allCoins, cantonCoin } from 'app/data/coins'
 import { usePathname } from 'app/utils/usePathname'
 import { useTokensMarketData, type MarketData } from 'app/utils/coin-gecko'
 
@@ -52,6 +52,11 @@ const normalizeCoingeckoPrices = (marketData: MarketData) => {
   const byId = new Map(marketData.map((d) => [d.id, d.current_price ?? 0]))
   return allCoins.reduce(
     (acc, coin) => {
+      // Canton has id='canton' in marketData (from TheTie/Hyperliquid via useTokensMarketData)
+      if (coin.token === cantonCoin.token) {
+        acc[coin.token] = byId.get('canton') ?? 0
+        return acc
+      }
       // Skip coins without CoinGecko ID - they'll get prices from DexScreener
       acc[coin.token] = coin.coingeckoTokenId ? (byId.get(coin.coingeckoTokenId) ?? 0) : 0
       return acc
