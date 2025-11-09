@@ -4736,6 +4736,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@henrygd/semaphore@npm:0.1.0":
+  version: 0.1.0
+  resolution: "@henrygd/semaphore@npm:0.1.0"
+  checksum: 10/bbc8832162be81d1c6d5782f635b53dd916bcc86dd366f161ad1f0216110f7a490a1a4579af16b3759563f11c517e73328412efec07fa1443d370df98c0cbd25
+  languageName: node
+  linkType: hard
+
 "@hookform/resolvers@npm:^3.3.2":
   version: 3.3.2
   resolution: "@hookform/resolvers@npm:3.3.2"
@@ -6398,6 +6405,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@msgpack/msgpack@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "@msgpack/msgpack@npm:3.1.2"
+  checksum: 10/e04ff37d7c89ffdd6b4fbcd1770af60b16c98afdf1c3c16190170dfe34764048eb45e3654016ac62cc616c7e4b09e611f8863317ca5f18b3a72974fb131e562e
+  languageName: node
+  linkType: hard
+
 "@mswjs/interceptors@npm:^0.38.1":
   version: 0.38.3
   resolution: "@mswjs/interceptors@npm:0.38.3"
@@ -6805,6 +6819,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nktkas/hyperliquid@npm:^0.25.9":
+  version: 0.25.9
+  resolution: "@nktkas/hyperliquid@npm:0.25.9"
+  dependencies:
+    "@henrygd/semaphore": "npm:0.1.0"
+    "@msgpack/msgpack": "npm:^3.1.2"
+    "@noble/hashes": "npm:^2.0.1"
+    "@noble/secp256k1": "npm:^3.0.0"
+    typescript-event-target: "npm:1.1.1"
+    valibot: "npm:1.1.0"
+  bin:
+    hyperliquid: esm/bin/cli.js
+  checksum: 10/b62cf956449342d0ef777d62a7ca03515ad7cbc7b54bb6907bd5f426ec3b54d82320e4d5fd80a489a98dea817fae34ec885fc9a9a598625425c45d103ae1974f
+  languageName: node
+  linkType: hard
+
 "@noble/ciphers@npm:1.2.1, @noble/ciphers@npm:^1.0.0":
   version: 1.2.1
   resolution: "@noble/ciphers@npm:1.2.1"
@@ -6940,10 +6970,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/hashes@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@noble/hashes@npm:2.0.1"
+  checksum: 10/f4d00e7564eb4ff4e6d16be151dd0e404aede35f91e4372b0a8a6ec888379c1dd1e02c721b480af8e7853bea9637185b5cb9533970c5b77d60c254ead0cfd8f7
+  languageName: node
+  linkType: hard
+
 "@noble/secp256k1@npm:1.7.1, @noble/secp256k1@npm:~1.7.0":
   version: 1.7.1
   resolution: "@noble/secp256k1@npm:1.7.1"
   checksum: 10/214d4756c20ed20809d948d0cc161e95664198cb127266faf747fd7deffe5444901f05fe9f833787738f2c6e60b09e544c2f737f42f73b3699e3999ba15b1b63
+  languageName: node
+  linkType: hard
+
+"@noble/secp256k1@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@noble/secp256k1@npm:3.0.0"
+  checksum: 10/8f3f90ca9cad5e4fc0d85613dee508fa9e4590ea7275e3b44ca52e164b316e88a03b9520c11882b8133c8bd4c8024f2135bee44060e84e180f281b85aad0b933
   languageName: node
   linkType: hard
 
@@ -27439,6 +27483,7 @@ __metadata:
     "@my/wagmi": "workspace:*"
     "@next/bundle-analyzer": "npm:^13.4.19"
     "@next/eslint-plugin-next": "npm:^14.0.4"
+    "@nktkas/hyperliquid": "npm:^0.25.9"
     "@plaiceholder/next": "npm:^3.0.0"
     "@supabase/auth-helpers-react": "npm:^0.5.0"
     "@supabase/supabase-js": "npm:^2.49.8"
@@ -35055,6 +35100,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript-event-target@npm:1.1.1":
+  version: 1.1.1
+  resolution: "typescript-event-target@npm:1.1.1"
+  checksum: 10/199c5f761cfedab59ac6a1198c597ffd03723002b0171f03fc060b4b9312cab40ac6eea117786ecd2c6d3d6a25bb7a007695ad4398de9dccfe60b7da782b893f
+  languageName: node
+  linkType: hard
+
 "typescript@npm:4.9.5":
   version: 4.9.5
   resolution: "typescript@npm:4.9.5"
@@ -35772,6 +35824,18 @@ __metadata:
     "@types/istanbul-lib-coverage": "npm:^2.0.1"
     convert-source-map: "npm:^2.0.0"
   checksum: 10/18dd8cebfb6790f27f4e41e7cff77c7ab1c8904085f354dd7875e2eb65f4261c4cf40939132502875779d92304bfea46b8336346ecb40b6f33c3a3979e6f5729
+  languageName: node
+  linkType: hard
+
+"valibot@npm:1.1.0":
+  version: 1.1.0
+  resolution: "valibot@npm:1.1.0"
+  peerDependencies:
+    typescript: ">=5"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10/667c99e3ec2825ea97c20f37add7fe7eb9d15fb338c5f49c166ffba13a6f4516c77c060083e1c6bda77a2275c4d37400b711d284bbea03fd4ae160bbca34112c
   languageName: node
   linkType: hard
 

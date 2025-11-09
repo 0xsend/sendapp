@@ -29,6 +29,7 @@ export const COINGECKO_IDS = [
   'euro-coin',
   'mamo',
   'masq',
+  'canton', // Canton uses custom API, not CoinGecko
 ] as const satisfies readonly [string, ...string[]]
 export type CoingeckoId = (typeof COINGECKO_IDS)[number]
 
@@ -182,6 +183,18 @@ export const lateNightOnBaseCoin = {
   // CoinGecko not available - uses DexScreener only
 } as const satisfies erc20Coin
 
+export const cantonCoin = {
+  label: 'Canton',
+  symbol: 'CC',
+  token: '0xCC00000000000000000000000000000000000000',
+  decimals: 10,
+  formatDecimals: 2,
+  coingeckoTokenId: 'canton' as const,
+  // Canton is on a separate network - balance fetched from external API
+  // Uses dummy address since it's not an actual ERC20 token on Base
+  // Buy/sell functionality disabled - coming soon
+} as const satisfies erc20Coin
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -212,6 +225,7 @@ export type coinsBySymbol = typeof coinsBySymbol
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */
 export const partnerCoins: coin[] = [
+  cantonCoin,
   ethCoin,
   cbBtcCoin,
   spx6900Coin,
@@ -283,8 +297,9 @@ export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
 export const stableCoins = [usdcCoin, eurcCoin] as const
 
 export const investmentCoins = [
-  ethCoin,
+  cantonCoin,
   sendCoin,
+  ethCoin,
   cbBtcCoin,
   spx6900Coin,
   moonwellCoin,
