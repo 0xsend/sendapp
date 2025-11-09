@@ -41,7 +41,7 @@ const DAYS_TO_INTERVAL_MAP: Record<
 export const cantonRouter = createTRPCRouter({
   /**
    * Get the authenticated user's Canton wallet balance (PROTECTED)
-   * Fetches from CantonScan API using the canton_wallet_address from their profile
+   * Fetches from ccview.io API using the canton_wallet_address from their profile
    */
   getBalance: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id
@@ -60,36 +60,40 @@ export const cantonRouter = createTRPCRouter({
     }
 
     const partyId = verification.canton_wallet_address
-    const encodedPartyId = encodeURIComponent(partyId)
 
     try {
-      const response = await fetch(`https://www.cantonscan.com/api/actors/${encodedPartyId}`)
+      // Note: This API key is not sensitive - it's a public key used by the ccview.io browser client
+      const response = await fetch(`https://ccview.io/api/v1/parties/${partyId}`, {
+        headers: {
+          'x-api-key': 'temp_mainnet_HsafylQwUo6yWBfSn0s5o6EDAT48Cp99jK8TH1p9kn1sqnDkxFcuSphbLQKko',
+        },
+      })
 
       if (!response.ok) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: `CantonScan API returned ${response.status}`,
+          message: `ccview.io API returned ${response.status}`,
         })
       }
 
       const data = await response.json()
 
-      if (typeof data.total_unlocked_coin !== 'string') {
+      if (!data.balance || typeof data.balance.total_unlocked_coin !== 'string') {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Invalid response from CantonScan API',
+          message: 'Invalid response from ccview.io API',
         })
       }
 
       // Return the balance data
       return {
-        total_unlocked_coin: data.total_unlocked_coin,
-        total_available_coin: data.total_available_coin,
-        round: data.round,
-        time: data.record_time,
+        total_unlocked_coin: data.balance.total_unlocked_coin,
+        total_available_coin: data.balance.total_available_coin,
+        round: data.balance.computed_as_of_round,
+        time: data.balance.computed_as_of_time,
       }
     } catch (error) {
-      console.error('Error fetching Canton balance from CantonScan:', error)
+      console.error('Error fetching Canton balance from ccview.io:', error)
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to fetch Canton balance',
