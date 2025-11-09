@@ -14,7 +14,7 @@ import {
 } from '@my/wagmi'
 import { z } from 'zod'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import { allCoins } from 'app/data/coins'
+import { allCoins, cantonCoin } from 'app/data/coins'
 import { usePathname } from 'app/utils/usePathname'
 import { useTokensMarketData, type MarketData } from 'app/utils/coin-gecko'
 
@@ -53,7 +53,7 @@ const normalizeCoingeckoPrices = (marketData: MarketData) => {
   return allCoins.reduce(
     (acc, coin) => {
       // Canton has id='canton' in marketData (from TheTie/Hyperliquid via useTokensMarketData)
-      if (coin.token === 'CC') {
+      if (coin.token === cantonCoin.token) {
         acc[coin.token] = byId.get('canton') ?? 0
         return acc
       }

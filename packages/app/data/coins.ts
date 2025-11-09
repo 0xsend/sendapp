@@ -54,17 +54,11 @@ export const ETHCoinSchema = BaseCoinSchema.extend({
   token: z.literal('eth'),
 })
 
-// Canton specific schema (external network, balance from external API)
-export const CantonCoinSchema = BaseCoinSchema.extend({
-  token: z.literal('canton'),
-})
-
-export const CoinSchema = z.union([ERC20CoinSchema, ETHCoinSchema, CantonCoinSchema])
+export const CoinSchema = z.union([ERC20CoinSchema, ETHCoinSchema])
 
 export type coin = z.infer<typeof CoinSchema>
 export type erc20Coin = z.infer<typeof ERC20CoinSchema>
 export type ethCoin = z.infer<typeof ETHCoinSchema>
-export type cantonCoin = z.infer<typeof CantonCoinSchema>
 
 export const usdcCoin = {
   label: 'USDC',
@@ -192,13 +186,14 @@ export const lateNightOnBaseCoin = {
 export const cantonCoin = {
   label: 'Canton',
   symbol: 'CC',
-  token: 'CC',
+  token: '0xCC00000000000000000000000000000000000000',
   decimals: 10,
   formatDecimals: 2,
   coingeckoTokenId: 'canton' as const,
   // Canton is on a separate network - balance fetched from external API
+  // Uses dummy address since it's not an actual ERC20 token on Base
   // Buy/sell functionality disabled - coming soon
-} as const satisfies cantonCoin
+} as const satisfies erc20Coin
 
 /**
  * The coins (tokens) array that are supported by Send App.

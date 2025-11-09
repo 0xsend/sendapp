@@ -3,7 +3,7 @@ import { useBalance, useReadContracts } from 'wagmi'
 import { useSendAccount } from './send-accounts'
 import { useTokenPrices } from './useTokenPrices'
 import { convertBalanceToFiat } from './convertBalanceToUSD'
-import { allCoins } from '../data/coins'
+import { allCoins, cantonCoin } from '../data/coins'
 import { useMemo, useCallback } from 'react'
 import type { Address, Hex } from 'viem'
 import { useUser } from './useUser'
@@ -30,7 +30,7 @@ export const useSendAccountBalances = () => {
   const tokenContracts = useMemo(
     () =>
       allCoins
-        .filter((coin) => coin.token !== 'eth' && coin.token !== 'CC')
+        .filter((coin) => coin.token !== 'eth' && coin.token !== cantonCoin.token)
         .map((coin) => ({
           address: coin.token as Hex,
           abi: erc20Abi,
@@ -102,7 +102,7 @@ export const useSendAccountBalances = () => {
           acc[coin.symbol] = ethQuery.data?.value
           return acc
         }
-        if (coin.token === 'CC') {
+        if (coin.token === cantonCoin.token) {
           acc[coin.token] = cantonBalance
           return acc
         }

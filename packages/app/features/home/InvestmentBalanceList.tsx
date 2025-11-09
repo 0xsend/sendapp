@@ -87,7 +87,7 @@ const TokenBalanceItem = ({
                   return isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField'
                 case changePercent24h === null:
                   return isDarkTheme ? '$lightGrayTextField' : '$darkGrayTextField'
-                case changePercent24h >= 0:
+                case changePercent24h !== null && changePercent24h >= 0:
                   return '$olive'
                 default:
                   return '$error'

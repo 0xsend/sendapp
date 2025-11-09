@@ -5,7 +5,27 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import * as hl from '@nktkas/hyperliquid'
 
 // Map CoinGecko days to Hyperliquid intervals
-const DAYS_TO_INTERVAL_MAP: Record<string, { interval: string; numCandles: number }> = {
+const DAYS_TO_INTERVAL_MAP: Record<
+  string,
+  {
+    interval:
+      | '1m'
+      | '3m'
+      | '5m'
+      | '15m'
+      | '30m'
+      | '1h'
+      | '2h'
+      | '4h'
+      | '8h'
+      | '12h'
+      | '1d'
+      | '3d'
+      | '1w'
+      | '1M'
+    numCandles: number
+  }
+> = {
   '1': { interval: '15m', numCandles: 96 },
   '7': { interval: '1h', numCandles: 168 },
   '30': { interval: '4h', numCandles: 180 },
@@ -119,6 +139,14 @@ export const cantonRouter = createTRPCRouter({
       }
 
       const cantonCtx = metaAndAssetCtxs[1][cantonIndex]
+
+      if (!cantonCtx) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Canton context not found in Hyperliquid data',
+        })
+      }
+
       const price = Number.parseFloat(cantonCtx.oraclePx)
       const prevDayPrice = Number.parseFloat(cantonCtx.prevDayPx)
       const priceChange24h = price - prevDayPrice
