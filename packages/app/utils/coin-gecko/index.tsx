@@ -104,7 +104,7 @@ export const useTokensMarketData = <R = MarketData>(options?: {
   const cantonQuery = useCantonMarketData()
 
   const cgQuery = useQuery<MarketData, Error, R>({
-    queryKey: ['coin-market-data', canonicalIds, ids, cantonQuery.data],
+    queryKey: ['coin-market-data', canonicalIds, ids, cantonQuery.data, cantonQuery.isSuccess],
     enabled: options?.enabled ?? canonicalIds.length > 0,
     queryFn: async () => {
       const url = buildCgMarketsUrl({
