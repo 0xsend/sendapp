@@ -39,7 +39,7 @@ import { useCoins } from 'app/provider/coins'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { coin } from 'app/data/coins'
-import { investmentCoins } from 'app/data/coins'
+import { investmentCoins, cantonCoin } from 'app/data/coins'
 import { CoinsModal } from 'app/components/CoinsModal'
 import { Link } from 'solito/link'
 import type { LayoutChangeEvent } from 'react-native'
@@ -629,7 +629,7 @@ const InvestSheetItemWeb = ({ coin }: { coin: coin }) => {
       key={coin.symbol}
       href={{
         pathname: '/',
-        query: { token: coin.token },
+        query: { token: coin.token === cantonCoin.token ? coin.symbol : coin.token },
       }}
     >
       <CoinsModal.Item coin={coin} />
@@ -642,8 +642,11 @@ const InvestSheetItemNative = ({ coin, onPress }: { coin: coin; onPress: () => v
 
   const handlePress = useCallback(() => {
     onPress()
-    router.push({ pathname: '/token', query: { token: coin.token } })
-  }, [coin.token, onPress, router])
+    router.push({
+      pathname: '/token',
+      query: { token: coin.token === cantonCoin.token ? coin.symbol : coin.token },
+    })
+  }, [coin.token, coin.symbol, onPress, router])
 
   return <CoinsModal.Item key={coin.symbol} onPress={handlePress} coin={coin} />
 }
