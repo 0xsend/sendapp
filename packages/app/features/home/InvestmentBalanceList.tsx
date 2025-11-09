@@ -1,6 +1,6 @@
 import { Card, isWeb, Link, Paragraph, XStack, YStack } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import type { CoinWithBalance } from 'app/data/coins'
+import { type CoinWithBalance, cantonCoin } from 'app/data/coins'
 
 import formatAmount from 'app/utils/formatAmount'
 import { Fragment } from 'react'
@@ -52,7 +52,7 @@ const TokenBalanceItem = ({
   const { isPriceHidden } = useIsPriceHidden()
   const href = {
     pathname: Platform.OS === 'web' ? '/' : '/token',
-    query: { token: coin.token },
+    query: { token: coin.token === cantonCoin.token ? coin.symbol : coin.token },
   }
   const linkProps = useLink({ href })
 
