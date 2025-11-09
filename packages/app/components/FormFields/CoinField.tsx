@@ -26,6 +26,7 @@ import formatAmount from 'app/utils/formatAmount'
 import { useId, useState } from 'react'
 import { IconCoin } from '../icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
+import { cantonCoin } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform, Dimensions } from 'react-native'
@@ -57,7 +58,9 @@ export const CoinField = ({
   const pickedCoinSymbol = coins.find((coin) => coin.token === field.value)?.symbol
 
   // Calculate dynamic snap point for Sheet
-  const filteredCoins = coins.filter((coin) => showAllCoins || (coin.balance && coin.balance >= 0n))
+  const filteredCoins = coins
+    .filter((coin) => showAllCoins || (coin.balance && coin.balance >= 0n))
+    .filter((coin) => coin.token !== cantonCoin.token) // Exclude Canton from swap/send - not yet supported
   const headerHeight = 90
   const itemHeight = 70
   const contentHeight = headerHeight + filteredCoins.length * itemHeight

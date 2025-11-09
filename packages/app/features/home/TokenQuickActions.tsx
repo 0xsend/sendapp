@@ -2,7 +2,7 @@ import { Text, Card, Theme, useAppToast, useMedia, XStack, YStack } from '@my/ui
 import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { Minus, Plus } from '@tamagui/lucide-icons'
 import type { LinkableButtonProps } from '@my/ui'
-import { type CoinWithBalance, stableCoins, usdcCoin } from 'app/data/coins'
+import { type CoinWithBalance, stableCoins, usdcCoin, cantonCoin } from 'app/data/coins'
 import { useLink } from 'solito/link'
 import { Platform } from 'react-native'
 
@@ -182,11 +182,64 @@ const WithdrawButton = ({ coin }: { coin: CoinWithBalance }) => {
   )
 }
 
+const CantonComingSoonButton = ({ label }: { label: string }) => {
+  const media = useMedia()
+  const isSmallScreen = !media.gtXs
+  const toast = useAppToast()
+
+  const handlePress = () => {
+    toast.show('Full Canton integration coming soon. Visit cantonwallet.com', {
+      burntOptions: {
+        preset: 'none',
+      },
+    })
+  }
+
+  return (
+    <Card materialInteractive f={1} height={'auto'} w="100%" opacity={0.6} onPress={handlePress}>
+      <YStack
+        gap="$2"
+        jc={'space-between'}
+        ai="center"
+        px={isSmallScreen ? '$3' : '$4'}
+        py="$3.5"
+        $gtSm={{ py: '$4' }}
+      >
+        <Theme name="gray">
+          {label === 'Buy' ? (
+            <Plus size={'$1.5'} color={'$color10'} />
+          ) : (
+            <Minus size={'$1.5'} color={'$color10'} />
+          )}
+        </Theme>
+        <Text
+          fontSize={isSmallScreen ? '$4' : '$5'}
+          px="$1"
+          ta="center"
+          w="100%"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          color={'$color10'}
+        >
+          {label}
+        </Text>
+      </YStack>
+    </Card>
+  )
+}
+
 export const TokenQuickActions = ({ coin }: { coin: CoinWithBalance }) => {
   const isStableCoin = stableCoins.some((c) => c.token === coin.token)
+  const isCanton = coin.token === cantonCoin.token
+
   return (
     <XStack w={'100%'} gap={'$3'}>
-      {isStableCoin ? (
+      {isCanton ? (
+        <>
+          <CantonComingSoonButton label="Sell" />
+          <CantonComingSoonButton label="Buy" />
+        </>
+      ) : isStableCoin ? (
         <>
           <AddMoneyButton />
           <WithdrawButton coin={coin} />

@@ -103,7 +103,8 @@ export function TokenKeyMetrics() {
   const volume = mdM?.total_volume ?? null
   // Volume 24h change is not provided by the endpoint; omit the badge when not available.
   const volumeChange = null
-  const circulating = md?.circulating_supply ?? null
+  // Use circulating supply from market data (includes Canton) or detailed CoinGecko data
+  const circulating = mdM?.circulating_supply ?? md?.circulating_supply ?? null
 
   return (
     <YStack gap={'$3'}>

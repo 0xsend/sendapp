@@ -12,6 +12,7 @@ import { IconCbBtc } from './IconCbBtc'
 import { IconEURC } from './IconEURC'
 import { IconMAMO } from './IconMAMO'
 import { IconMASQ } from './IconMASQ'
+import { IconCanton } from './IconCanton'
 import { Image, type ImageSourcePropType, type ImageStyle } from 'react-native'
 import { getTokens } from '@tamagui/core'
 
@@ -32,6 +33,7 @@ const coinSymbolToIcons: Record<coin['symbol'], IconEntry> = {
   MAMO: IconMAMO,
   MASQ: IconMASQ,
   LNOB: { type: 'image', source: require('./IconLnob.png') },
+  CC: IconCanton,
 }
 
 export const IconCoin = ({

@@ -52,6 +52,11 @@ const normalizeCoingeckoPrices = (marketData: MarketData) => {
   const byId = new Map(marketData.map((d) => [d.id, d.current_price ?? 0]))
   return allCoins.reduce(
     (acc, coin) => {
+      // Canton has id='canton' in marketData (from TheTie/Hyperliquid via useTokensMarketData)
+      if (coin.token === 'CC') {
+        acc[coin.token] = byId.get('canton') ?? 0
+        return acc
+      }
       // Skip coins without CoinGecko ID - they'll get prices from DexScreener
       acc[coin.token] = coin.coingeckoTokenId ? (byId.get(coin.coingeckoTokenId) ?? 0) : 0
       return acc

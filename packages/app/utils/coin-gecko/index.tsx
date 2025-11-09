@@ -3,6 +3,7 @@ import type { CoingeckoId, coins, CoinWithBalance } from 'app/data/coins'
 import { allCoins, COINGECKO_IDS } from 'app/data/coins'
 import { z } from 'zod'
 import { api } from 'app/utils/api'
+import { useCantonMarketData } from 'app/utils/useCantonMarketData'
 
 // Market data (current prices) is fetched from the free CoinGecko API on the client.
 // Detailed coin data and charts are fetched via our server API (Pro keys stay server-only).
@@ -99,8 +100,11 @@ export const useTokensMarketData = <R = MarketData>(options?: {
   const ids = allCoins.map((c) => c.coingeckoTokenId).filter((id) => id !== undefined)
   const canonicalIds = Array.from(new Set(ids)).sort().join(',')
 
-  return useQuery<MarketData, Error, R>({
-    queryKey: ['coin-market-data', canonicalIds, ids],
+  // Fetch Canton data separately
+  const cantonQuery = useCantonMarketData()
+
+  const cgQuery = useQuery<MarketData, Error, R>({
+    queryKey: ['coin-market-data', canonicalIds, ids, cantonQuery.data],
     enabled: options?.enabled ?? canonicalIds.length > 0,
     queryFn: async () => {
       const url = buildCgMarketsUrl({
@@ -117,12 +121,21 @@ export const useTokensMarketData = <R = MarketData>(options?: {
       if (!response.ok)
         throw new Error(`Failed to fetch market data for: ${canonicalIds}, ${response.status}`)
       const data = await response.json()
-      return MarketDataSchema.parse(data)
+      const parsedData = MarketDataSchema.parse(data)
+
+      // Merge Canton data before select transformation
+      if (cantonQuery.isSuccess && cantonQuery.data) {
+        return [...parsedData, cantonQuery.data as MarketData[number]]
+      }
+
+      return parsedData
     },
     select: options?.select,
     staleTime: 45000,
     refetchInterval: 45000,
   })
+
+  return cgQuery
 }
 
 // Minimal schema for /coins/{id} when only description is needed
@@ -187,11 +200,33 @@ export const useCoingeckoCoin = <
 >(
   tokenId: T
 ) => {
-  return api.coinGecko.getCoingeckoCoin.useQuery(
+  // Fetch Canton data from tRPC
+  const cantonQuery = api.canton.getMarketData.useQuery(undefined, {
+    enabled: tokenId === 'canton',
+    staleTime: 45000,
+    refetchInterval: 45000,
+    select: (data) => CoingeckoCoinSchema.parse(data.coin_data),
+  })
+
+  const cgQuery = api.coinGecko.getCoingeckoCoin.useQuery(
     // @ts-expect-error - disable when undefined
     { token: tokenId },
-    { enabled: Boolean(tokenId), staleTime: 1000 * 60 * 5 }
+    { enabled: Boolean(tokenId) && tokenId !== 'canton', staleTime: 1000 * 60 * 5 }
   )
+
+  // Return Canton data for Canton, CoinGecko data for others
+  if (tokenId === 'canton') {
+    return {
+      ...cantonQuery,
+      data: cantonQuery.data,
+      error: cantonQuery.error,
+      isLoading: cantonQuery.isLoading,
+      isSuccess: cantonQuery.isSuccess,
+      isError: cantonQuery.isError,
+    } as typeof cgQuery
+  }
+
+  return cgQuery
 }
 
 /**
@@ -227,7 +262,16 @@ export const useTokenMarketChart = <
   const vs = params.vsCurrency ?? 'usd'
   const days = params.days ?? '1'
 
-  return api.coinGecko.getMarketChart.useQuery(
+  // Fetch Canton chart data from tRPC
+  const cantonChartQuery = api.canton.getChart.useQuery(
+    { days },
+    {
+      enabled: tokenId === 'canton',
+      staleTime: 12 * 60 * 60 * 1000,
+    }
+  )
+
+  const cgQuery = api.coinGecko.getMarketChart.useQuery(
     {
       // @ts-expect-error - disable when undefined
       token: tokenId,
@@ -236,10 +280,17 @@ export const useTokenMarketChart = <
       precision: 'full',
     },
     {
-      enabled: Boolean(tokenId) && Boolean(days),
+      enabled: Boolean(tokenId) && Boolean(days) && tokenId !== 'canton',
       staleTime: 12 * 60 * 60 * 1000,
     }
   )
+
+  // Return Canton chart data for Canton, CoinGecko data for others
+  if (tokenId === 'canton') {
+    return cantonChartQuery as typeof cgQuery
+  }
+
+  return cgQuery
 }
 
 /**

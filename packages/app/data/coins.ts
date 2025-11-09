@@ -29,6 +29,7 @@ export const COINGECKO_IDS = [
   'euro-coin',
   'mamo',
   'masq',
+  'canton', // Canton uses custom API, not CoinGecko
 ] as const satisfies readonly [string, ...string[]]
 export type CoingeckoId = (typeof COINGECKO_IDS)[number]
 
@@ -53,11 +54,17 @@ export const ETHCoinSchema = BaseCoinSchema.extend({
   token: z.literal('eth'),
 })
 
-export const CoinSchema = z.union([ERC20CoinSchema, ETHCoinSchema])
+// Canton specific schema (external network, balance from external API)
+export const CantonCoinSchema = BaseCoinSchema.extend({
+  token: z.literal('canton'),
+})
+
+export const CoinSchema = z.union([ERC20CoinSchema, ETHCoinSchema, CantonCoinSchema])
 
 export type coin = z.infer<typeof CoinSchema>
 export type erc20Coin = z.infer<typeof ERC20CoinSchema>
 export type ethCoin = z.infer<typeof ETHCoinSchema>
+export type cantonCoin = z.infer<typeof CantonCoinSchema>
 
 export const usdcCoin = {
   label: 'USDC',
@@ -182,6 +189,17 @@ export const lateNightOnBaseCoin = {
   // CoinGecko not available - uses DexScreener only
 } as const satisfies erc20Coin
 
+export const cantonCoin = {
+  label: 'Canton',
+  symbol: 'CC',
+  token: 'CC',
+  decimals: 10,
+  formatDecimals: 2,
+  coingeckoTokenId: 'canton' as const,
+  // Canton is on a separate network - balance fetched from external API
+  // Buy/sell functionality disabled - coming soon
+} as const satisfies cantonCoin
+
 /**
  * The coins (tokens) array that are supported by Send App.
  */
@@ -212,6 +230,7 @@ export type coinsBySymbol = typeof coinsBySymbol
  * The coins (tokens) that sendapp supports through partnerships. (Hidden when balance is 0)
  */
 export const partnerCoins: coin[] = [
+  cantonCoin,
   ethCoin,
   cbBtcCoin,
   spx6900Coin,
@@ -283,8 +302,9 @@ export const isEthCoin = (coin: coin): coin is ethCoin => coin.symbol === 'ETH'
 export const stableCoins = [usdcCoin, eurcCoin] as const
 
 export const investmentCoins = [
-  ethCoin,
+  cantonCoin,
   sendCoin,
+  ethCoin,
   cbBtcCoin,
   spx6900Coin,
   moonwellCoin,
