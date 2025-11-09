@@ -186,7 +186,7 @@ export const lateNightOnBaseCoin = {
 export const cantonCoin = {
   label: 'Canton',
   symbol: 'CC',
-  token: '0xCC00000000000000000000000000000000000000',
+  token: '0xCc00000000000000000000000000000000000000',
   decimals: 10,
   formatDecimals: 2,
   coingeckoTokenId: 'canton' as const,
