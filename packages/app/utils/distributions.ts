@@ -227,6 +227,18 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
             (maxDate, v) => (!maxDate || v.created_at > maxDate ? v.created_at : maxDate),
             ''
           )
+          // Find the weight from the verification with the latest created_at
+          const latestWeight =
+            verifications.reduce(
+              (latestWeight, v) => {
+                if (!latestWeight || v.created_at > latestWeight.created_at) {
+                  return { created_at: v.created_at, weight: BigInt(v.weight ?? 0) }
+                }
+                return latestWeight
+              },
+              null as { created_at: string; weight: bigint } | null
+            )?.weight ?? 0n
+
           return {
             type: item.type as Database['public']['Enums']['verification_type'],
             weight: totalWeight,
@@ -234,6 +246,7 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
             fixed_value: BigInt(item.fixed_value ?? 0),
             metadata: verifications.map((v) => v.metadata).filter(Boolean),
             created_at: latestCreatedAt,
+            latestWeight: latestWeight,
           }
         })
         .filter(

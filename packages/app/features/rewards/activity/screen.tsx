@@ -37,6 +37,7 @@ import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
+import { calculateTicketsFromBps } from 'app/data/sendpot'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -47,6 +48,7 @@ const verificationTypesAndTitles = {
   tag_referral: { title: 'Referrals' },
   total_tag_referrals: { title: 'Total Referrals' },
   send_streak: { title: 'Send Streak', details: '(per day)' },
+  sendpot_ticket_purchase: { title: 'SendPot Tickets' },
 } as const
 
 export function ActivityRewardsScreen() {
@@ -361,6 +363,7 @@ const TaskCards = ({
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const verifications = verificationsQuery.data
+
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
@@ -428,20 +431,56 @@ const TaskCard = ({
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
+  const latestWeight = verification.latestWeight
   const value = ['send_ten', 'send_one_hundred'].includes(type)
     ? //@ts-expect-error these two verfiications will always have "value" in the metadata
       BigInt(metadata?.[0]?.value ?? 0)
     : weight
+  // Find the largest lastJackpotEndTime in the metadata array
+  const lastJackpotEndTime =
+    type === 'sendpot_ticket_purchase'
+      ? metadata
+          .map((m) => (m as { lastJackpotEndTime?: string })?.lastJackpotEndTime)
+          .filter((time): time is string => Boolean(time))
+          .reduce((max, time) => (!max || time > max ? time : max), null as string | null)
+      : null
   const isSendStreak = type === 'send_streak'
-  const isTagRegistration = type === 'tag_registration'
-  const isCompleted = isSendStreak
-    ? isEqualCalendarDate(new Date(verification.created_at), new Date()) ||
-      (Boolean(weight) && isQualificationOver)
-    : Boolean(weight)
+
+  const getIsCompleted = () => {
+    switch (type) {
+      case 'send_streak':
+        return (
+          isEqualCalendarDate(new Date(verification.created_at), new Date()) ||
+          (Boolean(weight) && isQualificationOver)
+        )
+      case 'sendpot_ticket_purchase': {
+        // Check if we have tickets for the current jackpot
+        if (lastJackpotEndTime && verification.created_at < lastJackpotEndTime) {
+          // No tickets for current jackpot
+          return false
+        }
+        return latestWeight ? latestWeight >= 10n : false
+      }
+      default:
+        return Boolean(weight)
+    }
+  }
+
+  const getDisplayValue = () => {
+    switch (type) {
+      case 'tag_registration':
+        return verification.count.toString()
+      case 'sendpot_ticket_purchase':
+        return weight ? calculateTicketsFromBps(Number(weight)).toString() : '0'
+      default:
+        return value.toString()
+    }
+  }
+
+  const isCompleted = getIsCompleted()
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
-
-  const displayValue = isTagRegistration ? verification.count.toString() : value.toString()
+  const displayValue = getDisplayValue()
 
   const statusConfig = {
     completed: {
@@ -472,6 +511,7 @@ const TaskCard = ({
     'tag_registration',
     'send_ten',
     'send_one_hundred',
+    'sendpot_ticket_purchase',
   ].includes(type)
 
   return (
