@@ -1,10 +1,10 @@
-import { Card, type CardProps, Paragraph, Shimmer, XStack } from '@my/ui'
+import { Card, type CardProps, Paragraph, Shimmer, useMedia, View, XStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useMemo } from 'react'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { formatUnits, zeroAddress } from 'viem'
-import { type LinkProps, useLink } from 'solito/link'
+import { useLink } from 'solito/link'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useQuery } from '@tanstack/react-query'
@@ -16,13 +16,15 @@ import {
   sendTokenV0Address,
 } from '@my/wagmi'
 import { sendCoin } from 'app/data/coins'
-import { HomeBodyCard } from './screen'
+import { HomeBodyCard, useHomeRightPanel } from './screen'
 
 import { type MerkleDropClaimParams, useSendMerkleDropsAreClaimed } from 'app/utils/distributions'
 import { byteaToHex } from 'app/utils/byteaToHex'
 
-export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
-  const linkProps = useLink({ href })
+export const REWARDS_CARD_HREF = '/rewards'
+
+export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
+  const linkProps = useLink({ href: REWARDS_CARD_HREF })
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
   const { data: sendAccount } = useSendAccount()
   const {
@@ -101,8 +103,22 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
     !sendAccount ||
     !isPricesEnabled
 
+  const { togglePage, page } = useHomeRightPanel()
+  const { gtLg } = useMedia()
+  const homeBodyProps = gtLg
+    ? {
+        onPress: () => {
+          togglePage({
+            pathname: REWARDS_CARD_HREF,
+            query: {},
+          } as const)
+        },
+      }
+    : linkProps
+
+  const isActive = page?.pathname === REWARDS_CARD_HREF
   return (
-    <HomeBodyCard {...linkProps} {...props}>
+    <HomeBodyCard {...homeBodyProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph
           fontSize={'$5'}
@@ -113,11 +129,13 @@ export const RewardsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
           Rewards
         </Paragraph>
         <XStack flex={1} />
-        <ChevronRight
-          size={'$1'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        />
+        <View animateOnly={['transform']} animation="fast" rotate={isActive ? '180deg' : '0deg'}>
+          <ChevronRight
+            size={'$1'}
+            color={isActive ? '$primary' : '$lightGrayTextField'}
+            $theme-light={{ color: isActive ? '$color12' : '$darkGrayTextField' }}
+          />
+        </View>
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
         <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
