@@ -11,7 +11,7 @@ import {
 import { useCallback, useMemo } from 'react'
 import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
-import { IconBirthday } from 'app/components/icons'
+import { IconBirthday, IconBadgeCheckSolid } from 'app/components/icons'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
 import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
@@ -19,7 +19,17 @@ import { RecyclerListView } from 'recyclerlistview'
 import { useLink } from 'solito/link'
 import { Platform } from 'react-native'
 
-type Referral = Functions<'get_friends'>[number]
+type Referral = Pick<
+  Functions<'profile_lookup'>[number],
+  | 'avatar_url'
+  | 'x_username'
+  | 'links_in_bio'
+  | 'birthday'
+  | 'tag'
+  | 'name'
+  | 'sendid'
+  | 'is_verified'
+>
 
 export default function FriendsScreen() {
   const friendsFeedQuery = useFriendsFeed({
@@ -135,7 +145,16 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
             </Avatar>
           )}
           <YStack gap={'$2'} f={1}>
-            <Paragraph lineHeight={20}>{label}</Paragraph>
+            <XStack ai="center" gap="$2">
+              <Paragraph lineHeight={20}>{label}</Paragraph>
+              {referral.is_verified ? (
+                <IconBadgeCheckSolid
+                  size={'$1'}
+                  color={'$primary'}
+                  $theme-light={{ color: '$color12' }}
+                />
+              ) : null}
+            </XStack>
             <XStack gap={'$2'} alignItems={'center'}>
               <IconBirthday size={'$1'} />
               <Paragraph lineHeight={20}>{birthday}</Paragraph>
