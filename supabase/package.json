@@ -24,14 +24,14 @@
     "generate:remote": "yarn _with-env yarn _generate:remote",
     "generate": "npx supabase gen types typescript --local --schema public,temporal > ./database-generated.types.ts",
     "g": "yarn generate",
-    "migration:diff": "PGSSLMODE=disable npx supabase db diff -f ",
+    "migration:diff": "npx supabase db diff -f",
     "start": "npx supabase start",
     "stop": "npx supabase stop",
     "reset": "npx supabase db reset && npx supabase start",
     "status": "npx supabase status",
     "_deploy": "yarn link-project && npx supabase db push",
     "deploy": "yarn _with-env yarn _deploy",
-    "test": "PGSSLMODE=disable npx supabase test db"
+    "test": "npx supabase test db"
   },
   "devDependencies": {
     "dotenv-cli": "^7.3.0",
