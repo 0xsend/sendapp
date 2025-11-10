@@ -5,26 +5,46 @@ import {
   Paragraph,
   Shimmer,
   ThemeableStack,
+  useMedia,
+  View,
   XStack,
   type XStackProps,
 } from '@my/ui'
 
 import { ChevronRight } from '@tamagui/lucide-icons'
-import { type LinkProps, useLink } from 'solito/link'
+import { useLink } from 'solito/link'
 import { useFriends } from '../affiliate/utils/useFriends'
 import { IconAccount } from 'app/components/icons'
-import { HomeBodyCard } from './screen'
+import { HomeBodyCard, useHomeRightPanel } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
 
-export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'children'>) => {
-  const linkProps = useLink({ href })
+export const FRIENDS_CARD_HREF = '/account/affiliate'
+
+export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
+  const linkProps = useLink({ href: FRIENDS_CARD_HREF })
+  const { gtLg } = useMedia()
   const limit = 3
   const { data, isLoading } = useFriends(limit)
   const hoverStyles = useHoverStyles()
 
+  const { togglePage, page } = useHomeRightPanel()
+
+  const homeBodyProps = gtLg
+    ? {
+        onPress: () => {
+          togglePage({
+            pathname: FRIENDS_CARD_HREF,
+            query: {},
+          } as const)
+        },
+      }
+    : linkProps
+
+  const isActive = page?.pathname === FRIENDS_CARD_HREF
+
   return (
-    <HomeBodyCard {...linkProps} {...props}>
+    <HomeBodyCard {...homeBodyProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph
           fontSize={'$5'}
@@ -35,11 +55,13 @@ export const FriendsCard = ({ href, ...props }: Omit<CardProps & LinkProps, 'chi
           Referrals
         </Paragraph>
         <XStack flex={1} />
-        <ChevronRight
-          size={'$1'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        />
+        <View animateOnly={['transform']} animation="fast" rotate={isActive ? '180deg' : '0deg'}>
+          <ChevronRight
+            size={'$1'}
+            color={isActive ? '$primary' : '$lightGrayTextField'}
+            $theme-light={{ color: isActive ? '$color12' : '$darkGrayTextField' }}
+          />
+        </View>
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
         {isLoading ? (
