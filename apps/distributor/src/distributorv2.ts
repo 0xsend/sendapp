@@ -17,6 +17,7 @@ import { calculateWeights, Mode, PERC_DENOM } from './weights'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import type { Address } from 'viem'
+import { BPS_PER_TICKET, COST_PER_TICKET_WEI } from 'packages/app/data/sendpot'
 
 type Multiplier = {
   value?: number
@@ -538,6 +539,11 @@ export class DistributorV2Worker {
       {} as Record<string, bigint>
     )
 
+    // TODO: index onchain data in the case these values change
+    // Hardcoded jackpot values for sendpot_ticket_purchase calculations
+    const ticketBps = BPS_PER_TICKET // ticketBps = 10,000 - feeBps (where feeBps = 3000)
+    const ticketPrice = COST_PER_TICKET_WEI
+
     // Calculate fixed pool share weights
     const fixedPoolAvailableAmount = distAmt
 
@@ -551,17 +557,35 @@ export class DistributorV2Worker {
 
       if (!isQualifying || !address) continue
 
-      // Get initial hodler amount - default to 0 if not found
-      const hodlerCapAmount =
-        (initialHodlerAmountByAddress[address] || 0n) + (scoresByUserId[userId] || 0n)
-
       let userFixedAmount = 0n
       const multipliers: Record<string, Multiplier> = {}
+      let totalTicketPurchaseValue = 0n
 
       // Calculate base fixed amount with multipliers
       for (const verification of verifications) {
         const verificationValue = verificationValues[verification.type]
         if (!verificationValue) continue
+
+        const weight = verification.weight
+
+        // Handle sendpot_ticket_purchase specially
+        if (
+          verification.type ===
+          ('sendpot_ticket_purchase' as Database['public']['Enums']['verification_type'])
+        ) {
+          if (verificationValue.fixedValue) {
+            // Calculate number of tickets: ticketCount = ticketsPurchasedBps / ticketBps
+            // Calculate amount spent: usedAmount = ticketCount * ticketPrice
+            // Every 10 tickets adds fixedValue
+            const numberOfTickets = BigInt(weight) / BigInt(ticketBps)
+            const groupsOfTenTickets = numberOfTickets / 10n
+            userFixedAmount += verificationValue.fixedValue * groupsOfTenTickets
+
+            // Calculate the amount spent on tickets: usedAmount = ticketCount * ticketPrice
+            const ticketPurchaseValue = numberOfTickets * ticketPrice
+            totalTicketPurchaseValue += ticketPurchaseValue
+          }
+        }
 
         if (
           !multipliers[verification.type] &&
@@ -576,7 +600,6 @@ export class DistributorV2Worker {
         }
 
         const multiplierInfo = multipliers[verification.type]
-        const weight = verification.weight
 
         if (verificationValue.fixedValue) {
           userFixedAmount += verificationValue.fixedValue * BigInt(weight)
@@ -608,6 +631,13 @@ export class DistributorV2Worker {
         (acc, info) => acc * (info.value ?? 1.0),
         1.0
       )
+
+      // Get initial hodler amount - default to 0 if not found
+      // Add ticket purchase value to hodlerCapAmount (amount spent on tickets)
+      const hodlerCapAmount =
+        (initialHodlerAmountByAddress[address] || 0n) +
+        (scoresByUserId[userId] || 0n) +
+        totalTicketPurchaseValue
 
       let amount =
         (userFixedAmount * BigInt(Math.round(finalMultiplier * Number(PERC_DENOM)))) / PERC_DENOM
