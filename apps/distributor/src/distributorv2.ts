@@ -565,6 +565,19 @@ export class DistributorV2Worker {
       for (const verification of verifications) {
         const verificationValue = verificationValues[verification.type]
         if (!verificationValue) continue
+        if (
+          !multipliers[verification.type] &&
+          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_max > 1)
+        ) {
+          multipliers[verification.type] = {
+            value: undefined,
+            min: verificationValue.multiplier_min,
+            max: verificationValue.multiplier_max,
+            step: verificationValue.multiplier_step,
+          }
+        }
+
+        const multiplierInfo = multipliers[verification.type]
 
         const weight = verification.weight
 
@@ -585,23 +598,8 @@ export class DistributorV2Worker {
             const ticketPurchaseValue = numberOfTickets * ticketPrice
             totalTicketPurchaseValue += ticketPurchaseValue
           }
-        }
-
-        if (
-          !multipliers[verification.type] &&
-          (verificationValue.multiplier_step > 0 || verificationValue.multiplier_max > 1)
-        ) {
-          multipliers[verification.type] = {
-            value: undefined,
-            min: verificationValue.multiplier_min,
-            max: verificationValue.multiplier_max,
-            step: verificationValue.multiplier_step,
-          }
-        }
-
-        const multiplierInfo = multipliers[verification.type]
-
-        if (verificationValue.fixedValue) {
+          // Normally we multiply fixed by weight
+        } else if (verificationValue.fixedValue) {
           userFixedAmount += verificationValue.fixedValue * BigInt(weight)
         }
 
