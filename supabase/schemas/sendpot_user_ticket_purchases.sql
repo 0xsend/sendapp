@@ -43,6 +43,8 @@ CREATE INDEX "sendpot_user_ticket_purchases_buyer" ON "public"."sendpot_user_tic
 CREATE INDEX "sendpot_user_ticket_purchases_recipient" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("recipient");
 CREATE INDEX "sendpot_user_ticket_purchases_referrer" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("referrer");
 CREATE UNIQUE INDEX "u_sendpot_user_ticket_purchases" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
+CREATE INDEX "idx_sendpot_user_ticket_purchases_buyer_block_time" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("buyer", "block_time");
+CREATE INDEX "idx_sendpot_user_ticket_purchases_block_time" ON "public"."sendpot_user_ticket_purchases" USING "btree" ("block_time");
 
 -- RLS
 ALTER TABLE "public"."sendpot_user_ticket_purchases" ENABLE ROW LEVEL SECURITY;
