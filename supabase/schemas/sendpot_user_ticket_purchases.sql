@@ -61,4 +61,5 @@ GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "authenticated";
 GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "service_role";
 
--- Functions
+-- Triggers
+CREATE OR REPLACE TRIGGER "insert_verification_sendpot_ticket_purchase" AFTER INSERT ON "public"."sendpot_user_ticket_purchases" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sendpot_ticket_purchase"();

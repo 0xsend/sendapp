@@ -17,9 +17,9 @@ SELECT results_eq(
       WHERE distribution_id = 7$$,
     $$SELECT array_agg(t ORDER BY t) FROM (
         SELECT t FROM unnest(enum_range(NULL::verification_type)) as t
-        WHERE t::text NOT IN ('send_streak', 'send_ceiling')
+        WHERE t::text NOT IN ('send_streak', 'send_ceiling', 'sendpot_ticket_purchase')
     ) x$$,
-    'Distribution 7 should have all types except send_streak and send_ceiling'
+    'Distribution 7 should have all types except send_streak, send_ceiling, and sendpot_ticket_purchase'
 );
 
 -- Test distribution 8
@@ -28,9 +28,9 @@ SELECT results_eq(
       WHERE distribution_id = 8$$,
     $$SELECT array_agg(t ORDER BY t) FROM (
         SELECT t FROM unnest(enum_range(NULL::verification_type)) as t
-        WHERE t::text != 'send_ceiling'
+        WHERE t::text NOT IN ('send_ceiling', 'sendpot_ticket_purchase')
     ) x$$,
-    'Distribution 8 should have all types except send_ceiling'
+    'Distribution 8 should have all types except send_ceiling and sendpot_ticket_purchase'
 );
 
 -- Test distributions 9+

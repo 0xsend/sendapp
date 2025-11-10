@@ -5,6 +5,7 @@ import {
   H3,
   Label,
   Paragraph,
+  Shimmer,
   Spinner,
   Stack,
   Theme,
@@ -29,12 +30,14 @@ import { useRewardsScreenParams } from 'app/routers/params'
 import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
+import { dynamic } from 'app/utils/dynamic'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
+import { calculateTicketsFromBps } from 'app/data/sendpot'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -45,6 +48,7 @@ const verificationTypesAndTitles = {
   tag_referral: { title: 'Referrals' },
   total_tag_referrals: { title: 'Total Referrals' },
   send_streak: { title: 'Send Streak', details: '(per day)' },
+  sendpot_ticket_purchase: { title: 'SendPot Tickets' },
 } as const
 
 export function ActivityRewardsScreen() {
@@ -69,13 +73,7 @@ export function ActivityRewardsScreen() {
   }
 
   if (isLoading) {
-    return (
-      <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
-        <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Spinner color="$color12" size="large" />
-        </Stack>
-      </YStack>
-    )
+    return <ActivityRewardsSkeleton />
   }
 
   if (!distributions?.length) {
@@ -157,6 +155,55 @@ export function ActivityRewardsScreen() {
     </YStack>
   )
 }
+
+export function ActivityRewardsSkeleton() {
+  return (
+    <YStack f={1} gap="$8" ai="stretch">
+      <Shimmer
+        ov="hidden"
+        br="$1"
+        h={30}
+        w={230}
+        componentName="Card"
+        bg="$background"
+        $theme-light={{ bg: '$background' }}
+      />
+      <Shimmer
+        ov="hidden"
+        br="$6"
+        h={230}
+        componentName="Card"
+        bg="$background"
+        $theme-light={{ bg: '$background' }}
+      />
+      <YStack fw="wrap" gap="$4">
+        <Shimmer
+          ov="hidden"
+          br="$6"
+          h={130}
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+        <Shimmer
+          ov="hidden"
+          br="$6"
+          h={130}
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+      </YStack>
+    </YStack>
+  )
+}
+
+export const ActivityRewardsScreenLazy = dynamic(
+  () => import('app/features/rewards/activity/screen').then((mod) => mod.ActivityRewardsScreen),
+  {
+    loading: () => <ActivityRewardsSkeleton />,
+  }
+)
 
 const DistributionRequirementsCard = ({
   distribution,
@@ -316,6 +363,7 @@ const TaskCards = ({
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const verifications = verificationsQuery.data
+
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
@@ -383,20 +431,56 @@ const TaskCard = ({
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
+  const latestWeight = verification.latestWeight
   const value = ['send_ten', 'send_one_hundred'].includes(type)
     ? //@ts-expect-error these two verfiications will always have "value" in the metadata
       BigInt(metadata?.[0]?.value ?? 0)
     : weight
+  // Find the largest lastJackpotEndTime in the metadata array
+  const lastJackpotEndTime =
+    type === 'sendpot_ticket_purchase'
+      ? metadata
+          .map((m) => (m as { lastJackpotEndTime?: string })?.lastJackpotEndTime)
+          .filter((time): time is string => Boolean(time))
+          .reduce((max, time) => (!max || time > max ? time : max), null as string | null)
+      : null
   const isSendStreak = type === 'send_streak'
-  const isTagRegistration = type === 'tag_registration'
-  const isCompleted = isSendStreak
-    ? isEqualCalendarDate(new Date(verification.created_at), new Date()) ||
-      (Boolean(weight) && isQualificationOver)
-    : Boolean(weight)
+
+  const getIsCompleted = () => {
+    switch (type) {
+      case 'send_streak':
+        return (
+          isEqualCalendarDate(new Date(verification.created_at), new Date()) ||
+          (Boolean(weight) && isQualificationOver)
+        )
+      case 'sendpot_ticket_purchase': {
+        // Check if we have tickets for the current jackpot
+        if (lastJackpotEndTime && verification.created_at < lastJackpotEndTime) {
+          // No tickets for current jackpot
+          return false
+        }
+        return latestWeight ? latestWeight >= 10n : false
+      }
+      default:
+        return Boolean(weight)
+    }
+  }
+
+  const getDisplayValue = () => {
+    switch (type) {
+      case 'tag_registration':
+        return verification.count.toString()
+      case 'sendpot_ticket_purchase':
+        return weight ? calculateTicketsFromBps(Number(weight)).toString() : '0'
+      default:
+        return value.toString()
+    }
+  }
+
+  const isCompleted = getIsCompleted()
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
-
-  const displayValue = isTagRegistration ? verification.count.toString() : value.toString()
+  const displayValue = getDisplayValue()
 
   const statusConfig = {
     completed: {
@@ -427,6 +511,7 @@ const TaskCard = ({
     'tag_registration',
     'send_ten',
     'send_one_hundred',
+    'sendpot_ticket_purchase',
   ].includes(type)
 
   return (
