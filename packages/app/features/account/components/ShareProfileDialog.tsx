@@ -17,17 +17,17 @@ import { useUser } from 'app/utils/useUser'
 import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native'
 import { Copy, X } from '@tamagui/lucide-icons'
-import { cloneElement, memo, useCallback, useEffect, useState } from 'react'
+import { memo, useCallback } from 'react'
 
 interface ShareProfileDialogProps {
-  children: React.ReactNode
+  isOpen: boolean
+  onClose: () => void
 }
 
 export const ShareProfileDialog = memo<ShareProfileDialogProps>(function ShareProfileDialog({
-  children,
+  isOpen,
+  onClose,
 }) {
-  const [unmounted, setUnmounted] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
   const { profile } = useUser()
   const toast = useAppToast()
 
@@ -44,35 +44,13 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
     try {
       await Clipboard.setStringAsync(profileUrl)
       toast.show('Profile link copied to clipboard')
-      setIsOpen(false)
+      onClose()
     } catch {
       toast.error('Failed to copy link', {
         message: 'Something went wrong while copying the link',
       })
     }
-  }, [profileUrl, toast])
-
-  // why? remove the dialog from the DOM when it is closed and animation is complete
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | undefined
-    if (!isOpen) {
-      timer = setTimeout(() => {
-        setUnmounted(true)
-      }, 300)
-    } else {
-      setUnmounted(false)
-    }
-    return () => {
-      if (timer) {
-        clearTimeout(timer)
-      }
-    }
-  }, [isOpen])
-
-  if (unmounted && !isOpen)
-    return cloneElement(children as React.ReactElement, {
-      onPress: () => setIsOpen(true),
-    })
+  }, [profileUrl, toast, onClose])
 
   const dialogContent = (
     <YStack ai="stretch">
@@ -81,7 +59,7 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
           Share Profile
         </H2>
         <Button
-          onPress={() => setIsOpen(false)}
+          onPress={onClose}
           size="$3"
           circular
           x={4}
@@ -124,8 +102,7 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
   )
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <Dialog.Portal>
         <Dialog.Overlay
           animation="smoothResponsive"
