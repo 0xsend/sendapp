@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 import { Platform, View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, {
-  FadeIn,
   interpolate,
   interpolateColor,
   runOnJS,
@@ -531,37 +530,35 @@ export const ChartPath = React.memo(
     return (
       <View style={{ height, width }}>
         {currentPath?.path ? (
-          <Animated.View entering={FadeIn.duration(140)}>
-            <ChartPathInner
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              {...{
-                ...props,
-                currentPath,
-                isCard,
-                gestureEnabled,
-                hapticsEnabled,
-                height,
-                hitSlop,
-                isActive,
-                panGestureHandlerProps,
-                originalX,
-                originalY,
-                positionX,
-                positionY,
-                previousPath,
-                progress,
-                selectedStrokeWidth,
-                state,
-                stroke,
-                selectedStroke,
-                strokeWidth,
-                timingAnimationConfig,
-                timingFeedbackConfig,
-                width: chartPathWidth,
-                containerWidth: width,
-              }}
-            />
-          </Animated.View>
+          <ChartPathInner
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...{
+              ...props,
+              currentPath,
+              isCard,
+              gestureEnabled,
+              hapticsEnabled,
+              height,
+              hitSlop,
+              isActive,
+              panGestureHandlerProps,
+              originalX,
+              originalY,
+              positionX,
+              positionY,
+              previousPath,
+              progress,
+              selectedStrokeWidth,
+              state,
+              stroke,
+              selectedStroke,
+              strokeWidth,
+              timingAnimationConfig,
+              timingFeedbackConfig,
+              width: chartPathWidth,
+              containerWidth: width,
+            }}
+          />
         ) : null}
       </View>
     )
