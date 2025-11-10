@@ -5,6 +5,7 @@ import {
   H3,
   Label,
   Paragraph,
+  Shimmer,
   Spinner,
   Stack,
   Theme,
@@ -29,6 +30,7 @@ import { useRewardsScreenParams } from 'app/routers/params'
 import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
 import { min } from 'app/utils/bigint'
+import { dynamic } from 'app/utils/dynamic'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin, usdcCoin } from 'app/data/coins'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
@@ -69,13 +71,7 @@ export function ActivityRewardsScreen() {
   }
 
   if (isLoading) {
-    return (
-      <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
-        <Stack w="100%" f={1} jc={'center'} ai={'center'}>
-          <Spinner color="$color12" size="large" />
-        </Stack>
-      </YStack>
-    )
+    return <ActivityRewardsSkeleton />
   }
 
   if (!distributions?.length) {
@@ -157,6 +153,55 @@ export function ActivityRewardsScreen() {
     </YStack>
   )
 }
+
+export function ActivityRewardsSkeleton() {
+  return (
+    <YStack f={1} gap="$8" ai="stretch">
+      <Shimmer
+        ov="hidden"
+        br="$1"
+        h={30}
+        w={230}
+        componentName="Card"
+        bg="$background"
+        $theme-light={{ bg: '$background' }}
+      />
+      <Shimmer
+        ov="hidden"
+        br="$6"
+        h={230}
+        componentName="Card"
+        bg="$background"
+        $theme-light={{ bg: '$background' }}
+      />
+      <YStack fw="wrap" gap="$4">
+        <Shimmer
+          ov="hidden"
+          br="$6"
+          h={130}
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+        <Shimmer
+          ov="hidden"
+          br="$6"
+          h={130}
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+      </YStack>
+    </YStack>
+  )
+}
+
+export const ActivityRewardsScreenLazy = dynamic(
+  () => import('app/features/rewards/activity/screen').then((mod) => mod.ActivityRewardsScreen),
+  {
+    loading: () => <ActivityRewardsSkeleton />,
+  }
+)
 
 const DistributionRequirementsCard = ({
   distribution,
