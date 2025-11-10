@@ -14511,6 +14511,9 @@
           "name": "send_ten"
         },
         {
+          "name": "sendpot_ticket_purchase"
+        },
+        {
           "name": "tag_referral"
         },
         {

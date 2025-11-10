@@ -2,7 +2,7 @@ SET client_min_messages TO NOTICE;
 
 BEGIN;
 SELECT
-    plan(28);
+    plan(37);
 CREATE EXTENSION "basejump-supabase_test_helpers";
 SELECT
     set_config('role', 'service_role', TRUE);
@@ -406,6 +406,34 @@ WHERE
                     distributions
                 WHERE
                     number = 123));
+
+-- Test sendpot_ticket_purchase verification trigger
+-- Add verification value for sendpot_ticket_purchase
+INSERT INTO public.distribution_verification_values(
+    type,
+    fixed_value,
+    bips_value,
+    multiplier_min,
+    multiplier_max,
+    multiplier_step,
+    distribution_id)
+VALUES (
+    'sendpot_ticket_purchase',
+    3000000000000000000,
+    0,
+    1.0,
+    1.0,
+    0.0,
+    (SELECT id FROM distributions WHERE number = 123));
+
+SELECT
+    results_eq($$
+        SELECT COUNT(*)::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (0) $$,
+        'No sendpot ticket purchase verification should exist initially');
+
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distributions WHERE number = 123', $$
     VALUES (1) $$, 'Service role should be able to create distributions');
@@ -1074,6 +1102,239 @@ SELECT results_eq(
     ARRAY[0, 1, 1, 1]::numeric[],
     'All tag_referral records with distribution shares should have weight = 1'
 );
+
+-- Insert ticket purchase before any jackpot (should create verification)
+INSERT INTO sendpot_user_ticket_purchases(
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    buyer,
+    recipient,
+    tickets_purchased_total_bps,
+    value,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx)
+VALUES (
+    8453,
+    '\x5afe000000000000000000000000000000000000',
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start FROM distributions WHERE number = 123) + interval '1 hour')),
+    '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    '\xB0B0000000000000000000000000000000000000',
+    '\xB0B0000000000000000000000000000000000000',
+    100,
+    1000000000000000000,
+    'sendpot_user_ticket_purchases',
+    'sendpot_user_ticket_purchases',
+    100,
+    0,
+    0,
+    0);
+
+SELECT
+    results_eq($$
+        SELECT COUNT(*)::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (1) $$,
+        'Should create verification for first ticket purchase');
+
+SELECT
+    results_eq($$
+        SELECT weight::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (100) $$,
+        'Weight should equal tickets purchased bps');
+
+-- Insert another ticket purchase in same period (should update existing verification)
+INSERT INTO sendpot_user_ticket_purchases(
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    buyer,
+    recipient,
+    tickets_purchased_total_bps,
+    value,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx)
+VALUES (
+    8453,
+    '\x5afe000000000000000000000000000000000000',
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start FROM distributions WHERE number = 123) + interval '2 hours')),
+    '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    '\xB0B0000000000000000000000000000000000000',
+    '\xB0B0000000000000000000000000000000000000',
+    50,
+    500000000000000000,
+    'sendpot_user_ticket_purchases',
+    'sendpot_user_ticket_purchases',
+    101,
+    0,
+    0,
+    0);
+
+SELECT
+    results_eq($$
+        SELECT COUNT(*)::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (1) $$,
+        'Should still have only one verification (updated, not inserted)');
+
+SELECT
+    results_eq($$
+        SELECT weight::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (150) $$,
+        'Weight should be sum of all tickets (100 + 50)');
+
+-- Insert a jackpot run
+INSERT INTO sendpot_jackpot_runs(
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    win_amount,
+    winner,
+    winning_ticket,
+    tickets_purchased_total_bps,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx)
+VALUES (
+    8453,
+    '\x5afe000000000000000000000000000000000000',
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start FROM distributions WHERE number = 123) + interval '3 hours')),
+    '\xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+    5000000000000000000,
+    '\xB0B0000000000000000000000000000000000000',
+    50,
+    150,
+    'sendpot_jackpot_runs',
+    'sendpot_jackpot_runs',
+    102,
+    0,
+    0,
+    0);
+
+-- Insert ticket purchase after jackpot (should create NEW verification for new period)
+INSERT INTO sendpot_user_ticket_purchases(
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    buyer,
+    recipient,
+    tickets_purchased_total_bps,
+    value,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx)
+VALUES (
+    8453,
+    '\x5afe000000000000000000000000000000000000',
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start FROM distributions WHERE number = 123) + interval '4 hours')),
+    '\xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+    '\xB0B0000000000000000000000000000000000000',
+    '\xB0B0000000000000000000000000000000000000',
+    200,
+    2000000000000000000,
+    'sendpot_user_ticket_purchases',
+    'sendpot_user_ticket_purchases',
+    103,
+    0,
+    0,
+    0);
+
+SELECT
+    results_eq($$
+        SELECT COUNT(*)::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (2) $$,
+        'Should create new verification for new jackpot period');
+
+SELECT
+    results_eq($$
+        SELECT weight::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase'
+        ORDER BY created_at DESC
+        LIMIT 1 $$, $$
+        VALUES (200) $$,
+        'New period verification should have weight of 200');
+
+-- Insert another ticket purchase in the new period (should update the latest verification)
+INSERT INTO sendpot_user_ticket_purchases(
+    chain_id,
+    log_addr,
+    block_time,
+    tx_hash,
+    buyer,
+    recipient,
+    tickets_purchased_total_bps,
+    value,
+    ig_name,
+    src_name,
+    block_num,
+    tx_idx,
+    log_idx,
+    abi_idx)
+VALUES (
+    8453,
+    '\x5afe000000000000000000000000000000000000',
+    EXTRACT(EPOCH FROM ((
+        SELECT qualification_start FROM distributions WHERE number = 123) + interval '5 hours')),
+    '\xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    '\xB0B0000000000000000000000000000000000000',
+    '\xB0B0000000000000000000000000000000000000',
+    75,
+    750000000000000000,
+    'sendpot_user_ticket_purchases',
+    'sendpot_user_ticket_purchases',
+    104,
+    0,
+    0,
+    0);
+
+SELECT
+    results_eq($$
+        SELECT COUNT(*)::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase' $$, $$
+        VALUES (2) $$,
+        'Should still have two verifications (one per jackpot period)');
+
+SELECT
+    results_eq($$
+        SELECT weight::integer FROM distribution_verifications
+        WHERE user_id = tests.get_supabase_uid('bob')
+        AND type = 'sendpot_ticket_purchase'
+        ORDER BY created_at DESC
+        LIMIT 1 $$, $$
+        VALUES (275) $$,
+        'Latest verification weight should be sum of tickets in new period (200 + 75)');
 
 SELECT finish();
 ROLLBACK;
