@@ -2026,6 +2026,10 @@ export type Database = {
         Args: { distribution_num: number }
         Returns: undefined
       }
+      insert_sendpot_ticket_purchase_verifications: {
+        Args: { distribution_num: number }
+        Returns: undefined
+      }
       insert_tag_referral_verifications: {
         Args: { distribution_num: number }
         Returns: undefined
@@ -2308,6 +2312,7 @@ export type Database = {
         | "total_tag_referrals"
         | "send_streak"
         | "send_ceiling"
+        | "sendpot_ticket_purchase"
       verification_value_mode: "individual" | "aggregate"
     }
     CompositeTypes: {
@@ -2609,6 +2614,7 @@ export const Constants = {
         "total_tag_referrals",
         "send_streak",
         "send_ceiling",
+        "sendpot_ticket_purchase",
       ],
       verification_value_mode: ["individual", "aggregate"],
     },
