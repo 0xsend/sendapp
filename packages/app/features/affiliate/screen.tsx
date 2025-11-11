@@ -279,9 +279,7 @@ const FriendDesktopRow = ({
             </Paragraph>
             {referral.is_verified ? (
               <IconBadgeCheckSolid
-                size={'$1.5'}
-                mih={'$1.5'}
-                miw={'$1.5'}
+                size={'$1'}
                 color={'$primary'}
                 $theme-light={{ color: '$color12' }}
               />
