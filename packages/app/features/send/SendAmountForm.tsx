@@ -47,15 +47,31 @@ export function SendAmountForm() {
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [{ profile: profileParam }] = useRootScreenParams()
 
+  console.log(
+    `[DEBUG SendAmountForm ${new Date().toISOString()}] Render with sendParams:`,
+    sendParams
+  )
+
   const [isAmountInputFocused, setIsAmountInputFocused] = useState<boolean>(false)
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
   const noteFieldRef = useRef<TamaguiElement>(null)
 
   const noteValidationError = form.formState.errors.note
 
+  console.log(
+    `[DEBUG ${new Date().toISOString()}] Creating callback - sendParams at callback creation time:`,
+    sendParams
+  )
+
   const onFormChange = useDebounce(
     useCallback(
       (values) => {
+        console.log(
+          `[DEBUG onFormChange ${new Date().toISOString()}] ===== CALLBACK EXECUTING =====`
+        )
+        console.log('[DEBUG onFormChange] Called with values:', values)
+        console.log('[DEBUG onFormChange] sendParams in closure:', sendParams)
+
         const { amount, token: _token, note } = values
         const sendToken = _token as allCoins[number]['token']
         const sanitizedAmount = sanitizeAmount(
@@ -73,15 +89,16 @@ export function SendAmountForm() {
         } else {
           form.clearErrors('note')
         }
-        setSendParams(
-          {
-            ...sendParams,
-            amount: sanitizedAmount,
-            sendToken,
-            note: note.trim(),
-          },
-          { webBehavior: 'replace' }
-        )
+
+        const paramsToSet = {
+          ...sendParams,
+          amount: sanitizedAmount,
+          sendToken,
+          note: note.trim(),
+        }
+        console.log('[DEBUG onFormChange] About to setSendParams with:', paramsToSet)
+
+        setSendParams(paramsToSet, { webBehavior: 'replace' })
       },
       [setSendParams, sendParams, form]
     ),
