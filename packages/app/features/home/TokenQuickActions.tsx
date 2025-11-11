@@ -12,7 +12,7 @@ const QuickActionButton = ({
   onPress,
 }: LinkableButtonProps & { onPress?: () => void }) => {
   const linkProps = useLink({ href })
-  const isIOS = Platform.OS === 'ios'
+  const isNative = Platform.OS !== 'web'
 
   return (
     <Card
@@ -20,8 +20,8 @@ const QuickActionButton = ({
       f={1}
       height={'auto'}
       w="100%"
-      opacity={isIOS && onPress ? 0.6 : 1}
-      {...(isIOS && onPress ? { onPress } : linkProps)}
+      opacity={isNative && onPress ? 0.6 : 1}
+      {...(isNative && onPress ? { onPress } : linkProps)}
     >
       {children}
     </Card>
@@ -32,7 +32,7 @@ const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
   const toast = useAppToast()
-  const isIOS = Platform.OS === 'ios'
+  const isNative = Platform.OS !== 'web'
 
   const getBuyUrl = () => `/trade?inToken=${usdcCoin.token}&outToken=${coin.token}`
 
@@ -45,7 +45,7 @@ const BuyButton = ({ coin }: { coin: CoinWithBalance }) => {
   }
 
   return (
-    <QuickActionButton href={getBuyUrl()} onPress={isIOS ? handlePress : undefined}>
+    <QuickActionButton href={getBuyUrl()} onPress={isNative ? handlePress : undefined}>
       <YStack
         testID={'buy-quick-action'}
         gap="$2"
@@ -77,7 +77,7 @@ const SellButton = ({ coin }: { coin: CoinWithBalance }) => {
   const media = useMedia()
   const isSmallScreen = !media.gtXs
   const toast = useAppToast()
-  const isIOS = Platform.OS === 'ios'
+  const isNative = Platform.OS !== 'web'
 
   const getSellUrl = () => `/trade?inToken=${coin.token}&outToken=${usdcCoin.token}`
 
@@ -90,7 +90,7 @@ const SellButton = ({ coin }: { coin: CoinWithBalance }) => {
   }
 
   return (
-    <QuickActionButton href={getSellUrl()} onPress={isIOS ? handlePress : undefined}>
+    <QuickActionButton href={getSellUrl()} onPress={isNative ? handlePress : undefined}>
       <YStack
         testID={'sell-quick-action'}
         gap="$2"
