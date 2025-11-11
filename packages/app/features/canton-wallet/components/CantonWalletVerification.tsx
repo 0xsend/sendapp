@@ -24,6 +24,7 @@ import { webauthnCredToAllowedCredentials } from 'app/utils/signUserOp'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
+import { Link } from 'solito/link'
 import {
   IconBadgeCheckSolid,
   IconDollarCircle,
@@ -141,6 +142,8 @@ function CantonWalletVerificationContent({
     )
   }, [distribution])
 
+  const isNative = Platform.OS !== 'web'
+
   return (
     <YStack w="100%" gap="$5">
       <Paragraph fontSize={'$7'} fontWeight={'600'} color={'$color12'}>
@@ -152,18 +155,21 @@ function CantonWalletVerificationContent({
           label="Purchased Sendtag"
           isCompleted={sendTagPurchased ?? false}
           isLoading={false}
+          href="/account/sendtag/add"
         />
         <VerificationCard
           icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
           label={`Deposit $${minSavingsBalance} to Savings Vault`}
           isCompleted={hasMinSavings}
           isLoading={isLoadingSendEarnBalances}
+          href="/earn/usdc/deposit"
         />
         <VerificationCard
           icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
           label={`Hold ${minSendBalance} $SEND Minimum`}
           isCompleted={(snapshotBalance ?? 0n) >= CANTON_WALLET_MIN_SEND_BALANCE}
           isLoading={isLoadingSnapshotBalance}
+          href={isNative ? '/deposit/crypto' : '/trade'}
         />
         {cantonWalletAddress ? (
           <CantonWalletVerifiedCard
@@ -185,9 +191,10 @@ interface VerificationCardProps {
   label: string
   isCompleted: boolean
   isLoading?: boolean
+  href?: string
 }
 
-function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationCardProps) {
+function VerificationCard({ icon, label, isCompleted, isLoading, href }: VerificationCardProps) {
   const hoverStyles = useHoverStyles()
 
   const statusConfig = {
@@ -201,7 +208,7 @@ function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationC
 
   const { icon: statusIcon } = statusConfig[isCompleted ? 'completed' : 'pending']
 
-  return (
+  const cardContent = (
     <FadeCard br={'$6'} flexDirection={'row'} jc={'space-between'} ai={'center'} w={'100%'}>
       <XStack width={'85%'} gap={'$3.5'} alignItems={'center'}>
         <XStack
@@ -223,6 +230,12 @@ function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationC
       </XStack>
     </FadeCard>
   )
+
+  if (href) {
+    return <Link href={href}>{cardContent}</Link>
+  }
+
+  return cardContent
 }
 
 function CantonWalletVerifiedCard({ address, canEdit }: { address: string; canEdit: boolean }) {
