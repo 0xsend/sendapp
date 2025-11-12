@@ -22,6 +22,7 @@ module.exports = {
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       LSApplicationCategoryType: 'public.app-category.finance',
+      UIRequiredDeviceCapabilities: [],
     },
     icon: './assets/icons/ios-icon.icon',
   },
