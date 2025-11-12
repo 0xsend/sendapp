@@ -58,7 +58,7 @@ const AddressLabels = {
 const labelAddress = (address: `0x${string}`): string =>
   AddressLabels[address] ?? shorten(address ?? '', 5, 4)
 
-const amountPrefix = (activity: Activity) => (activity.from_user?.id ? '- ' : '')
+const amountPrefix = (activity: Activity) => (activity.from_user?.id ? '' : '+ ')
 
 /**
  * Returns the counterpart of the activity which could be the logged in user.
@@ -143,7 +143,7 @@ export function amountFromActivity(
 
         const amount = formatAmount(formatUnits(v, coin.decimals), 5, coin.formatDecimals)
 
-        return `${isSellTransfer || activity.from_user?.id ? '- ' : ''}${amount} ${coin.symbol}`
+        return `${isSellTransfer || activity.from_user?.id ? '' : '+ '}${amount} ${coin.symbol}`
       }
       return `${amountPrefix(activity)}${formatAmount(`${v}`, 5, 0)}`
     }
