@@ -24,6 +24,8 @@ import {
   useReadBaseJackpotTokenDecimals,
 } from '@my/wagmi/contracts/base-jackpot'
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { sendTokenAddress, baseMainnet } from '@my/wagmi'
 
 const currencySymbol = 'SEND'
 
@@ -54,6 +56,10 @@ export function ConfirmBuyTicketsScreen() {
     isLoading: isLoadingDecimals,
     error: decimalsError,
   } = useReadBaseJackpotTokenDecimals()
+
+  const {
+    query: { data: prices, isLoading: isPricesLoading },
+  } = useTokenPrices()
 
   const {
     isPreparing,
@@ -122,6 +128,9 @@ export function ConfirmBuyTicketsScreen() {
   const formattedTicketPrice = formatAmount(formatUnits(ticketPriceBn, decimalsToUse))
   const ticketsToShow: number = numberOfTickets > 0 ? numberOfTickets : 0
 
+  const sendPrice = prices?.[sendTokenAddress[baseMainnet.id]] ?? 0
+  const totalCostInUSD = sendPrice * Number(formatUnits(totalCost, decimalsToUse))
+
   const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
   const feeDecimals = typeof usdcFees?.decimals === 'number' ? usdcFees.decimals : 6
 
@@ -177,7 +186,29 @@ export function ConfirmBuyTicketsScreen() {
         <FadeCard>
           <YStack gap={'$2'}>
             <Row label="Price per Ticket" value={`${formattedTicketPrice} ${currencySymbol}`} />
-            <Row label="Total Cost" value={`${formattedTotalCost} ${currencySymbol}`} isTotal />
+            <XStack gap={'$2.5'} jc={'space-between'} flexWrap={'wrap'} ai="flex-start">
+              <Paragraph size={'$5'} color={'$color11'} fow={'700'}>
+                Total Cost
+              </Paragraph>
+              <YStack gap={'$1'} ai={'flex-end'}>
+                <Paragraph size={'$6'} fow={'700'}>
+                  {formattedTotalCost} {currencySymbol}
+                </Paragraph>
+                {isPricesLoading ? (
+                  <Spinner size="small" color={'$color12'} />
+                ) : (
+                  <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
+                    (
+                    {totalCostInUSD.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      maximumFractionDigits: 2,
+                    })}
+                    )
+                  </Paragraph>
+                )}
+              </YStack>
+            </XStack>
             <Separator my="$2" />
             <Row
               label={'Est. Transaction Fee'}

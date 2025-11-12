@@ -35,14 +35,30 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   const { direction } = useScrollDirection()
   const translateY = useRef(new Animated.Value(0)).current
   const prevDirectionRef = useRef(direction)
+  const prevRouteRef = useRef(currentRoute)
   const { height } = useTabBarSize()
 
-  // Handle scroll-based animation
+  // Handle both route changes and scroll-based animation
   useEffect(() => {
+    const isInTabsRoute = segments.includes('(tabs)')
+    const routeChanged = prevRouteRef.current !== currentRoute
+
+    // Priority 1: Reset to visible when route changes
+    if (routeChanged && isInTabsRoute) {
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start()
+      prevRouteRef.current = currentRoute
+      prevDirectionRef.current = direction
+      return
+    }
+
+    // Priority 2: Handle scroll-based hide/show
     const prevDirection = prevDirectionRef.current
     const changedToDown = prevDirection === 'up' && direction === 'down'
     const changedToUp = prevDirection === 'down' && direction === 'up'
-    const isInTabsRoute = segments.includes('(tabs)')
     const shouldAnimate = isInTabsRoute && (changedToDown || changedToUp)
 
     if (shouldAnimate) {
@@ -54,7 +70,8 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
     }
 
     prevDirectionRef.current = direction
-  }, [direction, translateY, segments, height])
+    prevRouteRef.current = currentRoute
+  }, [currentRoute, direction, translateY, segments, height])
 
   return (
     <Animated.View

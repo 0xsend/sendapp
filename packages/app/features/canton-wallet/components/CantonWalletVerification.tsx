@@ -24,6 +24,7 @@ import { webauthnCredToAllowedCredentials } from 'app/utils/signUserOp'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
+import { Link } from 'solito/link'
 import {
   IconBadgeCheckSolid,
   IconDollarCircle,
@@ -47,8 +48,22 @@ import formatAmount from 'app/utils/formatAmount'
 import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 
-const CANTON_WALLET_MIN_SEND_BALANCE = 3000n * BigInt(10 ** 18)
-const CANTON_WALLET_FORM_THRESHOLD = 2000n * BigInt(10 ** 18)
+// Configuration for Canton Wallet verification requirements
+// Enable/disable requirements and set minimum amounts here
+const CANTON_WALLET_REQUIREMENTS = {
+  sendTag: {
+    enabled: false, // Toggle sendtag purchase requirement
+  },
+  savingsVault: {
+    enabled: false, // Toggle USDC savings vault requirement
+    minAmountUSDC: null, // Amount in USDC (e.g., 2000), null = use distribution.earn_min_balance
+  },
+  sendBalance: {
+    enabled: true, // Toggle SEND balance requirement
+    minDisplayBalance: 3000n * BigInt(10 ** 18), // Amount shown in UI
+    minFormBalance: 2000n * BigInt(10 ** 18), // Actual threshold to unlock form
+  },
+} as const
 
 export function CantonWalletVerification() {
   const { profile, isLoading: isUserLoading } = useUser()
@@ -112,7 +127,15 @@ function CantonWalletVerificationContent({
     [sendEarnBalances]
   )
 
-  const hasMinSavings = totalAssets >= BigInt(distribution.earn_min_balance)
+  // Determine savings vault minimum based on config
+  const savingsVaultMinBalance = useMemo(() => {
+    if (CANTON_WALLET_REQUIREMENTS.savingsVault.minAmountUSDC !== null) {
+      return BigInt(CANTON_WALLET_REQUIREMENTS.savingsVault.minAmountUSDC) * BigInt(10 ** 6) // USDC has 6 decimals
+    }
+    return BigInt(distribution.earn_min_balance)
+  }, [distribution.earn_min_balance])
+
+  const hasMinSavings = totalAssets >= savingsVaultMinBalance
 
   const sendTagPurchased = verifications?.verification_values?.some(
     (v) => v.type === 'tag_registration' && v.weight > 0n
@@ -121,25 +144,41 @@ function CantonWalletVerificationContent({
   const cantonWalletAddress = profile?.canton_party_verifications?.canton_wallet_address
 
   const canConnectCantonWallet = useMemo(() => {
-    const hasMinCantonBalance = (snapshotBalance ?? 0n) >= CANTON_WALLET_FORM_THRESHOLD
-    return sendTagPurchased && hasMinSavings && hasMinCantonBalance
+    const requirements: (boolean | undefined)[] = []
+
+    // Check each requirement only if enabled
+    if (CANTON_WALLET_REQUIREMENTS.sendTag.enabled) {
+      requirements.push(sendTagPurchased)
+    }
+    if (CANTON_WALLET_REQUIREMENTS.savingsVault.enabled) {
+      requirements.push(hasMinSavings)
+    }
+    if (CANTON_WALLET_REQUIREMENTS.sendBalance.enabled) {
+      const hasMinCantonBalance =
+        (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minFormBalance
+      requirements.push(hasMinCantonBalance)
+    }
+
+    // All enabled requirements must be met
+    return requirements.every((req) => req === true)
   }, [sendTagPurchased, hasMinSavings, snapshotBalance])
 
   const minSendBalance = useMemo(() => {
     return formatAmount(
-      formatUnits(CANTON_WALLET_MIN_SEND_BALANCE, distribution.token_decimals ?? 18),
+      formatUnits(
+        CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance,
+        distribution.token_decimals ?? 18
+      ),
       9,
       0
     )
   }, [distribution])
 
   const minSavingsBalance = useMemo(() => {
-    return formatAmount(
-      formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals),
-      9,
-      2
-    )
-  }, [distribution])
+    return formatAmount(formatUnits(savingsVaultMinBalance, usdcCoin.decimals), 9, 2)
+  }, [savingsVaultMinBalance])
+
+  const isNative = Platform.OS !== 'web'
 
   return (
     <YStack w="100%" gap="$5">
@@ -147,24 +186,35 @@ function CantonWalletVerificationContent({
         Get an invite to Canton Wallet
       </Paragraph>
       <YStack gap="$3.5">
-        <VerificationCard
-          icon={<IconSlash size={'$1'} color={'$color12'} />}
-          label="Purchased Sendtag"
-          isCompleted={sendTagPurchased ?? false}
-          isLoading={false}
-        />
-        <VerificationCard
-          icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
-          label={`Deposit $${minSavingsBalance} to Savings Vault`}
-          isCompleted={hasMinSavings}
-          isLoading={isLoadingSendEarnBalances}
-        />
-        <VerificationCard
-          icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
-          label={`Hold ${minSendBalance} $SEND Minimum`}
-          isCompleted={(snapshotBalance ?? 0n) >= CANTON_WALLET_MIN_SEND_BALANCE}
-          isLoading={isLoadingSnapshotBalance}
-        />
+        {CANTON_WALLET_REQUIREMENTS.sendTag.enabled && (
+          <VerificationCard
+            icon={<IconSlash size={'$1'} color={'$color12'} />}
+            label="Purchased Sendtag"
+            isCompleted={sendTagPurchased ?? false}
+            isLoading={false}
+            href="/account/sendtag/add"
+          />
+        )}
+        {CANTON_WALLET_REQUIREMENTS.savingsVault.enabled && (
+          <VerificationCard
+            icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
+            label={`Deposit $${minSavingsBalance} to Savings Vault`}
+            isCompleted={hasMinSavings}
+            isLoading={isLoadingSendEarnBalances}
+            href="/earn/usdc/deposit"
+          />
+        )}
+        {CANTON_WALLET_REQUIREMENTS.sendBalance.enabled && (
+          <VerificationCard
+            icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
+            label={`Hold ${minSendBalance} $SEND Minimum`}
+            isCompleted={
+              (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
+            }
+            isLoading={isLoadingSnapshotBalance}
+            href={isNative ? '/deposit/crypto' : '/trade'}
+          />
+        )}
         {cantonWalletAddress ? (
           <CantonWalletVerifiedCard
             address={cantonWalletAddress}
@@ -185,9 +235,10 @@ interface VerificationCardProps {
   label: string
   isCompleted: boolean
   isLoading?: boolean
+  href?: string
 }
 
-function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationCardProps) {
+function VerificationCard({ icon, label, isCompleted, isLoading, href }: VerificationCardProps) {
   const hoverStyles = useHoverStyles()
 
   const statusConfig = {
@@ -201,7 +252,7 @@ function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationC
 
   const { icon: statusIcon } = statusConfig[isCompleted ? 'completed' : 'pending']
 
-  return (
+  const cardContent = (
     <FadeCard br={'$6'} flexDirection={'row'} jc={'space-between'} ai={'center'} w={'100%'}>
       <XStack width={'85%'} gap={'$3.5'} alignItems={'center'}>
         <XStack
@@ -223,6 +274,12 @@ function VerificationCard({ icon, label, isCompleted, isLoading }: VerificationC
       </XStack>
     </FadeCard>
   )
+
+  if (href) {
+    return <Link href={href}>{cardContent}</Link>
+  }
+
+  return cardContent
 }
 
 function CantonWalletVerifiedCard({ address, canEdit }: { address: string; canEdit: boolean }) {

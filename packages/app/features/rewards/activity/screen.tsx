@@ -38,6 +38,7 @@ import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
 import { calculateTicketsFromBps } from 'app/data/sendpot'
+import { Link } from 'solito/link'
 
 //@todo get this from the db
 const verificationTypesAndTitles = {
@@ -49,7 +50,25 @@ const verificationTypesAndTitles = {
   total_tag_referrals: { title: 'Total Referrals' },
   send_streak: { title: 'Send Streak', details: '(per day)' },
   sendpot_ticket_purchase: { title: 'SendPot Tickets' },
+  send_ceiling: { title: '' },
 } as const
+
+const getTaskHref = (verificationType: keyof typeof verificationTypesAndTitles): string | null => {
+  switch (verificationType) {
+    case 'create_passkey':
+      return '/account/backup/create'
+    case 'tag_registration':
+      return '/account/sendtag/add'
+    case 'send_ten':
+    case 'send_one_hundred':
+    case 'send_streak':
+      return '/send'
+    case 'sendpot_ticket_purchase':
+      return Platform.OS === 'web' ? '/sendpot' : null
+    default:
+      return null
+  }
+}
 
 export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -277,61 +296,37 @@ const DistributionRequirementsCard = ({
           )}
         </YStack>
         <YStack gap="$2" ai={'flex-end'}>
-          <XStack ai="center" gap="$2">
-            <Paragraph>Sendtag Purchased</Paragraph>
-            {sendTagPurchased ? (
-              <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-            ) : (
-              <Theme name="red">
-                <IconInfoCircle color={'$color8'} size={'$2'} />
-              </Theme>
-            )}
-          </XStack>
-          <XStack ai="center" gap="$2">
-            <Paragraph>
-              Balance{' '}
-              {formatAmount(
-                formatUnits(
-                  BigInt(distribution.hodler_min_balance ?? 0n),
-                  distribution.token_decimals ?? 18
-                ) ?? 0,
-                9,
-                sendCoin.formatDecimals
+          <Link href="/account/sendtag/add">
+            <XStack ai="center" gap="$2">
+              <Paragraph>Sendtag Purchased</Paragraph>
+              {sendTagPurchased ? (
+                <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
+              ) : (
+                <Theme name="red">
+                  <IconInfoCircle color={'$color8'} size={'$2'} />
+                </Theme>
               )}
-            </Paragraph>
-            {(() => {
-              switch (true) {
-                case isLoadingSnapshotBalance:
-                  return <Spinner size="small" />
-                case distribution.hodler_min_balance === undefined ||
-                  BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
-                  return (
-                    <Theme name="red">
-                      <IconInfoCircle color={'$color8'} size={'$2'} />
-                    </Theme>
-                  )
-                default:
-                  return (
-                    <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-                  )
-              }
-            })()}
-          </XStack>
-          {BigInt(distribution.earn_min_balance ?? 0n) > 0n ? (
+            </XStack>
+          </Link>
+          <Link href={Platform.OS === 'web' ? '/trade' : '/deposit/crypto'}>
             <XStack ai="center" gap="$2">
               <Paragraph>
-                Savings Deposit $
+                Balance{' '}
                 {formatAmount(
-                  formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
+                  formatUnits(
+                    BigInt(distribution.hodler_min_balance ?? 0n),
+                    distribution.token_decimals ?? 18
+                  ) ?? 0,
                   9,
-                  2
-                )}{' '}
+                  sendCoin.formatDecimals
+                )}
               </Paragraph>
               {(() => {
                 switch (true) {
-                  case isLoadingSendEarnBalances:
+                  case isLoadingSnapshotBalance:
                     return <Spinner size="small" />
-                  case !hasMinSavings:
+                  case distribution.hodler_min_balance === undefined ||
+                    BigInt(distribution.hodler_min_balance ?? 0n) > (snapshotBalance ?? 0):
                     return (
                       <Theme name="red">
                         <IconInfoCircle color={'$color8'} size={'$2'} />
@@ -348,6 +343,41 @@ const DistributionRequirementsCard = ({
                 }
               })()}
             </XStack>
+          </Link>
+          {BigInt(distribution.earn_min_balance ?? 0n) > 0n ? (
+            <Link href="/earn/usdc/deposit">
+              <XStack ai="center" gap="$2">
+                <Paragraph>
+                  Savings Deposit $
+                  {formatAmount(
+                    formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ??
+                      0n,
+                    9,
+                    2
+                  )}{' '}
+                </Paragraph>
+                {(() => {
+                  switch (true) {
+                    case isLoadingSendEarnBalances:
+                      return <Spinner size="small" />
+                    case !hasMinSavings:
+                      return (
+                        <Theme name="red">
+                          <IconInfoCircle color={'$color8'} size={'$2'} />
+                        </Theme>
+                      )
+                    default:
+                      return (
+                        <Check
+                          size={'$1.5'}
+                          color={'$primary'}
+                          $theme-light={{ color: '$color12' }}
+                        />
+                      )
+                  }
+                })()}
+              </XStack>
+            </Link>
           ) : null}
         </YStack>
       </Stack>
@@ -409,6 +439,7 @@ const TaskCards = ({
               key={verification.type}
               verification={verification}
               isQualificationOver={isQualificationOver}
+              url={getTaskHref(verification.type)}
             >
               <H3 fontWeight={'600'} color={'$color12'}>
                 {verificationTypesAndTitles[verification.type]?.title}
@@ -424,9 +455,11 @@ const TaskCard = ({
   verification,
   isQualificationOver,
   children,
+  url,
 }: PropsWithChildren<CardProps> & {
   verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
+  url?: string | null
 }) => {
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
@@ -514,8 +547,8 @@ const TaskCard = ({
     'sendpot_ticket_purchase',
   ].includes(type)
 
-  return (
-    <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+  const cardContent = (
+    <>
       <XStack ai={'center'} jc="space-between">
         {status}
         {shouldShowValue ? (
@@ -533,6 +566,12 @@ const TaskCard = ({
         ) : null}
       </XStack>
       {children}
+    </>
+  )
+
+  return (
+    <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+      {url ? <Link href={url}>{cardContent}</Link> : cardContent}
     </Card>
   )
 }

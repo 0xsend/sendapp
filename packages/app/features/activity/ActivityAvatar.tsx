@@ -100,7 +100,7 @@ export function ActivityAvatar({
             </Avatar>
           </Avatar.Fallback>
         </LinkableAvatar>
-        <TransferDirectionIndicator activity={activity} />
+        {/*<TransferDirectionIndicator activity={activity} />*/}
       </XStack>
     )
   }
