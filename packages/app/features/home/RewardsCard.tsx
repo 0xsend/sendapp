@@ -20,11 +20,15 @@ import { HomeBodyCard } from './screen'
 
 import { type MerkleDropClaimParams, useSendMerkleDropsAreClaimed } from 'app/utils/distributions'
 import { byteaToHex } from 'app/utils/byteaToHex'
+import { usePrefetch } from '@my/ui'
 
 export const REWARDS_CARD_HREF = '/rewards'
 
 export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
   const linkProps = useLink({ href: REWARDS_CARD_HREF })
+
+  usePrefetch(REWARDS_CARD_HREF)
+
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
   const { data: sendAccount } = useSendAccount()
   const {
