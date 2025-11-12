@@ -1,4 +1,4 @@
-import { Card, type CardProps, Paragraph, Shimmer, useMedia, View, XStack } from '@my/ui'
+import { Card, type CardProps, Paragraph, Shimmer, View, XStack } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useMemo } from 'react'
@@ -16,7 +16,7 @@ import {
   sendTokenV0Address,
 } from '@my/wagmi'
 import { sendCoin } from 'app/data/coins'
-import { HomeBodyCard, useHomeRightPanel } from './screen'
+import { HomeBodyCard } from './screen'
 
 import { type MerkleDropClaimParams, useSendMerkleDropsAreClaimed } from 'app/utils/distributions'
 import { byteaToHex } from 'app/utils/byteaToHex'
@@ -103,22 +103,8 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
     !sendAccount ||
     !isPricesEnabled
 
-  const { togglePage, page } = useHomeRightPanel()
-  const { gtLg } = useMedia()
-  const homeBodyProps = gtLg
-    ? {
-        onPress: () => {
-          togglePage({
-            pathname: REWARDS_CARD_HREF,
-            query: {},
-          } as const)
-        },
-      }
-    : linkProps
-
-  const isActive = page?.pathname === REWARDS_CARD_HREF
   return (
-    <HomeBodyCard {...homeBodyProps} {...props}>
+    <HomeBodyCard {...linkProps} {...props}>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph
           fontSize={'$5'}
@@ -129,13 +115,11 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
           Rewards
         </Paragraph>
         <XStack flex={1} />
-        <View animateOnly={['transform']} animation="fast" rotate={isActive ? '180deg' : '0deg'}>
-          <ChevronRight
-            size={'$1'}
-            color={isActive ? '$primary' : '$lightGrayTextField'}
-            $theme-light={{ color: isActive ? '$color12' : '$darkGrayTextField' }}
-          />
-        </View>
+        <ChevronRight
+          size={'$1'}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
+        />
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
         <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
