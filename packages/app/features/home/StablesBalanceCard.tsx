@@ -155,6 +155,7 @@ const StablesBalanceCardActions = () => {
   return (
     <XStack gap="$2.5" w="100%">
       <LinkableButton
+        prefetch
         href="/deposit"
         jc="center"
         ai="center"
@@ -175,6 +176,7 @@ const StablesBalanceCardActions = () => {
       </LinkableButton>
       {shouldShowSendButton && (
         <LinkableButton
+          prefetch
           href={`/send?sendToken=${queryParams.token ?? usdcAddress[baseMainnet.id]}`}
           jc="center"
           ai="center"

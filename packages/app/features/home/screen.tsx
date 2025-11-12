@@ -33,8 +33,8 @@ import { SavingsBalanceCard } from './SavingsBalanceCard'
 import { InvestmentsBalanceCard, InvestmentsPortfolioCard } from './InvestmentsBalanceCard'
 import { InvestmentsBalanceList } from './InvestmentBalanceList'
 import { StablesBalanceList } from './StablesBalanceList'
-import { REWARDS_CARD_HREF, RewardsCard } from './RewardsCard'
-import { FRIENDS_CARD_HREF, FriendsCard } from './FriendsCard'
+import { RewardsCard } from './RewardsCard'
+import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
@@ -49,7 +49,6 @@ import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
 import { dynamic } from 'app/utils/dynamic'
-import { ActivityRewardsScreenLazy } from 'app/features/rewards/activity/screen'
 
 export function HomeScreen() {
   const router = useRouter()
@@ -94,13 +93,7 @@ export function HomeScreen() {
  *   setPage({ pathname: '/earn/[asset]/deposit', query: { asset: 'eth' } })
  */
 type RightPanelPage = {
-  pathname:
-    | '/earn'
-    | '/earn/[asset]'
-    | '/earn/[asset]/deposit'
-    | '/earn/[asset]/balance'
-    | typeof FRIENDS_CARD_HREF
-    | typeof REWARDS_CARD_HREF
+  pathname: '/earn' | '/earn/[asset]' | '/earn/[asset]/deposit' | '/earn/[asset]/balance'
   query?: { [key: string]: string | undefined }
 } | null
 
@@ -344,22 +337,6 @@ const EarnBalanceScreenLazy = dynamic(
   }
 )
 
-const AffiliateScreenLazy = dynamic(
-  () => import('app/features/affiliate/screen').then((mod) => mod.default),
-  {
-    loading: () => (
-      <Shimmer
-        ov="hidden"
-        br="$6"
-        h={230}
-        componentName="Card"
-        bg="$background"
-        $theme-light={{ bg: '$background' }}
-      />
-    ),
-  }
-)
-
 const RightPanel = () => {
   const { coin: selectedCoin } = useCoinFromTokenParam()
   const [queryParams] = useRootScreenParams()
@@ -387,12 +364,6 @@ const RightPanel = () => {
     }
     if (page?.pathname === '/earn/[asset]/balance') {
       return <EarnBalanceScreenLazy />
-    }
-    if (page?.pathname === FRIENDS_CARD_HREF) {
-      return <AffiliateScreenLazy />
-    }
-    if (page?.pathname === REWARDS_CARD_HREF) {
-      return <ActivityRewardsScreenLazy />
     }
     if (selectedCoin !== undefined) {
       return <TokenDetails />
