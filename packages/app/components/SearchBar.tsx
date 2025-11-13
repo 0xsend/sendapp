@@ -96,11 +96,11 @@ function SearchResults() {
   ).length
   if (matchesCount === 0) {
     return (
-      <XStack ai="center" gap="$4">
+      <XStack ai="center" gap="$2">
         <SearchX size="$1" col="$gray10" />
         <XStack>
           <SizableText size="$7" col="$gray10" fow="300">
-            No results for{' '}
+            No results found for{' '}
           </SizableText>
           <SizableText y="$-1" size="$7" col="$gray12">
             {query}
