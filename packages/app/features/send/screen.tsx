@@ -140,6 +140,7 @@ function SendSearchBody() {
         <YStack key="loading" gap="$4" mb="$4">
           <Shimmer
             ov="hidden"
+            scope="local"
             br="$4"
             h={80}
             w={600}
@@ -148,8 +149,8 @@ function SendSearchBody() {
             }}
             maw="100%"
             componentName="Card"
-            bg="$background"
-            $theme-light={{ bg: '$background' }}
+            bg="$color1"
+            $theme-light={{ bg: '$gray1' }}
           />
         </YStack>
       )}
@@ -159,7 +160,7 @@ function SendSearchBody() {
           <Text>{error.message}</Text>
         </YStack>
       )}
-      <Search.Results />
+      {!isLoading && !error && <Search.Results />}
     </AnimatePresence>
   )
 }
