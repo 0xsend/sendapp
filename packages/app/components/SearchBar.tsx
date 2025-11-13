@@ -20,6 +20,7 @@ import {
   XStack,
   YGroup,
   YStack,
+  SizableText,
 } from '@my/ui'
 import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
@@ -33,12 +34,13 @@ import { FormProvider } from 'react-hook-form'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { type Address, isAddress } from 'viem'
-import { IconAccount, IconArrowRight, IconBadgeCheckSolid, IconSearch, IconX } from './icons'
+import { IconAccount, IconBadgeCheckSolid2, IconSearch, IconX } from './icons'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useThemeName, type YStackProps } from 'tamagui'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import { ChevronRight, SearchX } from '@tamagui/lucide-icons'
 
 type SearchResultsType = Functions<'tag_search'>[number]
 type SearchResultsKeysType = keyof SearchResultsType
@@ -56,19 +58,12 @@ const formatResultsKey = (str: string): string => {
 }
 
 function SearchResults() {
-  const { results, isLoading, error } = useTagSearch()
+  const { results, error } = useTagSearch()
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
   const { onScroll, onContentSizeChange } = useScrollDirection()
 
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
-  if (isLoading) {
-    return (
-      <YStack key="loading" gap="$4" mt="$4" $gtLg={{ w: '50%' }}>
-        <Spinner size="large" color="$olive" />
-      </YStack>
-    )
-  }
   if (!results || error) {
     return null
   }
@@ -87,15 +82,8 @@ function SearchResults() {
         }}
       >
         <YStack key={'results-eoa'} gap="$3.5">
-          <H4
-            $theme-dark={{ color: '$lightGrayTextField' }}
-            $theme-light={{ color: '$darkGrayTextField' }}
-            fontFamily={'$mono'}
-            fontWeight={'500'}
-            size={'$5'}
-            textTransform="uppercase"
-          >
-            EOA
+          <H4 color="$gray12" size="$6" fow="500">
+            Externally owned account
           </H4>
           <AddressSearchResultRow address={query as Address} />
         </YStack>
@@ -107,19 +95,26 @@ function SearchResults() {
     (value) => Array.isArray(value) && value.length
   ).length
   if (matchesCount === 0) {
-    return <Text mt="$4">No results for {query}... 😢</Text>
+    return (
+      <XStack ai="center" gap="$4">
+        <SearchX size="$1" col="$gray10" />
+        <XStack>
+          <SizableText size="$7" col="$gray10" fow="300">
+            No results for{' '}
+          </SizableText>
+          <SizableText y="$-1" size="$7" col="$gray12">
+            {query}
+          </SizableText>
+        </XStack>
+      </XStack>
+    )
   }
   return (
     <ScrollView
       testID="searchResults"
       key="searchResults"
-      animation="quick"
       gap="$2.5"
       width="100%"
-      enterStyle={{
-        opacity: 0,
-        y: -10,
-      }}
       showsVerticalScrollIndicator={false}
       overflow="visible"
       overScrollMode={'never'}
@@ -154,28 +149,30 @@ function SearchResults() {
         </YStack>
       )}
       {query && (
-        <YGroup
-          elevation={'$0.75'}
-          bc={'$color1'}
-          p={'$3'}
-          $gtLg={{
-            width: '50%',
-          }}
+        <XStack
+          animation="responsive"
+          animateOnly={['opacity', 'transform']}
+          enterStyle={{ opacity: 0, y: -10 }}
+          exitStyle={{ opacity: 0, y: 10 }}
+          key="results"
+          maw={640}
         >
-          {SEARCH_RESULTS_KEYS.map((key) =>
-            Array.isArray(results[key]) &&
-            results[key].length &&
-            (!resultsFilter || resultsFilter === key) ? (
-              <Fragment key={`results-${key}`}>
-                {results[key].map((item: SearchResultCommonType) => (
-                  <YGroup.Item key={`${key}-${item.tag_name}-${item.send_id}`}>
-                    <SearchResultRow keyField={key as SearchResultsKeysType} profile={item} />
-                  </YGroup.Item>
-                ))}
-              </Fragment>
-            ) : null
-          )}
-        </YGroup>
+          <YGroup elevation={'$0.75'} bc={'$color1'} w="100%" p={'$3'}>
+            {SEARCH_RESULTS_KEYS.map((key) =>
+              Array.isArray(results[key]) &&
+              results[key].length &&
+              (!resultsFilter || resultsFilter === key) ? (
+                <Fragment key={`results-${key}`}>
+                  {results[key].map((item: SearchResultCommonType) => (
+                    <YGroup.Item key={`${key}-${item.tag_name}-${item.send_id}`}>
+                      <SearchResultRow keyField={key as SearchResultsKeysType} profile={item} />
+                    </YGroup.Item>
+                  ))}
+                </Fragment>
+              ) : null
+            )}
+          </YGroup>
+        </XStack>
       )}
     </ScrollView>
   )
@@ -282,7 +279,7 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
               <IconAccount color="$olive" size={'$4'} />
             </Avatar.Fallback>
           </Avatar>
-          <YStack gap="$1">
+          <YStack gap="$3">
             <XStack gap="$3" ai={'center'}>
               <Paragraph
                 fontWeight={'300'}
@@ -293,11 +290,11 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
               >
                 {ensFromAddress ?? 'External Address'}
               </Paragraph>
-              {isLoadingEns && <Spinner size="small" color={'$color11'} />}
+              {isLoadingEns && <Spinner size="small" color="$color11" />}
             </XStack>
             <Text
               fontSize="$4"
-              ff={'$mono'}
+              ff="$mono"
               $theme-light={{ color: '$darkGrayTextField' }}
               $gtSm={{ fontSize: '$2' }}
             >
@@ -305,13 +302,7 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
             </Text>
           </YStack>
         </XStack>
-        <IconArrowRight
-          size={'$1.5'}
-          color={'$primary'}
-          $theme-light={{
-            color: '$color12',
-          }}
-        />
+        <ChevronRight size="$1" color="$gray11" />
       </Card>
       <ConfirmSendDialog
         isOpen={sendConfirmDialogIsOpen}
@@ -443,10 +434,26 @@ function SearchResultRow({
   const { search: query } = queryParams
   const href = useSearchResultHref(profile)
   const hoverStyles = useHoverStyles()
+  const themeName = useThemeName()
+  const isDark = themeName?.includes('dark')
 
   if (!query) return null
 
   const label = profile.tag_name || profile.send_id || '??'
+
+  let highlightedText = ''
+
+  switch (keyField) {
+    case 'phone_matches':
+      highlightedText = profile.phone ?? ''
+      break
+    case 'tag_matches':
+      highlightedText = profile.tag_name ?? ''
+      break
+    case 'send_id_matches':
+      highlightedText = `#${profile.send_id}`
+      break
+  }
 
   return (
     <Stack
@@ -459,48 +466,50 @@ function SearchResultRow({
       <Link href={href}>
         <XStack ai={'center'} jc={'space-between'}>
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
-            <Avatar size="$4.5" br="$3">
-              {Platform.OS === 'android' && !profile.avatar_url ? (
-                <Avatar.Image
-                  src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-                />
-              ) : (
-                <>
-                  <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
-                  <Avatar.Fallback jc="center" bc="$olive">
-                    <Avatar size="$4.5" br="$3">
-                      <Avatar.Image
-                        src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-                      />
-                    </Avatar>
-                  </Avatar.Fallback>
-                </>
+            <View>
+              <Avatar size="$5" circular>
+                {Platform.OS === 'android' && !profile.avatar_url ? (
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+                  />
+                ) : (
+                  <>
+                    <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
+                    <Avatar.Fallback jc="center" bc="$olive">
+                      <Avatar size="$4.5" br="$3">
+                        <Avatar.Image
+                          src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+                        />
+                      </Avatar>
+                    </Avatar.Fallback>
+                  </>
+                )}
+              </Avatar>
+              {profile.is_verified && (
+                <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
+                  <XStack
+                    pos="absolute"
+                    x="$-0.5"
+                    y="$-0.5"
+                    elevation={'$1'}
+                    scale={0.7}
+                    br={1000}
+                    inset={0}
+                  />
+                  <IconBadgeCheckSolid2
+                    size="$1"
+                    scale={0.8}
+                    color="$neon8"
+                    $theme-dark={{ color: '$neon7' }}
+                    //@ts-expect-error - checkColor is not typed
+                    checkColor={isDark ? '#082B1B' : '#fff'}
+                  />
+                </XStack>
               )}
-            </Avatar>
+            </View>
             <YStack gap="$1">
               <XStack ai="center" gap="$2">
-                <HighlightMatchingText
-                  text={(() => {
-                    switch (keyField) {
-                      case 'phone_matches':
-                        return profile.phone ?? ''
-                      case 'tag_matches':
-                        return profile.tag_name ?? ''
-                      case 'send_id_matches':
-                        return `#${profile.send_id}`
-                      default:
-                        return ''
-                    }
-                  })()}
-                  highlight={query}
-                />
-                {profile.is_verified && (
-                  <IconBadgeCheckSolid
-                    size={'$1'}
-                    color={'$primary'}
-                    $theme-light={{ color: '$color12' }}
-                  />
-                )}
+                <HighlightMatchingText text={highlightedText} highlight={query} />
               </XStack>
               <Text
                 fontSize="$3"
@@ -511,9 +520,9 @@ function SearchResultRow({
               </Text>
             </YStack>
           </XStack>
-          <IconArrowRight
-            size={'$1.5'}
-            color={'$primary'}
+          <ChevronRight
+            size="$1"
+            color="$gray11"
             $theme-light={{
               color: '$color12',
             }}
@@ -606,23 +615,26 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 placeholder,
                 fontWeight: 'normal',
                 br: '$4',
-                bw: 0,
-                hoverStyle: {
-                  bw: 0,
-                },
                 placeholderTextColor: '$color4',
                 focusStyle: {
-                  boc: borderColor,
-                  bw: 1,
-                  outlineWidth: 0,
+                  outlineWidth: 2,
+                  outlineColor: borderColor,
+                },
+                '$theme-light': {
+                  focusStyle: {
+                    outlineWidth: 2,
+                    outlineColor: '$gray7',
+                  },
                 },
                 fontSize: 17,
                 lineHeight: 20,
+                py: '$5',
                 onChangeText: handleTextChange,
                 iconBefore: (
                   <IconSearch
                     ml={Platform.OS === 'web' ? 0 : '$3'}
                     color={'$silverChalice'}
+                    x="$-1"
                     $theme-light={{ color: '$darkGrayTextField' }}
                   />
                 ),
@@ -645,22 +657,15 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 autoFocus: autoFocus,
               },
             }}
-            formProps={{
-              width: '100%',
-              f: 1,
-              als: 'center',
-              $gtSm: {
-                maxWidth: '100%',
-              },
-              $gtLg: {
-                width: '50%',
-                maxWidth: '50%',
-                als: 'flex-start',
-              },
-            }}
           >
             {({ query }) => (
-              <ThemeableStack elevation={'$0.75'} br="$4" {...containerProps}>
+              <ThemeableStack
+                elevation={'$0.75'}
+                shadowOpacity={0.3}
+                $platform-native={{ elevation: '$0.25', shadowOpacity: 0.05 }}
+                br="$4"
+                {...containerProps}
+              >
                 {query}
               </ThemeableStack>
             )}
