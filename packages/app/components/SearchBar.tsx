@@ -155,7 +155,10 @@ function SearchResults() {
           enterStyle={{ opacity: 0, y: -10 }}
           exitStyle={{ opacity: 0, y: 10 }}
           key="results"
-          maw={640}
+          maw={600}
+          $sm={{
+            maw: '100%',
+          }}
         >
           <YGroup elevation={'$0.75'} bc={'$color1'} w="100%" p={'$3'}>
             {SEARCH_RESULTS_KEYS.map((key) =>
