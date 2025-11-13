@@ -195,28 +195,12 @@ VALUES (
 );
 
 -- Create new receipt for re-purchased tag
+-- This will trigger automatic verification creation via insert_verification_tag_registration_from_receipt
 INSERT INTO tag_receipts (tag_id, tag_name, event_id, created_at)
 VALUES (
     (SELECT id FROM tags WHERE name = 'alice'),
     'alice',
     '200:0:0:0',
-    NOW()
-);
-
--- Create new verification for active distribution
-INSERT INTO distribution_verifications (
-    distribution_id,
-    user_id,
-    type,
-    metadata,
-    weight,
-    created_at
-) VALUES (
-    (SELECT id FROM distributions WHERE number = 11 ORDER BY id DESC LIMIT 1),
-    tests.get_supabase_uid('user1'),
-    'tag_registration',
-    jsonb_build_object('tag', 'alice'),
-    4,
     NOW()
 );
 

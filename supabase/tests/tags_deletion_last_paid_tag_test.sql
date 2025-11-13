@@ -43,7 +43,7 @@ SELECT throws_ok(
        WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('user1'))
        AND tag_id = (SELECT id FROM tags WHERE name = 'bob') $$,
     'P0001',
-    'Cannot delete your last paid sendtag. Users must maintain at least one paid sendtag.',
+    'Cannot delete this sendtag. You must maintain at least one paid sendtag.',
     'Cannot delete last paid tag when user has free tags'
 );
 
@@ -104,7 +104,7 @@ SELECT throws_ok(
        WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('user1'))
        AND tag_id = (SELECT id FROM tags WHERE name = 'charlie') $$,
     'P0001',
-    'Cannot delete your last paid sendtag. Users must maintain at least one paid sendtag.',
+    'Cannot delete this sendtag. You must maintain at least one paid sendtag.',
     'Cannot delete last paid tag even when no free tags remain'
 );
 

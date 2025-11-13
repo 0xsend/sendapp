@@ -150,7 +150,7 @@ SELECT throws_ok(
        WHERE send_account_id = (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('main_tag_user'))
        AND tag_id = (SELECT id FROM tags WHERE name = 'maintag3') $$,
     'P0001',
-    'Cannot delete your last paid sendtag. Users must maintain at least one paid sendtag.'
+    'Cannot delete this sendtag. You must maintain at least one paid sendtag.'
 );
 SET ROLE postgres;
 

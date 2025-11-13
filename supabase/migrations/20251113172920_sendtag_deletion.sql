@@ -141,7 +141,7 @@ BEGIN
                 SELECT 1 FROM tag_receipts tr
                 WHERE tr.tag_id = t.id
             )) = 0 THEN
-            RAISE EXCEPTION 'Cannot delete your last paid sendtag. Users must maintain at least one paid sendtag.';
+            RAISE EXCEPTION 'Cannot delete this sendtag. You must maintain at least one paid sendtag.';
         END IF;
     END IF;
 
