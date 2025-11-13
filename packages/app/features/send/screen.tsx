@@ -9,6 +9,7 @@ import {
   Label,
   LinkableAvatar,
   Paragraph,
+  Shimmer,
   Spinner,
   Text,
   useAppToast,
@@ -29,6 +30,67 @@ import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { Platform } from 'react-native'
 
+const SendScreenSkeleton = () => {
+  return (
+    <YStack w="100%" gap="$8">
+      <Shimmer
+        ov="hidden"
+        br="$4"
+        h={50}
+        w={700}
+        maw="100%"
+        componentName="Card"
+        bg="$background"
+        $theme-light={{ bg: '$background' }}
+      />
+      <YStack gap="$6">
+        <Shimmer
+          ov="hidden"
+          br="$1"
+          h={30}
+          w={200}
+          maw="100%"
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+        <XStack gap="$4">
+          <Shimmer
+            ov="hidden"
+            br="$12"
+            h={80}
+            w={80}
+            maw="100%"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+          <Shimmer
+            ov="hidden"
+            br="$12"
+            h={80}
+            w={80}
+            maw="100%"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+          <Shimmer
+            ov="hidden"
+            br="$12"
+            h={80}
+            w={80}
+            maw="100%"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+        </XStack>
+      </YStack>
+    </YStack>
+  )
+}
+
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const {
@@ -38,7 +100,7 @@ export const SendScreen = () => {
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [{ search }] = useRootScreenParams()
 
-  if (isLoading) return <Spinner size="large" color={'$color12'} />
+  if (isLoading) return <SendScreenSkeleton />
 
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
@@ -49,9 +111,12 @@ export const SendScreen = () => {
   if (!profile)
     return (
       <TagSearchProvider>
-        <YStack f={1} width={'100%'} pb="$4" gap="$6" $lg={{ pt: '$3' }}>
-          <YStack width={'100%'} gap="$1.5" $gtSm={{ gap: '$2.5' }}>
-            <Search autoFocus={Platform.OS === 'web'} />
+        <YStack width="100%" pb="$4" gap="$6" $lg={{ pt: '$3' }}>
+          <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
+            <Search
+              placeholder="Search by send tag or wallet address"
+              autoFocus={Platform.OS === 'web'}
+            />
           </YStack>
           {!search && <SendSuggestions />}
           <SendSearchBody />
@@ -73,7 +138,20 @@ function SendSearchBody() {
     <AnimatePresence>
       {isLoading && (
         <YStack key="loading" gap="$4" mb="$4">
-          <Spinner size="large" color="$send1" />
+          <Shimmer
+            ov="hidden"
+            scope="local"
+            br="$4"
+            h={80}
+            w={600}
+            $sm={{
+              w: '100%',
+            }}
+            maw="100%"
+            componentName="Card"
+            bg="$color1"
+            $theme-light={{ bg: '$gray1' }}
+          />
         </YStack>
       )}
       {error && (
@@ -82,7 +160,7 @@ function SendSearchBody() {
           <Text>{error.message}</Text>
         </YStack>
       )}
-      <Search.Results />
+      {!isLoading && !error && <Search.Results />}
     </AnimatePresence>
   )
 }
