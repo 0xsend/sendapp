@@ -160,21 +160,30 @@ function SearchResults() {
             maw: '100%',
           }}
         >
-          <YGroup elevation={'$0.75'} bc={'$color1'} w="100%" p={'$3'}>
-            {SEARCH_RESULTS_KEYS.map((key) =>
-              Array.isArray(results[key]) &&
-              results[key].length &&
-              (!resultsFilter || resultsFilter === key) ? (
-                <Fragment key={`results-${key}`}>
-                  {results[key].map((item: SearchResultCommonType) => (
-                    <YGroup.Item key={`${key}-${item.tag_name}-${item.send_id}`}>
-                      <SearchResultRow keyField={key as SearchResultsKeysType} profile={item} />
-                    </YGroup.Item>
-                  ))}
-                </Fragment>
-              ) : null
-            )}
-          </YGroup>
+          <XStack
+            elevation="$0.75"
+            shadowOpacity={0.5}
+            $platform-native={{ elevation: '$0.25', shadowOpacity: 0.05 }}
+            w="100%"
+            bc="$color1"
+            br="$5"
+          >
+            <YGroup w="100%" p="$3">
+              {SEARCH_RESULTS_KEYS.map((key) =>
+                Array.isArray(results[key]) &&
+                results[key].length &&
+                (!resultsFilter || resultsFilter === key) ? (
+                  <Fragment key={`results-${key}`}>
+                    {results[key].map((item: SearchResultCommonType) => (
+                      <YGroup.Item key={`${key}-${item.tag_name}-${item.send_id}`}>
+                        <SearchResultRow keyField={key as SearchResultsKeysType} profile={item} />
+                      </YGroup.Item>
+                    ))}
+                  </Fragment>
+                ) : null
+              )}
+            </YGroup>
+          </XStack>
         </XStack>
       )}
     </ScrollView>

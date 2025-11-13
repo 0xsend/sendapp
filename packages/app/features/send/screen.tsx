@@ -32,7 +32,7 @@ import { Platform } from 'react-native'
 
 const SendScreenSkeleton = () => {
   return (
-    <YStack gap="$8">
+    <YStack w="100%" gap="$8">
       <Shimmer
         ov="hidden"
         br="$4"
@@ -142,10 +142,14 @@ function SendSearchBody() {
             ov="hidden"
             br="$4"
             h={80}
-            w={650}
+            w={600}
+            $sm={{
+              w: '100%',
+            }}
             maw="100%"
             componentName="Card"
             bg="$background"
+            $theme-light={{ bg: '$background' }}
           />
         </YStack>
       )}
