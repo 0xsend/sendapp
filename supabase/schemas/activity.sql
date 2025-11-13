@@ -276,6 +276,11 @@ WITH birthday_profiles AS (
         FROM tags t
         JOIN tag_receipts tr ON tr.tag_name = t.name
         WHERE t.user_id = p.id
+        AND tr.id = (
+            SELECT MAX(id)
+            FROM tag_receipts
+            WHERE tag_name = t.name
+        )
     )
 ),
 user_send_scores AS (

@@ -521,7 +521,12 @@ BEGIN
         END AS weight,
         t.created_at AS created_at
     FROM tags t
-    INNER JOIN tag_receipts tr ON t.name = tr.tag_name
+    INNER JOIN tag_receipts tr ON tr.tag_name = t.name
+    AND tr.id = (
+        SELECT MAX(id)
+        FROM tag_receipts
+        WHERE tag_name = t.name
+    )
     WHERE NOT EXISTS (
         SELECT 1
         FROM public.distribution_verifications dv

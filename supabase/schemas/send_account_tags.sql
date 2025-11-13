@@ -73,6 +73,40 @@ $$;
 
 ALTER FUNCTION "public"."handle_send_account_tags_deleted"() OWNER TO "postgres";
 
+-- Create function to cleanup distribution verifications for active distributions when tag is deleted
+CREATE OR REPLACE FUNCTION public.handle_tag_deletion_verifications()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'public'
+    AS $$
+DECLARE
+    tag_name_to_check citext;
+    tag_user_id_to_check uuid;
+BEGIN
+    -- Get tag details before they potentially change
+    SELECT t.name, t.user_id
+    INTO tag_name_to_check, tag_user_id_to_check
+    FROM tags t
+    WHERE t.id = OLD.tag_id;
+
+    -- Only delete verifications for ACTIVE distributions (in qualification period)
+    DELETE FROM distribution_verifications dv
+    WHERE dv.user_id = tag_user_id_to_check
+        AND dv.type = 'tag_registration'
+        AND dv.metadata->>'tag' = tag_name_to_check
+        AND dv.distribution_id IN (
+            SELECT id FROM distributions
+            WHERE qualification_start <= NOW()
+                AND qualification_end >= NOW()
+        );
+
+    RETURN OLD;
+END;
+$$;
+
+ALTER FUNCTION "public"."handle_tag_deletion_verifications"() OWNER TO "postgres";
+
 -- Create function to prevent deletion of last confirmed tag
 CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
     RETURNS TRIGGER
@@ -80,18 +114,24 @@ CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
     SET search_path TO 'public'
     AS $$
 BEGIN
-    -- Check if this deletion would leave the user with zero confirmed tags
-    -- Only prevent deletion if the tag being deleted is confirmed AND it's the last one
+    -- Check if this deletion would leave the user with zero PAID confirmed tags
+    -- Only prevent deletion if the tag being deleted is confirmed AND has a receipt (paid)
     IF current_setting('role')::text = 'authenticated' AND
         (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
-        -- Count remaining confirmed tags after this deletion
+
+        -- Count remaining PAID confirmed tags after this deletion
+        -- A paid tag is one that has a receipt (not the free first sendtag)
         IF (SELECT COUNT(*)
             FROM send_account_tags sat
             JOIN tags t ON t.id = sat.tag_id
             WHERE sat.send_account_id = OLD.send_account_id
             AND t.status = 'confirmed'
-            AND sat.tag_id != OLD.tag_id) = 0 THEN
-            RAISE EXCEPTION 'Cannot delete your last confirmed sendtag. Users must maintain at least one confirmed sendtag.';
+            AND sat.tag_id != OLD.tag_id
+            AND EXISTS (
+                SELECT 1 FROM tag_receipts tr
+                WHERE tr.tag_id = t.id
+            )) = 0 THEN
+            RAISE EXCEPTION 'Cannot delete your last paid sendtag. Users must maintain at least one paid sendtag.';
         END IF;
     END IF;
 
@@ -123,6 +163,11 @@ CREATE TRIGGER "send_account_tags_deleted"
     AFTER DELETE ON "public"."send_account_tags"
     FOR EACH ROW
     EXECUTE FUNCTION "public"."handle_send_account_tags_deleted"();
+
+CREATE TRIGGER "cleanup_active_distribution_verifications_on_tag_delete"
+    AFTER DELETE ON "public"."send_account_tags"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."handle_tag_deletion_verifications"();
 
 CREATE TRIGGER "prevent_last_confirmed_tag_deletion"
     BEFORE DELETE ON "public"."send_account_tags"
@@ -161,6 +206,10 @@ GRANT ALL ON TABLE "public"."send_account_tags" TO "service_role";
 GRANT ALL ON FUNCTION "public"."handle_send_account_tags_deleted"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_send_account_tags_deleted"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_send_account_tags_deleted"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."handle_tag_deletion_verifications"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_tag_deletion_verifications"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_tag_deletion_verifications"() TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."prevent_last_confirmed_tag_deletion"() TO "anon";
 GRANT ALL ON FUNCTION "public"."prevent_last_confirmed_tag_deletion"() TO "authenticated";
