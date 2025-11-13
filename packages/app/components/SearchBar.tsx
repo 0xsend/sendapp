@@ -640,7 +640,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 },
                 fontSize: 17,
                 lineHeight: 20,
-                py: '$5',
+                ...(Platform.OS === 'web' ? { py: '$5' } : {}),
                 onChangeText: handleTextChange,
                 iconBefore: (
                   <IconSearch
