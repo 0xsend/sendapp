@@ -18,7 +18,6 @@ export const useHoverStyles = (): ReturnType => {
   const memoizedWebReturn: ReturnType = useMemo(() => {
     return {
       backgroundColor: rowHoverBC,
-      transition: 'background 0.2s ease-in-out',
       cursor: 'pointer',
     }
   }, [rowHoverBC])
