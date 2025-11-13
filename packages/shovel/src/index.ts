@@ -17,6 +17,7 @@ import {
   sendEarnDeposit,
   sendEarnWithdraw,
 } from './integrations'
+import { createBackfillIntegration, backfills } from './backfills/backfill'
 
 const baseRpcUrls = {
   chain_id: '$BASE_CHAIN_ID' as const,
@@ -114,10 +115,16 @@ export const integrations: Integration[] = [
   },
 ]
 
+const backfillIntegrations: Integration[] = backfills.map((backfill) => ({
+  ...createBackfillIntegration(backfill.integration),
+  enabled: true,
+  sources: [{ name: baseSrcLogs.name, start: backfill.start }],
+}))
+
 const c = makeConfig({
   pg_url: '$DATABASE_URL',
   sources,
-  integrations,
+  integrations: [...integrations, ...backfillIntegrations],
   dashboard: {
     root_password: '$DASHBOARD_ROOT_PASSWORD',
   },
