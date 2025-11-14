@@ -1,4 +1,4 @@
-import { YStack } from '@my/ui'
+import { isWeb, YStack } from '@my/ui'
 import { useConfirmedTags, usePendingTags } from 'app/utils/tags'
 import { useEffect, useMemo } from 'react'
 import { useRouter } from 'solito/router'
@@ -14,10 +14,10 @@ export const CheckoutScreen = () => {
   const pendingTags = useMemo(() => pendingTagsRaw ?? [], [pendingTagsRaw])
 
   useEffect(() => {
-    if (confirmedTags?.length === 5 || (!isLoading && pendingTags.length === 0)) {
+    if (isWeb && (confirmedTags.length === 5 || (!isLoading && pendingTags.length === 0))) {
       router.replace('/account/sendtag')
     }
-  }, [confirmedTags, router, pendingTags, isLoading])
+  }, [confirmedTags.length, router, pendingTags.length, isLoading])
 
   return (
     <YStack

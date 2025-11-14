@@ -14,7 +14,8 @@ import {
   YStack,
 } from '@my/ui'
 import { IconPlus, IconSlash, IconX } from 'app/components/icons'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, Trash } from '@tamagui/lucide-icons'
+import { DeleteTagDialog } from './components/DeleteTagDialog'
 import { maxNumSendTags } from 'app/data/sendtags'
 import { useUser } from 'app/utils/useUser'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -133,32 +134,79 @@ function SendtagList({
   const isDark = theme?.startsWith('dark')
   const hoverStyles = useHoverStyles()
 
+  // State for delete dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [tagToDelete, setTagToDelete] = useState<Tables<'tags'> | null>(null)
+
+  // Query if user can delete any tags
+  const { data: canDeleteAnyTag } = api.tag.canDeleteTags.useQuery(undefined, {
+    enabled: !!tags && tags.length > 0,
+  })
+
   if (!tags || tags.length === 0) {
     return null
   }
 
   const canChangeMainTag = tags.length > 1
 
+  // Handle delete click
+  const handleDeleteClick = (tag: Tables<'tags'>) => {
+    setTagToDelete(tag)
+    setDeleteDialogOpen(true)
+  }
+
+  // Handle delete success
+  const handleDeleteSuccess = () => {
+    setTagToDelete(null)
+  }
+
   return (
-    <FadeCard testID={'sendtags-list'} elevation={'$0.75'} bc={'$color1'} gap={'$5'}>
-      {tags.map((tag) => (
-        <TagItem key={tag.name} tag={tag} isMain={tag.id === mainTagId} />
-      ))}
-      {canChangeMainTag && (
-        <Button
-          onPress={onMainTagSelect}
-          br="$4"
-          hoverStyle={hoverStyles}
-          bc={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-        >
-          <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
-        </Button>
+    <>
+      <FadeCard testID={'sendtags-list'} elevation={'$0.75'} bc={'$color1'} gap={'$5'}>
+        {tags.map((tag) => (
+          <TagItem
+            key={tag.name}
+            tag={tag}
+            isMain={tag.id === mainTagId}
+            canDelete={canDeleteAnyTag}
+            onDelete={handleDeleteClick}
+          />
+        ))}
+        {canChangeMainTag && (
+          <Button
+            onPress={onMainTagSelect}
+            br="$4"
+            hoverStyle={hoverStyles}
+            bc={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
+          >
+            <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
+          </Button>
+        )}
+      </FadeCard>
+
+      {tagToDelete && (
+        <DeleteTagDialog
+          tag={tagToDelete}
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onSuccess={handleDeleteSuccess}
+        />
       )}
-    </FadeCard>
+    </>
   )
 }
 
-function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
+function TagItem({
+  tag,
+  isMain,
+  canDelete,
+  onDelete,
+}: {
+  tag: Tables<'tags'>
+  isMain?: boolean
+  canDelete?: boolean
+  onDelete?: (tag: Tables<'tags'>) => void
+}) {
   return (
     <XStack jc={'space-between'} ai="center" gap="$2" br={'$4'}>
       <XStack width={'75%'}>
@@ -174,7 +222,21 @@ function TagItem({ tag, isMain }: { tag: Tables<'tags'>; isMain?: boolean }) {
           {tag.name}
         </Paragraph>
       </XStack>
+
       {isMain && <Check size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />}
+
+      {!isMain && canDelete && (
+        <Button
+          size="$2"
+          circular
+          chromeless
+          onPress={() => onDelete?.(tag)}
+          icon={<Trash size={16} color="$color11" />}
+          hoverStyle={{ bc: '$red2' }}
+          pressStyle={{ o: 0.8 }}
+          testID={`delete-tag-${tag.name}`}
+        />
+      )}
     </XStack>
   )
 }
