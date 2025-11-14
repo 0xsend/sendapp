@@ -116,7 +116,7 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
           Are you sure you want to delete /{tag.name}?
         </Paragraph>
         <Paragraph ta="center" size="$4" color="$color11">
-          This tag will become available for others to claim.
+          This Sendtag will become available for others to claim.
         </Paragraph>
       </YStack>
       <XStack gap="$3" w="100%">
