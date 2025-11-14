@@ -2,31 +2,36 @@ import { IconArrowUp, IconClock, IconCompass, IconHome } from 'app/components/ic
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 import { BottomNavBarContent } from 'app/components/BottomTabBar/BottomNavBarContent'
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
+import { useTranslation } from 'react-i18next'
 
 const TABS = [
   {
     Icon: IconHome,
     href: '/(tabs)/home',
     key: 'home/index',
+    labelKey: 'tabs.home',
   },
   {
     Icon: IconClock,
     href: '/(tabs)/activity',
     key: 'activity/index',
+    labelKey: 'tabs.activity',
   },
   {
     Icon: IconArrowUp,
     href: `/(tabs)/send?${new URLSearchParams({ sendToken: sendTokenAddress[baseMainnet.id] })}`,
     key: 'send/index',
+    labelKey: 'tabs.send',
   },
   {
     Icon: IconCompass,
     href: '/(tabs)/explore',
     key: 'explore/index',
+    labelKey: 'tabs.explore',
   },
 ]
 
@@ -37,6 +42,16 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   const prevDirectionRef = useRef(direction)
   const prevRouteRef = useRef(currentRoute)
   const { height } = useTabBarSize()
+  const { t } = useTranslation('navigation')
+
+  const translatedTabs = useMemo(
+    () =>
+      TABS.map((tab) => ({
+        ...tab,
+        label: t(tab.labelKey),
+      })),
+    [t]
+  )
 
   // Handle both route changes and scroll-based animation
   useEffect(() => {
@@ -85,7 +100,7 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
         transform: [{ translateY }],
       }}
     >
-      <BottomNavBarContent tabs={TABS} currentRoute={currentRoute} />
+      <BottomNavBarContent tabs={translatedTabs} currentRoute={currentRoute} />
     </Animated.View>
   )
 }

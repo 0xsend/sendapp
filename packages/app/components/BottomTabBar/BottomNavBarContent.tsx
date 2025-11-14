@@ -7,6 +7,7 @@ type Tab = {
   Icon: NamedExoticComponent<IconProps>
   key: string
   href: string
+  label?: string
 }
 
 export const BottomNavBarContent = ({
@@ -69,6 +70,8 @@ export const BottomNavBarContent = ({
               p={'$2'}
               br={'$3'}
               height={'auto'}
+              aria-label={tab.label}
+              accessibilityLabel={tab.label}
             >
               <Button.Icon>
                 <tab.Icon
