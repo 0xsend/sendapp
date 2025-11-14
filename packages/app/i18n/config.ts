@@ -8,6 +8,8 @@ import commonEn from './resources/common/en.json'
 import commonEs from './resources/common/es.json'
 import homeEn from './resources/home/en.json'
 import homeEs from './resources/home/es.json'
+import navigationEn from './resources/navigation/en.json'
+import navigationEs from './resources/navigation/es.json'
 import onboardingEn from './resources/onboarding/en.json'
 import onboardingEs from './resources/onboarding/es.json'
 import settingsEn from './resources/settings/en.json'
@@ -22,6 +24,7 @@ export const resources = {
   en: {
     [DEFAULT_NAMESPACE]: commonEn,
     home: homeEn,
+    navigation: navigationEn,
     onboarding: onboardingEn,
     settings: settingsEn,
     splash: splashEn,
@@ -29,6 +32,7 @@ export const resources = {
   es: {
     [DEFAULT_NAMESPACE]: commonEs,
     home: homeEs,
+    navigation: navigationEs,
     onboarding: onboardingEs,
     settings: settingsEs,
     splash: splashEs,

@@ -1,0 +1,19 @@
+{
+  "tabs": {
+    "home": "Home",
+    "activity": "Activity",
+    "send": "Send",
+    "trade": "Trade",
+    "explore": "Explore"
+  },
+  "sidebar": {
+    "account": "Account",
+    "secretShop": "Secret shop"
+  },
+  "topNav": {
+    "tokens": {
+      "invest": "Invest",
+      "cash": "Cash"
+    }
+  }
+}

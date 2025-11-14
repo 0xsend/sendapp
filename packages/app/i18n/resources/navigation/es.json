@@ -1,0 +1,19 @@
+{
+  "tabs": {
+    "home": "Inicio",
+    "activity": "Actividad",
+    "send": "Enviar",
+    "trade": "Operar",
+    "explore": "Explorar"
+  },
+  "sidebar": {
+    "account": "Cuenta",
+    "secretShop": "Tienda secreta"
+  },
+  "topNav": {
+    "tokens": {
+      "invest": "Invertir",
+      "cash": "Efectivo"
+    }
+  }
+}
