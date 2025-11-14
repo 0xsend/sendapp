@@ -382,6 +382,27 @@ export const tagRouter = createTRPCRouter({
         })
       }
 
+      // Validate if tag can be deleted (single DB call)
+      const { data: canDelete, error: validationError } = await supabase.rpc('can_delete_tag', {
+        p_send_account_id: sendAccount.id,
+        p_tag_id: tagId,
+      })
+
+      if (validationError) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to validate tag deletion',
+        })
+      }
+
+      // Block deletion if validation fails
+      if (!canDelete) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Cannot delete this sendtag. You must maintain at least one paid sendtag.',
+        })
+      }
+
       // Delete the send_account_tag association
       // The database trigger will automatically handle tag status update and main tag succession
       const { error: deleteError } = await supabase
@@ -400,4 +421,35 @@ export const tagRouter = createTRPCRouter({
 
       return { success: true }
     }),
+  canDeleteTags: protectedProcedure.query(async ({ ctx: { supabase } }) => {
+    const { data: profile } = await supabase.auth.getUser()
+    if (!profile.user) throw new TRPCError({ code: 'UNAUTHORIZED' })
+
+    // Get the user's send account
+    const { data: sendAccount, error: sendAccountError } = await supabase
+      .from('send_accounts')
+      .select('id')
+      .single()
+
+    if (sendAccountError || !sendAccount) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Send account not found',
+      })
+    }
+
+    // Check if user can delete any tag (no tag_id = general check)
+    const { data: canDelete, error: validationError } = await supabase.rpc('can_delete_tag', {
+      p_send_account_id: sendAccount.id,
+    })
+
+    if (validationError) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to check tag deletion eligibility',
+      })
+    }
+
+    return canDelete ?? false
+  }),
 })

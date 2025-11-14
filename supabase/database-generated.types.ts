@@ -1844,6 +1844,10 @@ export type Database = {
         Args: { distribution_number: number }
         Returns: undefined
       }
+      can_delete_tag: {
+        Args: { p_send_account_id: string; p_tag_id?: number }
+        Returns: boolean
+      }
       canton_party_verifications: {
         Args: { "": Database["public"]["Tables"]["profiles"]["Row"] }
         Returns: {

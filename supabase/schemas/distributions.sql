@@ -521,8 +521,17 @@ BEGIN
         END AS weight,
         t.created_at AS created_at
     FROM tags t
-    INNER JOIN tag_receipts tr ON t.name = tr.tag_name
-    WHERE NOT EXISTS (
+    INNER JOIN tag_receipts tr ON tr.tag_name = t.name
+    AND tr.id = (
+        SELECT MAX(id)
+        FROM tag_receipts
+        WHERE tag_name = t.name
+    )
+    INNER JOIN receipts r ON r.event_id = tr.event_id
+    WHERE t.user_id IS NOT NULL  -- Exclude deleted/available tags
+    AND t.status = 'confirmed'  -- Only confirmed tags
+    AND r.user_id = t.user_id  -- Ensure receipt belongs to current owner
+    AND NOT EXISTS (
         SELECT 1
         FROM public.distribution_verifications dv
         WHERE dv.distribution_id = (

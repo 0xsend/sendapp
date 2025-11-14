@@ -138,6 +138,42 @@ AFTER INSERT ON public.tag_receipts
 FOR EACH ROW
 EXECUTE PROCEDURE public.insert_verification_tag_registration_from_receipt();
 
+-- Helper functions
+CREATE OR REPLACE FUNCTION public.can_delete_tag(p_send_account_id uuid, p_tag_id bigint DEFAULT NULL)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+    WITH tag_info AS (
+        SELECT
+            COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM tag_receipts tr WHERE tr.tag_id = t.id
+            ))::integer as paid_tag_count,
+            CASE
+                WHEN p_tag_id IS NULL THEN false
+                ELSE bool_or(t.id = p_tag_id AND EXISTS (
+                    SELECT 1 FROM tag_receipts tr WHERE tr.tag_id = p_tag_id
+                ))
+            END as is_deleting_paid_tag
+        FROM send_account_tags sat
+        JOIN tags t ON t.id = sat.tag_id
+        WHERE sat.send_account_id = p_send_account_id
+        AND t.status = 'confirmed'
+    )
+    SELECT CASE
+        -- If no tag_id provided, check if user can delete any tag (has >= 2 paid tags)
+        WHEN p_tag_id IS NULL THEN paid_tag_count >= 2
+        -- If tag_id provided, check if this specific tag can be deleted
+        WHEN is_deleting_paid_tag AND paid_tag_count <= 1 THEN false
+        ELSE true
+    END
+    FROM tag_info
+$function$;
+
+ALTER FUNCTION "public"."can_delete_tag"(uuid, bigint) OWNER TO "postgres";
+
 -- RLS
 alter table "public"."tag_receipts" enable row level security;
 
@@ -145,6 +181,10 @@ alter table "public"."tag_receipts" enable row level security;
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "anon";
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."tag_receipts_insert_activity_trigger"() TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."can_delete_tag"(uuid, bigint) TO "anon";
+GRANT ALL ON FUNCTION "public"."can_delete_tag"(uuid, bigint) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."can_delete_tag"(uuid, bigint) TO "service_role";
 
 GRANT ALL ON TABLE "public"."tag_receipts" TO "anon";
 GRANT ALL ON TABLE "public"."tag_receipts" TO "authenticated";
