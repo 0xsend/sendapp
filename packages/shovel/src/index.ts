@@ -44,8 +44,8 @@ const baseRpcUrls = {
 // baseSrcLogs is to be used for integrations that require logs
 const baseSrcLogs: Source = {
   name: 'base_logs',
-  batch_size: 10,
-  concurrency: 8,
+  batch_size: process.env.NODE_ENV === 'production' ? 10 : 2,
+  concurrency: process.env.NODE_ENV === 'production' ? 8 : 2,
   ...baseRpcUrls,
 }
 
