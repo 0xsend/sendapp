@@ -26,7 +26,7 @@ import {
   useInitializeFormAmount,
   useParams,
 } from '../params'
-import { useSendEarnWithdrawCalls, useSendEarnWithdrawVault } from './hooks'
+import { useSendEarnWithdrawCalls, useSendEarnWithdrawVaults } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
 
@@ -144,7 +144,7 @@ export function WithdrawForm() {
 
   // QUERY WITHDRAW USEROP
   const chainId = useChainId()
-  const vault = useSendEarnWithdrawVault({ asset, coin: coinData })
+  const vaults = useSendEarnWithdrawVaults({ asset, coin: coinData })
   const sendAccount = useSendAccount()
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
@@ -312,8 +312,9 @@ export function WithdrawForm() {
 
   useInitializeFormAmount(form)
 
-  // use deposit vault if it exists, or the default vault for the asset
-  const { query: baseApy } = useSendEarnAPY({ vault: vault?.data ? vault.data : undefined })
+  // use first vault for APY calculation (all vaults should have similar APY for the same asset)
+  const firstVault = useMemo(() => vaults.data?.[0]?.vault, [vaults.data])
+  const { query: baseApy } = useSendEarnAPY({ vault: firstVault })
 
   // Memoize formatted APY to prevent unnecessary re-renders
   const formattedApy = useMemo(() => {
@@ -345,6 +346,7 @@ export function WithdrawForm() {
     parsedAmount,
     insufficientAmount,
     depositBalance,
+    vaults: vaults.data,
   })
 
   const renderAfterContent = useCallback(

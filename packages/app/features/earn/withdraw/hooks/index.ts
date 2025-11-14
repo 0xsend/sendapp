@@ -11,22 +11,25 @@ import { useQuery, type UseQueryReturnType } from 'wagmi/query'
 
 const log = debug('app:features:earn:withdraw')
 
+type VaultWithBalance = {
+  vault: `0x${string}`
+  balance: bigint
+}
+
 /**
- * Determine the vault to withdraw from.
- *
- * TODO: return all the vaults with a balance for this asset
+ * Determine all vaults with a balance for this asset.
  *
  * @param {Object} params - The parameters
  * @param {string} params.asset - The address of the ERC20 token to withdraw
- * @returns A query result containing the vault address to withdraw from
+ * @returns A query result containing an array of vault addresses with their balances
  */
-export function useSendEarnWithdrawVault({
+export function useSendEarnWithdrawVaults({
   asset,
   coin,
 }: {
   asset: `0x${string}` | undefined
   coin: erc20Coin | undefined
-}): UseQueryReturnType<`0x${string}` | null> {
+}): UseQueryReturnType<VaultWithBalance[]> {
   const coinBalances = useSendEarnCoinBalances(coin)
   const sendAccount = useSendAccount()
 
@@ -38,21 +41,23 @@ export function useSendEarnWithdrawVault({
       throwIf(sendAccount.error)
       assert(asset !== undefined, 'Asset is not defined')
 
-      // Find the vault with a balance for this asset
-      const userBalances = Array.isArray(coinBalances.data)
-        ? coinBalances.data.filter(
-            (balance) => balance.assets !== null && balance.assets > 0 && balance.log_addr !== null
-          )
+      // Find all vaults with a balance for this asset
+      const vaultsWithBalance: VaultWithBalance[] = Array.isArray(coinBalances.data)
+        ? coinBalances.data
+            .filter(
+              (balance) =>
+                balance.currentAssets !== null &&
+                balance.currentAssets > 0n &&
+                balance.log_addr !== null
+            )
+            .map((balance) => ({
+              vault: balance.log_addr,
+              balance: balance.currentAssets,
+            }))
         : []
 
-      if (userBalances.length > 0 && userBalances[0]) {
-        const addr = userBalances[0].log_addr
-        log('Found existing deposit. Using vault:', addr)
-        return addr
-      }
-
-      log('No existing deposits found for this asset.')
-      return null
+      log('Found vaults with balance:', vaultsWithBalance)
+      return vaultsWithBalance
     },
   })
 }
@@ -61,9 +66,8 @@ export function useSendEarnWithdrawVault({
  * Hook to create a send account calls for withdrawing Send Account assets from
  * Send Earn vaults.
  *
- * It will return send account calls for withdrawing tokens from a Send Earn vault.
- *
- * TODO: handle multiple vaults with balances for this asset
+ * It will return send account calls for withdrawing tokens from one or more Send Earn vaults.
+ * If the amount exceeds a single vault's balance, it will split the withdrawal across multiple vaults.
  *
  * @param {Object} params - The withdraw parameters
  * @param {string} params.sender - The address of the sender
@@ -83,42 +87,66 @@ export function useSendEarnWithdrawCalls({
   amount: bigint | undefined
   coin: erc20Coin | undefined
 }): UseQueryReturnType<SendAccountCall[] | null> {
-  const vault = useSendEarnWithdrawVault({ asset, coin })
+  const vaults = useSendEarnWithdrawVaults({ asset, coin })
 
   return useQuery({
-    queryKey: ['sendEarnWithdrawCalls', { sender, asset, amount, vault }] as const,
+    queryKey: ['sendEarnWithdrawCalls', { sender, asset, amount, vaults }] as const,
     enabled:
-      vault.isFetched &&
+      vaults.isFetched &&
       sender !== undefined &&
       asset !== undefined &&
       amount !== undefined &&
       amount > 0n,
     queryFn: async (): Promise<SendAccountCall[] | null> => {
-      throwIf(vault.error)
+      throwIf(vaults.error)
       assert(asset !== undefined, 'Asset is not defined')
       assert(amount !== undefined, 'Amount is not defined')
       assert(amount > 0n, 'Amount must be greater than 0')
       assert(!!sender, 'Sender is not defined')
 
-      if (vault.isPending || !vault.data) {
-        log('No vault found to withdraw from')
+      if (vaults.isPending || !vaults.data || vaults.data.length === 0) {
+        log('No vaults found to withdraw from')
         return null
       }
 
-      log('Withdrawing from vault', vault.data)
+      // Sort vaults by balance (largest first) to optimize withdrawal
+      const sortedVaults = [...vaults.data].sort((a, b) => {
+        if (a.balance > b.balance) return -1
+        if (a.balance < b.balance) return 1
+        return 0
+      })
 
-      // For withdrawing, we only need to call the withdraw function on the vault
-      return [
-        {
-          dest: vault.data,
+      const calls: SendAccountCall[] = []
+      let remainingAmount = amount
+
+      // Distribute the withdrawal amount across vaults
+      for (const vaultWithBalance of sortedVaults) {
+        if (remainingAmount <= 0n) break
+
+        const withdrawAmount =
+          remainingAmount > vaultWithBalance.balance ? vaultWithBalance.balance : remainingAmount
+
+        calls.push({
+          dest: vaultWithBalance.vault,
           value: 0n,
           data: encodeFunctionData({
             abi: sendEarnAbi,
             functionName: 'withdraw',
-            args: [amount, sender, sender],
+            args: [withdrawAmount, sender, sender],
           }),
-        },
-      ]
+        })
+
+        remainingAmount -= withdrawAmount
+        log(`Withdrawing ${withdrawAmount} from vault ${vaultWithBalance.vault}`)
+      }
+
+      if (remainingAmount > 0n) {
+        log('Warning: Requested amount exceeds total vault balances')
+        throw new Error('Requested withdrawal amount exceeds total available balance in vaults')
+      }
+
+      log('Created withdraw calls:', calls)
+      return calls
     },
   })
 }
