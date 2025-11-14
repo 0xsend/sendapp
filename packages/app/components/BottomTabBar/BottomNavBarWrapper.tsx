@@ -4,6 +4,8 @@ import { Container } from '@my/ui'
 import type { PropsWithChildren } from 'react'
 import { usePathname } from 'app/utils/usePathname'
 
+const HIDDEN_NAVBAR_ROUTES = ['/rewards'] as const
+
 export const BottomNavBarWrapper = ({ children }: PropsWithChildren) => {
   const location = usePathname()
   const parts = location.split('/').filter(Boolean)
@@ -20,12 +22,16 @@ export const BottomNavBarWrapper = ({ children }: PropsWithChildren) => {
     return activeTab?.key || 'index'
   }
 
+  const shouldShowNavBar = !HIDDEN_NAVBAR_ROUTES.some((route) => location === route)
+
   return (
     <YStack f={1}>
       {children}
-      <Container>
-        <BottomNavBar currentRoute={getCurrentRoute()} />
-      </Container>
+      {shouldShowNavBar && (
+        <Container>
+          <BottomNavBar currentRoute={getCurrentRoute()} />
+        </Container>
+      )}
     </YStack>
   )
 }
