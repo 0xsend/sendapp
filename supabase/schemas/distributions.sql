@@ -476,6 +476,7 @@ BEGIN
         FROM distribution_shares ds
         WHERE ds.user_id = referrals.referred_id
           AND ds.distribution_id = prev_dist_id
+          AND ds.amount > 0
       ) THEN 1
       ELSE 0
     END
@@ -571,6 +572,7 @@ BEGIN
         FROM distribution_shares ds
         WHERE ds.user_id = r.referred_id
         AND ds.distribution_id = prev_dist_id
+        AND ds.amount > 0
       )) AS qualified_referrals,
       MAX(r.created_at) AS last_referral_date
     FROM

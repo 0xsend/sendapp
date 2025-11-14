@@ -57,6 +57,7 @@ distributorRouter.post('/merkle', checkAuthorization, async (req: Request, res: 
       .from('distribution_shares')
       .select('index, address, amount::text', { count: 'exact' })
       .eq('distribution_id', Number(id))
+      .gt('amount', 0)
       .order('index', { ascending: true })
   )
   if (sharesError) {

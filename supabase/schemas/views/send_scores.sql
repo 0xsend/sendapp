@@ -36,6 +36,7 @@ send_ceiling_settings AS (
     FROM distribution_shares ds
     JOIN distributions d ON d.id = ds.distribution_id
     WHERE d.number = (SELECT number - 1 FROM active_distribution)
+    AND ds.amount > 0
   )
   SELECT
     sa.user_id,
@@ -189,6 +190,7 @@ create materialized view "private"."send_scores_history" as  WITH dws AS (
              JOIN ( SELECT DISTINCT sender_accounts.distribution_id,
                     sender_accounts.user_id
                    FROM sender_accounts) s ON (((s.user_id = ds.user_id) AND (s.distribution_id = dws.id))))
+           WHERE ds.amount > 0
         ), send_ceiling_settings AS (
          SELECT s.distribution_id,
             s.user_id,
@@ -330,6 +332,7 @@ AND stv.f IN (SELECT address_bytes FROM sender_accounts)
              JOIN distribution_shares ds ON ((ds.distribution_id = dws_1.prev_distribution_id)))
              JOIN distributions d ON ((d.id = ds.distribution_id)))
              JOIN sender_accounts s ON ((s.user_id = ds.user_id)))
+           WHERE ds.amount > 0
         ), send_ceiling AS (
          SELECT s.user_id,
             s.address_bytes AS address,

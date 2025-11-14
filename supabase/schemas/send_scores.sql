@@ -38,7 +38,8 @@ BEGIN
                     JOIN distributions d ON d.id = ds.distribution_id
                     JOIN send_accounts sa ON sa.user_id = ds.user_id
                     WHERE ds.distribution_id = ad.prev_distribution_id
-                    AND sa.address = concat('0x', encode(addr, 'hex'))::citext),
+                    AND sa.address = concat('0x', encode(addr, 'hex'))::citext
+                    AND ds.amount > 0),
                     CASE
                         WHEN ad.token_addr = '\x3f14920c99beb920afa163031c4e47a3e03b3e4a'::bytea
                         THEN ad.hodler_min_balance * '10000000000000000'::numeric
