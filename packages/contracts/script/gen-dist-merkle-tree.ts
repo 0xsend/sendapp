@@ -27,6 +27,7 @@ async function fetchDistributionShares(supabase: SupabaseClient<Database>, distr
       .from('distribution_shares')
       .select('index, address, amount::text', { count: 'exact' })
       .eq('distribution_id', distributionId)
+      .gt('amount', 0)
       .order('index', { ascending: true })
   )
 }
