@@ -104,7 +104,11 @@ BEGIN
         FROM tag_receipts
         WHERE tag_name = t.name
     )
-    WHERE NOT EXISTS (
+    INNER JOIN receipts r ON r.event_id = tr.event_id
+    WHERE t.user_id IS NOT NULL  -- Exclude deleted/available tags
+    AND t.status = 'confirmed'  -- Only confirmed tags
+    AND r.user_id = t.user_id  -- Ensure receipt belongs to current owner
+    AND NOT EXISTS (
         SELECT 1
         FROM public.distribution_verifications dv
         WHERE dv.distribution_id = (
@@ -173,7 +177,10 @@ WITH birthday_profiles AS (
         SELECT 1
         FROM tags t
         JOIN tag_receipts tr ON tr.tag_name = t.name
+        JOIN receipts r ON r.event_id = tr.event_id
         WHERE t.user_id = p.id
+        AND t.status = 'confirmed'  -- Only confirmed tags
+        AND r.user_id = t.user_id  -- Ensure receipt belongs to current owner
         AND tr.id = (
             SELECT MAX(id)
             FROM tag_receipts

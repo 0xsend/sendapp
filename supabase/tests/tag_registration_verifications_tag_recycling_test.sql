@@ -97,6 +97,14 @@ VALUES (
 );
 
 -- Create receipt for User A's tag (older receipt)
+INSERT INTO receipts (user_id, event_id, hash, created_at)
+VALUES (
+    tests.get_supabase_uid('user_a'),
+    '100:0:0:0',
+    '0x1111111111111111111111111111111111111111111111111111111111111111',
+    NOW() - INTERVAL '2 months'
+);
+
 INSERT INTO tag_receipts (tag_id, tag_name, event_id, created_at)
 VALUES (
     (SELECT id FROM tags WHERE name = 'alice'),
@@ -121,6 +129,14 @@ VALUES (
 );
 
 -- Create NEW receipt for User B's tag (newer receipt)
+INSERT INTO receipts (user_id, event_id, hash, created_at)
+VALUES (
+    tests.get_supabase_uid('user_b'),
+    '200:0:0:0',
+    '0x2222222222222222222222222222222222222222222222222222222222222222',
+    NOW() - INTERVAL '1 month'
+);
+
 INSERT INTO tag_receipts (tag_id, tag_name, event_id, created_at)
 VALUES (
     (SELECT id FROM tags WHERE name = 'alice'),
