@@ -189,6 +189,8 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
           await updateProfile().then(() => {
             refetchReceipts()
           })
+          // Invalidate canDeleteTags query since user now has a new tag
+          await queryClient.invalidateQueries({ queryKey: [['tag', 'canDeleteTags']] })
           onConfirmed()
         })
         .catch((err) => {
@@ -216,7 +218,15 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
           setSubmitting(false)
         })
     },
-    [attempts, refetchReceipts, confirm, onConfirmed, updateProfile, referralCode]
+    [
+      attempts,
+      refetchReceipts,
+      confirm,
+      onConfirmed,
+      updateProfile,
+      referralCode,
+      queryClient.invalidateQueries,
+    ]
   )
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: otherwise it infinite loops

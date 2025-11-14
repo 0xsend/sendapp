@@ -169,6 +169,7 @@ export const AddSendtagsForm = () => {
                             <PrimaryButton.Text
                               color={'$white'}
                               $theme-light={{ color: '$color12' }}
+                              lineHeight={25}
                             >
                               ADD TAG
                             </PrimaryButton.Text>

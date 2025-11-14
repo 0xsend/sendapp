@@ -111,6 +111,7 @@ ALTER FUNCTION "public"."handle_tag_deletion_verifications"() OWNER TO "postgres
 CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
     RETURNS TRIGGER
     LANGUAGE plpgsql
+    SECURITY DEFINER
     SET search_path TO 'public'
     AS $$
 BEGIN

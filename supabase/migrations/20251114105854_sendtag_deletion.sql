@@ -121,6 +121,7 @@ $function$
 CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
  RETURNS trigger
  LANGUAGE plpgsql
+ SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
 BEGIN
