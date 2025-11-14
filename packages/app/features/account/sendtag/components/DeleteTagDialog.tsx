@@ -188,7 +188,7 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             gap="$4"
-            width="100%"
+            width="90%"
             maxWidth={450}
           >
             {dialogContent}
