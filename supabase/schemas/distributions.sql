@@ -476,6 +476,7 @@ BEGIN
         FROM distribution_shares ds
         WHERE ds.user_id = referrals.referred_id
           AND ds.distribution_id = prev_dist_id
+          AND ds.amount > 0
       ) THEN 1
       ELSE 0
     END
@@ -571,6 +572,7 @@ BEGIN
         FROM distribution_shares ds
         WHERE ds.user_id = r.referred_id
         AND ds.distribution_id = prev_dist_id
+        AND ds.amount > 0
       )) AS qualified_referrals,
       MAX(r.created_at) AS last_referral_date
     FROM
@@ -731,16 +733,6 @@ CREATE OR REPLACE FUNCTION "public"."update_distribution_shares"("distribution_i
     SET "search_path" TO 'public'
     AS $_$
 BEGIN
-  -- validate shares are greater than 0
-  IF(
-    SELECT
-      count(*)
-    FROM
-      unnest(shares) shares
-    WHERE
-      shares.amount <= 0) > 0 THEN
-    RAISE EXCEPTION 'Shares must be greater than 0.';
-  END IF;
   -- get the distribution
   IF(
     SELECT
@@ -807,15 +799,16 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 BEGIN
-    -- Create temp table for shares lookup
+    -- Create temp table for shares lookup with amount
     CREATE TEMPORARY TABLE temp_shares ON COMMIT DROP AS
-    SELECT DISTINCT user_id
-    FROM unnest(shares) ds;
+    SELECT user_id, SUM(amount) as amount
+    FROM unnest(shares) ds
+    GROUP BY user_id;
 
-    -- Update tag_referral weights - just check if in shares
+    -- Update tag_referral weights - check if in shares and amount > 0
     UPDATE distribution_verifications dv
     SET weight = CASE
-        WHEN ts.user_id IS NOT NULL THEN 1
+        WHEN ts.user_id IS NOT NULL AND ts.amount > 0 THEN 1
         ELSE 0
     END
     FROM referrals r
@@ -825,7 +818,7 @@ BEGIN
     AND dv.user_id = r.referrer_id
     AND (dv.metadata->>'referred_id')::uuid = r.referred_id;
 
-    -- Insert total_tag_referrals if doesn't exist
+    -- Insert total_tag_referrals if doesn't exist (only count shares with amount > 0)
     INSERT INTO distribution_verifications (distribution_id, user_id, type, weight)
     SELECT
         $1,
@@ -834,7 +827,8 @@ BEGIN
         COUNT(ts.user_id)
     FROM referrals r
     JOIN temp_shares ts ON ts.user_id = r.referred_id
-    WHERE NOT EXISTS (
+    WHERE ts.amount > 0
+    AND NOT EXISTS (
         SELECT 1 FROM distribution_verifications dv
         WHERE dv.distribution_id = $1
         AND dv.type = 'total_tag_referrals'
@@ -842,7 +836,7 @@ BEGIN
     )
     GROUP BY r.referrer_id;
 
-    -- Update existing total_tag_referrals
+    -- Update existing total_tag_referrals (only count shares with amount > 0)
     UPDATE distribution_verifications dv
     SET weight = rc.referral_count
     FROM (
@@ -851,6 +845,7 @@ BEGIN
             COUNT(ts.user_id) as referral_count
         FROM referrals r
         JOIN temp_shares ts ON ts.user_id = r.referred_id
+        WHERE ts.amount > 0
         GROUP BY r.referrer_id
     ) rc
     WHERE dv.distribution_id = $1

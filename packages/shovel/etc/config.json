@@ -6,8 +6,8 @@
   "eth_sources": [
     {
       "name": "base_logs",
-      "batch_size": 10,
-      "concurrency": 8,
+      "batch_size": 2,
+      "concurrency": 2,
       "chain_id": "$BASE_CHAIN_ID",
       "url": "$BASE_RPC_URL_PRIMARY",
       "urls": [

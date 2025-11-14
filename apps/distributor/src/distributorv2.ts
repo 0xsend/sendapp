@@ -785,8 +785,8 @@ export class DistributorV2Worker {
         const fixedPoolAmount = fixedPoolAmountsByAddress[share.address] || 0n
         const amount = hodlerPoolAmount + fixedPoolAmount
 
-        // Skip if amount is 0
-        if (amount <= 0n) {
+        // Skip if amount is less than 0
+        if (amount < 0n) {
           return null
         }
 
@@ -836,7 +836,7 @@ export class DistributorV2Worker {
     }
 
     for (const share of shares) {
-      if (!share.amount) {
+      if (share.amount === undefined || share.amount === null) {
         log.error({ share }, 'Share missing amount')
         throw new Error(`Share for user ${share.user_id} missing amount`)
       }
