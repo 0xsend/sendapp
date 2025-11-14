@@ -5,6 +5,13 @@ import { useUser } from 'app/utils/useUser'
 import { api } from 'app/utils/api'
 import { Platform } from 'react-native'
 import { useQueryClient } from '@tanstack/react-query'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { signChallenge } from 'app/utils/signChallenge'
+import { webauthnCredToAllowedCredentials } from 'app/utils/signUserOp'
+import { bytesToHex, hexToBytes } from 'viem'
+import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
+import { useMemo, useState } from 'react'
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 
 interface DeleteTagDialogProps {
   tag: Tables<'tags'>
@@ -17,8 +24,16 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
   const toast = useAppToast()
   const { updateProfile } = useUser()
   const queryClient = useQueryClient()
+  const { data: sendAccount } = useSendAccount()
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
 
-  const { mutateAsync: deleteTag, isPending } = api.tag.delete.useMutation({
+  // Challenge API mutations
+  const { mutateAsync: getChallenge } = api.challenge.getChallenge.useMutation({ retry: false })
+  const { mutateAsync: validateSignature } = api.challenge.validateSignature.useMutation({
+    retry: false,
+  })
+
+  const { mutateAsync: deleteTag, isPending: isDeleting } = api.tag.delete.useMutation({
     onSuccess: async () => {
       toast.show('Sendtag deleted')
       await updateProfile()
@@ -34,10 +49,61 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
     },
   })
 
+  // Get webauthn credentials for passkey signing
+  const webauthnCreds = useMemo(
+    () =>
+      sendAccount?.send_account_credentials
+        ?.filter((c) => !!c.webauthn_credentials)
+        ?.map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? [],
+    [sendAccount?.send_account_credentials]
+  )
+
+  const allowedCredentials = useMemo(
+    () => webauthnCredToAllowedCredentials(webauthnCreds),
+    [webauthnCreds]
+  )
+
   const handleDelete = async () => {
-    if (isPending) return
-    await deleteTag({ tagId: tag.id })
+    if (isAuthenticating || isDeleting) return
+
+    setIsAuthenticating(true)
+
+    try {
+      // Step 1: Get challenge from backend
+      const challengeData = await getChallenge()
+
+      // Step 2: Sign challenge with passkey
+      const { encodedWebAuthnSig, accountName, keySlot } = await signChallenge(
+        challengeData.challenge as `0x${string}`,
+        allowedCredentials
+      )
+
+      // Step 3: Prepare signature for validation
+      const encodedWebAuthnSigBytes = hexToBytes(encodedWebAuthnSig)
+      const newEncodedWebAuthnSigBytes = new Uint8Array(encodedWebAuthnSigBytes.length + 1)
+      newEncodedWebAuthnSigBytes[0] = keySlot
+      newEncodedWebAuthnSigBytes.set(encodedWebAuthnSigBytes, 1)
+
+      // Step 4: Validate signature with backend
+      await validateSignature({
+        recoveryType: RecoveryOptions.WEBAUTHN,
+        signature: bytesToHex(newEncodedWebAuthnSigBytes),
+        challengeId: challengeData.id,
+        identifier: `${accountName}.${keySlot}`,
+      })
+
+      // Step 5: If signature is valid, proceed with deletion
+      await deleteTag({ tagId: tag.id })
+    } catch (error) {
+      console.error('Failed to authenticate or delete sendtag:', error)
+      toast.error(formatErrorMessage(error))
+      onOpenChange(false)
+    } finally {
+      setIsAuthenticating(false)
+    }
   }
+
+  const isPending = isAuthenticating || isDeleting
 
   // Shared content component to avoid duplication
   const dialogContent = (
@@ -56,6 +122,7 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
       <XStack gap="$3" w="100%">
         <Button
           flex={1}
+          width={'100%'}
           size="$4"
           onPress={() => onOpenChange(false)}
           disabled={isPending}
@@ -65,6 +132,7 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
         </Button>
         <Button
           flex={1}
+          width={'100%'}
           size="$4"
           theme="red"
           onPress={handleDelete}
