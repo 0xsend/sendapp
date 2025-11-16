@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "title": "Error",
+    "fallback": "Something went wrong."
+  },
+  "empty": {
+    "noActivities": "No activities",
+    "noActivitiesMobile": "No activities, just send it!"
+  },
+  "sections": {
+    "today": "Today"
+  },
+  "details": {
+    "heading": "Transaction details",
+    "phraseOn": "{{phrase}} on",
+    "dateOnly": "On"
+  }
+}

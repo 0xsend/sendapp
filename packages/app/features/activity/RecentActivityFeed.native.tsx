@@ -16,6 +16,7 @@ import { RecyclerListView } from 'recyclerlistview'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useIsFocused } from '@react-navigation/native'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 // Date separator component
 const DateSeparatorRow = ({ dateKey }: { dateKey: string }) => (
@@ -41,6 +42,7 @@ export default function ActivityFeed({
   const { onScroll, onContentSizeChange } = useScrollDirection()
   const isFocused = useIsFocused()
   const justLoadedRef = useRef(false)
+  const { t, i18n } = useTranslation('activity')
 
   const {
     data,
@@ -62,11 +64,12 @@ export default function ActivityFeed({
     }
 
     // Group activities by date
+    const locale = i18n.resolvedLanguage ?? i18n.language
     const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
       const dateKey = isToday
-        ? 'Today'
-        : activity.created_at.toLocaleDateString(undefined, {
+        ? t('sections.today')
+        : activity.created_at.toLocaleDateString(locale || undefined, {
             day: 'numeric',
             month: 'long',
           })
@@ -105,7 +108,7 @@ export default function ActivityFeed({
     })
 
     return { listData: items }
-  }, [activities])
+  }, [activities, t, i18n.language, i18n.resolvedLanguage])
 
   const dataProvider = useMemo(() => {
     return dataProviderMakerNative(listData)
@@ -177,7 +180,7 @@ export default function ActivityFeed({
   if (activitiesError) {
     return (
       <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$error'} mt={'$3.5'}>
-        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+        {activitiesError?.message.split('.').at(0) ?? t('errors.fallback')}
       </Paragraph>
     )
   }
@@ -185,7 +188,7 @@ export default function ActivityFeed({
   if (!activities.length) {
     return (
       <Paragraph fontSize={'$5'} color={'$color12'} mt={'$3.5'} ta={'center'} w={'100%'}>
-        No activities, just send it!
+        {t('empty.noActivitiesMobile')}
       </Paragraph>
     )
   }

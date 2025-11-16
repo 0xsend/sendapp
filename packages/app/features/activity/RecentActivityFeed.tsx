@@ -7,6 +7,7 @@ import { type PropsWithChildren, useEffect, useMemo } from 'react'
 import { H4, Paragraph, Spinner, YStack } from '@my/ui'
 import { SectionList } from 'react-native'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { useTranslation } from 'react-i18next'
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -16,6 +17,7 @@ export default function ActivityFeed({
   onActivityPress: (activity: Activity) => void
 }) {
   const { isAtEnd } = useScrollDirection()
+  const { t, i18n } = useTranslation('activity')
 
   const {
     data,
@@ -36,11 +38,12 @@ export default function ActivityFeed({
     if (!data?.pages) return []
 
     const activities = data.pages.flat()
+    const locale = i18n.resolvedLanguage ?? i18n.language
     const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
       const dateKey = isToday
-        ? 'Today'
-        : activity.created_at.toLocaleDateString(undefined, {
+        ? t('sections.today')
+        : activity.created_at.toLocaleDateString(locale || undefined, {
             day: 'numeric',
             month: 'long',
           })
@@ -58,7 +61,7 @@ export default function ActivityFeed({
       data,
       index,
     }))
-  }, [data?.pages])
+  }, [data?.pages, t, i18n.language, i18n.resolvedLanguage])
 
   if (isLoadingActivities) {
     return <Spinner size="small" />
@@ -67,13 +70,13 @@ export default function ActivityFeed({
   if (activitiesError) {
     return (
       <Paragraph maxWidth={600} fontFamily={'$mono'} fontSize={'$5'} color={'$color12'}>
-        {activitiesError?.message.split('.').at(0) ?? `${activitiesError}`}
+        {activitiesError?.message.split('.').at(0) ?? t('errors.fallback')}
       </Paragraph>
     )
   }
 
   if (!sections.length) {
-    return <RowLabel>No activities</RowLabel>
+    return <RowLabel>{t('empty.noActivities')}</RowLabel>
   }
 
   return (
