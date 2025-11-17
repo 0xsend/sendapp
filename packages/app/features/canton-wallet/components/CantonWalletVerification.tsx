@@ -6,6 +6,7 @@ import {
   Paragraph,
   Spinner,
   SubmitButton,
+  Switch,
   useAppToast,
   XStack,
   YStack,
@@ -33,14 +34,14 @@ import {
   IconSlash,
   IconX,
 } from 'app/components/icons'
-import { Check, Pencil, Copy } from '@tamagui/lucide-icons'
+import { Check, Copy, Pencil, Search } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import {
+  type DistributionsVerificationsQuery,
   type UseDistributionsResultData,
+  useDistributionVerifications,
   useMonthlyDistributions,
   useSnapshotBalance,
-  useDistributionVerifications,
-  type DistributionsVerificationsQuery,
 } from 'app/utils/distributions'
 import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { usdcCoin } from 'app/data/coins'
@@ -216,10 +217,13 @@ function CantonWalletVerificationContent({
           />
         )}
         {cantonWalletAddress ? (
-          <CantonWalletVerifiedCard
-            address={cantonWalletAddress}
-            canEdit={canConnectCantonWallet ?? false}
-          />
+          <>
+            <CantonWalletVerifiedCard
+              address={cantonWalletAddress}
+              canEdit={canConnectCantonWallet ?? false}
+            />
+            <CantonWalletDiscoverableCard />
+          </>
         ) : canConnectCantonWallet ? (
           <CantonWalletFormCard />
         ) : (
@@ -822,6 +826,112 @@ function CantonWalletFormCard() {
       >
         Create Canton Wallet Account
       </Anchor>
+    </FadeCard>
+  )
+}
+
+function CantonWalletDiscoverableCard() {
+  const { profile } = useUser()
+  const supabase = useSupabase()
+  const queryClient = useQueryClient()
+  const toast = useAppToast()
+  const hoverStyles = useHoverStyles()
+
+  const profileIsDiscoverable = profile?.canton_party_verifications?.is_discoverable ?? null
+  const [optimisticValue, setOptimisticValue] = useState<boolean | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Use optimistic value during loading, otherwise use profile value
+  const isDiscoverable = isLoading ? optimisticValue : profileIsDiscoverable
+
+  const updateDiscoverableMutation = useMutation({
+    mutationFn: async (checked: boolean) => {
+      if (!profile?.id) {
+        throw new Error('User not authenticated')
+      }
+
+      const { data: result, error } = await supabase
+        .from('canton_party_verifications')
+        .update({
+          is_discoverable: checked,
+        })
+        .eq('user_id', profile.id)
+        .select()
+        .single()
+
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      return result
+    },
+    onSuccess: async () => {
+      toast.show('Updated successfully')
+      await queryClient.invalidateQueries({ queryKey: ['profile'] })
+    },
+    onError: (error) => {
+      console.error('Update failed:', error)
+      toast.error('Update failed')
+      setOptimisticValue(null) // Reset optimistic value on error
+    },
+    onSettled: () => {
+      setIsLoading(false)
+    },
+  })
+
+  const handleToggle = async (checked: boolean) => {
+    setOptimisticValue(checked) // Set optimistic value immediately
+    setIsLoading(true)
+    await updateDiscoverableMutation.mutateAsync(checked)
+  }
+
+  return (
+    <FadeCard br={'$6'} jc={'space-between'} w={'100%'}>
+      <XStack width="100%" justifyContent="space-between" alignItems="center">
+        <XStack gap={'$3.5'} alignItems={'center'} flex={1}>
+          <XStack
+            w={40}
+            h={40}
+            ai="center"
+            jc="center"
+            br="$3"
+            backgroundColor={hoverStyles.backgroundColor}
+          >
+            <Search size={'$1'} color={'$color12'} />
+          </XStack>
+          <Paragraph size="$5" fontWeight="600" color="$color12">
+            Discoverable in Canton Wallet?
+          </Paragraph>
+        </XStack>
+        <XStack ai="center" jc="center" width={50}>
+          {isLoading ? (
+            <Spinner size="small" color={'$color12'} />
+          ) : (
+            <Switch
+              size="$2"
+              checked={isDiscoverable ?? false}
+              onCheckedChange={handleToggle}
+              disabled={updateDiscoverableMutation.isPending}
+              backgroundColor={isDiscoverable ? '$primary' : '$color0'}
+              borderColor={isDiscoverable ? '$primary' : '$color0'}
+              $theme-light={{
+                backgroundColor: isDiscoverable ? '#33C940' : '#999999',
+                borderColor: isDiscoverable ? '#33C940' : '#999999',
+              }}
+            >
+              <Switch.Thumb
+                animation="100ms"
+                $theme-light={{
+                  backgroundColor: '$white',
+                }}
+              />
+            </Switch>
+          )}
+        </XStack>
+      </XStack>
+      <Paragraph fontSize={'$5'} color="$color11">
+        Enable this to share your Send profile with the Canton Wallet community.
+      </Paragraph>
     </FadeCard>
   )
 }

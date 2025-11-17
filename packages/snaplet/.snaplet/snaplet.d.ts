@@ -84,6 +84,7 @@ interface Table_public_canton_party_verifications {
   canton_wallet_address: string;
   created_at: string;
   updated_at: string | null;
+  is_discoverable: boolean | null;
 }
 interface Table_public_chain_addresses {
   address: string;
