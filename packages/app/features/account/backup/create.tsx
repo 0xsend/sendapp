@@ -22,6 +22,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 const CreatePasskeySchema = z.object({
   accountName: z.string().min(1).trim().describe('Passkey name'),
@@ -31,10 +32,11 @@ type CreatePasskeySchema = z.infer<typeof CreatePasskeySchema>
 
 export const CreatePasskeyScreen = () => {
   const router = useRouter()
+  const { t } = useTranslation('account')
 
   return (
     <YStack w={'100%'} gap={'$3.5'}>
-      {Platform.OS === 'web' && <SettingsHeader>Passkeys</SettingsHeader>}
+      {Platform.OS === 'web' && <SettingsHeader>{t('passkeys.header')}</SettingsHeader>}
       <CreatePasskeyForm
         onPasskeySaved={(cred) => router.push(`/account/backup/confirm/${cred.id}`)}
       />
@@ -68,6 +70,7 @@ const CreatePasskeyForm = ({
     address: sendAcct?.address,
   })
   const queryClient = useQueryClient()
+  const { t } = useTranslation('account')
 
   const isLoading = isLoadingUser || isLoadingSendAccount || isLoadingKeySlot
 
@@ -145,12 +148,12 @@ const CreatePasskeyForm = ({
           <Spinner size="small" color={'$color'} />
         ) : (
           <SubmitButton onPress={submit}>
-            <SubmitButton.Text>Add a Passkey</SubmitButton.Text>
+            <SubmitButton.Text>{t('passkeys.create.submit')}</SubmitButton.Text>
           </SubmitButton>
         )}
       </>
     ),
-    [form, isLoading]
+    [form, isLoading, t]
   )
 
   return (
@@ -185,16 +188,16 @@ const CreatePasskeyForm = ({
               labelProps: {
                 color: '$color10',
               },
+              'aria-label': t('passkeys.create.accountNameLabel'),
             },
           }}
           renderBefore={() => (
             <>
               <H1 size={'$8'} fontWeight={'600'} color="$color12">
-                Secure Your Account with Passkeys
+                {t('passkeys.create.title')}
               </H1>
               <Paragraph size={'$5'} color={'$color10'}>
-                Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices
-                authorized to sign your account&apos;s transactions.
+                {t('passkeys.create.description')}
               </Paragraph>
             </>
           )}

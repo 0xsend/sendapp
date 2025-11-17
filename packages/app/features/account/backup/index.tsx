@@ -44,10 +44,12 @@ import { z } from 'zod'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { Linking, Platform } from 'react-native'
+import { Trans, useTranslation } from 'react-i18next'
 
 export const BackupScreen = () => {
   const { data: sendAcct, error, isLoading } = useSendAccount()
   const supabase = useSupabase()
+  const { t } = useTranslation('account')
   const {
     data: webAuthnCreds,
     error: webAuthnCredsError,
@@ -90,16 +92,21 @@ export const BackupScreen = () => {
             return (
               <YStack w={'100%'} gap={'$6'}>
                 <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>
-                  You have no WebAuthn credentials. This should never happen. Please reach out to
-                  <Link
-                    href="https://support.send.app/en/"
-                    target="_blank"
-                    onPress={() => Linking.openURL('https://support.send.app/en/')}
-                  >
-                    {' '}
-                    support
-                  </Link>{' '}
-                  if you need help.
+                  <Trans
+                    t={t}
+                    i18nKey="passkeys.empty.noCredentials"
+                    components={{
+                      supportLink: (
+                        <Link
+                          href="https://support.send.app/en/"
+                          target="_blank"
+                          onPress={() => Linking.openURL('https://support.send.app/en/')}
+                        >
+                          {t('passkeys.empty.supportLink')}
+                        </Link>
+                      ),
+                    }}
+                  />
                 </Paragraph>
                 <Link
                   href="https://support.send.app/en/articles/9789876-what-are-passkeys"
@@ -116,7 +123,7 @@ export const BackupScreen = () => {
                 >
                   <IconNote size="$1.5" />
                   <Paragraph size={'$6'} fontWeight={'300'}>
-                    Learn more about WebAuthn credentials
+                    {t('passkeys.empty.learnCredentials')}
                   </Paragraph>
                 </Link>
               </YStack>
@@ -125,7 +132,7 @@ export const BackupScreen = () => {
             return (
               <YStack w={'100%'} gap={'$6'}>
                 <Paragraph size={'$6'} fontWeight={'300'}>
-                  You have no Send Account.
+                  {t('passkeys.empty.noAccount')}
                 </Paragraph>
                 <Link
                   href="https://support.send.app/en/articles/9789876-what-are-passkeys"
@@ -142,7 +149,7 @@ export const BackupScreen = () => {
                 >
                   <IconNote size="$1.5" />
                   <Paragraph size={'$6'} fontWeight={'300'}>
-                    Learn more about Send Accounts
+                    {t('passkeys.empty.learnAccounts')}
                   </Paragraph>
                 </Link>
               </YStack>
@@ -167,17 +174,18 @@ const WebauthnCreds = ({
   const addPasskeyLink = useLink({
     href: '/account/backup/create',
   })
+  const { t } = useTranslation('account')
 
   return (
     <YStack w={'100%'} gap={'$5'}>
       <YStack gap={'$3.5'}>
-        {Platform.OS === 'web' && <SettingsHeader>Passkeys</SettingsHeader>}
+        {Platform.OS === 'web' && <SettingsHeader>{t('passkeys.header')}</SettingsHeader>}
         {webAuthnCreds.map((cred) => (
           <WebAuthnCred key={`${sendAcct.id}-${cred.id}`} sendAcct={sendAcct} cred={cred} />
         ))}
       </YStack>
       <PrimaryButton {...addPasskeyLink}>
-        <PrimaryButton.Text>Add a Passkey</PrimaryButton.Text>
+        <PrimaryButton.Text>{t('passkeys.list.add')}</PrimaryButton.Text>
       </PrimaryButton>
     </YStack>
   )
@@ -213,6 +221,7 @@ const WebAuthnCred = ({
   const link = useLink({
     href: `/account/backup/confirm/${cred?.id}`,
   })
+  const { t } = useTranslation('account')
 
   return (
     <FadeCard elevation={'$0.75'}>
@@ -222,7 +231,7 @@ const WebAuthnCred = ({
           size={'$5'}
           color={cardStatus === 'remove' ? '$error' : '$color12'}
         >
-          {cardStatus === 'remove' ? 'Remove Passkey?' : cred.display_name}
+          {cardStatus === 'remove' ? t('passkeys.list.removePrompt') : cred.display_name}
         </Paragraph>
         {cardStatus !== 'remove' && (
           <Button
@@ -256,7 +265,7 @@ const WebAuthnCred = ({
                 hoverStyle={{ borderColor: '$error' }}
                 onPress={() => setCardStatus('remove')}
               >
-                REMOVE PASSKEY
+                {t('passkeys.list.removeAction')}
               </Button>
             )
           case 'remove':
@@ -272,13 +281,19 @@ const WebAuthnCred = ({
               <>
                 <YStack gap={'$3.5'} $gtLg={{ flexDirection: 'row' }}>
                   {cred.created_at && (
-                    <CardTextBlock label="Created At" text={formatTimeDate(cred.created_at)} />
+                    <CardTextBlock
+                      label={t('passkeys.list.labels.createdAt')}
+                      text={formatTimeDate(cred.created_at)}
+                    />
                   )}
                   {keySlot ? (
-                    <CardTextBlock label="Key Slot" text={keySlot.toString().padStart(2, '0')} />
+                    <CardTextBlock
+                      label={t('passkeys.list.labels.keySlot')}
+                      text={keySlot.toString().padStart(2, '0')}
+                    />
                   ) : activeIndex !== -1 ? (
                     <CardTextBlock
-                      label="Key Slot"
+                      label={t('passkeys.list.labels.keySlot')}
                       text={activeIndex.toString().padStart(2, '0')}
                     />
                   ) : null}
@@ -302,8 +317,8 @@ const WebAuthnCred = ({
                       return (
                         <YStack gap={'$3'} ai="flex-start">
                           <CardTextBlock
-                            label="Status"
-                            text="Passkey is not confirmed onchain. Finish confirming the passkey onchain."
+                            label={t('passkeys.list.labels.status')}
+                            text={t('passkeys.list.status.notConfirmed')}
                             warningText
                           />
                           <PrimaryButton
@@ -319,7 +334,7 @@ const WebAuthnCred = ({
                                 color: '$color12',
                               }}
                             >
-                              CONFIRM
+                              {t('common.confirm')}
                             </PrimaryButton.Text>
                           </PrimaryButton>
                         </YStack>
@@ -496,6 +511,7 @@ const RemovePasskeyConfirmation = ({
     isLoadingUserOp ||
     isLoadingUsdcBal
   const inputVal = form.watch('name', '')
+  const { t } = useTranslation('account')
 
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
@@ -516,7 +532,7 @@ const RemovePasskeyConfirmation = ({
               color: '$color12',
             }}
           >
-            CANCEL
+            {t('common.cancel')}
           </PrimaryButton.Text>
         </PrimaryButton>
         <SubmitButton
@@ -535,12 +551,12 @@ const RemovePasskeyConfirmation = ({
               color: '$color12',
             }}
           >
-            REMOVE
+            {t('common.remove')}
           </Button.Text>
         </SubmitButton>
       </XStack>
     ),
-    [onCancel, isLoading, displayName, inputVal, isDarkTheme]
+    [onCancel, isLoading, displayName, inputVal, isDarkTheme, t]
   )
 
   const onSubmit = async () => {
@@ -551,7 +567,7 @@ const RemovePasskeyConfirmation = ({
         throwIf(gasFeesError)
         throwIf(userOpError)
         throwIf(usdcBalError)
-        assert((usdcBal?.value ?? 0n) > 0n, 'No USDC balance to pay for gas fees')
+        assert((usdcBal?.value ?? 0n) > 0n, t('passkeys.list.errors.noBalance'))
         assert(!!userOp, 'User op is required')
 
         await sendUserOp({ userOp, webauthnCreds })
@@ -612,14 +628,14 @@ const RemovePasskeyConfirmation = ({
         {({ name: nameCheck }) => (
           <YStack gap={'$3.5'}>
             <Text fontWeight={'400'} fontSize={'$5'} color="$color12">
-              Removing &quot;{displayName}&quot; as a signer on your Send account.{' '}
+              {t('passkeys.list.remove.title', { name: displayName })}{' '}
               <Text
                 fontWeight={'400'}
                 fontSize={'$5'}
                 $theme-dark={{ color: '$warning' }}
                 $theme-light={{ color: '$networkBnb' }}
               >
-                This cannot be undone.
+                {t('passkeys.list.remove.warning')}
               </Text>
             </Text>
 
@@ -630,7 +646,7 @@ const RemovePasskeyConfirmation = ({
                 $theme-dark={{ color: '$white' }}
                 $theme-light={{ color: '$black' }}
               >
-                Please enter &quot;{displayName}&quot; below
+                {t('passkeys.list.remove.prompt', { name: displayName })}
               </Text>
 
               {nameCheck}
@@ -668,6 +684,7 @@ const UpdateKeySlotButton = ({
   const queryClient = useQueryClient()
   const sendAcctCred = cred.send_account_credentials?.[0] // should be impossible but just in case
   const toast = useAppToast()
+  const { t } = useTranslation('account')
   const {
     mutate: updateKeySlot,
     isPending,
@@ -705,21 +722,26 @@ const UpdateKeySlotButton = ({
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['webauthn_credentials'] })
-      toast.show('Updated key slot')
+      toast.show(t('passkeys.list.updateKeySlot.toast'))
     },
   })
   const isDisabled = isSuccess || isPending
   return (
     <>
       <Paragraph fontWeight={'300'} color={'$warning'}>
-        Onchain Slot, {onchainSlot}, does not match Webauthn Slot {sendAcctCred?.key_slot ?? 'N/A'}.
-        This should never happen. Please update the key slot below.
+        {t('passkeys.list.updateKeySlot.message', {
+          onchainSlot,
+          storageSlot:
+            sendAcctCred?.key_slot !== undefined ? sendAcctCred.key_slot : t('common.notAvailable'),
+        })}
       </Paragraph>
       <Button onPress={() => updateKeySlot(onchainSlot)} disabled={isDisabled}>
-        Update Key Slot
+        {t('passkeys.list.updateKeySlot.cta')}
       </Button>
       {isError && <Paragraph color={'$error'}>{error?.message}</Paragraph>}
-      {isSuccess && <Paragraph color={'$primary'}>Updated key slot</Paragraph>}
+      {isSuccess && (
+        <Paragraph color={'$primary'}>{t('passkeys.list.updateKeySlot.toast')}</Paragraph>
+      )}
     </>
   )
 }
