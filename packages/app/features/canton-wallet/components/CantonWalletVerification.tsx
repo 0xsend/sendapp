@@ -34,7 +34,7 @@ import {
   IconSlash,
   IconX,
 } from 'app/components/icons'
-import { Check, Copy, Pencil, Search } from '@tamagui/lucide-icons'
+import { Check, Copy, Pencil } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import {
   type DistributionsVerificationsQuery,
@@ -835,7 +835,6 @@ function CantonWalletDiscoverableCard() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const toast = useAppToast()
-  const hoverStyles = useHoverStyles()
 
   const profileIsDiscoverable = profile?.canton_party_verifications?.is_discoverable ?? null
   const [optimisticValue, setOptimisticValue] = useState<boolean | null>(null)
@@ -887,20 +886,10 @@ function CantonWalletDiscoverableCard() {
 
   return (
     <FadeCard br={'$6'} jc={'space-between'} w={'100%'}>
-      <XStack width="100%" justifyContent="space-between" alignItems="center">
+      <XStack width="100%" justifyContent="space-between" alignItems="center" gap={'$2'}>
         <XStack gap={'$3.5'} alignItems={'center'} flex={1}>
-          <XStack
-            w={40}
-            h={40}
-            ai="center"
-            jc="center"
-            br="$3"
-            backgroundColor={hoverStyles.backgroundColor}
-          >
-            <Search size={'$1'} color={'$color12'} />
-          </XStack>
           <Paragraph size="$5" fontWeight="600" color="$color12">
-            Discoverable in Canton Wallet?
+            Account discoverable in Canton Wallet
           </Paragraph>
         </XStack>
         <XStack ai="center" jc="center" width={50}>
@@ -929,9 +918,6 @@ function CantonWalletDiscoverableCard() {
           )}
         </XStack>
       </XStack>
-      <Paragraph fontSize={'$5'} color="$color11">
-        Enable this to share your Send profile with the Canton Wallet community.
-      </Paragraph>
     </FadeCard>
   )
 }
