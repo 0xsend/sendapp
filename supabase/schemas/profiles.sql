@@ -58,6 +58,8 @@ ALTER TABLE ONLY "public"."profiles"
 
 -- Indexes
 CREATE INDEX "profiles_send_id_idx" ON "public"."profiles" USING "btree" ("send_id");
+-- Partial covering index for top_senders query: filters and includes all selected columns
+CREATE INDEX "profiles_public_avatar_idx" ON "public"."profiles" USING "btree" ("id", "name", "avatar_url", "send_id") WHERE "is_public" = TRUE AND "avatar_url" IS NOT NULL;
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."profiles"
