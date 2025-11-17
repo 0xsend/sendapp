@@ -215,6 +215,10 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         transition: 'filter linear 100ms',
                       }}
                       animateOnly={['transform', 'opacity']}
+                      px="$4.5"
+                      $xs={{
+                        px: '$2',
+                      }}
                     >
                       {/* TODO: move this to another component and memozie it to avoid re-rendering */}
                       <LegendList
@@ -399,7 +403,7 @@ const SendChatInput = Input.styleable((props) => {
               placeholderTextColor="$gray11"
               f={1}
               ref={inputRef}
-              autoFocus
+              autoFocus={false}
               value={message}
               onChangeText={setMessage}
               // use a placeholder that trigger the user to send some crypto with a message
