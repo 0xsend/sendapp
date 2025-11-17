@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS profiles_public_avatar_idx ON public.profiles USING btree (id, name, avatar_url, send_id) WHERE ((is_public = true) AND (avatar_url IS NOT NULL));
