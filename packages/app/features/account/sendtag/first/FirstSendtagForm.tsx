@@ -12,6 +12,7 @@ import { Platform } from 'react-native'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { assert } from 'app/utils/assert'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { useTranslation } from 'react-i18next'
 
 const SendtagSchemaWithoutRestrictions = z.object({
   name: formFields.text,
@@ -24,6 +25,7 @@ export const FirstSendtagForm = () => {
   const user = useUser()
   const sendAccount = useSendAccount()
   const { data: referralCode } = useReferralCodeQuery()
+  const { t } = useTranslation('account')
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -72,10 +74,10 @@ export const FirstSendtagForm = () => {
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <SubmitButton onPress={submit} disabled={!canSubmit}>
-        <SubmitButton.Text>register</SubmitButton.Text>
+        <SubmitButton.Text>{t('sendtag.buttons.register')}</SubmitButton.Text>
       </SubmitButton>
     ),
-    [canSubmit]
+    [canSubmit, t]
   )
 
   return (
@@ -83,14 +85,14 @@ export const FirstSendtagForm = () => {
       <FormProvider {...form}>
         <YStack gap="$2">
           <Paragraph w={'100%'} size={'$8'} fontWeight={600}>
-            Register first sendtag
+            {t('sendtag.header.first')}
           </Paragraph>
           <Paragraph
             fontSize={'$4'}
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Own your identity on Send. Register up to 5 verified tags and make them yours.
+            {t('sendtag.header.description')}
           </Paragraph>
         </YStack>
         <SchemaForm
@@ -102,7 +104,7 @@ export const FirstSendtagForm = () => {
           }}
           props={{
             name: {
-              placeholder: 'Input desired Sendtag',
+              placeholder: t('sendtag.labels.inputDesired'),
               color: '$color12',
               fontWeight: '500',
               bw: 0,

@@ -25,11 +25,13 @@ import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useThemeName } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 export function SendTagScreen() {
   const { tags, isLoading } = useUser()
   const { data: sendAccount } = useSendAccount()
   const [mainTagSheetOpen, setMainTagSheetOpen] = useState(false)
+  const { t } = useTranslation('account')
   const isFirstSendtagClaimable = Array.isArray(tags) && tags.length === 0
   const confirmedTags = Array.isArray(tags) ? tags.filter((tag) => tag.status === 'confirmed') : []
   const mainTagId = sendAccount?.main_tag_id
@@ -65,14 +67,14 @@ export function SendTagScreen() {
       <YStack gap="$5">
         <YStack gap="$2">
           <Paragraph w={'100%'} size={'$8'} fontWeight={600}>
-            {isFirstSendtagClaimable ? 'Register first Sendtag' : 'Verified Sendtags'}
+            {isFirstSendtagClaimable ? t('sendtag.header.first') : t('sendtag.header.verified')}
           </Paragraph>
           <Paragraph
             fontSize={'$4'}
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Own your identity on Send. Register up to 5 verified tags and make them yours.
+            {t('sendtag.header.description')}
           </Paragraph>
         </YStack>
         <SendtagList
@@ -102,6 +104,7 @@ function AddNewTagButton({
   const linkProps = useLink({
     href: isFirstSendtagClaimable ? '/account/sendtag/first' : '/account/sendtag/add',
   })
+  const { t } = useTranslation('account')
 
   if (tags && tags.length >= maxNumSendTags) {
     return null
@@ -115,7 +118,7 @@ function AddNewTagButton({
         </PrimaryButton.Icon>
       )}
       <PrimaryButton.Text>
-        {isFirstSendtagClaimable ? 'register free sendtag' : 'add new'}
+        {isFirstSendtagClaimable ? t('sendtag.buttons.registerFree') : t('sendtag.buttons.addNew')}
       </PrimaryButton.Text>
     </PrimaryButton>
   )
@@ -133,6 +136,7 @@ function SendtagList({
   const theme = useThemeName()
   const isDark = theme?.startsWith('dark')
   const hoverStyles = useHoverStyles()
+  const { t } = useTranslation('account')
 
   // State for delete dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -179,7 +183,7 @@ function SendtagList({
             hoverStyle={hoverStyles}
             bc={isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
           >
-            <Button.Text fontSize={'$5'}>Change Main Tag</Button.Text>
+            <Button.Text fontSize={'$5'}>{t('sendtag.buttons.changeMain')}</Button.Text>
           </Button>
         )}
       </FadeCard>
@@ -260,16 +264,17 @@ function MainTagSelectionSheet({
   const { refetch: refetchSendAccount, data: sendAccount } = useSendAccount()
   const { mutateAsync: updateMainTag, isPending } = api.sendAccount.updateMainTag.useMutation({
     onSuccess: async () => {
-      toast.show('Main tag updated')
+      toast.show(t('sendtag.toasts.mainUpdated'))
       await updateProfile()
       await refetchSendAccount()
       onOpenChange(false)
     },
     onError: (error) => {
-      toast.error('Failed to update main tag')
-      console.error('Failed to update main tag:', error)
+      toast.error(t('sendtag.toasts.mainUpdateFailed'))
+      console.error(t('sendtag.toasts.mainUpdateFailed'), error)
     },
   })
+  const { t } = useTranslation('account')
 
   const handleSelectTag = async (tagId: number) => {
     if (tagId === currentMainTagId || isPending || !sendAccount) return
@@ -280,10 +285,10 @@ function MainTagSelectionSheet({
   const dialogContent = (
     <>
       <H2 fontSize={'$7'} ta={'center'}>
-        Select Main Tag
+        {t('sendtag.sheet.title')}
       </H2>
       <Paragraph ta="center" size="$4" color="$color11">
-        Choose which tag appears as your primary identity
+        {t('sendtag.messages.choosePrimary')}
       </Paragraph>
       <YStack gap="$2">
         {tags.map((tag) => {
@@ -329,7 +334,7 @@ function MainTagSelectionSheet({
         <XStack ai="center" jc="center" gap="$2" mt="$2">
           <Spinner size="small" color="$primary" />
           <Paragraph size="$3" color="$color11">
-            Updating main tag...
+            {t('sendtag.messages.updatingMain')}
           </Paragraph>
         </XStack>
       )}

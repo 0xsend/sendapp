@@ -37,6 +37,7 @@ import {
 } from '../checkout-utils'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { useLink } from 'solito/link'
+import { useTranslation } from 'react-i18next'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
@@ -55,6 +56,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { data: rewardDue } = useReferralReward({ tags: pendingTags })
   const { data: referralCode } = useReferralCodeQuery()
   const { coin: usdc, tokensQuery, isLoading: isLoadingUSDC } = useCoin('USDC')
+  const { t } = useTranslation('account')
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -157,7 +159,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       if (userOpReceipt.success) {
         setSentTx(userOpReceipt.receipt.transactionHash)
       } else {
-        setError(`Something went wrong: ${userOpReceipt.receipt.transactionHash}`)
+        setError(`${t('sendtag.messages.genericError')}: ${userOpReceipt.receipt.transactionHash}`)
       }
     },
     onSettled: () => {
@@ -174,7 +176,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
     } catch (e) {
       const msg = (e.details ?? e.message)?.split('.').at(0)
       console.error(msg, e)
-      setError(msg)
+      setError(msg ?? t('sendtag.messages.genericError'))
     }
   }
 
@@ -212,7 +214,9 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
               return
             }
           }
-          setError((err?.details ?? err?.message)?.split('.').at(0) ?? 'Something went wrong')
+          setError(
+            (err?.details ?? err?.message)?.split('.').at(0) ?? t('sendtag.messages.genericError')
+          )
         })
         .finally(() => {
           setSubmitting(false)
@@ -226,6 +230,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       updateProfile,
       referralCode,
       queryClient.invalidateQueries,
+      t,
     ]
   )
 
@@ -270,7 +275,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   if (canRetry) {
     return (
       <ConfirmButtonError
-        buttonText={'Retry'}
+        buttonText={t('sendtag.checkout.retry')}
         onPress={() => {
           setError(undefined)
           switch (true) {
@@ -322,40 +327,42 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
             return (
               <PrimaryButton disabled gap="$1.5">
                 <Spinner theme={theme} />
-                <PrimaryButton.Text>loading...</PrimaryButton.Text>
+                <PrimaryButton.Text>{t('sendtag.checkout.loading')}</PrimaryButton.Text>
               </PrimaryButton>
             )
           case !canAffordTags && (!txWaitLoading || !submitting):
             return (
               <PrimaryButton theme="red" testID="checkout-deposit-button" {...depositLinkProps}>
-                <PrimaryButton.Text color={'$white'}>Deposit USDC</PrimaryButton.Text>
+                <PrimaryButton.Text color={'$white'}>
+                  {t('sendtag.checkout.deposit')}
+                </PrimaryButton.Text>
               </PrimaryButton>
             )
           case sendTransactionIsPending:
             return (
               <PrimaryButton disabled gap="$1.5">
                 <Spinner theme={theme} />
-                <PrimaryButton.Text>requesting...</PrimaryButton.Text>
+                <PrimaryButton.Text>{t('sendtag.checkout.requesting')}</PrimaryButton.Text>
               </PrimaryButton>
             )
           case txWaitLoading:
             return (
               <PrimaryButton disabled gap="$1.5">
                 <Spinner theme={theme} />
-                <PrimaryButton.Text>processing...</PrimaryButton.Text>
+                <PrimaryButton.Text>{t('sendtag.checkout.processing')}</PrimaryButton.Text>
               </PrimaryButton>
             )
           case submitting:
             return (
               <PrimaryButton disabled gap="$1.5">
                 <Spinner theme={theme} />
-                <PrimaryButton.Text>registering...</PrimaryButton.Text>
+                <PrimaryButton.Text>{t('sendtag.checkout.registering')}</PrimaryButton.Text>
               </PrimaryButton>
             )
           default:
             return (
               <PrimaryButton disabled={!canSubmit} onPress={handleCheckoutTx}>
-                <PrimaryButton.Text>complete purchase</PrimaryButton.Text>
+                <PrimaryButton.Text>{t('sendtag.checkout.complete')}</PrimaryButton.Text>
               </PrimaryButton>
             )
         }
@@ -372,6 +379,7 @@ const ConfirmButtonError = ({
   ...props
 }: ButtonProps & { buttonText?: string }) => {
   const media = useMedia()
+  const { t } = useTranslation('account')
   return (
     <Tooltip open={true} placement={media.gtMd ? 'right' : 'bottom'}>
       <Tooltip.Content
@@ -400,7 +408,7 @@ const ConfirmButtonError = ({
       </Tooltip.Content>
       <Tooltip.Trigger>
         <Button theme="green" py={'$5'} br={'$4'} onPress={onPress} {...props}>
-          <PrimaryButton.Text>{buttonText || 'error'}</PrimaryButton.Text>
+          <PrimaryButton.Text>{buttonText || t('sendtag.checkout.error')}</PrimaryButton.Text>
           <ButtonIcon>
             <AlertTriangle color={'$error'} size={'$1'} />
           </ButtonIcon>

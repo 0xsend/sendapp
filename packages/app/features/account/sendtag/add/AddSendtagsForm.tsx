@@ -27,6 +27,7 @@ import { useReleaseTag } from 'app/features/account/sendtag/checkout/checkout-ut
 import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -43,6 +44,7 @@ export const AddSendtagsForm = () => {
   const linkProps = useLink({
     href: '/account/sendtag/checkout',
   })
+  const { t } = useTranslation('account')
 
   const { mutateAsync: createTagMutateAsync, isPending: isCreateSendtagLoading } =
     api.tag.create.useMutation()
@@ -56,7 +58,7 @@ export const AddSendtagsForm = () => {
     if (error || !data) {
       form.setError('name', {
         type: 'custom',
-        message: error?.errors?.[0]?.message ?? 'Invalid input',
+        message: error?.errors?.[0]?.message ?? t('sendtag.messages.invalidInput'),
       })
       return
     }
@@ -69,11 +71,14 @@ export const AddSendtagsForm = () => {
     } catch (error) {
       console.error("Couldn't create Sendtag", error)
       if (error?.message?.includes('already taken')) {
-        form.setError('name', { type: 'custom', message: 'This Sendtag is already taken' })
+        form.setError('name', {
+          type: 'custom',
+          message: t('sendtag.messages.alreadyTaken'),
+        })
       } else {
         form.setError('name', {
           type: 'custom',
-          message: error?.message ?? 'Something went wrong',
+          message: error?.message ?? t('sendtag.messages.genericError'),
         })
       }
     }
@@ -85,7 +90,9 @@ export const AddSendtagsForm = () => {
         <FormProvider {...form}>
           {!has5Tags && (
             <YStack gap={'$3.5'}>
-              <RowLabel>{hasPendingTags ? 'Add Another Sendtag' : 'Create a New Sendtag'}</RowLabel>
+              <RowLabel>
+                {hasPendingTags ? t('sendtag.labels.addAnother') : t('sendtag.labels.createNew')}
+              </RowLabel>
               <FadeCard>
                 <SchemaForm
                   form={form}
@@ -97,8 +104,8 @@ export const AddSendtagsForm = () => {
                   props={{
                     name: {
                       autoFocus: Platform.OS === 'web',
-                      'aria-label': 'Sendtag name',
-                      placeholder: 'Enter Sendtag name',
+                      'aria-label': t('sendtag.labels.sendtagName'),
+                      placeholder: t('sendtag.labels.enterName'),
                       lineHeight: 30,
                       color: '$color12',
                       fontWeight: '500',
@@ -171,7 +178,7 @@ export const AddSendtagsForm = () => {
                               $theme-light={{ color: '$color12' }}
                               lineHeight={25}
                             >
-                              ADD TAG
+                              {t('sendtag.buttons.addTag')}
                             </PrimaryButton.Text>
                           </PrimaryButton>
                         </XStack>
@@ -185,13 +192,15 @@ export const AddSendtagsForm = () => {
           {hasPendingTags && (
             <YStack gap={'$3.5'}>
               <RowLabel>
-                Sendtags [ {pendingTags?.length || 0}/
-                {maxNumSendTags - (confirmedTags?.length || 0)} ]
+                {t('sendtag.labels.pendingList', {
+                  pending: pendingTags?.length ?? 0,
+                  remaining: maxNumSendTags - (confirmedTags?.length || 0),
+                })}
               </RowLabel>
               <FadeCard>
                 <XStack jc={'space-between'}>
-                  <Paragraph size={'$6'}>Name</Paragraph>
-                  <Paragraph size={'$6'}>Price</Paragraph>
+                  <Paragraph size={'$6'}>{t('sendtag.labels.name')}</Paragraph>
+                  <Paragraph size={'$6'}>{t('sendtag.labels.price')}</Paragraph>
                 </XStack>
                 <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
                 <YStack aria-labelledby="checkout-pending-tags-label" gap={'$2'}>
@@ -259,10 +268,10 @@ export const AddSendtagsForm = () => {
           $theme-light={{ color: '$darkGrayTextField' }}
           ta={'center'}
         >
-          Your Sendtag will be secured after payment confirmation
+          {t('sendtag.messages.securedAfterPayment')}
         </Paragraph>
         <PrimaryButton disabled={!hasPendingTags} {...linkProps}>
-          <PrimaryButton.Text>continue</PrimaryButton.Text>
+          <PrimaryButton.Text>{t('sendtag.buttons.continue')}</PrimaryButton.Text>
         </PrimaryButton>
       </YStack>
     </>
@@ -277,6 +286,7 @@ function ConfirmTagPrice({ tag }: { tag: { name: string } }) {
 function TotalPrice() {
   const pendingTags = usePendingTags()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
+  const { t } = useTranslation('account')
 
   return (
     <XStack jc={'space-between'} ai="center">
@@ -285,7 +295,7 @@ function TotalPrice() {
         color={'$lightGrayTextField'}
         $theme-light={{ color: '$darkGrayTextField' }}
       >
-        Total
+        {t('sendtag.labels.total')}
       </Paragraph>
       <Paragraph fontWeight={'500'} fontSize={'$8'} lineHeight={'$8'}>
         {formatUnits(_total, usdcCoin.decimals)} USDC
