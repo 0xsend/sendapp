@@ -7,9 +7,13 @@ import {
   createStyledContext,
   Input,
   LinearGradient,
+  Portal,
   SizableText,
+  useControllableState,
+  useMedia,
   usePresence,
   useThemeName,
+  useWindowDimensions,
   View,
   XStack,
   YStack,
@@ -72,8 +76,22 @@ const SendChatContext = createStyledContext<{
   setActivePage: () => {},
 })
 
-export const SendChat = () => {
+interface SendChatProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
+  const { height } = useWindowDimensions()
   const [chats, setChats] = useState(initialChats)
+
+  const { lg } = useMedia()
+
+  const [open, setOpen] = useControllableState({
+    defaultProp: false,
+    prop: openProp,
+    onChange: onOpenChangeProp,
+  })
 
   const [activePage, setActivePage] = useState<'chat' | 'enterAmount'>('chat')
 
@@ -97,72 +115,165 @@ export const SendChat = () => {
   const keyExtractor = useCallback((item: Chat) => item.id, [])
 
   return (
-    <SendChatContext.Provider activePage={activePage} setActivePage={setActivePage}>
-      <View jc="flex-end" mih={700} f={1} py="$4">
-        <View
-          animation="responsive"
-          h={activePage === 'chat' ? 700 : 500}
-          w={400}
-          animateOnly={['height']}
-        >
-          <YStack
-            br="$8"
-            btlr="$11"
-            elevation="$3"
-            shadowOpacity={0.4}
-            ov="hidden"
-            f={1}
-            bg="$color1"
-          >
-            <SendChatHeader />
-            <View
-              animation={[
-                'responsive',
-                {
-                  opacity: '100ms',
-                  transform: 'responsive',
-                },
-              ]}
-              scaleY={activePage === 'chat' ? 1 : 0.5}
-              opacity={activePage === 'chat' ? 1 : 0}
-              y={activePage === 'chat' ? 0 : -50}
-              f={1}
-              $platform-web={{
-                willChange: 'transform',
-                filter: activePage === 'chat' ? 'blur(0px)' : 'blur(4px)',
-                transition: 'filter linear 100ms',
-              }}
-              animateOnly={['transform', 'opacity']}
-            >
-              {/* TODO: move this to another component and memozie it to avoid re-rendering */}
-              <LegendList
-                recycleItems
-                maintainScrollAtEnd
-                alignItemsAtEnd
-                maintainVisibleContentPosition
-                initialScrollIndex={chats.length - 1}
-                data={chats}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                style={{
-                  paddingHorizontal: 12,
+    <Portal>
+      <SendChatContext.Provider activePage={activePage} setActivePage={setActivePage}>
+        <AnimatePresence>
+          {open && (
+            <View ai="center" jc="center" pos="absolute" zi={10} inset={0}>
+              <View
+                animation={[
+                  'smoothResponsive',
+                  {
+                    opacity: '100ms',
+                    y: lg
+                      ? 'smoothResponsive'
+                      : {
+                          damping: 35,
+                          stiffness: 500,
+                          mass: 1,
+                        },
+                    rotateZ: lg
+                      ? '100ms'
+                      : {
+                          damping: 50,
+                          stiffness: 300,
+                          mass: 1,
+                        },
+                  },
+                ]}
+                animateOnly={['transform', 'opacity']}
+                filter="blur(0px)"
+                enterStyle={
+                  lg
+                    ? {
+                        y: height,
+                        opacity: 0,
+                      }
+                    : {
+                        scale: 1.5,
+                        y: height,
+                        rotateZ: '6deg',
+                        transformOrigin: 'right top',
+                      }
+                }
+                exitStyle={
+                  lg
+                    ? {
+                        y: height,
+                        opacity: 0,
+                      }
+                    : {
+                        scale: 1.2,
+                        opacity: 0,
+                        rotateZ: '3deg',
+                        y: height,
+                      }
+                }
+                rotateZ="0deg"
+                y={lg ? -65 : 0}
+                w={700}
+                maw="95%"
+                pe="auto"
+                jc="center"
+                $lg={{
+                  jc: 'flex-end',
                 }}
-              />
+                mih={700}
+                f={1}
+                py="$4"
+              >
+                <YStack
+                  animation="responsive"
+                  h={activePage === 'chat' ? height * 0.9 : 500}
+                  animateOnly={['height']}
+                >
+                  <YStack
+                    br="$8"
+                    btlr="$11"
+                    elevation="$9"
+                    shadowOpacity={0.4}
+                    ov="hidden"
+                    f={1}
+                    bg="$color1"
+                  >
+                    <SendChatHeader onClose={() => setOpen(false)} />
+                    <View
+                      animation={[
+                        'responsive',
+                        {
+                          opacity: '100ms',
+                          transform: 'responsive',
+                        },
+                      ]}
+                      scaleY={activePage === 'chat' ? 1 : 0.5}
+                      opacity={activePage === 'chat' ? 1 : 0}
+                      y={activePage === 'chat' ? 0 : -50}
+                      f={1}
+                      $platform-web={{
+                        willChange: 'transform',
+                        filter: activePage === 'chat' ? 'blur(0px)' : 'blur(4px)',
+                        transition: 'filter linear 100ms',
+                      }}
+                      animateOnly={['transform', 'opacity']}
+                    >
+                      {/* TODO: move this to another component and memozie it to avoid re-rendering */}
+                      <LegendList
+                        recycleItems
+                        maintainScrollAtEnd
+                        alignItemsAtEnd
+                        maintainVisibleContentPosition
+                        initialScrollIndex={chats.length - 1}
+                        data={chats}
+                        renderItem={renderItem}
+                        keyExtractor={keyExtractor}
+                        style={{
+                          paddingHorizontal: 12,
+                        }}
+                      />
+                    </View>
+                    <SendChatInput />
+                    <AnimatePresence>
+                      {activePage === 'enterAmount' && (
+                        <EnterAmountNoteSection
+                          key="enterAmount"
+                          onPress={() => setActivePage('chat')}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </YStack>
+                </YStack>
+              </View>
             </View>
-            <SendChatInput />
-            <AnimatePresence>
-              {activePage === 'enterAmount' && (
-                <EnterAmountNoteSection key="enterAmount" onPress={() => setActivePage('chat')} />
-              )}
-            </AnimatePresence>
-          </YStack>
-        </View>
-      </View>
-    </SendChatContext.Provider>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {open && (
+            <View
+              pe="auto"
+              tag="button"
+              role="button"
+              aria-label="Close send chat"
+              aria-expanded={open}
+              tabIndex={0}
+              onPress={() => setOpen(false)}
+              key="overlay-send-chat"
+              enterStyle={{ opacity: 0 }}
+              exitStyle={{ opacity: 0 }}
+              animation="200ms"
+              animateOnly={['opacity']}
+              bg="$gray10Dark"
+              opacity={0.7}
+              pos="absolute"
+              inset={0}
+            />
+          )}
+        </AnimatePresence>
+      </SendChatContext.Provider>
+    </Portal>
   )
 }
 
-const SendChatHeader = () => {
+const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
   const themeName = useThemeName()
 
   const isDark = themeName.includes('dark')
@@ -224,6 +335,7 @@ const SendChatHeader = () => {
           boc: '$aztec4',
           scale: 0.9,
         }}
+        onPress={onClose}
       >
         <Button.Icon scaleIcon={1.2}>
           <X />
