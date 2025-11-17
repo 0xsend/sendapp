@@ -17,7 +17,8 @@
     "web:prod": "yarn workspace next-app build",
     "web:prod:serve": "yarn workspace next-app serve",
     "fix": "manypkg fix",
-    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn check-deps && yarn build)",
+    "patch-package": "patch-package",
+    "postinstall": "test -n \"$SKIP_YARN_POST_INSTALL\" || (yarn patch-package && yarn check-deps && yarn build)",
     "build": "yarn workspaces foreach --all --exclude next-app run build",
     "biome:check": "yarn run biome check .",
     "biome:check:fix": "yarn run biome check . --write",
@@ -67,6 +68,7 @@
     "@postgrestools/postgrestools": "^0.6.1",
     "dotenv-cli": "^7.3.0",
     "lefthook": "^1.5.5",
+    "patch-package": "^8.0.1",
     "zx": "^8.1.2"
   }
 }

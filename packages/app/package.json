@@ -18,6 +18,7 @@
     "@coinbase/onchainkit": "^0.38.1",
     "@intercom/intercom-react-native": "^8.6.0",
     "@intercom/messenger-js-sdk": "^0.0.14",
+    "@legendapp/list": "^2.0.15",
     "@marsidev/react-turnstile": "^0.7.1",
     "@my/supabase": "workspace:*",
     "@my/ui": "workspace:*",

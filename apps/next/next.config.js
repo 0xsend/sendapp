@@ -101,6 +101,7 @@ export default () => {
       },
     },
     transpilePackages: [
+      '@legendapp/list',
       'solito',
       'react-native-web',
       'react-native-reanimated',
