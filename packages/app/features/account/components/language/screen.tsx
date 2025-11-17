@@ -8,7 +8,7 @@ import { getSupportedLocaleOptions } from 'app/i18n/locales'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 export const LanguagePreferences = () => {
-  const { i18n, t } = useTranslation('settings')
+  const { i18n, t } = useTranslation('account')
   const [pendingLocale, setPendingLocale] = useState<string | null>(null)
   const resolvedLanguage = i18n.resolvedLanguage ?? i18n.language
 

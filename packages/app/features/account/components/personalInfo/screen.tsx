@@ -23,6 +23,7 @@ import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
 import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
 import { ReadOnlyFieldWithLabel } from 'app/features/account/components/ReadOnlyFieldWithLabel'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 enum FormState {
   Overview = 'Overview',
@@ -53,10 +54,11 @@ export const PersonalInfoScreen = () => {
   const { mutateAsync: mutateProfileAsync } = useProfileMutation()
   const [formState, setFormState] = useState<FormState>(FormState.Overview)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const { t } = useTranslation('account')
 
   async function handleSuccessCodeVerification() {
     setFormState(FormState.Overview)
-    toast.show('Phone number updated')
+    toast.show(t('personalInfo.toast.phoneUpdated'))
 
     if (!isWeb) {
       await supabase.auth.refreshSession()
@@ -124,14 +126,14 @@ export const PersonalInfoScreen = () => {
       onSubmit={handleSubmit}
       props={{
         phone: {
-          'aria-label': 'Phone number',
+          'aria-label': t('personalInfo.labels.phone'),
           autoComplete: 'tel',
           keyboardType: 'phone-pad',
           autoCapitalize: 'none',
           bc: '$color0',
         },
         xUsername: {
-          'aria-label': 'X username',
+          'aria-label': t('personalInfo.labels.xUsername'),
           bc: '$color0',
           pl: '$8',
           iconBefore: (
@@ -146,7 +148,7 @@ export const PersonalInfoScreen = () => {
           ),
         },
         birthday: {
-          'aria-label': 'birthday',
+          'aria-label': t('personalInfo.labels.birthday'),
           bc: '$color0',
           customDateFormatter: formatDate,
           disabled: Boolean(profile?.birthday),
@@ -167,16 +169,20 @@ export const PersonalInfoScreen = () => {
       {({ birthday, xUsername }) => (
         <YStack gap={'$3.5'}>
           <FadeCard>
-            <FieldWithLabel label={'Date of Birth'} additionalInfo={'(non-editable)'} gap={'$2'}>
+            <FieldWithLabel
+              label={t('personalInfo.labels.dateOfBirth')}
+              additionalInfo={t('personalInfo.labels.nonEditable')}
+              gap={'$2'}
+            >
               {birthday}
             </FieldWithLabel>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-            <FieldWithLabel label={'X Handle'} gap={'$2'}>
+            <FieldWithLabel label={t('personalInfo.labels.xHandle')} gap={'$2'}>
               {xUsername}
             </FieldWithLabel>
           </FadeCard>
           <SubmitButton onPress={() => form.handleSubmit(handleSubmit)()}>
-            <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
+            <SubmitButton.Text>{t('common.saveChanges')}</SubmitButton.Text>
           </SubmitButton>
           {errorMessage && (
             <Paragraph theme="red" color="$color9">
@@ -192,18 +198,18 @@ export const PersonalInfoScreen = () => {
     <YStack gap={'$5'}>
       <FadeCard>
         <ReadOnlyFieldWithLabel
-          label={'Date of Birth'}
+          label={t('personalInfo.labels.dateOfBirth')}
           text={formatDate(birthday) || '-'}
-          additionalInfo={'(non-editable)'}
+          additionalInfo={t('personalInfo.labels.nonEditable')}
         />
         <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
         <ReadOnlyFieldWithLabel
-          label={'X Handle'}
+          label={t('personalInfo.labels.xHandle')}
           text={profile?.x_username ? `@ ${profile?.x_username}` : '-'}
         />
       </FadeCard>
       <SubmitButton onPress={() => setFormState(FormState.PersonalInfoForm)}>
-        <SubmitButton.Text>edit personal information</SubmitButton.Text>
+        <SubmitButton.Text>{t('personalInfo.overview.edit')}</SubmitButton.Text>
       </SubmitButton>
     </YStack>
   )
@@ -211,7 +217,7 @@ export const PersonalInfoScreen = () => {
   return (
     <YStack w={'100%'}>
       <YStack gap={'$3.5'}>
-        {Platform.OS === 'web' && <SettingsHeader>Personal Information</SettingsHeader>}
+        {Platform.OS === 'web' && <SettingsHeader>{t('personalInfo.header')}</SettingsHeader>}
         <FormProvider {...form}>
           {(() => {
             switch (formState) {
