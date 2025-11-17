@@ -63,6 +63,7 @@ type Override = {
       canton_wallet_address?: string;
       created_at?: string;
       updated_at?: string;
+      is_discoverable?: string;
       users?: string;
     };
   }

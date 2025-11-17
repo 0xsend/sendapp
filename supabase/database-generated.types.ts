@@ -76,6 +76,7 @@ export type Database = {
           canton_wallet_address: string
           created_at: string
           id: string
+          is_discoverable: boolean | null
           updated_at: string | null
           user_id: string
         }
@@ -83,6 +84,7 @@ export type Database = {
           canton_wallet_address: string
           created_at?: string
           id?: string
+          is_discoverable?: boolean | null
           updated_at?: string | null
           user_id: string
         }
@@ -90,6 +92,7 @@ export type Database = {
           canton_wallet_address?: string
           created_at?: string
           id?: string
+          is_discoverable?: boolean | null
           updated_at?: string | null
           user_id?: string
         }
@@ -436,6 +439,7 @@ export type Database = {
             canton_wallet_address: string
             created_at: string
             id: string
+            is_discoverable: boolean | null
             updated_at: string | null
             user_id: string
           } | null
@@ -1854,6 +1858,7 @@ export type Database = {
           canton_wallet_address: string
           created_at: string
           id: string
+          is_discoverable: boolean | null
           updated_at: string | null
           user_id: string
         }
