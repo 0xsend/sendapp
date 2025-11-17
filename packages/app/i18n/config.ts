@@ -6,6 +6,8 @@ import type { Locale } from 'expo-localization'
 import { getStoredLocale, setStoredLocale } from '../utils/i18n/localeStorage'
 import commonEn from './resources/common/en.json'
 import commonEs from './resources/common/es.json'
+import accountEn from './resources/account/en.json'
+import accountEs from './resources/account/es.json'
 import activityEn from './resources/activity/en.json'
 import activityEs from './resources/activity/es.json'
 import homeEn from './resources/home/en.json'
@@ -25,6 +27,7 @@ export const DEFAULT_LOCALE = 'en'
 export const resources = {
   en: {
     [DEFAULT_NAMESPACE]: commonEn,
+    account: accountEn,
     activity: activityEn,
     home: homeEn,
     navigation: navigationEn,
@@ -34,6 +37,7 @@ export const resources = {
   },
   es: {
     [DEFAULT_NAMESPACE]: commonEs,
+    account: accountEs,
     activity: activityEs,
     home: homeEs,
     navigation: navigationEs,

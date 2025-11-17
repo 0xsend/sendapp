@@ -17,6 +17,7 @@ import {
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -29,6 +30,7 @@ const iconProps = {
 export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
   const { openChat } = useIntercom()
+  const { t } = useTranslation('account')
 
   const handleSignOut = useCallback(() => {
     void supabase.auth.signOut()
@@ -53,44 +55,72 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   return (
     <YStack gap={'$5'} pb={'$3.5'}>
       <YStack gap={'$3.5'}>
-        <RowLabel>Settings</RowLabel>
+        <RowLabel>{t('links.sections.settings')}</RowLabel>
         <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
-            <AccountNavLink text="Profile" href="/account/edit-profile" icon={icons.account} />
+            <AccountNavLink
+              text={t('links.items.profile')}
+              href="/account/edit-profile"
+              icon={icons.account}
+            />
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink
-              text="Personal Information"
+              text={t('links.items.personalInfo')}
               href="/account/personal-info"
               icon={icons.idCard}
             />
           </YGroup.Item>
           <YGroup.Item>
-            <AccountNavLink text="Language" href="/account/language" icon={icons.worldSearch} />
+            <AccountNavLink
+              text={t('links.items.language')}
+              href="/account/language"
+              icon={icons.worldSearch}
+            />
           </YGroup.Item>
           <YGroup.Item>
-            <AccountNavLink text="Link In Bio" href="/account/link-in-bio" icon={icons.xLogo} />
+            <AccountNavLink
+              text={t('links.items.linkInBio')}
+              href="/account/link-in-bio"
+              icon={icons.xLogo}
+            />
           </YGroup.Item>
           <YGroup.Item>
-            <AccountNavLink text="Passkeys" href="/account/backup" icon={icons.fingerprint} />
+            <AccountNavLink
+              text={t('links.items.passkeys')}
+              href="/account/backup"
+              icon={icons.fingerprint}
+            />
           </YGroup.Item>
           <YGroup.Item>
-            <AccountNavLink text="Sendtags" href="/account/sendtag" icon={icons.slash} />
+            <AccountNavLink
+              text={t('links.items.sendtags')}
+              href="/account/sendtag"
+              icon={icons.slash}
+            />
           </YGroup.Item>
           <YGroup.Item>
-            <AccountNavLink text="Rewards" href="/rewards" icon={icons.starOutline} />
+            <AccountNavLink
+              text={t('links.items.rewards')}
+              href="/rewards"
+              icon={icons.starOutline}
+            />
           </YGroup.Item>
           <YGroup.Item>
-            <AccountNavLink text="Referrals" href="/account/affiliate" icon={icons.dollar} />
+            <AccountNavLink
+              text={t('links.items.referrals')}
+              href="/account/affiliate"
+              icon={icons.dollar}
+            />
           </YGroup.Item>
         </YGroup>
       </YStack>
       <YStack gap={'$3.5'}>
-        <RowLabel>Support</RowLabel>
+        <RowLabel>{t('links.sections.support')}</RowLabel>
         <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
             <AccountNavLink
-              text="Learn more about Send"
+              text={t('links.items.learnMore')}
               href="https://support.send.app/en/"
               target="_blank"
               icon={icons.infoCircle}
@@ -98,7 +128,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink
-              text="Live Chat Support"
+              text={t('links.items.liveChat')}
               onPress={openChat}
               icon={icons.questionCircle}
             />
@@ -109,7 +139,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
         <PrimaryButton.Icon>
           <IconLogout {...iconProps} color={'$black'} />
         </PrimaryButton.Icon>
-        <PrimaryButton.Text>sign out</PrimaryButton.Text>
+        <PrimaryButton.Text>{t('links.signOut')}</PrimaryButton.Text>
       </PrimaryButton>
     </YStack>
   )

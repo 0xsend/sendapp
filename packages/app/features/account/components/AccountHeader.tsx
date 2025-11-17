@@ -24,6 +24,7 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Link } from 'solito/link'
 import { Platform, Share } from 'react-native'
 import { ShareProfileDialog } from './ShareProfileDialog'
+import { useTranslation } from 'react-i18next'
 
 const icons = {
   account: <IconAccount color={'$primary'} $theme-light={{ color: '$color12' }} />,
@@ -35,6 +36,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   const { profile, distributionShares } = useUser()
   const hoverStyles = useHoverStyles()
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const { t } = useTranslation('account')
 
   const avatar_url = useMemo(() => profile?.avatar_url, [profile?.avatar_url])
   const name = useMemo(() => profile?.name, [profile?.name])
@@ -152,7 +154,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                         $theme-dark={{ col: '$white' }}
                         $theme-light={{ col: '$black' }}
                       >
-                        Not verified
+                        {t('header.verification.notVerified')}
                       </Paragraph>
                     </Tooltip.Content>
                     <Tooltip.Trigger
@@ -190,7 +192,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
             hoverStyle={hoverStyles}
           >
             <Button.Icon>{icons.share}</Button.Icon>
-            <Button.Text size={'$5'}>Invite Friends</Button.Text>
+            <Button.Text size={'$5'}>{t('header.actions.invite')}</Button.Text>
           </Button>
           <Button
             elevation="$0.75"
@@ -203,7 +205,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
             onPress={handleOpenShareDialog}
           >
             <Button.Icon>{icons.qrFull}</Button.Icon>
-            <Button.Text size="$5">Share Profile</Button.Text>
+            <Button.Text size="$5">{t('header.actions.share')}</Button.Text>
           </Button>
           <ShareProfileDialog isOpen={isShareDialogOpen} onClose={handleCloseShareDialog} />
         </XStack>

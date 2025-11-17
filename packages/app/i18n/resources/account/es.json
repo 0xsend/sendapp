@@ -1,0 +1,49 @@
+{
+  "header": {
+    "verification": {
+      "notVerified": "Sin verificar"
+    },
+    "actions": {
+      "invite": "Invitar a amigos",
+      "share": "Compartir perfil"
+    }
+  },
+  "links": {
+    "sections": {
+      "settings": "Configuración",
+      "support": "Soporte"
+    },
+    "items": {
+      "profile": "Perfil",
+      "personalInfo": "Información personal",
+      "language": "Idioma",
+      "linkInBio": "Enlace en la biografía",
+      "passkeys": "Llaves de acceso",
+      "sendtags": "Sendtags",
+      "rewards": "Recompensas",
+      "referrals": "Referidos",
+      "learnMore": "Más información sobre Send",
+      "liveChat": "Soporte por chat en vivo"
+    },
+    "signOut": "cerrar sesión"
+  },
+  "share": {
+    "title": "Compartir perfil",
+    "actions": {
+      "copy": "copiar enlace"
+    },
+    "toast": {
+      "copied": "Enlace del perfil copiado al portapapeles",
+      "copyError": {
+        "title": "No se pudo copiar el enlace",
+        "message": "Algo salió mal al copiar el enlace"
+      }
+    }
+  },
+  "upload": {
+    "errors": {
+      "noImage": "No se proporcionó ninguna imagen.",
+      "bufferNull": "El ArrayBuffer es nulo."
+    }
+  }
+}

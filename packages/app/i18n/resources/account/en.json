@@ -1,0 +1,49 @@
+{
+  "header": {
+    "verification": {
+      "notVerified": "Not verified"
+    },
+    "actions": {
+      "invite": "Invite Friends",
+      "share": "Share Profile"
+    }
+  },
+  "links": {
+    "sections": {
+      "settings": "Settings",
+      "support": "Support"
+    },
+    "items": {
+      "profile": "Profile",
+      "personalInfo": "Personal Information",
+      "language": "Language",
+      "linkInBio": "Link In Bio",
+      "passkeys": "Passkeys",
+      "sendtags": "Sendtags",
+      "rewards": "Rewards",
+      "referrals": "Referrals",
+      "learnMore": "Learn more about Send",
+      "liveChat": "Live Chat Support"
+    },
+    "signOut": "sign out"
+  },
+  "share": {
+    "title": "Share Profile",
+    "actions": {
+      "copy": "copy link"
+    },
+    "toast": {
+      "copied": "Profile link copied to clipboard",
+      "copyError": {
+        "title": "Failed to copy link",
+        "message": "Something went wrong while copying the link"
+      }
+    }
+  },
+  "upload": {
+    "errors": {
+      "noImage": "No image provided.",
+      "bufferNull": "ArrayBuffer is null."
+    }
+  }
+}
