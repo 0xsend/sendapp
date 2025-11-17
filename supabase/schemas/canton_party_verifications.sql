@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS "public"."canton_party_verifications" (
     "id" uuid NOT NULL DEFAULT gen_random_uuid(),
     "user_id" uuid NOT NULL,
     "canton_wallet_address" text NOT NULL,
+    "is_discoverable" boolean DEFAULT NULL,
     "created_at" timestamp with time zone NOT NULL DEFAULT now(),
     "updated_at" timestamp with time zone DEFAULT NULL
 );
