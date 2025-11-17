@@ -45,5 +45,186 @@
       "noImage": "No se proporcionó ninguna imagen.",
       "bufferNull": "El ArrayBuffer es nulo."
     }
+  },
+  "common": {
+    "saveChanges": "GUARDAR CAMBIOS",
+    "cancel": "CANCELAR",
+    "remove": "ELIMINAR",
+    "confirm": "CONFIRMAR",
+    "success": "¡Éxito!",
+    "notAvailable": "N/D"
+  },
+  "profile": {
+    "header": "Perfil",
+    "overview": {
+      "name": "Nombre",
+      "about": "Descripción",
+      "visibility": {
+        "public": "Perfil público",
+        "private": "Perfil privado"
+      },
+      "edit": "editar perfil"
+    },
+    "form": {
+      "name": "Nombre",
+      "about": "Descripción",
+      "aboutPlaceholder": "Cuéntanos sobre ti",
+      "makePublic": "Hacer perfil público"
+    }
+  },
+  "personalInfo": {
+    "header": "Información personal",
+    "toast": {
+      "phoneUpdated": "Número de teléfono actualizado"
+    },
+    "labels": {
+      "dateOfBirth": "Fecha de nacimiento",
+      "nonEditable": "(no editable)",
+      "xHandle": "Usuario de X",
+      "phone": "Número de teléfono",
+      "xUsername": "Usuario de X",
+      "birthday": "fecha de nacimiento"
+    },
+    "overview": {
+      "edit": "editar información personal"
+    }
+  },
+  "linkInBio": {
+    "header": "Enlace en la biografía",
+    "empty": "Aún no has añadido enlaces sociales.",
+    "cta": {
+      "edit": "editar enlaces"
+    },
+    "placeholders": {
+      "whatsapp": "Número de teléfono de WhatsApp"
+    }
+  },
+  "language": {
+    "title": "Idioma",
+    "description": "Send utiliza tu idioma seleccionado en todos los dispositivos conectados a tu cuenta.",
+    "updating": "Aplicando idioma…"
+  },
+  "passkeys": {
+    "header": "Llaves de acceso",
+    "empty": {
+      "noCredentials": "No tienes credenciales WebAuthn. Esto no debería ocurrir nunca. Ponte en contacto con <supportLink>soporte</supportLink> si necesitas ayuda.",
+      "noAccount": "No tienes una cuenta de Send.",
+      "learnCredentials": "Más información sobre las credenciales WebAuthn",
+      "learnAccounts": "Más información sobre las cuentas de Send",
+      "supportLink": "soporte"
+    },
+    "list": {
+      "add": "Agregar una llave de acceso",
+      "removePrompt": "¿Eliminar llave de acceso?",
+      "removeAction": "ELIMINAR LLAVE",
+      "labels": {
+        "createdAt": "Creado el",
+        "keySlot": "Ranura de clave",
+        "status": "Estado"
+      },
+      "status": {
+        "notConfirmed": "La llave de acceso no está confirmada on-chain. Completa la confirmación en cadena."
+      },
+      "remove": {
+        "title": "Eliminando \"{{name}}\" como firmante de tu cuenta Send.",
+        "warning": "Esto no se puede deshacer.",
+        "prompt": "Escribe \"{{name}}\" a continuación"
+      },
+      "errors": {
+        "noBalance": "No tienes saldo de USDC para pagar las comisiones de gas"
+      },
+      "updateKeySlot": {
+        "toast": "Ranura de clave actualizada",
+        "message": "La ranura on-chain, {{onchainSlot}}, no coincide con la ranura WebAuthn {{storageSlot}}. Esto no debería ocurrir. Actualiza la ranura a continuación.",
+        "cta": "Actualizar ranura de clave"
+      }
+    },
+    "create": {
+      "title": "Protege tu cuenta con llaves de acceso",
+      "description": "Protege tu cuenta de Send agregando hasta 20 llaves de acceso. Las llaves de acceso son dispositivos de confianza autorizados para firmar las transacciones de tu cuenta.",
+      "submit": "Agregar una llave de acceso",
+      "accountNameLabel": "Nombre de la llave"
+    },
+    "confirm": {
+      "title": "Agregar llave de acceso como firmante",
+      "description": "Tu llave de acceso {{name}} se ha guardado. Agrega tu nueva llave como firmante. Esto te permitirá firmar transacciones en tu cuenta con la nueva llave.",
+      "submit": "Agregar llave de acceso como firmante",
+      "noCredential": "No se encontró una credencial con el ID {{id}}"
+    }
+  },
+  "sendtag": {
+    "header": {
+      "first": "Registrar primer Sendtag",
+      "verified": "Sendtags verificados",
+      "description": "Haz tuya tu identidad en Send. Registra hasta 5 etiquetas verificadas y hazlas tuyas."
+    },
+    "buttons": {
+      "registerFree": "registrar sendtag gratis",
+      "addNew": "agregar nuevo",
+      "addTag": "AGREGAR ETIQUETA",
+      "continue": "continuar",
+      "changeMain": "Cambiar sendtag principal",
+      "register": "registrar"
+    },
+    "labels": {
+      "addAnother": "Agregar otro Sendtag",
+      "createNew": "Crear un nuevo Sendtag",
+      "sendtagName": "Nombre del Sendtag",
+      "enterName": "Introduce el nombre del Sendtag",
+      "inputDesired": "Ingresa el Sendtag deseado",
+      "pendingList": "Sendtags [{{pending}}/{{remaining}}]",
+      "name": "Nombre",
+      "price": "Precio",
+      "total": "Total",
+      "referralCode": "Código de referido"
+    },
+    "messages": {
+      "securedAfterPayment": "Tu Sendtag se asegurará después de confirmar el pago",
+      "updatingMain": "Actualizando sendtag principal...",
+      "choosePrimary": "Elige qué etiqueta aparecerá como tu identidad principal",
+      "invalidInput": "Entrada no válida",
+      "alreadyTaken": "Este Sendtag ya está en uso",
+      "genericError": "Algo salió mal"
+    },
+    "sheet": {
+      "title": "Seleccionar sendtag principal"
+    },
+    "toasts": {
+      "mainUpdated": "Sendtag principal actualizado",
+      "mainUpdateFailed": "No se pudo actualizar el sendtag principal"
+    },
+    "referral": {
+      "placeholder": "Código de referido",
+      "empty": "¿Tienes un referido? ¡Ingresa el código para obtener recompensas!",
+      "validating": "Validando código de referido",
+      "invalid": "Código de referido inválido",
+      "applied": "Código de referido aplicado"
+    },
+    "pricing": {
+      "title": "Precios de Sendtag",
+      "description": "Los Sendtags se tarifan según su longitud. Cuanto más corto es el Sendtag, mayor es el costo.",
+      "tooltipDescription": "El precio del Sendtag depende de su longitud: cuanto más corto, mayor es el precio.",
+      "ok": "Aceptar",
+      "button": {
+        "label": "Precios",
+        "free": "Gratis"
+      }
+    },
+    "checkout": {
+      "review": "Revisar compra",
+      "totalPrice": "Precio total",
+      "price": "Precio",
+      "fees": "Comisiones",
+      "balance": "Saldo:",
+      "balanceError": "Error al obtener la información del saldo",
+      "retry": "Reintentar",
+      "loading": "cargando...",
+      "deposit": "Depositar USDC",
+      "requesting": "solicitando...",
+      "processing": "procesando...",
+      "registering": "registrando...",
+      "complete": "finalizar compra",
+      "error": "error"
+    }
   }
 }
