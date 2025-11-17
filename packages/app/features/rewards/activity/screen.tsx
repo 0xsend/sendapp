@@ -473,9 +473,13 @@ const TaskCard = ({
   const lastJackpotEndTime =
     type === 'sendpot_ticket_purchase'
       ? metadata
-          .map((m) => (m as { lastJackpotEndTime?: string })?.lastJackpotEndTime)
-          .filter((time): time is string => Boolean(time))
-          .reduce((max, time) => (!max || time > max ? time : max), null as string | null)
+          .map((m) => {
+            const time = (m as { lastJackpotEndTime?: string | number })?.lastJackpotEndTime
+            // Convert to number if it's a string (Unix seconds)
+            return time ? Number(time) : null
+          })
+          .filter((time): time is number => time !== null)
+          .reduce((max, time) => (!max || time > max ? time : max), null as number | null)
       : null
   const isSendStreak = type === 'send_streak'
 
@@ -487,12 +491,17 @@ const TaskCard = ({
           (Boolean(weight) && isQualificationOver)
         )
       case 'sendpot_ticket_purchase': {
-        // Check if we have tickets for the current jackpot
-        if (lastJackpotEndTime && verification.created_at < lastJackpotEndTime) {
+        if (!latestWeight || !lastJackpotEndTime) return false
+        // Convert Unix seconds to Date object (multiply by 1000 to get milliseconds)
+        const lastJackpotEndDate = new Date(lastJackpotEndTime * 1000)
+        const createdAtDate = new Date(verification.created_at)
+        if (createdAtDate < lastJackpotEndDate) {
           // No tickets for current jackpot
           return false
         }
-        return latestWeight ? latestWeight >= 10n : false
+
+        const numTickets = calculateTicketsFromBps(Number(latestWeight))
+        return numTickets >= 10
       }
       default:
         return Boolean(weight)
