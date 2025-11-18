@@ -11,6 +11,7 @@ import {
 import { formatUnits } from 'viem'
 import { IconCoin } from 'app/components/icons'
 import { useRouter } from 'solito/router'
+import { useTranslation } from 'react-i18next'
 
 const zeroTime = { days: 0, hours: 0, minutes: 0, seconds: 0 }
 
@@ -23,6 +24,7 @@ export const JackpotCard = () => {
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
   const { data: isGeoBlocked, isLoading: isLoadingGeoBlock } = useGeoBlock()
   const router = useRouter()
+  const { t } = useTranslation('sendpot')
 
   const jackpotEndTime = useMemo(() => {
     if (lastJackpotEndTime === undefined || roundDuration === undefined) return null
@@ -67,7 +69,7 @@ export const JackpotCard = () => {
   }, [jackpotEndTime, calculateTimeRemaining])
 
   const jackpotEndTimeString = useMemo(() => {
-    if (!jackpotEndTime) return 'Loading...'
+    if (!jackpotEndTime) return t('jackpot.loading')
     const date = new Date(jackpotEndTime)
     return date.toLocaleString(undefined, {
       weekday: 'short',
@@ -76,7 +78,7 @@ export const JackpotCard = () => {
       hour: 'numeric',
       minute: '2-digit',
     })
-  }, [jackpotEndTime])
+  }, [jackpotEndTime, t])
 
   const formattedJackpotAmount = useMemo(() => {
     if (typeof lpPoolTotal !== 'bigint' || tokenDecimals === undefined) {
@@ -109,7 +111,7 @@ export const JackpotCard = () => {
   return (
     <FadeCard gap={'$7'} $gtLg={{ p: '$7', gap: '$7' }}>
       <Paragraph fontSize={'$8'} fontWeight="600" $gtLg={{ fontSize: '$9' }}>
-        Current Sendpot
+        {t('jackpot.title')}
       </Paragraph>
       <XStack alignItems={'center'} gap={'$2'} justifyContent={'center'}>
         <Paragraph fontSize={'$11'} fontWeight={600} $gtLg={{ fontSize: '$12' }}>
@@ -135,11 +137,11 @@ export const JackpotCard = () => {
           </XStack>
         </XStack>
         <PrimaryButton onPress={handleOnPress} disabled={isBuyButtonDisabled}>
-          <PrimaryButton.Text>Buy ticket</PrimaryButton.Text>
+          <PrimaryButton.Text>{t('jackpot.actions.buy')}</PrimaryButton.Text>
         </PrimaryButton>
         {isGeoBlocked && (
           <Paragraph color="$error" fontSize="$3" textAlign="center">
-            Ticket purchases are not available in your region currently.
+            {t('jackpot.messages.geoBlocked')}
           </Paragraph>
         )}
       </YStack>

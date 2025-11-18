@@ -26,6 +26,7 @@ import {
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { sendTokenAddress, baseMainnet } from '@my/wagmi'
+import { useTranslation } from 'react-i18next'
 
 const currencySymbol = 'SEND'
 
@@ -39,6 +40,7 @@ export function ConfirmBuyTicketsScreen() {
   const router = useRouter()
   const queryClient = useQueryClient()
   const toast = useAppToast()
+  const { t } = useTranslation('sendpot')
   const [rawNumberOfTickets] = useParam('numberOfTickets')
   const numberOfTickets = Number.parseInt(rawNumberOfTickets || '0', 10) || 0
 
@@ -81,12 +83,12 @@ export function ConfirmBuyTicketsScreen() {
       onSuccess: () => {
         console.log('Purchase successful')
         queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
-        toast.show('Purchase Successful')
+        toast.show(t('confirm.toast.success'))
         router.push('/sendpot')
       },
       onError: (error) => {
         console.error('Purchase mutation failed:', error)
-        toast.error('Purchase Failed')
+        toast.error(t('confirm.toast.error'))
       },
     }
   )
@@ -113,7 +115,9 @@ export function ConfirmBuyTicketsScreen() {
 
     if (webauthnCreds.length === 0) {
       console.error('No WebAuthn credentials found for the account.')
-      toast.error('Error', { message: 'No Passkey found for this account.' })
+      toast.error(t('confirm.errors.noPasskeyTitle'), {
+        message: t('confirm.errors.noPasskeyDescription'),
+      })
       return
     }
 
@@ -167,7 +171,7 @@ export function ConfirmBuyTicketsScreen() {
           <YStack gap="$3">
             <XStack ai={'center'} jc={'space-between'}>
               <Paragraph size={'$5'} color={'$color11'}>
-                Tickets
+                {t('confirm.tickets')}
               </Paragraph>
               <EditButton />
             </XStack>
@@ -185,10 +189,13 @@ export function ConfirmBuyTicketsScreen() {
 
         <FadeCard>
           <YStack gap={'$2'}>
-            <Row label="Price per Ticket" value={`${formattedTicketPrice} ${currencySymbol}`} />
+            <Row
+              label={t('confirm.rows.price')}
+              value={`${formattedTicketPrice} ${currencySymbol}`}
+            />
             <XStack gap={'$2.5'} jc={'space-between'} flexWrap={'wrap'} ai="flex-start">
               <Paragraph size={'$5'} color={'$color11'} fow={'700'}>
-                Total Cost
+                {t('confirm.rows.total')}
               </Paragraph>
               <YStack gap={'$1'} ai={'flex-end'}>
                 <Paragraph size={'$6'} fow={'700'}>
@@ -198,20 +205,20 @@ export function ConfirmBuyTicketsScreen() {
                   <Spinner size="small" color={'$color12'} />
                 ) : (
                   <Paragraph color={'$color10'} fontSize={'$3'} fontFamily={'$mono'}>
-                    (
-                    {totalCostInUSD.toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                      maximumFractionDigits: 2,
+                    {t('confirm.usd', {
+                      value: totalCostInUSD.toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        maximumFractionDigits: 2,
+                      }),
                     })}
-                    )
                   </Paragraph>
                 )}
               </YStack>
             </XStack>
             <Separator my="$2" />
             <Row
-              label={'Est. Transaction Fee'}
+              label={t('confirm.rows.fee')}
               value={(() => {
                 if (!usdcFees) {
                   return '-'
@@ -226,9 +233,9 @@ export function ConfirmBuyTicketsScreen() {
           {combinedError
             ? toNiceError(combinedError)
             : !hasSufficientBalance
-              ? 'Insufficient balance.'
+              ? t('confirm.errors.insufficientBalance')
               : !hasSufficientGas
-                ? 'Insufficient gas.'
+                ? t('confirm.errors.insufficientGas')
                 : ''}
         </Paragraph>
       </YStack>
@@ -257,20 +264,20 @@ export function ConfirmBuyTicketsScreen() {
               size={'$5'}
               color={'$black'}
             >
-              {isPurchasing ? 'Processing...' : 'Preparing...'}
+              {isPurchasing ? t('confirm.button.processing') : t('confirm.button.preparing')}
             </Button.Text>
           </>
         ) : !hasSufficientBalance && !combinedError ? (
           <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-            insufficient balance
+            {t('confirm.button.insufficientBalance')}
           </Button.Text>
         ) : !hasSufficientGas && !combinedError ? (
           <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'}>
-            insufficient gas
+            {t('confirm.button.insufficientGas')}
           </Button.Text>
         ) : (
           <Button.Text ff={'$mono'} fontWeight={'500'} tt="uppercase" size={'$5'} color={'$black'}>
-            {`Buy ${numberOfTickets} Ticket${numberOfTickets > 1 ? 's' : ''}`}
+            {t('confirm.button.buy', { count: numberOfTickets })}
           </Button.Text>
         )}
       </Button>
@@ -306,6 +313,7 @@ export const Row = ({
 export const EditButton = () => {
   const router = useRouter()
   const [rawNumberOfTickets] = useParam('numberOfTickets')
+  const { t } = useTranslation('sendpot')
 
   const handlePress = () => {
     router.push({
@@ -326,10 +334,10 @@ export const EditButton = () => {
       bw={0}
       height={'auto'}
       onPress={handlePress}
-      accessibilityLabel="Edit number of tickets"
+      accessibilityLabel={t('confirm.edit.label')}
     >
       <Button.Text size={'$5'} color="$color11" hoverStyle={{ color: '$primary' }}>
-        edit
+        {t('confirm.edit.cta')}
       </Button.Text>
     </Button>
   )
