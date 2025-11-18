@@ -1555,9 +1555,9 @@ exports[`shovel config 1`] = `
   "pg_url": "$DATABASE_URL",
   "sources": [
     {
-      "batch_size": 10,
+      "batch_size": 2,
       "chain_id": "$BASE_CHAIN_ID",
-      "concurrency": 8,
+      "concurrency": 2,
       "name": "base_logs",
       "url": "$BASE_RPC_URL_PRIMARY",
       "urls": [
