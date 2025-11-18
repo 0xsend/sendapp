@@ -901,8 +901,8 @@ function CantonWalletDiscoverableCard() {
               checked={isDiscoverable ?? false}
               onCheckedChange={handleToggle}
               disabled={updateDiscoverableMutation.isPending}
-              backgroundColor={isDiscoverable ? '$primary' : '$color0'}
-              borderColor={isDiscoverable ? '$primary' : '$color0'}
+              backgroundColor={isDiscoverable ? '$primary' : '#2A3639'}
+              borderColor={isDiscoverable ? '$primary' : '#2A3639'}
               $theme-light={{
                 backgroundColor: isDiscoverable ? '#33C940' : '#999999',
                 borderColor: isDiscoverable ? '#33C940' : '#999999',
