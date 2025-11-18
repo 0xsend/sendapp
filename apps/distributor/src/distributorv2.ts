@@ -706,11 +706,12 @@ export class DistributorV2Worker {
         .map(({ user_id: userId, balance, address }) => {
           // Check if user is qualifying
           const isQualifying = qualifyingUserIds.has(userId)
+          if (!isQualifying) return null
 
           const sendCeilingData = sendCeilingByUserId[userId]
           let slashPercentage = 0n
 
-          if (sendCeilingData && sendCeilingData.weight > 0n && isQualifying) {
+          if (sendCeilingData && sendCeilingData.weight > 0n) {
             const previousReward =
               previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
             const scaledPreviousReward =
@@ -731,7 +732,7 @@ export class DistributorV2Worker {
             balance: slashedBalance,
           }
         })
-        .filter(({ balance }) => balance >= BigInt('0'))
+        .filter((item) => item !== null)
 
       if (log.isLevelEnabled('debug')) {
         await Bun.write(

@@ -3,6 +3,9 @@ import { z } from 'zod'
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import * as hl from '@nktkas/hyperliquid'
+import debug from 'debug'
+
+const log = debug('api:routers:canton')
 
 // Map CoinGecko days to Hyperliquid intervals
 const DAYS_TO_INTERVAL_MAP: Record<
@@ -93,7 +96,7 @@ export const cantonRouter = createTRPCRouter({
         time: data.balance.computed_as_of_time,
       }
     } catch (error) {
-      console.error('Error fetching Canton balance from ccview.io:', error)
+      log('Error fetching Canton balance from ccview.io:', error)
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to fetch Canton balance',
@@ -223,7 +226,7 @@ export const cantonRouter = createTRPCRouter({
 
       return coingeckoData
     } catch (error) {
-      console.error('Error fetching Canton data:', error)
+      log('Error fetching Canton data:', error)
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to fetch Canton data',
@@ -280,7 +283,7 @@ export const cantonRouter = createTRPCRouter({
 
         return { prices }
       } catch (error) {
-        console.error('Error fetching Canton chart data:', error)
+        log('Error fetching Canton chart data:', error)
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to fetch Canton chart data',
