@@ -64,6 +64,11 @@
     "rewards": {
       "root": "Recompensas"
     },
+    "sendpot": {
+      "root": "Sendpot",
+      "buyTickets": "Comprar boletos",
+      "confirm": "Resumen de compra de boletos"
+    },
     "send": {
       "enterAmount": "Ingresar monto",
       "previewAndSend": "Previsualizar y enviar"

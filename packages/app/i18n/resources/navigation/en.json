@@ -64,6 +64,11 @@
     "rewards": {
       "root": "Rewards"
     },
+    "sendpot": {
+      "root": "Sendpot",
+      "buyTickets": "Buy Tickets",
+      "confirm": "Buy Tickets Summary"
+    },
     "send": {
       "enterAmount": "Enter Amount",
       "previewAndSend": "Preview and Send"

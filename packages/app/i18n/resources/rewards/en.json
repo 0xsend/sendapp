@@ -1,0 +1,67 @@
+{
+  "activity": {
+    "empty": "No rewards available",
+    "error": {
+      "verifications": "Error fetching verifications. {{message}}"
+    },
+    "title": {
+      "period": "{{period}} Rewards",
+      "total": "Total {{period}}",
+      "fallback": "Monthly"
+    },
+    "sections": {
+      "tasks": "Tasks",
+      "multipliers": "Multiplier",
+      "progress": "Progress"
+    }
+  },
+  "requirements": {
+    "title": "Your SEND Balance",
+    "sendtag": "Sendtag Purchased",
+    "balance": "Balance {{amount}}",
+    "savings": "Savings Deposit ${{amount}}"
+  },
+  "tasks": {
+    "status": {
+      "completed": "Completed",
+      "ongoing": "Ongoing",
+      "pending": "Pending"
+    },
+    "types": {
+      "create_passkey": "Create a Passkey",
+      "tag_registration": "Purchase a Sendtag",
+      "send_ten": "10+ Sends",
+      "send_one_hundred": "100+ Sends",
+      "tag_referral": "Referrals",
+      "total_tag_referrals": "Total Referrals",
+      "send_streak": "Send Streak",
+      "sendpot_ticket_purchase": "SendPot Tickets",
+      "send_ceiling": ""
+    }
+  },
+  "multipliers": {
+    "title": "Multiplier",
+    "referralTitle": "{{period}} {{title}}"
+  },
+  "common": {
+    "x": "X {{value}}",
+    "na": "N/A"
+  },
+  "claim": {
+    "heading": {
+      "period": "{{period}} Rewards",
+      "total": "Total {{period}}"
+    },
+    "cta": {
+      "default": "$ Claim Reward",
+      "claiming": "Claiming...",
+      "claimed": "$ Claimed",
+      "insufficientGas": "Insufficient Gas",
+      "notYet": "Not yet claimable",
+      "error": "Error"
+    }
+  },
+  "select": {
+    "month": "Select Month"
+  }
+}

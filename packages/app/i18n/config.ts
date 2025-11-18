@@ -10,6 +10,12 @@ import accountEn from './resources/account/en.json'
 import accountEs from './resources/account/es.json'
 import activityEn from './resources/activity/en.json'
 import activityEs from './resources/activity/es.json'
+import exploreEn from './resources/explore/en.json'
+import exploreEs from './resources/explore/es.json'
+import rewardsEn from './resources/rewards/en.json'
+import rewardsEs from './resources/rewards/es.json'
+import sendpotEn from './resources/sendpot/en.json'
+import sendpotEs from './resources/sendpot/es.json'
 import homeEn from './resources/home/en.json'
 import homeEs from './resources/home/es.json'
 import navigationEn from './resources/navigation/en.json'
@@ -29,6 +35,9 @@ export const resources = {
     [DEFAULT_NAMESPACE]: commonEn,
     account: accountEn,
     activity: activityEn,
+    explore: exploreEn,
+    rewards: rewardsEn,
+    sendpot: sendpotEn,
     home: homeEn,
     navigation: navigationEn,
     onboarding: onboardingEn,
@@ -39,6 +48,9 @@ export const resources = {
     [DEFAULT_NAMESPACE]: commonEs,
     account: accountEs,
     activity: activityEs,
+    explore: exploreEs,
+    rewards: rewardsEs,
+    sendpot: sendpotEs,
     home: homeEs,
     navigation: navigationEs,
     onboarding: onboardingEs,
