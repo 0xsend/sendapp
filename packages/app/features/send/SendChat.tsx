@@ -20,6 +20,11 @@ import {
 } from '@my/ui'
 import { IconAccount, IconBadgeCheckSolid2, IconEthereum } from 'app/components/icons'
 import { X } from '@tamagui/lucide-icons'
+import { useSendScreenParams } from 'app/routers/params'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { shorten } from 'app/utils/strings'
+import { isAndroid } from '@tamagui/constants'
+import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 const initialChats = [
   {
@@ -93,6 +98,8 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
     onChange: onOpenChangeProp,
   })
 
+  const { coin } = useCoinFromSendTokenParam()
+
   const [activePage, setActivePage] = useState<'chat' | 'enterAmount'>('chat')
 
   const handleSend = useCallback((message: string) => {
@@ -150,7 +157,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         opacity: 0,
                       }
                     : {
-                        scale: 1.5,
+                        scale: 1.2,
                         y: height,
                         rotateZ: '6deg',
                         transformOrigin: 'right top',
@@ -237,12 +244,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                     </View>
                     <SendChatInput />
                     <AnimatePresence>
-                      {activePage === 'enterAmount' && (
-                        <EnterAmountNoteSection
-                          key="enterAmount"
-                          onPress={() => setActivePage('chat')}
-                        />
-                      )}
+                      {activePage === 'enterAmount' && <EnterAmountNoteSection key="enterAmount" />}
                     </AnimatePresence>
                   </YStack>
                 </YStack>
@@ -282,6 +284,13 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
 
   const isDark = themeName.includes('dark')
 
+  const [{ recipient, idType }] = useSendScreenParams()
+  const {
+    data: profile,
+    isLoading,
+    error: errorProfileLookup,
+  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+
   return (
     <XStack
       gap="$3"
@@ -293,13 +302,25 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
       $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
     >
       <View>
-        <Avatar circular size="$4.5">
-          <Avatar.Image src="https://randomuser.me/api/portraits/men/1.jpg" />
-          <Avatar.Fallback>
-            <IconAccount size="$2" color="$color12" />
-          </Avatar.Fallback>
+        <Avatar circular size="$4.5" elevation="$0.75">
+          {isAndroid && !profile?.avatar_url ? (
+            <Avatar.Image
+              src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+            />
+          ) : (
+            <>
+              <Avatar.Image src={profile?.avatar_url ?? ''} />
+              <Avatar.Fallback jc="center" bc="$olive">
+                <Avatar size="$4.5" circular>
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+                  />
+                </Avatar>
+              </Avatar.Fallback>
+            </>
+          )}
         </Avatar>
-        {true && (
+        {profile?.is_verified && (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
             <IconBadgeCheckSolid2
@@ -315,10 +336,14 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
       </View>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
-          Jack Smith
+          {profile?.name || 'No name'}
         </SizableText>
         <SizableText size="$3" color="$gray10">
-          /jacksmith
+          {idType === 'address'
+            ? shorten(recipient, 5, 4)
+            : profile?.tag
+              ? `/${profile?.tag}`
+              : `#${profile?.sendid}`}
         </SizableText>
       </YStack>
       <Button
@@ -419,7 +444,10 @@ const SendChatInput = Input.styleable((props) => {
 })
 
 const EnterAmountNoteSection = YStack.styleable((props) => {
+  const { coin } = useCoinFromSendTokenParam()
+
   const [present] = usePresence()
+  const { setActivePage } = SendChatContext.useStyledContext()
   return (
     <YStack
       zi={1}
@@ -481,16 +509,19 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                 unstyled
                 bg="transparent"
                 bbw={1}
-                boc="$neon2"
+                boc="$gray8"
+                fontFamily="$mono"
                 col="$gray12"
                 pr="$8"
                 placeholderTextColor="$gray11"
-                placeholder="Amount"
+                placeholder="0.000"
                 focusStyle={{
                   bbc: '$primary',
                 }}
-                fontSize={24}
-                pb="$4"
+                fontSize={40}
+                fontWeight="500"
+                pb="$2"
+                inputMode={coin?.decimals ? 'decimal' : 'numeric'}
               />
               <View t={15} pos="absolute" r={0}>
                 <SizableText>ETH</SizableText>
@@ -500,11 +531,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               <SizableText size="$5" col="$gray10">
                 Balance:{' '}
               </SizableText>
-              <SizableText size="$5">12500,000</SizableText>
+              <SizableText size="$5" col="$gray12">
+                12500,000
+              </SizableText>
             </XStack>
           </YStack>
         </View>
         <View
+          //@ts-expect-error - delay is not typed in tamagui
           animation={
             present
               ? [
@@ -546,6 +580,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         animation={[
           'smoothResponsive',
           {
+            //@ts-expect-error - delay is not typed in tamagui
             delay: present ? 50 : 0,
           },
         ]}
@@ -563,6 +598,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           bg: '$neon7',
           scale: 0.98,
         }}
+        onPress={() => setActivePage('chat')}
       >
         <Button.Text col="$gray1" $theme-light={{ col: '$gray12' }}>
           Send
