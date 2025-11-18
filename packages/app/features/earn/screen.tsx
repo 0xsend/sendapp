@@ -11,6 +11,7 @@ import type { SendEarnBalance } from './hooks'
 import { useSendEarn } from './providers/SendEarnProvider'
 import { useThemeName } from 'tamagui'
 import { usePathname } from 'app/utils/usePathname'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:earn:screen')
 
@@ -83,25 +84,26 @@ const EarningsCallToAction = memo(() => {
   const { push } = useRouter()
 
   const pathname = usePathname()
+  const { t } = useTranslation('earn')
 
   const notInEarnScreen = !pathname.startsWith('/earn')
 
   const content = (
     <Card w="100%" p="$5" gap="$7" ai="flex-start" $gtLg={{ p: '$7' }}>
-      <Badge text={'Earnings'} />
+      <Badge text={t('cta.badge')} />
       <YStack gap={'$3.5'}>
         <Paragraph size={'$7'} fontWeight={'500'}>
-          Boost Your Savings Instantly
+          {t('cta.title')}
         </Paragraph>
         <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
         <YStack gap={'$2'}>
-          <ListItem>High APY: up to 12% on your deposits</ListItem>
-          <ListItem>Full Flexibility: Access your funds anytime</ListItem>
-          <ListItem>Rewards: Bonus SEND tokens</ListItem>
+          <ListItem>{t('cta.bullets.apy')}</ListItem>
+          <ListItem>{t('cta.bullets.flex')}</ListItem>
+          <ListItem>{t('cta.bullets.rewards')}</ListItem>
         </YStack>
       </YStack>
       <PrimaryButton onPress={() => push('/earn/usdc/deposit')}>
-        <PrimaryButton.Text>START EARNING</PrimaryButton.Text>
+        <PrimaryButton.Text>{t('cta.buttons.start')}</PrimaryButton.Text>
       </PrimaryButton>
     </Card>
   )
@@ -117,6 +119,7 @@ EarningsCallToAction.displayName = 'EarningsCallToAction'
 const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) => {
   const { push } = useRouter()
   const { totalAssets: totalAssetsData } = useSendEarn()
+  const { t } = useTranslation('earn')
 
   // Get total assets from provider (already computed and cached)
   const { totalCurrentValue } = totalAssetsData
@@ -145,7 +148,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
       ai="flex-start"
       $gtLg={{ p: '$7', gap: '$7' }}
     >
-      <Badge text={'Active Earnings'} />
+      <Badge text={t('summary.badge')} />
       <YStack gap={'$3'} w={'100%'}>
         <YStack gap={'$2'}>
           <Paragraph
@@ -153,7 +156,7 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Total Value
+            {t('summary.labels.total')}
           </Paragraph>
           <XStack ai={'center'} jc={'space-between'}>
             <Paragraph
@@ -196,15 +199,15 @@ const EarningsSummary = ({ balances }: { balances: SendEarnBalance[] | null }) =
         </YStack>
         <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
         <YStack gap={'$2'}>
-          <Row label={'Deposits'} value={`${totalDeposits} USDC`} />
+          <Row label={t('summary.labels.deposits')} value={`${totalDeposits} USDC`} />
           {/* Rewards section commented out since it won't be live on launch
-            <Row label={'Earnings'} value={`+${formatUSDCValue(0n)} USDC`} />
-            <Row label={'Rewards'} value={`+0 SEND`} />
-            */}
+          <Row label={t('summary.labels.earnings')} value={`+${formatUSDCValue(0n)} USDC`} />
+          <Row label={t('summary.labels.rewards')} value={`+0 SEND`} />
+          */}
         </YStack>
       </YStack>
       <PrimaryButton onPress={() => push('/earn/usdc')}>
-        <PrimaryButton.Text>VIEW DETAILS</PrimaryButton.Text>
+        <PrimaryButton.Text>{t('summary.buttons.viewDetails')}</PrimaryButton.Text>
       </PrimaryButton>
     </Card>
   )

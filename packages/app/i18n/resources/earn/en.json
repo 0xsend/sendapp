@@ -1,0 +1,82 @@
+{
+  "cta": {
+    "badge": "Earnings",
+    "title": "Boost Your Savings Instantly",
+    "bullets": {
+      "apy": "High APY: up to 12% on your deposits",
+      "flex": "Full flexibility: Access your funds anytime",
+      "rewards": "Rewards: Bonus SEND tokens"
+    },
+    "buttons": {
+      "start": "Start earning"
+    }
+  },
+  "summary": {
+    "badge": "Active Earnings",
+    "labels": {
+      "total": "Total Value",
+      "deposits": "Deposits",
+      "earnings": "Earnings",
+      "rewards": "Rewards"
+    },
+    "buttons": {
+      "viewDetails": "View details"
+    }
+  },
+  "active": {
+    "buttons": {
+      "withdraw": "Withdraw",
+      "earnings": "Earnings",
+      "rewards": "Rewards"
+    },
+    "addMore": "Add more deposits",
+    "breakdown": {
+      "deposits": "Deposits",
+      "earnings": "Earnings",
+      "rewards": "Rewards"
+    }
+  },
+  "deposit": {
+    "heading": "Deposit Amount",
+    "balance": {
+      "label": "Balance:",
+      "insufficient": "Insufficient funds"
+    },
+    "toast": {
+      "error": {
+        "title": "Deposit error"
+      },
+      "success": {
+        "title": "Deposit submitted",
+        "message": "Your deposit is being processed."
+      }
+    },
+    "validation": {
+      "minimum": "Minimum deposit is {{amount}} {{symbol}}"
+    },
+    "buttons": {
+      "confirm": "Confirm deposit"
+    }
+  },
+  "withdraw": {
+    "heading": "Withdraw amount",
+    "balance": {
+      "label": "Deposit balance:",
+      "insufficient": "Insufficient funds"
+    },
+    "toast": {
+      "success": "Withdrawn successfully"
+    },
+    "status": {
+      "requesting": "Requesting signature...",
+      "sending": "Sending transaction...",
+      "waiting": "Waiting for confirmation..."
+    },
+    "validation": {
+      "insufficient": "Insufficient funds"
+    },
+    "buttons": {
+      "confirm": "Confirm withdraw"
+    }
+  }
+}

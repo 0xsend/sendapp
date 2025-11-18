@@ -1,0 +1,82 @@
+{
+  "cta": {
+    "badge": "Ganancias",
+    "title": "Impulsa tus ahorros al instante",
+    "bullets": {
+      "apy": "Alto APY: hasta 12% en tus depósitos",
+      "flex": "Flexibilidad total: accede a tus fondos en cualquier momento",
+      "rewards": "Recompensas: tokens SEND de bonificación"
+    },
+    "buttons": {
+      "start": "Comienza a ganar"
+    }
+  },
+  "summary": {
+    "badge": "Ganancias activas",
+    "labels": {
+      "total": "Valor total",
+      "deposits": "Depósitos",
+      "earnings": "Ganancias",
+      "rewards": "Recompensas"
+    },
+    "buttons": {
+      "viewDetails": "Ver detalles"
+    }
+  },
+  "active": {
+    "buttons": {
+      "withdraw": "Retirar",
+      "earnings": "Ganancias",
+      "rewards": "Recompensas"
+    },
+    "addMore": "Agregar más depósitos",
+    "breakdown": {
+      "deposits": "Depósitos",
+      "earnings": "Ganancias",
+      "rewards": "Recompensas"
+    }
+  },
+  "deposit": {
+    "heading": "Monto del depósito",
+    "balance": {
+      "label": "Saldo:",
+      "insufficient": "Fondos insuficientes"
+    },
+    "toast": {
+      "error": {
+        "title": "Error al depositar"
+      },
+      "success": {
+        "title": "Depósito enviado",
+        "message": "Tu depósito se está procesando."
+      }
+    },
+    "validation": {
+      "minimum": "El depósito mínimo es de {{amount}} {{symbol}}"
+    },
+    "buttons": {
+      "confirm": "Confirmar depósito"
+    }
+  },
+  "withdraw": {
+    "heading": "Monto a retirar",
+    "balance": {
+      "label": "Saldo del depósito:",
+      "insufficient": "Fondos insuficientes"
+    },
+    "toast": {
+      "success": "Retiro completado"
+    },
+    "status": {
+      "requesting": "Solicitando firma...",
+      "sending": "Enviando transacción...",
+      "waiting": "Esperando confirmación..."
+    },
+    "validation": {
+      "insufficient": "Fondos insuficientes"
+    },
+    "buttons": {
+      "confirm": "Confirmar retiro"
+    }
+  }
+}

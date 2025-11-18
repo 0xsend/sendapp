@@ -47,6 +47,7 @@ import { useHomeRightPanel } from 'app/features/home/screen'
 import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
@@ -74,6 +75,8 @@ const DepositBalanceDisplay = memo(
     insufficientAmount: boolean
     isLoading: boolean
   }) => {
+    const { t } = useTranslation('earn')
+
     if (isLoading) {
       return <Spinner size="small" />
     }
@@ -93,7 +96,7 @@ const DepositBalanceDisplay = memo(
               color: insufficientAmount ? '$error' : '$darkGrayTextField',
             }}
           >
-            Balance:
+            {t('deposit.balance.label')}
           </Paragraph>
           <Paragraph
             color={insufficientAmount ? '$error' : '$color12'}
@@ -105,7 +108,7 @@ const DepositBalanceDisplay = memo(
         </XStack>
         {insufficientAmount && (
           <Paragraph color={'$error'} size={'$5'}>
-            Insufficient funds
+            {t('deposit.balance.insufficient')}
           </Paragraph>
         )}
       </XStack>
@@ -171,6 +174,7 @@ export function DepositForm() {
   const sender = useMemo(() => sendAccount?.data?.address, [sendAccount?.data?.address])
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
+  const { t } = useTranslation('earn')
 
   const uop = useUserOp({
     sender,
@@ -195,14 +199,14 @@ export function DepositForm() {
     },
     onError: (error) => {
       log('sendEarn.deposit.onError', error)
-      toast.error('Deposit Error', {
+      toast.error(t('deposit.toast.error.title'), {
         message: toNiceError(error),
       })
     },
     onSuccess: (data) => {
       log('sendEarn.deposit.onSuccess', data)
-      toast.show('Deposit Submitted', {
-        message: 'Your deposit is being processed.',
+      toast.show(t('deposit.toast.success.title'), {
+        message: t('deposit.toast.success.message'),
       })
       if (!coin.data) return
 
@@ -289,7 +293,7 @@ export function DepositForm() {
       })
     } catch (error) {
       log('Error during signing or mutation', error)
-      toast.error('Deposit Error', {
+      toast.error(t('deposit.toast.error.title'), {
         message: toNiceError(error),
       })
     }
@@ -305,6 +309,7 @@ export function DepositForm() {
     sponsorUserOpMutation,
     paymasterSignMutation,
     toast,
+    t,
   ])
 
   // DEBUG
@@ -338,7 +343,10 @@ export function DepositForm() {
       if (sanitizedAmount !== null && sanitizedAmount < MINIMUM_DEPOSIT) {
         form.setError('amount', {
           type: 'required',
-          message: `Minimum deposit is ${formatUnits(MINIMUM_DEPOSIT, coin.data?.decimals)} USDC`,
+          message: t('deposit.validation.minimum', {
+            amount: formatUnits(MINIMUM_DEPOSIT, coin.data?.decimals),
+            symbol: coin.data?.symbol ?? '',
+          }),
         })
       } else {
         form.clearErrors('amount')
@@ -354,7 +362,7 @@ export function DepositForm() {
         )
       }
     },
-    [form, setParams, coin.data?.decimals, params, depositMutation.isSuccess]
+    [form, setParams, coin.data?.decimals, coin.data?.symbol, params, depositMutation.isSuccess, t]
   )
 
   // validate and sanitize amount
@@ -398,11 +406,11 @@ export function DepositForm() {
           }}
           disabled={!canSubmit}
         >
-          <SubmitButton.Text>CONFIRM DEPOSIT</SubmitButton.Text>
+          <SubmitButton.Text>{t('deposit.buttons.confirm')}</SubmitButton.Text>
         </SubmitButton>
       </YStack>
     ),
-    [calls.error, uop.error, sendAccount.error, areTermsAccepted, form, canSubmit]
+    [calls.error, uop.error, sendAccount.error, areTermsAccepted, form, canSubmit, t]
   )
 
   // RESET FORM ERRORS for terms or auto accept if user has existing deposit
@@ -463,7 +471,7 @@ export function DepositForm() {
       $group-gtLg={{ w: '50%' }}
     >
       <Paragraph size={'$7'} fontWeight={'500'}>
-        Deposit Amount
+        {t('deposit.heading')}
       </Paragraph>
       <FormProvider {...form}>
         <SchemaForm

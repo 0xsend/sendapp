@@ -29,6 +29,7 @@ import {
 import { useSendEarnWithdrawCalls, useSendEarnWithdrawVaults } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export const log = debug('app:earn:withdraw')
 
@@ -54,6 +55,7 @@ const BalanceDisplay = memo(
     coinSymbol: string | undefined
     insufficientAmount: boolean
   }) => {
+    const { t } = useTranslation('earn')
     return (
       <XStack gap={'$2'} flexDirection={'column'} $gtSm={{ flexDirection: 'row' }}>
         <XStack gap={'$2'}>
@@ -65,7 +67,7 @@ const BalanceDisplay = memo(
               color: insufficientAmount ? '$error' : '$darkGrayTextField',
             }}
           >
-            Deposit Balance:
+            {t('withdraw.balance.label')}
           </Paragraph>
           <Paragraph
             color={insufficientAmount ? '$error' : '$color12'}
@@ -86,7 +88,7 @@ const BalanceDisplay = memo(
         </XStack>
         {insufficientAmount && (
           <Paragraph color={'$error'} size={'$5'}>
-            Insufficient funds
+            {t('withdraw.balance.insufficient')}
           </Paragraph>
         )}
       </XStack>
@@ -153,6 +155,7 @@ export function WithdrawForm() {
     sender,
     calls: calls.data ?? undefined,
   })
+  const { t } = useTranslation('earn')
   const webauthnCreds = useMemo(
     () =>
       sendAccount?.data?.send_account_credentials
@@ -178,13 +181,13 @@ export function WithdrawForm() {
         entryPoint: entryPointAddress[chainId],
       })
 
-      setUseropState('Sending transaction...')
+      setUseropState(t('withdraw.status.sending'))
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
       })
 
-      setUseropState('Waiting for confirmation...')
+      setUseropState(t('withdraw.status.waiting'))
 
       const receipt = await withRetry(
         () =>
@@ -208,7 +211,7 @@ export function WithdrawForm() {
     onMutate: (variables) => {
       // A mutation is about to happen!
       log('onMutate', variables)
-      setUseropState('Requesting signature...')
+      setUseropState(t('withdraw.status.requesting'))
       // Optionally return a context containing data to use when for example rolling back
       // return { id: 1 }
     },
@@ -220,7 +223,7 @@ export function WithdrawForm() {
       // Boom baby!
       log('onSuccess', data, variables, context)
 
-      toast.show('Withdrawn successfully')
+      toast.show(t('withdraw.toast.success'))
 
       if (coinData && Platform.OS === 'web') {
         router.push({
@@ -283,7 +286,7 @@ export function WithdrawForm() {
       ) {
         form.setError('amount', {
           type: 'required',
-          message: 'Insufficient funds',
+          message: t('withdraw.validation.insufficient'),
         })
       } else {
         form.clearErrors('amount')
@@ -299,7 +302,7 @@ export function WithdrawForm() {
         { webBehavior: 'replace' }
       )
     },
-    [form, setParams, coin.data?.decimals, params, depositBalance, mutation.isSuccess]
+    [form, setParams, coin.data?.decimals, params, depositBalance, mutation.isSuccess, t]
   )
 
   // validate and sanitize amount
@@ -361,8 +364,8 @@ export function WithdrawForm() {
         ) : null}
         {[calls.error, sendAccount.error, uop.error, mutation.error].filter(Boolean).map((e) =>
           e ? (
-            <Fade key="error-state">
-              <XStack alignItems="center" jc="center" gap={'$2'} key={e.message} role="alert">
+            <Fade key={e.message}>
+              <XStack alignItems="center" jc="center" gap={'$2'} role="alert">
                 <Paragraph color="$error">{toNiceError(e)}</Paragraph>
               </XStack>
             </Fade>
@@ -377,7 +380,7 @@ export function WithdrawForm() {
           !mutation.isPending ? (
             <Spinner size="small" />
           ) : (
-            <SubmitButton.Text>CONFIRM WITHDRAW</SubmitButton.Text>
+            <SubmitButton.Text>{t('withdraw.buttons.confirm')}</SubmitButton.Text>
           )}
         </SubmitButton>
       </YStack>
@@ -393,6 +396,7 @@ export function WithdrawForm() {
       calls.isLoading,
       sendAccount.isLoading,
       uop.isLoading,
+      t,
     ]
   )
 
@@ -413,7 +417,7 @@ export function WithdrawForm() {
       $gtLg={{ w: '50%', pb: '$3.5' }}
     >
       <Paragraph size={'$7'} fontWeight={'600'}>
-        Withdraw Amount
+        {t('withdraw.heading')}
       </Paragraph>
       <FormProvider {...form}>
         <SchemaForm
@@ -497,8 +501,8 @@ export function WithdrawForm() {
                   <XStack ai={'center'} position="relative" jc={'space-between'}>
                     {amount}
                     <XStack ai={'center'} gap={'$2'}>
-                      <IconCoin symbol={'USDC'} size={'$2'} />
-                      <Paragraph size={'$6'}>USDC</Paragraph>
+                      <IconCoin symbol={coin.data?.symbol || ''} size={'$2'} />
+                      <Paragraph size={'$6'}>{coin.data?.symbol ?? ''}</Paragraph>
                     </XStack>
                     <XStack
                       position="absolute"
