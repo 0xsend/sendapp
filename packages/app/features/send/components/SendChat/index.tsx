@@ -1,0 +1,1313 @@
+import { LegendList } from '@legendapp/list'
+import type React from 'react'
+import { useCallback, useState, useRef, useMemo, useEffect } from 'react'
+import {
+  AnimatePresence,
+  Avatar,
+  Button,
+  createStyledContext,
+  Input,
+  LinearGradient,
+  Paragraph,
+  Portal,
+  Shimmer,
+  SizableText,
+  Spinner,
+  type TamaguiElement,
+  Text,
+  useAppToast,
+  useControllableState,
+  useDebounce,
+  useMedia,
+  usePresence,
+  useThemeName,
+  useWindowDimensions,
+  View,
+  XStack,
+  YStack,
+} from '@my/ui'
+
+import { formatUnits, isAddress } from 'viem'
+
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'solito/router'
+import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
+import { IconAccount, IconBadgeCheckSolid2, IconCoin, IconEthereum } from 'app/components/icons'
+import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
+import { X } from '@tamagui/lucide-icons'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { shorten } from 'app/utils/strings'
+import { isAndroid, isWeb } from '@tamagui/constants'
+import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { Controller, FormProvider, useForm } from 'react-hook-form'
+import { type BRAND, z } from 'zod'
+import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CoinField } from './CoinField'
+import { useCoin, useCoins } from 'app/provider/coins'
+import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
+import { assert } from 'app/utils/assert'
+import useRedirectAfterSend from '../../confirm/useRedirectAfterSend'
+import { useSendAccount } from 'app/utils/send-accounts'
+import { useUser } from 'app/utils/useUser'
+import { api } from 'app/utils/api'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { useAccountNonce } from 'app/utils/userop'
+import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
+import { useUSDCFees } from 'app/utils/useUSDCFees'
+import { useEstimateFeesPerGas } from 'wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { Platform } from 'react-native'
+import { throwIf } from 'app/utils/throwIf'
+
+import debug from 'debug'
+import { signUserOp } from 'app/utils/signUserOp'
+import type { UserOperation } from 'permissionless'
+import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
+import { formatErrorMessage } from 'app/utils/formatErrorMessage'
+
+const log = debug('app:features:send:confirm:screen')
+
+const initialChats = [
+  {
+    id: '1',
+    message: 'Thanks for the coffee!',
+    amount: '4.50',
+    sender: 'user',
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    message: 'Send it for you.',
+    amount: '4.50',
+    sender: 'bot',
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    message: 'Breakfast payback.',
+    amount: '35.00',
+    sender: 'user',
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    message: 'Enjoy your coffee!',
+    amount: '35.00',
+    sender: 'bot',
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    message: 'Lunch payback.',
+    amount: '11.75',
+    sender: 'user',
+    timestamp: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    message: 'I like what you did there!',
+    amount: '11.75',
+    sender: 'bot',
+    timestamp: new Date().toISOString(),
+  },
+]
+
+type Chat = (typeof initialChats)[number]
+
+type Sections = 'chat' | 'enterAmount' | 'reviewAndSend'
+
+const SendChatContext = createStyledContext<{
+  activeSection: Sections
+  setActiveSection: React.Dispatch<React.SetStateAction<Sections>>
+}>({
+  activeSection: 'chat',
+  setActiveSection: () => {},
+})
+
+interface SendChatProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
+  const { height } = useWindowDimensions()
+  const [chats, setChats] = useState(initialChats)
+
+  const { lg } = useMedia()
+
+  const [open, setOpen] = useControllableState({
+    defaultProp: false,
+    prop: openProp,
+    onChange: onOpenChangeProp,
+  })
+
+  const { coin } = useCoinFromSendTokenParam()
+
+  const [activeSection, setActiveSection] = useState<Sections>('chat')
+
+  const handleSend = useCallback((message: string) => {
+    setChats((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        message,
+        amount: '23.5',
+        sender: 'user',
+        timestamp: new Date().toISOString(),
+      },
+    ])
+  }, [])
+
+  const renderItem = useCallback(({ item }: { item: Chat }) => {
+    return <Item item={item} />
+  }, [])
+
+  const keyExtractor = useCallback((item: Chat) => item.id, [])
+
+  return (
+    <Portal>
+      <SendChatContext.Provider activeSection={activeSection} setActiveSection={setActiveSection}>
+        <AnimatePresence>
+          {open && (
+            <View ai="center" jc="center" pos="absolute" zi={10} inset={0}>
+              <View
+                animation={[
+                  'smoothResponsive',
+                  {
+                    opacity: '100ms',
+                    transform: 'responsive',
+                  },
+                ]}
+                animateOnly={['transform', 'opacity']}
+                filter="blur(0px)"
+                enterStyle={
+                  lg
+                    ? {
+                        y: height,
+                        opacity: 0,
+                      }
+                    : {
+                        scale: 0.9,
+                        opacity: 0,
+                      }
+                }
+                exitStyle={
+                  lg
+                    ? {
+                        y: height,
+                        opacity: 0,
+                      }
+                    : {
+                        scale: 0.9,
+                        opacity: 0,
+                      }
+                }
+                rotateZ="0deg"
+                y={lg ? -65 : 0}
+                w={700}
+                maw="95%"
+                pe="auto"
+                jc="center"
+                $lg={{
+                  jc: 'flex-end',
+                }}
+                mih={700}
+                f={1}
+                py="$4"
+              >
+                <YStack
+                  animation="responsive"
+                  h={
+                    activeSection === 'chat'
+                      ? height * 0.9
+                      : activeSection === 'enterAmount'
+                        ? 500
+                        : 570
+                  }
+                  animateOnly={['height']}
+                >
+                  <YStack
+                    br="$8"
+                    btlr="$11"
+                    elevation="$9"
+                    shadowOpacity={0.4}
+                    ov="hidden"
+                    f={1}
+                    bg="$color1"
+                  >
+                    <SendChatHeader
+                      onClose={() => {
+                        if (activeSection === 'chat') {
+                          setOpen(false)
+                        } else {
+                          setActiveSection('chat')
+                        }
+                      }}
+                    />
+                    <View
+                      animation={[
+                        'responsive',
+                        {
+                          opacity: '100ms',
+                          transform: 'responsive',
+                        },
+                      ]}
+                      scaleY={activeSection === 'chat' ? 1 : 0.5}
+                      opacity={activeSection === 'chat' ? 1 : 0}
+                      y={activeSection === 'chat' ? 0 : -50}
+                      f={1}
+                      $platform-web={{
+                        willChange: 'transform',
+                        filter: activeSection === 'chat' ? 'blur(0px)' : 'blur(4px)',
+                        transition: 'filter linear 100ms',
+                      }}
+                      animateOnly={['transform', 'opacity']}
+                      px="$4.5"
+                      $xs={{
+                        px: '$2',
+                      }}
+                    >
+                      {/* TODO: move this to another component and memozie it to avoid re-rendering */}
+                      <LegendList
+                        recycleItems
+                        maintainScrollAtEnd
+                        alignItemsAtEnd
+                        maintainVisibleContentPosition
+                        initialScrollIndex={chats.length - 1}
+                        data={chats}
+                        renderItem={renderItem}
+                        keyExtractor={keyExtractor}
+                        style={{
+                          paddingHorizontal: 12,
+                        }}
+                      />
+                    </View>
+                    <SendChatInput />
+                    <AnimatePresence>
+                      {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
+                    </AnimatePresence>
+                  </YStack>
+                </YStack>
+              </View>
+            </View>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {open && (
+            <View
+              pe="auto"
+              tag="button"
+              role="button"
+              aria-label="Close send chat"
+              aria-expanded={open}
+              tabIndex={0}
+              onPress={() => setOpen(false)}
+              key="overlay-send-chat"
+              enterStyle={{ opacity: 0 }}
+              exitStyle={{ opacity: 0 }}
+              animation="200ms"
+              animateOnly={['opacity']}
+              bg="#000"
+              opacity={0.6}
+              pos="absolute"
+              inset={0}
+            />
+          )}
+        </AnimatePresence>
+      </SendChatContext.Provider>
+    </Portal>
+  )
+}
+
+const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
+  const themeName = useThemeName()
+
+  const isDark = themeName.includes('dark')
+
+  const [{ recipient, idType }] = useSendScreenParams()
+  const {
+    data: profile,
+    isLoading,
+    error: errorProfileLookup,
+  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+
+  return (
+    <XStack
+      gap="$3"
+      ai="center"
+      p="$4"
+      bg="$aztec1"
+      bbw={1}
+      bbc="$gray3"
+      $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
+    >
+      <View>
+        <Avatar circular size="$4.5" elevation="$0.75">
+          {isAndroid && !profile?.avatar_url ? (
+            <Avatar.Image
+              src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+            />
+          ) : (
+            <>
+              <Avatar.Image src={profile?.avatar_url ?? ''} />
+              <Avatar.Fallback jc="center" bc="$olive">
+                <Avatar size="$4.5" circular>
+                  <Avatar.Image
+                    src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+                  />
+                </Avatar>
+              </Avatar.Fallback>
+            </>
+          )}
+        </Avatar>
+        {profile?.is_verified && (
+          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
+            <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+            <IconBadgeCheckSolid2
+              size="$1"
+              scale={0.7}
+              color="$neon8"
+              $theme-dark={{ color: '$neon7' }}
+              //@ts-expect-error - checkColor is not typed
+              checkColor={isDark ? '#082B1B' : '#fff'}
+            />
+          </XStack>
+        )}
+      </View>
+      <YStack gap="$1.5">
+        <SizableText size="$4" color="$gray12" fow="500">
+          {profile?.name || 'No name'}
+        </SizableText>
+        <SizableText size="$3" color="$gray10">
+          {idType === 'address'
+            ? shorten(recipient, 5, 4)
+            : profile?.tag
+              ? `/${profile?.tag}`
+              : `#${profile?.sendid}`}
+        </SizableText>
+      </YStack>
+      <Button
+        size="$3"
+        circular
+        animation="100ms"
+        animateOnly={['transform']}
+        pos="absolute"
+        r={0}
+        t={0}
+        x={-9}
+        y={10}
+        boc="$aztec3"
+        hoverStyle={{
+          boc: '$aztec4',
+        }}
+        pressStyle={{
+          boc: '$aztec4',
+          scale: 0.9,
+        }}
+        onPress={onClose}
+      >
+        <Button.Icon scaleIcon={1.2}>
+          <X />
+        </Button.Icon>
+      </Button>
+    </XStack>
+  )
+}
+
+const SendChatInput = Input.styleable((props) => {
+  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
+
+  const [message, setMessage] = useState('')
+  const inputRef = useRef<Input>(null)
+  const themeName = useThemeName()
+
+  const gradientColors = useMemo(() => {
+    if (themeName.includes('dark')) {
+      return ['hsl(190, 40%, 10%, 0.8)', 'hsl(190, 40%, 10%, 0.3)', 'transparent']
+    }
+    return ['hsl(0, 0%, 92%, 0.5)', 'hsl(0, 0%, 92%, 0.2)', 'transparent']
+  }, [themeName])
+
+  return (
+    <YStack zi={1}>
+      <View
+        animation="smoothResponsive"
+        animateOnly={['opacity']}
+        opacity={activeSection === 'chat' ? 1 : 0}
+      >
+        <LinearGradient
+          // Use the actual aztec3 color value as in line 129
+          colors={gradientColors}
+          locations={[0, 0.36, 1]}
+          start={{ x: 0, y: 1 }}
+          end={{ x: 0, y: 0 }}
+          pointerEvents="none"
+          w="100%"
+          h={20}
+          y={-18}
+          pos="absolute"
+        />
+      </View>
+      <YStack w="100%" zi={1}>
+        <XStack py="$4" px="$4">
+          <View
+            animation="responsive"
+            animateOnly={['height', 'transform']}
+            h={activeSection === 'chat' ? 47 : 80}
+            y={activeSection === 'chat' ? 0 : -84}
+            f={1}
+          >
+            <Input
+              bg="$aztec5"
+              $theme-light={{
+                bg: '$gray3',
+              }}
+              numberOfLines={4}
+              multiline
+              onPress={() => setActiveSection('enterAmount')}
+              placeholderTextColor="$gray11"
+              f={1}
+              ref={inputRef}
+              autoFocus={false}
+              value={message}
+              onChangeText={setMessage}
+              // use a placeholder that trigger the user to send some crypto with a message
+              placeholder="Type amount, add a note..."
+              br="$3"
+              {...props}
+            />
+          </View>
+        </XStack>
+      </YStack>
+    </YStack>
+  )
+})
+
+const SendAmountSchema = z.object({
+  amount: formFields.text,
+  token: formFields.coin,
+  note: formFields.note,
+})
+
+// all inputs are here
+const EnterAmountNoteSection = YStack.styleable((props) => {
+  const [sendParams, setSendParams] = useSendScreenParams()
+
+  const { coin } = useCoinFromSendTokenParam()
+
+  const { isLoading: isLoadingCoins } = useCoins()
+  const form = useForm<z.infer<typeof SendAmountSchema>>({
+    resolver: zodResolver(SendAmountSchema),
+    defaultValues: {
+      token: coin?.token,
+      amount:
+        sendParams.amount && coin !== undefined
+          ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
+          : undefined,
+      note: sendParams.note || '',
+    },
+  })
+
+  const [present] = usePresence()
+  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
+
+  // copied
+
+  const { recipient, idType } = sendParams
+  const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
+    idType ?? 'tag',
+    recipient ?? ''
+  )
+
+  const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
+
+  const noteValidationError = form.formState.errors.note
+
+  const onFormChange = useDebounce(
+    useCallback(
+      (values) => {
+        const { amount, token: _token, note } = values
+        const sendToken = _token as allCoins[number]['token']
+        const sanitizedAmount = sanitizeAmount(
+          amount,
+          allCoinsDict[sendToken]?.decimals
+        )?.toString()
+
+        const noteValidation = formFields.note.safeParse(note)
+        if (noteValidation.error) {
+          form.setError('note', {
+            message:
+              noteValidation.error.errors[0]?.message ??
+              'Note failed to match validation constraints',
+          })
+        } else {
+          form.clearErrors('note')
+        }
+        setSendParams(
+          {
+            ...sendParams,
+            amount: sanitizedAmount,
+            sendToken,
+            note: note.trim(),
+          },
+          { webBehavior: 'replace' }
+        )
+      },
+      [setSendParams, sendParams, form]
+    ),
+    300,
+    { leading: false },
+    []
+  )
+
+  useEffect(() => {
+    const subscription = form.watch(onFormChange)
+
+    return () => {
+      subscription.unsubscribe()
+      onFormChange.cancel()
+    }
+  }, [form, onFormChange])
+
+  const parsedAmount = BigInt(sendParams.amount ?? '0')
+
+  const minXfrAmt = coin?.minXfrAmt
+    ? BigInt(Math.floor(coin.minXfrAmt * 10 ** coin.decimals))
+    : BigInt(0)
+
+  const belowMinimum =
+    coin?.minXfrAmt !== undefined &&
+    sendParams.amount !== undefined &&
+    parsedAmount > BigInt(0) &&
+    parsedAmount < minXfrAmt
+
+  const canSubmitSendReview =
+    !isLoadingCoins &&
+    coin?.balance !== undefined &&
+    sendParams.amount !== undefined &&
+    coin.balance >= parsedAmount &&
+    parsedAmount > BigInt(0) &&
+    !belowMinimum &&
+    !noteValidationError
+
+  const insufficientAmount =
+    coin?.balance !== undefined && sendParams.amount !== undefined && parsedAmount > coin?.balance
+
+  // new copied  code from send confirm screen
+
+  const queryClient = useQueryClient()
+  const [queryParams] = useSendScreenParams()
+  const { sendToken, amount, note } = queryParams
+  const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
+  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { profile: currentUserProfile } = useUser()
+
+  const [loadingSend, setLoadingSend] = useState(false)
+
+  // states for auth flow
+  const [error, setError] = useState<Error | null>(null)
+  const {
+    mutateAsync: transfer,
+    isPending: isTransferPending,
+    isSuccess: isTransferInitialized,
+  } = api.temporal.transfer.useMutation()
+
+  const isUSDCSelected = selectedCoin?.label === 'USDC'
+  const { coin: usdc } = useCoin('USDC')
+  const {
+    query: { data: prices, isLoading: isPricesLoading },
+  } = useTokenPrices()
+
+  const href = profile ? `/profile/${profile?.sendid}` : ''
+
+  const webauthnCreds =
+    sendAccount?.send_account_credentials
+      .filter((c) => !!c.webauthn_credentials)
+      .map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? []
+
+  const {
+    data: nonce,
+    error: nonceError,
+    isLoading: nonceIsLoading,
+  } = useAccountNonce({
+    sender: sendAccount?.address,
+  })
+
+  const { data: userOp, isPending: isGeneratingUserOp } = useGenerateTransferUserOp({
+    sender: sendAccount?.address,
+    // @ts-expect-error some work to` do here
+    to: profile?.address ?? recipient,
+    token: sendToken === 'eth' ? undefined : sendToken,
+    amount: BigInt(queryParams.amount ?? '0'),
+    nonce,
+  })
+
+  const { mutateAsync: validateUserOp, isPending: isValidatePending } = useValidateTransferUserOp()
+
+  const {
+    data: usdcFees,
+    isLoading: isFeesLoading,
+    error: usdcFeesError,
+  } = useUSDCFees({
+    userOp,
+  })
+
+  const {
+    data: feesPerGas,
+    isLoading: isGasLoading,
+    error: feesPerGasError,
+  } = useEstimateFeesPerGas({
+    chainId: baseMainnet.id,
+  })
+
+  const toast = useAppToast()
+
+  const hasEnoughBalance = !!selectedCoin?.balance && selectedCoin.balance >= BigInt(amount ?? '0')
+  const gas = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : BigInt(Number.MAX_SAFE_INTEGER)
+  const hasEnoughGas =
+    (usdc?.balance ?? BigInt(0)) > (isUSDCSelected ? BigInt(amount ?? '0') + gas : gas)
+
+  const isLoading =
+    nonceIsLoading || isProfileLoading || isSendAccountLoading || isGeneratingUserOp || isGasLoading
+
+  const isSubmitting = isValidatePending || isTransferPending || isTransferInitialized
+
+  const canSubmitSend =
+    !isLoading && !isSubmitting && hasEnoughBalance && hasEnoughGas && feesPerGas !== undefined
+
+  const localizedAmountForSendReview = localizeAmount(
+    formatUnits(
+      BigInt(amount ?? ''),
+      selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
+    )
+  )
+
+  const price = prices?.[sendToken] ?? 0
+  const amountInUSDForSendReview =
+    price *
+    Number(
+      formatUnits(
+        BigInt(amount ?? ''),
+        selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
+      )
+    )
+
+  async function onSubmit() {
+    if (activeSection === 'enterAmount') {
+      if (!canSubmitSendReview) return
+      setActiveSection('reviewAndSend')
+    } else {
+      if (!canSubmitSend) return
+      try {
+        setLoadingSend(true)
+        assert(!!userOp, 'User op is required')
+        assert(!!selectedCoin?.balance, 'Balance is not available')
+        assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
+        assert(nonce !== undefined, 'Nonce is not available')
+        throwIf(feesPerGasError)
+        assert(!!feesPerGas, 'Fees per gas is not available')
+        assert(
+          !note || !formFields.note.safeParse(note).error,
+          'Note failed to match validation constraints'
+        )
+
+        assert(selectedCoin?.balance >= BigInt(amount ?? '0'), 'Insufficient balance')
+        const sender = sendAccount?.address as `0x${string}`
+        assert(isAddress(sender), 'No sender address')
+        const _userOp = {
+          ...userOp,
+          maxFeePerGas: feesPerGas.maxFeePerGas,
+          maxPriorityFeePerGas: feesPerGas.maxPriorityFeePerGas,
+        }
+
+        log('gasEstimate', usdcFees)
+        log('feesPerGas', feesPerGas)
+        log('userOp', _userOp)
+        const chainId = baseMainnetClient.chain.id
+        const entryPoint = entryPointAddress[chainId]
+
+        const signature = await signUserOp({
+          userOp,
+          chainId,
+          webauthnCreds,
+          entryPoint,
+        })
+        userOp.signature = signature
+
+        const validatedUserOp = await validateUserOp(userOp)
+        assert(!!validatedUserOp, 'Operation expected to fail')
+
+        const { workflowId } = await transfer({
+          userOp: validatedUserOp,
+          ...(note && { note: encodeURIComponent(note) }),
+        })
+
+        if (workflowId) {
+          // Don't await - fire and forget to avoid iOS hanging on cache operations
+          void queryClient.invalidateQueries({
+            queryKey: ['activity_feed'],
+            exact: false,
+          })
+
+          void queryClient.resetQueries({
+            queryKey: ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
+            exact: false,
+          })
+
+          setActiveSection('chat')
+        }
+      } catch (e) {
+        // @TODO: handle sending repeated tx when nonce is still pending
+        // if (e.message.includes('Workflow execution already started')) {
+        //   router.replace({ pathname: '/', query: { token: sendToken } })
+        //   return
+        // }
+        console.error(e)
+        setError(e)
+        const errorMessage = (e as { details?: string }).details ?? e.message ?? 'Error sending'
+        toast.error(errorMessage.split('.').at(0) ?? errorMessage)
+        await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+      } finally {
+        setLoadingSend(false)
+      }
+    }
+  }
+
+  const isSendButtonDisabled =
+    loadingSend || (activeSection === 'enterAmount' ? !canSubmitSendReview : !canSubmitSend)
+
+  return (
+    <FormProvider {...form}>
+      <YStack
+        zi={1}
+        pos="absolute"
+        bottom={0}
+        height={400}
+        f={1}
+        w="100%"
+        gap="$7"
+        p="$4"
+        jc="flex-end"
+        {...props}
+        animation="responsive"
+        exitStyle={{
+          opacity: 0,
+          y: 20,
+        }}
+      >
+        <YStack gap="$2.5">
+          <View
+            animation={[
+              'responsive',
+              {
+                opacity: '100ms',
+                transform: 'responsive',
+              },
+            ]}
+            animateOnly={['opacity', 'transform']}
+            enterStyle={{
+              opacity: 0,
+              y: -20,
+            }}
+            exitStyle={{
+              opacity: 0,
+              y: -20,
+            }}
+            gap="$2.5"
+          >
+            <XStack ai="center" w="100%" jc="space-between">
+              <SizableText size="$2" fow="300" col="$gray11">
+                You&apos;re Sending
+              </SizableText>
+              {activeSection === 'reviewAndSend' && (
+                <Button onPress={() => setActiveSection('enterAmount')} size="$2" chromeless>
+                  <Button.Text fos="$3" fow="500" col="$neon10">
+                    Edit
+                  </Button.Text>
+                </Button>
+              )}
+            </XStack>
+            <YStack
+              gap="$3.5"
+              ai="stretch"
+              p="$6"
+              px="$4"
+              br="$4"
+              bg="$aztec4"
+              $theme-light={{ bg: '$gray2' }}
+              animation="responsive"
+              animateOnly={['height']}
+              h={activeSection === 'reviewAndSend' ? 220 : 170}
+              jc="center"
+            >
+              <AnimatePresence exitBeforeEnter>
+                {activeSection === 'reviewAndSend' ? (
+                  <ReviewSendAmountBox
+                    key="review-send-amount-box"
+                    localizedAmount={localizedAmountForSendReview}
+                    selectedCoin={selectedCoin}
+                    amountInUSD={amountInUSDForSendReview}
+                    isPricesLoading={isPricesLoading}
+                    isFeesLoading={isFeesLoading}
+                    usdcFees={usdcFees}
+                    usdcFeesError={usdcFeesError}
+                  />
+                ) : (
+                  <>
+                    <XStack
+                      key="enter-amount-box"
+                      animation="100ms"
+                      filter="blur(0px)"
+                      enterStyle={{
+                        opacity: 0,
+                        filter: 'blur(4px)',
+                      }}
+                    >
+                      <Controller
+                        control={form.control}
+                        name="amount"
+                        render={({ field: { value, onBlur } }) => (
+                          <Input
+                            unstyled
+                            value={value}
+                            bg="transparent"
+                            bbw={1}
+                            boc="$gray8"
+                            fontFamily="$mono"
+                            col="$gray12"
+                            placeholderTextColor="$gray11"
+                            placeholder="0.000"
+                            focusStyle={{
+                              bbc: '$primary',
+                            }}
+                            fontWeight="500"
+                            inputMode={coin?.decimals ? 'decimal' : 'numeric'}
+                            onChangeText={(amount) => {
+                              const localizedAmount = localizeAmount(amount)
+                              form.setValue('amount', localizedAmount)
+                            }}
+                            onBlur={onBlur}
+                            w="100%"
+                            pr="$15"
+                            allowFontScaling
+                            fontSize={value?.length > 12 ? 32 : 40}
+                            lh={55}
+                            pb="$2"
+                          />
+                        )}
+                      />
+                      <View pos="absolute" t="$2" r={0}>
+                        <CoinField defaultValue={coin?.token} />
+                      </View>
+                    </XStack>
+                    <YStack>
+                      {isLoadingCoins ? (
+                        <Shimmer bg="$aztec5" w={200} h={22} br="$1" />
+                      ) : (
+                        <XStack
+                          gap={'$2'}
+                          flexDirection={'column'}
+                          $gtSm={{ flexDirection: 'row' }}
+                        >
+                          <XStack gap={'$2'}>
+                            <Paragraph testID="SendFormBalance" size={'$5'}>
+                              Balance:
+                            </Paragraph>
+                            <Paragraph color="$color12" size={'$5'} fontWeight={'600'}>
+                              {!coin?.balance
+                                ? '0.000'
+                                : formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
+                            </Paragraph>
+                          </XStack>
+                          {insufficientAmount && (
+                            <Paragraph color={'$error'} size={'$5'}>
+                              Insufficient funds
+                            </Paragraph>
+                          )}
+                          {belowMinimum && coin?.minXfrAmt !== undefined && (
+                            <Paragraph color={'$error'} size={'$5'} testID="SendFormMinimumError">
+                              Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
+                              {coin.symbol}
+                            </Paragraph>
+                          )}
+                        </XStack>
+                      )}
+                    </YStack>
+                  </>
+                )}
+              </AnimatePresence>
+            </YStack>
+          </View>
+          <View
+            //@ts-expect-error - delay is not typed in tamagui
+            animation={
+              present
+                ? [
+                    '200ms',
+                    {
+                      delay: 200,
+                    },
+                  ]
+                : null
+            }
+            // changing animation at runtime require a key change to remount the component and avoid hook errors
+            key={present ? 'note-input-enter' : 'note-input-exit'}
+            opacity={present ? 1 : 0}
+            enterStyle={{
+              opacity: 0,
+            }}
+          >
+            <Controller
+              name="note"
+              control={form.control}
+              render={({ field: { value, onChange, onBlur, ...rest } }) => (
+                <YStack>
+                  <Input
+                    {...rest}
+                    bg="$aztec5"
+                    numberOfLines={4}
+                    ai="flex-start"
+                    $theme-light={{
+                      bg: '$gray3',
+                    }}
+                    placeholderTextColor="$gray11"
+                    autoFocus
+                    disabled={activeSection === 'reviewAndSend'}
+                    placeholder="Type amount, add a note..."
+                    br="$3"
+                    multiline
+                    value={value}
+                    onFocus={() => {
+                      setIsNoteInputFocused(true)
+                    }}
+                    onBlur={() => {
+                      onBlur()
+                      setIsNoteInputFocused(false)
+                    }}
+                    onChangeText={onChange}
+                  />
+
+                  <Paragraph
+                    color={noteValidationError ? '$error' : '$lightGrayTextField'}
+                    $theme-light={{ color: '$darkGrayTextField' }}
+                    pos="absolute"
+                    b={0}
+                    y="120%"
+                  >
+                    {isNoteInputFocused || noteValidationError ? (
+                      <>
+                        {noteValidationError
+                          ? noteValidationError.message
+                          : `Max: ${MAX_NOTE_LENGTH} characters`}
+                      </>
+                    ) : (
+                      ''
+                    )}
+                  </Paragraph>
+                </YStack>
+              )}
+            />
+          </View>
+        </YStack>
+        <Button
+          bg="$neon7"
+          $theme-light={{
+            bg: '$neon7',
+          }}
+          br="$4"
+          animation={[
+            'smoothResponsive',
+            {
+              //@ts-expect-error - delay is not typed in tamagui
+              delay: present ? 50 : 0,
+            },
+          ]}
+          animateOnly={['opacity', 'transform']}
+          bw={0}
+          y={present ? 0 : 20}
+          enterStyle={{
+            opacity: 0,
+            y: 20,
+          }}
+          hoverStyle={{
+            bg: '$neon6',
+          }}
+          pressStyle={{
+            bg: '$neon7',
+            scale: 0.98,
+          }}
+          onPress={form.handleSubmit(onSubmit)}
+          ov="hidden"
+          disabled={isSendButtonDisabled}
+          o={isSendButtonDisabled ? 0.5 : 1}
+        >
+          <AnimatePresence exitBeforeEnter>
+            {loadingSend ? (
+              <View
+                animation="responsive"
+                animateOnly={['opacity', 'transform']}
+                filter="blur(0px)"
+                pos="absolute"
+                enterStyle={{
+                  opacity: 0,
+                  y: -40,
+                  ...(isWeb && {
+                    filter: 'blur(4px)',
+                  }),
+                }}
+                exitStyle={{
+                  opacity: 0,
+                  y: 40,
+                  ...(isWeb && {
+                    filter: 'blur(4px)',
+                  }),
+                }}
+              >
+                <Spinner size="small" color={'$gray1'} />
+              </View>
+            ) : (
+              <Button.Text
+                key={activeSection === 'reviewAndSend' ? 'review-button-text' : 'send-button-text'}
+                fos="$5"
+                col="$gray1"
+                $theme-light={{ col: '$gray12' }}
+                animation="responsive"
+                animateOnly={['opacity', 'transform']}
+                filter="blur(0px)"
+                pos="absolute"
+                enterStyle={{
+                  opacity: 0,
+                  y: -40,
+                  ...(isWeb && {
+                    filter: 'blur(4px)',
+                  }),
+                }}
+                exitStyle={{
+                  opacity: 0,
+                  y: 40,
+                  ...(isWeb && {
+                    filter: 'blur(4px)',
+                  }),
+                }}
+                $platform-web={{
+                  willChange: 'transform, opacity, filter',
+                  transition: 'filter linear 200ms',
+                }}
+              >
+                {activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
+              </Button.Text>
+            )}
+          </AnimatePresence>
+        </Button>
+      </YStack>
+    </FormProvider>
+  )
+})
+
+function useValidateTransferUserOp() {
+  return useMutation({
+    mutationFn: async (userOp?: UserOperation<'v0.7'>) => {
+      if (!userOp?.signature) return null
+
+      try {
+        await baseMainnetClient.call({
+          account: entryPointAddress[baseMainnetClient.chain.id],
+          to: userOp.sender,
+          data: userOp.callData,
+        })
+
+        const { from, to, token, amount } = decodeTransferUserOp({ userOp })
+        if (!from || !to || !amount || !token) {
+          log('Failed to decode transfer user op', { from, to, amount, token })
+          throw new Error('Not a valid transfer')
+        }
+        if (!allCoins.find((c) => c.token === token)) {
+          log('Token ${token} is not a supported', { token })
+          throw new Error(`Token ${token} is not a supported`)
+        }
+        if (amount < 0n) {
+          log('User Operation has amount < 0', { amount })
+          throw new Error('User Operation has amount < 0')
+        }
+        return userOp
+      } catch (e) {
+        const error = e instanceof Error ? e : new Error('Validation failed')
+        throw error
+      }
+    },
+  })
+}
+
+interface ReviewSendAmountBoxProps {
+  localizedAmount: string
+  selectedCoin: CoinWithBalance | undefined
+  amountInUSD: number
+  isPricesLoading: boolean
+  isFeesLoading: boolean
+  usdcFees:
+    | {
+        gasFees: bigint
+        baseFee: bigint
+        decimals: number
+      }
+    | undefined
+  usdcFeesError: Error | null
+}
+
+const ReviewSendAmountBox = YStack.styleable<ReviewSendAmountBoxProps>((props) => {
+  const {
+    localizedAmount,
+    selectedCoin,
+    amountInUSD,
+    isPricesLoading,
+    isFeesLoading,
+    usdcFees,
+    usdcFeesError,
+    ...rest
+  } = props
+  return (
+    <YStack
+      key="review-send-amount-box"
+      animation="200ms"
+      gap="$3"
+      animateOnly={['opacity']}
+      enterStyle={{
+        opacity: 0,
+      }}
+      exitStyle={{
+        opacity: 0,
+      }}
+      jc="center"
+      {...rest}
+    >
+      <YStack gap="$4">
+        <XStack gap="$2" ai="center">
+          <IconCoin
+            symbol={selectedCoin?.symbol ?? 'USDC'}
+            size={localizedAmount.length > 10 ? '$1.5' : '$2.5'}
+          />
+          <SizableText size="$6" fow="500">
+            {selectedCoin?.symbol}
+          </SizableText>
+        </XStack>
+        <XStack ai={'center'} gap={'$2'} bbw={1} bbc="$gray8">
+          <Text
+            fontWeight={'700'}
+            fontFamily="$mono"
+            fontSize={localizedAmount?.length > 12 ? 32 : 40}
+            lh={55}
+            pb="$2"
+          >
+            {localizedAmount}
+          </Text>
+          {isPricesLoading ? (
+            <Spinner size="small" color={'$color12'} />
+          ) : (
+            <SizableText color={'$color10'} fontSize={'$3'} fontFamily={'$mono'} mt={-1}>
+              (
+              {amountInUSD.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 2,
+              })}
+              )
+            </SizableText>
+          )}
+        </XStack>
+      </YStack>
+      <YStack gap="$3">
+        <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
+          <SizableText col="$gray11" size="$5">
+            Fees
+          </SizableText>
+          {isFeesLoading && <Spinner size="small" color={'$color11'} />}
+          {usdcFees && (
+            <SizableText size="$5" col="$gray12">
+              {formatAmount(formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals))}{' '}
+              USDC
+            </SizableText>
+          )}
+          {usdcFeesError && (
+            <SizableText col="$error">{usdcFeesError?.message?.split('.').at(0)}</SizableText>
+          )}
+        </XStack>
+      </YStack>
+    </YStack>
+  )
+})
+
+interface ItemProps {
+  item: Chat
+}
+
+const Item = YStack.styleable<ItemProps>((props) => {
+  const { item } = props
+  const isSent = item.sender === 'user'
+
+  return (
+    <View py="$4">
+      <YStack gap="$2">
+        <YStack
+          w="60%"
+          bg={item.sender === 'user' ? '$aztec6' : '$aztec3'}
+          bw={isSent ? 0 : 1}
+          boc={item.sender === 'user' ? 'transparent' : '$aztec4'}
+          $theme-light={{
+            bg: item.sender === 'user' ? '$gray3' : '$gray1',
+            boc: item.sender === 'user' ? 'transparent' : '$gray2',
+          }}
+          br="$5"
+          gap="$3"
+          p="$3"
+          als={item.sender === 'user' ? 'flex-end' : 'flex-start'}
+          ov="hidden"
+        >
+          <SizableText size="$1" fow="300" color="$aztec10">
+            {isSent ? 'You sent' : 'You received'}
+          </SizableText>
+          <XStack ai="center" gap="$2">
+            <SizableText size="$7" fow="600" col={isSent ? '$color' : '$neon9'}>
+              {isSent ? '-' : '+'}
+            </SizableText>
+            <SizableText size="$7" fow="600" color={isSent ? '$color' : '$neon9'}>
+              {item.amount}
+            </SizableText>
+            <IconEthereum size="$1" />
+          </XStack>
+          <View
+            p="$2"
+            pb="$4"
+            px="$3.5"
+            br="$2"
+            btlr={0}
+            btrr={0}
+            bg={isSent ? '$aztec5' : '$aztec3'}
+            bw={1}
+            boc={isSent ? 'transparent' : '$aztec4'}
+            $theme-light={{
+              bg: isSent ? '$gray1' : '$gray2',
+            }}
+            mx="$-3.5"
+            mb="$-3.5"
+          >
+            <SizableText size="$3" color="$aztec10">
+              {item.message}
+            </SizableText>
+          </View>
+        </YStack>
+        <SizableText
+          als={item.sender === 'user' ? 'flex-end' : 'flex-start'}
+          size="$2"
+          color="$gray10"
+        >
+          {new Date(item.timestamp).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </SizableText>
+      </YStack>
+    </View>
+  )
+})
