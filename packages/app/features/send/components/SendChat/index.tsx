@@ -8,6 +8,7 @@ import {
   createStyledContext,
   Input,
   LinearGradient,
+  Link,
   Paragraph,
   Portal,
   Shimmer,
@@ -250,7 +251,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                       animation={[
                         'responsive',
                         {
-                          opacity: '100ms',
+                          opacity: '50ms',
                           transform: 'responsive',
                         },
                       ]}
@@ -333,6 +334,8 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
+  const href = profile ? `/profile/${profile?.sendid}` : ''
+
   return (
     <XStack
       gap="$3"
@@ -343,7 +346,18 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
       bbc="$gray3"
       $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
     >
-      <View>
+      <Link
+        hoverStyle={{
+          opacity: 0.8,
+        }}
+        focusStyle={{
+          opacity: 0.8,
+        }}
+        pressStyle={{
+          scale: 0.95,
+        }}
+        href={href}
+      >
         <Avatar circular size="$4.5" elevation="$0.75">
           {isAndroid && !profile?.avatar_url ? (
             <Avatar.Image
@@ -375,7 +389,7 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
             />
           </XStack>
         )}
-      </View>
+      </Link>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
           {profile?.name || 'No name'}
@@ -797,7 +811,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           y: 20,
         }}
       >
-        <YStack gap="$2.5">
+        <YStack gap="$3.5">
           <View
             animation={[
               'responsive',
@@ -871,6 +885,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                         render={({ field: { value, onBlur } }) => (
                           <Input
                             unstyled
+                            autoFocus={isWeb}
                             value={value}
                             bg="transparent"
                             bbw={1}
@@ -973,9 +988,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                       bg: '$gray3',
                     }}
                     placeholderTextColor="$gray11"
-                    autoFocus
                     disabled={activeSection === 'reviewAndSend'}
-                    placeholder="Type amount, add a note..."
+                    placeholder="Add a note..."
                     br="$3"
                     multiline
                     value={value}
