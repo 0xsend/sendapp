@@ -26,6 +26,7 @@ import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Link } from 'solito/link'
+import { useTranslation } from 'react-i18next'
 import {
   IconBadgeCheckSolid,
   IconDollarCircle,
@@ -67,6 +68,7 @@ const CANTON_WALLET_REQUIREMENTS = {
 } as const
 
 export function CantonWalletVerification() {
+  const { t } = useTranslation('cantonWallet')
   const { profile, isLoading: isUserLoading } = useUser()
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const { data: distributions, isLoading: isLoadingDistributions } = useMonthlyDistributions()
@@ -82,7 +84,7 @@ export function CantonWalletVerification() {
   if (!distribution || !sendAccount) {
     return (
       <Paragraph color="$error" size="$5">
-        No distribution available
+        {t('messages.noDistribution')}
       </Paragraph>
     )
   }
@@ -110,6 +112,7 @@ function CantonWalletVerificationContent({
   distribution,
   verifications,
 }: CantonWalletVerificationContentProps) {
+  const { t } = useTranslation('cantonWallet')
   const snapshotBalanceQuery = useSnapshotBalance({
     distribution,
     sendAccount,
@@ -184,13 +187,13 @@ function CantonWalletVerificationContent({
   return (
     <YStack w="100%" gap="$5">
       <Paragraph fontSize={'$7'} fontWeight={'600'} color={'$color12'}>
-        Get an invite to Canton Wallet
+        {t('header.title')}
       </Paragraph>
       <YStack gap="$3.5">
         {CANTON_WALLET_REQUIREMENTS.sendTag.enabled && (
           <VerificationCard
             icon={<IconSlash size={'$1'} color={'$color12'} />}
-            label="Purchased Sendtag"
+            label={t('requirements.sendTag')}
             isCompleted={sendTagPurchased ?? false}
             isLoading={false}
             href="/account/sendtag/add"
@@ -199,7 +202,7 @@ function CantonWalletVerificationContent({
         {CANTON_WALLET_REQUIREMENTS.savingsVault.enabled && (
           <VerificationCard
             icon={<IconDollarCircle size={'$1.5'} color={'$color12'} />}
-            label={`Deposit $${minSavingsBalance} to Savings Vault`}
+            label={t('requirements.savingsVault', { amount: minSavingsBalance })}
             isCompleted={hasMinSavings}
             isLoading={isLoadingSendEarnBalances}
             href="/earn/usdc/deposit"
@@ -208,7 +211,7 @@ function CantonWalletVerificationContent({
         {CANTON_WALLET_REQUIREMENTS.sendBalance.enabled && (
           <VerificationCard
             icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
-            label={`Hold ${minSendBalance} $SEND Minimum`}
+            label={t('requirements.sendBalance', { amount: minSendBalance })}
             isCompleted={
               (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
             }
@@ -290,12 +293,13 @@ function CantonWalletVerifiedCard({ address, canEdit }: { address: string; canEd
   const toast = useAppToast()
   const hoverStyles = useHoverStyles()
   const [isEditing, setIsEditing] = useState(false)
+  const { t } = useTranslation('cantonWallet')
 
   const copyCantonAddress = useCallback(async () => {
     await Clipboard.setStringAsync(address)
-      .then(() => toast.show('Copied Canton Wallet Address'))
-      .catch(() => toast.error('Unable to copy'))
-  }, [address, toast])
+      .then(() => toast.show(t('toasts.copySuccess')))
+      .catch(() => toast.error(t('toasts.copyError')))
+  }, [address, t, toast])
 
   if (isEditing) {
     return <CantonWalletEditCard currentAddress={address} onCancel={() => setIsEditing(false)} />
@@ -316,7 +320,7 @@ function CantonWalletVerifiedCard({ address, canEdit }: { address: string; canEd
             <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
           </XStack>
           <Paragraph size="$5" fontWeight="600" color="$color12">
-            Canton Wallet Verified
+            {t('cards.verifiedTitle')}
           </Paragraph>
         </XStack>
         <XStack ai={'center'} jc="space-between">
@@ -379,6 +383,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
   const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
+  const { t } = useTranslation('cantonWallet')
 
   const form = useForm<CantonWalletFormData>({
     defaultValues: { address: currentAddress },
@@ -446,14 +451,14 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
       return result
     },
     onSuccess: () => {
-      toast.show('Canton Wallet Address Updated')
+      toast.show(t('toasts.updateSuccess'))
       form.reset()
       onCancel()
       void queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
     onError: (error) => {
       console.error('Update failed:', error)
-      toast.error('Update failed')
+      toast.error(t('toasts.updateError'))
     },
   })
 
@@ -462,7 +467,14 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
     const { data, error } = CantonWalletSchema.safeParse(values)
 
     if (error || !data) {
-      setErrorMessage(error?.errors?.[0]?.message ?? 'Invalid input')
+      const issue = error?.errors?.[0]
+      if (issue?.code === 'too_small') {
+        setErrorMessage(t('errors.addressRequired'))
+      } else if (issue?.code === 'invalid_string') {
+        setErrorMessage(t('errors.invalidFormat'))
+      } else {
+        setErrorMessage(t('errors.invalidInput'))
+      }
       return
     }
 
@@ -488,7 +500,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
           <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
         </XStack>
         <Paragraph size="$5" flex={1} fontWeight="600" color="$color12">
-          Edit Canton Wallet Address
+          {t('cards.editTitle')}
         </Paragraph>
       </XStack>
 
@@ -501,7 +513,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
             defaultValues={{ address: currentAddress }}
             props={{
               address: {
-                placeholder: 'Canton Wallet Address',
+                placeholder: t('placeholders.address'),
                 pr: '$8',
                 fontWeight: 'normal',
                 br: '$4',
@@ -550,7 +562,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
             {({ address }) => (
               <>
                 <Paragraph size="$3" color="$warning" $theme-light={{ color: '$orange8' }}>
-                  Changing your canton wallet address will pause all $CC rewards for 24 hours
+                  {t('messages.addressChangeWarning')}
                 </Paragraph>
                 <YStack gap="$3" w="100%" ai={'flex-start'}>
                   <XStack w={'100%'}>{address}</XStack>
@@ -564,7 +576,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                       focusStyle={{ outlineWidth: 0 }}
                       hoverStyle={{ outlineWidth: 0 }}
                     >
-                      <Button.Text>Cancel</Button.Text>
+                      <Button.Text>{t('buttons.cancel')}</Button.Text>
                     </Button>
                     <SubmitButton
                       p={0}
@@ -574,7 +586,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
                       disabled={updateMutation.isPending}
                       icon={updateMutation.isPending ? <Spinner size="small" /> : undefined}
                     >
-                      <SubmitButton.Text tt={undefined}>Save</SubmitButton.Text>
+                      <SubmitButton.Text tt={undefined}>{t('buttons.save')}</SubmitButton.Text>
                     </SubmitButton>
                   </XStack>
                 </YStack>
@@ -590,6 +602,7 @@ function CantonWalletEditCard({ currentAddress, onCancel }: CantonWalletEditCard
 
 function CantonWalletPendingCard() {
   const hoverStyles = useHoverStyles()
+  const { t } = useTranslation('cantonWallet')
 
   return (
     <FadeCard br={'$6'} flexDirection={'row'} jc={'space-between'} w={'100%'}>
@@ -605,7 +618,7 @@ function CantonWalletPendingCard() {
           <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
         </XStack>
         <Paragraph size="$5" fontWeight="600" color="$color12">
-          Canton Wallet Verified
+          {t('cards.verifiedTitle')}
         </Paragraph>
       </XStack>
       <XStack ai={'center'} jc="space-between">
@@ -626,6 +639,7 @@ function CantonWalletFormCard() {
   const borderColor = isDark ? '$primary' : '$color12'
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
+  const { t } = useTranslation('cantonWallet')
 
   const form = useForm<CantonWalletFormData>({
     defaultValues: { address: '' },
@@ -692,13 +706,13 @@ function CantonWalletFormCard() {
       return result
     },
     onSuccess: () => {
-      toast.show('Successfully verified')
+      toast.show(t('toasts.verifySuccess'))
       form.reset()
       void queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
     onError: (error) => {
       console.error('Verification failed:', error)
-      toast.error('Verification failed')
+      toast.error(t('toasts.verifyError'))
     },
   })
 
@@ -707,7 +721,14 @@ function CantonWalletFormCard() {
     const { data, error } = CantonWalletSchema.safeParse(values)
 
     if (error || !data) {
-      setErrorMessage(error?.errors?.[0]?.message ?? 'Invalid input')
+      const issue = error?.errors?.[0]
+      if (issue?.code === 'too_small') {
+        setErrorMessage(t('errors.addressRequired'))
+      } else if (issue?.code === 'invalid_string') {
+        setErrorMessage(t('errors.invalidFormat'))
+      } else {
+        setErrorMessage(t('errors.invalidInput'))
+      }
       return
     }
 
@@ -733,7 +754,7 @@ function CantonWalletFormCard() {
           <IconBadgeCheckSolid size={'$1'} color={'$color12'} />
         </XStack>
         <Paragraph size="$5" flex={1} fontWeight="600" color="$color12">
-          Canton Wallet Verified
+          {t('cards.verifiedTitle')}
         </Paragraph>
         <XStack ai={'center'} jc="space-between">
           <IconInfoCircle color={'$error'} size={'$1.5'} />
@@ -748,7 +769,7 @@ function CantonWalletFormCard() {
             defaultValues={{ address: '' }}
             props={{
               address: {
-                placeholder: 'Canton Wallet Address',
+                placeholder: t('placeholders.address'),
                 pr: '$8',
                 fontWeight: 'normal',
                 br: '$4',
@@ -806,7 +827,7 @@ function CantonWalletFormCard() {
                     disabled={verifyMutation.isPending}
                     icon={verifyMutation.isPending ? <Spinner size="small" /> : undefined}
                   >
-                    <SubmitButton.Text tt={undefined}>Verify</SubmitButton.Text>
+                    <SubmitButton.Text tt={undefined}>{t('buttons.verify')}</SubmitButton.Text>
                   </SubmitButton>
                 </XStack>
                 {errorMessage && <Paragraph color={'$error'}>{errorMessage}</Paragraph>}
@@ -824,7 +845,7 @@ function CantonWalletFormCard() {
         textAlign="center"
         fontSize={'$5'}
       >
-        Create Canton Wallet Account
+        {t('links.createAccount')}
       </Anchor>
     </FadeCard>
   )
@@ -835,6 +856,7 @@ function CantonWalletDiscoverableCard() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const toast = useAppToast()
+  const { t } = useTranslation('cantonWallet')
 
   const profileIsDiscoverable = profile?.canton_party_verifications?.is_discoverable ?? null
   const [optimisticValue, setOptimisticValue] = useState<boolean | null>(null)
@@ -865,12 +887,12 @@ function CantonWalletDiscoverableCard() {
       return result
     },
     onSuccess: async () => {
-      toast.show('Updated successfully')
+      toast.show(t('toasts.discoverableSuccess'))
       await queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
     onError: (error) => {
       console.error('Update failed:', error)
-      toast.error('Update failed')
+      toast.error(t('toasts.updateError'))
       setOptimisticValue(null) // Reset optimistic value on error
     },
     onSettled: () => {
@@ -889,7 +911,7 @@ function CantonWalletDiscoverableCard() {
       <XStack width="100%" justifyContent="space-between" alignItems="center" gap={'$2'}>
         <XStack gap={'$3.5'} alignItems={'center'} flex={1}>
           <Paragraph size="$5" fontWeight="600" color="$color12">
-            Account discoverable in Canton Wallet
+            {t('cards.discoverable')}
           </Paragraph>
         </XStack>
         <XStack ai="center" jc="center" width={50}>

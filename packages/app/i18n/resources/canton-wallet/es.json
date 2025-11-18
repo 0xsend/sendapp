@@ -1,0 +1,44 @@
+{
+  "header": {
+    "title": "Consigue una invitación para Canton Wallet"
+  },
+  "requirements": {
+    "sendTag": "Sendtag comprado",
+    "savingsVault": "Deposita ${{amount}} en la bóveda de ahorros",
+    "sendBalance": "Mantén un mínimo de {{amount}} $SEND"
+  },
+  "cards": {
+    "verifiedTitle": "Canton Wallet verificado",
+    "editTitle": "Editar dirección de Canton Wallet",
+    "discoverable": "Cuenta visible en Canton Wallet"
+  },
+  "placeholders": {
+    "address": "Dirección de Canton Wallet"
+  },
+  "buttons": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "verify": "Verificar"
+  },
+  "links": {
+    "createAccount": "Crear cuenta de Canton Wallet"
+  },
+  "messages": {
+    "noDistribution": "No hay distribución disponible",
+    "addressChangeWarning": "Cambiar tu dirección de Canton Wallet pausará todas las recompensas $CC durante 24 horas"
+  },
+  "toasts": {
+    "copySuccess": "Dirección de Canton Wallet copiada",
+    "copyError": "No se pudo copiar",
+    "updateSuccess": "Dirección de Canton Wallet actualizada",
+    "updateError": "Error al actualizar",
+    "verifySuccess": "Verificación completada",
+    "verifyError": "Error de verificación",
+    "discoverableSuccess": "Actualización realizada"
+  },
+  "errors": {
+    "invalidInput": "Entrada no válida",
+    "addressRequired": "La dirección de Canton Wallet es obligatoria",
+    "invalidFormat": "Formato de dirección de Canton Wallet no válido. Formato esperado: cantonwallet-usuario::hash"
+  }
+}
