@@ -1,4 +1,5 @@
 import { LegendList } from '@legendapp/list'
+import type React from 'react'
 import { useCallback, useState, useRef, useMemo } from 'react'
 import {
   AnimatePresence,
@@ -23,7 +24,7 @@ import { X } from '@tamagui/lucide-icons'
 import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
-import { isAndroid } from '@tamagui/constants'
+import { isAndroid, isWeb } from '@tamagui/constants'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 
 const initialChats = [
@@ -73,12 +74,14 @@ const initialChats = [
 
 type Chat = (typeof initialChats)[number]
 
+type Sections = 'chat' | 'enterAmount' | 'reviewAndSend'
+
 const SendChatContext = createStyledContext<{
-  activePage: 'chat' | 'enterAmount'
-  setActivePage: (page: 'chat' | 'enterAmount') => void
+  activeSection: Sections
+  setActiveSection: React.Dispatch<React.SetStateAction<Sections>>
 }>({
-  activePage: 'chat',
-  setActivePage: () => {},
+  activeSection: 'chat',
+  setActiveSection: () => {},
 })
 
 interface SendChatProps {
@@ -100,7 +103,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
 
   const { coin } = useCoinFromSendTokenParam()
 
-  const [activePage, setActivePage] = useState<'chat' | 'enterAmount'>('chat')
+  const [activeSection, setActiveSection] = useState<Sections>('chat')
 
   const handleSend = useCallback((message: string) => {
     setChats((prev) => [
@@ -123,7 +126,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
 
   return (
     <Portal>
-      <SendChatContext.Provider activePage={activePage} setActivePage={setActivePage}>
+      <SendChatContext.Provider activeSection={activeSection} setActiveSection={setActiveSection}>
         <AnimatePresence>
           {open && (
             <View ai="center" jc="center" pos="absolute" zi={10} inset={0}>
@@ -132,20 +135,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                   'smoothResponsive',
                   {
                     opacity: '100ms',
-                    y: lg
-                      ? 'smoothResponsive'
-                      : {
-                          damping: 35,
-                          stiffness: 500,
-                          mass: 1,
-                        },
-                    rotateZ: lg
-                      ? '100ms'
-                      : {
-                          damping: 50,
-                          stiffness: 300,
-                          mass: 1,
-                        },
+                    transform: 'responsive',
                   },
                 ]}
                 animateOnly={['transform', 'opacity']}
@@ -157,10 +147,8 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         opacity: 0,
                       }
                     : {
-                        scale: 1.2,
-                        y: height,
-                        rotateZ: '6deg',
-                        transformOrigin: 'right top',
+                        scale: 0.9,
+                        opacity: 0,
                       }
                 }
                 exitStyle={
@@ -170,10 +158,8 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         opacity: 0,
                       }
                     : {
-                        scale: 1.2,
+                        scale: 0.9,
                         opacity: 0,
-                        rotateZ: '3deg',
-                        y: height,
                       }
                 }
                 rotateZ="0deg"
@@ -191,7 +177,13 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
               >
                 <YStack
                   animation="responsive"
-                  h={activePage === 'chat' ? height * 0.9 : 500}
+                  h={
+                    activeSection === 'chat'
+                      ? height * 0.9
+                      : activeSection === 'enterAmount'
+                        ? 500
+                        : 550
+                  }
                   animateOnly={['height']}
                 >
                   <YStack
@@ -212,13 +204,13 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                           transform: 'responsive',
                         },
                       ]}
-                      scaleY={activePage === 'chat' ? 1 : 0.5}
-                      opacity={activePage === 'chat' ? 1 : 0}
-                      y={activePage === 'chat' ? 0 : -50}
+                      scaleY={activeSection === 'chat' ? 1 : 0.5}
+                      opacity={activeSection === 'chat' ? 1 : 0}
+                      y={activeSection === 'chat' ? 0 : -50}
                       f={1}
                       $platform-web={{
                         willChange: 'transform',
-                        filter: activePage === 'chat' ? 'blur(0px)' : 'blur(4px)',
+                        filter: activeSection === 'chat' ? 'blur(0px)' : 'blur(4px)',
                         transition: 'filter linear 100ms',
                       }}
                       animateOnly={['transform', 'opacity']}
@@ -244,7 +236,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                     </View>
                     <SendChatInput />
                     <AnimatePresence>
-                      {activePage === 'enterAmount' && <EnterAmountNoteSection key="enterAmount" />}
+                      {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
                     </AnimatePresence>
                   </YStack>
                 </YStack>
@@ -375,7 +367,7 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
 }
 
 const SendChatInput = Input.styleable((props) => {
-  const { setActivePage, activePage } = SendChatContext.useStyledContext()
+  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
 
   const [message, setMessage] = useState('')
   const inputRef = useRef<Input>(null)
@@ -393,7 +385,7 @@ const SendChatInput = Input.styleable((props) => {
       <View
         animation="smoothResponsive"
         animateOnly={['opacity']}
-        opacity={activePage === 'chat' ? 1 : 0}
+        opacity={activeSection === 'chat' ? 1 : 0}
       >
         <LinearGradient
           // Use the actual aztec3 color value as in line 129
@@ -413,8 +405,8 @@ const SendChatInput = Input.styleable((props) => {
           <View
             animation="responsive"
             animateOnly={['height', 'transform']}
-            h={activePage === 'chat' ? 47 : 80}
-            y={activePage === 'chat' ? 0 : -62}
+            h={activeSection === 'chat' ? 47 : 80}
+            y={activeSection === 'chat' ? 0 : -62}
             f={1}
           >
             <Input
@@ -424,7 +416,7 @@ const SendChatInput = Input.styleable((props) => {
               }}
               numberOfLines={4}
               multiline
-              onPress={() => setActivePage('enterAmount')}
+              onPress={() => setActiveSection('enterAmount')}
               placeholderTextColor="$gray11"
               f={1}
               ref={inputRef}
@@ -447,7 +439,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const { coin } = useCoinFromSendTokenParam()
 
   const [present] = usePresence()
-  const { setActivePage } = SendChatContext.useStyledContext()
+  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
   return (
     <YStack
       zi={1}
@@ -490,9 +482,13 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             <SizableText size="$2" fow="300" col="$gray11">
               You&apos;re Sending
             </SizableText>
-            {/* <Button size="$2" chromeless>
-              <Button.Text col="$neon10">Edit</Button.Text>
-            </Button> */}
+            {activeSection === 'reviewAndSend' && (
+              <Button onPress={() => setActiveSection('enterAmount')} size="$2" chromeless>
+                <Button.Text fos="$3" fow="500" col="$neon10">
+                  Edit
+                </Button.Text>
+              </Button>
+            )}
           </XStack>
           <YStack
             gap="$3.5"
@@ -502,39 +498,59 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             br="$4"
             bg="$aztec4"
             $theme-light={{ bg: '$gray2' }}
+            animation="responsive"
+            animateOnly={['height']}
+            h={activeSection === 'reviewAndSend' ? 220 : 170}
+            jc="center"
           >
-            <XStack>
-              <Input
-                f={1}
-                unstyled
-                bg="transparent"
-                bbw={1}
-                boc="$gray8"
-                fontFamily="$mono"
-                col="$gray12"
-                pr="$8"
-                placeholderTextColor="$gray11"
-                placeholder="0.000"
-                focusStyle={{
-                  bbc: '$primary',
-                }}
-                fontSize={40}
-                fontWeight="500"
-                pb="$2"
-                inputMode={coin?.decimals ? 'decimal' : 'numeric'}
-              />
-              <View t={15} pos="absolute" r={0}>
-                <SizableText>ETH</SizableText>
-              </View>
-            </XStack>
-            <XStack>
-              <SizableText size="$5" col="$gray10">
-                Balance:{' '}
-              </SizableText>
-              <SizableText size="$5" col="$gray12">
-                12500,000
-              </SizableText>
-            </XStack>
+            <AnimatePresence exitBeforeEnter>
+              {activeSection === 'reviewAndSend' ? (
+                <ReviewSendAmountBox key="review-send-amount-box" />
+              ) : (
+                <>
+                  <XStack
+                    key="enter-amount-box"
+                    animation="100ms"
+                    filter="blur(0px)"
+                    enterStyle={{
+                      opacity: 0,
+                      filter: 'blur(4px)',
+                    }}
+                  >
+                    <Input
+                      f={1}
+                      unstyled
+                      bg="transparent"
+                      bbw={1}
+                      boc="$gray8"
+                      fontFamily="$mono"
+                      col="$gray12"
+                      pr="$8"
+                      placeholderTextColor="$gray11"
+                      placeholder="0.000"
+                      focusStyle={{
+                        bbc: '$primary',
+                      }}
+                      fontSize={40}
+                      fontWeight="500"
+                      pb="$2"
+                      inputMode={coin?.decimals ? 'decimal' : 'numeric'}
+                    />
+                    <View t={15} pos="absolute" r={0}>
+                      <SizableText>ETH</SizableText>
+                    </View>
+                  </XStack>
+                  <XStack>
+                    <SizableText size="$5" col="$gray10">
+                      Balance:{' '}
+                    </SizableText>
+                    <SizableText size="$5" col="$gray12">
+                      12500,000
+                    </SizableText>
+                  </XStack>
+                </>
+              )}
+            </AnimatePresence>
           </YStack>
         </View>
         <View
@@ -598,12 +614,54 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           bg: '$neon7',
           scale: 0.98,
         }}
-        onPress={() => setActivePage('chat')}
+        onPress={() =>
+          setActiveSection((prev) => {
+            if (prev === 'reviewAndSend') return 'chat'
+            return 'reviewAndSend'
+          })
+        }
       >
         <Button.Text col="$gray1" $theme-light={{ col: '$gray12' }}>
           Send
         </Button.Text>
       </Button>
+    </YStack>
+  )
+})
+
+const ReviewSendAmountBox = YStack.styleable((props) => {
+  return (
+    <YStack
+      key="review-send-amount-box"
+      gap="$4"
+      {...props}
+      animation="200ms"
+      animateOnly={['opacity']}
+      enterStyle={{
+        opacity: 0,
+      }}
+      exitStyle={{
+        opacity: 0,
+      }}
+    >
+      <YStack gap="$5" pb="$5" bbw={1} bbc="$primary">
+        <XStack gap="$3" ai="center">
+          <IconEthereum />
+          <SizableText>ETH</SizableText>
+        </XStack>
+        <XStack gap="$2">
+          <SizableText fos="$10">-12500,000</SizableText>
+          <SizableText fos="$2">$360</SizableText>
+        </XStack>
+      </YStack>
+      <XStack jc="space-between">
+        <SizableText>Maya receives</SizableText>
+        <SizableText fos="$3">+12500,000 SEND</SizableText>
+      </XStack>
+      <XStack jc="space-between">
+        <SizableText>Fees</SizableText>
+        <SizableText fos="$3">0.04 USDC</SizableText>
+      </XStack>
     </YStack>
   )
 })
