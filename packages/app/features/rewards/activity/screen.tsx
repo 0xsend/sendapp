@@ -501,7 +501,7 @@ const TaskCard = ({
         }
 
         const numTickets = calculateTicketsFromBps(Number(latestWeight))
-        return numTickets >= 10
+        return numTickets >= 1
       }
       default:
         return Boolean(weight)
