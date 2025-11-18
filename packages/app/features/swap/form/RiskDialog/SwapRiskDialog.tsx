@@ -16,6 +16,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useEffect, useId, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
+import { useTranslation } from 'react-i18next'
 
 const SwapRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
@@ -24,6 +25,7 @@ const SwapRiskDialog = () => {
   const didUserSwap = useDidUserSwap()
   const router = useRouter()
   const id = useId()
+  const { t } = useTranslation('trade')
 
   const handleConfirm = () => {
     setIsOpen(false)
@@ -64,24 +66,21 @@ const SwapRiskDialog = () => {
     <>
       {didUserSwap.error ? (
         <YStack gap="$4">
-          <Dialog.Title>Error</Dialog.Title>
+          <Dialog.Title>{t('risk.errorTitle')}</Dialog.Title>
           <Paragraph>{toNiceError(didUserSwap.error)}</Paragraph>
         </YStack>
       ) : (
         <YStack gap="$4" testID={'swapRiskDialogContent'}>
-          <H2>Important Disclaimer</H2>
+          <H2>{t('risk.title')}</H2>
           <Paragraph>
-            Trading cryptocurrencies involves a high level of risk and may not be suitable for all
-            investors. You could lose some or all of your principal, and should only invest money
-            you can afford to lose. Carefully consider your investment objectives, experience, and
-            risk tolerance before proceeding.{' '}
+            {t('risk.description')}{' '}
             <Anchor
               target="_blank"
               href="https://support.send.app/en/articles/10916009-terms-of-service"
               rel="noreferrer"
               textDecorationLine={'underline'}
             >
-              Learn more.
+              {t('risk.learnMore')}
             </Anchor>
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>
@@ -103,14 +102,14 @@ const SwapRiskDialog = () => {
               </Checkbox.Indicator>
             </Checkbox>
             <Label htmlFor={id} cursor={'pointer'} lineHeight={20}>
-              I have read and understand the risks involved.
+              {t('risk.checkbox')}
             </Label>
           </XStack>
           <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
             {Platform.OS === 'web' && (
               <Dialog.Close asChild>
                 <Button theme="red_active" testID={'swapRiskDialogCancelButton'} br={'$2'}>
-                  <Button.Text>Cancel</Button.Text>
+                  <Button.Text>{t('risk.buttons.cancel')}</Button.Text>
                 </Button>
               </Dialog.Close>
             )}
@@ -123,7 +122,7 @@ const SwapRiskDialog = () => {
               disabledStyle={{ opacity: 0.5 }}
               width={Platform.OS === 'web' ? undefined : '100%'}
             >
-              <Button.Text>I Agree & Continue</Button.Text>
+              <Button.Text>{t('risk.buttons.confirm')}</Button.Text>
             </Button>
           </XStack>
         </YStack>

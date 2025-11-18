@@ -24,6 +24,7 @@ import { Platform } from 'react-native'
 import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useUser } from 'app/utils/useUser'
+import { useTranslation } from 'react-i18next'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
@@ -39,6 +40,7 @@ export const SwapSummaryScreen = () => {
   const { tokensQuery, ethQuery } = useCoinFromSendTokenParam()
   const queryClient = useQueryClient()
   const { distributionShares } = useUser()
+  const { t } = useTranslation('trade')
 
   // Compute if user is verified
   const isVerified = useMemo(
@@ -282,11 +284,11 @@ export const SwapSummaryScreen = () => {
             <YStack gap={'$2'}>
               <Row
                 testID={'exchangeRate'}
-                label={'Exchange Rate'}
+                label={t('summary.labels.exchangeRate')}
                 value={`1 ${inCoin?.symbol} = ${exchangeRate} ${outCoin?.symbol}`}
               />
               <Row
-                label={'Transaction Fee'}
+                label={t('summary.labels.transactionFee')}
                 value={(() => {
                   switch (true) {
                     case isLoadingUSDCFees:
@@ -299,7 +301,7 @@ export const SwapSummaryScreen = () => {
                 })()}
               />
               <Row
-                label={'Send Fee'}
+                label={t('summary.labels.sendFee')}
                 value={
                   <Paragraph
                     size={'$5'}
@@ -313,7 +315,7 @@ export const SwapSummaryScreen = () => {
               {priceImpact && (
                 <Row
                   testID={'priceImpact'}
-                  label={'Price Impact'}
+                  label={t('summary.labels.priceImpact')}
                   value={
                     <Paragraph
                       size={'$5'}
@@ -326,7 +328,7 @@ export const SwapSummaryScreen = () => {
               )}
               <Row
                 testID={'slippage'}
-                label={'Max Slippage'}
+                label={t('summary.labels.maxSlippage')}
                 value={`${(Number(slippage || DEFAULT_SLIPPAGE) / 100).toString()}%`}
               />
             </YStack>
@@ -369,20 +371,22 @@ export const SwapSummaryScreen = () => {
               !isLoadingUserOp &&
               !encodeRouteError &&
               !userOpError:
-              return <PrimaryButton.Text>insufficient balance</PrimaryButton.Text>
+              return (
+                <PrimaryButton.Text>{t('summary.buttons.insufficientBalance')}</PrimaryButton.Text>
+              )
             case !hasEnoughGas && !encodeRouteError && !userOpError:
-              return <PrimaryButton.Text>insufficient gas</PrimaryButton.Text>
+              return <PrimaryButton.Text>{t('summary.buttons.insufficientGas')}</PrimaryButton.Text>
             case isSendUserOpPending:
               return (
                 <>
                   <PrimaryButton.Icon>
                     <Spinner size="small" color="$color12" mr={'$2'} />
                   </PrimaryButton.Icon>
-                  <PrimaryButton.Text>trading...</PrimaryButton.Text>
+                  <PrimaryButton.Text>{t('summary.buttons.loading')}</PrimaryButton.Text>
                 </>
               )
             default:
-              return <PrimaryButton.Text>confirm trade</PrimaryButton.Text>
+              return <PrimaryButton.Text>{t('summary.buttons.confirm')}</PrimaryButton.Text>
           }
         })()}
       </PrimaryButton>
@@ -419,6 +423,7 @@ export const Row = ({
 
 export const EditButton = () => {
   const router = useRouter()
+  const { t } = useTranslation('trade')
 
   const handlePress = () => {
     router.back()
@@ -441,7 +446,7 @@ export const EditButton = () => {
       margin={-10} // This keeps layout visually unchanged
     >
       <Button.Text size={'$5'} hoverStyle={{ color: '$primary' }}>
-        edit
+        {t('summary.buttons.edit')}
       </Button.Text>
     </Button>
   )

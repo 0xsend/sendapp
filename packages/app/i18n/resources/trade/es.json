@@ -1,0 +1,67 @@
+{
+  "form": {
+    "labels": {
+      "pay": "Pagas",
+      "receive": "Recibes",
+      "priceImpact": "Impacto en el precio:"
+    },
+    "buttons": {
+      "review": "revisar",
+      "loading": "cargando",
+      "max": "máx."
+    },
+    "slippage": {
+      "label": "Deslizamiento máximo",
+      "customPlaceholder": "Personalizado"
+    },
+    "errors": {
+      "balance": "Error al obtener el saldo",
+      "slippageMin": "El deslizamiento mínimo es 0%",
+      "slippageMax": "El deslizamiento máximo es 20%"
+    },
+    "priceImpact": {
+      "levels": {
+        "medium": "Alto",
+        "high": "Muy alto"
+      }
+    }
+  },
+  "summary": {
+    "labels": {
+      "exchangeRate": "Tipo de cambio",
+      "transactionFee": "Comisión de transacción",
+      "sendFee": "Comisión de Send",
+      "priceImpact": "Impacto en el precio",
+      "maxSlippage": "Deslizamiento máximo"
+    },
+    "buttons": {
+      "edit": "editar",
+      "insufficientBalance": "saldo insuficiente",
+      "insufficientGas": "gas insuficiente",
+      "loading": "realizando intercambio...",
+      "confirm": "confirmar intercambio"
+    }
+  },
+  "risk": {
+    "errorTitle": "Error",
+    "title": "Aviso importante",
+    "description": "Operar con criptomonedas implica un alto nivel de riesgo y puede no ser adecuado para todas las personas. Podrías perder parte o la totalidad de tu capital, y solo debes invertir dinero que puedas permitirte perder. Considera detenidamente tus objetivos, experiencia y tolerancia al riesgo antes de continuar.",
+    "learnMore": "Obtén más información.",
+    "checkbox": "He leído y comprendo los riesgos involucrados.",
+    "buttons": {
+      "cancel": "Cancelar",
+      "confirm": "Acepto y continúo"
+    }
+  },
+  "priceImpactInfo": {
+    "title": "¿Qué es el impacto en el precio?",
+    "description": "Intercambiar montos grandes reduce el rendimiento. La tasa disponible podría no reflejar la mejor oferta.",
+    "tipsTitle": "Cómo obtener mejores tasas:",
+    "tips": [
+      "Divide tu intercambio en montos más pequeños",
+      "Opera cuando haya más personas operando",
+      "Usa montos más bajos para obtener mejores tasas"
+    ],
+    "dismiss": "Entendido"
+  }
+}

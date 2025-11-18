@@ -20,6 +20,8 @@ import sendpotEn from './resources/sendpot/en.json'
 import sendpotEs from './resources/sendpot/es.json'
 import sendEn from './resources/send/en.json'
 import sendEs from './resources/send/es.json'
+import tradeEn from './resources/trade/en.json'
+import tradeEs from './resources/trade/es.json'
 import homeEn from './resources/home/en.json'
 import homeEs from './resources/home/es.json'
 import navigationEn from './resources/navigation/en.json'
@@ -44,6 +46,7 @@ export const resources = {
     rewards: rewardsEn,
     sendpot: sendpotEn,
     send: sendEn,
+    trade: tradeEn,
     home: homeEn,
     navigation: navigationEn,
     onboarding: onboardingEn,
@@ -59,6 +62,7 @@ export const resources = {
     rewards: rewardsEs,
     sendpot: sendpotEs,
     send: sendEs,
+    trade: tradeEs,
     home: homeEs,
     navigation: navigationEs,
     onboarding: onboardingEs,

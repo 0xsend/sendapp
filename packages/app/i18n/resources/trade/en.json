@@ -1,0 +1,67 @@
+{
+  "form": {
+    "labels": {
+      "pay": "You Pay",
+      "receive": "You Receive",
+      "priceImpact": "Price Impact:"
+    },
+    "buttons": {
+      "review": "review",
+      "loading": "loading",
+      "max": "max"
+    },
+    "slippage": {
+      "label": "Max Slippage",
+      "customPlaceholder": "Custom"
+    },
+    "errors": {
+      "balance": "Error fetching balance info",
+      "slippageMin": "Min slippage value is 0%",
+      "slippageMax": "Max slippage value is 20%"
+    },
+    "priceImpact": {
+      "levels": {
+        "medium": "High",
+        "high": "Very high"
+      }
+    }
+  },
+  "summary": {
+    "labels": {
+      "exchangeRate": "Exchange Rate",
+      "transactionFee": "Transaction Fee",
+      "sendFee": "Send Fee",
+      "priceImpact": "Price Impact",
+      "maxSlippage": "Max Slippage"
+    },
+    "buttons": {
+      "edit": "edit",
+      "insufficientBalance": "insufficient balance",
+      "insufficientGas": "insufficient gas",
+      "loading": "trading...",
+      "confirm": "confirm trade"
+    }
+  },
+  "risk": {
+    "errorTitle": "Error",
+    "title": "Important Disclaimer",
+    "description": "Trading cryptocurrencies involves a high level of risk and may not be suitable for all investors. You could lose some or all of your principal, and should only invest money you can afford to lose. Carefully consider your investment objectives, experience, and risk tolerance before proceeding.",
+    "learnMore": "Learn more.",
+    "checkbox": "I have read and understand the risks involved.",
+    "buttons": {
+      "cancel": "Cancel",
+      "confirm": "I Agree & Continue"
+    }
+  },
+  "priceImpactInfo": {
+    "title": "What is Price Impact?",
+    "description": "Exchanging large amounts reduces return. Available rate may not reflect best deal.",
+    "tipsTitle": "How to get better rates:",
+    "tips": [
+      "Break your exchange into smaller amounts",
+      "Trade when more people are trading",
+      "Use lower amount for better rates"
+    ],
+    "dismiss": "Got it"
+  }
+}
