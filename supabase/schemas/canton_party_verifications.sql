@@ -59,6 +59,20 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $function$
 BEGIN
+    -- Validate and cap page_size to prevent abuse
+    IF page_size > 50 THEN
+        page_size := 50;
+    END IF;
+
+    IF page_size < 1 THEN
+        page_size := 1;
+    END IF;
+
+    -- Ensure page_number is not negative
+    IF page_number < 0 THEN
+        page_number := 0;
+    END IF;
+
     RETURN QUERY
     WITH valid_users AS (
         SELECT
@@ -131,12 +145,14 @@ GRANT ALL ON FUNCTION "public"."canton_party_verifications"("public"."profiles")
 GRANT ALL ON FUNCTION "public"."canton_party_verifications"("public"."profiles") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."canton_party_verifications"("public"."profiles") TO "service_role";
 
+-- Grant public access to canton_top_senders function (used directly via Supabase API)
 REVOKE ALL ON FUNCTION "public"."canton_top_senders"(integer, integer) FROM PUBLIC;
-REVOKE ALL ON FUNCTION "public"."canton_top_senders"(integer, integer) FROM anon;
-REVOKE ALL ON FUNCTION "public"."canton_top_senders"(integer, integer) FROM authenticated;
+GRANT EXECUTE ON FUNCTION "public"."canton_top_senders"(integer, integer) TO "anon";
+GRANT EXECUTE ON FUNCTION "public"."canton_top_senders"(integer, integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."canton_top_senders"(integer, integer) TO "service_role";
 
+-- Grant type access for anon users
 REVOKE USAGE ON TYPE "public"."canton_top_sender_result" FROM PUBLIC;
-REVOKE USAGE ON TYPE "public"."canton_top_sender_result" FROM anon;
-REVOKE USAGE ON TYPE "public"."canton_top_sender_result" FROM authenticated;
+GRANT USAGE ON TYPE "public"."canton_top_sender_result" TO "anon";
+GRANT USAGE ON TYPE "public"."canton_top_sender_result" TO "authenticated";
 GRANT USAGE ON TYPE "public"."canton_top_sender_result" TO "service_role";

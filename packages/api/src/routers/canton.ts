@@ -290,46 +290,6 @@ export const cantonRouter = createTRPCRouter({
         })
       }
     }),
-
-  /**
-   * Get top senders with Canton wallets (PUBLIC)
-   * Returns paginated list of top senders sorted by send score, filtered by Canton wallet holders
-   * See docs/top-senders-api-implementation-plan.md for full documentation
-   */
-  topSenders: publicProcedure
-    .input(
-      z
-        .object({
-          pageNumber: z.number().int().min(0).default(0).optional(),
-          pageSize: z.number().int().min(1).max(50).default(10).optional(),
-        })
-        .optional()
-        .default({
-          pageNumber: 0,
-          pageSize: 10,
-        })
-    )
-    .query(async ({ input }) => {
-      const supabase = createSupabaseAdminClient()
-
-      const rpcParams = {
-        page_number: input.pageNumber,
-        page_size: input.pageSize,
-      }
-
-      const { data, error } = await supabase.rpc('canton_top_senders', rpcParams)
-
-      if (error) {
-        log('Canton top senders RPC error:', error)
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to fetch Canton top senders',
-          cause: error.message,
-        })
-      }
-
-      return data ?? []
-    }),
 })
 
 function calculateStartTime(endTime: number, days: string): number {
