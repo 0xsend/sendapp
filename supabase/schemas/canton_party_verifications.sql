@@ -34,6 +34,13 @@ ALTER TABLE ONLY "public"."canton_party_verifications"
 CREATE INDEX "canton_party_verifications_user_id_idx"
     ON "public"."canton_party_verifications" USING "btree" ("user_id");
 
+-- Composite partial index for canton_top_senders function: indexes only discoverable verifications
+-- This improves performance by filtering is_discoverable = TRUE before joining
+-- Covers both user_id (for joins) and canton_wallet_address (for lookups) on discoverable records
+CREATE INDEX "canton_party_verifications_discoverable_user_id_canton_wallet_address_idx"
+    ON "public"."canton_party_verifications" USING "btree" ("user_id", "canton_wallet_address")
+    WHERE "is_discoverable" = TRUE;
+
 -- Foreign Keys
 ALTER TABLE ONLY "public"."canton_party_verifications"
     ADD CONSTRAINT "canton_party_verifications_user_id_fkey"
