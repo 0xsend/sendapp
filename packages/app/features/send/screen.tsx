@@ -31,6 +31,68 @@ import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { Platform } from 'react-native'
 import { SendChat } from './components/SendChat'
+import { useTranslation } from 'react-i18next'
+
+const SendScreenSkeleton = () => {
+  return (
+    <YStack w="100%" gap="$8">
+      <Shimmer
+        ov="hidden"
+        br="$4"
+        h={50}
+        w={700}
+        maw="100%"
+        componentName="Card"
+        bg="$background"
+        $theme-light={{ bg: '$background' }}
+      />
+      <YStack gap="$6">
+        <Shimmer
+          ov="hidden"
+          br="$1"
+          h={30}
+          w={200}
+          maw="100%"
+          componentName="Card"
+          bg="$background"
+          $theme-light={{ bg: '$background' }}
+        />
+        <XStack gap="$4">
+          <Shimmer
+            ov="hidden"
+            br="$12"
+            h={80}
+            w={80}
+            maw="100%"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+          <Shimmer
+            ov="hidden"
+            br="$12"
+            h={80}
+            w={80}
+            maw="100%"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+          <Shimmer
+            ov="hidden"
+            br="$12"
+            h={80}
+            w={80}
+            maw="100%"
+            componentName="Card"
+            bg="$background"
+            $theme-light={{ bg: '$background' }}
+          />
+        </XStack>
+      </YStack>
+    </YStack>
+  )
+}
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
@@ -40,7 +102,7 @@ export const SendScreen = () => {
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [{ search }] = useRootScreenParams()
-  const { gtLg } = useMedia()
+  const { t } = useTranslation('send')
 
   // to avoid flickering
   const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
@@ -64,7 +126,20 @@ export const SendScreen = () => {
     return <SendAmountForm />
   }
 
-  if (profile && !profile.address)
+  if (!profile)
+    return (
+      <TagSearchProvider>
+        <YStack width="100%" pb="$4" gap="$6" $lg={{ pt: '$3' }}>
+          <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
+            <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
+          </YStack>
+          {!search && <SendSuggestions />}
+          <SendSearchBody />
+        </YStack>
+      </TagSearchProvider>
+    )
+
+  if (!profile.address)
     // handle when user has no send account
     return <NoSendAccount profile={profile} />
 
@@ -130,6 +205,7 @@ export const SendScreen = () => {
 
 function SendSearchBody() {
   const { isLoading, error } = useTagSearch()
+  const { t } = useTranslation('send')
 
   return (
     <AnimatePresence>
@@ -153,7 +229,7 @@ function SendSearchBody() {
       )}
       {error && (
         <YStack key="red" gap="$4" mb="$4">
-          <H4 theme={'alt2'}>Error</H4>
+          <H4 theme={'alt2'}>{t('search.errorHeading')}</H4>
           <Text>{error.message}</Text>
         </YStack>
       )}
@@ -168,6 +244,7 @@ export function SendRecipient({ ...props }: YStackProps) {
   const router = useRouter()
   const { data: profile, isLoading, error } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const href = profile ? `/profile/${profile?.sendid}` : ''
+  const { t } = useTranslation('send')
 
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
@@ -181,7 +258,7 @@ export function SendRecipient({ ...props }: YStackProps) {
           textTransform="uppercase"
           $theme-dark={{ col: '$gray8Light' }}
         >
-          TO
+          {t('recipient.label')}
         </Label>
         <Button
           bc="transparent"
@@ -196,7 +273,7 @@ export function SendRecipient({ ...props }: YStackProps) {
             })
           }
         >
-          <Button.Text $theme-dark={{ col: '$primary' }}>edit</Button.Text>
+          <Button.Text $theme-dark={{ col: '$primary' }}>{t('recipient.edit')}</Button.Text>
         </Button>
       </XStack>
       <XStack
@@ -250,11 +327,12 @@ export function SendRecipient({ ...props }: YStackProps) {
 function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[number] }) {
   const toast = useAppToast()
   const [clicked, setClicked] = useState(false)
+  const { t } = useTranslation('send')
   return (
     <YStack testID="NoSendAccount" gap="$4" mb="$4" maw={600} $lg={{ mx: 'auto' }} width={'100%'}>
       <SendRecipient width={'100%'} />
       <H4 theme={'alt2'} color="$olive">
-        No send account
+        {t('noAccount.title')}
       </H4>
       <Anchor
         testID="NoSendAccountLink"
@@ -271,7 +349,7 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
         </Text>
         <Text display="flex" color="$color12">
           {' '}
-          has no send account! Ask them to create one or write a /send Check.
+          {t('noAccount.description')}
         </Text>
       </Anchor>
 
@@ -283,15 +361,15 @@ function NoSendAccount({ profile }: { profile: Functions<'profile_lookup'>[numbe
         onPress={() => {
           setClicked(true)
           console.error('TODO: create send account')
-          toast.show('Coming soon')
+          toast.show(t('noAccount.toast'))
         }}
       >
-        Write /send Check
+        {t('noAccount.cta')}
       </Button>
       {clicked && (
         <Fade>
           <Paragraph width={'100%'} textAlign="center" color="$color12">
-            <Text>/send Checks Coming Soon</Text>
+            <Text>{t('noAccount.banner')}</Text>
           </Paragraph>
         </Fade>
       )}

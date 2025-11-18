@@ -16,6 +16,8 @@ import rewardsEn from './resources/rewards/en.json'
 import rewardsEs from './resources/rewards/es.json'
 import sendpotEn from './resources/sendpot/en.json'
 import sendpotEs from './resources/sendpot/es.json'
+import sendEn from './resources/send/en.json'
+import sendEs from './resources/send/es.json'
 import homeEn from './resources/home/en.json'
 import homeEs from './resources/home/es.json'
 import navigationEn from './resources/navigation/en.json'
@@ -38,6 +40,7 @@ export const resources = {
     explore: exploreEn,
     rewards: rewardsEn,
     sendpot: sendpotEn,
+    send: sendEn,
     home: homeEn,
     navigation: navigationEn,
     onboarding: onboardingEn,
@@ -51,6 +54,7 @@ export const resources = {
     explore: exploreEs,
     rewards: rewardsEs,
     sendpot: sendpotEs,
+    send: sendEs,
     home: homeEs,
     navigation: navigationEs,
     onboarding: onboardingEs,
