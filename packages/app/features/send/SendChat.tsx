@@ -259,8 +259,8 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
               exitStyle={{ opacity: 0 }}
               animation="200ms"
               animateOnly={['opacity']}
-              bg="$gray10Dark"
-              opacity={0.7}
+              bg="#000"
+              opacity={0.6}
               pos="absolute"
               inset={0}
             />
@@ -608,7 +608,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           y: 20,
         }}
         hoverStyle={{
-          bg: '$neon9',
+          bg: '$neon6',
         }}
         pressStyle={{
           bg: '$neon7',
@@ -620,10 +620,39 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             return 'reviewAndSend'
           })
         }
+        ov="hidden"
       >
-        <Button.Text col="$gray1" $theme-light={{ col: '$gray12' }}>
-          Send
-        </Button.Text>
+        <AnimatePresence>
+          <Button.Text
+            key={activeSection === 'reviewAndSend' ? 'review-button-text' : 'send-button-text'}
+            col="$gray1"
+            $theme-light={{ col: '$gray12' }}
+            animation="responsive"
+            animateOnly={['opacity', 'transform']}
+            filter="blur(0px)"
+            pos="absolute"
+            enterStyle={{
+              opacity: 0,
+              y: -40,
+              ...(isWeb && {
+                filter: 'blur(4px)',
+              }),
+            }}
+            exitStyle={{
+              opacity: 0,
+              y: 40,
+              ...(isWeb && {
+                filter: 'blur(4px)',
+              }),
+            }}
+            $platform-web={{
+              willChange: 'transform, opacity, filter',
+              transition: 'filter linear 200ms',
+            }}
+          >
+            {activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
+          </Button.Text>
+        </AnimatePresence>
       </Button>
     </YStack>
   )
