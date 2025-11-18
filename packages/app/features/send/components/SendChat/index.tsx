@@ -488,7 +488,9 @@ const SendChatInput = Input.styleable((props) => {
               value={message}
               onChangeText={setMessage}
               // use a placeholder that trigger the user to send some crypto with a message
-              placeholder="Type amount, add a note..."
+              placeholder={
+                activeSection === 'chat' ? 'Type amount, add a note...' : 'Add a note...'
+              }
               br="$3"
               {...props}
             />
