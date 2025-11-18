@@ -12,6 +12,8 @@ import activityEn from './resources/activity/en.json'
 import activityEs from './resources/activity/es.json'
 import exploreEn from './resources/explore/en.json'
 import exploreEs from './resources/explore/es.json'
+import depositEn from './resources/deposit/en.json'
+import depositEs from './resources/deposit/es.json'
 import cantonWalletEn from './resources/canton-wallet/en.json'
 import cantonWalletEs from './resources/canton-wallet/es.json'
 import rewardsEn from './resources/rewards/en.json'
@@ -42,6 +44,7 @@ export const resources = {
     account: accountEn,
     activity: activityEn,
     explore: exploreEn,
+    deposit: depositEn,
     cantonWallet: cantonWalletEn,
     rewards: rewardsEn,
     sendpot: sendpotEn,
@@ -58,6 +61,7 @@ export const resources = {
     account: accountEs,
     activity: activityEs,
     explore: exploreEs,
+    deposit: depositEs,
     cantonWallet: cantonWalletEs,
     rewards: rewardsEs,
     sendpot: sendpotEs,

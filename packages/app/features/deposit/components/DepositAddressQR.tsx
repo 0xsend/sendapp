@@ -1,6 +1,7 @@
 import { QRCode, Text, YStack } from '@my/ui'
 import type { Address } from 'viem'
 import { IconBase } from 'app/components/icons'
+import { useTranslation } from 'react-i18next'
 
 type DepositAddressQR = {
   address?: Address
@@ -9,6 +10,8 @@ type DepositAddressQR = {
 }
 
 export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddressQR) {
+  const { t } = useTranslation('deposit')
+
   if (!address) return null
 
   return (
@@ -44,7 +47,7 @@ export function DepositAddressQR({ address, isConfirmed, onPress }: DepositAddre
             borderRadius={8}
           >
             <Text color="$color" fontSize="$4">
-              Click to reveal QR code
+              {t('crypto.qr.reveal')}
             </Text>
           </YStack>
         )}

@@ -5,6 +5,7 @@ import { Check, Copy } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import { useState } from 'react'
 import { CopyAddressDialog } from 'app/features/deposit/components/CopyAddressDialog'
+import { useTranslation } from 'react-i18next'
 
 export function DepositCryptoScreen() {
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
@@ -12,11 +13,12 @@ export function DepositCryptoScreen() {
   const [hasCopied, setHasCopied] = useState(false)
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [copyAddressDialogIsOpen, setCopyAddressDialogIsOpen] = useState(false)
+  const { t } = useTranslation('deposit')
 
   const copyToClipboard = async () => {
     await Clipboard.setStringAsync(sendAccount?.address || '').catch(() =>
-      toast.error('Something went wrong', {
-        message: 'We were unable to copy your address to the clipboard',
+      toast.error(t('crypto.toast.errorTitle'), {
+        message: t('crypto.toast.errorMessage'),
       })
     )
     setHasCopied(true)
@@ -46,7 +48,7 @@ export function DepositCryptoScreen() {
     >
       <YStack gap={'$3.5'}>
         <FadeCard>
-          <Paragraph size={'$7'}>Base Network</Paragraph>
+          <Paragraph size={'$7'}>{t('crypto.networkLabel')}</Paragraph>
           <DepositAddressQR
             address={sendAccount?.address}
             onPress={() => setCopyAddressDialogIsOpen(true)}
@@ -62,7 +64,7 @@ export function DepositCryptoScreen() {
           $gtLg={{ marginHorizontal: 0 }}
         >
           <Paragraph w={'100%'} size={'$7'}>
-            Wallet Address
+            {t('crypto.walletAddress')}
           </Paragraph>
           <FadeCard maxWidth={'100%'}>
             <Button

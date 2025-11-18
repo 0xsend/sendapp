@@ -1,0 +1,92 @@
+{
+  "options": {
+    "crypto": {
+      "title": "Crypto Wallet",
+      "description": "Deposit from an external wallet"
+    },
+    "applePay": {
+      "title": "Apple Pay",
+      "description": "Debit card only"
+    },
+    "debitCard": {
+      "title": "Debit Card",
+      "description": "Quick deposits up to $500/week"
+    }
+  },
+  "copyAddressDialog": {
+    "title": "Confirm External Deposit",
+    "intro": "Please confirm you agree to the following before proceeding:",
+    "steps": {
+      "baseNetwork": "The external address is on the Base Network and <supportLink>can receive transfers from Smart Contracts</supportLink>",
+      "tokens": "I have double checked that the tokens {{coins}} are on Base Network.",
+      "liability": "I understand that if I make any mistakes, there is no way to recover the funds."
+    },
+    "actions": {
+      "confirm": "I agree & proceed",
+      "cancel": "Cancel"
+    }
+  },
+  "crypto": {
+    "networkLabel": "Base Network",
+    "walletAddress": "Wallet Address",
+    "toast": {
+      "errorTitle": "Something went wrong",
+      "errorMessage": "We were unable to copy your address to the clipboard"
+    },
+    "qr": {
+      "reveal": "Click to reveal QR code"
+    }
+  },
+  "coinbaseForm": {
+    "title": "Enter Deposit Amount",
+    "submit": {
+      "default": "Confirm deposit",
+      "loading": "Processing..."
+    },
+    "limits": "Min $10 - Max $500 per week",
+    "fees": "Fees: $0.00",
+    "currency": "USD"
+  },
+  "coinbase": {
+    "errors": {
+      "windowClosed": "Coinbase window was closed"
+    },
+    "help": {
+      "iosPopup": "Turn off \"Block Popups\" in iOS Safari Settings then try again."
+    },
+    "status": {
+      "almostThere": {
+        "title": "Almost there...",
+        "description": "Just wrapping up the final steps."
+      },
+      "holdTight": {
+        "title": "Hold tight...",
+        "description": "Complete the transaction in your Coinbase window."
+      },
+      "pending": {
+        "title": "Transaction Pending",
+        "description": "Coinbase is verifying your payment. This page will redirect when complete."
+      },
+      "timedOut": {
+        "title": "Transaction Timed Out",
+        "description": "Your payment took too long to process. Please try again."
+      },
+      "failed": {
+        "title": "Payment Failed",
+        "description": "Please check your connection or try a different card."
+      }
+    },
+    "actions": {
+      "tryAgain": "Try again",
+      "cancel": "Cancel"
+    }
+  },
+  "success": {
+    "title": "Deposit Complete",
+    "description": "You’re all set — your funds will appear in your wallet soon",
+    "actions": {
+      "depositAgain": "Deposit again",
+      "continue": "Continue"
+    }
+  }
+}

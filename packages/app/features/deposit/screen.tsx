@@ -1,8 +1,36 @@
+import { useMemo } from 'react'
 import { YStack } from '@my/ui'
 import { DepositOptionButton } from './components/DepositOptionButton'
 import { IconApple, IconDebitCard, IconWallet } from 'app/components/icons'
+import { useTranslation } from 'react-i18next'
 
 export function DepositScreen() {
+  const { t } = useTranslation('deposit')
+
+  const options = useMemo(
+    () => [
+      {
+        Icon: IconWallet,
+        href: '/deposit/crypto',
+        title: t('options.crypto.title'),
+        description: t('options.crypto.description'),
+      },
+      {
+        Icon: IconApple,
+        href: '/deposit/apple-pay',
+        title: t('options.applePay.title'),
+        description: t('options.applePay.description'),
+      },
+      {
+        Icon: IconDebitCard,
+        href: '/deposit/debit-card',
+        title: t('options.debitCard.title'),
+        description: t('options.debitCard.description'),
+      },
+    ],
+    [t]
+  )
+
   return (
     <YStack
       width={'100%'}
@@ -20,24 +48,9 @@ export function DepositScreen() {
           gap: '$5',
         }}
       >
-        <DepositOptionButton
-          title="Crypto Wallet"
-          description="Deposit from an external wallet"
-          Icon={IconWallet}
-          href={'/deposit/crypto'}
-        />
-        <DepositOptionButton
-          title="Apple Pay"
-          description="Debit card only"
-          Icon={IconApple}
-          href={'/deposit/apple-pay'}
-        />
-        <DepositOptionButton
-          title="Debit Card"
-          description="Quick deposits up to $500/week"
-          Icon={IconDebitCard}
-          href={'/deposit/debit-card'}
-        />
+        {options.map((option) => (
+          <DepositOptionButton key={option.href} {...option} />
+        ))}
       </YStack>
     </YStack>
   )
