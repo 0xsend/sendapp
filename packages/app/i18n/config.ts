@@ -8,12 +8,18 @@ import commonEn from './resources/common/en.json'
 import commonEs from './resources/common/es.json'
 import accountEn from './resources/account/en.json'
 import accountEs from './resources/account/es.json'
+import affiliateEn from './resources/affiliate/en.json'
+import affiliateEs from './resources/affiliate/es.json'
 import activityEn from './resources/activity/en.json'
 import activityEs from './resources/activity/es.json'
 import exploreEn from './resources/explore/en.json'
 import exploreEs from './resources/explore/es.json'
+import investEn from './resources/invest/en.json'
+import investEs from './resources/invest/es.json'
 import depositEn from './resources/deposit/en.json'
 import depositEs from './resources/deposit/es.json'
+import earnEn from './resources/earn/en.json'
+import earnEs from './resources/earn/es.json'
 import cantonWalletEn from './resources/canton-wallet/en.json'
 import cantonWalletEs from './resources/canton-wallet/es.json'
 import rewardsEn from './resources/rewards/en.json'
@@ -42,8 +48,11 @@ export const resources = {
   en: {
     [DEFAULT_NAMESPACE]: commonEn,
     account: accountEn,
+    affiliate: affiliateEn,
     activity: activityEn,
     explore: exploreEn,
+    earn: earnEn,
+    invest: investEn,
     deposit: depositEn,
     cantonWallet: cantonWalletEn,
     rewards: rewardsEn,
@@ -59,8 +68,11 @@ export const resources = {
   es: {
     [DEFAULT_NAMESPACE]: commonEs,
     account: accountEs,
+    affiliate: affiliateEs,
     activity: activityEs,
     explore: exploreEs,
+    earn: earnEs,
+    invest: investEs,
     deposit: depositEs,
     cantonWallet: cantonWalletEs,
     rewards: rewardsEs,

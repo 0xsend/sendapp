@@ -12,11 +12,13 @@ import { useUser } from 'app/utils/useUser'
 import { CheckCheck, Copy } from '@tamagui/lucide-icons'
 import { useEffect, useState, memo, useMemo, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
+import { useTranslation } from 'react-i18next'
 
 export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
   const { profile } = useUser()
   const toast = useAppToast()
   const [hasCopied, setHasCopied] = useState(false)
+  const { t } = useTranslation('affiliate')
 
   const send_id = useMemo(() => profile?.send_id, [profile?.send_id])
   const referralCode = useMemo(() => profile?.main_tag?.name, [profile?.main_tag?.name])
@@ -54,13 +56,13 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
 
   const copyAndMaybeShareOnPress = useCallback(async () => {
     await Clipboard.setStringAsync(referralHref)
-      .then(() => toast.show('Copied your referral link to the clipboard'))
+      .then(() => toast.show(t('referralLink.toast.copied')))
       .catch(() =>
-        toast.error('Something went wrong', {
-          message: 'We were unable to copy your referral link to the clipboard',
+        toast.error(t('referralLink.toast.errorTitle'), {
+          message: t('referralLink.toast.errorMessage'),
         })
       )
-  }, [referralHref, toast])
+  }, [referralHref, t, toast])
 
   const handlePress = useCallback(
     (e) => {
@@ -84,7 +86,7 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
     return (
       <XStack ai={'center'} gap={'$2'} width={'100%'}>
         <Paragraph size={'$5'} color={'$color10'}>
-          Send ID:
+          {t('referralLink.labels.sendId')}
         </Paragraph>
         <Paragraph fontSize={'$5'} fontWeight={'500'}>
           {send_id}
@@ -113,7 +115,7 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
         {...props}
       >
         <ButtonText size={'$5'} color={'$color10'} flexShrink={0}>
-          Referral Code:
+          {t('referralLink.labels.referralCode')}
         </ButtonText>
         <ButtonText
           fontSize={'$5'}

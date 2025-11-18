@@ -16,7 +16,7 @@ This checklist captures the current English-only strings that need to be migrate
 
 Audit each `Stack.Screen` title and move it into resources; afterwards fetch via `useTranslation` or a helper to avoid inline literals.
 
-- [ ] `Deposit`, `Deposit on Base`, `Apple Pay`, `Debit Card`, `Success` (`apps/expo/app/deposit/*.tsx`)
+- [x] `Deposit`, `Deposit on Base`, `Apple Pay`, `Debit Card`, `Success` (`apps/expo/app/deposit/*.tsx`)
 - [ ] `Enter Amount`, `Preview and Send` (`apps/expo/app/send/*.tsx`)
 - [ ] `Savings`, `Details`, `Deposit`, `Withdraw Savings`, `Rewards Balance`, `Balance` (`apps/expo/app/earn/[asset]/*.tsx`, `apps/expo/app/earn/index.tsx`)
 - [ ] `Trade`, `Trade summary` (`apps/expo/app/trade/*.tsx`)
@@ -54,31 +54,41 @@ Audit each `Stack.Screen` title and move it into resources; afterwards fetch via
 - [ ] `ActivityScreen` and `ActivityDetails` require translation-aware headers, error messages, and field labels (`packages/app/features/activity/screen.tsx:16`, `packages/app/features/activity/ActivityDetails.tsx:1`)
 
 ### Deposit & Funding
-- [ ] `DepositScreen` option titles/descriptions (`Crypto Wallet`, `Deposit from an external wallet`, etc.) (`packages/app/features/deposit/screen.tsx:5`)
-- [ ] `DepositCryptoScreen` instructions, button states, and toast errors (`packages/app/features/deposit/crypto/screen.tsx:9`)
-- [ ] Coinbase onramp screens (`packages/app/features/deposit/DepositCoinbase/*`) should use translations for payment method messaging
-- [ ] `DepositSuccessScreen` confirmation text (`packages/app/features/deposit/success/screen.tsx:6`)
+- [x] `DepositScreen` option titles/descriptions (`Crypto Wallet`, `Deposit from an external wallet`, etc.) (`packages/app/features/deposit/screen.tsx:5`)
+- [x] `DepositCryptoScreen` instructions, button states, and toast errors (`packages/app/features/deposit/crypto/screen.tsx:9`)
+- [x] Coinbase onramp screens (`packages/app/features/deposit/DepositCoinbase/*`) should use translations for payment method messaging
+- [x] `DepositSuccessScreen` confirmation text (`packages/app/features/deposit/success/screen.tsx:6`)
 
 ### Savings / Earn / Rewards
-- [ ] `EarnScreen` marketing copy (`Boost Your Savings Instantly`, bullet points, buttons) (`packages/app/features/earn/screen.tsx:16`)
-- [ ] `DepositScreen` / `WithdrawForm` under `earn` namespace need translated placeholders, validation errors, and CTA text (`packages/app/features/earn/deposit/screen.tsx:56`, `packages/app/features/earn/withdraw/screen.tsx:40`)
+- [x] `EarnScreen` marketing copy (`Boost Your Savings Instantly`, bullet points, buttons) (`packages/app/features/earn/screen.tsx:16`)
+- [x] `DepositScreen` under `earn` namespace uses translated placeholders, validation errors, and CTA text (`packages/app/features/earn/deposit/screen.tsx:56`)
+- [x] `WithdrawForm` under `earn` namespace uses translated placeholders, validation errors, and CTA text (`packages/app/features/earn/withdraw/screen.tsx:40`)
 - [ ] Balance/Rewards sub-screens should share keys for headers (`packages/app/features/earn/active/screen.tsx`, `packages/app/features/earn/rewards/screen.tsx`, `packages/app/features/earn/earnings/screen.tsx`)
 - [ ] Rewards activity dashboard copy (section headings, fallback text, button labels) (`packages/app/features/rewards/activity/screen.tsx:54`)
-- [ ] `Affiliate/Friends` screen messaging (`Invite friends...`, toast messages, table labels) (`packages/app/features/affiliate/screen.tsx:1`)
+- [x] `Affiliate/Friends` screen messaging (`Invite friends...`, toast messages, table labels) (`packages/app/features/affiliate/screen.tsx:1`)
 
 ### Trading & Swaps
-- [ ] `SwapFormScreen` field labels, validation messages (`Min slippage value is 0%`, `review`, `loading`) (`packages/app/features/swap/form/screen.tsx:43`)
-- [ ] `SwapSummaryScreen` confirmation copy, error handling, and button text (`packages/app/features/swap/summary/screen.tsx:24`)
-- [ ] Risk dialog content (`packages/app/features/swap/form/RiskDialog/SwapRiskDialog.tsx`)
+- [x] `SwapFormScreen` field labels, validation messages (`Min slippage value is 0%`, `review`, `loading`) (`packages/app/features/swap/form/screen.tsx:43`)
+- [x] `SwapSummaryScreen` confirmation copy, error handling, and button text (`packages/app/features/swap/summary/screen.tsx:24`)
+- [x] Risk dialog content (`packages/app/features/swap/form/RiskDialog/SwapRiskDialog.tsx`)
 
 ### Additional Modules
-- [ ] `SendPot` (jackpot cards, risk dialog, buy/confirm flows) (`packages/app/features/sendpot/*.tsx`)
+- [x] `Invest` marketing banner copy (`packages/app/features/invest/screen.tsx:7-19`)
+- [x] `SendPot` (jackpot cards, risk dialog, buy/confirm flows) (`packages/app/features/sendpot/*.tsx`)
 - [ ] `SecretShop` administrative helpers, success/error toasts (`packages/app/features/secret-shop/screen.tsx:42`)
 - [ ] `Leaderboard` headings and table labels (`packages/app/features/leaderboard/screen.tsx:5`)
 - [ ] `MaintenanceModeScreen` headline/subtitle (`packages/app/features/maintenance-mode/screen.tsx:10`)
 - [ ] `SendV0TokenUpgradeScreen` body copy, button labels, link text (`packages/app/features/send-token-upgrade/screen.tsx:78`)
 - [ ] `UnknownScreen` fallback strings (`packages/app/features/unknown/screen.tsx:1`)
 - [ ] Any additional marketing banners or modals under `packages/app/features/home` (`RewardsCard`, `FriendsCard`, etc.)
+
+## Next.js Pages
+
+- [ ] Activity page TopNav header/SEO copy (`apps/next/pages/activity.tsx:6-15`)
+- [ ] Account shell pages (`Account`, `Link In Bio`, `Language`, `Sendtags`, `Backup`, `Passkeys`) TopNav + `NextSeo` strings (`apps/next/pages/account/**/*.tsx`)
+- [ ] Affiliate page header (dynamic `Referrals` label) and SEO description (`apps/next/pages/account/affiliate.tsx:8-38`)
+- [ ] Leaderboard TopNav header/description (`apps/next/pages/leaderboard.tsx:6-12`)
+- [ ] Any remaining `TopNav` headers or `NextSeo` titles using literal strings in `apps/next/pages/*`
 
 ## Supporting Tasks
 
