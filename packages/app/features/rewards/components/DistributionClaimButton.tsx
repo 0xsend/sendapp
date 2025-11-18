@@ -21,11 +21,13 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEffect, useState } from 'react'
 import { type Hex, isAddress } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
+import { useTranslation } from 'react-i18next'
 
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
 }
 export const DistributionClaimButton = ({ distribution }: DistributionsClaimButtonProps) => {
+  const { t } = useTranslation('rewards')
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const queryClient = useQueryClient()
   // Check if the user is eligible
@@ -223,11 +225,11 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
                 </ButtonOg.Icon>
               )
             case isClaimed:
-              return <ButtonOg.Text>$ Claimed</ButtonOg.Text>
+              return <ButtonOg.Text>{t('claim.cta.claimed')}</ButtonOg.Text>
             case !isTrancheActive:
               return (
                 <ButtonOg.Text opacity={0.5} disabled>
-                  Not yet claimable
+                  {t('claim.cta.notYet')}
                 </ButtonOg.Text>
               )
             case !!isTrancheActiveError ||
@@ -235,20 +237,20 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
               !!nonceError ||
               !!feesPerGasError ||
               !!usdcFeesError:
-              return <ButtonOg.Text opacity={0.5}>Error</ButtonOg.Text>
+              return <ButtonOg.Text opacity={0.5}>{t('claim.cta.error')}</ButtonOg.Text>
             case isClaimPending && !isClaimError:
               return (
                 <>
                   <ButtonOg.Icon>
                     <Spinner size="small" color="$black" />
                   </ButtonOg.Icon>
-                  <ButtonOg.Text>Claiming...</ButtonOg.Text>
+                  <ButtonOg.Text>{t('claim.cta.claiming')}</ButtonOg.Text>
                 </>
               )
             case !hasEnoughGas:
-              return <ButtonOg.Text>Insufficient Gas</ButtonOg.Text>
+              return <ButtonOg.Text>{t('claim.cta.insufficientGas')}</ButtonOg.Text>
             default:
-              return <ButtonOg.Text fontWeight={'500'}>$ Claim Reward</ButtonOg.Text>
+              return <ButtonOg.Text fontWeight={'500'}>{t('claim.cta.default')}</ButtonOg.Text>
           }
         })()}
       </Button>

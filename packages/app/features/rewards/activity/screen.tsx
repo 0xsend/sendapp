@@ -39,21 +39,22 @@ import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
 import { calculateTicketsFromBps } from 'app/data/sendpot'
 import { Link } from 'solito/link'
+import { useTranslation } from 'react-i18next'
 
 //@todo get this from the db
-const verificationTypesAndTitles = {
-  create_passkey: { title: 'Create a Passkey' },
-  tag_registration: { title: 'Purchase a Sendtag', details: '(per tag)' },
-  send_ten: { title: '10+ Sends' },
-  send_one_hundred: { title: '100+ Sends' },
-  tag_referral: { title: 'Referrals' },
-  total_tag_referrals: { title: 'Total Referrals' },
-  send_streak: { title: 'Send Streak', details: '(per day)' },
-  sendpot_ticket_purchase: { title: 'SendPot Tickets' },
-  send_ceiling: { title: '' },
+const verificationTypeTitleKey = {
+  create_passkey: 'tasks.types.create_passkey',
+  tag_registration: 'tasks.types.tag_registration',
+  send_ten: 'tasks.types.send_ten',
+  send_one_hundred: 'tasks.types.send_one_hundred',
+  tag_referral: 'tasks.types.tag_referral',
+  total_tag_referrals: 'tasks.types.total_tag_referrals',
+  send_streak: 'tasks.types.send_streak',
+  sendpot_ticket_purchase: 'tasks.types.sendpot_ticket_purchase',
+  send_ceiling: 'tasks.types.send_ceiling',
 } as const
 
-const getTaskHref = (verificationType: keyof typeof verificationTypesAndTitles): string | null => {
+const getTaskHref = (verificationType: keyof typeof verificationTypeTitleKey): string | null => {
   switch (verificationType) {
     case 'create_passkey':
       return '/account/backup/create'
@@ -71,6 +72,7 @@ const getTaskHref = (verificationType: keyof typeof verificationTypesAndTitles):
 }
 
 export function ActivityRewardsScreen() {
+  const { t } = useTranslation('rewards')
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
   const distribution = queryParams.distribution
   const { data: distributions, isLoading } = useMonthlyDistributions()
@@ -100,7 +102,7 @@ export function ActivityRewardsScreen() {
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
         <Stack w="100%" f={1} jc={'center'} ai={'center'}>
           <Paragraph color={'$color10'} size={'$5'}>
-            No rewards available
+            {t('activity.empty')}
           </Paragraph>
         </Stack>
       </YStack>
@@ -113,12 +115,15 @@ export function ActivityRewardsScreen() {
         month: 'long',
       })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
   )
+  const fallbackPeriod = t('activity.title.fallback')
+  const currentPeriod =
+    distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? fallbackPeriod
 
   return (
     <YStack pb={'$12'} pt={'$3.5'} gap={'$7'} $gtLg={{ pt: '$0' }} $platform-web={{ f: 1 }}>
       <XStack w={'100%'} jc={'space-between'} ai={'center'} flexWrap={'wrap'} gap={'$2'}>
         <H3 fontWeight={'600'} color={'$color12'} pr={'$2'}>
-          {`${distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? 'Monthly'} Rewards`}
+          {t('activity.title.period', { period: currentPeriod })}
         </H3>
         {distributions.length > 1 ? (
           <DistributionSelect
@@ -136,13 +141,15 @@ export function ActivityRewardsScreen() {
             case verificationsQuery.isError:
               return (
                 <Paragraph color={'$error'} size={'$5'}>
-                  Error fetching verifications. {toNiceError(verificationsQuery.error)}
+                  {t('activity.error.verifications', {
+                    message: toNiceError(verificationsQuery.error),
+                  })}
                 </Paragraph>
               )
             case !distributions[selectedDistributionIndex]:
               return (
                 <Paragraph color={'$color10'} size={'$5'}>
-                  No rewards available
+                  {t('activity.empty')}
                 </Paragraph>
               )
             default:
@@ -231,6 +238,7 @@ const DistributionRequirementsCard = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const { t } = useTranslation('rewards')
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const verifications = verificationsQuery.data
   const {
@@ -254,6 +262,17 @@ const DistributionRequirementsCard = ({
   const sendTagPurchased = verifications?.verification_values?.some(
     (v) => v.type === 'tag_registration' && v.weight > 0n
   )
+  const hodlerRequirement = formatAmount(
+    formatUnits(BigInt(distribution.hodler_min_balance ?? 0n), distribution.token_decimals ?? 18) ??
+      0,
+    9,
+    sendCoin.formatDecimals
+  )
+  const savingsRequirement = formatAmount(
+    formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ?? 0n,
+    9,
+    2
+  )
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
@@ -272,7 +291,7 @@ const DistributionRequirementsCard = ({
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack>
           <Label fontSize={'$5'} col={'$color10'} miw={120}>
-            Your SEND Balance
+            {t('requirements.title')}
           </Label>
           {isLoadingSnapshotBalance ? (
             <Spinner size="small" color={'$color11'} />
@@ -298,7 +317,7 @@ const DistributionRequirementsCard = ({
         <YStack gap="$2" ai={'flex-end'}>
           <Link href="/account/sendtag/add">
             <XStack ai="center" gap="$2">
-              <Paragraph>Sendtag Purchased</Paragraph>
+              <Paragraph>{t('requirements.sendtag')}</Paragraph>
               {sendTagPurchased ? (
                 <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />
               ) : (
@@ -310,17 +329,7 @@ const DistributionRequirementsCard = ({
           </Link>
           <Link href={Platform.OS === 'web' ? '/trade' : '/deposit/crypto'}>
             <XStack ai="center" gap="$2">
-              <Paragraph>
-                Balance{' '}
-                {formatAmount(
-                  formatUnits(
-                    BigInt(distribution.hodler_min_balance ?? 0n),
-                    distribution.token_decimals ?? 18
-                  ) ?? 0,
-                  9,
-                  sendCoin.formatDecimals
-                )}
-              </Paragraph>
+              <Paragraph>{t('requirements.balance', { amount: hodlerRequirement })}</Paragraph>
               {(() => {
                 switch (true) {
                   case isLoadingSnapshotBalance:
@@ -347,15 +356,7 @@ const DistributionRequirementsCard = ({
           {BigInt(distribution.earn_min_balance ?? 0n) > 0n ? (
             <Link href="/earn/usdc/deposit">
               <XStack ai="center" gap="$2">
-                <Paragraph>
-                  Savings Deposit $
-                  {formatAmount(
-                    formatUnits(BigInt(distribution.earn_min_balance ?? 0n), usdcCoin.decimals) ??
-                      0n,
-                    9,
-                    2
-                  )}{' '}
-                </Paragraph>
+                <Paragraph>{t('requirements.savings', { amount: savingsRequirement })}</Paragraph>
                 {(() => {
                   switch (true) {
                     case isLoadingSendEarnBalances:
@@ -392,13 +393,14 @@ const TaskCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const { t } = useTranslation('rewards')
   const verifications = verificationsQuery.data
 
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
         <H3 fontWeight={'600'} color={'$color12'}>
-          Tasks
+          {t('activity.sections.tasks')}
         </H3>
         <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
@@ -415,7 +417,7 @@ const TaskCards = ({
   return (
     <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
-        Tasks
+        {t('activity.sections.tasks')}
       </H3>
       <Stack gap="$5" $gtXs={{ fd: 'row' }} $platform-web={{ flexWrap: 'wrap' }}>
         {verifications?.verification_values
@@ -430,8 +432,8 @@ const TaskCards = ({
               (isQualificationOver && weight !== 0n && fixed_value > 0n)
           )
           .sort((a, b) => {
-            const orderA = Object.keys(verificationTypesAndTitles).indexOf(a.type)
-            const orderB = Object.keys(verificationTypesAndTitles).indexOf(b.type)
+            const orderA = Object.keys(verificationTypeTitleKey).indexOf(a.type)
+            const orderB = Object.keys(verificationTypeTitleKey).indexOf(b.type)
             return orderA - orderB
           })
           .map((verification) => (
@@ -442,7 +444,11 @@ const TaskCards = ({
               url={getTaskHref(verification.type)}
             >
               <H3 fontWeight={'600'} color={'$color12'}>
-                {verificationTypesAndTitles[verification.type]?.title}
+                {(() => {
+                  const type = verification.type as keyof typeof verificationTypeTitleKey
+                  const key = verificationTypeTitleKey[type]
+                  return key ? t(key) : ''
+                })()}
               </H3>
             </TaskCard>
           ))}
@@ -461,6 +467,7 @@ const TaskCard = ({
   isQualificationOver: boolean
   url?: string | null
 }) => {
+  const { t } = useTranslation('rewards')
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
@@ -527,7 +534,10 @@ const TaskCard = ({
   const statusConfig = {
     completed: {
       icon: <Check size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
-      text: isSendStreak && !isQualificationOver ? 'Ongoing' : 'Completed',
+      text:
+        isSendStreak && !isQualificationOver
+          ? t('tasks.status.ongoing')
+          : t('tasks.status.completed'),
     },
     pending: {
       icon: (
@@ -535,7 +545,7 @@ const TaskCard = ({
           <IconInfoCircle color={'$color8'} size={'$2'} />
         </Theme>
       ),
-      text: 'Pending',
+      text: t('tasks.status.pending'),
     },
   }
 
@@ -592,12 +602,13 @@ const MultiplierCards = ({
   distribution: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const { t } = useTranslation('rewards')
   const verifications = verificationsQuery.data
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
         <H3 fontWeight={'600'} color={'$color12'}>
-          Multiplier
+          {t('activity.sections.multipliers')}
         </H3>
         <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
@@ -628,7 +639,7 @@ const MultiplierCards = ({
   return (
     <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
-        Multiplier
+        {t('activity.sections.multipliers')}
       </H3>
       <Stack gap="$5" $gtXs={{ fd: 'row' }} $platform-web={{ flexWrap: 'wrap' }}>
         {activeMultipliers.map(({ type: verificationType, value }) => (
@@ -636,8 +647,17 @@ const MultiplierCards = ({
             <XStack ai="center" gap="$2" jc="center">
               <IconAccount size={'$2'} color={'$color10'} />
               <H3 fontWeight={'500'} color={'$color10'}>
-                {verificationType === 'tag_referral' ? (distributionMonth ?? 'Monthly') : ''}{' '}
-                {verificationTypesAndTitles[verificationType]?.title}
+                {(() => {
+                  const type = verificationType as keyof typeof verificationTypeTitleKey
+                  const titleKey = verificationTypeTitleKey[type]
+                  const title = titleKey ? t(titleKey) : ''
+                  return verificationType === 'tag_referral'
+                    ? t('multipliers.referralTitle', {
+                        period: distributionMonth ?? t('activity.title.fallback'),
+                        title,
+                      })
+                    : title
+                })()}
               </H3>
             </XStack>
             <Paragraph
@@ -648,7 +668,7 @@ const MultiplierCards = ({
               lineHeight={32}
               mx="auto"
             >
-              X {(value ?? 1).toString()}
+              {t('common.x', { value: (value ?? 1).toString() })}
             </Paragraph>
           </MultiplierCard>
         ))}
@@ -683,6 +703,7 @@ const ProgressCard = ({
   previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
+  const { t } = useTranslation('rewards')
   const sendSlash = distribution.send_slash.at(0)
 
   if (!sendSlash) {
@@ -711,7 +732,7 @@ const ProgressCard = ({
     return (
       <YStack w={'100%'} gap="$5">
         <H3 fontWeight={'600'} color={'$color12'}>
-          Progress
+          {t('activity.sections.progress')}
         </H3>
         <FadeCard br={'$6'} p="$7" $xs={{ p: '$5' }} w={'100%'} maw={500}>
           <Progress progress={0} />
@@ -742,7 +763,7 @@ const ProgressCard = ({
   return (
     <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
-        Progress
+        {t('activity.sections.progress')}
       </H3>
       <FadeCard br={'$6'} p="$6" w={'100%'} maw={500}>
         <Progress progress={progress} />
@@ -782,6 +803,7 @@ const ClaimableRewardsCard = ({
 }: {
   distribution: UseDistributionsResultData[number]
 }) => {
+  const { t } = useTranslation('rewards')
   const shareAmount = BigInt(distribution.distribution_shares?.[0]?.amount ?? 0n)
   if (shareAmount === undefined || shareAmount === 0n) return null
   const now = new Date()
@@ -793,6 +815,10 @@ const ClaimableRewardsCard = ({
       month: 'long',
     }
   )
+  const periodLabel = distributionMonth ?? t('activity.title.fallback')
+  const headingText = isQualificationOver
+    ? t('claim.heading.total', { period: periodLabel })
+    : t('claim.heading.period', { period: periodLabel })
 
   return (
     <YStack
@@ -802,7 +828,7 @@ const ClaimableRewardsCard = ({
       $gtSm={{ display: 'flex' }}
     >
       <H3 fontWeight={'600'} color={'$color12'}>
-        {isQualificationOver ? `Total ${distributionMonth}` : ` ${distributionMonth} Rewards`}
+        {headingText}
       </H3>
       <FadeCard br={'$6'} p="$7" ai={'center'} w={'100%'}>
         <Stack
@@ -820,7 +846,7 @@ const ClaimableRewardsCard = ({
             lh={40}
           >
             {shareAmount === undefined
-              ? 'N/A'
+              ? t('common.na')
               : `${formatAmount(
                   formatUnits(shareAmount ?? 0n, distribution.token_decimals ?? 18) ?? 0n,
                   10,
