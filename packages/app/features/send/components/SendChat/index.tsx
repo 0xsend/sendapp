@@ -170,7 +170,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
   const keyExtractor = useCallback((item: Chat) => item.id, [])
 
   return (
-    <Portal>
+    <Portal zIndex={2}>
       <SendChatContext.Provider activeSection={activeSection} setActiveSection={setActiveSection}>
         <AnimatePresence>
           {open && (
@@ -1262,8 +1262,8 @@ const ChatList = YStack.styleable(() => {
   )
 
   const loadingSkeletons =
-    isLoadingActivities || isLoadingOtherUserProfile ? (
-      <YStack f={1} gap="$6" p="$6">
+    activities.length === 0 && (isLoadingActivities || isLoadingOtherUserProfile) ? (
+      <YStack jc="flex-end" f={1} gap="$6" p="$6">
         <Shimmer w={280} h={100} br="$4" />
         <Shimmer als="flex-end" w={280} h={100} br="$4" />
       </YStack>
@@ -1323,7 +1323,7 @@ const ChatList = YStack.styleable(() => {
     >
       {errorComponent ? (
         errorComponent
-      ) : isLoadingActivities || isLoadingOtherUserProfile ? (
+      ) : loadingSkeletons ? (
         loadingSkeletons
       ) : !activities || activities.length === 0 ? (
         noActivity
@@ -1440,14 +1440,12 @@ const useTransactionEntryDate = ({ activity, sent }: { activity: Activity; sent:
       case 'failed':
       case 'cancelled':
         return <DateText sent={sent}>Failed</DateText>
-      case 'confirmed':
+      default:
         return (
           <DateText sent={sent}>
             {new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
           </DateText>
         )
-      default:
-        return <Spinner size="small" color={'$color11'} />
     }
   }
 
