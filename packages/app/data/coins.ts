@@ -29,7 +29,7 @@ export const COINGECKO_IDS = [
   'euro-coin',
   'mamo',
   'masq',
-  'canton', // Canton uses custom API, not CoinGecko
+  'canton-network',
 ] as const satisfies readonly [string, ...string[]]
 export type CoingeckoId = (typeof COINGECKO_IDS)[number]
 
@@ -189,7 +189,7 @@ export const cantonCoin = {
   token: '0xCc00000000000000000000000000000000000000',
   decimals: 10,
   formatDecimals: 2,
-  coingeckoTokenId: 'canton' as const,
+  coingeckoTokenId: 'canton-network' as const,
   // Canton is on a separate network - balance fetched from external API
   // Uses dummy address since it's not an actual ERC20 token on Base
   // Buy/sell functionality disabled - coming soon
