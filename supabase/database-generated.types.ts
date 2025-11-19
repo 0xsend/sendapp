@@ -1869,6 +1869,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      canton_tag_search: {
+        Args: { page_number?: number; page_size?: number; query: string }
+        Returns: Database["public"]["CompositeTypes"]["canton_tag_search_result"][]
+        SetofOptions: {
+          from: "*"
+          to: "canton_tag_search_result"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       canton_top_senders: {
         Args: { page_number?: number; page_size?: number }
         Returns: Database["public"]["CompositeTypes"]["canton_top_sender_result"][]
@@ -2343,6 +2353,15 @@ export type Database = {
         main_tag_id: number | null
         main_tag_name: string | null
         tags: string[] | null
+      }
+      canton_tag_search_result: {
+        avatar_url: string | null
+        name: string | null
+        send_id: number | null
+        main_tag_name: string | null
+        matched_tag_name: string | null
+        tags: string[] | null
+        canton_wallet_address: string | null
       }
       canton_top_sender_result: {
         avatar_url: string | null
