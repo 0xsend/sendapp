@@ -32,35 +32,6 @@ import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { Platform } from 'react-native'
 import { SendChat } from './components/SendChat'
 
-const SendScreenSkeleton = () => {
-  return (
-    <YStack w="100%" gap="$8">
-      <Shimmer
-        ov="hidden"
-        br="$4"
-        h={50}
-        w={700}
-        maw="100%"
-        componentName="Card"
-        bg="$background"
-        $theme-light={{ bg: '$background' }}
-      />
-      <YStack gap="$6">
-        <Shimmer
-          ov="hidden"
-          br="$1"
-          h={80}
-          w={600}
-          maw="100%"
-          componentName="Card"
-          bg="$background"
-          $theme-light={{ bg: '$background' }}
-        />
-      </YStack>
-    </YStack>
-  )
-}
-
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const {

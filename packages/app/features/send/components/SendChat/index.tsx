@@ -1,4 +1,3 @@
-import { LegendList } from '@legendapp/list'
 import type React from 'react'
 import { useCallback, useState, useRef, useMemo, useEffect, type PropsWithChildren } from 'react'
 import {
@@ -15,7 +14,6 @@ import {
   Shimmer,
   SizableText,
   Spinner,
-  type TamaguiElement,
   Text,
   useAppToast,
   useControllableState,
@@ -32,25 +30,23 @@ import {
 import { formatUnits, isAddress } from 'viem'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'solito/router'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
-import { IconAccount, IconBadgeCheckSolid2, IconCoin, IconEthereum } from 'app/components/icons'
+import { IconBadgeCheckSolid2, IconCoin, IconEthereum } from 'app/components/icons'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { History, X } from '@tamagui/lucide-icons'
-import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
+import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
 import { isAndroid, isWeb } from '@tamagui/constants'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { type BRAND, z } from 'zod'
-import { formFields, SchemaForm } from 'app/utils/SchemaForm'
+import { z } from 'zod'
+import { formFields } from 'app/utils/SchemaForm'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CoinField } from './CoinField'
 import { useCoin, useCoins } from 'app/provider/coins'
 import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
 import { assert } from 'app/utils/assert'
-import useRedirectAfterSend from '../../confirm/useRedirectAfterSend'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useUser } from 'app/utils/useUser'
 import { api } from 'app/utils/api'
@@ -60,64 +56,16 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { FlatList, Platform } from 'react-native'
+import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
 import debug from 'debug'
 import { signUserOp } from 'app/utils/signUserOp'
 import type { UserOperation } from 'permissionless'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
-import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
 
 const log = debug('app:features:send:confirm:screen')
-
-const initialChats = [
-  {
-    id: '1',
-    message: 'Thanks for the coffee!',
-    amount: '4.50',
-    sender: 'user',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    message: 'Send it for you.',
-    amount: '4.50',
-    sender: 'bot',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    message: 'Breakfast payback.',
-    amount: '35.00',
-    sender: 'user',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    message: 'Enjoy your coffee!',
-    amount: '35.00',
-    sender: 'bot',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    message: 'Lunch payback.',
-    amount: '11.75',
-    sender: 'user',
-    timestamp: new Date().toISOString(),
-  },
-  {
-    id: '6',
-    message: 'I like what you did there!',
-    amount: '11.75',
-    sender: 'bot',
-    timestamp: new Date().toISOString(),
-  },
-]
-
-type Chat = (typeof initialChats)[number]
 
 type Sections = 'chat' | 'enterAmount' | 'reviewAndSend'
 
@@ -136,7 +84,6 @@ interface SendChatProps {
 
 export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
   const { height } = useWindowDimensions()
-  const [chats, setChats] = useState(initialChats)
 
   const { lg } = useMedia()
 
@@ -146,28 +93,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
     onChange: onOpenChangeProp,
   })
 
-  const { coin } = useCoinFromSendTokenParam()
-
   const [activeSection, setActiveSection] = useState<Sections>('chat')
-
-  const handleSend = useCallback((message: string) => {
-    setChats((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        message,
-        amount: '23.5',
-        sender: 'user',
-        timestamp: new Date().toISOString(),
-      },
-    ])
-  }, [])
-
-  const renderItem = useCallback(({ item }: { item: Chat }) => {
-    return <Item item={item} />
-  }, [])
-
-  const keyExtractor = useCallback((item: Chat) => item.id, [])
 
   return (
     <Portal zIndex={2}>
@@ -457,6 +383,7 @@ const SendChatInput = Input.styleable((props) => {
                 activeSection === 'chat' ? 'Type amount, add a note...' : 'Add a note...'
               }
               br="$3"
+              fos="$5"
               {...props}
             />
           </View>
@@ -477,6 +404,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const [sendParams, setSendParams] = useSendScreenParams()
 
   const { coin } = useCoinFromSendTokenParam()
+
+  const themeName = useThemeName()
 
   const { isLoading: isLoadingCoins } = useCoins()
   const form = useForm<z.infer<typeof SendAmountSchema>>({
@@ -600,8 +529,6 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const {
     query: { data: prices, isLoading: isPricesLoading },
   } = useTokenPrices()
-
-  const href = profile ? `/profile/${profile?.sendid}` : ''
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -799,12 +726,12 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             gap="$2.5"
           >
             <XStack ai="center" w="100%" jc="space-between">
-              <SizableText size="$2" fow="300" col="$gray11">
+              <SizableText size="$4" fow="500" col="$gray10">
                 You&apos;re Sending
               </SizableText>
               {activeSection === 'reviewAndSend' && (
                 <Button onPress={() => setActiveSection('enterAmount')} size="$2" chromeless>
-                  <Button.Text fos="$3" fow="500" col="$neon10">
+                  <Button.Text fos="$5" fow="500" col="$neon10">
                     Edit
                   </Button.Text>
                 </Button>
@@ -855,14 +782,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                             autoFocus={isWeb}
                             value={value}
                             bg="transparent"
-                            bbw={1}
+                            bbw={1.5}
                             boc="$gray8"
                             fontFamily="$mono"
                             col="$gray12"
                             placeholderTextColor="$gray11"
                             placeholder="0.000"
                             focusStyle={{
-                              bbc: '$primary',
+                              bbc: themeName.includes('dark') ? '$primary' : '$neon8',
                             }}
                             fontWeight="500"
                             inputMode={coin?.decimals ? 'decimal' : 'numeric'}
@@ -902,18 +829,19 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                                 ? '0.000'
                                 : formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
                             </Paragraph>
+
+                            {insufficientAmount && (
+                              <Paragraph color={'$error'} size={'$5'}>
+                                Insufficient funds
+                              </Paragraph>
+                            )}
+                            {belowMinimum && coin?.minXfrAmt !== undefined && (
+                              <Paragraph color={'$error'} size={'$5'} testID="SendFormMinimumError">
+                                Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
+                                {coin.symbol}
+                              </Paragraph>
+                            )}
                           </XStack>
-                          {insufficientAmount && (
-                            <Paragraph color={'$error'} size={'$5'}>
-                              Insufficient funds
-                            </Paragraph>
-                          )}
-                          {belowMinimum && coin?.minXfrAmt !== undefined && (
-                            <Paragraph color={'$error'} size={'$5'} testID="SendFormMinimumError">
-                              Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
-                              {coin.symbol}
-                            </Paragraph>
-                          )}
                         </XStack>
                       )}
                     </YStack>
@@ -957,6 +885,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     placeholderTextColor="$gray11"
                     disabled={activeSection === 'reviewAndSend'}
                     placeholder="Add a note..."
+                    fos="$5"
                     br="$3"
                     multiline
                     value={value}
@@ -1376,51 +1305,57 @@ const Item = YStack.styleable<ItemProps>((props) => {
       <YStack gap="$2">
         <YStack
           w="60%"
-          bg={isSent ? '$aztec6' : '$aztec3'}
+          bg={isSent ? '$aztec6' : '$aztec4'}
           bw={isSent ? 0 : 1}
           boc={isSent ? 'transparent' : '$aztec4'}
           $theme-light={{
             bg: isSent ? '$gray3' : '$gray1',
-            boc: isSent ? 'transparent' : '$gray2',
+            boc: isSent ? 'transparent' : '$gray4',
           }}
           br="$5"
           gap="$3"
           p="$3"
+          pb="$4"
           als={isSent ? 'flex-end' : 'flex-start'}
           ov="hidden"
         >
-          <SizableText size="$1" fow="300" color="$aztec10">
+          <SizableText size="$3" fow="300" color="$aztec10">
             {isSent ? 'You sent' : 'You received'}
           </SizableText>
-          <XStack ai="center" gap="$2">
-            <SizableText size="$7" fow="600" col={isSent ? '$color' : '$neon9'}>
-              {isSent ? '-' : '+'}
-            </SizableText>
-            <SizableText size="$7" fow="600" color={isSent ? '$color' : '$neon9'}>
-              {amount?.replace('+ ', '')}
-            </SizableText>
+          <XStack ai="center" gap="$3">
+            <XStack gap="$2" ai="center">
+              <SizableText size="$8" fow="500" col={isSent ? '$color' : '$neon9'}>
+                {isSent ? '-' : '+'}
+              </SizableText>
+              <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
+                {amount?.replace('+ ', '')}
+              </SizableText>
+            </XStack>
             <IconEthereum size="$1" />
           </XStack>
-          <View
-            p="$2"
-            pb="$4"
-            px="$3.5"
-            br="$2"
-            btlr={0}
-            btrr={0}
-            bg={isSent ? '$aztec5' : '$aztec3'}
-            bw={1}
-            boc={isSent ? 'transparent' : '$aztec4'}
-            $theme-light={{
-              bg: isSent ? '$gray1' : '$gray2',
-            }}
-            mx="$-3.5"
-            mb="$-3.5"
-          >
-            <SizableText size="$3" color="$aztec10">
-              {decodeURIComponent(item.data?.note)}
-            </SizableText>
-          </View>
+          {item.data?.note && (
+            <View
+              p="$2"
+              pb="$4"
+              px="$3.5"
+              br="$2"
+              btlr={0}
+              btrr={0}
+              bg={isSent ? '$aztec5' : '$aztec3'}
+              bw={0}
+              btw={1}
+              boc={isSent ? 'transparent' : '$aztec4'}
+              $theme-light={{
+                bg: isSent ? '$gray1' : '$gray2',
+              }}
+              mx="$-3.5"
+              mb="$-4"
+            >
+              <SizableText size="$5" color="$aztec10">
+                {decodeURIComponent(item.data?.note ?? '')}
+              </SizableText>
+            </View>
+          )}
         </YStack>
         <SizableText als={isSent ? 'flex-end' : 'flex-start'} size="$2" color="$gray10">
           {date}

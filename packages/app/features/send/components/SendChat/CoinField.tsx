@@ -174,6 +174,7 @@ export const CoinField = ({
                 overflow={'hidden'}
                 elevation="$3"
                 shadowOpacity={0.1}
+                opacity={0.95}
               >
                 <XStack
                   als="flex-start"
