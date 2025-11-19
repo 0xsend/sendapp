@@ -33,8 +33,8 @@ export const cantonRouter = createTRPCRouter({
     const partyId = verification.canton_wallet_address
 
     try {
-      const cfAccessClientId = process.env.CANTON_CF_ACCOUNT_ID
-      const cfAccessClientSecret = process.env.CANTON_CF_API_TOKEN
+      const cfAccessClientId = process.env.CF_CANTON_ACCESS_CLIENT_ID
+      const cfAccessClientSecret = process.env.CF_CANTON_ACCESS_CLIENT_SECRET
 
       if (!cfAccessClientId || !cfAccessClientSecret) {
         throw new TRPCError({
