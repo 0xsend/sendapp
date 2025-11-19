@@ -6010,7 +6010,7 @@ export const sendVerifyingPaymasterAbi = [
 export const sendVerifyingPaymasterAddress = {
   8453: '0x8A77aE0c07047c5b307B2319A8F4Bd9d3604DdD8',
   84532: '0x3CA2b4DAE6cFA762a690EbC4C45cA2f6b896dB80',
-  845337: '0xBdf361C9279a08d69d86CCd217B64374ab334583',
+  845337: '0xA78b09e93462c630272CF4ddc006A484c3E96beB',
 } as const
 
 /**
