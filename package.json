@@ -67,7 +67,6 @@
     "@postgrestools/postgrestools": "^0.6.1",
     "dotenv-cli": "^7.3.0",
     "lefthook": "^1.5.5",
-    "patch-package": "^8.0.1",
     "zx": "^8.1.2"
   }
 }
