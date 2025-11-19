@@ -101,7 +101,11 @@ BEGIN
         SELECT
             ss.user_id,
             COALESCE(SUM(ss.score), 0) AS send_score
-        FROM send_scores ss
+        FROM (
+            SELECT user_id, score FROM private.send_scores_history
+            UNION ALL
+            SELECT user_id, score FROM public.send_scores_current
+        ) ss
         WHERE ss.user_id IN (SELECT id FROM valid_users)
         GROUP BY ss.user_id
         HAVING COALESCE(SUM(ss.score), 0) > 0
