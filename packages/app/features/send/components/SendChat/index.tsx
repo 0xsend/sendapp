@@ -20,6 +20,7 @@ import {
   useDebounce,
   useMedia,
   usePresence,
+  useSafeAreaInsets,
   useThemeName,
   useWindowDimensions,
   View,
@@ -58,6 +59,7 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
+import { useContextBridge, FiberProvider } from 'its-fine'
 
 import debug from 'debug'
 import { signUserOp } from 'app/utils/signUserOp'
@@ -94,13 +96,14 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
   })
 
   const [activeSection, setActiveSection] = useState<Sections>('chat')
+  const { bottom, top } = useSafeAreaInsets()
 
   return (
     <Portal zIndex={2}>
       <SendChatContext.Provider activeSection={activeSection} setActiveSection={setActiveSection}>
         <AnimatePresence>
           {open && (
-            <View ai="center" jc="center" pos="absolute" zi={10} inset={0}>
+            <View pt={top} pb={bottom} ai="center" jc="center" pos="absolute" zi={10} inset={0}>
               <View
                 animation={[
                   'smoothResponsive',
@@ -110,7 +113,6 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                   },
                 ]}
                 animateOnly={['transform', 'opacity']}
-                filter="blur(0px)"
                 enterStyle={
                   lg
                     ? {
@@ -134,7 +136,6 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                       }
                 }
                 rotateZ="0deg"
-                y={lg ? -65 : 0}
                 w={700}
                 maw="95%"
                 pe="auto"
@@ -142,9 +143,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                 $lg={{
                   jc: 'flex-end',
                 }}
-                mih={700}
                 f={1}
-                py="$4"
               >
                 <YStack
                   animation="responsive"
@@ -156,6 +155,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         : 570
                   }
                   animateOnly={['height']}
+                  mah="100%"
                 >
                   <YStack
                     br="$8"
@@ -781,7 +781,6 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                             unstyled
                             autoFocus={isWeb}
                             value={value}
-                            bg="transparent"
                             bbw={1.5}
                             boc="$gray8"
                             fontFamily="$mono"
@@ -797,6 +796,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                               const localizedAmount = localizeAmount(amount)
                               form.setValue('amount', localizedAmount)
                             }}
+                            bg="$aztec4"
+                            $theme-light={{ bg: '$gray2' }}
                             onBlur={onBlur}
                             w="100%"
                             pr="$15"
@@ -813,7 +814,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     </XStack>
                     <YStack>
                       {isLoadingCoins ? (
-                        <Shimmer bg="$aztec5" w={200} h={22} br="$1" />
+                        <Shimmer
+                          componentName="Card"
+                          bg="$background"
+                          $theme-light={{ bg: '$background' }}
+                          w={200}
+                          h={22}
+                          br="$1"
+                        />
                       ) : (
                         <XStack
                           gap={'$2'}
@@ -923,9 +931,6 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         </YStack>
         <Button
           bg="$neon7"
-          $theme-light={{
-            bg: '$neon7',
-          }}
           br="$4"
           animation={[
             'smoothResponsive',
@@ -985,7 +990,6 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                 $theme-light={{ col: '$gray12' }}
                 animation="responsive"
                 animateOnly={['opacity', 'transform']}
-                filter="blur(0px)"
                 pos="absolute"
                 enterStyle={{
                   opacity: 0,
@@ -1002,6 +1006,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                   }),
                 }}
                 $platform-web={{
+                  filter: 'blur(0px)',
                   willChange: 'transform, opacity, filter',
                   transition: 'filter linear 200ms',
                 }}
