@@ -139,21 +139,6 @@ const SuggestionsList = memo(
                 top={0}
                 right={0}
               />
-              {/* left gradient */}
-              <LinearGradient
-                display="none"
-                $sm={{ display: 'flex' }}
-                pointerEvents="none"
-                colors={['$aztec1', 'rgba(255, 255, 255, 0)']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                width="$4"
-                height="100%"
-                zi={100}
-                pos="absolute"
-                top={0}
-                left={0}
-              />
             </View>
           </>
         )}
