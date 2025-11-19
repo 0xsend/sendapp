@@ -37,6 +37,7 @@ import { useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useMemo, useState } from 'react'
 import { encodeFunctionData, erc20Abi, withRetry } from 'viem'
+import { useTranslation } from 'react-i18next'
 
 interface TokenBalanceRowProps {
   label: string
@@ -78,6 +79,7 @@ function TokenBalanceRow({ label, amount }: TokenBalanceRowProps) {
 export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactNode }) {
   const chainId = baseMainnetClient.chain.id
   const { data: sendAccount } = useSendAccount()
+  const { t } = useTranslation('sendTokenUpgrade')
   const {
     data: balance,
     isPending,
@@ -113,20 +115,20 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
 
           <YStack ai="center" gap="$2">
             <H1 fontWeight="800" tt="uppercase">
-              TOKEN UPGRADE
+              {t('hero.title')}
             </H1>
             <Paragraph color="$color10" ta="center" fontSize="$6" maw={400}>
-              Upgrade required to continue using Send. New total supply: 100B → 1B
+              {t('hero.subtitle')}
             </Paragraph>
           </YStack>
 
           <Card w="100%" maw={500} p="$5" gap="$4">
             <TokenBalanceRow
-              label="CURRENT"
+              label={t('balances.current')}
               amount={formatAmount(balance.toString(), 9, sendCoin.formatDecimals)}
             />
             <TokenBalanceRow
-              label="AFTER"
+              label={t('balances.after')}
               amount={formatAmount((balance / 100n).toString(), 9, sendCoin.formatDecimals)}
             />
           </Card>
@@ -144,7 +146,7 @@ export function SendV0TokenUpgradeScreen({ children }: { children?: React.ReactN
                 color={'$primary'}
                 $theme-light={{ color: '$color12' }}
               >
-                Read more about the Upgrade
+                {t('links.docs')}
               </Paragraph>
             </Link>
           </YStack>
@@ -171,7 +173,8 @@ function UpgradeTokenButton() {
     query: { enabled: !!sender },
   })
   const { tokensQuery } = useSendAccountBalances()
-  const [userOpState, setUserOpState] = useState('')
+  const [userOpStateKey, setUserOpStateKey] = useState<string | null>(null)
+  const { t } = useTranslation('sendTokenUpgrade')
 
   const calls = useMemo(
     () => [
@@ -198,7 +201,7 @@ function UpgradeTokenButton() {
   )
 
   const paymasterSign = api.sendAccount.paymasterSign.useMutation({
-    onMutate: () => setUserOpState('Requesting signature...'),
+    onMutate: () => setUserOpStateKey('requesting'),
     onSuccess: async (data) => {
       assert(uop.isSuccess, 'uop is not success')
 
@@ -213,13 +216,13 @@ function UpgradeTokenButton() {
         entryPoint: entryPointAddress[baseMainnetClient.chain.id],
       })
 
-      setUserOpState('Sending transaction...')
+      setUserOpStateKey('sending')
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
       })
 
-      setUserOpState('Waiting for confirmation...')
+      setUserOpStateKey('waiting')
 
       const receipt = await withRetry(
         () =>
@@ -235,11 +238,12 @@ function UpgradeTokenButton() {
 
       assert(receipt.success, 'receipt status is not success')
 
-      toast.show('Upgraded successfully')
+      toast.show(t('toast.success'))
     },
     onSettled() {
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })
       queryClient.invalidateQueries({ queryKey: sendTokenV0Bal.queryKey })
+      setUserOpStateKey(null)
     },
   })
 
@@ -259,19 +263,17 @@ function UpgradeTokenButton() {
   const canSendUserOp = uop.isSuccess && !uop.isPending && !paymasterSign.isPending
   const anyError = uop.error || paymasterSign.error
 
+  const statusMessage = (() => {
+    if (paymasterSign.isPending && userOpStateKey) return t(`status.${userOpStateKey}`)
+    if (paymasterSign.isPending) return t('status.waiting')
+    if (anyError) return t('status.retry')
+    return t('status.ready')
+  })()
+
   return (
     <YStack gap="$4" w="100%" maw={500}>
       <Paragraph color="$color10" ta="center">
-        {(() => {
-          switch (true) {
-            case paymasterSign.isPending && userOpState !== '':
-              return userOpState
-            case paymasterSign.isPending:
-              return 'Waiting for confirmation...'
-            default:
-              return `Click "Upgrade" to proceed.${anyError ? ' Please try again.' : ''}`
-          }
-        })()}
+        {statusMessage}
       </Paragraph>
 
       <Button
@@ -294,7 +296,9 @@ function UpgradeTokenButton() {
         icon={<IconUpgrade size="$1" />}
         iconAfter={paymasterSign.isPending ? <Spinner size="small" /> : undefined}
       >
-        <Button.Text>{paymasterSign.isPending ? 'UPGRADING...' : 'UPGRADE'}</Button.Text>
+        <Button.Text>
+          {paymasterSign.isPending ? t('actions.upgrading') : t('actions.upgrade')}
+        </Button.Text>
       </Button>
       {[uop.error, paymasterSign.error].filter(Boolean).map((e) =>
         e ? (

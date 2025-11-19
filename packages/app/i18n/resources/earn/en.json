@@ -78,5 +78,29 @@
     "buttons": {
       "confirm": "Confirm withdraw"
     }
+  },
+  "rewards": {
+    "history": {
+      "title": "Rewards history",
+      "empty": "No rewards activity",
+      "error": "Unable to load rewards: {{message}}"
+    },
+    "messages": {
+      "minimum": "You need at least {{amount}} {{symbol}} to claim rewards"
+    },
+    "status": {
+      "requesting": "Requesting signature...",
+      "sending": "Sending transaction...",
+      "waiting": "Waiting for confirmation..."
+    },
+    "toast": {
+      "success": "Rewards claimed"
+    },
+    "feed": {
+      "today": "Today"
+    },
+    "actions": {
+      "claim": "Claim rewards"
+    }
   }
 }

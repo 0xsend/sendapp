@@ -18,6 +18,8 @@ import investEn from './resources/invest/en.json'
 import investEs from './resources/invest/es.json'
 import depositEn from './resources/deposit/en.json'
 import depositEs from './resources/deposit/es.json'
+import leaderboardEn from './resources/leaderboard/en.json'
+import leaderboardEs from './resources/leaderboard/es.json'
 import earnEn from './resources/earn/en.json'
 import earnEs from './resources/earn/es.json'
 import cantonWalletEn from './resources/canton-wallet/en.json'
@@ -28,18 +30,26 @@ import sendpotEn from './resources/sendpot/en.json'
 import sendpotEs from './resources/sendpot/es.json'
 import sendEn from './resources/send/en.json'
 import sendEs from './resources/send/es.json'
+import secretShopEn from './resources/secret-shop/en.json'
+import secretShopEs from './resources/secret-shop/es.json'
+import sendTokenUpgradeEn from './resources/send-token-upgrade/en.json'
+import sendTokenUpgradeEs from './resources/send-token-upgrade/es.json'
 import tradeEn from './resources/trade/en.json'
 import tradeEs from './resources/trade/es.json'
 import homeEn from './resources/home/en.json'
 import homeEs from './resources/home/es.json'
 import navigationEn from './resources/navigation/en.json'
 import navigationEs from './resources/navigation/es.json'
+import maintenanceEn from './resources/maintenance/en.json'
+import maintenanceEs from './resources/maintenance/es.json'
 import onboardingEn from './resources/onboarding/en.json'
 import onboardingEs from './resources/onboarding/es.json'
 import settingsEn from './resources/settings/en.json'
 import settingsEs from './resources/settings/es.json'
 import splashEn from './resources/splash/en.json'
 import splashEs from './resources/splash/es.json'
+import unknownEn from './resources/unknown/en.json'
+import unknownEs from './resources/unknown/es.json'
 
 export const DEFAULT_NAMESPACE = 'common'
 export const DEFAULT_LOCALE = 'en'
@@ -54,16 +64,21 @@ export const resources = {
     earn: earnEn,
     invest: investEn,
     deposit: depositEn,
+    leaderboard: leaderboardEn,
     cantonWallet: cantonWalletEn,
     rewards: rewardsEn,
     sendpot: sendpotEn,
     send: sendEn,
+    secretShop: secretShopEn,
+    sendTokenUpgrade: sendTokenUpgradeEn,
     trade: tradeEn,
     home: homeEn,
     navigation: navigationEn,
+    maintenance: maintenanceEn,
     onboarding: onboardingEn,
     settings: settingsEn,
     splash: splashEn,
+    unknown: unknownEn,
   },
   es: {
     [DEFAULT_NAMESPACE]: commonEs,
@@ -74,16 +89,21 @@ export const resources = {
     earn: earnEs,
     invest: investEs,
     deposit: depositEs,
+    leaderboard: leaderboardEs,
     cantonWallet: cantonWalletEs,
     rewards: rewardsEs,
     sendpot: sendpotEs,
     send: sendEs,
+    secretShop: secretShopEs,
+    sendTokenUpgrade: sendTokenUpgradeEs,
     trade: tradeEs,
     home: homeEs,
     navigation: navigationEs,
+    maintenance: maintenanceEs,
     onboarding: onboardingEs,
     settings: settingsEs,
     splash: splashEs,
+    unknown: unknownEs,
   },
 } as const
 

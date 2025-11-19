@@ -78,5 +78,29 @@
     "buttons": {
       "confirm": "Confirmar retiro"
     }
+  },
+  "rewards": {
+    "history": {
+      "title": "Historial de recompensas",
+      "empty": "No hay actividad de recompensas",
+      "error": "No se pudieron cargar las recompensas: {{message}}"
+    },
+    "messages": {
+      "minimum": "Necesitas al menos {{amount}} {{symbol}} para reclamar recompensas"
+    },
+    "status": {
+      "requesting": "Solicitando firma...",
+      "sending": "Enviando transacción...",
+      "waiting": "Esperando confirmación..."
+    },
+    "toast": {
+      "success": "Recompensas reclamadas"
+    },
+    "feed": {
+      "today": "Hoy"
+    },
+    "actions": {
+      "claim": "Reclamar recompensas"
+    }
   }
 }

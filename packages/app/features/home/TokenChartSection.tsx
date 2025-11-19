@@ -17,6 +17,7 @@ export function TokenChartSection() {
   const [tf, setTf] = useState<Timeframe>('1W')
   const { coin } = useCoinFromTokenParam()
   const { points, smoothed, last, change } = useTokenChartData(coin?.coingeckoTokenId, tf)
+  const { t } = useTranslation('home')
 
   const [measuredWidth, setMeasuredWidth] = useState<number>(0)
   const theme = useThemeName()
@@ -143,15 +144,19 @@ function ChartScrubReadout({
   changeBadge: React.ReactNode
 }) {
   const { price, ts } = useScrubState()
+  const { i18n } = useTranslation()
+  const locale = i18n.resolvedLanguage ?? i18n.language
   const displayPrice = price ?? fallbackPrice
   const formattedPrice = `$${formatAmount(displayPrice, 9, decimals)}`
 
   const timeLabel = (() => {
     if (ts === null)
-      return new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+      return new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(
+        new Date()
+      )
     try {
       const d = new Date(ts)
-      return d.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+      return new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(d)
     } catch {
       return null
     }
@@ -178,4 +183,3 @@ function ChartExtremeLabelsWithActive({ decimals }: { decimals: number }) {
   const { active } = useScrubState()
   return <ChartExtremeLabels decimals={decimals} active={active} />
 }
-const { t } = useTranslation('home')
