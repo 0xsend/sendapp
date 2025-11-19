@@ -1,0 +1,30 @@
+{
+  "status": {
+    "networkNotice": "Disponible solo en {{network}}. Dirección de tu Send Account:",
+    "missingAccount": "No se encontró una Send Account. ¿Ya creaste una?"
+  },
+  "actions": {
+    "fundAccount": "Financiar cuenta"
+  },
+  "dev": {
+    "buttons": {
+      "fundEth": "Añadir 10 ETH",
+      "fundUsdc": "Añadir 100 USDC",
+      "fundSend": "Añadir 100K Send",
+      "fundSendV0": "Añadir 1M Send V0 - suministro 100B",
+      "fundSpx": "Añadir 69K SPX6900"
+    },
+    "toasts": {
+      "fundEth": "Se añadieron 10 ETH",
+      "fundUsdc": "Se añadieron 100 USDC",
+      "fundSend": "Se añadieron 10K Send",
+      "fundSendV0": "Se añadieron 1M Send V0",
+      "fundSpx": "Se añadieron 69K SPX6900"
+    }
+  },
+  "result": {
+    "title": "Resultado",
+    "transaction": "Transacción {{type}}: {{hash}}",
+    "skipped": "{{type}}: saldo demasiado alto."
+  }
+}
