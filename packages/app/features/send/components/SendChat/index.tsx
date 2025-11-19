@@ -1,6 +1,6 @@
 import { LegendList } from '@legendapp/list'
 import type React from 'react'
-import { useCallback, useState, useRef, useMemo, useEffect } from 'react'
+import { useCallback, useState, useRef, useMemo, useEffect, type PropsWithChildren } from 'react'
 import {
   AnimatePresence,
   Avatar,
@@ -11,6 +11,7 @@ import {
   Link,
   Paragraph,
   Portal,
+  type ScrollView,
   Shimmer,
   SizableText,
   Spinner,
@@ -35,7 +36,7 @@ import { useRouter } from 'solito/router'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
 import { IconAccount, IconBadgeCheckSolid2, IconCoin, IconEthereum } from 'app/components/icons'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
-import { X } from '@tamagui/lucide-icons'
+import { History, X } from '@tamagui/lucide-icons'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
@@ -59,7 +60,7 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { Platform } from 'react-native'
+import { FlatList, Platform } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
 import debug from 'debug'
@@ -67,6 +68,7 @@ import { signUserOp } from 'app/utils/signUserOp'
 import type { UserOperation } from 'permissionless'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
+import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -247,44 +249,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         }
                       }}
                     />
-                    <View
-                      animation={[
-                        'responsive',
-                        {
-                          opacity: '50ms',
-                          transform: 'responsive',
-                        },
-                      ]}
-                      scaleY={activeSection === 'chat' ? 1 : 0.5}
-                      opacity={activeSection === 'chat' ? 1 : 0}
-                      y={activeSection === 'chat' ? 0 : -50}
-                      f={1}
-                      $platform-web={{
-                        willChange: 'transform',
-                        filter: activeSection === 'chat' ? 'blur(0px)' : 'blur(4px)',
-                        transition: 'filter linear 100ms',
-                      }}
-                      animateOnly={['transform', 'opacity']}
-                      px="$4.5"
-                      $xs={{
-                        px: '$2',
-                      }}
-                    >
-                      {/* TODO: move this to another component and memozie it to avoid re-rendering */}
-                      <LegendList
-                        recycleItems
-                        maintainScrollAtEnd
-                        alignItemsAtEnd
-                        maintainVisibleContentPosition
-                        initialScrollIndex={chats.length - 1}
-                        data={chats}
-                        renderItem={renderItem}
-                        keyExtractor={keyExtractor}
-                        style={{
-                          paddingHorizontal: 12,
-                        }}
-                      />
-                    </View>
+                    <ChatList />
                     <SendChatInput />
                     <AnimatePresence>
                       {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
@@ -1059,7 +1024,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           disabled={isSendButtonDisabled}
           o={isSendButtonDisabled ? 0.5 : 1}
         >
-          <AnimatePresence exitBeforeEnter>
+          <AnimatePresence>
             {loadingSend ? (
               <View
                 animation="responsive"
@@ -1081,7 +1046,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                   }),
                 }}
               >
-                <Spinner size="small" color={'$gray1'} />
+                <Spinner size="small" color="$gray1Dark" />
               </View>
             ) : (
               <Button.Text
@@ -1254,30 +1219,174 @@ const ReviewSendAmountBox = YStack.styleable<ReviewSendAmountBoxProps>((props) =
   )
 })
 
+const ChatList = YStack.styleable(() => {
+  const [{ recipient: recipientParam, idType: idTypeParam }] = useSendScreenParams()
+  const { activeSection } = SendChatContext.useStyledContext()
+  const { profile: currentUserProfile } = useUser()
+
+  const {
+    data: otherUserProfile,
+    isLoading: isLoadingOtherUserProfile,
+    error: otherUserProfileError,
+  } = useProfileLookup(idTypeParam ?? 'tag', recipientParam ?? '')
+
+  const {
+    data,
+    isLoading: isLoadingActivities,
+    error: activitiesError,
+    isFetchingNextPage: isFetchingNextPageActivities,
+    fetchNextPage,
+    hasNextPage,
+  } = useInterUserActivityFeed({
+    pageSize: 5,
+    otherUserId: otherUserProfile?.sendid ?? undefined,
+    currentUserId: currentUserProfile?.send_id,
+  })
+
+  const refScrollView = useRef<ScrollView>(null)
+
+  useEffect(() => {
+    if (activeSection === 'chat' && refScrollView.current) {
+      refScrollView.current.scrollToEnd({ animated: false })
+    }
+  }, [activeSection])
+
+  const { pages } = data ?? {}
+  const activities = (pages?.flat() || []).filter(Boolean)
+
+  const renderItem = useCallback(
+    ({ item }: { item: (typeof activities)[number] }) => {
+      return <Item item={item} currentUserProfile={currentUserProfile} />
+    },
+    [currentUserProfile]
+  )
+
+  const loadingSkeletons =
+    isLoadingActivities || isLoadingOtherUserProfile ? (
+      <YStack f={1} gap="$6" p="$6">
+        <Shimmer w={280} h={100} br="$4" />
+        <Shimmer als="flex-end" w={280} h={100} br="$4" />
+      </YStack>
+    ) : null
+
+  const noActivity =
+    !activities || activities.length === 0 ? (
+      <YStack ai="center" jc="center" f={1} gap="$4">
+        <History col="$gray11" size="$6" />
+        <YStack jc="center" ai="center" gap="$4">
+          <SizableText size="$8">No transactions yet</SizableText>
+          <SizableText size="$5" col="$gray11">
+            Your next transaction will appear here
+          </SizableText>
+        </YStack>
+      </YStack>
+    ) : null
+
+  const error = activitiesError || otherUserProfileError
+  let errorComponent: React.ReactNode | null = null
+  if (error) {
+    errorComponent = (
+      <YStack ai="center" jc="center" f={1} gap="$4">
+        <YStack jc="center" ai="center" gap="$4">
+          <SizableText size="$8">Something went wrong!</SizableText>
+          <SizableText size="$5" col="$gray11">
+            An error occurred while loading your activity feed. Please try again in a few moments.
+          </SizableText>
+        </YStack>
+      </YStack>
+    )
+  }
+
+  return (
+    <View
+      animation={[
+        'responsive',
+        {
+          opacity: '50ms',
+          transform: 'responsive',
+        },
+      ]}
+      scaleY={activeSection === 'chat' ? 1 : 0.5}
+      opacity={activeSection === 'chat' ? 1 : 0}
+      y={activeSection === 'chat' ? 0 : -50}
+      f={1}
+      $platform-web={{
+        willChange: 'transform',
+        filter: activeSection === 'chat' ? 'blur(0px)' : 'blur(4px)',
+        transition: 'filter linear 100ms',
+      }}
+      animateOnly={['transform', 'opacity']}
+      px="$4.5"
+      $xs={{
+        px: '$2',
+      }}
+    >
+      {errorComponent ? (
+        errorComponent
+      ) : isLoadingActivities || isLoadingOtherUserProfile ? (
+        loadingSkeletons
+      ) : !activities || activities.length === 0 ? (
+        noActivity
+      ) : (
+        <FlatList
+          data={activities}
+          keyExtractor={(activity) =>
+            `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+          }
+          onEndReached={() => hasNextPage && fetchNextPage()}
+          ListFooterComponent={
+            !isLoadingActivities && isFetchingNextPageActivities ? (
+              <XStack pos="absolute" l={0} r={0} jc="space-between">
+                <Shimmer w="100%" h={10} br="$4" btlr={0} btrr={0} />
+              </XStack>
+            ) : null
+          }
+          inverted
+          renderItem={renderItem}
+          contentContainerStyle={{
+            paddingHorizontal: 12,
+          }}
+        />
+      )}
+    </View>
+  )
+})
+
+import type { Activity } from 'app/utils/zod/activity'
+import { amountFromActivity } from 'app/utils/activity'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+
 interface ItemProps {
-  item: Chat
+  item: Activity
+  currentUserProfile: ReturnType<typeof useUser>['profile']
 }
 
 const Item = YStack.styleable<ItemProps>((props) => {
-  const { item } = props
-  const isSent = item.sender === 'user'
+  const { item, currentUserProfile } = props
+  const isSent = item.from_user?.send_id === currentUserProfile?.send_id
+
+  const amount = amountFromActivity(item)
+  const date = useTransactionEntryDate({ activity: item, sent: isSent })
 
   return (
     <View py="$4">
       <YStack gap="$2">
         <YStack
           w="60%"
-          bg={item.sender === 'user' ? '$aztec6' : '$aztec3'}
+          bg={isSent ? '$aztec6' : '$aztec3'}
           bw={isSent ? 0 : 1}
-          boc={item.sender === 'user' ? 'transparent' : '$aztec4'}
+          boc={isSent ? 'transparent' : '$aztec4'}
           $theme-light={{
-            bg: item.sender === 'user' ? '$gray3' : '$gray1',
-            boc: item.sender === 'user' ? 'transparent' : '$gray2',
+            bg: isSent ? '$gray3' : '$gray1',
+            boc: isSent ? 'transparent' : '$gray2',
           }}
           br="$5"
           gap="$3"
           p="$3"
-          als={item.sender === 'user' ? 'flex-end' : 'flex-start'}
+          als={isSent ? 'flex-end' : 'flex-start'}
           ov="hidden"
         >
           <SizableText size="$1" fow="300" color="$aztec10">
@@ -1288,7 +1397,7 @@ const Item = YStack.styleable<ItemProps>((props) => {
               {isSent ? '-' : '+'}
             </SizableText>
             <SizableText size="$7" fow="600" color={isSent ? '$color' : '$neon9'}>
-              {item.amount}
+              {amount?.replace('+ ', '')}
             </SizableText>
             <IconEthereum size="$1" />
           </XStack>
@@ -1309,21 +1418,55 @@ const Item = YStack.styleable<ItemProps>((props) => {
             mb="$-3.5"
           >
             <SizableText size="$3" color="$aztec10">
-              {item.message}
+              {decodeURIComponent(item.data?.note)}
             </SizableText>
           </View>
         </YStack>
-        <SizableText
-          als={item.sender === 'user' ? 'flex-end' : 'flex-start'}
-          size="$2"
-          color="$gray10"
-        >
-          {new Date(item.timestamp).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
+        <SizableText als={isSent ? 'flex-end' : 'flex-start'} size="$2" color="$gray10">
+          {date}
         </SizableText>
       </YStack>
     </View>
   )
 })
+
+const useTransactionEntryDate = ({ activity, sent }: { activity: Activity; sent: boolean }) => {
+  const { created_at, data } = activity
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+
+  if (isTemporalTransfer) {
+    switch (data.status) {
+      case 'failed':
+      case 'cancelled':
+        return <DateText sent={sent}>Failed</DateText>
+      case 'confirmed':
+        return (
+          <DateText sent={sent}>
+            {new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          </DateText>
+        )
+      default:
+        return <Spinner size="small" color={'$color11'} />
+    }
+  }
+
+  return (
+    <DateText sent={sent}>
+      {new Date(created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+    </DateText>
+  )
+}
+export const DateText = ({ children, sent }: PropsWithChildren & { sent: boolean }) => {
+  return (
+    <Paragraph
+      display={'flex'}
+      size={'$2'}
+      ta={sent ? 'right' : 'left'}
+      color={'$darkGrayTextField'}
+      $theme-light={{ color: '$silverChalice' }}
+    >
+      {children}
+    </Paragraph>
+  )
+}

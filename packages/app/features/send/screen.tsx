@@ -13,6 +13,7 @@ import {
   Spinner,
   Text,
   useAppToast,
+  View,
   XStack,
   YStack,
   type YStackProps,
@@ -21,7 +22,7 @@ import Search from './components/SearchBarSend'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useEffect, useState } from 'react'
+import { useDeferredValue, useEffect, useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
@@ -64,10 +65,14 @@ export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const {
     data: profile,
-    isLoading,
+    isLoading: isLoadingRecipient,
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [{ search }] = useRootScreenParams()
+
+  // to avoid flickering
+  const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
+  const finalIsLoading = isLoadingRecipient && deferredIsLoadingRecipient
 
   // const router = useRouter()
   const [queryParams, setQueryParams] = useSendScreenParams()
@@ -79,8 +84,6 @@ export const SendScreen = () => {
       setOpen(true)
     }
   }, [profile])
-
-  if (isLoading) return <SendScreenSkeleton />
 
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
@@ -94,7 +97,21 @@ export const SendScreen = () => {
 
   return (
     <TagSearchProvider>
-      <YStack width="100%" pb="$4" gap="$6" $lg={{ pt: '$3' }}>
+      <YStack
+        pe={isLoadingRecipient ? 'none' : 'auto'}
+        o={finalIsLoading ? 0.5 : 1}
+        width="100%"
+        pb="$4"
+        gap="$6"
+        $lg={{ pt: '$3' }}
+        $platform-web={{
+          transition: 'opacity 100ms linear',
+        }}
+        $platform-native={{
+          animation: '100ms',
+          animateOnly: ['opacity'],
+        }}
+      >
         <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
           <Search
             placeholder="Search by send tag or wallet address"
