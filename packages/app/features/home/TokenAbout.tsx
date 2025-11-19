@@ -26,6 +26,9 @@ export const TokenAbout = () => {
     if (coin?.coingeckoTokenId === 'send-token-2') {
       return 'Send, Save, Invest. Your global wallet app, built for real life.'
     }
+    if (coin?.coingeckoTokenId === 'canton-network') {
+      return 'Canton Network enables selective privacy, data protection, and regulatory compliance for institutional financial markets through synchronized, real-time settlement across applications.'
+    }
     return aboutFromApi
   }, [coin?.coingeckoTokenId, aboutFromApi])
 

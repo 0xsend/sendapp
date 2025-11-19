@@ -33,10 +33,10 @@ export const cantonRouter = createTRPCRouter({
     const partyId = verification.canton_wallet_address
 
     try {
-      const cfAccountId = process.env.CANTON_CF_ACCOUNT_ID
-      const cfApiToken = process.env.CANTON_CF_API_TOKEN
+      const cfAccessClientId = process.env.CANTON_CF_ACCOUNT_ID
+      const cfAccessClientSecret = process.env.CANTON_CF_API_TOKEN
 
-      if (!cfAccountId || !cfApiToken) {
+      if (!cfAccessClientId || !cfAccessClientSecret) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Canton API credentials not configured',
@@ -44,15 +44,15 @@ export const cantonRouter = createTRPCRouter({
       }
 
       // Fetch CC (Amulet) balance from Canton Wallet API
-      const url = new URL('https://qapi-mainnet.cantonwallet.com/cantonwallet_balances')
-      url.searchParams.set('party_hint', `eq.${partyId}`)
+      const url = new URL('https://qapi-mainnet.cantonwallet.com/party_balances')
+      url.searchParams.set('party_id', `eq.${partyId}`)
       url.searchParams.set('instrument_id', 'eq.Amulet')
 
       const response = await fetch(url.toString(), {
         headers: {
           'Content-Type': 'application/json',
-          'cf-account-id': cfAccountId,
-          'cf-api-token': cfApiToken,
+          'CF-Access-Client-Id': cfAccessClientId,
+          'CF-Access-Client-Secret': cfAccessClientSecret,
         },
       })
 
