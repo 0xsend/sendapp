@@ -5953,15 +5953,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@legendapp/list@npm:^2.0.15":
-  version: 2.0.15
-  resolution: "@legendapp/list@npm:2.0.15"
+"@legendapp/list@npm:2.1.0-beta.12":
+  version: 2.1.0-beta.12
+  resolution: "@legendapp/list@npm:2.1.0-beta.12"
   dependencies:
     use-sync-external-store: "npm:^1.5.0"
   peerDependencies:
     react: "*"
-    react-native: "*"
-  checksum: 10/c3e836c017eb79c1cac321132dd49a10afbaecdcff25999424af48675b69b2357206c578f841488029a835246d82238abe4259cdf280b1b0ccb24bdd5a4dc9aa
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 10/c36a3411f5ef9d3fdb5002737f54c039d39ab357c145624e66b3bebd2442718772b06a82f711eef9f36e5f25374755c216d22971f058c2479754202024d819b9
   languageName: node
   linkType: hard
 
@@ -14764,7 +14768,7 @@ __metadata:
     "@intercom/intercom-react-native": "npm:^8.6.0"
     "@intercom/messenger-js-sdk": "npm:^0.0.14"
     "@jest/globals": "npm:^29"
-    "@legendapp/list": "npm:^2.0.15"
+    "@legendapp/list": "npm:2.1.0-beta.12"
     "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
