@@ -14,5 +14,70 @@
     "heading": "Transaction details",
     "phraseOn": "{{phrase}} on",
     "dateOnly": "On"
+  },
+  "events": {
+    "sendpot": {
+      "ticketPurchase": "Bought",
+      "win": "Sendpot Win"
+    },
+    "temporal": {
+      "depositFailed": "Deposit Failed"
+    },
+    "sendEarn": {
+      "deposit": "Send Earn Deposit",
+      "withdraw": "Send Earn Withdraw"
+    },
+    "revenueShare": "Revenue Share",
+    "sendTokenUpgrade": "Send Token Upgrade",
+    "trade": "Trade",
+    "withdraw": "Withdraw",
+    "deposit": "Deposit",
+    "received": "Received",
+    "sent": "Sent",
+    "sendtagRegistered": "Sendtag Registered",
+    "referral": "Referral",
+    "referredBy": "Referred By",
+    "rewards": "Rewards",
+    "sendAccountSigningKeyAdded": "Send Account Signing Key Added",
+    "sendAccountSigningKeyRemoved": "Send Account Signing Key Removed"
+  },
+  "phrases": {
+    "sendpot": {
+      "win": "won",
+      "ticketPurchase": "bought"
+    },
+    "sendEarn": {
+      "affiliateReward": "Earned rewards",
+      "depositPending": "Depositing to Send Earn...",
+      "depositFailed": "Failed to deposit to Send Earn",
+      "depositComplete": "Deposited to Send Earn",
+      "withdrawComplete": "Withdrew from Send Earn"
+    },
+    "revenueShare": "Earned revenue share",
+    "upgrade": "Upgraded",
+    "trade": "Trade",
+    "withdraw": "Withdrew",
+    "deposit": "Deposited",
+    "sentYou": "Sent you",
+    "received": "Received",
+    "sendtagsCreated": "Sendtags created",
+    "sendtagCreated": "Sendtag created",
+    "referred": "Referred",
+    "referredYou": "Referred you",
+    "sendAccountSigningKeyAdded": "Added"
+  },
+  "subtext": {
+    "tickets_one": "{{count}} ticket",
+    "tickets_other": "{{count}} tickets",
+    "sendEarn": "Send Earn",
+    "sendAccountSigningKey": "Send Account Signing Key"
+  },
+  "status": {
+    "sending": "Sending...",
+    "confirming": "Confirming...",
+    "sent": "Sent",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "initializing": "Initializing..."
   }
 }

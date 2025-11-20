@@ -1,36 +1,31 @@
-export const CommentsTime = (date: Date) => {
-  const currentDate: Date = new Date()
-  const timeDifference = currentDate.getTime() - date.getTime()
-  const secondsAgo = Math.floor(timeDifference / 1000)
-  const minutesAgo = Math.floor(secondsAgo / 60)
-  const hoursAgo = Math.floor(minutesAgo / 60)
-  const daysAgo = Math.floor(hoursAgo / 24)
-  const monthsAgo = Math.floor(daysAgo / 30)
-  const yearsAgo = Math.floor(monthsAgo / 12)
+export const CommentsTime = (date: Date, locale = 'en') => {
+  const now = Date.now()
+  const diffMs = date.getTime() - now
+  const diffSeconds = Math.round(diffMs / 1000)
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
 
-  if (yearsAgo > 0) {
-    return `${yearsAgo} year ago`
-  }
-  if (monthsAgo > 0) {
-    return `${monthsAgo} mon ago`
-  }
-  if (daysAgo > 1) {
-    return `${daysAgo} days ago`
-  }
-  if (daysAgo > 0) {
-    return `${daysAgo} day ago`
-  }
-  if (hoursAgo > 1) {
-    return `${hoursAgo} hours ago`
-  }
-  if (hoursAgo > 0) {
-    return `${hoursAgo} hour ago`
-  }
+  const minutes = Math.round(diffSeconds / 60)
+  const hours = Math.round(diffSeconds / 3600)
+  const days = Math.round(diffSeconds / 86400)
+  const months = Math.round(diffSeconds / 2592000)
+  const years = Math.round(diffSeconds / 31536000)
 
-  if (minutesAgo > 0) {
-    return `${minutesAgo} min ago`
+  if (Math.abs(diffSeconds) < 60) {
+    return formatter.format(diffSeconds, 'second')
   }
-  return `${secondsAgo} sec ago`
+  if (Math.abs(minutes) < 60) {
+    return formatter.format(minutes, 'minute')
+  }
+  if (Math.abs(hours) < 24) {
+    return formatter.format(hours, 'hour')
+  }
+  if (Math.abs(days) < 30) {
+    return formatter.format(days, 'day')
+  }
+  if (Math.abs(months) < 12) {
+    return formatter.format(months, 'month')
+  }
+  return formatter.format(years, 'year')
 }
 
 export const adjustUTCDateForTimezone = (date: Date, offset?: number) => {

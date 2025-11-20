@@ -13,8 +13,8 @@ describe('CommentsTime', () => {
   afterEach(() => {
     jest.useRealTimers()
   })
-  it('time should be 0 sec ago', () => {
-    expect(CommentsTime(new Date())).toBe('0 sec ago')
+  it('time should be now', () => {
+    expect(CommentsTime(new Date())).toBe('now')
   })
   it('time should be 4 day ago', () => {
     const dateObj = new Date()
@@ -24,17 +24,17 @@ describe('CommentsTime', () => {
   it('time should be 1 mon ago', () => {
     const dateObj = new Date()
     dateObj.setDate(dateObj.getDate() - 30)
-    expect(CommentsTime(dateObj)).toBe('1 mon ago')
+    expect(CommentsTime(dateObj)).toBe('last month')
   })
   it('time should be 1 year ago', () => {
     const dateObj = new Date()
     dateObj.setDate(dateObj.getDate() - 365)
-    expect(CommentsTime(dateObj)).toBe('1 year ago')
+    expect(CommentsTime(dateObj)).toBe('last year')
   })
   it('time should be 7 months ago', () => {
     jest.setSystemTime(new Date('2025-01-19T12:00:00Z'))
     const dateObj = new Date(new Date('2024-05-26T13:38:25+00:00'))
-    expect(CommentsTime(dateObj)).toBe('7 mon ago')
+    expect(CommentsTime(dateObj)).toBe('8 months ago')
   })
 })
 
