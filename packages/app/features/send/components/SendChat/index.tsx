@@ -28,6 +28,9 @@ import {
   YStack,
 } from '@my/ui'
 
+import BottomSheet from '@gorhom/bottom-sheet'
+import { BottomSheetView } from '@gorhom/bottom-sheet'
+
 import { formatUnits, isAddress } from 'viem'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -59,7 +62,6 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
-import { useContextBridge, FiberProvider } from 'its-fine'
 
 import debug from 'debug'
 import { signUserOp } from 'app/utils/signUserOp'
@@ -97,123 +99,155 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
 
   const [activeSection, setActiveSection] = useState<Sections>('chat')
   const { bottom, top } = useSafeAreaInsets()
+  const bottomSheetRef = useRef<BottomSheet>(null)
+
+  useEffect(() => {
+    if (open) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.close()
+    }
+  }, [open])
 
   return (
-    <Portal zIndex={2}>
-      <SendChatContext.Provider activeSection={activeSection} setActiveSection={setActiveSection}>
-        <AnimatePresence>
-          {open && (
-            <View pt={top} pb={bottom} ai="center" jc="center" pos="absolute" zi={10} inset={0}>
-              <View
-                animation={[
-                  'smoothResponsive',
-                  {
-                    opacity: '100ms',
-                    transform: 'responsive',
-                  },
-                ]}
-                animateOnly={['transform', 'opacity']}
-                enterStyle={
-                  lg
-                    ? {
-                        y: height,
-                        opacity: 0,
-                      }
-                    : {
-                        scale: 0.9,
-                        opacity: 0,
-                      }
-                }
-                exitStyle={
-                  lg
-                    ? {
-                        y: height,
-                        opacity: 0,
-                      }
-                    : {
-                        scale: 0.9,
-                        opacity: 0,
-                      }
-                }
-                rotateZ="0deg"
-                w={700}
-                maw="95%"
-                pe="auto"
-                jc="center"
-                $lg={{
-                  jc: 'flex-end',
-                }}
-                f={1}
-              >
-                <YStack
-                  animation="responsive"
-                  h={
-                    activeSection === 'chat'
-                      ? height * 0.9
-                      : activeSection === 'enterAmount'
-                        ? 500
-                        : 570
+    <Portal zIndex={10}>
+      <BottomSheet
+        index={-1}
+        ref={bottomSheetRef}
+        snapPoints={['95%']}
+        style={{ backgroundColor: 'transparent' }}
+        enableDynamicSizing={false}
+        detached
+        handleComponent={null}
+        backgroundStyle={{
+          backgroundColor: 'transparent',
+        }}
+        bottomInset={bottom + 10}
+        topInset={top}
+      >
+        <BottomSheetView
+          style={{
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            flex: 1,
+            height: '100%',
+          }}
+        >
+          <SendChatContext.Provider
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+          >
+            <AnimatePresence>
+              {open && (
+                <View
+                  animation={[
+                    'smoothResponsive',
+                    {
+                      opacity: '100ms',
+                      transform: 'responsive',
+                    },
+                  ]}
+                  animateOnly={['transform', 'opacity']}
+                  enterStyle={
+                    lg
+                      ? {
+                          y: height,
+                          opacity: 0,
+                        }
+                      : {
+                          scale: 0.9,
+                          opacity: 0,
+                        }
                   }
-                  animateOnly={['height']}
-                  mah="100%"
+                  exitStyle={
+                    lg
+                      ? {
+                          y: height,
+                          opacity: 0,
+                        }
+                      : {
+                          scale: 0.9,
+                          opacity: 0,
+                        }
+                  }
+                  rotateZ="0deg"
+                  w={700}
+                  mih="100%"
+                  maw="95%"
+                  pe="auto"
+                  jc="center"
+                  $lg={{
+                    jc: 'flex-end',
+                  }}
+                  f={1}
                 >
                   <YStack
-                    br="$8"
-                    btlr="$11"
-                    elevation="$9"
-                    shadowOpacity={0.4}
-                    ov="hidden"
-                    f={1}
-                    bg="$color1"
+                    animation="responsive"
+                    h={
+                      activeSection === 'chat'
+                        ? height
+                        : activeSection === 'enterAmount'
+                          ? 500
+                          : 570
+                    }
+                    animateOnly={['height']}
+                    mah="100%"
                   >
-                    <SendChatHeader
-                      onClose={() => {
-                        if (activeSection === 'chat') {
-                          setOpen(false)
-                        } else {
-                          setActiveSection('chat')
-                        }
-                      }}
-                    />
-                    <ChatList />
-                    <SendChatInput />
-                    <AnimatePresence>
-                      {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
-                    </AnimatePresence>
+                    <YStack
+                      br="$8"
+                      btlr="$11"
+                      elevation="$9"
+                      shadowOpacity={0.4}
+                      ov="hidden"
+                      f={1}
+                      bg="$color1"
+                    >
+                      <SendChatHeader
+                        onClose={() => {
+                          if (activeSection === 'chat') {
+                            setOpen(false)
+                          } else {
+                            setActiveSection('chat')
+                          }
+                        }}
+                        zi={2}
+                      />
+                      <ChatList />
+                      <SendChatInput />
+
+                      <AnimatePresence>
+                        {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
+                      </AnimatePresence>
+                    </YStack>
                   </YStack>
-                </YStack>
-              </View>
-            </View>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {open && (
-            <View
-              pe="auto"
-              tag="button"
-              role="button"
-              aria-label="Close send chat"
-              aria-expanded={open}
-              tabIndex={0}
-              onPress={() => setOpen(false)}
-              key="overlay-send-chat"
-              enterStyle={{ opacity: 0 }}
-              exitStyle={{ opacity: 0 }}
-              animation="200ms"
-              animateOnly={['opacity']}
-              bg="#000"
-              opacity={0.6}
-              pos="absolute"
-              inset={0}
-            />
-          )}
-        </AnimatePresence>
-      </SendChatContext.Provider>
+                </View>
+              )}
+            </AnimatePresence>
+          </SendChatContext.Provider>
+        </BottomSheetView>
+      </BottomSheet>
+      <AnimatePresence>
+        {open && (
+          <View
+            animation="200ms"
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+            bg="$shadowColor"
+            pos="absolute"
+            inset={0}
+            zi={-1}
+          />
+        )}
+      </AnimatePresence>
     </Portal>
   )
 }
 
-const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
+interface SendChatHeaderProps {
+  onClose: () => void
+}
+
+const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...props }) => {
   const themeName = useThemeName()
 
   const isDark = themeName.includes('dark')
@@ -236,6 +270,7 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
       bbw={1}
       bbc="$gray3"
       $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
+      {...props}
     >
       <Link
         hoverStyle={{
@@ -319,7 +354,7 @@ const SendChatHeader = ({ onClose }: { onClose: () => void }) => {
       </Button>
     </XStack>
   )
-}
+})
 
 const SendChatInput = Input.styleable((props) => {
   const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
@@ -363,6 +398,8 @@ const SendChatInput = Input.styleable((props) => {
             h={activeSection === 'chat' ? 47 : 80}
             y={activeSection === 'chat' ? 0 : -84}
             f={1}
+            tabIndex={0}
+            onPress={() => setActiveSection('enterAmount')}
           >
             <Input
               bg="$aztec5"
@@ -371,13 +408,13 @@ const SendChatInput = Input.styleable((props) => {
               }}
               numberOfLines={4}
               multiline
-              onPress={() => setActiveSection('enterAmount')}
               placeholderTextColor="$gray11"
               f={1}
               ref={inputRef}
               autoFocus={false}
               value={message}
               onChangeText={setMessage}
+              pointerEvents="none"
               // use a placeholder that trigger the user to send some crypto with a message
               placeholder={
                 activeSection === 'chat' ? 'Type amount, add a note...' : 'Add a note...'
@@ -432,6 +469,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   )
 
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
+  const amountInputRef = useRef<Input>(null)
 
   const noteValidationError = form.formState.errors.note
 
@@ -480,6 +518,19 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
       onFormChange.cancel()
     }
   }, [form, onFormChange])
+
+  // Delay keyboard appearance to allow animation to complete
+  useEffect(() => {
+    if (activeSection === 'enterAmount' && amountInputRef.current) {
+      const timeoutId = setTimeout(() => {
+        amountInputRef.current?.focus()
+      }, 500)
+
+      return () => {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [activeSection])
 
   const parsedAmount = BigInt(sendParams.amount ?? '0')
 
@@ -779,7 +830,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                         render={({ field: { value, onBlur } }) => (
                           <Input
                             unstyled
-                            autoFocus={isWeb}
+                            ref={amountInputRef}
                             value={value}
                             bbw={1.5}
                             boc="$gray8"

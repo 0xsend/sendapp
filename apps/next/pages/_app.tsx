@@ -26,6 +26,10 @@ if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
 }
 
+if (typeof window !== 'undefined') {
+  window.global = window
+}
+
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
 }
