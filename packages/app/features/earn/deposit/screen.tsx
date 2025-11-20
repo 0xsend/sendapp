@@ -26,6 +26,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { shouldUseErc7677 } from 'app/utils/shouldUseErc7677'
 import { toNiceError } from 'app/utils/toNiceError'
+import { ERR_MSG_NOT_ENOUGH_USDC } from 'app/utils/userOpConstants'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import debug from 'debug'
@@ -130,8 +131,15 @@ const DepositBenefitsDisplay = memo(
     formattedApy: string | undefined
     monthlyEarning: string | undefined
   }) => {
+    const { t } = useTranslation('earn')
+
     if (isError) {
-      return <Paragraph color="$error">{toNiceError(error)}</Paragraph>
+      const errorMessage =
+        error?.message === ERR_MSG_NOT_ENOUGH_USDC
+          ? t('errors.notEnoughForFees')
+          : toNiceError(error)
+
+      return <Paragraph color="$error">{errorMessage}</Paragraph>
     }
 
     // Always show CalculatedBenefits to avoid layout shift

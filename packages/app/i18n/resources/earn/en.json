@@ -42,6 +42,30 @@
       "label": "Balance:",
       "insufficient": "Insufficient funds"
     },
+    "benefits": {
+      "title": "Benefits",
+      "apy": {
+        "dynamicLabel": "APY",
+        "staticLabel": "Deposit APY",
+        "placeholder": "up to {{value}}"
+      },
+      "monthlyEarning": {
+        "label": "Estimated Monthly Earning",
+        "symbol": "{{symbol}}"
+      },
+      "withdraw": {
+        "label": "Withdraw Anytime",
+        "value": "Full flexibility"
+      },
+      "rewards": {
+        "label": "Rewards",
+        "symbol": "{{token}}",
+        "fallback": "Bonus {{token}} tokens"
+      }
+    },
+    "terms": {
+      "text": "I accept <tos>Terms of Service</tos>, <privacy>Privacy Policy</privacy> & <disclaimer>Disclaimer of the Send Earn Program</disclaimer>"
+    },
     "toast": {
       "error": {
         "title": "Deposit error"
@@ -102,5 +126,8 @@
     "actions": {
       "claim": "Claim rewards"
     }
+  },
+  "errors": {
+    "notEnoughForFees": "Not enough USDC to cover transaction fees"
   }
 }

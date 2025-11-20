@@ -42,6 +42,30 @@
       "label": "Saldo:",
       "insufficient": "Fondos insuficientes"
     },
+    "benefits": {
+      "title": "Beneficios",
+      "apy": {
+        "dynamicLabel": "APY",
+        "staticLabel": "APY del depósito",
+        "placeholder": "hasta {{value}}"
+      },
+      "monthlyEarning": {
+        "label": "Ganancia mensual estimada",
+        "symbol": "{{symbol}}"
+      },
+      "withdraw": {
+        "label": "Retira en cualquier momento",
+        "value": "Flexibilidad total"
+      },
+      "rewards": {
+        "label": "Recompensas",
+        "symbol": "{{token}}",
+        "fallback": "Tokens {{token}} de bonificación"
+      }
+    },
+    "terms": {
+      "text": "Acepto las <tos>Condiciones del servicio</tos>, la <privacy>Política de privacidad</privacy> y el <disclaimer>Aviso del programa Send Earn</disclaimer>"
+    },
     "toast": {
       "error": {
         "title": "Error al depositar"
@@ -102,5 +126,8 @@
     "actions": {
       "claim": "Reclamar recompensas"
     }
+  },
+  "errors": {
+    "notEnoughForFees": "No hay suficiente USDC para cubrir las comisiones de la transacción"
   }
 }

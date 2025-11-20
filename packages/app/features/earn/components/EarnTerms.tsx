@@ -1,6 +1,8 @@
 import { Anchor, type AnchorProps, Paragraph } from '@my/ui'
+import { Trans, useTranslation } from 'react-i18next'
 
 export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
+  const { t } = useTranslation('earn')
   const colorProps = {
     color: hasError ? '$error' : '$lightGrayTextField',
     '$theme-light': {
@@ -10,18 +12,21 @@ export const EarnTerms = ({ hasError }: { hasError?: boolean }) => {
 
   return (
     <Paragraph flexShrink={1} maxWidth={'100%'} {...colorProps}>
-      I accept{' '}
-      <TermsLink href="https://info.send.it/docs/legal/terms-of-service" {...colorProps}>
-        Terms of Service
-      </TermsLink>
-      ,{' '}
-      <TermsLink href="https://info.send.it/docs/legal/privacy-policy" {...colorProps}>
-        Privacy Policy
-      </TermsLink>{' '}
-      &{' '}
-      <TermsLink href="https://info.send.it/docs/legal/disclaimer" {...colorProps}>
-        Disclaimer of the Send Earn Program
-      </TermsLink>
+      <Trans
+        t={t}
+        i18nKey="deposit.terms.text"
+        components={{
+          tos: (
+            <TermsLink href="https://info.send.it/docs/legal/terms-of-service" {...colorProps} />
+          ),
+          privacy: (
+            <TermsLink href="https://info.send.it/docs/legal/privacy-policy" {...colorProps} />
+          ),
+          disclaimer: (
+            <TermsLink href="https://info.send.it/docs/legal/disclaimer" {...colorProps} />
+          ),
+        }}
+      />
     </Paragraph>
   )
 }
