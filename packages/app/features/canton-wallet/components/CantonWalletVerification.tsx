@@ -63,7 +63,7 @@ const CANTON_WALLET_REQUIREMENTS = {
   sendBalance: {
     enabled: true, // Toggle SEND balance requirement
     minDisplayBalance: 3000n * BigInt(10 ** 18), // Amount shown in UI
-    minFormBalance: 2000n * BigInt(10 ** 18), // Actual threshold to unlock form
+    minFormBalance: 3000n * BigInt(10 ** 18), // Actual threshold to unlock form
   },
 } as const
 
@@ -229,7 +229,8 @@ export function CantonWalletVerificationContent({
                 icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
                 label={`Hold ${minSendBalance} $SEND Minimum`}
                 isCompleted={
-                  (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
+                  (snapshotBalance ?? 0n) >=
+                  CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
                 }
                 isLoading={isLoadingSnapshotBalance}
                 href={isNative ? '/deposit/crypto' : '/trade'}
@@ -261,7 +262,8 @@ export function CantonWalletVerificationContent({
                 icon={<IconSendSingleLetter size={'$1'} color={'$color12'} />}
                 label={`Hold ${minSendBalance} $SEND Minimum`}
                 isCompleted={
-                  (snapshotBalance ?? 0n) >= CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
+                  (snapshotBalance ?? 0n) >=
+                  CANTON_WALLET_REQUIREMENTS.sendBalance.minDisplayBalance
                 }
                 isLoading={isLoadingSnapshotBalance}
                 href={isNative ? '/deposit/crypto' : '/trade'}

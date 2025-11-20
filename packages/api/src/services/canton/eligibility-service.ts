@@ -2,16 +2,13 @@
  * Canton Wallet Priority Token Eligibility Service
  *
  * This service validates user eligibility for Canton Wallet priority tokens.
- * Eligibility is determined by three server-side checks at a snapshot block:
- * 1. SendTag ownership (via distribution_verifications)
- * 2. Send Earn balance >= $2,000 USDC (via send_earn_balances_timeline at snapshot block)
- * 3. SEND token balance >= 3,000 SEND (via RPC call at snapshot block)
+ * Eligibility is determined server-side at a snapshot block:
+ * - SEND token balance >= 3,000 SEND (via RPC call at snapshot block)
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { PublicClient, Abi } from 'viem'
 import debugBase from 'debug'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import type { EligibilityResult, EligibilityCheck } from './types'
 import { CANTON_SNAPSHOT_CONFIG } from './types'
@@ -121,22 +118,19 @@ export class CantonEligibilityService {
 
     debug('Checking eligibility for distribution: %s (block: %s)', distribution.name, snapshotBlock)
 
-    // Run all three checks in parallel
-    const [hasTag, hasEarnBalance, hasSendBalance] = await Promise.all([
-      this.checkSendTagOwnership(userId, distribution.id),
-      this.checkSendEarnBalance(userId, snapshotBlock),
-      this.checkSendTokenBalance(userId, snapshotBlock, distribution.token_addr),
-    ])
+    const hasSendBalance = await this.checkSendTokenBalance(
+      userId,
+      snapshotBlock,
+      distribution.token_addr
+    )
 
-    // User is eligible if ALL checks pass
-    const eligible = hasTag.eligible && hasEarnBalance.eligible && hasSendBalance.eligible
+    // User is eligible if SEND balance check passes
+    const eligible = hasSendBalance.eligible
 
     const result: EligibilityResult = {
       eligible,
       checkedAt: new Date().toISOString(),
       checks: {
-        hasTag,
-        hasEarnBalance,
         hasSendBalance,
       },
       distribution: {
@@ -200,128 +194,6 @@ export class CantonEligibilityService {
 
     return data
   }
-
-  /**
-   * Check if user has a registered SendTag with weight > 0
-   */
-  private async checkSendTagOwnership(
-    userId: string,
-    distributionId: number
-  ): Promise<EligibilityCheck> {
-    debug('Checking SendTag ownership for user: %s', userId)
-
-    const { data, error } = await this.supabase
-      .from('distribution_verifications')
-      .select('weight')
-      .eq('user_id', userId)
-      .eq('distribution_id', distributionId)
-      .eq('type', 'tag_registration')
-      .gt('weight', 0)
-      .maybeSingle()
-
-    if (error) {
-      debug('Error checking tag ownership: %o', error)
-      throw new Error(`Failed to check SendTag ownership: ${error.message}`)
-    }
-
-    const hasTag = data !== null
-
-    return {
-      eligible: hasTag,
-      reason: hasTag ? 'User has registered SendTag' : 'No SendTag registered',
-      metadata: hasTag
-        ? {
-            weight: data.weight,
-          }
-        : undefined,
-    }
-  }
-
-  /**
-   * Check if user has Send Earn balance >= $2,000 USDC at snapshot block
-   */
-  private async checkSendEarnBalance(
-    userId: string,
-    snapshotBlock: bigint
-  ): Promise<EligibilityCheck> {
-    debug('Checking Send Earn balance for user: %s at block: %s', userId, snapshotBlock)
-
-    // First, get the user's send account address
-    const { data: sendAccount, error: accountError } = await this.supabase
-      .from('send_accounts')
-      .select('address')
-      .eq('user_id', userId)
-      .maybeSingle()
-
-    if (accountError) {
-      debug('Error fetching send account: %o', accountError)
-      throw new Error(`Failed to fetch send account: ${accountError.message}`)
-    }
-
-    if (!sendAccount) {
-      return {
-        eligible: false,
-        reason: 'No Send account found for user',
-        metadata: {
-          actualBalance: '0',
-          requiredBalance: CANTON_SNAPSHOT_CONFIG.MIN_EARN_BALANCE_USDC.toString(),
-        },
-      }
-    }
-
-    const address = sendAccount.address
-    if (typeof address !== 'string' || !address.startsWith('0x')) {
-      throw new Error(`Invalid send account address for user: ${userId}`)
-    }
-    const ownerBytea = hexToBytea(address as `0x${string}`)
-
-    // Query send_earn_balances_timeline for all vaults at or before snapshot block
-    // The view returns cumulative balances over time, grouped by vault (log_addr)
-    // We need the most recent balance for each vault <= snapshot block
-    const { data: balances, error: balancesError } = await this.supabase
-      .from('send_earn_balances_timeline')
-      .select('log_addr, assets')
-      .eq('owner', ownerBytea)
-      .lte('block_num', snapshotBlock.toString())
-      .order('block_num', { ascending: false })
-
-    if (balancesError) {
-      debug('Error fetching earn balances: %o', balancesError)
-      throw new Error(`Failed to fetch Send Earn balances: ${balancesError.message}`)
-    }
-
-    // Deduplicate by vault (log_addr) - take most recent balance for each vault
-    const vaultBalances = new Map<string, bigint>()
-    for (const balance of balances || []) {
-      // log_addr is bytea format: \xHEX
-      const vaultKey =
-        typeof balance.log_addr === 'string' ? balance.log_addr : balance.log_addr.toString()
-      if (!vaultBalances.has(vaultKey)) {
-        vaultBalances.set(vaultKey, BigInt(balance.assets || 0))
-      }
-    }
-
-    // Sum all vault balances
-    const totalBalance = Array.from(vaultBalances.values()).reduce(
-      (sum, amount) => sum + amount,
-      0n
-    )
-
-    const meetsThreshold = totalBalance >= CANTON_SNAPSHOT_CONFIG.MIN_EARN_BALANCE_USDC
-
-    return {
-      eligible: meetsThreshold,
-      reason: meetsThreshold
-        ? 'Send Earn balance meets minimum requirement'
-        : 'Send Earn balance below minimum requirement',
-      metadata: {
-        actualBalance: totalBalance.toString(),
-        requiredBalance: CANTON_SNAPSHOT_CONFIG.MIN_EARN_BALANCE_USDC.toString(),
-        vaultCount: vaultBalances.size,
-      },
-    }
-  }
-
   /**
    * Check if user has SEND token balance >= 3,000 SEND at snapshot block
    */

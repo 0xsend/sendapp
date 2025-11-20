@@ -166,8 +166,6 @@ describe('cantonWallet.generatePriorityToken', () => {
         eligible: true,
         checkedAt: new Date().toISOString(),
         checks: {
-          hasTag: { eligible: true, reason: 'User has registered SendTag' },
-          hasEarnBalance: { eligible: true, reason: 'Meets minimum requirement' },
           hasSendBalance: { eligible: true, reason: 'Meets minimum requirement' },
         },
       })
@@ -278,8 +276,6 @@ describe('cantonWallet.generatePriorityToken', () => {
         eligible: true,
         checkedAt: new Date().toISOString(),
         checks: {
-          hasTag: { eligible: true, reason: 'User has registered SendTag' },
-          hasEarnBalance: { eligible: true, reason: 'Meets minimum requirement' },
           hasSendBalance: { eligible: true, reason: 'Meets minimum requirement' },
         },
       })
@@ -559,8 +555,6 @@ describe('cantonWallet.generatePriorityToken', () => {
         eligible: false,
         checkedAt: new Date().toISOString(),
         checks: {
-          hasTag: { eligible: true, reason: 'User has registered SendTag' },
-          hasEarnBalance: { eligible: false, reason: 'Below minimum requirement' },
           hasSendBalance: { eligible: false, reason: 'Below minimum requirement' },
         },
       })
@@ -654,8 +648,6 @@ describe('cantonWallet.generatePriorityToken', () => {
         eligible: true,
         checkedAt: new Date().toISOString(),
         checks: {
-          hasTag: { eligible: true, reason: 'User has registered SendTag' },
-          hasEarnBalance: { eligible: true, reason: 'Meets minimum requirement' },
           hasSendBalance: { eligible: true, reason: 'Meets minimum requirement' },
         },
       })

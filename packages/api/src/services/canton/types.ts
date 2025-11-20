@@ -19,13 +19,7 @@ export const CANTON_SNAPSHOT_CONFIG = {
    * Minimum SEND token balance required for eligibility
    * User must hold at least this amount at snapshot block
    */
-  MIN_SEND_BALANCE: process.env.NODE_ENV === 'production' ? 3000n * 10n ** 18n : 100n * 10n ** 18n, // 3,000 SEND (prod), 100 SEND (dev)
-
-  /**
-   * Minimum Send Earn USDC balance required for eligibility
-   * Sum of all vault balances must be at least this amount at snapshot block
-   */
-  MIN_EARN_BALANCE_USDC: process.env.NODE_ENV === 'production' ? 2000n * 10n ** 6n : 5n * 10n ** 6n, // $2,000 USDC (prod), $5 USDC (dev)
+  MIN_SEND_BALANCE: 3000n * 10n ** 18n, // 3,000 SEND in all environments
 } as const
 
 /**
@@ -50,10 +44,6 @@ export interface EligibilityResult {
   checkedAt: string
   /** Results from individual eligibility checks */
   checks: {
-    /** SendTag ownership check */
-    hasTag: EligibilityCheck
-    /** Send Earn balance check (at snapshot block) */
-    hasEarnBalance: EligibilityCheck
     /** SEND token balance check (at snapshot block) */
     hasSendBalance: EligibilityCheck
   }
