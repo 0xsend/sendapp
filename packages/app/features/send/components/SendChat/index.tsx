@@ -5,7 +5,6 @@ import {
   Avatar,
   Button,
   createStyledContext,
-  Input,
   LinearGradient,
   Link,
   Paragraph,
@@ -14,6 +13,7 @@ import {
   Shimmer,
   SizableText,
   Spinner,
+  styled,
   Text,
   useAppToast,
   useControllableState,
@@ -26,6 +26,8 @@ import {
   View,
   XStack,
   YStack,
+  GorhomSheetInput,
+  Input as InputOG,
 } from '@my/ui'
 
 import BottomSheet from '@gorhom/bottom-sheet'
@@ -60,7 +62,7 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { FlatList } from 'react-native'
+import { FlatList, KeyboardAvoidingView } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
 import debug from 'debug'
@@ -85,6 +87,8 @@ interface SendChatProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
+
+const Input = isWeb ? InputOG : GorhomSheetInput
 
 export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
   const { height } = useWindowDimensions()
@@ -122,8 +126,9 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
         backgroundStyle={{
           backgroundColor: 'transparent',
         }}
-        bottomInset={bottom + 10}
+        bottomInset={bottom || 10}
         topInset={top}
+        keyboardBehavior="interactive"
       >
         <BottomSheetView
           style={{
@@ -140,37 +145,6 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
             <AnimatePresence>
               {open && (
                 <View
-                  animation={[
-                    'smoothResponsive',
-                    {
-                      opacity: '100ms',
-                      transform: 'responsive',
-                    },
-                  ]}
-                  animateOnly={['transform', 'opacity']}
-                  enterStyle={
-                    lg
-                      ? {
-                          y: height,
-                          opacity: 0,
-                        }
-                      : {
-                          scale: 0.9,
-                          opacity: 0,
-                        }
-                  }
-                  exitStyle={
-                    lg
-                      ? {
-                          y: height,
-                          opacity: 0,
-                        }
-                      : {
-                          scale: 0.9,
-                          opacity: 0,
-                        }
-                  }
-                  rotateZ="0deg"
                   w={700}
                   mih="100%"
                   maw="95%"
