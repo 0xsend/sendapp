@@ -98,13 +98,15 @@ const TransactionContent = ({
 
 export const Transaction = ({ open, onClose, transaction }: TransactionProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null)
+
   useEffect(() => {
     if (open) {
-      bottomSheetRef.current?.expand()
+      bottomSheetRef.current?.snapToIndex(1)
     } else {
       bottomSheetRef.current?.close()
     }
   }, [open])
+
   const { bottom, top } = useSafeAreaInsets()
 
   return (
@@ -112,20 +114,22 @@ export const Transaction = ({ open, onClose, transaction }: TransactionProps) =>
       <BottomSheet
         index={-1}
         ref={bottomSheetRef}
-        enableDynamicSizing
+        snapPoints={[250, '50%']}
         enablePanDownToClose
-        onClose={onClose}
         bottomInset={bottom}
         topInset={top}
         handleComponent={null}
       >
-        <BottomSheetView>
+        <BottomSheetView id="transaction-content">
           {transaction && <TransactionContent transaction={transaction} onClose={onClose} />}
         </BottomSheetView>
       </BottomSheet>
       <AnimatePresence>
         {open && (
           <View
+            pe="auto"
+            role="button"
+            aria-label="Close transaction"
             animation="200ms"
             enterStyle={{ opacity: 0 }}
             exitStyle={{ opacity: 0 }}
