@@ -2,5 +2,12 @@
   "app": {
     "name": "Send",
     "loading": "Cargando"
+  },
+  "referral": {
+    "placeholder": "Código de referido",
+    "validating": "Validando código de referido",
+    "invalid": "Código de referido inválido",
+    "applied": "Código de referido aplicado",
+    "cta": "¿Tienes un referido? ¡Ingresa el código para obtener recompensas!"
   }
 }
