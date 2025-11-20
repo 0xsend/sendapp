@@ -140,12 +140,6 @@ export const CoinField = ({
                     <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
                       Select Currency
                     </Paragraph>
-                    <Button
-                      chromeless
-                      unstyled
-                      icon={<IconX color={'$color12'} size={'$1.5'} />}
-                      onPress={() => setIsOpen(false)}
-                    />
                   </XStack>
                   <ScrollView showsVerticalScrollIndicator={false}>
                     <Adapt.Contents />

@@ -88,12 +88,10 @@ interface SendChatProps {
   onOpenChange: (open: boolean) => void
 }
 
-const Input = isWeb ? InputOG : GorhomSheetInput
+const Input = (isWeb ? InputOG : GorhomSheetInput) as unknown as typeof InputOG
 
 export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
   const { height } = useWindowDimensions()
-
-  const { lg } = useMedia()
 
   const [open, setOpen] = useControllableState({
     defaultProp: false,
@@ -142,61 +140,51 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
             activeSection={activeSection}
             setActiveSection={setActiveSection}
           >
-            <AnimatePresence>
-              {open && (
-                <View
-                  w={700}
-                  mih="100%"
-                  maw="95%"
-                  pe="auto"
-                  jc="center"
-                  $lg={{
-                    jc: 'flex-end',
-                  }}
+            <View
+              w={700}
+              mih="100%"
+              maw="95%"
+              pe="auto"
+              jc="center"
+              $lg={{
+                jc: 'flex-end',
+              }}
+              f={1}
+            >
+              <YStack
+                animation="responsive"
+                h={activeSection === 'chat' ? height : activeSection === 'enterAmount' ? 500 : 570}
+                animateOnly={['height']}
+                mah="100%"
+              >
+                <YStack
+                  br="$8"
+                  btlr="$11"
+                  elevation="$9"
+                  shadowOpacity={0.4}
+                  ov="hidden"
                   f={1}
+                  bg="$color1"
                 >
-                  <YStack
-                    animation="responsive"
-                    h={
-                      activeSection === 'chat'
-                        ? height
-                        : activeSection === 'enterAmount'
-                          ? 500
-                          : 570
-                    }
-                    animateOnly={['height']}
-                    mah="100%"
-                  >
-                    <YStack
-                      br="$8"
-                      btlr="$11"
-                      elevation="$9"
-                      shadowOpacity={0.4}
-                      ov="hidden"
-                      f={1}
-                      bg="$color1"
-                    >
-                      <SendChatHeader
-                        onClose={() => {
-                          if (activeSection === 'chat') {
-                            setOpen(false)
-                          } else {
-                            setActiveSection('chat')
-                          }
-                        }}
-                        zi={2}
-                      />
-                      <ChatList />
-                      <SendChatInput />
+                  <SendChatHeader
+                    onClose={() => {
+                      if (activeSection === 'chat') {
+                        setOpen(false)
+                      } else {
+                        setActiveSection('chat')
+                      }
+                    }}
+                    zi={2}
+                  />
+                  <ChatList />
+                  <SendChatInput />
 
-                      <AnimatePresence>
-                        {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
-                      </AnimatePresence>
-                    </YStack>
-                  </YStack>
-                </View>
-              )}
-            </AnimatePresence>
+                  <AnimatePresence>
+                    {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
+                  </AnimatePresence>
+                </YStack>
+              </YStack>
+            </View>
           </SendChatContext.Provider>
         </BottomSheetView>
       </BottomSheet>
@@ -334,7 +322,7 @@ const SendChatInput = Input.styleable((props) => {
   const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
 
   const [message, setMessage] = useState('')
-  const inputRef = useRef<Input>(null)
+  const inputRef = useRef<InputOG>(null)
   const themeName = useThemeName()
 
   const gradientColors = useMemo(() => {
@@ -443,7 +431,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   )
 
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
-  const amountInputRef = useRef<Input>(null)
+  const amountInputRef = useRef<InputOG>(null)
 
   const noteValidationError = form.formState.errors.note
 
@@ -1294,11 +1282,7 @@ const ChatList = YStack.styleable(() => {
           }
           onEndReached={() => hasNextPage && fetchNextPage()}
           ListFooterComponent={
-            !isLoadingActivities && isFetchingNextPageActivities ? (
-              <XStack pos="absolute" l={0} r={0} jc="space-between">
-                <Shimmer w="100%" h={10} br="$4" btlr={0} btrr={0} />
-              </XStack>
-            ) : null
+            !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
           }
           inverted
           renderItem={renderItem}
