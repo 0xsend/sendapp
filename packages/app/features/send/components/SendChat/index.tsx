@@ -1343,7 +1343,7 @@ const Item = YStack.styleable<ItemProps>((props) => {
           boc={isSent ? 'transparent' : '$aztec4'}
           $theme-light={{
             bg: isSent ? '$gray3' : '$gray1',
-            boc: isSent ? 'transparent' : '$gray4',
+            boc: isSent ? 'transparent' : '$gray2',
           }}
           br="$5"
           gap="$3"
@@ -1352,39 +1352,18 @@ const Item = YStack.styleable<ItemProps>((props) => {
           als={isSent ? 'flex-end' : 'flex-start'}
           ov="hidden"
         >
-          <SizableText size="$3" fow="300" color="$aztec10">
+          <SizableText size="$3" fow="300" color="$aztec9">
             {isSent ? 'You sent' : 'You received'}
           </SizableText>
           <XStack ai="center" gap="$3">
-            <XStack gap="$2" ai="center">
-              <SizableText size="$8" fow="500" col={isSent ? '$color' : '$neon9'}>
-                {isSent ? '-' : '+'}
-              </SizableText>
-              <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
-                {amount?.replace('+ ', '')}
-              </SizableText>
-            </XStack>
+            <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
+              {amount?.replace('+ ', '')}
+            </SizableText>
             <IconEthereum size="$1" />
           </XStack>
           {item.data?.note && (
-            <View
-              p="$2"
-              pb="$4"
-              px="$3.5"
-              br="$2"
-              btlr={0}
-              btrr={0}
-              bg={isSent ? '$aztec5' : '$aztec3'}
-              bw={0}
-              btw={1}
-              boc={isSent ? 'transparent' : '$aztec4'}
-              $theme-light={{
-                bg: isSent ? '$gray1' : '$gray2',
-              }}
-              mx="$-3.5"
-              mb="$-4"
-            >
-              <SizableText size="$5" color="$aztec10">
+            <View p="$2" pb="$4" px="$3.5" mx="$-3.5" mb="$-4">
+              <SizableText size="$5" fow="300" color="$aztec10">
                 {decodeURIComponent(item.data?.note ?? '')}
               </SizableText>
             </View>
