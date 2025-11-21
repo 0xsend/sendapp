@@ -6,18 +6,12 @@
  */
 
 /**
- * Snapshot configuration for Canton Wallet priority token eligibility checks
+ * Canton Wallet priority token eligibility configuration
  */
 export const CANTON_SNAPSHOT_CONFIG = {
   /**
-   * Block number at which eligibility is evaluated
-   * All balance and state checks occur at this block
-   */
-  SNAPSHOT_BLOCK: 22524265n,
-
-  /**
    * Minimum SEND token balance required for eligibility
-   * User must hold at least this amount at snapshot block
+   * User must hold at least this amount at the snapshot block defined in the distribution
    */
   MIN_SEND_BALANCE: 3000n * 10n ** 18n, // 3,000 SEND in all environments
 } as const

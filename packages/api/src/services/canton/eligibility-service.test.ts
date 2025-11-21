@@ -35,7 +35,10 @@ describe('CantonEligibilityService', () => {
     service = new CantonEligibilityService(mockSupabase, mockViemClient)
   })
 
-  function mockDistributionQuery(record = distributionRecord, sendAccount?: string | null) {
+  function mockDistributionQuery(
+    record: typeof distributionRecord | null = distributionRecord,
+    sendAccount?: string | null
+  ) {
     // biome-ignore lint/suspicious/noExplicitAny: Test mocking requires any types
     mockSupabase.from = jest.fn<any>().mockImplementation((table: string) => {
       if (table === 'distributions') {
