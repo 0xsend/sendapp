@@ -171,11 +171,10 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
         containerStyle={
           gtLg
             ? {
-                maxWidth: 700,
-                margin: 48,
-                marginBottom: 48,
+                maxWidth: 698,
+                margin: 47,
                 marginLeft: 'auto',
-                borderRadius: 16,
+                borderRadius: 20,
               }
             : undefined
         }
