@@ -25,7 +25,8 @@ export function getLocaleDisplayName(locale: string, displayLocale?: string): st
       })
       const label = displayNames.of(normalizedTarget) ?? displayNames.of(languagePart)
       if (label) {
-        return label
+        // Capitalize first letter for consistency
+        return label.charAt(0).toUpperCase() + label.slice(1)
       }
     } catch (error) {
       // Ignore display failures and fall back to static labels.
