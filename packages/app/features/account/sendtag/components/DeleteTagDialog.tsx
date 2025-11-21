@@ -134,11 +134,17 @@ export function DeleteTagDialog({ tag, open, onOpenChange, onSuccess }: DeleteTa
           flex={1}
           width={'100%'}
           size="$4"
-          theme="red"
+          backgroundColor={'$red8'}
           onPress={handleDelete}
           disabled={isPending}
           pressStyle={{ o: 0.8 }}
           icon={isPending ? <Spinner size="small" color="$white" /> : undefined}
+          hoverStyle={{
+            backgroundColor: '$red9',
+          }}
+          $theme-light={{
+            backgroundColor: '$red11',
+          }}
         >
           <Button.Text fontSize="$5" color="$white">
             {isPending ? 'Deleting...' : 'Delete'}
