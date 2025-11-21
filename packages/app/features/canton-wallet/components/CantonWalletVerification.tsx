@@ -52,6 +52,12 @@ import { useCantonWallet } from 'app/utils/useCantonWallet'
 
 // Configuration for Canton Wallet verification requirements
 // Enable/disable requirements and set minimum amounts here
+//
+// TODO: Move this configuration to the API and enforce on the backend.
+// Currently, these toggles only control UI display. The API (CantonEligibilityService)
+// only enforces SEND balance checks. If sendTag or savingsVault are enabled here,
+// they must also be implemented in packages/api/src/services/canton/eligibility-service.ts
+// to prevent users from bypassing requirements by calling the API directly.
 const CANTON_WALLET_REQUIREMENTS = {
   sendTag: {
     enabled: false, // Toggle sendtag purchase requirement
