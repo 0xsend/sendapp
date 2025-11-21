@@ -6,7 +6,9 @@ import {
   XStack,
   YStack,
   Paragraph,
-  Stack,
+  Button,
+  SizableText,
+  useTheme,
 } from '@my/ui'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
@@ -15,13 +17,13 @@ import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import {
-  counterpart,
-  userNameFromActivityUser,
-  noteFromActivity,
-  useDateDetailsFromActivity,
-} from 'app/utils/activity'
+import { counterpart, userNameFromActivityUser, noteFromActivity } from 'app/utils/activity'
 import { useAmountFromActivity } from 'app/utils/activity-hooks'
+import { useTokenPrices } from 'app/utils/useTokenPrices'
+import { useSendScreenParams } from 'app/routers/params'
+import { formatUnits } from 'viem'
+import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { allCoinsDict } from 'app/data/coins'
 
 interface TransactionProps {
   open: boolean
@@ -34,7 +36,6 @@ const TransactionContent = ({
   onClose,
 }: { transaction: Activity; onClose: () => void }) => {
   const amount = useAmountFromActivity(transaction)
-  const date = useDateDetailsFromActivity({ activity: transaction })
   const otherUser = counterpart(transaction)
   const isReceived = !!transaction.to_user?.id
   const username = otherUser ? userNameFromActivityUser(otherUser) : ''
@@ -45,58 +46,90 @@ const TransactionContent = ({
   const amountMatch = amountText.match(/^[+-]?\s*([\d,]+\.?\d*)\s*(\w+)?/)
   const numericAmount = amountMatch?.[1] || amountText
   const symbol = amountMatch?.[2] || coinSymbol || ''
+  const [queryParams] = useSendScreenParams()
+  const { sendToken, amount: amountParam } = queryParams
+
+  const {
+    query: { data: prices },
+  } = useTokenPrices()
+
+  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+
+  const price = prices?.[sendToken] ?? 0
+  const amountInUSD =
+    price *
+    Number(
+      formatUnits(
+        BigInt(amountParam ?? ''),
+        selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
+      )
+    )
 
   return (
-    <YStack bg="$color1" br="$6" p="$4" gap="$4" m="$4">
-      <XStack ai="center" jc="space-between">
-        <XStack ai="center" gap="$3" f={1}>
-          <ActivityAvatar activity={transaction} size="$5" circular={true} />
-          <Paragraph size="$5" color="$color11">
-            {username} {isReceived ? 'received' : 'sent'}
+    <YStack bg="$color1" p="$4" py="$5" gap="$6">
+      <XStack ai="center" gap="$3" f={1}>
+        <ActivityAvatar activity={transaction} size="$5" circular={true} />
+        <YStack>
+          <Paragraph size="$6" color="$color11">
+            {username}
           </Paragraph>
-        </XStack>
-        <Stack onPress={onClose} cursor="pointer" p="$2">
-          <IconX size="$1.5" color="$color11" />
-        </Stack>
-      </XStack>
-
-      <XStack ai="center" gap="$2">
-        <Paragraph
-          size="$10"
-          fontWeight="700"
-          color="$color12"
-          $theme-light={{ color: '$color12' }}
-        >
-          {numericAmount}
-        </Paragraph>
-        {symbol && (
-          <XStack>
-            <IconCoin symbol={symbol} size="$2" />
+          <XStack ai="center" gap="$2">
+            <SizableText size="$4" col="$gray11">
+              {isReceived ? 'Received on' : 'Sent on'}
+            </SizableText>
+            {transaction.created_at && (
+              <SizableText size="$3" col="$gray9">
+                {transaction.created_at?.toLocaleString([], {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}
+              </SizableText>
+            )}
           </XStack>
+        </YStack>
+      </XStack>
+      <Button circular onPress={onClose} cursor="pointer" pos="absolute" t={12} r={6}>
+        <Button.Icon>
+          <IconX size="$1.5" color="$gray11" />
+        </Button.Icon>
+      </Button>
+
+      <YStack gap="$4">
+        <XStack ai="center" gap="$3">
+          <SizableText size="$9" fontWeight="600" fontFamily="$mono" color="$color12">
+            {numericAmount}
+          </SizableText>
+          <XStack gap="$2" ai="center">
+            <SizableText size="$9" fow="600" fontFamily="$mono" col="$color12">
+              {symbol}
+            </SizableText>
+            {symbol && <IconCoin scale={1} symbol={symbol} size="$2" />}
+          </XStack>
+          <SizableText color="$gray10" fontSize="$2" fontFamily="$mono" mt={-1}>
+            {Number.isNaN(amountInUSD)
+              ? null
+              : `(${amountInUSD.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  maximumFractionDigits: 2,
+                })})`}
+          </SizableText>
+        </XStack>
+
+        {note && (
+          <Paragraph boc="$aztec2" size="$4" color="$gray11">
+            {decodeURIComponent(note)}
+          </Paragraph>
         )}
-      </XStack>
-
-      {/* Note */}
-      {note && (
-        <Paragraph size="$5" color="$color11">
-          {decodeURIComponent(note)}
-        </Paragraph>
-      )}
-
-      {/* Date */}
-      <XStack jc="space-between" ai="center" pt="$2">
-        <Paragraph size="$4" color="$color10">
-          {isReceived ? 'Received on' : 'Sent on'}
-        </Paragraph>
-        <Paragraph size="$4" color="$color11">
-          {date || ''}
-        </Paragraph>
-      </XStack>
+      </YStack>
     </YStack>
   )
 }
 
-export const Transaction = ({ open, onClose, transaction }: TransactionProps) => {
+export const Transaction = ({ open, onClose: onCloseProp, transaction }: TransactionProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null)
 
   useEffect(() => {
@@ -107,18 +140,31 @@ export const Transaction = ({ open, onClose, transaction }: TransactionProps) =>
     }
   }, [open])
 
+  const theme = useTheme()
+
   const { bottom, top } = useSafeAreaInsets()
+
+  const onClose = () => {
+    bottomSheetRef.current?.close()
+    setTimeout(() => {
+      onCloseProp()
+    }, 200)
+  }
 
   return (
     <Portal zIndex={200}>
       <BottomSheet
         index={-1}
         ref={bottomSheetRef}
-        snapPoints={[250, '50%']}
+        snapPoints={[230]}
         enablePanDownToClose
         bottomInset={bottom}
         topInset={top}
         handleComponent={null}
+        backgroundStyle={{
+          borderRadius: 0,
+          backgroundColor: theme.color1.val,
+        }}
       >
         <BottomSheetView id="transaction-content">
           {transaction && <TransactionContent transaction={transaction} onClose={onClose} />}
