@@ -13,15 +13,16 @@ import {
   Spinner,
   Text,
   useAppToast,
+  useMedia,
   XStack,
   YStack,
   type YStackProps,
 } from '@my/ui'
-import Search from 'app/components/SearchBar'
+import Search from './components/SearchBarSend'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useState } from 'react'
+import { useDeferredValue, useEffect, useRef, useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
@@ -29,78 +30,33 @@ import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { Platform } from 'react-native'
-
-const SendScreenSkeleton = () => {
-  return (
-    <YStack w="100%" gap="$8">
-      <Shimmer
-        ov="hidden"
-        br="$4"
-        h={50}
-        w={700}
-        maw="100%"
-        componentName="Card"
-        bg="$background"
-        $theme-light={{ bg: '$background' }}
-      />
-      <YStack gap="$6">
-        <Shimmer
-          ov="hidden"
-          br="$1"
-          h={30}
-          w={200}
-          maw="100%"
-          componentName="Card"
-          bg="$background"
-          $theme-light={{ bg: '$background' }}
-        />
-        <XStack gap="$4">
-          <Shimmer
-            ov="hidden"
-            br="$12"
-            h={80}
-            w={80}
-            maw="100%"
-            componentName="Card"
-            bg="$background"
-            $theme-light={{ bg: '$background' }}
-          />
-          <Shimmer
-            ov="hidden"
-            br="$12"
-            h={80}
-            w={80}
-            maw="100%"
-            componentName="Card"
-            bg="$background"
-            $theme-light={{ bg: '$background' }}
-          />
-          <Shimmer
-            ov="hidden"
-            br="$12"
-            h={80}
-            w={80}
-            maw="100%"
-            componentName="Card"
-            bg="$background"
-            $theme-light={{ bg: '$background' }}
-          />
-        </XStack>
-      </YStack>
-    </YStack>
-  )
-}
+import { SendChat } from './components/SendChat'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
   const {
     data: profile,
-    isLoading,
+    isLoading: isLoadingRecipient,
     error: errorProfileLookup,
   } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [{ search }] = useRootScreenParams()
+  const { gtLg } = useMedia()
 
-  if (isLoading) return <SendScreenSkeleton />
+  // to avoid flickering
+  const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
+  const finalIsLoading = isLoadingRecipient && deferredIsLoadingRecipient
+
+  // const router = useRouter()
+  const [queryParams, setQueryParams] = useSendScreenParams()
+
+  const [open, setOpen] = useState(false)
+  const closeRecipientTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    if (profile?.address) {
+      setOpen(true)
+    }
+  }, [profile])
 
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
@@ -108,27 +64,68 @@ export const SendScreen = () => {
     return <SendAmountForm />
   }
 
-  if (!profile)
-    return (
-      <TagSearchProvider>
-        <YStack width="100%" pb="$4" gap="$6" $lg={{ pt: '$3' }}>
-          <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
-            <Search
-              placeholder="Search by send tag or wallet address"
-              autoFocus={Platform.OS === 'web'}
-            />
-          </YStack>
-          {!search && <SendSuggestions />}
-          <SendSearchBody />
-        </YStack>
-      </TagSearchProvider>
-    )
-
-  if (!profile.address)
+  if (profile && !profile.address)
     // handle when user has no send account
     return <NoSendAccount profile={profile} />
 
-  return <SendAmountForm />
+  // if (!gtLg || !profile || isLoadingRecipient)
+  return (
+    <TagSearchProvider>
+      <YStack
+        pe={isLoadingRecipient ? 'none' : 'auto'}
+        o={finalIsLoading ? 0.5 : 1}
+        width="100%"
+        pb="$4"
+        gap="$6"
+        $lg={{ pt: '$3' }}
+        $platform-web={{
+          transition: 'opacity 100ms linear',
+        }}
+        $platform-native={{
+          animation: '100ms',
+          animateOnly: ['opacity'],
+        }}
+      >
+        <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
+          <Search
+            placeholder="Search by send tag or wallet address"
+            autoFocus={Platform.OS === 'web'}
+          />
+        </YStack>
+        {!search && <SendSuggestions />}
+        {/* {!gtLg && ( */}
+        <SendChat
+          open={open}
+          onOpenChange={(val) => {
+            setOpen(val)
+            if (!val) {
+              if (closeRecipientTimeout.current) {
+                clearTimeout(closeRecipientTimeout.current)
+                closeRecipientTimeout.current = null
+              }
+
+              closeRecipientTimeout.current = setTimeout(() => {
+                setQueryParams(
+                  {
+                    ...queryParams,
+                    recipient: undefined,
+                  },
+                  { webBehavior: 'replace' }
+                )
+                closeRecipientTimeout.current = null
+              }, 200)
+            }
+          }}
+        />
+        {/* )} */}
+        <SendSearchBody />
+      </YStack>
+    </TagSearchProvider>
+  )
+
+  // if (gtLg) {
+  //   return <SendAmountForm />
+  // }
 }
 
 function SendSearchBody() {

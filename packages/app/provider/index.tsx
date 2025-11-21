@@ -27,12 +27,12 @@ export function Provider({
 }) {
   return (
     <AuthProvider initialSession={initialSession}>
-      <Providers>
-        <ShimmerProvider duration={2000}>
+      <ShimmerProvider duration={2000}>
+        <Providers>
           <Concerns>{children}</Concerns>
           {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
-        </ShimmerProvider>
-      </Providers>
+        </Providers>
+      </ShimmerProvider>
     </AuthProvider>
   )
 }

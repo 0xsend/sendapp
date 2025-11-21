@@ -16,6 +16,10 @@ import { SendEarnProvider } from 'app/features/earn/providers/SendEarnProvider'
 import { useAuthScreenParams } from 'app/routers/params'
 import { useSetReferralCode } from 'app/utils/useReferralCode'
 
+if (typeof global === 'undefined') {
+  window.global = window
+}
+
 export const Page: NextPageWithLayout = () => {
   const { session, isLoading } = useUser()
   const [carouselImages, setCarouselImages] = useState<GetPlaiceholderImage[]>([])
