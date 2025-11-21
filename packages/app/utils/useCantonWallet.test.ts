@@ -137,7 +137,7 @@ describe('useCantonWallet', () => {
       await onSuccessCallback?.({ url: mockUrl, isNew: true }, {}, undefined)
 
       await waitFor(() => {
-        expect(mockNavigator.clipboard.writeText).toHaveBeenCalledWith(mockUrl)
+        expect(clipboardMock).toHaveBeenCalledWith(mockUrl)
       })
       expect(mockToast.show).toHaveBeenCalledWith('Priority invite link copied!')
     })
@@ -166,7 +166,7 @@ describe('useCantonWallet', () => {
       await onSuccessCallback?.({ url: mockUrl, isNew: false }, {}, undefined)
 
       await waitFor(() => {
-        expect(mockNavigator.clipboard.writeText).toHaveBeenCalledWith(mockUrl)
+        expect(clipboardMock).toHaveBeenCalledWith(mockUrl)
       })
       expect(mockToast.show).toHaveBeenCalledWith('Your existing invite link has been copied')
     })
