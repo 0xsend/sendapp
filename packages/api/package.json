@@ -3,8 +3,10 @@
   "name": "@my/api",
   "main": "src/index.ts",
   "private": true,
+  "type": "module",
   "scripts": {
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "jest"
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "^1.21.0",
@@ -30,7 +32,10 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@jest/globals": "^29",
     "@types/jsonwebtoken": "^9.0.2",
+    "jest": "^29",
+    "ts-jest": "^29",
     "typescript": "~5.9.2"
   }
 }

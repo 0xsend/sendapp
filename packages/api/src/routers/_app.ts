@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
 import { createTRPCRouter } from '../trpc'
 import { accountRecoveryRouter } from './account-recovery/router'
 import { authRouter } from './auth/router'
+import { cantonWalletRouter } from './cantonWallet/router'
 import { chainAddressRouter } from './chainAddress'
 import { distributionRouter } from './distribution'
 import { erc7677PaymasterRouter } from './erc7677Paymaster'
@@ -22,6 +23,7 @@ type AppRouterType = ReturnType<
     chainAddress: typeof chainAddressRouter
     tag: typeof tagRouter
     auth: typeof authRouter
+    cantonWallet: typeof cantonWalletRouter
     challenge: typeof accountRecoveryRouter
     distribution: typeof distributionRouter
     erc7677Paymaster: typeof erc7677PaymasterRouter
@@ -39,6 +41,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   chainAddress: chainAddressRouter,
   tag: tagRouter,
   auth: authRouter,
+  cantonWallet: cantonWalletRouter,
   challenge: accountRecoveryRouter,
   distribution: distributionRouter,
   erc7677Paymaster: erc7677PaymasterRouter,

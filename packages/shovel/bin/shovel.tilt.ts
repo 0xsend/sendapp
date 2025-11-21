@@ -1,4 +1,4 @@
-#!/usr/bin/env zx
+#!/usr/bin/env bun run
 
 import 'zx/globals'
 
