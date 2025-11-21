@@ -1,6 +1,5 @@
 import {
   Adapt,
-  Button,
   FieldError,
   Fieldset,
   getFontSize,
@@ -20,8 +19,7 @@ import {
   YStack,
 } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
-import { IconX } from 'app/components/icons'
+import { Check, ChevronDown } from '@tamagui/lucide-icons'
 import formatAmount from 'app/utils/formatAmount'
 import { useId, useState } from 'react'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -29,7 +27,7 @@ import type { CoinWithBalance } from 'app/data/coins'
 import { cantonCoin } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Platform, Dimensions } from 'react-native'
+import { Dimensions } from 'react-native'
 import { useController, useFormContext } from 'react-hook-form'
 
 export const CoinField = ({
@@ -131,7 +129,7 @@ export const CoinField = ({
               </XStack>
             </Select.Trigger>
 
-            <Adapt when="sm" platform="touch">
+            <Adapt when="sm">
               <Sheet
                 native
                 modal
@@ -141,7 +139,7 @@ export const CoinField = ({
                 disableDrag={!useFitContent}
                 animation="responsive"
               >
-                <Sheet.Frame maw={738} bc={'$color1'} px={'$3.5'} py={'$6'}>
+                <Sheet.Frame px="$2" maw="100%" bc={'$color1'} py={'$6'}>
                   <XStack ai="center" jc="space-between" w="100%" px="$4">
                     <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
                       Select Currency
@@ -167,7 +165,7 @@ export const CoinField = ({
                 btrr={0}
                 boc="transparent"
                 x={'-50%'}
-                $gtLg={{
+                $lg={{
                   x: 0,
                 }}
                 br={'$6'}
@@ -178,10 +176,10 @@ export const CoinField = ({
               >
                 <XStack
                   als="flex-start"
-                  w={320}
-                  $sm={{ w: isTouchable ? '100%' : 320 }}
+                  w="100%"
                   boc={'transparent'}
                   f={1}
+                  miw={300}
                   maxHeight={isTouchable ? 'unset' : 275}
                   // @ts-expect-error - overflowY is needed for Y-axis specific scroll behavior
                   overflowY={isTouchable ? 'hidden' : 'scroll'}

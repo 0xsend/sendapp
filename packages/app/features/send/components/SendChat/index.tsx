@@ -28,6 +28,7 @@ import {
   YStack,
   GorhomSheetInput,
   Input as InputOG,
+  type ViewProps,
 } from '@my/ui'
 
 import BottomSheet from '@gorhom/bottom-sheet'
@@ -97,6 +98,8 @@ const Input = (isWeb ? InputOG : GorhomSheetInput) as unknown as typeof InputOG
 export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
   const { height } = useWindowDimensions()
 
+  const { gtLg } = useMedia()
+
   const [open, setOpen] = useControllableState({
     defaultProp: false,
     prop: openProp,
@@ -106,7 +109,6 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
   const [transaction, setTransaction] = useState<Activity>()
 
   const [activeSection, setActiveSection] = useState<Sections>('chat')
-  const { bottom, top } = useSafeAreaInsets()
   const bottomSheetRef = useRef<BottomSheet>(null)
 
   useEffect(() => {
@@ -117,91 +119,94 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
     }
   }, [open])
 
+  const animateOnMount = gtLg
+    ? ({
+        animation: 'responsive',
+        animateOnly: ['opacity', 'transform'],
+        enterStyle: {
+          opacity: 0,
+          scale: 0.98,
+          x: 100,
+        },
+        exitStyle: {
+          opacity: 0,
+          scale: 0.98,
+          x: 100,
+        },
+      } as ViewProps)
+    : {}
+
   return (
     <>
       <Portal zIndex={10}>
-        <BottomSheet
-          index={-1}
-          ref={bottomSheetRef}
-          snapPoints={['95%']}
-          style={{ backgroundColor: 'transparent' }}
-          enableDynamicSizing={false}
-          detached
-          handleComponent={null}
-          backgroundStyle={{
-            backgroundColor: 'transparent',
-          }}
-          bottomInset={bottom || 10}
-          topInset={top}
-          keyboardBehavior="interactive"
-        >
-          <BottomSheetView
-            style={{
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              flex: 1,
-              height: '100%',
-            }}
+        <Container open={open}>
+          <SendChatContext.Provider
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            setTransaction={setTransaction}
+            transaction={transaction}
           >
-            <SendChatContext.Provider
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-              setTransaction={setTransaction}
-              transaction={transaction}
-            >
-              <View
-                w={700}
-                mih="100%"
-                maw="95%"
-                pe="auto"
-                jc="center"
-                $lg={{
-                  jc: 'flex-end',
-                }}
-                f={1}
-              >
-                <YStack
-                  animation="responsive"
-                  h={
-                    activeSection === 'chat' ? height : activeSection === 'enterAmount' ? 500 : 570
-                  }
-                  animateOnly={['height']}
-                  mah="100%"
+            <AnimatePresence>
+              {(open || !gtLg) && (
+                <View
+                  w={700}
+                  mih="100%"
+                  maw="95%"
+                  pe="auto"
+                  jc="flex-end"
+                  f={1}
+                  {...animateOnMount}
                 >
                   <YStack
-                    br="$8"
-                    btlr="$11"
-                    elevation="$9"
-                    shadowOpacity={0.4}
-                    ov="hidden"
-                    f={1}
-                    bg="$color1"
+                    animation="responsive"
+                    h={
+                      activeSection === 'chat'
+                        ? height
+                        : activeSection === 'enterAmount'
+                          ? 500
+                          : 570
+                    }
+                    animateOnly={['height']}
+                    mah="100%"
                   >
-                    <SendChatHeader
-                      onClose={() => {
-                        if (activeSection === 'chat') {
-                          setOpen(false)
-                        } else {
-                          setActiveSection('chat')
-                        }
-                      }}
-                      zi={2}
-                    />
-                    <ChatList />
-                    <SendChatInput />
+                    <YStack
+                      br="$8"
+                      btlr="$11"
+                      elevation="$9"
+                      shadowOpacity={0.4}
+                      ov="hidden"
+                      f={1}
+                      bg="$color1"
+                    >
+                      <SendChatHeader
+                        onClose={() => {
+                          if (activeSection === 'chat') {
+                            setOpen(false)
+                          } else {
+                            setActiveSection('chat')
+                          }
+                        }}
+                        zi={2}
+                      />
+                      <ChatList />
+                      <SendChatInput />
 
-                    <AnimatePresence>
-                      {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
-                    </AnimatePresence>
+                      <AnimatePresence>
+                        {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
+                      </AnimatePresence>
+                    </YStack>
                   </YStack>
-                </YStack>
-              </View>
-            </SendChatContext.Provider>
-          </BottomSheetView>
-        </BottomSheet>
+                </View>
+              )}
+            </AnimatePresence>
+          </SendChatContext.Provider>
+        </Container>
         <AnimatePresence>
           {open && (
             <View
+              pe="auto"
+              cursor="pointer"
+              onPress={() => setOpen(false)}
               animation="200ms"
               enterStyle={{ opacity: 0 }}
               exitStyle={{ opacity: 0 }}
@@ -219,6 +224,66 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
         transaction={transaction}
       />
     </>
+  )
+}
+
+interface ContainerProps {
+  children: React.ReactNode
+  open: boolean
+}
+
+const Container = ({ children, open }: ContainerProps) => {
+  const { lg } = useMedia()
+  const bottomSheetRef = useRef<BottomSheet>(null)
+  const { bottom, top } = useSafeAreaInsets()
+
+  useEffect(() => {
+    if (open) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.close()
+    }
+  }, [open])
+
+  if (lg) {
+    return (
+      <BottomSheet
+        index={-1}
+        ref={bottomSheetRef}
+        snapPoints={['95%']}
+        style={{ backgroundColor: 'transparent' }}
+        enableDynamicSizing={false}
+        detached
+        animationConfigs={{
+          damping: 35,
+          stiffness: 400,
+        }}
+        handleComponent={null}
+        backgroundStyle={{
+          backgroundColor: 'transparent',
+        }}
+        bottomInset={bottom || 10}
+        topInset={top}
+        keyboardBehavior="interactive"
+      >
+        <BottomSheetView
+          style={{
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            flex: 1,
+            height: '100%',
+          }}
+        >
+          {children}
+        </BottomSheetView>
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <View p="$8" jc="center" ai="flex-end" pos="absolute" inset={0} zi={1000}>
+      {children}
+    </View>
   )
 }
 

@@ -22,7 +22,7 @@ import Search from './components/SearchBarSend'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useDeferredValue, useEffect, useState } from 'react'
+import { useDeferredValue, useEffect, useRef, useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
@@ -50,6 +50,7 @@ export const SendScreen = () => {
   const [queryParams, setQueryParams] = useSendScreenParams()
 
   const [open, setOpen] = useState(false)
+  const closeRecipientTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (profile?.address) {
@@ -67,36 +68,43 @@ export const SendScreen = () => {
     // handle when user has no send account
     return <NoSendAccount profile={profile} />
 
-  if (!gtLg || !profile || isLoadingRecipient)
-    return (
-      <TagSearchProvider>
-        <YStack
-          pe={isLoadingRecipient ? 'none' : 'auto'}
-          o={finalIsLoading ? 0.5 : 1}
-          width="100%"
-          pb="$4"
-          gap="$6"
-          $lg={{ pt: '$3' }}
-          $platform-web={{
-            transition: 'opacity 100ms linear',
-          }}
-          $platform-native={{
-            animation: '100ms',
-            animateOnly: ['opacity'],
-          }}
-        >
-          <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
-            <Search
-              placeholder="Search by send tag or wallet address"
-              autoFocus={Platform.OS === 'web'}
-            />
-          </YStack>
-          {!search && <SendSuggestions />}
-          {!gtLg && (
-            <SendChat
-              open={open}
-              onOpenChange={(val) => {
-                setOpen(val)
+  // if (!gtLg || !profile || isLoadingRecipient)
+  return (
+    <TagSearchProvider>
+      <YStack
+        pe={isLoadingRecipient ? 'none' : 'auto'}
+        o={finalIsLoading ? 0.5 : 1}
+        width="100%"
+        pb="$4"
+        gap="$6"
+        $lg={{ pt: '$3' }}
+        $platform-web={{
+          transition: 'opacity 100ms linear',
+        }}
+        $platform-native={{
+          animation: '100ms',
+          animateOnly: ['opacity'],
+        }}
+      >
+        <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
+          <Search
+            placeholder="Search by send tag or wallet address"
+            autoFocus={Platform.OS === 'web'}
+          />
+        </YStack>
+        {!search && <SendSuggestions />}
+        {/* {!gtLg && ( */}
+        <SendChat
+          open={open}
+          onOpenChange={(val) => {
+            setOpen(val)
+            if (!val) {
+              if (closeRecipientTimeout.current) {
+                clearTimeout(closeRecipientTimeout.current)
+                closeRecipientTimeout.current = null
+              }
+
+              closeRecipientTimeout.current = setTimeout(() => {
                 setQueryParams(
                   {
                     ...queryParams,
@@ -104,17 +112,20 @@ export const SendScreen = () => {
                   },
                   { webBehavior: 'replace' }
                 )
-              }}
-            />
-          )}
-          <SendSearchBody />
-        </YStack>
-      </TagSearchProvider>
-    )
+                closeRecipientTimeout.current = null
+              }, 200)
+            }
+          }}
+        />
+        {/* )} */}
+        <SendSearchBody />
+      </YStack>
+    </TagSearchProvider>
+  )
 
-  if (gtLg) {
-    return <SendAmountForm />
-  }
+  // if (gtLg) {
+  //   return <SendAmountForm />
+  // }
 }
 
 function SendSearchBody() {

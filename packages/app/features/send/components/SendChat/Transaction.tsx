@@ -9,6 +9,7 @@ import {
   Button,
   SizableText,
   useTheme,
+  useMedia,
 } from '@my/ui'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
@@ -134,11 +135,13 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
 
   useEffect(() => {
     if (open) {
-      bottomSheetRef.current?.snapToIndex(1)
+      bottomSheetRef.current?.expand()
     } else {
       bottomSheetRef.current?.close()
     }
   }, [open])
+
+  const { gtLg } = useMedia()
 
   const theme = useTheme()
 
@@ -165,6 +168,17 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
           borderRadius: 0,
           backgroundColor: theme.color1.val,
         }}
+        containerStyle={
+          gtLg
+            ? {
+                maxWidth: 700,
+                margin: 48,
+                marginBottom: 48,
+                marginLeft: 'auto',
+                borderRadius: 16,
+              }
+            : undefined
+        }
       >
         <BottomSheetView id="transaction-content">
           {transaction && <TransactionContent transaction={transaction} onClose={onClose} />}
