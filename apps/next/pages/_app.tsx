@@ -46,6 +46,8 @@ function MyApp({
   initialSession: AuthProviderProps['initialSession']
   seo?: ReturnType<typeof buildSeo>
 }>) {
+  const [, setTheme] = useRootTheme()
+
   useEffect(() => {
     void initSharedI18n()
       .then(async (instance) => {
@@ -65,8 +67,6 @@ function MyApp({
   }
   // reference: https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts
   const getLayout = Component.getLayout || ((page) => page)
-
-  const [, setTheme] = useRootTheme()
 
   // Only render DefaultSeo if the page doesn't provide its own SEO
   const hasPageSeo = pageProps.seo !== undefined

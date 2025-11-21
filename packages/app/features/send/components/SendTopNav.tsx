@@ -5,21 +5,23 @@ import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { useTranslation } from 'react-i18next'
 import { usePathname } from 'solito/navigation'
 import { useSendScreenParams } from 'app/routers/params'
-import { back, isWeb } from 'app/utils/nav'
+import { useRouter } from 'solito/router'
+import { Platform } from 'react-native'
 
 export function SendTopNav() {
   const { profile } = useUser()
   const path = usePathname()
   const { t } = useTranslation('send')
   const [sendParams] = useSendScreenParams()
+  const { back } = useRouter()
 
   const handleBack = () => {
-    if (isWeb || window.history.length > 1) {
+    if (Platform.OS === 'web' || window.history.length > 1) {
       back()
     }
   }
 
-  const isOnSelectRecipient = !(path.includes('/confirm') || sendParams.recipient)
+  const isOnSelectRecipient = !(path?.includes('/confirm') || sendParams.recipient)
 
   return (
     <Header w="100%" $lg={{ py: '$3.5' }}>
@@ -44,7 +46,7 @@ export function SendTopNav() {
           <Paragraph fontWeight={'500'} size={isOnSelectRecipient ? '$9' : '$8'} col={'$color12'}>
             {(() => {
               switch (true) {
-                case path.includes('/confirm'):
+                case path?.includes('/confirm'):
                   return t('topNav.preview')
                 case Boolean(sendParams.recipient):
                   return t('topNav.enterAmount')
@@ -69,7 +71,7 @@ export function SendTopNav() {
           >
             {(() => {
               switch (true) {
-                case path.includes('/confirm'):
+                case path?.includes('/confirm'):
                   return t('topNav.preview')
                 case Boolean(sendParams.recipient):
                   return t('topNav.enterAmount')
