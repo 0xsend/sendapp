@@ -104,7 +104,13 @@ export const CoinField = ({
               hoverStyle={hoverStyles}
               $gtSm={{ p: '$2.5' }}
               iconAfter={
-                <View animation="responsive" rotateZ={isOpen ? '180deg' : '0deg'}>
+                <View
+                  x={-2}
+                  y={1}
+                  scale={0.9}
+                  animation="responsive"
+                  rotateZ={isOpen ? '180deg' : '0deg'}
+                >
                   <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
                 </View>
               }
