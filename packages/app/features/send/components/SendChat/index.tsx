@@ -170,8 +170,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                     mah="100%"
                   >
                     <YStack
-                      br="$8"
-                      btlr="$11"
+                      br="$6"
                       elevation="$9"
                       shadowOpacity={0.4}
                       ov="hidden"
@@ -253,6 +252,7 @@ const Container = ({ children, open }: ContainerProps) => {
         snapPoints={['95%']}
         style={{ backgroundColor: 'transparent' }}
         enableDynamicSizing={false}
+        enablePanDownToClose
         detached
         animationConfigs={{
           damping: 35,
