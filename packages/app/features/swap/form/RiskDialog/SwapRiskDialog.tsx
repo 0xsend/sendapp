@@ -96,6 +96,7 @@ const SwapRiskDialog = () => {
               backgroundColor={isChecked ? '$primary' : '$color1'}
               circular={true}
               focusStyle={{ outlineWidth: 0 }}
+              elevation={3}
             >
               <Checkbox.Indicator>
                 <Check color={'$black'} />

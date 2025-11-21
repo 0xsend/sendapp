@@ -72,9 +72,10 @@ const SendpotRiskDialog = () => {
                 setIsChecked(checked === true)
               }}
               borderWidth={0}
-              backgroundColor={isChecked ? '$primary' : '$background'}
+              backgroundColor={isChecked ? '$primary' : '$color1'}
               circular={true}
               focusStyle={{ outlineWidth: 0 }}
+              elevation={3}
             >
               <Checkbox.Indicator>
                 <Check color={'$black'} />
