@@ -50,6 +50,8 @@ const TransactionContent = ({
   const [queryParams] = useSendScreenParams()
   const { sendToken, amount: amountParam } = queryParams
 
+  const { bottom } = useSafeAreaInsets()
+
   const {
     query: { data: prices },
   } = useTokenPrices()
@@ -67,7 +69,7 @@ const TransactionContent = ({
     )
 
   return (
-    <YStack bg="$color1" p="$4" py="$5" gap="$6">
+    <YStack bg="$color1" p="$4" py="$5" gap="$6" pb={bottom}>
       <XStack ai="center" gap="$3" f={1}>
         <ActivityAvatar activity={transaction} size="$5" circular={true} />
         <YStack>
@@ -145,8 +147,6 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
 
   const theme = useTheme()
 
-  const { bottom, top } = useSafeAreaInsets()
-
   const onClose = () => {
     bottomSheetRef.current?.close()
     setTimeout(() => {
@@ -161,8 +161,6 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
         ref={bottomSheetRef}
         snapPoints={[230]}
         enablePanDownToClose
-        bottomInset={bottom}
-        topInset={top}
         handleComponent={null}
         backgroundStyle={{
           borderRadius: 0,
