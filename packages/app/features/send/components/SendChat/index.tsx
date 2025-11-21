@@ -1424,7 +1424,7 @@ const Item = YStack.styleable<ItemProps>((props) => {
             <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
               {amount?.replace('+ ', '')}
             </SizableText>
-            <IconEthereum size="$1" />
+            <IconCoin symbol={item.data?.coin?.symbol ?? ''} size="$1" />
           </XStack>
           {item.data?.note && (
             <View p="$2" pb="$4" px="$3.5" mx="$-3.5" mb="$-4">
