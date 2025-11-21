@@ -16,16 +16,23 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useEffect, useId, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
-import { useDidUserBuyTicket } from './hooks/useDidUserBuyTicket'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+  useDidUserBuyTicket,
+  SENDPOT_DISCLAIMER_ACCEPTED_QUERY_KEY,
+} from './hooks/useDidUserBuyTicket'
 
 const SendpotRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const didUserBuyTicket = useDidUserBuyTicket()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const id = useId()
 
   const handleConfirm = () => {
+    // Set the disclaimer accepted flag in the query cache
+    queryClient.setQueryData([SENDPOT_DISCLAIMER_ACCEPTED_QUERY_KEY], true)
     setIsOpen(false)
   }
 
