@@ -126,22 +126,7 @@ export const SendScreen = () => {
     return <SendAmountForm />
   }
 
-  if (!profile)
-    return (
-      <TagSearchProvider>
-        <YStack width="100%" pb="$4" gap="$6" $lg={{ pt: '$3' }}>
-          <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
-            <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
-          </YStack>
-          {!search && <SendSuggestions />}
-          <SendSearchBody />
-        </YStack>
-      </TagSearchProvider>
-    )
-
-  if (!profile.address)
-    // handle when user has no send account
-    return <NoSendAccount profile={profile} />
+  if (profile && !profile.address) return <NoSendAccount profile={profile} />
 
   // if (!gtLg || !profile || isLoadingRecipient)
   return (
@@ -154,18 +139,15 @@ export const SendScreen = () => {
         gap="$6"
         $lg={{ pt: '$3' }}
         $platform-web={{
-          transition: 'opacity 100ms linear',
+          transition: 'opacity 200ms linear',
         }}
         $platform-native={{
-          animation: '100ms',
+          animation: '200ms',
           animateOnly: ['opacity'],
         }}
       >
         <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
-          <Search
-            placeholder="Search by send tag or wallet address"
-            autoFocus={Platform.OS === 'web'}
-          />
+          <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
         </YStack>
         {!search && <SendSuggestions />}
         {/* {!gtLg && ( */}

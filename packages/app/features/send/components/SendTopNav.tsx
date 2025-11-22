@@ -15,6 +15,8 @@ export function SendTopNav() {
   const [sendParams] = useSendScreenParams()
   const { back } = useRouter()
 
+  const isTagSend = sendParams?.idType === 'tag'
+
   const handleBack = () => {
     if (Platform.OS === 'web' || window.history.length > 1) {
       back()
@@ -32,7 +34,7 @@ export function SendTopNav() {
         safeAreaProps={{ edges: { bottom: 'off' } }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
-          {!isOnSelectRecipient && (
+          {!isOnSelectRecipient && !isTagSend && (
             <Button onPress={handleBack}>
               <ButtonOg.Icon>
                 <IconArrowLeft
@@ -44,16 +46,13 @@ export function SendTopNav() {
             </Button>
           )}
           <Paragraph fontWeight={'500'} size={isOnSelectRecipient ? '$9' : '$8'} col={'$color12'}>
-            {(() => {
-              switch (true) {
-                case path?.includes('/confirm'):
-                  return t('topNav.preview')
-                case Boolean(sendParams.recipient):
-                  return t('topNav.enterAmount')
-                default:
-                  return <IconSendLogo size={'$2.5'} color={'$color12'} />
-              }
-            })()}
+            {path?.includes('/confirm') ? (
+              t('topNav.preview')
+            ) : Boolean(sendParams.recipient) && !isTagSend ? (
+              t('topNav.enterAmount')
+            ) : (
+              <IconSendLogo size={'$2.5'} color={'$color12'} />
+            )}
           </Paragraph>
           {profile && (
             <XStack ml={'auto'}>
@@ -69,16 +68,11 @@ export function SendTopNav() {
             display={'flex'}
             $lg={{ als: 'flex-end' }}
           >
-            {(() => {
-              switch (true) {
-                case path?.includes('/confirm'):
-                  return t('topNav.preview')
-                case Boolean(sendParams.recipient):
-                  return t('topNav.enterAmount')
-                default:
-                  return t('topNav.default')
-              }
-            })()}
+            {path?.includes('/confirm')
+              ? t('topNav.preview')
+              : Boolean(sendParams.recipient) && !isTagSend
+                ? t('topNav.enterAmount')
+                : t('topNav.default')}
           </H2>
         </Stack>
       </Container>
