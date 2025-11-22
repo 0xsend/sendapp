@@ -139,7 +139,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
   return (
     <>
       <Portal zIndex={10}>
-        <Container open={open}>
+        <Container open={open} setOpen={setOpen}>
           <SendChatContext.Provider
             activeSection={activeSection}
             setActiveSection={setActiveSection}
@@ -229,9 +229,10 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
 interface ContainerProps {
   children: React.ReactNode
   open: boolean
+  setOpen: (open: boolean) => void
 }
 
-const Container = ({ children, open }: ContainerProps) => {
+const Container = ({ children, open, setOpen }: ContainerProps) => {
   const { lg } = useMedia()
   const bottomSheetRef = useRef<BottomSheet>(null)
   const { bottom, top } = useSafeAreaInsets()
@@ -254,6 +255,9 @@ const Container = ({ children, open }: ContainerProps) => {
         enableDynamicSizing={false}
         enablePanDownToClose
         detached
+        onClose={() => {
+          setOpen(false)
+        }}
         animationConfigs={{
           damping: 35,
           stiffness: 400,
