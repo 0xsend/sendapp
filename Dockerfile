@@ -111,6 +111,7 @@ ENV TAMAGUI_TARGET=web
 # Build the specified service
 RUN --mount=type=cache,target=/tmp/yarn-cache \
   --mount=type=cache,target=/tmp/turbo-cache \
+  NODE_ENV=development \
   yarn turbo build --cache-dir=/tmp/turbo-cache --filter=${PACKAGE}
 
 # ==========================
