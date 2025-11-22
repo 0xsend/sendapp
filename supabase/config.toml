@@ -71,6 +71,7 @@ schema_paths = [
 
   # Schema-specific tables
   "./schemas/shovel.sql",
+  "./schemas/shovel_backfill.sql",
   "./schemas/temporal.sql",
 
   # Views
