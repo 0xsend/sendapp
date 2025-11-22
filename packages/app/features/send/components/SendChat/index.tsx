@@ -309,6 +309,13 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
 
   const href = profile ? `/profile/${profile?.sendid}` : ''
 
+  const tagName =
+    idType === 'address'
+      ? shorten(recipient, 5, 4)
+      : profile?.tag
+        ? `/${profile?.tag}`
+        : `#${profile?.sendid}`
+
   return (
     <XStack
       gap="$3"
@@ -366,14 +373,10 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       </Link>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
-          {profile?.name || 'No name'}
+          {profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
         </SizableText>
         <SizableText size="$3" color="$gray10">
-          {idType === 'address'
-            ? shorten(recipient, 5, 4)
-            : profile?.tag
-              ? `/${profile?.tag}`
-              : `#${profile?.sendid}`}
+          {tagName}
         </SizableText>
       </YStack>
       <Button
