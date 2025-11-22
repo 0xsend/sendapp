@@ -158,6 +158,11 @@ CMD ["--bun", "run", "./src/server.ts"]
 FROM node:20-slim AS workers-runner
 WORKDIR /sendapp
 
+# Install ca-certificates for TLS connections
+RUN apt-get update && \
+  apt-get install -y ca-certificates && \
+  rm -rf /var/lib/apt/lists/*
+
 # Create non-root user
 RUN addgroup --system --gid 900 nodejs && \
   adduser --system --uid 900 workers
