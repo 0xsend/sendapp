@@ -1,0 +1,22 @@
+{
+  "hero": {
+    "title": "Best in class",
+    "description": "Register a Sendtag, maintain the minimum balance, and refer others to rise in the ranks."
+  },
+  "boards": {
+    "referrals": {
+      "title": "Referrals"
+    }
+  },
+  "table": {
+    "columns": {
+      "rank": "#",
+      "identifier": "Sendtag",
+      "referrals": "Referrals",
+      "transactions": "Total transactions"
+    }
+  },
+  "errors": {
+    "noData": "Unable to find leaderboard data"
+  }
+}

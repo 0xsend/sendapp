@@ -5,6 +5,7 @@ import { Button, Fade, FadeCard, Input, Paragraph, Spinner, useDebounce, XStack 
 import { Check } from '@tamagui/lucide-icons'
 import { IconX } from 'app/components/icons'
 import { useReferralCodeQuery, useSetReferralCode } from 'app/utils/useReferralCode'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Shows the referral code and the user's profile if they have one
@@ -27,6 +28,7 @@ export function ReferredBy() {
 
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [referralCode, setReferralCode] = useState<string | null>(null)
+  const { t } = useTranslation('account')
 
   const updateReferralCodeInStorage = useDebounce(
     useCallback(
@@ -72,7 +74,7 @@ export function ReferredBy() {
           disabledStyle={{ opacity: 0.5 }}
           value={referralCode || ''}
           onChangeText={(text) => setReferralCode(text)}
-          placeholder={'Referral Code'}
+          placeholder={t('sendtag.referral.placeholder')}
           lineHeight={20}
           col={'$color12'}
           bw={0}
@@ -140,20 +142,20 @@ export function ReferredBy() {
       {(() => {
         switch (true) {
           case referralCode === '':
-            return <Paragraph>Got a referral? Enter the code to get rewards!</Paragraph>
+            return <Paragraph>{t('sendtag.referral.empty')}</Paragraph>
           case isReferrerLoading:
-            return <Paragraph>Validating referral code</Paragraph>
+            return <Paragraph>{t('sendtag.referral.validating')}</Paragraph>
           case !!referrerError:
             return <Paragraph color="$error">{referrerError.message}</Paragraph>
           case !isReferrerLoading &&
             !referrer &&
             referralCode !== null &&
             referralCode === referralCodeFromStorage:
-            return <Paragraph color="$error">Invalid referral code</Paragraph>
+            return <Paragraph color="$error">{t('sendtag.referral.invalid')}</Paragraph>
           case !!referrer:
-            return <Paragraph>Referral code applied</Paragraph>
+            return <Paragraph>{t('sendtag.referral.applied')}</Paragraph>
           default:
-            return <Paragraph>Got a referral? Enter the code to get rewards!</Paragraph>
+            return <Paragraph>{t('sendtag.referral.empty')}</Paragraph>
         }
       })()}
     </FadeCard>

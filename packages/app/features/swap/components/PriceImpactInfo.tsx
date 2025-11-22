@@ -2,15 +2,7 @@ import { Paragraph, Popover, PrimaryButton, Sheet, useMedia, XStack, YStack } fr
 import { Info } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
-
-const PRICE_IMPACT_EXPLANATION =
-  'Exchanging large amounts reduces return. Available rate may not reflect best deal.'
-
-const TIPS = [
-  'Break your exchange into smaller amounts',
-  'Trade when more people are trading',
-  'Use lower amount for better rates',
-]
+import { useTranslation } from 'react-i18next'
 
 interface PriceImpactInfoProps {
   color: '$warning' | '$error' | '$orange8' | '$color12'
@@ -19,6 +11,8 @@ interface PriceImpactInfoProps {
 export const PriceImpactInfo = ({ color }: PriceImpactInfoProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const media = useMedia()
+  const { t } = useTranslation('trade')
+  const tips = t('priceImpactInfo.tips', { returnObjects: true }) as string[]
 
   // Use sheet for mobile/tablet, popover for desktop
   const shouldUseSheet = Platform.OS !== 'web' || media.sm || media.md
@@ -48,16 +42,16 @@ export const PriceImpactInfo = ({ color }: PriceImpactInfoProps) => {
           <Sheet.Frame key="price-impact-info-sheet" gap="$4" padding="$4" pb="$6">
             <YStack gap="$4">
               <Paragraph fontWeight="600" size="$6">
-                What is Price Impact?
+                {t('priceImpactInfo.title')}
               </Paragraph>
               <Paragraph size="$4" lineHeight={22}>
-                {PRICE_IMPACT_EXPLANATION}
+                {t('priceImpactInfo.description')}
               </Paragraph>
               <YStack gap="$2.5" mt="$2">
                 <Paragraph size="$4" fontWeight="600">
-                  How to get better rates:
+                  {t('priceImpactInfo.tipsTitle')}
                 </Paragraph>
-                {TIPS.map((tip) => (
+                {tips.map((tip) => (
                   <XStack key={tip} gap="$2" ai="flex-start">
                     <Paragraph size="$4" color="$color11">
                       •
@@ -70,7 +64,7 @@ export const PriceImpactInfo = ({ color }: PriceImpactInfoProps) => {
               </YStack>
               <XStack justifyContent="flex-end" marginTop="$2">
                 <PrimaryButton onPress={() => setIsOpen(false)}>
-                  <PrimaryButton.Text>Got it</PrimaryButton.Text>
+                  <PrimaryButton.Text>{t('priceImpactInfo.dismiss')}</PrimaryButton.Text>
                 </PrimaryButton>
               </XStack>
             </YStack>
@@ -110,16 +104,16 @@ export const PriceImpactInfo = ({ color }: PriceImpactInfoProps) => {
         <Popover.Arrow borderWidth={1} borderColor="$borderColor" />
         <YStack gap="$3">
           <Paragraph fontWeight="600" size="$5">
-            What is Price Impact?
+            {t('priceImpactInfo.title')}
           </Paragraph>
           <Paragraph size="$3" lineHeight={20} color="$color11">
-            {PRICE_IMPACT_EXPLANATION}
+            {t('priceImpactInfo.description')}
           </Paragraph>
           <YStack gap="$2" mt="$1">
             <Paragraph size="$3" fontWeight="600">
-              How to get better rates:
+              {t('priceImpactInfo.tipsTitle')}
             </Paragraph>
-            {TIPS.map((tip) => (
+            {tips.map((tip) => (
               <XStack key={tip} gap="$2" ai="flex-start">
                 <Paragraph size="$3" color="$color11">
                   •

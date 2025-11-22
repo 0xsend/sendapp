@@ -1,0 +1,67 @@
+{
+  "activity": {
+    "empty": "No hay recompensas disponibles",
+    "error": {
+      "verifications": "Error al obtener las verificaciones. {{message}}"
+    },
+    "title": {
+      "period": "Recompensas de {{period}}",
+      "total": "Total {{period}}",
+      "fallback": "este mes"
+    },
+    "sections": {
+      "tasks": "Tareas",
+      "multipliers": "Multiplicador",
+      "progress": "Progreso"
+    }
+  },
+  "requirements": {
+    "title": "Tu saldo SEND",
+    "sendtag": "Sendtag comprado",
+    "balance": "Saldo {{amount}}",
+    "savings": "Depósito en Ahorros ${{amount}}"
+  },
+  "tasks": {
+    "status": {
+      "completed": "Completado",
+      "ongoing": "En curso",
+      "pending": "Pendiente"
+    },
+    "types": {
+      "create_passkey": "Crear una Passkey",
+      "tag_registration": "Comprar un Sendtag",
+      "send_ten": "10+ envíos",
+      "send_one_hundred": "100+ envíos",
+      "tag_referral": "Referidos",
+      "total_tag_referrals": "Referidos totales",
+      "send_streak": "Racha de envíos",
+      "sendpot_ticket_purchase": "Boletos de SendPot",
+      "send_ceiling": ""
+    }
+  },
+  "multipliers": {
+    "title": "Multiplicador",
+    "referralTitle": "{{title}} de {{period}}"
+  },
+  "common": {
+    "x": "X {{value}}",
+    "na": "N/D"
+  },
+  "claim": {
+    "heading": {
+      "period": "Recompensas de {{period}}",
+      "total": "Total {{period}}"
+    },
+    "cta": {
+      "default": "$ Reclamar recompensa",
+      "claiming": "Reclamando...",
+      "claimed": "$ Reclamada",
+      "insufficientGas": "Gas insuficiente",
+      "notYet": "Aún no disponible",
+      "error": "Error"
+    }
+  },
+  "select": {
+    "month": "Seleccionar mes"
+  }
+}

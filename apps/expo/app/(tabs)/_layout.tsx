@@ -6,30 +6,38 @@ import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { HeaderSlot } from 'apps-expo/components/layout/HeaderSlot'
 import BottomNavBar from 'app/components/BottomTabBar/BottomNavBar'
 import type { NavigationState, PartialState, Route } from '@react-navigation/native'
-import { useCallback } from 'react'
+import { useCallback, type ReactNode } from 'react'
 import * as NavigationBar from 'expo-navigation-bar'
 import { useColorScheme } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
-const TABS = [
+type TabConfig = {
+  key: string
+  renderHeader?: () => ReactNode
+  labelKey?: string
+}
+
+const TABS: TabConfig[] = [
   {
     key: 'home/index',
-    title: () => (
+    renderHeader: () => (
       <XStack ai="center" jc="flex-start">
         <IconSendLogo size={'$2'} color={'$color12'} />
       </XStack>
     ),
+    labelKey: 'tabs.home',
   },
   {
     key: 'activity/index',
-    title: 'Activity',
+    labelKey: 'tabs.activity',
   },
   {
     key: 'send/index',
-    title: 'Send',
+    labelKey: 'tabs.send',
   },
   {
     key: 'explore/index',
-    title: 'Explore',
+    labelKey: 'tabs.explore',
   },
 ]
 
@@ -49,6 +57,7 @@ export default function Layout() {
   const theme = useTheme()
   const { session, profile } = useUser()
   const scheme = useColorScheme()
+  const { t } = useTranslation('navigation')
 
   useFocusEffect(
     useCallback(() => {
@@ -94,7 +103,11 @@ export default function Layout() {
               key={tab.key}
               options={{
                 headerLeft: () => {
-                  if (typeof tab.title === 'string') {
+                  if (tab.renderHeader) {
+                    return <HeaderSlot>{tab.renderHeader()}</HeaderSlot>
+                  }
+
+                  if (tab.labelKey) {
                     return (
                       <HeaderSlot>
                         <Paragraph
@@ -103,13 +116,13 @@ export default function Layout() {
                           col="$color12"
                           lineHeight={32}
                         >
-                          {tab.title}
+                          {t(tab.labelKey)}
                         </Paragraph>
                       </HeaderSlot>
                     )
                   }
 
-                  return <HeaderSlot>{tab.title()}</HeaderSlot>
+                  return null
                 },
                 headerTitle: () => null,
                 headerRight: () => (

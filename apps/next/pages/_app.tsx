@@ -10,11 +10,12 @@ import '@my/ui/src/config/fonts.css'
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 
 import { Provider } from 'app/provider'
+import { getI18n, initSharedI18n, resolvePreferredLocale } from 'app/i18n'
 import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
 import { DefaultSeo } from 'next-seo'
-import type { ReactElement, ReactNode } from 'react'
+import { type ReactElement, type ReactNode, useEffect } from 'react'
 import type { SolitoAppProps } from 'solito'
 
 import { defaultSEOConfig } from '../config/next-seo'
@@ -30,6 +31,10 @@ if (typeof window !== 'undefined') {
   window.global = window
 }
 
+void initSharedI18n().catch((error) => {
+  console.error('[i18n] failed to initialize during import', error)
+})
+
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode
 }
@@ -41,10 +46,27 @@ function MyApp({
   initialSession: AuthProviderProps['initialSession']
   seo?: ReturnType<typeof buildSeo>
 }>) {
+  const [, setTheme] = useRootTheme()
+
+  useEffect(() => {
+    void initSharedI18n()
+      .then(async (instance) => {
+        const preferred = await resolvePreferredLocale()
+        if (preferred && instance.language !== preferred) {
+          await instance.changeLanguage(preferred)
+        }
+      })
+      .catch((error) => {
+        console.error('[i18n] failed to initialize on client', error)
+      })
+  }, [])
+
+  const i18n = getI18n()
+  if (!i18n) {
+    return null
+  }
   // reference: https://nextjs.org/docs/pages/building-your-application/routing/pages-and-layouts
   const getLayout = Component.getLayout || ((page) => page)
-
-  const [, setTheme] = useRootTheme()
 
   // Only render DefaultSeo if the page doesn't provide its own SEO
   const hasPageSeo = pageProps.seo !== undefined
@@ -64,7 +86,7 @@ function MyApp({
           setTheme(next as ColorScheme)
         }}
       >
-        <Provider initialSession={pageProps.initialSession}>
+        <Provider initialSession={pageProps.initialSession} i18n={i18n}>
           {getLayout(<Component {...pageProps} />)}
         </Provider>
       </NextThemeProvider>

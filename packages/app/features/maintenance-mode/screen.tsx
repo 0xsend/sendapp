@@ -1,6 +1,7 @@
 import { IconSendLogo } from 'app/components/icons'
 import type { ReactNode } from 'react'
 import { YStack, H1, H2 } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 /**
  * This screen is used to display a maintenance mode screen.
@@ -8,6 +9,7 @@ import { YStack, H1, H2 } from 'tamagui'
  * TODO: this will not work on native, add an API route to check for maintenance mode
  */
 export function MaintenanceModeScreen({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('maintenance')
   if (process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true') {
     return (
       <YStack
@@ -24,10 +26,10 @@ export function MaintenanceModeScreen({ children }: { children: ReactNode }) {
       >
         <IconSendLogo size={'$2.5'} color="$color12" />
         <H1 $gtMd={{ size: '$8' }} size="$4" fontWeight={'300'} color="$color12">
-          currently undergoing maintenance
+          {t('title')}
         </H1>
         <H2 $gtMd={{ size: '$6' }} size="$4" fontWeight={'300'} color="$color12">
-          We will be back shortly!
+          {t('subtitle')}
         </H2>
       </YStack>
     )

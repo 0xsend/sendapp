@@ -6,6 +6,7 @@ import { decode } from 'base64-arraybuffer'
 import * as ImagePicker from 'expo-image-picker'
 import type React from 'react'
 import { type Ref, forwardRef, useImperativeHandle, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface UploadAvatarRefObject {
   pickImage: () => void
@@ -20,6 +21,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
   const [errMsg, setErrMsg] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const isDark = useThemeName()?.startsWith('dark')
+  const { t } = useTranslation('account')
 
   useImperativeHandle(ref, () => ({ pickImage }))
 
@@ -43,14 +45,14 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
     if (!user) return
     const image = pickerResult.assets[0]
     if (!image) {
-      setErrMsg('No image provided.')
+      setErrMsg(t('upload.errors.noImage'))
       return
     }
 
     const base64Image = image.base64
 
     if (!base64Image) {
-      setErrMsg('No image provided.')
+      setErrMsg(t('upload.errors.noImage'))
       return
     }
 
@@ -60,7 +62,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
     const res = decode(base64Str)
 
     if (!(res.byteLength > 0)) {
-      setErrMsg('ArrayBuffer is null')
+      setErrMsg(t('upload.errors.bufferNull'))
       // console.error('ArrayBuffer is null')
       return null
     }

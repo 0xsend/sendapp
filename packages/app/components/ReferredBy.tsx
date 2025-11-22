@@ -5,6 +5,7 @@ import { IconX } from 'app/components/icons'
 import { useCallback, useEffect, useState } from 'react'
 import { useReferredBy, useReferrer } from 'app/utils/referrer'
 import { useReferralCodeQuery, useSetReferralCode } from 'app/utils/useReferralCode'
+import { useTranslation } from 'react-i18next'
 
 /**
  * Shows the referral code and the user's profile if they have one
@@ -27,6 +28,7 @@ export function ReferredBy() {
   const { data: referredBy, isLoading: isLoadingReferredBy } = useReferredBy()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [referralCode, setReferralCode] = useState<string | null>(null)
+  const { t } = useTranslation('common')
 
   const updateReferralCodeInStorage = useDebounce(
     useCallback(
@@ -80,7 +82,7 @@ export function ReferredBy() {
         <Input
           value={referralCode || ''}
           onChangeText={(text) => setReferralCode(text)}
-          placeholder={'Referral Code'}
+          placeholder={t('referral.placeholder')}
           lineHeight={20}
           col={'$color12'}
           bw={0}
@@ -146,15 +148,15 @@ export function ReferredBy() {
       {(() => {
         switch (true) {
           case isLoadingReferrer:
-            return <Paragraph>Validating referral code</Paragraph>
+            return <Paragraph>{t('referral.validating')}</Paragraph>
           case !!referrerError:
             return <Paragraph color="$error">{referrerError.message}</Paragraph>
           case !!referralCodeFromStorage && !!referralCode && !referrer:
-            return <Paragraph color="$error">Invalid referral code</Paragraph>
+            return <Paragraph color="$error">{t('referral.invalid')}</Paragraph>
           case !!referrer:
-            return <Paragraph>Referral code applied</Paragraph>
+            return <Paragraph>{t('referral.applied')}</Paragraph>
           default:
-            return <Paragraph>Got a referral? Enter the code to get rewards!</Paragraph>
+            return <Paragraph>{t('referral.cta')}</Paragraph>
         }
       })()}
     </Card>

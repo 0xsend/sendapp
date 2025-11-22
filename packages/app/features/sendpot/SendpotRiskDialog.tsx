@@ -16,11 +16,14 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useEffect, useId, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
+
 import { useQueryClient } from '@tanstack/react-query'
 import {
   useDidUserBuyTicket,
   SENDPOT_DISCLAIMER_ACCEPTED_QUERY_KEY,
 } from './hooks/useDidUserBuyTicket'
+
+import { useTranslation } from 'react-i18next'
 
 const SendpotRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
@@ -29,6 +32,7 @@ const SendpotRiskDialog = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const id = useId()
+  const { t } = useTranslation('sendpot')
 
   const handleConfirm = () => {
     // Set the disclaimer accepted flag in the query cache
@@ -51,23 +55,21 @@ const SendpotRiskDialog = () => {
     <>
       {didUserBuyTicket.error ? (
         <YStack gap="$4">
-          <H2>Error</H2>
+          <H2>{t('risk.errorTitle')}</H2>
           <Paragraph>{toNiceError(didUserBuyTicket.error)}</Paragraph>
         </YStack>
       ) : (
         <YStack gap="$4" testID={'sendpotRiskDialogContent'}>
-          <H2>Important Disclaimer</H2>
+          <H2>{t('risk.title')}</H2>
           <Paragraph>
-            By purchasing a Sendpot ticket, you acknowledge that winnings are not guaranteed and
-            ticket costs are non-refundable. Draws are powered by Megapot and use provably fair
-            onchain randomness—please play responsibly.{' '}
+            {t('risk.body')}{' '}
             <Anchor
               target="_blank"
               href="https://support.send.app/en/articles/10916009-terms-of-service"
               rel="noreferrer"
               textDecorationLine={'underline'}
             >
-              Learn more.
+              {t('risk.link')}
             </Anchor>
           </Paragraph>
           <XStack ai={'center'} gap={'$2'}>
@@ -89,14 +91,14 @@ const SendpotRiskDialog = () => {
               </Checkbox.Indicator>
             </Checkbox>
             <Label htmlFor={id} cursor={'pointer'}>
-              I have read and understand the terms.
+              {t('risk.checkbox')}
             </Label>
           </XStack>
           <XStack justifyContent="flex-end" gap="$4">
             {Platform.OS === 'web' && (
               <Dialog.Close asChild>
                 <Button theme="red_active" br={'$2'}>
-                  <Button.Text>Cancel</Button.Text>
+                  <Button.Text>{t('risk.actions.cancel')}</Button.Text>
                 </Button>
               </Dialog.Close>
             )}
@@ -110,7 +112,7 @@ const SendpotRiskDialog = () => {
               width={Platform.OS === 'web' ? undefined : '100%'}
             >
               <Button.Text color="$color0" $theme-light={{ color: '$color12' }}>
-                I Agree & Continue
+                {t('risk.actions.confirm')}
               </Button.Text>
             </Button>
           </XStack>

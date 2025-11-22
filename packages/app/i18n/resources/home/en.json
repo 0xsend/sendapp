@@ -1,0 +1,53 @@
+{
+  "fallback": {
+    "missingAccount": {
+      "title": "No send account found",
+      "description": "This should never happen.",
+      "sitemap": "Sitemap",
+      "onboarding": "Go To Onboarding",
+      "signOut": "Sign Out"
+    }
+  },
+  "actions": {
+    "deposit": "Deposit",
+    "send": "Send",
+    "invest": "Invest",
+    "earn": "Earn",
+    "addMoney": "Add Money"
+  },
+  "cards": {
+    "stables": {
+      "title": "Cash Balance",
+      "totalTitle": "Total Balance"
+    },
+    "savings": {
+      "title": "Save",
+      "earning": "Earning {{percent}}%",
+      "fallback": "Up to 10% Interest"
+    },
+    "investments": {
+      "title": "Invest",
+      "cta": "INVEST",
+      "empty": "Diversify Your Portfolio",
+      "error": "Failed to load market data",
+      "weeklyDelta": "{{sign}}${{amount}} this week"
+    },
+    "rewards": {
+      "title": "Rewards"
+    },
+    "referrals": {
+      "title": "Referrals"
+    }
+  },
+  "token": {
+    "keyMetrics": "Key Metrics",
+    "metrics": {
+      "marketCap": "Market Cap",
+      "fdv": "FDV",
+      "volume24h": "Volume (24h)",
+      "circulatingSupply": "Circulating Supply"
+    },
+    "priceOverview": "Price Overview",
+    "chartError": "Failed to load chart data"
+  }
+}

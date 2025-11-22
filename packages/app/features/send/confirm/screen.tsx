@@ -42,6 +42,7 @@ import { formFields } from 'app/utils/SchemaForm'
 import { Platform } from 'react-native'
 import ConfirmScreenAvatar from 'app/features/send/confirm/ConfirmScreenAvatar'
 import useRedirectAfterSend from 'app/features/send/confirm/useRedirectAfterSend'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -80,6 +81,7 @@ export function SendConfirm() {
   const { coin: selectedCoin } = useCoinFromSendTokenParam()
   const { redirect } = useRedirectAfterSend()
   const { profile: currentUserProfile } = useUser()
+  const { t } = useTranslation('send')
 
   const submitButtonRef = useRef<TamaguiElement | null>(null)
 
@@ -365,7 +367,7 @@ export function SendConfirm() {
               pl={'$2'}
               textAlign={'right'}
             >
-              edit
+              {t('confirm.edit')}
             </Paragraph>
           </XStack>
           <Separator px="$4" />
@@ -378,7 +380,7 @@ export function SendConfirm() {
                   color: '$darkGrayTextField',
                 }}
               >
-                Fees
+                {t('confirm.fees')}
               </Paragraph>
               {isFeesLoading && <Spinner size="small" color={'$color11'} />}
               {usdcFees && (
@@ -414,7 +416,7 @@ export function SendConfirm() {
                   color: '$darkGrayTextField',
                 }}
               >
-                Your note
+                {t('confirm.noteTitle')}
               </Paragraph>
               <Paragraph
                 onPress={onEdit}
@@ -424,7 +426,7 @@ export function SendConfirm() {
                 pl={'$2'}
                 textAlign={'right'}
               >
-                edit
+                {t('confirm.edit')}
               </Paragraph>
             </XStack>
             <Paragraph fontSize={17} whiteSpace={'pre-wrap'}>
@@ -434,7 +436,11 @@ export function SendConfirm() {
         )}
         {error && (
           <ErrorMessage
-            error={(error as { details?: string }).details ?? error.message ?? 'Error sending'}
+            error={
+              (error as { details?: string }).details ??
+              error.message ??
+              t('confirm.errors.default')
+            }
           />
         )}
       </YStack>
@@ -453,11 +459,13 @@ export function SendConfirm() {
                 </PrimaryButton.Icon>
               )
             case !hasEnoughBalance:
-              return <PrimaryButton.Text>Insufficient Balance</PrimaryButton.Text>
+              return (
+                <PrimaryButton.Text>{t('confirm.errors.insufficientBalance')}</PrimaryButton.Text>
+              )
             case !hasEnoughGas:
-              return <PrimaryButton.Text>Insufficient Gas</PrimaryButton.Text>
+              return <PrimaryButton.Text>{t('confirm.errors.insufficientGas')}</PrimaryButton.Text>
             default:
-              return <PrimaryButton.Text>SEND</PrimaryButton.Text>
+              return <PrimaryButton.Text>{t('confirm.button.send')}</PrimaryButton.Text>
           }
         })()}
       </PrimaryButton>

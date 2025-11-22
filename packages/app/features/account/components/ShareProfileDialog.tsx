@@ -18,6 +18,7 @@ import * as Clipboard from 'expo-clipboard'
 import { Platform } from 'react-native'
 import { Copy, X } from '@tamagui/lucide-icons'
 import { memo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface ShareProfileDialogProps {
   isOpen: boolean
@@ -30,6 +31,7 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
 }) {
   const { profile } = useUser()
   const toast = useAppToast()
+  const { t } = useTranslation('account')
 
   const sendtag = profile?.main_tag?.name
   const hostname = isWeb ? window.location.hostname : 'send.app'
@@ -43,20 +45,20 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
   const handleCopyLink = useCallback(async () => {
     try {
       await Clipboard.setStringAsync(profileUrl)
-      toast.show('Profile link copied to clipboard')
+      toast.show(t('share.toast.copied'))
       onClose()
     } catch {
-      toast.error('Failed to copy link', {
-        message: 'Something went wrong while copying the link',
+      toast.error(t('share.toast.copyError.title'), {
+        message: t('share.toast.copyError.message'),
       })
     }
-  }, [profileUrl, toast, onClose])
+  }, [profileUrl, toast, onClose, t])
 
   const dialogContent = (
     <YStack ai="stretch">
       <XStack jc="space-between" mx="$-4" mt="$-4" p="$3" pb="$2" pl="$4">
         <H2 size="$8" fontWeight={400}>
-          Share Profile
+          {t('share.title')}
         </H2>
         <Button
           onPress={onClose}
@@ -94,7 +96,7 @@ export const ShareProfileDialog = memo<ShareProfileDialogProps>(function SharePr
             <PrimaryButton.Icon>
               <Copy size={16} color={'$black'} />
             </PrimaryButton.Icon>
-            <PrimaryButton.Text>copy link</PrimaryButton.Text>
+            <PrimaryButton.Text>{t('share.actions.copy')}</PrimaryButton.Text>
           </PrimaryButton>
         </YStack>
       </YStack>

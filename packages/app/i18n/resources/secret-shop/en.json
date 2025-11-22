@@ -1,0 +1,30 @@
+{
+  "status": {
+    "networkNotice": "Available on {{network}} only. Your Send Account address:",
+    "missingAccount": "No Send Account found. Did you create one?"
+  },
+  "actions": {
+    "fundAccount": "Fund account"
+  },
+  "dev": {
+    "buttons": {
+      "fundEth": "Fund with 10 ETH",
+      "fundUsdc": "Fund with 100 USDC",
+      "fundSend": "Fund with 100K Send",
+      "fundSendV0": "Fund with 1M Send V0 - 100B supply",
+      "fundSpx": "Fund with 69K SPX6900"
+    },
+    "toasts": {
+      "fundEth": "Funded with 10 ETH",
+      "fundUsdc": "Funded with 100 USDC",
+      "fundSend": "Funded with 10K Send",
+      "fundSendV0": "Funded with 1M Send V0",
+      "fundSpx": "Funded with 69K SPX6900"
+    }
+  },
+  "result": {
+    "title": "Result",
+    "transaction": "{{type}} transaction: {{hash}}",
+    "skipped": "{{type}}: too much balance."
+  }
+}

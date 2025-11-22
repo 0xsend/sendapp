@@ -23,7 +23,6 @@ import {
   getPriceImpactAnalysis,
   getPriceImpactColor,
   getPriceImpactLevel,
-  getPriceImpactMessage,
 } from 'app/features/swap/utils/priceImpact'
 import { PriceImpactInfo } from 'app/features/swap/components/PriceImpactInfo'
 import { useCoin, useCoins } from 'app/provider/coins'
@@ -39,15 +38,14 @@ import { formatUnits } from 'viem'
 import { type BRAND, z } from 'zod'
 import { Platform } from 'react-native'
 import { useUser } from 'app/utils/useUser'
+import { useTranslation } from 'react-i18next'
 
 const SwapFormSchema = z.object({
   outToken: formFields.coin,
   inToken: formFields.coin,
   outAmount: formFields.text,
   inAmount: formFields.text,
-  slippage: formFields.number
-    .min(0, 'Min slippage value is 0%')
-    .max(2000, 'Max slippage value is 20%'),
+  slippage: formFields.number.min(0, 'errors.slippageMin').max(2000, 'errors.slippageMax'),
 })
 
 export const SwapFormScreen = () => {
@@ -62,6 +60,7 @@ export const SwapFormScreen = () => {
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
   const { distributionShares } = useUser()
+  const { t } = useTranslation('trade')
 
   // Compute if user is verified
   const isVerified = useMemo(
@@ -188,14 +187,14 @@ export const SwapFormScreen = () => {
         {(quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ? (
           <>
             <Spinner size="small" color="$color12" mr={'$2'} />
-            <SubmitButton.Text>loading</SubmitButton.Text>
+            <SubmitButton.Text>{t('form.buttons.loading')}</SubmitButton.Text>
           </>
         ) : (
-          <SubmitButton.Text>review</SubmitButton.Text>
+          <SubmitButton.Text>{t('form.buttons.review')}</SubmitButton.Text>
         )}
       </SubmitButton>
     ),
-    [canSubmit, isFetchingSwap, isEstimating, quoteSide]
+    [canSubmit, isFetchingSwap, isEstimating, quoteSide, t]
   )
 
   const insufficientAmount =
@@ -556,7 +555,7 @@ export const SwapFormScreen = () => {
                           color={'$lightGrayTextField'}
                           $theme-light={{ color: '$darkGrayTextField' }}
                         >
-                          You Pay
+                          {t('form.labels.pay')}
                         </Paragraph>
                       </XStack>
                       <XStack gap={'$2'} ai={'center'} position="relative" jc={'space-between'}>
@@ -618,7 +617,7 @@ export const SwapFormScreen = () => {
                                 return <Spinner color="$color11" />
                               case !isLoadingCoins && !inCoin:
                                 return (
-                                  <Paragraph color="$error">Error fetching balance info</Paragraph>
+                                  <Paragraph color="$error">{t('form.errors.balance')}</Paragraph>
                                 )
                               case !inCoin?.balance:
                                 return (
@@ -680,7 +679,7 @@ export const SwapFormScreen = () => {
                                       : '$darkGrayTextField',
                                 }}
                               >
-                                max
+                                {t('form.buttons.max')}
                               </Button.Text>
                             </Button>
                           )}
@@ -699,7 +698,7 @@ export const SwapFormScreen = () => {
                           color={'$lightGrayTextField'}
                           $theme-light={{ color: '$darkGrayTextField' }}
                         >
-                          You Receive
+                          {t('form.labels.receive')}
                         </Paragraph>
                       </XStack>
                       <XStack gap={'$2'} ai={'center'} position="relative" jc={'space-between'}>
@@ -765,7 +764,7 @@ export const SwapFormScreen = () => {
                                 color={'$lightGrayTextField'}
                                 $theme-light={{ color: '$darkGrayTextField' }}
                               >
-                                Price Impact:
+                                {t('form.labels.priceImpact')}
                               </Paragraph>
                               <Paragraph
                                 testID="priceImpactValue"
@@ -784,7 +783,7 @@ export const SwapFormScreen = () => {
                               size={'$3'}
                               color={getPriceImpactColor(priceImpact.level, isDarkTheme)}
                             >
-                              {getPriceImpactMessage(priceImpact.level)}
+                              {t(`form.priceImpact.levels.${priceImpact.level}`)}
                             </Paragraph>
                             <PriceImpactInfo
                               color={getPriceImpactColor(priceImpact.level, isDarkTheme)}
@@ -839,7 +838,7 @@ export const SwapFormScreen = () => {
                 {(() => {
                   switch (true) {
                     case !!form.formState.errors?.slippage:
-                      return form.formState.errors.slippage.message
+                      return t(form.formState.errors.slippage.message as string)
                     case !!estimateError:
                       return estimateError.message
                     default:
@@ -869,6 +868,7 @@ export const Slippage = ({
   const [isFocused, setIsFocused] = useState<boolean>(false)
   const [customSlippage, setCustomSlippage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
+  const { t } = useTranslation('trade')
 
   const handleInputChange = (value: string) => {
     if (/^\d{0,2}(\.\d{0,2})?$/.test(value) || value === '') {
@@ -909,7 +909,7 @@ export const Slippage = ({
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Max Slippage
+          {t('form.slippage.label')}
         </Paragraph>
         <XStack gap={'$2'}>
           <Paragraph size={'$5'}>{slippage / 100}%</Paragraph>
@@ -971,7 +971,7 @@ export const Slippage = ({
               focusStyle={{ outlineWidth: 0 }}
               w={100}
               br={'$4'}
-              placeholder={isFocused ? '' : 'Custom'}
+              placeholder={isFocused ? '' : t('form.slippage.customPlaceholder')}
               placeholderTextColor={'$color12'}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}

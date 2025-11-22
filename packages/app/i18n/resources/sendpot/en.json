@@ -1,0 +1,112 @@
+{
+  "jackpot": {
+    "title": "Current Sendpot",
+    "loading": "Loading...",
+    "actions": {
+      "buy": "Buy ticket"
+    },
+    "messages": {
+      "geoBlocked": "Ticket purchases are not available in your region currently."
+    }
+  },
+  "history": {
+    "title": "Drawing History",
+    "upcoming": "Upcoming",
+    "current": "Current",
+    "winner": {
+      "label": "Winner",
+      "pending": "(Pending)",
+      "you": "You Won!",
+      "none": "None",
+      "loading": "(Loading...)"
+    },
+    "tickets": {
+      "none": "You purchased 0 tickets",
+      "purchased_one": "You purchased {{count}} ticket",
+      "purchased_other": "You purchased {{count}} tickets"
+    },
+    "totalPool": "Total Pool:",
+    "empty": "No drawing history available.",
+    "notAvailable": "N/A"
+  },
+  "claim": {
+    "title": "You won!",
+    "cta": {
+      "default": "Claim Winnings",
+      "claiming": "Claiming...",
+      "preparing": "Preparing..."
+    },
+    "toast": {
+      "success": "Claim Successful",
+      "error": "Claim Failed",
+      "noPasskeyTitle": "Error",
+      "noPasskeyDescription": "No Passkey found for this account."
+    }
+  },
+  "risk": {
+    "errorTitle": "Error",
+    "title": "Important Disclaimer",
+    "body": "By purchasing a Sendpot ticket, you acknowledge that winnings are not guaranteed and ticket costs are non-refundable. Draws are powered by Megapot and use provably fair onchain randomness—please play responsibly.",
+    "link": "Learn more.",
+    "checkbox": "I have read and understand the terms.",
+    "actions": {
+      "cancel": "Cancel",
+      "confirm": "I Agree & Continue"
+    }
+  },
+  "buy": {
+    "title": "How many tickets would you like to purchase?",
+    "input": {
+      "ticketsLabel": "Tickets"
+    },
+    "balance": {
+      "label": "Balance:",
+      "insufficient": "Insufficient funds"
+    },
+    "ticketPrice": "Ticket price:",
+    "total": {
+      "label": "Total Cost"
+    },
+    "button": {
+      "review": "Review"
+    },
+    "toast": {
+      "errorTitle": "Error",
+      "insufficientFunds": "Insufficient funds.",
+      "invalidQuantity": "Please enter a valid number of tickets.",
+      "loadingTitle": "Info",
+      "loadingMessage": "Please wait, loading data..."
+    }
+  },
+  "confirm": {
+    "rows": {
+      "price": "Price per Ticket",
+      "total": "Total Cost",
+      "fee": "Est. Transaction Fee"
+    },
+    "tickets": "Tickets",
+    "usd": "({{value}})",
+    "errors": {
+      "insufficientBalance": "Insufficient balance.",
+      "insufficientGas": "Insufficient gas.",
+      "noPasskeyTitle": "Error",
+      "noPasskeyDescription": "No Passkey found for this account."
+    },
+    "toast": {
+      "success": "Purchase Successful",
+      "error": "Purchase Failed"
+    },
+    "button": {
+      "processing": "Processing...",
+      "preparing": "Preparing...",
+      "insufficientBalance": "Insufficient balance",
+      "insufficientGas": "Insufficient gas",
+      "buy_one": "Buy {{count}} Ticket",
+      "buy_other": "Buy {{count}} Tickets"
+    },
+    "edit": {
+      "label": "Edit number of tickets",
+      "cta": "Edit"
+    }
+  }
+}

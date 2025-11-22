@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "description": "Invita a tus amigos a Send con tu código de referido."
+  },
+  "list": {
+    "invitedYou": "(Te invitó a Send)",
+    "birthdayFallback": "N/D",
+    "unknownTag": "??"
+  },
+  "referralLink": {
+    "labels": {
+      "sendId": "ID de Send:",
+      "referralCode": "Código de referido:"
+    },
+    "toast": {
+      "copied": "Copiamos tu enlace de referido al portapapeles",
+      "errorTitle": "Algo salió mal",
+      "errorMessage": "No pudimos copiar tu enlace de referido al portapapeles"
+    }
+  },
+  "table": {
+    "position": "#",
+    "sendtag": "sendtag",
+    "birthday": "cumpleaños",
+    "social": "enlace social"
+  }
+}

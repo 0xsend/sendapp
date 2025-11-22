@@ -31,6 +31,7 @@ import {
   type TestClient,
 } from 'viem'
 import { shorten } from 'app/utils/strings'
+import { useTranslation } from 'react-i18next'
 
 const testClient = createTestClient({
   chain: baseMainnetClient.chain,
@@ -49,6 +50,7 @@ export function SecretShopScreen() {
   } = api.secretShop.fund.useMutation()
   const { data: sendAccts, isPending } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
+  const { t } = useTranslation('secretShop')
 
   if (isPending) {
     return (
@@ -63,7 +65,7 @@ export function SecretShopScreen() {
   if (!sendAcct) {
     return (
       <Container>
-        <Paragraph>No Send Account found. Did you create one?</Paragraph>
+        <Paragraph>{t('status.missingAccount')}</Paragraph>
       </Container>
     )
   }
@@ -75,9 +77,7 @@ export function SecretShopScreen() {
           <Theme name="alt1">
             <YStack pt="$4" gap="$4">
               <YStack gap="$2">
-                <Paragraph>
-                  Available on {baseMainnet.name} only. Your Send Account Address:
-                </Paragraph>
+                <Paragraph>{t('status.networkNotice', { network: baseMainnet.name })}</Paragraph>
                 <XStack>
                   <Paragraph ta="center" fontWeight="bold" fontFamily="$mono">
                     <Anchor
@@ -96,10 +96,10 @@ export function SecretShopScreen() {
                         address: sendAcct.address,
                         value: parseEther('10'),
                       })
-                      toast.show('Funded with 10 ETH')
+                      toast.show(t('dev.toasts.fundEth'))
                     }}
                   >
-                    Fund with 10 ETH
+                    {t('dev.buttons.fundEth')}
                   </Button>
                   <Button
                     onPress={async () => {
@@ -109,10 +109,10 @@ export function SecretShopScreen() {
                         tokenAddress: usdcAddress[baseMainnetClient.chain.id],
                         value: BigInt(100000000),
                       })
-                      toast.show('Funded with 100 USDC')
+                      toast.show(t('dev.toasts.fundUsdc'))
                     }}
                   >
-                    Fund with 100 USDC
+                    {t('dev.buttons.fundUsdc')}
                   </Button>
                   {/* send v1 has 18 decimals and 1B supply */}
                   <Button
@@ -123,10 +123,10 @@ export function SecretShopScreen() {
                         tokenAddress: sendTokenAddress[baseMainnetClient.chain.id],
                         value: BigInt(parseEther('10000')),
                       })
-                      toast.show('Funded with 10K Send')
+                      toast.show(t('dev.toasts.fundSend'))
                     }}
                   >
-                    Fund with 100K Send
+                    {t('dev.buttons.fundSend')}
                   </Button>
                   {/* send v0 has 0 decimals and 100B supply */}
                   <Button
@@ -137,10 +137,10 @@ export function SecretShopScreen() {
                         tokenAddress: sendTokenV0Address[baseMainnetClient.chain.id],
                         value: BigInt(1_000_000),
                       })
-                      toast.show('Funded with 1M Send V0')
+                      toast.show(t('dev.toasts.fundSendV0'))
                     }}
                   >
-                    Fund with 1M Send V0 - 100B supply
+                    {t('dev.buttons.fundSendV0')}
                   </Button>
                   <Button
                     onPress={async () => {
@@ -150,10 +150,10 @@ export function SecretShopScreen() {
                         tokenAddress: spx6900Address[baseMainnetClient.chain.id],
                         value: BigInt(6900 * 1e8),
                       })
-                      toast.show('Funded with 69K SPX6900')
+                      toast.show(t('dev.toasts.fundSpx'))
                     }}
                   >
-                    Fund with 69K SPX6900
+                    {t('dev.buttons.fundSpx')}
                   </Button>
                 </>
               ) : (
@@ -165,21 +165,21 @@ export function SecretShopScreen() {
                       fundMutation({ address: sendAcct.address })
                     }}
                   >
-                    Fund Account
+                    {t('actions.fundAccount')}
                   </Button>
                   {fundError && <Paragraph color="$error">{fundError.message}</Paragraph>}
                   {fundData && (
                     <YStack gap="$2" mt="$4">
-                      <Paragraph>Result</Paragraph>
+                      <Paragraph>{t('result.title')}</Paragraph>
                       {Object.entries(fundData).map(([key, value]) =>
                         value ? (
                           <Paragraph key={key}>
                             <Anchor href={`${baseMainnet.blockExplorers.default.url}/tx/${value}`}>
-                              {key} transaction: {shorten(value)}
+                              {t('result.transaction', { type: key, hash: shorten(value) })}
                             </Anchor>
                           </Paragraph>
                         ) : (
-                          <Paragraph key={key}>{key}: too much balance.</Paragraph>
+                          <Paragraph key={key}>{t('result.skipped', { type: key })}</Paragraph>
                         )
                       )}
                     </YStack>

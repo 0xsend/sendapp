@@ -1,0 +1,133 @@
+{
+  "cta": {
+    "badge": "Earnings",
+    "title": "Boost Your Savings Instantly",
+    "bullets": {
+      "apy": "High APY: up to 12% on your deposits",
+      "flex": "Full flexibility: Access your funds anytime",
+      "rewards": "Rewards: Bonus SEND tokens"
+    },
+    "buttons": {
+      "start": "Start earning"
+    }
+  },
+  "summary": {
+    "badge": "Active Earnings",
+    "labels": {
+      "total": "Total Value",
+      "deposits": "Deposits",
+      "earnings": "Earnings",
+      "rewards": "Rewards"
+    },
+    "buttons": {
+      "viewDetails": "View details"
+    }
+  },
+  "active": {
+    "buttons": {
+      "withdraw": "Withdraw",
+      "earnings": "Earnings",
+      "rewards": "Rewards"
+    },
+    "addMore": "Add more deposits",
+    "breakdown": {
+      "deposits": "Deposits",
+      "earnings": "Earnings",
+      "rewards": "Rewards"
+    }
+  },
+  "deposit": {
+    "heading": "Deposit Amount",
+    "balance": {
+      "label": "Balance:",
+      "insufficient": "Insufficient funds"
+    },
+    "benefits": {
+      "title": "Benefits",
+      "apy": {
+        "dynamicLabel": "APY",
+        "staticLabel": "Deposit APY",
+        "placeholder": "up to {{value}}"
+      },
+      "monthlyEarning": {
+        "label": "Estimated Monthly Earning",
+        "symbol": "{{symbol}}"
+      },
+      "withdraw": {
+        "label": "Withdraw Anytime",
+        "value": "Full flexibility"
+      },
+      "rewards": {
+        "label": "Rewards",
+        "symbol": "{{token}}",
+        "fallback": "Bonus {{token}} tokens"
+      }
+    },
+    "terms": {
+      "text": "I accept <tos>Terms of Service</tos>, <privacy>Privacy Policy</privacy> & <disclaimer>Disclaimer of the Send Earn Program</disclaimer>"
+    },
+    "toast": {
+      "error": {
+        "title": "Deposit error"
+      },
+      "success": {
+        "title": "Deposit submitted",
+        "message": "Your deposit is being processed."
+      }
+    },
+    "validation": {
+      "minimum": "Minimum deposit is {{amount}} {{symbol}}"
+    },
+    "buttons": {
+      "confirm": "Confirm deposit"
+    }
+  },
+  "withdraw": {
+    "heading": "Withdraw amount",
+    "balance": {
+      "label": "Deposit balance:",
+      "insufficient": "Insufficient funds"
+    },
+    "toast": {
+      "success": "Withdrawn successfully"
+    },
+    "status": {
+      "requesting": "Requesting signature...",
+      "sending": "Sending transaction...",
+      "waiting": "Waiting for confirmation..."
+    },
+    "validation": {
+      "insufficient": "Insufficient funds"
+    },
+    "buttons": {
+      "confirm": "Confirm withdraw"
+    }
+  },
+  "rewards": {
+    "history": {
+      "title": "Rewards history",
+      "empty": "No rewards activity",
+      "error": "Unable to load rewards: {{message}}"
+    },
+    "messages": {
+      "minimum": "You need at least {{amount}} {{symbol}} to claim rewards"
+    },
+    "status": {
+      "requesting": "Requesting signature...",
+      "sending": "Sending transaction...",
+      "waiting": "Waiting for confirmation..."
+    },
+    "toast": {
+      "success": "Rewards claimed"
+    },
+    "feed": {
+      "today": "Today"
+    },
+    "actions": {
+      "claim": "Claim rewards"
+    }
+  },
+  "errors": {
+    "notEnoughForFees": "Not enough USDC to cover transaction fees"
+  }
+}

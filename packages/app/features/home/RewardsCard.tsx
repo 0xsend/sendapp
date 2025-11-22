@@ -21,6 +21,7 @@ import { HomeBodyCard } from './screen'
 import { type MerkleDropClaimParams, useSendMerkleDropsAreClaimed } from 'app/utils/distributions'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { usePrefetch } from '@my/ui'
+import { useTranslation } from 'react-i18next'
 
 export const REWARDS_CARD_HREF = '/rewards'
 
@@ -36,6 +37,7 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
     enabled: isPricesEnabled,
   } = useTokenPrices()
   const { data: distributions, isLoading: isDistributionLoading } = useDistributionShares()
+  const { t } = useTranslation('home')
 
   const [currentDistribution, pastDistributions] = useMemo(() => {
     if (!distributions) return [null, []]
@@ -116,7 +118,7 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Rewards
+          {t('cards.rewards.title')}
         </Paragraph>
         <XStack flex={1} />
         <ChevronRight

@@ -1,0 +1,92 @@
+{
+  "options": {
+    "crypto": {
+      "title": "Billetera cripto",
+      "description": "Deposita desde una billetera externa"
+    },
+    "applePay": {
+      "title": "Apple Pay",
+      "description": "Solo tarjeta de débito"
+    },
+    "debitCard": {
+      "title": "Tarjeta de débito",
+      "description": "Depósitos rápidos de hasta $500 por semana"
+    }
+  },
+  "copyAddressDialog": {
+    "title": "Confirmar depósito externo",
+    "intro": "Confirma que aceptas lo siguiente antes de continuar:",
+    "steps": {
+      "baseNetwork": "La dirección externa está en la red Base y <supportLink>puede recibir transferencias desde contratos inteligentes</supportLink>",
+      "tokens": "Verifiqué que los tokens {{coins}} están en la red Base.",
+      "liability": "Entiendo que, si cometo algún error, no hay forma de recuperar los fondos."
+    },
+    "actions": {
+      "confirm": "Acepto y continúo",
+      "cancel": "Cancelar"
+    }
+  },
+  "crypto": {
+    "networkLabel": "Red Base",
+    "walletAddress": "Dirección de la billetera",
+    "toast": {
+      "errorTitle": "Ocurrió un problema",
+      "errorMessage": "No pudimos copiar tu dirección al portapapeles"
+    },
+    "qr": {
+      "reveal": "Toca para mostrar el código QR"
+    }
+  },
+  "coinbaseForm": {
+    "title": "Ingresa el monto del depósito",
+    "submit": {
+      "default": "Confirmar depósito",
+      "loading": "Procesando..."
+    },
+    "limits": "Mínimo $10 - Máximo $500 por semana",
+    "fees": "Comisión: $0.00",
+    "currency": "USD"
+  },
+  "coinbase": {
+    "errors": {
+      "windowClosed": "La ventana de Coinbase se cerró"
+    },
+    "help": {
+      "iosPopup": "Desactiva \"Bloquear ventanas emergentes\" en los ajustes de Safari para iOS e inténtalo de nuevo."
+    },
+    "status": {
+      "almostThere": {
+        "title": "Casi listo...",
+        "description": "Terminando los últimos pasos."
+      },
+      "holdTight": {
+        "title": "Espera un momento...",
+        "description": "Completa la transacción en tu ventana de Coinbase."
+      },
+      "pending": {
+        "title": "Transacción pendiente",
+        "description": "Coinbase está verificando tu pago. Esta página se redirigirá al finalizar."
+      },
+      "timedOut": {
+        "title": "La transacción expiró",
+        "description": "El pago tardó demasiado en procesarse. Inténtalo de nuevo."
+      },
+      "failed": {
+        "title": "El pago falló",
+        "description": "Revisa tu conexión o prueba con otra tarjeta."
+      }
+    },
+    "actions": {
+      "tryAgain": "Intentar de nuevo",
+      "cancel": "Cancelar"
+    }
+  },
+  "success": {
+    "title": "Depósito completo",
+    "description": "Todo listo: tus fondos aparecerán en tu billetera pronto",
+    "actions": {
+      "depositAgain": "Depositar otra vez",
+      "continue": "Continuar"
+    }
+  }
+}

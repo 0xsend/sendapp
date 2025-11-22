@@ -1,0 +1,27 @@
+{
+  "hero": {
+    "title": "Token upgrade",
+    "subtitle": "Upgrade required to continue using Send. New total supply: 100B → 1B"
+  },
+  "balances": {
+    "current": "Current",
+    "after": "After"
+  },
+  "links": {
+    "docs": "Read more about the upgrade"
+  },
+  "status": {
+    "requesting": "Requesting signature...",
+    "sending": "Sending transaction...",
+    "waiting": "Waiting for confirmation...",
+    "ready": "Click \"Upgrade\" to proceed.",
+    "retry": "Click \"Upgrade\" to proceed. Please try again."
+  },
+  "toast": {
+    "success": "Upgraded successfully"
+  },
+  "actions": {
+    "upgrade": "Upgrade",
+    "upgrading": "Upgrading..."
+  }
+}

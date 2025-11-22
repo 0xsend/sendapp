@@ -1,0 +1,22 @@
+{
+  "hero": {
+    "title": "Los mejores",
+    "description": "Registra un Sendtag, mantén el saldo mínimo y refiere a otros para subir en la clasificación."
+  },
+  "boards": {
+    "referrals": {
+      "title": "Referidos"
+    }
+  },
+  "table": {
+    "columns": {
+      "rank": "#",
+      "identifier": "Sendtag",
+      "referrals": "Referidos",
+      "transactions": "Transacciones totales"
+    }
+  },
+  "errors": {
+    "noData": "No se pudieron obtener los datos del ranking"
+  }
+}

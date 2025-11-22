@@ -2,6 +2,7 @@ import { Card, H4, Paragraph, Spinner, Theme, XStack, YStack } from '@my/ui'
 import { useCoingeckoCoin, useTokensMarketData } from 'app/utils/coin-gecko'
 import formatAmount from 'app/utils/formatAmount'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useTranslation } from 'react-i18next'
 
 function MetricTile({
   title,
@@ -105,33 +106,34 @@ export function TokenKeyMetrics() {
   const volumeChange = null
   // Use circulating supply from market data (includes Canton) or detailed CoinGecko data
   const circulating = mdM?.circulating_supply ?? md?.circulating_supply ?? null
+  const { t } = useTranslation('home')
 
   return (
     <YStack gap={'$3'}>
       <H4 fontWeight={600} size={'$7'}>
-        Key Metrics
+        {t('token.keyMetrics')}
       </H4>
       {isLoading ? (
         <Spinner size="small" color={'$color12'} />
       ) : (
         <XStack gap={'$3'} flexWrap="wrap" w="100%">
           <MetricTile
-            title="Market Cap"
+            title={t('token.metrics.marketCap')}
             value={`$${formatAmount(marketCap ?? undefined, 5, 0)}`}
             change={marketCapChange ?? undefined}
           />
           <MetricTile
-            title="FDV"
+            title={t('token.metrics.fdv')}
             value={`$${formatAmount(fdv ?? undefined, 5, 0)}`}
             change={fdvChange ?? undefined}
           />
           <MetricTile
-            title="Volume (24h)"
+            title={t('token.metrics.volume24h')}
             value={`$${formatAmount(volume ?? undefined, 5, 0)}`}
             change={volumeChange ?? undefined}
           />
           <MetricTile
-            title="Circulating Supply"
+            title={t('token.metrics.circulatingSupply')}
             value={`${formatAmount(circulating ?? undefined, 5, 0)} ${coin?.symbol ?? ''}`}
             change={null}
           />

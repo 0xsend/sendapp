@@ -33,43 +33,51 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useUser } from 'app/utils/useUser'
 import { ReferralLink } from '../ReferralLink'
 import { usePathname } from 'app/utils/usePathname'
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
-const links = [
-  {
-    icon: <IconHome size={'$1'} scale={1.2} />,
-    text: 'Home',
-    href: '/',
-  },
-  {
-    icon: <IconClock size={'$1'} scale={1.2} />,
-    text: 'Activity',
-    href: '/activity',
-  },
-  {
-    icon: <IconArrowUp size={'$1'} scale={1.3} />,
-    text: 'Send',
-    href: '/send',
-  },
-  {
-    icon: <IconChart size={'$1'} scale={1.3} />,
-    text: 'Trade',
-    href: '/trade',
-  },
-  {
-    icon: <IconCompass size={'$1'} scale={1.2} />,
-    text: 'Explore',
-    href: '/explore',
-  },
-  __DEV__ || baseMainnet.id === 84532
-    ? {
-        icon: <Lock size="$1" />,
-        text: 'Secret shop',
-        href: '/secret-shop',
-      }
-    : undefined,
-].filter(Boolean) as { icon: ReactElement; text: string; href: string }[]
+type NavigationLink = { icon: ReactElement; text: string; href: string }
+
+const buildNavigationLinks = (t: (key: string) => string): NavigationLink[] =>
+  [
+    {
+      icon: <IconHome size={'$1'} scale={1.2} />,
+      text: t('tabs.home'),
+      href: '/',
+    },
+    {
+      icon: <IconClock size={'$1'} scale={1.2} />,
+      text: t('tabs.activity'),
+      href: '/activity',
+    },
+    {
+      icon: <IconArrowUp size={'$1'} scale={1.3} />,
+      text: t('tabs.send'),
+      href: '/send',
+    },
+    {
+      icon: <IconChart size={'$1'} scale={1.3} />,
+      text: t('tabs.trade'),
+      href: '/trade',
+    },
+    {
+      icon: <IconCompass size={'$1'} scale={1.2} />,
+      text: t('tabs.explore'),
+      href: '/explore',
+    },
+    __DEV__ || baseMainnet.id === 84532
+      ? {
+          icon: <Lock size="$1" />,
+          text: t('sidebar.secretShop'),
+          href: '/secret-shop',
+        }
+      : undefined,
+  ].filter(Boolean) as NavigationLink[]
 
 function HomeSideBar({ ...props }: YStackProps) {
+  const { t } = useTranslation('navigation')
+  const links = useMemo(() => buildNavigationLinks(t), [t])
+
   return (
     <SideBar {...props} ai={'flex-start'} px="$7">
       <YStack width={'100%'}>
@@ -96,6 +104,7 @@ const DesktopAccountMenuEntry = () => {
   const parts = location.split('/').filter(Boolean)
   const isActiveRoute =
     location === 'account' || parts.includes('account') || 'account'.startsWith(`/${parts[0]}`)
+  const { t } = useTranslation('navigation')
 
   return (
     <LinkableButton
@@ -123,7 +132,7 @@ const DesktopAccountMenuEntry = () => {
         color={isActiveRoute ? '$color12' : '$lightGrayTextField'}
         $theme-light={{ color: isActiveRoute ? '$color12' : '$darkGrayTextField' }}
       >
-        Account
+        {t('sidebar.account')}
       </Paragraph>
     </LinkableButton>
   )
@@ -133,6 +142,8 @@ const HomeBottomSheet = () => {
   const { profile } = useUser()
   const hoverStyles = useHoverStyles()
   const avatarUrl = profile?.avatar_url
+  const { t } = useTranslation('navigation')
+  const links = useMemo(() => buildNavigationLinks(t), [t])
 
   return (
     <NavSheet navId="home">

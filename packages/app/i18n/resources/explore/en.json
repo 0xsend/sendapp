@@ -1,0 +1,16 @@
+{
+  "banner": {
+    "rewards": {
+      "title": "Rewards",
+      "subtitle": "Make money move for you"
+    },
+    "sendpot": {
+      "title": "Sendpot",
+      "subtitle": "Spin. Win. Brag."
+    },
+    "cantonWallet": {
+      "title": "Canton Wallet",
+      "subtitle": "Get in first. Stay ahead."
+    }
+  }
+}

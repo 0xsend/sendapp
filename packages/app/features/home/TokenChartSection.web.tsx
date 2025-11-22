@@ -10,6 +10,7 @@ import { useTokenChartData } from './charts/shared/useTokenChartData'
 import { useScrubState } from './charts/shared/useScrubState.web'
 import type { Timeframe } from './charts/shared/timeframes'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useTranslation } from 'react-i18next'
 
 export function TokenChartSection() {
   const [tf, setTf] = useState<Timeframe>('1W')
@@ -24,6 +25,7 @@ export function TokenChartSection() {
   const isDark = theme?.startsWith('dark')
 
   const stroke = isDark ? '#40FB50' : '#000000'
+  const { t } = useTranslation('home')
 
   const changeBadge = (() => {
     if (change === null || change === undefined) return null
@@ -65,7 +67,7 @@ export function TokenChartSection() {
   }
 
   return (
-    <ChartCardSection title="Price Overview" tf={tf}>
+    <ChartCardSection title={t('token.priceOverview')} tf={tf}>
       <YStack onLayout={onLayoutContainer}>
         <ChartLineSection
           points={points}
@@ -75,7 +77,7 @@ export function TokenChartSection() {
           pathProps={pathProps}
           childrenBeforePath={
             isLoading ? null : isError && !isLoading ? (
-              <Paragraph color={'$color10'}>Failed to load chart data</Paragraph>
+              <Paragraph color={'$color10'}>{t('token.chartError')}</Paragraph>
             ) : (
               <ChartScrubReadoutWeb
                 fallbackPrice={last}

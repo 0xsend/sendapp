@@ -34,6 +34,7 @@ import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { HomeBodyCard } from './screen'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
+import { useTranslation } from 'react-i18next'
 
 const InvestmentsBalanceCardContent = (props: CardProps) => {
   const [queryParams, setParams] = useRootScreenParams()
@@ -68,6 +69,7 @@ const InvestmentsBalanceCardContent = (props: CardProps) => {
 
 const InvestmentsBalanceCardHomeScreenHeader = () => {
   const [queryParams] = useRootScreenParams()
+  const { t } = useTranslation('home')
   const isInvestmentCoin = investmentCoins.some(
     (coin) => coin.token.toLowerCase() === queryParams.token?.toLowerCase()
   )
@@ -83,7 +85,7 @@ const InvestmentsBalanceCardHomeScreenHeader = () => {
         color={'$lightGrayTextField'}
         $theme-light={{ color: '$darkGrayTextField' }}
       >
-        Invest
+        {t('cards.investments.title')}
       </Paragraph>
 
       <View animateOnly={['transform']} animation="fast" rotate={isChevronLeft ? '180deg' : '0deg'}>
@@ -108,22 +110,26 @@ const InvestmentsBalanceCardFooter = ({ onInvest }: { onInvest?: () => void }) =
 
 // Primary Invest button
 const InvestmentsBalanceCardInvestButton = ({
-  children = 'INVEST',
+  children,
   ...props
-}: ButtonProps & { children?: React.ReactNode }) => (
-  <Button
-    theme="neon_active"
-    borderRadius={'$4'}
-    jc="center"
-    ai="center"
-    position="relative"
-    f={1}
-    mah={32}
-    {...props}
-  >
-    <Button.Text color="$black">{children}</Button.Text>
-  </Button>
-)
+}: ButtonProps & { children?: React.ReactNode }) => {
+  const { t } = useTranslation('home')
+  const label = children ?? t('cards.investments.cta')
+  return (
+    <Button
+      theme="neon_active"
+      borderRadius={'$4'}
+      jc="center"
+      ai="center"
+      position="relative"
+      f={1}
+      mah={32}
+      {...props}
+    >
+      <Button.Text color="$black">{label}</Button.Text>
+    </Button>
+  )
+}
 
 const InvestmentsBalanceCardBody = () => (
   <YStack w={'100%'} gap={'$3'}>
@@ -311,6 +317,7 @@ function InvestmentsWeeklyDelta() {
   const coins = investmentCoins.filter((c) => c?.balance && c.balance > 0n)
   const { data: marketData, isLoading, isError } = useTokensMarketData()
   const { isPriceHidden } = useIsPriceHidden()
+  const { t } = useTranslation('home')
 
   const deltaUSD = useMemo(() => {
     if (!marketData?.length) return 0
@@ -335,7 +342,7 @@ function InvestmentsWeeklyDelta() {
   if (coins.length === 0)
     return (
       <XStack gap="$2" ai="center">
-        <Paragraph color="$color10">Diversify Your Portfolio</Paragraph>
+        <Paragraph color="$color10">{t('cards.investments.empty')}</Paragraph>
       </XStack>
     )
 
@@ -343,7 +350,7 @@ function InvestmentsWeeklyDelta() {
     return (
       <XStack gap="$2" ai="center">
         <Paragraph color="$color10" $gtXs={{ fontSize: 14 }} fontSize={12}>
-          Failed to load market data
+          {t('cards.investments.error')}
         </Paragraph>
         <IconError size="$1.5" color={'$error'} />
       </XStack>
@@ -353,7 +360,9 @@ function InvestmentsWeeklyDelta() {
   const formattedDeltaUSD = localizeAmount(Math.abs(deltaUSD).toFixed(2))
   return (
     <Paragraph color={'$color10'} fontWeight={400} size={'$5'}>
-      {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD} this week`}
+      {isPriceHidden
+        ? '******'
+        : t('cards.investments.weeklyDelta', { sign, amount: formattedDeltaUSD })}
     </Paragraph>
   )
 }

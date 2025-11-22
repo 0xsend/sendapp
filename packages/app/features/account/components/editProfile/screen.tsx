@@ -26,6 +26,7 @@ import { FieldWithLabel } from 'app/features/account/components/FieldWithLabel'
 import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 enum FormState {
   Overview = 'Overview',
@@ -35,11 +36,12 @@ enum FormState {
 export const EditProfile = () => {
   const [formState, setFormState] = useState<FormState>(FormState.Overview)
   const { profile } = useUser()
+  const { t } = useTranslation('account')
 
   return (
     <YStack w={'100%'}>
       <YStack gap={'$3.5'}>
-        {Platform.OS === 'web' && <SettingsHeader>Profile</SettingsHeader>}
+        {Platform.OS === 'web' && <SettingsHeader>{t('profile.header')}</SettingsHeader>}
         {(() => {
           switch (true) {
             case !profile:
@@ -66,6 +68,10 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
   const { name, about, is_public, avatar_url, banner_url } = profile
   const avatarRef = useRef<UploadAvatarRefObject>(null)
   const bannerRef = useRef<UploadBannerRefObject>(null)
+  const { t } = useTranslation('account')
+  const visibilityLabel = is_public
+    ? t('profile.overview.visibility.public')
+    : t('profile.overview.visibility.private')
 
   return (
     <YStack gap={'$5'}>
@@ -111,13 +117,13 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
               </UploadAvatar>
             </YStack>
           </YStack>
-          <FieldWithLabel label={'Name'} mt="$4">
+          <FieldWithLabel label={t('profile.overview.name')} mt="$4">
             <Paragraph size={'$8'} fontWeight={'500'}>
               {name || '-'}
             </Paragraph>
           </FieldWithLabel>
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-          <ReadOnlyFieldWithLabel label={'About'} text={about || '-'} />
+          <ReadOnlyFieldWithLabel label={t('profile.overview.about')} text={about || '-'} />
           <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
           <XStack gap={'$3'} ai={'center'}>
             <Checkbox
@@ -131,12 +137,12 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
                 <Check color={'$black'} />
               </Checkbox.Indicator>
             </Checkbox>
-            <Paragraph size={'$5'}>{`${is_public ? 'Public' : 'Private'}`} Profile</Paragraph>
+            <Paragraph size={'$5'}>{visibilityLabel}</Paragraph>
           </XStack>
         </Card>
       </Fade>
       <SubmitButton onPress={onPress}>
-        <SubmitButton.Text>edit profile</SubmitButton.Text>
+        <SubmitButton.Text>{t('profile.overview.edit')}</SubmitButton.Text>
       </SubmitButton>
     </YStack>
   )
@@ -146,6 +152,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
   const { id, name, about, is_public } = profile
   const { mutateAsync, error } = useProfileMutation(id)
   const form = useForm<z.infer<typeof ProfileSchema>>()
+  const { t } = useTranslation('account')
 
   const handleSubmit = async () => {
     const values = form.getValues()
@@ -159,12 +166,12 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
       schema={ProfileSchema}
       props={{
         name: {
-          'aria-label': 'Name',
+          'aria-label': t('profile.form.name'),
           bc: '$color0',
         },
         about: {
-          'aria-label': 'Bio',
-          placeholder: 'Tell us about yourself',
+          'aria-label': t('profile.form.about'),
+          placeholder: t('profile.form.aboutPlaceholder'),
           backgroundColor: '$color0',
           rows: 2,
           focusStyle: {
@@ -196,21 +203,21 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
       {({ name, about, isPublic }) => (
         <YStack gap={'$3.5'}>
           <FadeCard>
-            <FieldWithLabel label={'Name'} gap={'$2'}>
+            <FieldWithLabel label={t('profile.form.name')} gap={'$2'}>
               {name}
             </FieldWithLabel>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-            <FieldWithLabel label={'About'} gap={'$2'}>
+            <FieldWithLabel label={t('profile.form.about')} gap={'$2'}>
               {about}
             </FieldWithLabel>
             <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
             <XStack gap={'$3'} ai={'center'}>
               {isPublic}
-              <Paragraph size={'$5'}>Make Profile Public</Paragraph>
+              <Paragraph size={'$5'}>{t('profile.form.makePublic')}</Paragraph>
             </XStack>
           </FadeCard>
           <SubmitButton onPress={() => form.handleSubmit(handleSubmit)()}>
-            <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
+            <SubmitButton.Text>{t('common.saveChanges')}</SubmitButton.Text>
           </SubmitButton>
           {error && (
             <Paragraph theme="red" color="$color9">

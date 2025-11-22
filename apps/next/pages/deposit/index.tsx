@@ -1,20 +1,33 @@
+import type { ReactNode } from 'react'
 import { DepositScreen } from 'app/features/deposit/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
 import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from '../_app'
+import { useTranslation } from 'react-i18next'
 
 export const Page: NextPageWithLayout = () => {
+  const { t } = useTranslation('navigation')
+  const depositTitle = t('stack.deposit.root')
+
   return (
     <>
-      <NextSeo title="Send | Deposit" />
+      <NextSeo title={`Send | ${depositTitle}`} />
       <DepositScreen />
     </>
   )
 }
 
-Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Deposit" backFunction="home" />}>{children}</HomeLayout>
-)
+function DepositLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('navigation')
+
+  return (
+    <HomeLayout TopNav={<TopNav header={t('stack.deposit.root')} backFunction="home" />}>
+      {children}
+    </HomeLayout>
+  )
+}
+
+Page.getLayout = (children) => <DepositLayout>{children}</DepositLayout>
 
 export default Page

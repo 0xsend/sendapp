@@ -30,6 +30,7 @@ import { ProfilesDetailsModal } from 'app/features/profile/components/ProfileDet
 import { IconX } from 'app/components/icons'
 import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 const SendAmountSchema = z.object({
   amount: formFields.text,
@@ -46,6 +47,7 @@ export function SendAmountForm() {
   const { recipient, idType } = sendParams
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
   const [{ profile: profileParam }] = useRootScreenParams()
+  const { t } = useTranslation('send')
 
   const [isAmountInputFocused, setIsAmountInputFocused] = useState<boolean>(false)
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
@@ -67,8 +69,7 @@ export function SendAmountForm() {
         if (noteValidation.error) {
           form.setError('note', {
             message:
-              noteValidation.error.errors[0]?.message ??
-              'Note failed to match validation constraints',
+              noteValidation.error.errors[0]?.message ?? t('form.errors.noteValidationFallback'),
           })
         } else {
           form.clearErrors('note')
@@ -83,7 +84,7 @@ export function SendAmountForm() {
           { webBehavior: 'replace' }
         )
       },
-      [setSendParams, sendParams, form]
+      [setSendParams, sendParams, form, t]
     ),
     300,
     { leading: false },
@@ -332,7 +333,7 @@ export function SendAmountForm() {
                                             : '$darkGrayTextField',
                                       }}
                                     >
-                                      Balance:
+                                      {t('form.balanceLabel')}
                                     </Paragraph>
                                     <Paragraph
                                       color={
@@ -350,7 +351,7 @@ export function SendAmountForm() {
                                   </XStack>
                                   {insufficientAmount && (
                                     <Paragraph color={'$error'} size={'$5'}>
-                                      Insufficient funds
+                                      {t('form.errors.insufficientFunds')}
                                     </Paragraph>
                                   )}
                                   {belowMinimum && coin?.minXfrAmt !== undefined && (
@@ -359,8 +360,10 @@ export function SendAmountForm() {
                                       size={'$5'}
                                       testID="SendFormMinimumError"
                                     >
-                                      Minimum: {formatAmount(coin.minXfrAmt.toString(), 12, 4)}{' '}
-                                      {coin.symbol}
+                                      {t('form.errors.minimum', {
+                                        amount: formatAmount(coin.minXfrAmt.toString(), 12, 4),
+                                        symbol: coin.symbol ?? '',
+                                      })}
                                     </Paragraph>
                                   )}
                                 </XStack>
@@ -379,13 +382,13 @@ export function SendAmountForm() {
                       >
                         {noteValidationError
                           ? noteValidationError.message
-                          : `Max: ${MAX_NOTE_LENGTH} characters`}
+                          : t('form.note.maxCharacters', { count: MAX_NOTE_LENGTH })}
                       </Paragraph>
                     )}
                   </YStack>
                 </YStack>
                 <SubmitButton onPress={() => form.handleSubmit(onSubmit)()}>
-                  <SubmitButton.Text>CONTINUE</SubmitButton.Text>
+                  <SubmitButton.Text>{t('form.submit')}</SubmitButton.Text>
                 </SubmitButton>
               </YStack>
             )}

@@ -22,21 +22,27 @@ import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
 import { memo, useCallback } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
+import { useTranslation } from 'react-i18next'
 
 export const SendSuggestions = () => {
   const recentSendersQuery = useRecentSenders()
   const favouriteSendersQuery = useFavouriteSenders()
   const topSendersQuery = useTopSenders()
   const todayBirthdaySendersQuery = useTodayBirthdaySenders()
+  const { t } = useTranslation('send')
 
   return (
     <>
-      <SuggestionsList query={recentSendersQuery} title="Recent Activity" />
-      <SuggestionsList query={favouriteSendersQuery} title="Favorite Senders" delay={100} />
-      <SuggestionsList query={topSendersQuery} title="Top Senders" delay={150} />
+      <SuggestionsList query={recentSendersQuery} title={t('suggestions.recent')} />
+      <SuggestionsList
+        query={favouriteSendersQuery}
+        title={t('suggestions.favorites')}
+        delay={100}
+      />
+      <SuggestionsList query={topSendersQuery} title={t('suggestions.top')} delay={150} />
       <SuggestionsList
         query={todayBirthdaySendersQuery}
-        title="Wish Them Happy Birthday"
+        title={t('suggestions.birthdays')}
         delay={200}
       />
     </>
@@ -54,6 +60,7 @@ const SuggestionsList = memo(
     delay?: number
   }) => {
     const { error, data } = query
+    const { t } = useTranslation('send')
 
     const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
       return <SenderSuggestion item={item} />
@@ -89,7 +96,9 @@ const SuggestionsList = memo(
           {title}
         </Paragraph>
         {error ? (
-          <Paragraph color={'$error'}>{error.message?.split('.')[0] ?? 'Unknown error'}</Paragraph>
+          <Paragraph color={'$error'}>
+            {error.message?.split('.')[0] ?? t('search.unknownError')}
+          </Paragraph>
         ) : (
           <>
             <View

@@ -1,0 +1,53 @@
+{
+  "fallback": {
+    "missingAccount": {
+      "title": "No se encontró cuenta de Send",
+      "description": "Esto no debería ocurrir.",
+      "sitemap": "Mapa del sitio",
+      "onboarding": "Ir a la incorporación",
+      "signOut": "Cerrar sesión"
+    }
+  },
+  "actions": {
+    "deposit": "Depositar",
+    "send": "Enviar",
+    "invest": "Invertir",
+    "earn": "Ganar",
+    "addMoney": "Agregar dinero"
+  },
+  "cards": {
+    "stables": {
+      "title": "Saldo en efectivo",
+      "totalTitle": "Saldo total"
+    },
+    "savings": {
+      "title": "Ahorro",
+      "earning": "Generando {{percent}}%",
+      "fallback": "Hasta 10% de interés"
+    },
+    "investments": {
+      "title": "Invertir",
+      "cta": "INVERTIR",
+      "empty": "Diversifica tu portafolio",
+      "error": "No se pudieron cargar los datos del mercado",
+      "weeklyDelta": "{{sign}}${{amount}} esta semana"
+    },
+    "rewards": {
+      "title": "Recompensas"
+    },
+    "referrals": {
+      "title": "Referidos"
+    }
+  },
+  "token": {
+    "keyMetrics": "Métricas clave",
+    "metrics": {
+      "marketCap": "Capitalización de mercado",
+      "fdv": "FDV",
+      "volume24h": "Volumen (24 h)",
+      "circulatingSupply": "Oferta en circulación"
+    },
+    "priceOverview": "Resumen de precios",
+    "chartError": "No se pudieron cargar los datos del gráfico"
+  }
+}

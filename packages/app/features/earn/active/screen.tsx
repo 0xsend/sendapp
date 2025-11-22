@@ -24,6 +24,7 @@ import { coinToParam, useERC20AssetCoin } from '../params'
 import { Platform } from 'react-native'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useHomeRightPanel } from 'app/features/home/screen'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:earn:active')
 
@@ -35,6 +36,7 @@ function ActiveEarnings() {
   const { setPage, page, isInsideRightPanel } = useHomeRightPanel()
   const coin = useERC20AssetCoin()
   const { affiliateRewards } = useSendEarnCoin(coin.data || undefined)
+  const { t } = useTranslation('earn')
   const isAffiliate = useMemo(
     () => !!affiliateRewards.data?.vault?.send_earn_affiliate,
     [affiliateRewards.data]
@@ -45,24 +47,24 @@ function ActiveEarnings() {
       [
         {
           Icon: ArrowDown,
-          label: 'Withdraw',
+          label: t('active.buttons.withdraw'),
           href: `/earn/${coinToParam(coin.data)}/withdraw`,
         },
         {
           Icon: IconStacks,
-          label: 'Earnings',
+          label: t('active.buttons.earnings'),
           href: `/earn/${coinToParam(coin.data)}/balance`,
         },
         isAffiliate
           ? {
               Icon: IconStarOutline,
-              label: 'Rewards',
+              label: t('active.buttons.rewards'),
               href: `/earn/${coinToParam(coin.data)}/rewards`,
             }
           : null,
       ] as const
     ).filter(Boolean)
-  }, [coin, isAffiliate]) as {
+  }, [coin, isAffiliate, t]) as {
     Icon: NamedExoticComponent<IconProps>
     label: string
     href: string
@@ -101,7 +103,7 @@ function ActiveEarnings() {
       <PrimaryButton
         onPress={() => (!coin.data ? undefined : push(`/earn/${coinToParam(coin.data)}/deposit`))}
       >
-        <PrimaryButton.Text>ADD MORE DEPOSITS</PrimaryButton.Text>
+        <PrimaryButton.Text>{t('active.addMore')}</PrimaryButton.Text>
       </PrimaryButton>
     </YStack>
   )
@@ -114,6 +116,7 @@ function ActiveEarnings() {
 function TotalValue() {
   const coin = useERC20AssetCoin()
   const { coinBalances, affiliateRewards } = useSendEarnCoin(coin.data || undefined)
+  const { t } = useTranslation('earn')
   const totalValue = useMemo(() => {
     if (!coinBalances.data) return '0'
     if (!coin.data) return '0'
@@ -184,7 +187,7 @@ function TotalValue() {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Total Value
+            {t('summary.labels.total')}
           </Paragraph>
         )}
       </YStack>
@@ -198,6 +201,7 @@ function TotalValue() {
 function ActiveEarningBreakdown() {
   const coin = useERC20AssetCoin()
   const { coinBalances, affiliateRewards } = useSendEarnCoin(coin.data || undefined)
+  const { t } = useTranslation('earn')
   const totalDeposits = useMemo(() => {
     if (!coinBalances.data) return 0n
     const totalCurrentAssets = coinBalances.data.reduce((acc, balance) => {
@@ -231,18 +235,18 @@ function ActiveEarningBreakdown() {
     <Card w={'100%'} p={'$5'} gap={'$6'} $gtLg={{ p: '$7' }}>
       <BreakdownRow
         symbol={coin.data.symbol}
-        label={'Deposits'}
+        label={t('active.breakdown.deposits')}
         value={formatCoinAmount({ amount: totalDeposits, coin: coin.data })}
       />
       <BreakdownRow
         symbol={coin.data.symbol}
-        label={'Earnings'}
+        label={t('active.breakdown.earnings')}
         value={formatCoinAmount({ amount: totalEarnings, coin: coin.data })}
       />
       {affiliateRewards.data && affiliateRewards.data.assets > 0n ? (
         <BreakdownRow
           symbol={coin.data.symbol}
-          label={'Rewards'}
+          label={t('active.breakdown.rewards')}
           value={formatCoinAmount({ amount: affiliateRewards.data.assets, coin: coin.data })}
         />
       ) : null}

@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "description": "Invite friends to Send using your referral code."
+  },
+  "list": {
+    "invitedYou": "(Invited you to Send)",
+    "birthdayFallback": "N/A",
+    "unknownTag": "??"
+  },
+  "referralLink": {
+    "labels": {
+      "sendId": "Send ID:",
+      "referralCode": "Referral Code:"
+    },
+    "toast": {
+      "copied": "Copied your referral link to the clipboard",
+      "errorTitle": "Something went wrong",
+      "errorMessage": "We were unable to copy your referral link to the clipboard"
+    }
+  },
+  "table": {
+    "position": "#",
+    "sendtag": "sendtag",
+    "birthday": "birthday",
+    "social": "social link"
+  }
+}

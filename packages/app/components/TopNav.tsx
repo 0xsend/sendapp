@@ -18,6 +18,7 @@ import { useRouter } from 'solito/router'
 import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
+import { useTranslation } from 'react-i18next'
 
 interface TopNavProps {
   header?: string
@@ -56,6 +57,7 @@ export function TopNav({
   const { push, back } = useRouter()
   const media = useMedia()
   const { profile } = useUser()
+  const { t } = useTranslation('navigation')
 
   const handleBack = () => {
     // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
@@ -129,11 +131,11 @@ export function TopNav({
                     {(() => {
                       switch (queryParams.token) {
                         case 'investments':
-                          return 'Invest'
+                          return t('topNav.tokens.invest')
                         case 'stables':
-                          return 'Cash'
+                          return t('topNav.tokens.cash')
                         default:
-                          return 'Invest'
+                          return t('topNav.tokens.invest')
                       }
                     })()}
                   </Paragraph>

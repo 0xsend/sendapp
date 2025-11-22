@@ -1,44 +1,68 @@
 import { Anchor, Button, Dialog, Paragraph, PrimaryButton, Sheet, YStack } from '@my/ui'
 import { allCoins } from 'app/data/coins'
 import { Platform } from 'react-native'
+import { Trans, useTranslation } from 'react-i18next'
 
 export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
-  // Shared content component to avoid duplication
+  const { t } = useTranslation('deposit')
+  const coinsList = allCoins.map((coin) => coin.symbol).join(', ')
+
+  const steps = [
+    {
+      key: 'base-network',
+      content: (
+        <Trans
+          t={t}
+          i18nKey="copyAddressDialog.steps.baseNetwork"
+          components={{
+            supportLink: (
+              <Anchor
+                target="_blank"
+                href="https://support.send.app/en/articles/9809554-smart-contract-deposit-issue"
+                rel="noreferrer"
+                textDecorationLine={'underline'}
+              />
+            ),
+          }}
+        />
+      ),
+    },
+    {
+      key: 'tokens',
+      content: t('copyAddressDialog.steps.tokens', { coins: coinsList }),
+    },
+    {
+      key: 'liability',
+      content: t('copyAddressDialog.steps.liability'),
+    },
+  ]
+
   const dialogContent = (
     <>
       <Paragraph size={'$8'} fontWeight={600} ta={'center'}>
-        Confirm External Deposit
+        {t('copyAddressDialog.title')}
       </Paragraph>
       <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
-        Please confirm you agree to the following before proceeding:
+        {t('copyAddressDialog.intro')}
       </Paragraph>
-      <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
-        1. The external address is on the Base Network and{' '}
-        <Anchor
-          target="_blank"
-          href="https://support.send.app/en/articles/9809554-smart-contract-deposit-issue"
-          rel="noreferrer"
-          textDecorationLine={'underline'}
+      {steps.map((step, index) => (
+        <Paragraph
+          key={`copy-address-step-${step.key}`}
+          color={'$lightGrayTextField'}
+          $theme-light={{ color: '$darkGrayTextField' }}
         >
-          can receive transfers from Smart Contracts
-        </Anchor>
-      </Paragraph>
-      <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
-        2. I have double checked that the tokens {allCoins.map((coin) => coin.symbol).join(', ')}{' '}
-        are on Base Network.
-      </Paragraph>
-      <Paragraph color={'$lightGrayTextField'} $theme-light={{ color: '$darkGrayTextField' }}>
-        3. I understand that if I make any mistakes, there is no way to recover the funds.
-      </Paragraph>
+          {index + 1}. {step.content}
+        </Paragraph>
+      ))}
       <YStack justifyContent="space-between" marginTop="$4" gap="$4">
         <PrimaryButton onPress={onConfirm} focusStyle={{ outlineWidth: 0 }}>
-          <PrimaryButton.Text>i agree & proceed</PrimaryButton.Text>
+          <PrimaryButton.Text>{t('copyAddressDialog.actions.confirm')}</PrimaryButton.Text>
         </PrimaryButton>
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
             <Button borderRadius={'$4'} p={'$4'} focusStyle={{ outlineWidth: 0 }}>
               <Button.Text fontWeight={'500'} tt="uppercase" size={'$4'}>
-                cancel
+                {t('copyAddressDialog.actions.cancel')}
               </Button.Text>
             </Button>
           </Dialog.Close>
@@ -47,7 +71,6 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
     </>
   )
 
-  // Web version using Dialog
   if (Platform.OS === 'web') {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -68,7 +91,6 @@ export function CopyAddressDialog({ isOpen, onClose, onConfirm }) {
     )
   }
 
-  // Native version using Sheet
   return (
     <Sheet
       open={isOpen}

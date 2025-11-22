@@ -1,0 +1,27 @@
+{
+  "hero": {
+    "title": "Actualización del token",
+    "subtitle": "Actualiza para seguir usando Send. Nuevo suministro total: 100B → 1B"
+  },
+  "balances": {
+    "current": "Actual",
+    "after": "Después"
+  },
+  "links": {
+    "docs": "Leer más sobre la actualización"
+  },
+  "status": {
+    "requesting": "Solicitando firma...",
+    "sending": "Enviando transacción...",
+    "waiting": "Esperando confirmación...",
+    "ready": "Haz clic en \"Actualizar\" para continuar.",
+    "retry": "Haz clic en \"Actualizar\" para continuar. Inténtalo de nuevo."
+  },
+  "toast": {
+    "success": "Actualización completada"
+  },
+  "actions": {
+    "upgrade": "Actualizar",
+    "upgrading": "Actualizando..."
+  }
+}

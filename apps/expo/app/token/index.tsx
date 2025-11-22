@@ -4,15 +4,17 @@ import { Paragraph, Spinner } from '@my/ui'
 import { TokenDetails } from 'app/features/home/TokenDetails'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
+import { useTranslation } from 'react-i18next'
 
 export default function TokenScreen() {
   const { coin: selectedCoin, isLoading } = useCoinFromTokenParam()
+  const { t } = useTranslation('navigation')
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Invest',
+          title: t('stack.token.root'),
         }}
       />
       <ScreenContainer>

@@ -96,20 +96,23 @@ export const isTemporalEthTransfersEvent = (event: {
 }
 
 export const temporalEventNameFromStatus = (
-  status: Database['temporal']['Enums']['transfer_status']
+  status: Database['temporal']['Enums']['transfer_status'],
+  translate?: (key: string, defaultValue: string) => string
 ) => {
+  const t = translate ?? ((_, defaultValue: string) => defaultValue)
+
   switch (status) {
     case 'initialized':
     case 'submitted':
-      return 'Sending...'
+      return t('status.sending', 'Sending...')
     case 'sent':
-      return 'Confirming...'
+      return t('status.confirming', 'Confirming...')
     case 'confirmed':
-      return 'Sent'
+      return t('status.sent', 'Sent')
     case 'failed':
     case 'cancelled':
-      return 'Failed'
+      return t('status.failed', 'Failed')
     default:
-      return 'Initializing...'
+      return t('status.initializing', 'Initializing...')
   }
 }

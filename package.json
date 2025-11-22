@@ -36,7 +36,10 @@
     "workers": "yarn workspace workers",
     "shovel": "yarn workspace @my/shovel",
     "workflows": "yarn workspace @my/workflows",
-    "clean": "yarn workspaces foreach --all -pi run clean"
+    "clean": "yarn workspaces foreach --all -pi run clean",
+    "i18n:sync": "node packages/app/scripts/i18n-sync.cjs",
+    "i18n:check": "yarn i18n:sync --check",
+    "i18n:translate": "node packages/app/scripts/i18n-translate.cjs"
   },
   "resolutions": {
     "react": "19.1.0",

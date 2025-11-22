@@ -22,6 +22,7 @@ import { useReferrer } from 'app/utils/useReferrer'
 import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
 import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
+import { useTranslation } from 'react-i18next'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
@@ -36,6 +37,7 @@ type Referral = Pick<
 >
 
 export default function FriendsScreen() {
+  const { t } = useTranslation('affiliate')
   const media = useMedia()
   const { isAtEnd } = useScrollDirection()
   const [layoutSize, setLayoutSize] = useState<Dimension>({ width: 0, height: 0 })
@@ -125,7 +127,7 @@ export default function FriendsScreen() {
   if (referrals.length === 0) {
     return (
       <YStack w={'100%'} ai={'flex-start'} pt={'$5'} gap={'$5'}>
-        <Paragraph size={'$5'}>Invite friends to Send using your referral code.</Paragraph>
+        <Paragraph size={'$5'}>{t('empty.description')}</Paragraph>
         <ReferralLink f={0} p={0} />
       </YStack>
     )
@@ -161,19 +163,22 @@ const FriendMobileRow = ({
   referrer?: Referral | null
 }) => {
   const hoverStyles = useHoverStyles()
+  const { t, i18n } = useTranslation('affiliate')
+  const locale = i18n.resolvedLanguage ?? i18n.language
 
   const birthday = referral.birthday
-    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
+    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(locale, {
         day: 'numeric',
         month: 'long',
       })
-    : 'NA'
+    : t('list.birthdayFallback')
 
   const label = referral.tag
     ? `/${referral.tag}`
     : referral.name || referral.sendid
       ? `#${referral.sendid}`
-      : '??'
+      : t('list.unknownTag')
+  const invitedCopy = t('list.invitedYou')
 
   return (
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} cursor={'pointer'} hoverStyle={hoverStyles}>
@@ -199,7 +204,7 @@ const FriendMobileRow = ({
               <XStack ai="center" gap="$2">
                 <Paragraph lineHeight={20}>
                   {label}
-                  {referral.sendid === referrer?.sendid ? ' (Invited you to Send)' : ''}
+                  {referral.sendid === referrer?.sendid ? ` ${invitedCopy}` : ''}
                 </Paragraph>
                 {referral.is_verified ? (
                   <IconBadgeCheckSolid
@@ -233,13 +238,16 @@ const FriendDesktopRow = ({
   referrer?: Referral | null
 }) => {
   const hoverStyles = useHoverStyles()
+  const { t, i18n } = useTranslation('affiliate')
+  const locale = i18n.resolvedLanguage ?? i18n.language
+  const invitedCopy = t('list.invitedYou')
 
   const birthday = referral.birthday
-    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
+    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(locale, {
         day: 'numeric',
         month: 'long',
       })
-    : 'NA'
+    : t('list.birthdayFallback')
 
   return (
     <Link href={`/${referral.tag}`}>
@@ -275,7 +283,7 @@ const FriendDesktopRow = ({
           <XStack ai="center" gap="$2">
             <Paragraph lineHeight={20}>
               /{referral.tag}
-              {referral.tag === referrer?.tag ? ' (Invited you to Send)' : ''}
+              {referral.tag === referrer?.tag ? ` ${invitedCopy}` : ''}
             </Paragraph>
             {referral.is_verified ? (
               <IconBadgeCheckSolid
@@ -296,6 +304,7 @@ const FriendDesktopRow = ({
 
 const FriendsListTable = ({ children }: PropsWithChildren) => {
   const media = useMedia()
+  const { t } = useTranslation('affiliate')
 
   if (media.gtLg) {
     return (
@@ -308,7 +317,7 @@ const FriendsListTable = ({ children }: PropsWithChildren) => {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            #
+            {t('table.position')}
           </Paragraph>
           <Paragraph
             width={'47%'}
@@ -316,7 +325,7 @@ const FriendsListTable = ({ children }: PropsWithChildren) => {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            sendtag
+            {t('table.sendtag')}
           </Paragraph>
           <Paragraph
             width={'25%'}
@@ -325,7 +334,7 @@ const FriendsListTable = ({ children }: PropsWithChildren) => {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            birthday
+            {t('table.birthday')}
           </Paragraph>
           <Paragraph
             width={'25%'}
@@ -334,7 +343,7 @@ const FriendsListTable = ({ children }: PropsWithChildren) => {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            social link
+            {t('table.social')}
           </Paragraph>
         </XStack>
         <Separator boc={'$darkGrayTextField'} />
