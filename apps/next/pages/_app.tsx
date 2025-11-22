@@ -10,7 +10,7 @@ import '@my/ui/src/config/fonts.css'
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 
 import { Provider } from 'app/provider'
-import { getI18n, initSharedI18n, resolvePreferredLocale } from 'app/i18n'
+import { getI18n, initSharedI18n, resolvePreferredLocale, DEFAULT_LOCALE } from 'app/i18n'
 import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
@@ -31,7 +31,8 @@ if (typeof window !== 'undefined') {
   window.global = window
 }
 
-void initSharedI18n().catch((error) => {
+// Initialize with English immediately to avoid async detection race
+void initSharedI18n({ initialLanguage: DEFAULT_LOCALE }).catch((error) => {
   console.error('[i18n] failed to initialize during import', error)
 })
 
@@ -49,16 +50,19 @@ function MyApp({
   const [, setTheme] = useRootTheme()
 
   useEffect(() => {
-    void initSharedI18n()
-      .then(async (instance) => {
-        const preferred = await resolvePreferredLocale()
-        if (preferred && instance.language !== preferred) {
-          await instance.changeLanguage(preferred)
-        }
-      })
-      .catch((error) => {
-        console.error('[i18n] failed to initialize on client', error)
-      })
+    // Update to user's preferred locale after hydration (stored preference only)
+    const instance = getI18n()
+    if (instance) {
+      resolvePreferredLocale()
+        .then((preferred) => {
+          if (preferred && instance.language !== preferred) {
+            return instance.changeLanguage(preferred)
+          }
+        })
+        .catch((error) => {
+          console.error('[i18n] failed to update locale on client', error)
+        })
+    }
   }, [])
 
   const i18n = getI18n()

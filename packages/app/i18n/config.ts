@@ -185,9 +185,8 @@ export async function resolvePreferredLocale(explicit?: string): Promise<string>
   const stored = await getStoredLocale()
   if (stored) return stored
 
-  const detected = await detectSystemLocale()
-  if (detected) return detected
-
+  // Auto-detection disabled - users must explicitly choose language in settings
+  // This ensures all new users default to English
   return DEFAULT_LOCALE
 }
 
