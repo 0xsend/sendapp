@@ -63,7 +63,7 @@ import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
-import { FlatList, KeyboardAvoidingView } from 'react-native'
+import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
 import debug from 'debug'
@@ -71,6 +71,7 @@ import { signUserOp } from 'app/utils/signUserOp'
 import type { UserOperation } from 'permissionless'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
+import type { Activity } from 'app/utils/zod/activity'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -1255,6 +1256,63 @@ const ReviewSendAmountBox = YStack.styleable<ReviewSendAmountBoxProps>((props) =
   )
 })
 
+type ListItem = { type: 'activity'; activity: Activity } | { type: 'dateHeader'; date: Date }
+
+const formatDateHeader = (date: Date): string => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  const dateToCheck = new Date(date)
+  dateToCheck.setHours(0, 0, 0, 0)
+
+  if (dateToCheck.getTime() === today.getTime()) {
+    return 'Today'
+  }
+
+  if (dateToCheck.getTime() === yesterday.getTime()) {
+    return 'Yesterday'
+  }
+
+  return dateToCheck.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+}
+
+const groupActivitiesByDate = (activities: Activity[]): ListItem[] => {
+  if (activities.length === 0) return []
+
+  const grouped: ListItem[] = []
+  let currentDate: Date | null = null
+  let currentDateHeader: Date | null = null
+
+  for (let i = 0; i < activities.length; i++) {
+    const activity = activities[i]
+    if (!activity) continue
+
+    const activityDate = new Date(activity.created_at)
+    const activityDateOnly = new Date(activityDate)
+    activityDateOnly.setHours(0, 0, 0, 0)
+
+    if (!currentDate || currentDate.getTime() !== activityDateOnly.getTime()) {
+      if (currentDateHeader !== null && i > 0) {
+        grouped.push({ type: 'dateHeader', date: currentDateHeader })
+      }
+
+      currentDate = activityDateOnly
+      currentDateHeader = activityDate
+    }
+
+    grouped.push({ type: 'activity', activity })
+
+    if (i === activities.length - 1 && currentDateHeader !== null) {
+      grouped.push({ type: 'dateHeader', date: currentDateHeader })
+    }
+  }
+
+  return grouped
+}
+
 const ChatList = YStack.styleable(() => {
   const [{ recipient: recipientParam, idType: idTypeParam }] = useSendScreenParams()
   const { activeSection } = SendChatContext.useStyledContext()
@@ -1290,15 +1348,20 @@ const ChatList = YStack.styleable(() => {
   const { pages } = data ?? {}
   const activities = (pages?.flat() || []).filter(Boolean)
 
+  const listItems = useMemo(() => groupActivitiesByDate(activities), [activities])
+
   const renderItem = useCallback(
-    ({ item }: { item: (typeof activities)[number] }) => {
-      return <Item item={item} currentUserProfile={currentUserProfile} />
+    ({ item }: { item: ListItem }) => {
+      if (item.type === 'dateHeader') {
+        return <DateHeader date={item.date} />
+      }
+      return <Item item={item.activity} currentUserProfile={currentUserProfile} />
     },
     [currentUserProfile]
   )
 
   const loadingSkeletons =
-    activities.length === 0 && (isLoadingActivities || isLoadingOtherUserProfile) ? (
+    listItems.length === 0 && (isLoadingActivities || isLoadingOtherUserProfile) ? (
       <YStack jc="flex-end" f={1} gap="$6" p="$6">
         <Shimmer w={280} h={100} br="$4" />
         <Shimmer als="flex-end" w={280} h={100} br="$4" />
@@ -1306,7 +1369,7 @@ const ChatList = YStack.styleable(() => {
     ) : null
 
   const noActivity =
-    !activities || activities.length === 0 ? (
+    !listItems || listItems.length === 0 ? (
       <YStack ai="center" jc="center" f={1} gap="$4">
         <History col="$gray11" size="$6" />
         <YStack jc="center" ai="center" gap="$4">
@@ -1361,14 +1424,17 @@ const ChatList = YStack.styleable(() => {
         errorComponent
       ) : loadingSkeletons ? (
         loadingSkeletons
-      ) : !activities || activities.length === 0 ? (
+      ) : !listItems || listItems.length === 0 ? (
         noActivity
       ) : (
         <FlatList
-          data={activities}
-          keyExtractor={(activity) =>
-            `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-          }
+          data={listItems}
+          keyExtractor={(item, index) => {
+            if (item.type === 'dateHeader') {
+              return `date-header-${item.date.toISOString().split('T')[0]}`
+            }
+            return `${item.activity.event_name}-${item.activity.created_at}-${item.activity?.from_user?.id}-${item.activity?.to_user?.id}`
+          }}
           onEndReached={() => hasNextPage && fetchNextPage()}
           ListFooterComponent={
             !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
@@ -1384,13 +1450,38 @@ const ChatList = YStack.styleable(() => {
   )
 })
 
-import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
 import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import { Transaction } from './Transaction'
+
+interface DateHeaderProps {
+  date: Date
+}
+
+const DateHeader = YStack.styleable<DateHeaderProps>(({ date, ...props }) => {
+  const formattedDate = formatDateHeader(date)
+
+  return (
+    <YStack ai="center" py="$4" {...props}>
+      <XStack
+        ai="center"
+        gap="$2"
+        px="$3"
+        py="$1.5"
+        br="$10"
+        bg="$aztec3"
+        $theme-light={{ bg: '$gray3' }}
+      >
+        <SizableText size="$3" fow="500" color="$gray11">
+          {formattedDate}
+        </SizableText>
+      </XStack>
+    </YStack>
+  )
+})
 
 interface ItemProps {
   item: Activity
