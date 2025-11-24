@@ -10931,6 +10931,117 @@
         }
       ]
     },
+    "sendpot_fee_history": {
+      "id": "public.sendpot_fee_history",
+      "schemaName": "public",
+      "tableName": "sendpot_fee_history",
+      "fields": [
+        {
+          "id": "public.sendpot_fee_history.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"sendpot_fee_history_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.sendpot_fee_history.block_num",
+          "name": "block_num",
+          "columnName": "block_num",
+          "type": "numeric",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.sendpot_fee_history.block_time",
+          "name": "block_time",
+          "columnName": "block_time",
+          "type": "numeric",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.sendpot_fee_history.tx_hash",
+          "name": "tx_hash",
+          "columnName": "tx_hash",
+          "type": "bytea",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.sendpot_fee_history.fee_bps",
+          "name": "fee_bps",
+          "columnName": "fee_bps",
+          "type": "numeric",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.sendpot_fee_history.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "sendpot_fee_history_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "u_sendpot_fee_history_block_num",
+          "fields": [
+            "block_num"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "sendpot_jackpot_runs": {
       "id": "public.sendpot_jackpot_runs",
       "schemaName": "public",
@@ -11411,6 +11522,20 @@
           "name": "abi_idx",
           "columnName": "abi_idx",
           "type": "int2",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.sendpot_user_ticket_purchases.tickets_purchased_count",
+          "name": "tickets_purchased_count",
+          "columnName": "tickets_purchased_count",
+          "type": "numeric",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,
