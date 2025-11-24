@@ -38,7 +38,11 @@ import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
-import { calculateTicketsFromBps, calculateTicketsFromRawPurchases } from 'app/data/sendpot'
+import {
+  calculateTicketsFromBps,
+  calculateTicketsFromRawPurchases,
+  getBpsPerTicket,
+} from 'app/data/sendpot'
 import { Link } from 'solito/link'
 
 //@todo get this from the db
@@ -469,23 +473,10 @@ const TaskCard = ({
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
-  const latestWeight = verification.latestWeight
   const value = ['send_ten', 'send_one_hundred'].includes(type)
     ? //@ts-expect-error these two verfiications will always have "value" in the metadata
       BigInt(metadata?.[0]?.value ?? 0)
     : weight
-  // Find the largest lastJackpotEndTime in the metadata array
-  const lastJackpotEndTime =
-    type === 'sendpot_ticket_purchase'
-      ? metadata
-          .map((m) => {
-            const time = (m as { lastJackpotEndTime?: string | number })?.lastJackpotEndTime
-            // Convert to number if it's a string (Unix seconds)
-            return time ? Number(time) : null
-          })
-          .filter((time): time is number => time !== null)
-          .reduce((max, time) => (!max || time > max ? time : max), null as number | null)
-      : null
   const isSendStreak = type === 'send_streak'
 
   const getIsCompleted = () => {
@@ -496,19 +487,14 @@ const TaskCard = ({
           (Boolean(weight) && isQualificationOver)
         )
       case 'sendpot_ticket_purchase': {
-        if (!latestWeight || !lastJackpotEndTime) return false
-        // Convert Unix seconds to Date object (multiply by 1000 to get milliseconds)
-        const lastJackpotEndDate = new Date(lastJackpotEndTime * 1000)
-        const createdAtDate = new Date(verification.created_at)
-        if (createdAtDate < lastJackpotEndDate) {
-          // No tickets for current jackpot
-          return false
+        // Calculate tickets for the entire distribution period
+        if (userTicketPurchases && userTicketPurchases.length > 0) {
+          const numTickets = calculateTicketsFromRawPurchases(userTicketPurchases)
+          return numTickets >= 1
         }
 
-        // Use current timestamp for latest weight (current period)
-        const currentTimestamp = Math.floor(Date.now() / 1000)
-        const numTickets = calculateTicketsFromBps(Number(latestWeight), currentTimestamp)
-        return numTickets >= 1
+        // Fallback: if no raw purchases available, check if any weight exists
+        return Boolean(weight) && isQualificationOver
       }
       default:
         return Boolean(weight)
@@ -525,8 +511,8 @@ const TaskCard = ({
         if (userTicketPurchases && userTicketPurchases.length > 0) {
           return calculateTicketsFromRawPurchases(userTicketPurchases).toString()
         }
-        // Fallback to simple calculation if raw purchases not available
-        const timestamp = lastJackpotEndTime ?? Math.floor(Date.now() / 1000)
+        // Fallback: use current time as approximation if raw purchases unavailable
+        const timestamp = Math.floor(Date.now() / 1000)
         return calculateTicketsFromBps(Number(weight), timestamp).toString()
       }
       default:
