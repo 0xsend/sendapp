@@ -25,6 +25,7 @@ import { useSendScreenParams } from 'app/routers/params'
 import { formatUnits } from 'viem'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { allCoinsDict } from 'app/data/coins'
+import { AlertCircle } from '@tamagui/lucide-icons'
 
 interface TransactionProps {
   open: boolean
@@ -68,66 +69,80 @@ const TransactionContent = ({
       )
     )
 
+  const isFailed =
+    transaction?.data?.status === 'failed' || transaction?.data?.status === 'cancelled'
+
   return (
     <YStack bg="$color1" p="$4" py="$5" gap="$6" pb={bottom}>
-      <XStack ai="center" gap="$3" f={1}>
-        <ActivityAvatar activity={transaction} size="$5" circular={true} />
-        <YStack>
-          <Paragraph size="$6" color="$color11">
-            {username}
-          </Paragraph>
-          <XStack ai="center" gap="$2">
-            <SizableText size="$4" col="$gray11">
-              {isReceived ? 'Received on' : 'Sent on'}
-            </SizableText>
-            {transaction.created_at && (
-              <SizableText size="$3" col="$gray9">
-                {transaction.created_at?.toLocaleString([], {
-                  year: 'numeric',
-                  month: 'numeric',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                })}
+      {!isFailed && (
+        <XStack ai="center" gap="$3" f={1}>
+          <ActivityAvatar activity={transaction} size="$5" circular={true} />
+          <YStack>
+            <Paragraph size="$6" color="$color11">
+              {username}
+            </Paragraph>
+            <XStack ai="center" gap="$2">
+              <SizableText size="$4" col="$gray11">
+                {isReceived ? 'Received on' : 'Sent on'}
               </SizableText>
-            )}
-          </XStack>
-        </YStack>
-      </XStack>
-      <Button circular onPress={onClose} cursor="pointer" pos="absolute" t={12} r={6}>
+              {transaction.created_at && (
+                <SizableText size="$3" col="$gray9">
+                  {transaction.created_at?.toLocaleString([], {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                  })}
+                </SizableText>
+              )}
+            </XStack>
+          </YStack>
+        </XStack>
+      )}
+      <Button zi={100} circular onPress={onClose} cursor="pointer" pos="absolute" t={12} r={6}>
         <Button.Icon>
           <IconX size="$1.5" color="$gray11" />
         </Button.Icon>
       </Button>
 
-      <YStack gap="$4">
-        <XStack ai="center" gap="$3">
-          <SizableText size="$9" fontWeight="600" fontFamily="$mono" color="$color12">
-            {numericAmount}
-          </SizableText>
-          <XStack gap="$2" ai="center">
-            <SizableText size="$9" fow="600" fontFamily="$mono" col="$color12">
-              {symbol}
+      {!isFailed ? (
+        <YStack gap="$4">
+          <XStack ai="center" gap="$3">
+            <SizableText size="$9" fontWeight="600" fontFamily="$mono" color="$color12">
+              {numericAmount}
             </SizableText>
-            {symbol && <IconCoin scale={1} symbol={symbol} size="$2" />}
+            <XStack gap="$2" ai="center">
+              <SizableText size="$9" fow="600" fontFamily="$mono" col="$color12">
+                {symbol}
+              </SizableText>
+              {symbol && <IconCoin scale={1} symbol={symbol} size="$2" />}
+            </XStack>
+            <SizableText color="$gray10" fontSize="$2" fontFamily="$mono" mt={-1}>
+              {Number.isNaN(amountInUSD)
+                ? null
+                : `(${amountInUSD.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 2,
+                  })})`}
+            </SizableText>
           </XStack>
-          <SizableText color="$gray10" fontSize="$2" fontFamily="$mono" mt={-1}>
-            {Number.isNaN(amountInUSD)
-              ? null
-              : `(${amountInUSD.toLocaleString('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  maximumFractionDigits: 2,
-                })})`}
-          </SizableText>
-        </XStack>
 
-        {note && (
-          <Paragraph boc="$aztec2" size="$4" color="$gray11">
-            {decodeURIComponent(note)}
-          </Paragraph>
-        )}
-      </YStack>
+          {note && (
+            <Paragraph boc="$aztec2" size="$4" color="$gray11">
+              {decodeURIComponent(note)}
+            </Paragraph>
+          )}
+        </YStack>
+      ) : (
+        <YStack ai="center" jc="center" gap="$4" h={150}>
+          <AlertCircle opacity={0.8} size="$5" color="$warning" />
+          <SizableText size="$8" color="$warning">
+            Transaction failed
+          </SizableText>
+        </YStack>
+      )}
     </YStack>
   )
 }
@@ -160,6 +175,10 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
         index={-1}
         ref={bottomSheetRef}
         snapPoints={[230]}
+        animationConfigs={{
+          stiffness: 1000,
+          damping: 80,
+        }}
         enablePanDownToClose
         handleComponent={null}
         backgroundStyle={{
