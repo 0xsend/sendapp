@@ -81,7 +81,7 @@ SELECT
   c.winner,
   c.win_amount,
   (
-    SELECT COALESCE(SUM(utp.tickets_purchased_total_bps), 0)
+    SELECT COALESCE(SUM(utp.tickets_purchased_count), 0)
     FROM public.sendpot_user_ticket_purchases utp
     WHERE utp.block_num >= c.prev_block_num
       AND utp.block_num < c.jackpot_block_num
@@ -121,9 +121,9 @@ WITH last_jackpot AS (
   SELECT COALESCE(MAX(block_num), 0) AS last_block
   FROM public.sendpot_jackpot_runs
 )
--- Sum the tickets purchased (tickets_purchased_total_bps) from the sendpot_user_ticket_purchases
--- table for all rows where the block_num is greater than or equal to the last completed jackpot's block.
-SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) AS total_tickets
+-- Sum the actual ticket counts from the sendpot_user_ticket_purchases table
+-- for all purchases since the last completed jackpot
+SELECT COALESCE(SUM(tickets_purchased_count), 0) AS total_tickets
 FROM public.sendpot_user_ticket_purchases
 WHERE block_num >= (SELECT last_block FROM last_jackpot);
 $function$

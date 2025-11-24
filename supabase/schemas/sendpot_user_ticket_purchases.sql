@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "public"."sendpot_user_ticket_purchases" (
     "recipient" "bytea",
     "buyer" "bytea",
     "tickets_purchased_total_bps" numeric,
+    "tickets_purchased_count" numeric,
     "ig_name" "text",
     "src_name" "text",
     "block_num" numeric,
@@ -64,4 +65,5 @@ GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "authen
 GRANT ALL ON SEQUENCE "public"."sendpot_user_ticket_purchases_id_seq" TO "service_role";
 
 -- Triggers
+CREATE OR REPLACE TRIGGER "calculate_tickets_purchased_count_trigger" BEFORE INSERT ON "public"."sendpot_user_ticket_purchases" FOR EACH ROW EXECUTE FUNCTION "public"."calculate_tickets_purchased_count"();
 CREATE OR REPLACE TRIGGER "insert_verification_sendpot_ticket_purchase" AFTER INSERT ON "public"."sendpot_user_ticket_purchases" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_sendpot_ticket_purchase"();
