@@ -33,6 +33,19 @@ module.exports = {
     },
     package: 'app.send',
     permissions: ['android.permission.RECORD_AUDIO'],
+    intentFilters: [
+      {
+        action: 'VIEW',
+        autoVerify: true,
+        data: [
+          {
+            scheme: 'https',
+            host: 'send.app',
+          },
+        ],
+        category: ['BROWSABLE', 'DEFAULT'],
+      },
+    ],
   },
   plugins: [
     [
