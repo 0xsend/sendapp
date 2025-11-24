@@ -1,0 +1,24 @@
+{
+  "hero": {
+    "title": "Actualización de Paymaster Requerida",
+    "subtitle": "Hemos actualizado el contrato de paymaster. Por favor apruebe la nueva dirección para continuar usando transacciones sin gas."
+  },
+  "allowances": {
+    "current": "Asignación Actual",
+    "required": "Asignación Requerida"
+  },
+  "actions": {
+    "approve": "Aprobar Paymaster",
+    "approving": "Aprobando..."
+  },
+  "status": {
+    "ready": "Listo para aprobar",
+    "requesting": "Solicitando aprobación...",
+    "sending": "Enviando transacción...",
+    "waiting": "Esperando confirmación...",
+    "retry": "La transacción falló, por favor reinténtelo"
+  },
+  "toast": {
+    "success": "¡Paymaster aprobado exitosamente!"
+  }
+}

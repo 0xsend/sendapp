@@ -1,6 +1,7 @@
 import type React from 'react'
 import { OnboardedConcern } from './OnboardedConcern'
 import { SendV0TokenUpgradeScreen } from 'app/features/send-token-upgrade/screen'
+import { PaymasterAllowanceScreen } from 'app/features/paymaster-allowance/screen'
 import { MaintenanceModeScreen } from 'app/features/maintenance-mode/screen'
 
 const compose = (providers: React.FC<{ children: React.ReactNode }>[]) =>
@@ -23,4 +24,9 @@ const compose = (providers: React.FC<{ children: React.ReactNode }>[]) =>
  *
  * The concerns are ordered from the most important to the least important.
  */
-export const Concerns = compose([MaintenanceModeScreen, OnboardedConcern, SendV0TokenUpgradeScreen])
+export const Concerns = compose([
+  MaintenanceModeScreen,
+  OnboardedConcern,
+  SendV0TokenUpgradeScreen,
+  PaymasterAllowanceScreen,
+])

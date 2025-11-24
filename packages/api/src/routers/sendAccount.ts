@@ -13,11 +13,7 @@ import {
   tokenPaymasterAddress,
   usdcAddress,
 } from '@my/wagmi'
-import {
-  decodeSendEarnDepositUserOp,
-  isFactoryDeposit as isSendEarnFactoryDeposit,
-  isVaultDeposit as isSendEarnVaultDeposit,
-} from 'app/utils/decodeSendEarnDepositUserOp'
+import { validateUserOp } from '../validators'
 import { base16 } from '@scure/base'
 import { TRPCError } from '@trpc/server'
 import { base16Regex } from 'app/utils/base16Regex'
@@ -62,8 +58,6 @@ const sendAccountFactoryClient = createWalletClient({
   chain: baseMainnet,
   transport: http(baseMainnetClient.transport.url),
 }).extend(publicActions)
-
-const MINIMUM_USDC_VAULT_DEPOSIT = parseUnits('5', 6) // 5 USDC
 
 // nonce storage to avoid nonce conflicts
 const nonceQueue = new PQueue({ concurrency: 1 })
@@ -385,73 +379,51 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
-        // Determine operation type and validate
-        let isValidOperation = false
-
-        // Try to decode as SendEarn deposit
-        try {
-          const depositArgs = decodeSendEarnDepositUserOp({ userOp: userop })
-          if (isSendEarnVaultDeposit(depositArgs)) {
-            const { owner, assets, vault } = depositArgs
-            if (isAddress(owner) && isAddress(vault) && assets >= MINIMUM_USDC_VAULT_DEPOSIT) {
-              log('Validated as SendEarn vault deposit', { assets: assets.toString() })
-              isValidOperation = true
-            } else if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
-              log('Deposit amount below minimum', {
-                assets: assets.toString(),
-                minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
-              })
-            }
-          } else if (isSendEarnFactoryDeposit(depositArgs)) {
-            const { owner, assets } = depositArgs
-            // Referrer can be zero address (no referral), so we don't validate it
-            if (isAddress(owner) && assets >= MINIMUM_USDC_VAULT_DEPOSIT) {
-              log('Validated as SendEarn factory deposit', { assets: assets.toString() })
-              isValidOperation = true
-            } else if (assets < MINIMUM_USDC_VAULT_DEPOSIT) {
-              log('Deposit amount below minimum', {
-                assets: assets.toString(),
-                minimum: MINIMUM_USDC_VAULT_DEPOSIT.toString(),
-              })
-            }
-          }
-        } catch (e) {
-          log('Not a SendEarn deposit operation', e)
-        }
-
-        // If not SendEarn, try to validate as send token upgrade
-        if (!isValidOperation && sendAccountCalls) {
-          const [approval, deposit] = sendAccountCalls
-
-          if (approval && deposit) {
-            if (
-              approval.dest === sendTokenV0Address[sendAccount.chain_id] &&
-              approval.data.startsWith('0x095ea7b3') && // approve(address,uint256)
-              deposit.dest === sendTokenV0LockboxAddress[sendAccount.chain_id] &&
-              deposit.data.startsWith('0xb6b55f25') // deposit(uint256)
-            ) {
-              const _calldata = encodeFunctionData({
-                abi: sendAccountAbi,
-                functionName: 'executeBatch',
-                args: [sendAccountCalls],
-              })
-              if (userop.callData === _calldata) {
-                log('Validated as send token upgrade')
-                isValidOperation = true
-              } else {
-                log('callData mismatch for send token upgrade')
-              }
-            }
-          }
-        }
-
-        if (!isValidOperation) {
-          log('Operation is not whitelisted for gas sponsorship')
+        // Validate entryPoint matches expected value for chain
+        if (entryPoint !== entryPointAddress[sendAccount.chain_id]) {
+          log('Invalid entryPoint', {
+            provided: entryPoint,
+            expected: entryPointAddress[sendAccount.chain_id],
+          })
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Operation is not whitelisted for gas sponsorship',
+            message: `Invalid entryPoint. Expected ${entryPointAddress[sendAccount.chain_id]}, got ${entryPoint}`,
           })
         }
+
+        // Validate paymaster matches expected verifying paymaster for chain
+        if (
+          userop.paymaster &&
+          userop.paymaster !== sendVerifyingPaymasterAddress[sendAccount.chain_id]
+        ) {
+          log('Invalid paymaster', {
+            provided: userop.paymaster,
+            expected: sendVerifyingPaymasterAddress[sendAccount.chain_id],
+          })
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Invalid paymaster. Expected ${sendVerifyingPaymasterAddress[sendAccount.chain_id]}, got ${userop.paymaster}`,
+          })
+        }
+
+        // Validate operation using validator registry
+        const validationResult = validateUserOp({
+          userop,
+          sendAccountCalls,
+          chainId: sendAccount.chain_id,
+          entryPoint,
+          sendAccount: { address: sendAccount.address },
+        })
+
+        if (!validationResult.ok) {
+          log('Operation validation failed', validationResult.reason)
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: validationResult.reason,
+          })
+        }
+
+        log('Operation validated successfully', { validator: validationResult.context })
 
         // Create paymaster signature
         const validUntil = Math.floor((Date.now() + 1000 * 120) / 1000)

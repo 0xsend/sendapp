@@ -34,6 +34,8 @@ import secretShopEn from './resources/secret-shop/en.json'
 import secretShopEs from './resources/secret-shop/es.json'
 import sendTokenUpgradeEn from './resources/send-token-upgrade/en.json'
 import sendTokenUpgradeEs from './resources/send-token-upgrade/es.json'
+import paymasterAllowanceEn from './resources/paymaster-allowance/en.json'
+import paymasterAllowanceEs from './resources/paymaster-allowance/es.json'
 import tradeEn from './resources/trade/en.json'
 import tradeEs from './resources/trade/es.json'
 import homeEn from './resources/home/en.json'
@@ -71,6 +73,7 @@ export const resources = {
     send: sendEn,
     secretShop: secretShopEn,
     sendTokenUpgrade: sendTokenUpgradeEn,
+    paymasterAllowance: paymasterAllowanceEn,
     trade: tradeEn,
     home: homeEn,
     navigation: navigationEn,
@@ -96,6 +99,7 @@ export const resources = {
     send: sendEs,
     secretShop: secretShopEs,
     sendTokenUpgrade: sendTokenUpgradeEs,
+    paymasterAllowance: paymasterAllowanceEs,
     trade: tradeEs,
     home: homeEs,
     navigation: navigationEs,
