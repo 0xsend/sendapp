@@ -133,6 +133,28 @@ export async function fetchSendSlash(distribution: {
     .single()
 }
 
+export async function fetchUserTicketPurchases(params: {
+  userIds: string[]
+  startTime: Date
+  endTime: Date
+}) {
+  const supabaseAdmin = createSupabaseAdminClient()
+
+  // Convert dates to Unix timestamps (seconds)
+  const startTimestamp = Math.floor(startTime.getTime() / 1000)
+  const endTimestamp = Math.floor(endTime.getTime() / 1000)
+
+  return selectAll(
+    supabaseAdmin
+      .from('sendpot_user_ticket_purchases')
+      .select('recipient, buyer, block_time, tickets_purchased_total_bps')
+      .gte('block_time', startTimestamp)
+      .lte('block_time', endTimestamp)
+      .order('recipient', { ascending: true })
+      .order('block_time', { ascending: true })
+  )
+}
+
 export async function updateReferralVerifications(
   distributionId: number,
   shares: Tables<'distribution_shares'>[]

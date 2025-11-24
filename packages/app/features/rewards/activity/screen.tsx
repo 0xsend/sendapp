@@ -19,6 +19,7 @@ import {
   useDistributionVerifications,
   useMonthlyDistributions,
   useSnapshotBalance,
+  useUserTicketPurchases,
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
@@ -37,7 +38,7 @@ import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
-import { calculateTicketsFromBps } from 'app/data/sendpot'
+import { calculateTicketsFromBps, calculateTicketsFromRawPurchases } from 'app/data/sendpot'
 import { Link } from 'solito/link'
 
 //@todo get this from the db
@@ -393,6 +394,7 @@ const TaskCards = ({
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const verifications = verificationsQuery.data
+  const { data: userTicketPurchases } = useUserTicketPurchases(distribution)
 
   if (verificationsQuery.isLoading) {
     return (
@@ -440,6 +442,7 @@ const TaskCards = ({
               verification={verification}
               isQualificationOver={isQualificationOver}
               url={getTaskHref(verification.type)}
+              userTicketPurchases={userTicketPurchases}
             >
               <H3 fontWeight={'600'} color={'$color12'}>
                 {verificationTypesAndTitles[verification.type]?.title}
@@ -456,10 +459,12 @@ const TaskCard = ({
   isQualificationOver,
   children,
   url,
+  userTicketPurchases,
 }: PropsWithChildren<CardProps> & {
   verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
   url?: string | null
+  userTicketPurchases?: Array<{ block_time: number; tickets_purchased_total_bps: number }>
 }) => {
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
@@ -500,7 +505,9 @@ const TaskCard = ({
           return false
         }
 
-        const numTickets = calculateTicketsFromBps(Number(latestWeight))
+        // Use current timestamp for latest weight (current period)
+        const currentTimestamp = Math.floor(Date.now() / 1000)
+        const numTickets = calculateTicketsFromBps(Number(latestWeight), currentTimestamp)
         return numTickets >= 1
       }
       default:
@@ -512,8 +519,16 @@ const TaskCard = ({
     switch (type) {
       case 'tag_registration':
         return verification.count.toString()
-      case 'sendpot_ticket_purchase':
-        return weight ? calculateTicketsFromBps(Number(weight)).toString() : '0'
+      case 'sendpot_ticket_purchase': {
+        if (!weight) return '0'
+        // Use raw purchases if available for accurate calculation across BPS changes
+        if (userTicketPurchases && userTicketPurchases.length > 0) {
+          return calculateTicketsFromRawPurchases(userTicketPurchases).toString()
+        }
+        // Fallback to simple calculation if raw purchases not available
+        const timestamp = lastJackpotEndTime ?? Math.floor(Date.now() / 1000)
+        return calculateTicketsFromBps(Number(weight), timestamp).toString()
+      }
       default:
         return value.toString()
     }

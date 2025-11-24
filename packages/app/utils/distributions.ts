@@ -288,6 +288,54 @@ export const useDistributionVerifications = (distributionNumber?: number) => {
   })
 }
 
+/**
+ * Hook to fetch user's raw ticket purchases for a distribution period.
+ * Used to calculate accurate ticket counts when BPS changes during the period.
+ */
+export const useUserTicketPurchases = (distribution?: {
+  qualification_start: Date
+  qualification_end: Date
+}) => {
+  const supabase = useSupabase()
+  const { data: sendAccount } = useSendAccount()
+
+  return useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: [
+      'user_ticket_purchases',
+      sendAccount?.address,
+      distribution?.qualification_start?.toISOString(),
+      distribution?.qualification_end?.toISOString(),
+    ] as const,
+    queryFn: async () => {
+      if (!sendAccount?.address || !distribution) {
+        return []
+      }
+
+      const startTimestamp = Math.floor(distribution.qualification_start.getTime() / 1000)
+      const endTimestamp = Math.floor(distribution.qualification_end.getTime() / 1000)
+
+      const { data, error } = await selectAll(
+        supabase
+          .from('sendpot_user_ticket_purchases')
+          .select('block_time, tickets_purchased_total_bps')
+          .eq('recipient', sendAccount.address_bytes)
+          .gte('block_time', startTimestamp)
+          .lte('block_time', endTimestamp)
+          .order('block_time', { ascending: true })
+      )
+
+      if (error) throw error
+
+      return (data ?? []).map((purchase) => ({
+        block_time: Number(purchase.block_time),
+        tickets_purchased_total_bps: Number(purchase.tickets_purchased_total_bps),
+      }))
+    },
+    enabled: Boolean(sendAccount?.address && distribution),
+  })
+}
+
 export const useActiveDistribution = () => {
   const { data: distributions, isLoading, error } = useDistributions()
   if (error) {

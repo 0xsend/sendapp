@@ -25,6 +25,7 @@ export type DrawingHistoryEntry = {
   winnerTagName?: string
   winnerLink?: string
   totalTicketsPurchased: number
+  blockTime: number
   result?: 'won' | 'lost' | 'pending'
 }
 
@@ -111,6 +112,7 @@ export const DrawingHistory = () => {
         winnerTagName,
         winnerLink,
         totalTicketsPurchased: userTicketsBps,
+        blockTime: run.jackpot_block_time,
         result: resultStatus,
       })
     }
@@ -126,6 +128,7 @@ export const DrawingHistory = () => {
         id: 'draw-current',
         drawDate: 'Upcoming',
         totalTicketsPurchased: currentTicketsBps,
+        blockTime: Math.floor(Date.now() / 1000), // Current timestamp for pending draw
         result: 'pending',
         prizePool: formattedCurrentJackpotAmount ?? 0,
         winner: undefined,
@@ -142,6 +145,7 @@ export const DrawingHistory = () => {
           id: 'draw-current-loading',
           drawDate: 'Upcoming',
           totalTicketsPurchased: 0,
+          blockTime: Math.floor(Date.now() / 1000), // Current timestamp for loading state
           result: 'pending',
           prizePool: 0,
           winner: '(Loading...)',
@@ -169,7 +173,7 @@ export const DrawingHistory = () => {
   const renderDrawingEntry = ({ item }: { item: DrawingHistoryEntry }) => {
     const isCurrent = item.result === 'pending'
     const ticketsBps = item.totalTicketsPurchased
-    const actualTickets = calculateTicketsFromBps(ticketsBps)
+    const actualTickets = calculateTicketsFromBps(ticketsBps, item.blockTime)
     const displayPrizePool = item.prizePool
 
     const itemIsLoadingCurrent =

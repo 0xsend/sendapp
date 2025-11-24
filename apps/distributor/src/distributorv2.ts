@@ -10,6 +10,7 @@ import {
   fetchDistributionShares,
   fetchSendScores,
   fetchSendSlash,
+  fetchUserTicketPurchases,
   updateReferralVerifications,
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
@@ -17,7 +18,7 @@ import { calculateWeights, Mode, PERC_DENOM } from './weights'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import type { Address } from 'viem'
-import { BPS_PER_TICKET, COST_PER_TICKET_WEI } from 'packages/app/data/sendpot'
+import { calculateTicketsFromRawPurchases, COST_PER_TICKET_WEI } from 'packages/app/data/sendpot'
 
 type Multiplier = {
   value?: number
@@ -261,6 +262,41 @@ export class DistributorV2Worker {
         log.error(e, 'Error writing hodlerAddresses.json')
       })
     }
+
+    // Fetch raw ticket purchases for sendpot_ticket_purchase verifications
+    // This is needed to calculate tickets correctly when BPS changes during the distribution period
+    const allUserIds = Object.keys(verificationsByUserId)
+    const { data: ticketPurchases, error: ticketPurchasesError } = await fetchUserTicketPurchases({
+      userIds: allUserIds,
+      startTime: new Date(distribution.qualification_start),
+      endTime: new Date(distribution.qualification_end),
+    })
+
+    if (ticketPurchasesError) {
+      log.error(ticketPurchasesError, 'Error fetching ticket purchases')
+      throw ticketPurchasesError
+    }
+
+    // Group purchases by recipient address
+    const purchasesByRecipient =
+      ticketPurchases?.reduce(
+        (acc, purchase) => {
+          const recipientHex = byteaToHex(purchase.recipient as `\\x${string}`)
+          if (!acc[recipientHex]) {
+            acc[recipientHex] = []
+          }
+          acc[recipientHex].push({
+            block_time: Number(purchase.block_time),
+            tickets_purchased_total_bps: Number(purchase.tickets_purchased_total_bps),
+          })
+          return acc
+        },
+        {} as Record<string, Array<{ block_time: number; tickets_purchased_total_bps: number }>>
+      ) ?? {}
+
+    log.info(
+      `Found ${ticketPurchases?.length ?? 0} ticket purchases for ${Object.keys(purchasesByRecipient).length} addresses.`
+    )
 
     // lookup balances of all hodler addresses in qualification period
     // Filter out hodler with not enough send token balance
@@ -539,9 +575,7 @@ export class DistributorV2Worker {
       {} as Record<string, bigint>
     )
 
-    // TODO: index onchain data in the case these values change
-    // Hardcoded jackpot values for sendpot_ticket_purchase calculations
-    const ticketBps = BPS_PER_TICKET // ticketBps = 10,000 - feeBps (where feeBps = 3000)
+    // Ticket price constant for calculating the amount spent on tickets
     const ticketPrice = COST_PER_TICKET_WEI
 
     // Calculate fixed pool share weights
@@ -587,10 +621,14 @@ export class DistributorV2Worker {
           ('sendpot_ticket_purchase' as Database['public']['Enums']['verification_type'])
         ) {
           if (verificationValue.fixedValue) {
-            // Calculate number of tickets: ticketCount = ticketsPurchasedBps / ticketBps
-            // Calculate amount spent: usedAmount = ticketCount * ticketPrice
+            // Calculate tickets from raw purchases to handle BPS changes during the period
+            const userAddress = hodlerAddressesByUserId[userId]
+            const userPurchases = userAddress ? (purchasesByRecipient[userAddress] ?? []) : []
+
+            // Calculate actual tickets accounting for BPS changes over time
+            const numberOfTickets = BigInt(calculateTicketsFromRawPurchases(userPurchases))
+
             // Every 10 tickets adds fixedValue
-            const numberOfTickets = BigInt(weight) / BigInt(ticketBps)
             const groupsOfTenTickets = numberOfTickets / 10n
             userFixedAmount += verificationValue.fixedValue * groupsOfTenTickets
 
