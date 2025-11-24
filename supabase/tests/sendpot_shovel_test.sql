@@ -1,6 +1,6 @@
 BEGIN;
 
-SELECT plan(9); -- Adjust plan count as needed
+SELECT plan(12); -- Adjust plan count as needed
 
 -- Create the necessary extensions
 CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
@@ -57,6 +57,53 @@ INSERT INTO public.sendpot_jackpot_runs (
     (1, '\x01', 1000, '\x11', 1000, '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1, 50, 60, 'ig1', 'src1', 100, 1, 1, 1), -- Run 1
     (1, '\x01', 2000, '\x22', 2000, '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 2, 80, 90, 'ig1', 'src1', 200, 1, 1, 1), -- Run 2
     (1, '\x01', 3000, '\x33', 3000, '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 3, 50, 60, 'ig1', 'src1', 300, 1, 1, 1); -- Run 3
+
+-- =============================================================================
+-- Test tickets_purchased_count trigger calculation
+-- =============================================================================
+-- Verify the trigger correctly calculates tickets from BPS delta using fee history
+-- With feeBps=3000 (blocks < 38567474), net BPS per ticket = 7000
+SELECT results_eq(
+    $$ SELECT buyer, block_num, tickets_purchased_total_bps, tickets_purchased_count
+       FROM public.sendpot_user_ticket_purchases
+       WHERE buyer = '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+       ORDER BY block_num $$,
+    $$ VALUES ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 50::numeric,  70000::numeric, 10::numeric),
+              ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 100::numeric, 210000::numeric, 20::numeric),
+              ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 150::numeric, 350000::numeric, 20::numeric),
+              ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 200::numeric, 630000::numeric, 40::numeric),
+              ('\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea, 310::numeric, 1050000::numeric, 60::numeric) $$,
+    'Trigger: User A tickets_purchased_count calculated correctly from BPS delta'
+);
+
+SELECT results_eq(
+    $$ SELECT buyer, block_num, tickets_purchased_total_bps, tickets_purchased_count
+       FROM public.sendpot_user_ticket_purchases
+       WHERE buyer = '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+       ORDER BY block_num $$,
+    $$ VALUES ('\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea, 50::numeric, 210000::numeric, 30::numeric),
+              ('\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea, 250::numeric, 350000::numeric, 20::numeric) $$,
+    'Trigger: User B tickets_purchased_count calculated correctly from BPS delta'
+);
+
+-- Test with different feeBps (after block 38567474, feeBps = 7000, net BPS per ticket = 3000)
+-- Create a new buyer for this test to have clean cumulative sequence
+INSERT INTO public.sendpot_user_ticket_purchases (
+    chain_id, log_addr, block_time, tx_hash, referrer, value, recipient, buyer, tickets_purchased_total_bps, ig_name, src_name, block_num, tx_idx, log_idx, abi_idx
+) VALUES
+    -- User C: purchases after fee change (block >= 38567474), feeBps = 7000, net = 3000 BPS/ticket
+    (1, '\x01', 5000, '\x07', NULL, 700, '\xcccccccccccccccccccccccccccccccccccccccc', '\xcccccccccccccccccccccccccccccccccccccccc', 9000, 'ig1', 'src1', 39000000, 1, 1, 1),   -- delta=9000 -> 3 tickets (9000/3000)
+    (1, '\x01', 5100, '\x08', NULL, 800, '\xcccccccccccccccccccccccccccccccccccccccc', '\xcccccccccccccccccccccccccccccccccccccccc', 21000, 'ig1', 'src1', 39100000, 1, 1, 1);  -- delta=12000 -> 4 tickets (12000/3000)
+
+SELECT results_eq(
+    $$ SELECT buyer, block_num, tickets_purchased_total_bps, tickets_purchased_count
+       FROM public.sendpot_user_ticket_purchases
+       WHERE buyer = '\xcccccccccccccccccccccccccccccccccccccccc'
+       ORDER BY block_num $$,
+    $$ VALUES ('\xcccccccccccccccccccccccccccccccccccccccc'::bytea, 39000000::numeric, 9000::numeric, 3::numeric),
+              ('\xcccccccccccccccccccccccccccccccccccccccc'::bytea, 39100000::numeric, 21000::numeric, 4::numeric) $$,
+    'Trigger: User C tickets calculated with higher feeBps (7000) after block 38567474'
+);
 
 -- =============================================================================
 -- Test RLS on sendpot_user_ticket_purchases
