@@ -3,11 +3,15 @@ export const SENDPOT_CONTRACT_ADDRESS = '0xa0A5611b9A1071a1D8A308882065c48650bAe
 // Constant for actual cost of the ticket for user (in SEND wei)
 export const COST_PER_TICKET_WEI = 30000000000000000000n
 
-// Base ticket value in basis points
+// Base ticket value in basis points (for reference)
 export const BASE_TICKET_BPS = 10000
 
-// @deprecated Use calculateTicketsFromBpsWithFee() for accurate calculations
-// This constant represents the current net BPS per ticket but doesn't account for historical fee changes
+// Hardcoded BPS per ticket value for approximate display only
+// Only used in rewards activity screen for showing verification weights
+// Note: This is approximate and doesn't reflect actual historical fees
+// - Block 0-38567473: feeBps=3000 → net 7000 BPS/ticket
+// - Block 38567474+: feeBps=7000 → net 3000 BPS/ticket
+// @deprecated Use tickets_purchased_count from database for accurate data
 export const BPS_PER_TICKET = 7000
 
 export const MAX_JACKPOT_HISTORY = 5
@@ -19,41 +23,14 @@ export const calculateTicketsFromWei = (totalSendWei: bigint) => {
 }
 
 /**
- * Calculates tickets from BPS using a specific feeBps value.
- * Use this for real-time calculations with current contract state.
+ * Calculates approximate tickets from BPS for display purposes only.
+ * Uses a hardcoded BPS_PER_TICKET value that doesn't account for historical fee changes.
  *
- * Formula: tickets = bps / (BASE_TICKET_BPS - feeBps)
+ * @deprecated Use tickets_purchased_count from database for accurate historical data.
+ * This is only kept for displaying distribution verification weights in the rewards screen.
  *
  * @param bps - The basis points to convert to tickets
- * @param feeBps - The fee in basis points (fetch from contract via RPC)
- * @returns The number of tickets
- *
- * @example
- * // Get current fee from contract
- * const feeBps = await readContract({
- *   address: baseJackpotAddress,
- *   abi: baseJackpotAbi,
- *   functionName: 'feeBps'
- * })
- * const tickets = calculateTicketsFromBpsWithFee(bpsDelta, Number(feeBps))
- */
-export const calculateTicketsFromBpsWithFee = (bps: number, feeBps: number): number => {
-  if (bps <= 0) {
-    return 0
-  }
-  const netBpsPerTicket = BASE_TICKET_BPS - feeBps
-  if (netBpsPerTicket <= 0) {
-    throw new Error(`Invalid fee configuration: netBpsPerTicket = ${netBpsPerTicket}`)
-  }
-  return Math.floor(bps / netBpsPerTicket)
-}
-
-/**
- * @deprecated Use tickets_purchased_count from database for historical data.
- * For real-time calculations, use calculateTicketsFromBpsWithFee() instead.
- *
- * This function uses a hardcoded BPS_PER_TICKET value that doesn't account
- * for historical fee changes (fee increased from 3000 to 7000 at block 38567474).
+ * @returns Approximate number of tickets (for display only)
  */
 export const calculateTicketsFromBps = (bps: number): number => {
   if (bps <= 0 || BPS_PER_TICKET <= 0) {
