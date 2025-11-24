@@ -216,11 +216,11 @@ grant truncate on table "public"."sendpot_fee_history" to "service_role";
 
 grant update on table "public"."sendpot_fee_history" to "service_role";
 
-create policy "fee_history_select_policy"
+create policy "authenticated can read fee history"
 on "public"."sendpot_fee_history"
 as permissive
 for select
-to public
+to authenticated
 using (true);
 
 

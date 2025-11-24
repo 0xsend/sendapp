@@ -35,11 +35,11 @@ CREATE UNIQUE INDEX "u_sendpot_fee_history_block_num" ON "public"."sendpot_fee_h
 
 -- RLS
 ALTER TABLE "public"."sendpot_fee_history" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "fee_history_select_policy" ON "public"."sendpot_fee_history" FOR SELECT USING (true);
+CREATE POLICY "authenticated can read fee history" ON "public"."sendpot_fee_history" FOR SELECT TO "authenticated" USING (true);
 
 -- Grants
-GRANT SELECT ON TABLE "public"."sendpot_fee_history" TO "anon";
-GRANT SELECT ON TABLE "public"."sendpot_fee_history" TO "authenticated";
+GRANT ALL ON TABLE "public"."sendpot_fee_history" TO "anon";
+GRANT ALL ON TABLE "public"."sendpot_fee_history" TO "authenticated";
 GRANT ALL ON TABLE "public"."sendpot_fee_history" TO "service_role";
 
 GRANT USAGE ON SEQUENCE "public"."sendpot_fee_history_id_seq" TO "service_role";
