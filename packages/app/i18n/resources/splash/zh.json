@@ -1,0 +1,12 @@
+{
+  "actions": {
+    "signIn": "登录",
+    "signInLoading": "正在登录...",
+    "signUp": "注册"
+  },
+  "headline": {
+    "line1": "欢迎",
+    "line2": "使用 Send",
+    "subtitle": "使用通行密钥登录"
+  }
+}

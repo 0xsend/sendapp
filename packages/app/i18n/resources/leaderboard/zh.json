@@ -1,0 +1,22 @@
+{
+  "boards": {
+    "referrals": {
+      "title": "推荐"
+    }
+  },
+  "errors": {
+    "noData": "无法找到排行榜数据"
+  },
+  "hero": {
+    "description": "注册 Sendtag，保持最低余额，并推荐他人以提升排名。",
+    "title": "同类最佳"
+  },
+  "table": {
+    "columns": {
+      "identifier": "Sendtag",
+      "rank": "#",
+      "referrals": "推荐",
+      "transactions": "总交易数"
+    }
+  }
+}

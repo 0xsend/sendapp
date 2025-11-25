@@ -1,0 +1,133 @@
+{
+  "active": {
+    "addMore": "增加更多存款",
+    "breakdown": {
+      "deposits": "存款",
+      "earnings": "收益",
+      "rewards": "奖励"
+    },
+    "buttons": {
+      "earnings": "收益",
+      "rewards": "奖励",
+      "withdraw": "提款"
+    }
+  },
+  "cta": {
+    "badge": "收益",
+    "bullets": {
+      "apy": "高年利率：存款高达 12%",
+      "flex": "完全灵活：随时访问您的资金",
+      "rewards": "奖励：奖励 SEND 代币"
+    },
+    "buttons": {
+      "start": "开始赚取"
+    },
+    "title": "立即增加您的储蓄"
+  },
+  "deposit": {
+    "balance": {
+      "insufficient": "资金不足",
+      "label": "余额："
+    },
+    "benefits": {
+      "apy": {
+        "dynamicLabel": "年利率",
+        "placeholder": "高达 {{value}}",
+        "staticLabel": "存款年利率"
+      },
+      "monthlyEarning": {
+        "label": "预计每月收益",
+        "symbol": "{{symbol}}"
+      },
+      "rewards": {
+        "fallback": "奖励 {{token}} 代币",
+        "label": "奖励",
+        "symbol": "{{token}}"
+      },
+      "title": "好处",
+      "withdraw": {
+        "label": "随时提款",
+        "value": "完全灵活"
+      }
+    },
+    "buttons": {
+      "confirm": "确认存款"
+    },
+    "heading": "存款金额",
+    "terms": {
+      "text": "我接受<tos>服务条款</tos>、<privacy>隐私政策</privacy>和<disclaimer>Send Earn 计划的免责声明</disclaimer>"
+    },
+    "toast": {
+      "error": {
+        "title": "存款错误"
+      },
+      "success": {
+        "message": "您的存款正在处理中。",
+        "title": "存款已提交"
+      }
+    },
+    "validation": {
+      "minimum": "最低存款为 {{amount}} {{symbol}}"
+    }
+  },
+  "errors": {
+    "notEnoughForFees": "USDC 不足以支付交易费用"
+  },
+  "rewards": {
+    "actions": {
+      "claim": "领取奖励"
+    },
+    "feed": {
+      "today": "今天"
+    },
+    "history": {
+      "empty": "没有奖励活动",
+      "error": "无法加载奖励：{{message}}",
+      "title": "奖励历史记录"
+    },
+    "messages": {
+      "minimum": "您需要至少 {{amount}} {{symbol}} 才能领取奖励"
+    },
+    "status": {
+      "requesting": "正在请求签名...",
+      "sending": "正在发送交易...",
+      "waiting": "正在等待确认..."
+    },
+    "toast": {
+      "success": "奖励已领取"
+    }
+  },
+  "summary": {
+    "badge": "有效收益",
+    "buttons": {
+      "viewDetails": "查看详情"
+    },
+    "labels": {
+      "deposits": "存款",
+      "earnings": "收益",
+      "rewards": "奖励",
+      "total": "总价值"
+    }
+  },
+  "withdraw": {
+    "balance": {
+      "insufficient": "资金不足",
+      "label": "存款余额："
+    },
+    "buttons": {
+      "confirm": "确认提款"
+    },
+    "heading": "提款金额",
+    "status": {
+      "requesting": "正在请求签名...",
+      "sending": "正在发送交易...",
+      "waiting": "正在等待确认..."
+    },
+    "toast": {
+      "success": "提款成功"
+    },
+    "validation": {
+      "insufficient": "资金不足"
+    }
+  }
+}

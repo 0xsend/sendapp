@@ -1,0 +1,27 @@
+{
+  "actions": {
+    "upgrade": "升级",
+    "upgrading": "正在升级..."
+  },
+  "balances": {
+    "after": "之后",
+    "current": "当前"
+  },
+  "hero": {
+    "subtitle": "需要升级才能继续使用 Send。新的总供应量：1000 亿 → 10 亿",
+    "title": "代币升级"
+  },
+  "links": {
+    "docs": "阅读有关升级的更多信息"
+  },
+  "status": {
+    "ready": "点击“升级”以继续。",
+    "requesting": "正在请求签名...",
+    "retry": "点击“升级”以继续。请重试。",
+    "sending": "正在发送交易...",
+    "waiting": "正在等待确认..."
+  },
+  "toast": {
+    "success": "升级成功"
+  }
+}
