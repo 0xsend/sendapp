@@ -10,7 +10,7 @@ import { formatUnits } from 'viem'
 import { baseMainnet } from '@my/wagmi'
 
 import type { Functions } from '@my/supabase/database.types'
-import { calculateTicketsFromBps, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
+import { MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useUserPendingJackpotTickets } from './hooks/useUserPendingJackpotTickets'
 import { useUserJackpotSummary } from './hooks/useUserJackpotSummary'
@@ -75,7 +75,7 @@ export const DrawingHistory = () => {
     const historicalEntries: DrawingHistoryEntry[] = []
 
     for (const run of summaryResults) {
-      const userTicketsBps = run.total_tickets ?? 0
+      const userTicketsCount = run.total_tickets ?? 0
       let resultStatus: 'won' | 'lost' | undefined = undefined
       const winnerAddress = byteaToHex(run.winner as `\\x${string}`)
 
@@ -112,7 +112,7 @@ export const DrawingHistory = () => {
         winnerFormatted: winnerDisplayText,
         winnerTagName,
         winnerLink,
-        totalTicketsPurchased: userTicketsBps,
+        totalTicketsPurchased: userTicketsCount,
         result: resultStatus,
       })
     }
@@ -123,11 +123,11 @@ export const DrawingHistory = () => {
       formattedCurrentJackpotAmount !== undefined && !isLoadingPendingTickets
 
     if (canDisplayCurrentEntry) {
-      const currentTicketsBps = pendingTicketsData ?? 0
+      const currentTicketsCount = pendingTicketsData ?? 0
       const currentEntry: DrawingHistoryEntry = {
         id: 'draw-current',
         drawDate: t('history.upcoming'),
-        totalTicketsPurchased: currentTicketsBps,
+        totalTicketsPurchased: currentTicketsCount,
         result: 'pending',
         prizePool: formattedCurrentJackpotAmount ?? 0,
         winner: undefined,
@@ -171,8 +171,7 @@ export const DrawingHistory = () => {
 
   const renderDrawingEntry = ({ item }: { item: DrawingHistoryEntry }) => {
     const isCurrent = item.result === 'pending'
-    const ticketsBps = item.totalTicketsPurchased
-    const actualTickets = calculateTicketsFromBps(ticketsBps)
+    const actualTickets = item.totalTicketsPurchased
     const displayPrizePool = item.prizePool
     const winnerLabel = t('history.winner.label')
 

@@ -56,6 +56,7 @@ schema_paths = [
   "./schemas/sendtag_checkout_receipts.sql",
 
   # Sendpot tables
+  "./schemas/sendpot_fee_history.sql",
   "./schemas/sendpot_user_ticket_purchases.sql",
   "./schemas/sendpot_jackpot_runs.sql",
 

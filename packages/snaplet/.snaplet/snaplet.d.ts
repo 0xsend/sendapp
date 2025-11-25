@@ -747,6 +747,14 @@ interface Table_public_send_token_v_0_transfers {
   log_idx: number;
   abi_idx: number;
 }
+interface Table_public_sendpot_fee_history {
+  id: number;
+  block_num: number;
+  block_time: number;
+  tx_hash: string | null;
+  fee_bps: number;
+  created_at: string;
+}
 interface Table_public_sendpot_jackpot_runs {
   id: number;
   chain_id: number | null;
@@ -782,6 +790,7 @@ interface Table_public_sendpot_user_ticket_purchases {
   tx_idx: number | null;
   log_idx: number | null;
   abi_idx: number | null;
+  tickets_purchased_count: number | null;
 }
 interface Table_public_sendtag_checkout_receipts {
   id: number;
@@ -1051,6 +1060,7 @@ interface Schema_public {
   send_slash: Table_public_send_slash;
   send_token_transfers: Table_public_send_token_transfers;
   send_token_v0_transfers: Table_public_send_token_v_0_transfers;
+  sendpot_fee_history: Table_public_sendpot_fee_history;
   sendpot_jackpot_runs: Table_public_sendpot_jackpot_runs;
   sendpot_user_ticket_purchases: Table_public_sendpot_user_ticket_purchases;
   sendtag_checkout_receipts: Table_public_sendtag_checkout_receipts;
