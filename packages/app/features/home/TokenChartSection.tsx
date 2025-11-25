@@ -11,11 +11,13 @@ import { useTokenChartData } from './charts/shared/useTokenChartData'
 import { useScrubState } from './charts/shared/useScrubState.native'
 import type { Timeframe } from './charts/shared/timeframes'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { useTranslation } from 'react-i18next'
 
 export function TokenChartSection() {
   const [tf, setTf] = useState<Timeframe>('1W')
   const { coin } = useCoinFromTokenParam()
   const { points, smoothed, last, change } = useTokenChartData(coin?.coingeckoTokenId, tf)
+  const { t } = useTranslation('home')
 
   const [measuredWidth, setMeasuredWidth] = useState<number>(0)
   const theme = useThemeName()
@@ -36,7 +38,7 @@ export function TokenChartSection() {
   }
 
   return (
-    <ChartCardSection title="Price Overview" tf={tf}>
+    <ChartCardSection title={t('token.priceOverview')} tf={tf}>
       <YStack onLayout={onLayoutContainer}>
         <ChartSection
           coin={coin}
@@ -109,6 +111,7 @@ function ChartSection({
     return <Paragraph fontSize={'$3'}>{formatted}</Paragraph>
   })()
 
+  const { t } = useTranslation('home')
   return (
     <ChartLineSection
       points={points}
@@ -117,7 +120,7 @@ function ChartSection({
       stroke={stroke}
       childrenBeforePath={
         isLoading ? null : isError ? (
-          <Paragraph color={'$color10'}>Failed to load chart data</Paragraph>
+          <Paragraph color={'$color10'}>{t('token.chartError')}</Paragraph>
         ) : (
           <ChartScrubReadout
             fallbackPrice={last}
@@ -141,15 +144,19 @@ function ChartScrubReadout({
   changeBadge: React.ReactNode
 }) {
   const { price, ts } = useScrubState()
+  const { i18n } = useTranslation()
+  const locale = i18n.resolvedLanguage ?? i18n.language
   const displayPrice = price ?? fallbackPrice
   const formattedPrice = `$${formatAmount(displayPrice, 9, decimals)}`
 
   const timeLabel = (() => {
     if (ts === null)
-      return new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+      return new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(
+        new Date()
+      )
     try {
       const d = new Date(ts)
-      return d.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+      return new Intl.DateTimeFormat(locale, { dateStyle: 'short', timeStyle: 'short' }).format(d)
     } catch {
       return null
     }

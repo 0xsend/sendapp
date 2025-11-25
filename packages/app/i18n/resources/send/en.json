@@ -1,0 +1,54 @@
+{
+  "topNav": {
+    "default": "Send",
+    "enterAmount": "Enter Amount",
+    "preview": "Preview and Send"
+  },
+  "form": {
+    "balanceLabel": "Balance:",
+    "errors": {
+      "insufficientFunds": "Insufficient funds",
+      "minimum": "Minimum: {{amount}} {{symbol}}",
+      "noteValidationFallback": "Note failed to match validation constraints"
+    },
+    "note": {
+      "maxCharacters": "Max: {{count}} characters"
+    },
+    "submit": "CONTINUE"
+  },
+  "confirm": {
+    "edit": "edit",
+    "fees": "Fees",
+    "noteTitle": "Your note",
+    "button": {
+      "send": "SEND"
+    },
+    "errors": {
+      "default": "Error sending",
+      "insufficientBalance": "Insufficient Balance",
+      "insufficientGas": "Insufficient Gas"
+    }
+  },
+  "search": {
+    "placeholder": "Search by send tag or wallet address",
+    "errorHeading": "Error",
+    "unknownError": "Unknown error"
+  },
+  "suggestions": {
+    "recent": "Recent Activity",
+    "favorites": "Favorite Senders",
+    "top": "Top Senders",
+    "birthdays": "Wish Them Happy Birthday"
+  },
+  "recipient": {
+    "label": "TO",
+    "edit": "edit"
+  },
+  "noAccount": {
+    "title": "No send account",
+    "description": "has no send account! Ask them to create one or write a /send Check.",
+    "cta": "Write /send Check",
+    "toast": "Coming soon",
+    "banner": "/send Checks Coming Soon"
+  }
+}

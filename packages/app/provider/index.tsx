@@ -1,39 +1,54 @@
 import type { Session } from '@supabase/supabase-js'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import type { i18n } from 'i18next'
 import { Concerns } from 'app/concerns'
+import { getI18n } from 'app/i18n'
+import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 import type React from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { ShimmerProvider } from '@my/ui'
+import { ActivityDetailsProvider } from './activity-details'
 import { AuthProvider } from './auth'
 import { CoinsProvider } from './coins'
+import { GlobalDatePickerProvider } from './datepicker'
 import { OnchainKitProvider } from './onchainkit'
 import { QueryClientProvider } from './react-query'
 import { SafeAreaProvider } from './safe-area'
 import { TamaguiProvider } from './tamagui'
-import { UniversalThemeProvider } from './theme'
 import { ToastProvider } from './toast'
+import { UniversalThemeProvider } from './theme'
 import { WagmiProvider } from './wagmi'
-import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
-import { ActivityDetailsProvider } from './activity-details'
-import { GlobalDatePickerProvider } from './datepicker'
-import { ShimmerProvider } from '@my/ui'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 
 export function Provider({
   initialSession,
+  i18n,
   children,
 }: {
   initialSession?: Session | null
+  i18n?: i18n | null
   children: React.ReactNode
 }) {
+  const i18nInstance = i18n ?? getI18n()
+
+  if (!i18nInstance) {
+    throw new Error(
+      'Provider requires an initialized i18n instance. Call initSharedI18n() before rendering.'
+    )
+  }
+
   return (
-    <AuthProvider initialSession={initialSession}>
-      <Providers>
+    <I18nextProvider i18n={i18nInstance}>
+      <AuthProvider initialSession={initialSession}>
         <ShimmerProvider duration={2000}>
-          <Concerns>{children}</Concerns>
-          {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
+          <Providers>
+            <Concerns>{children}</Concerns>
+            {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
+          </Providers>
         </ShimmerProvider>
-      </Providers>
-    </AuthProvider>
+      </AuthProvider>
+    </I18nextProvider>
   )
 }
 

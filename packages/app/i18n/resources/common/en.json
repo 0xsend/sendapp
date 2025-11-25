@@ -1,0 +1,13 @@
+{
+  "app": {
+    "name": "Send",
+    "loading": "Loading"
+  },
+  "referral": {
+    "placeholder": "Referral Code",
+    "validating": "Validating referral code",
+    "invalid": "Invalid referral code",
+    "applied": "Referral code applied",
+    "cta": "Got a referral? Enter the code to get rewards!"
+  }
+}

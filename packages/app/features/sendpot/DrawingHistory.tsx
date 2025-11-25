@@ -10,11 +10,12 @@ import { formatUnits } from 'viem'
 import { baseMainnet } from '@my/wagmi'
 
 import type { Functions } from '@my/supabase/database.types'
-import { calculateTicketsFromBps, MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
+import { MAX_JACKPOT_HISTORY, NO_WINNER_ADDRESS } from 'app/data/sendpot'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { useUserPendingJackpotTickets } from './hooks/useUserPendingJackpotTickets'
 import { useUserJackpotSummary } from './hooks/useUserJackpotSummary'
 import { IconCoin } from 'app/components/icons'
+import { useTranslation } from 'react-i18next'
 
 export type DrawingHistoryEntry = {
   id: string
@@ -28,22 +29,23 @@ export type DrawingHistoryEntry = {
   result?: 'won' | 'lost' | 'pending'
 }
 
-const formatBlockTimeToDate = (blockTime: number) => {
+const formatBlockTimeToDate = (blockTime: number, fallback: string) => {
   try {
     const date = new Date(blockTime * 1000)
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(undefined, {
       timeZone: 'UTC',
       month: 'short',
       day: 'numeric',
       year: 'numeric',
     })
   } catch (e) {
-    return 'N/A'
+    return fallback
   }
 }
 
 export const DrawingHistory = () => {
   const [drawingHistory, setDrawingHistory] = useState<DrawingHistoryEntry[]>([])
+  const { t } = useTranslation('sendpot')
 
   const { data: lpPoolTotal, isLoading: isLoadingPoolTotal } = useReadBaseJackpotLpPoolTotal()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
@@ -73,7 +75,7 @@ export const DrawingHistory = () => {
     const historicalEntries: DrawingHistoryEntry[] = []
 
     for (const run of summaryResults) {
-      const userTicketsBps = run.total_tickets ?? 0
+      const userTicketsCount = run.total_tickets ?? 0
       let resultStatus: 'won' | 'lost' | undefined = undefined
       const winnerAddress = byteaToHex(run.winner as `\\x${string}`)
 
@@ -93,7 +95,7 @@ export const DrawingHistory = () => {
       let winnerDisplayText: string
 
       if (noWinner) {
-        winnerDisplayText = 'None'
+        winnerDisplayText = t('history.winner.none')
       } else if (winnerTagName) {
         winnerDisplayText = `/${winnerTagName}`
         winnerLink = `https://send.app/${winnerTagName}`
@@ -104,13 +106,13 @@ export const DrawingHistory = () => {
 
       historicalEntries.push({
         id: `draw-${run.jackpot_run_id}`,
-        drawDate: formatBlockTimeToDate(run.jackpot_block_time),
+        drawDate: formatBlockTimeToDate(run.jackpot_block_time, t('history.notAvailable')),
         prizePool: historicalPrizePool,
-        winner: noWinner ? 'None' : winnerAddress,
+        winner: noWinner ? t('history.winner.none') : winnerAddress,
         winnerFormatted: winnerDisplayText,
         winnerTagName,
         winnerLink,
-        totalTicketsPurchased: userTicketsBps,
+        totalTicketsPurchased: userTicketsCount,
         result: resultStatus,
       })
     }
@@ -121,11 +123,11 @@ export const DrawingHistory = () => {
       formattedCurrentJackpotAmount !== undefined && !isLoadingPendingTickets
 
     if (canDisplayCurrentEntry) {
-      const currentTicketsBps = pendingTicketsData ?? 0
+      const currentTicketsCount = pendingTicketsData ?? 0
       const currentEntry: DrawingHistoryEntry = {
         id: 'draw-current',
-        drawDate: 'Upcoming',
-        totalTicketsPurchased: currentTicketsBps,
+        drawDate: t('history.upcoming'),
+        totalTicketsPurchased: currentTicketsCount,
         result: 'pending',
         prizePool: formattedCurrentJackpotAmount ?? 0,
         winner: undefined,
@@ -140,11 +142,11 @@ export const DrawingHistory = () => {
       ) {
         const loadingEntry: DrawingHistoryEntry = {
           id: 'draw-current-loading',
-          drawDate: 'Upcoming',
+          drawDate: t('history.upcoming'),
           totalTicketsPurchased: 0,
           result: 'pending',
           prizePool: 0,
-          winner: '(Loading...)',
+          winner: t('history.winner.loading'),
         }
         combinedHistory = [loadingEntry, ...historicalEntries]
       }
@@ -162,15 +164,16 @@ export const DrawingHistory = () => {
     tokenDecimals,
     pendingTicketsData,
     isLoadingPendingTickets,
+    t,
   ])
 
   const isLoadingInitialData = isLoadingSummary || isLoadingPendingTickets
 
   const renderDrawingEntry = ({ item }: { item: DrawingHistoryEntry }) => {
     const isCurrent = item.result === 'pending'
-    const ticketsBps = item.totalTicketsPurchased
-    const actualTickets = calculateTicketsFromBps(ticketsBps)
+    const actualTickets = item.totalTicketsPurchased
     const displayPrizePool = item.prizePool
+    const winnerLabel = t('history.winner.label')
 
     const itemIsLoadingCurrent =
       isCurrent && (isLoadingPoolTotal || isLoadingDecimals || isLoadingSendAccount)
@@ -181,7 +184,7 @@ export const DrawingHistory = () => {
           <YStack flex={1} gap="$1">
             {/* Left side: Date, user’s tickets */}
             <H4 fontWeight="600" mt="$1">
-              {isCurrent ? 'Current' : item.drawDate}
+              {isCurrent ? t('history.current') : item.drawDate}
             </H4>
 
             {sendAccount && (
@@ -189,9 +192,9 @@ export const DrawingHistory = () => {
                 {itemIsLoadingCurrent && isCurrent ? (
                   <Spinner size="small" />
                 ) : actualTickets > 0 ? (
-                  `You purchased ${actualTickets} ticket${actualTickets !== 1 ? 's' : ''}`
+                  t('history.tickets.purchased', { count: actualTickets })
                 ) : (
-                  'You purchased 0 tickets'
+                  t('history.tickets.none')
                 )}
               </Paragraph>
             )}
@@ -201,18 +204,18 @@ export const DrawingHistory = () => {
             {/* Right side: Winner, pool */}
             {isCurrent ? (
               <Paragraph fos="$4" color="$color10" ta="right">
-                Winner: <Text color={'$color12'}>(Pending)</Text>
+                {winnerLabel}: <Text color={'$color12'}>{t('history.winner.pending')}</Text>
               </Paragraph>
             ) : item.result === 'won' ? (
               <Paragraph fos="$4" color="$color10" ta="right">
-                Winner:{' '}
+                {winnerLabel}:{' '}
                 <Text color={'$primary'} $theme-light={{ color: '$olive' }}>
-                  You Won!
+                  {t('history.winner.you')}
                 </Text>
               </Paragraph>
             ) : item.winnerLink ? (
               <Paragraph fos="$4" color="$color10" ta="right">
-                Winner:{' '}
+                {winnerLabel}:{' '}
                 <Anchor
                   href={item.winnerLink}
                   target="_blank"
@@ -224,13 +227,13 @@ export const DrawingHistory = () => {
               </Paragraph>
             ) : (
               <Paragraph fos="$4" color="$color10" ta="right">
-                Winner: <Text color={'$color12'}>{item.winnerFormatted}</Text>
+                {winnerLabel}: <Text color={'$color12'}>{item.winnerFormatted}</Text>
               </Paragraph>
             )}
 
             <XStack gap={'$2'} alignItems={'center'}>
               <Paragraph fos="$4" color="$color10" ta="right">
-                Total Pool:
+                {t('history.totalPool')}
               </Paragraph>
               <XStack gap={'$1'}>
                 <Paragraph>
@@ -256,7 +259,7 @@ export const DrawingHistory = () => {
   return (
     <YStack gap="$4" w="100%">
       <Paragraph fontSize={'$8'} fontWeight="600" $gtLg={{ fontSize: '$9' }}>
-        Drawing History
+        {t('history.title')}
       </Paragraph>
       <Separator boc={'$color4'} />
       {isLoadingInitialData && drawingHistory.length === 0 ? (
@@ -272,7 +275,7 @@ export const DrawingHistory = () => {
         />
       ) : (
         <YStack ai="center" jc="center">
-          <Paragraph color="$color10">No drawing history available.</Paragraph>
+          <Paragraph color="$color10">{t('history.empty')}</Paragraph>
         </YStack>
       )}
     </YStack>

@@ -1,0 +1,44 @@
+{
+  "header": {
+    "title": "Get an invite to Canton Wallet"
+  },
+  "requirements": {
+    "sendTag": "Purchased Sendtag",
+    "savingsVault": "Deposit ${{amount}} to Savings Vault",
+    "sendBalance": "Hold {{amount}} $SEND Minimum"
+  },
+  "cards": {
+    "verifiedTitle": "Canton Wallet Verified",
+    "editTitle": "Edit Canton Wallet Address",
+    "discoverable": "Account discoverable in Canton Wallet"
+  },
+  "placeholders": {
+    "address": "Canton Wallet Address"
+  },
+  "buttons": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "verify": "Verify"
+  },
+  "links": {
+    "createAccount": "Create Canton Wallet Account"
+  },
+  "messages": {
+    "noDistribution": "No distribution available",
+    "addressChangeWarning": "Changing your Canton Wallet address will pause all $CC rewards for 24 hours"
+  },
+  "toasts": {
+    "copySuccess": "Copied Canton Wallet Address",
+    "copyError": "Unable to copy",
+    "updateSuccess": "Canton Wallet Address Updated",
+    "updateError": "Update failed",
+    "verifySuccess": "Successfully verified",
+    "verifyError": "Verification failed",
+    "discoverableSuccess": "Updated successfully"
+  },
+  "errors": {
+    "invalidInput": "Invalid input",
+    "addressRequired": "Canton wallet address is required",
+    "invalidFormat": "Invalid Canton wallet address format. Expected: cantonwallet-username::hash"
+  }
+}

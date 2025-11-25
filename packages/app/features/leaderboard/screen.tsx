@@ -1,39 +1,49 @@
 import { Avatar, Card, H2, H3, Paragraph, XStack, YStack } from '@my/ui'
 import { useLeaderboard } from './utils/useLeaderboard'
 import type { LeaderboardEntry } from 'app/utils/zod/leaderboard'
+import { useTranslation } from 'react-i18next'
 
 export function LeaderboardScreen() {
   const { data } = useLeaderboard()
+  const { t } = useTranslation('leaderboard')
 
   return (
     <YStack w={'100%'} gap={'$3.5'} pb={'$2'} $gtMd={{ pt: 0 }} pt={'$3.5'}>
       <YStack gap={'$0.9'}>
         <H2 tt={'uppercase'} fontWeight={'900'} testID="mainTitle">
-          Best in Class
+          {t('hero.title')}
         </H2>
         <Paragraph color={'$color10'} size={'$5'}>
-          Register a Sendtag, maintain the minimum balance, and refer others to rise in the ranks.
+          {t('hero.description')}
         </Paragraph>
       </YStack>
       {data?.referrals.length ? (
         <YStack gap={'$1.5'} $gtMd={{ flexDirection: 'row' }} maxWidth={600}>
-          <Leaderboard title="Referrals" list={data?.referrals} />
-          {/* <Leaderboard title="Transactions" list={data?.rewards} /> */}
+          <Leaderboard variant="referrals" list={data?.referrals} />
+          {/* <Leaderboard variant="transactions" list={data?.rewards} /> */}
         </YStack>
       ) : (
-        <Paragraph>Unable to find leaderboard data</Paragraph>
+        <Paragraph>{t('errors.noData')}</Paragraph>
       )}
     </YStack>
   )
 }
 
-function Leaderboard({ title, list }: { title: string; list: LeaderboardEntry[] }) {
-  const isReferrals = title === 'Referrals'
+function Leaderboard({
+  variant,
+  list,
+}: {
+  variant: 'referrals'
+  list: LeaderboardEntry[]
+}) {
+  const { t } = useTranslation('leaderboard')
+  const isReferrals = variant === 'referrals'
+  const title = t(`boards.${variant}.title`)
   return (
     <Card f={1} pb={0}>
       <YStack br="$8">
         <YStack gap="$0.9" p="$5" $gtMd={{ p: '$8', pb: '$0.9' }} pb="$0.9" br="$8">
-          <H3 pb={'$0.9'} fontWeight={'600'} size={'$7'} testID={`title${title}`}>
+          <H3 pb={'$0.9'} fontWeight={'600'} size={'$7'} testID={`title-${variant}`}>
             {title}
           </H3>
           <LeaderBoardHeader isReferrals={isReferrals} />
@@ -45,6 +55,7 @@ function Leaderboard({ title, list }: { title: string; list: LeaderboardEntry[] 
 }
 
 function LeaderBoardHeader({ isReferrals }: { isReferrals: boolean }) {
+  const { t } = useTranslation('leaderboard')
   return (
     <XStack
       gap="$3"
@@ -56,15 +67,15 @@ function LeaderBoardHeader({ isReferrals }: { isReferrals: boolean }) {
     >
       <XStack>
         <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'} w="$3">
-          #
+          {t('table.columns.rank')}
         </Paragraph>
         <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'}>
-          Sendtag
+          {t('table.columns.identifier')}
         </Paragraph>
       </XStack>
 
       <Paragraph fontFamily={'$mono'} color={'$color10'} tt={'uppercase'} ta="right">
-        {isReferrals ? 'Referrals' : 'Total transactions'}
+        {isReferrals ? t('table.columns.referrals') : t('table.columns.transactions')}
       </Paragraph>
     </XStack>
   )

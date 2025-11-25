@@ -227,6 +227,7 @@ export type SendScreenParams = {
   amount?: string
   sendToken?: allCoins[number]['token']
   note?: string
+  m?: number
 }
 
 const { useParam: useSendParam, useParams: useSendParams } = createParam<SendScreenParams>()
@@ -293,7 +294,7 @@ const useNote = () => {
 }
 
 const useSendScreenParamsBase = () => {
-  const { setParams } = useSendParams()
+  const { setParams, params } = useSendParams()
   const [idType] = useIdType()
   const [recipient] = useRecipient()
   const [amount] = useAmount()
@@ -319,6 +320,7 @@ const useSendScreenParamsBase = () => {
       amount,
       sendToken,
       note,
+      m: params?.m,
     },
     setEncodedParams,
   ] as const

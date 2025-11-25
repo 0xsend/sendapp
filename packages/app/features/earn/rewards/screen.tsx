@@ -33,6 +33,7 @@ import { useChainId } from 'wagmi'
 import { useEarnRewardsActivityFeed } from './hooks'
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetailsHeader'
 import { useCoin } from 'app/provider/coins'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:features:earn:rewards')
 
@@ -49,6 +50,7 @@ function RewardsBalance() {
   const chainId = useChainId()
   const coin = useERC20AssetCoin()
   const balanceCoin = useCoin(coin.data?.symbol)
+  const { t } = useTranslation('earn')
 
   // Get the user's send account
   const sendAccount = useSendAccount()
@@ -109,13 +111,13 @@ function RewardsBalance() {
         entryPoint: entryPointAddress[chainId],
       })
 
-      setUseropState('Sending transaction...')
+      setUseropState(t('rewards.status.sending'))
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
       })
 
-      setUseropState('Waiting for confirmation...')
+      setUseropState(t('rewards.status.waiting'))
 
       const receipt = await withRetry(
         () =>
@@ -139,7 +141,7 @@ function RewardsBalance() {
     onMutate: (variables) => {
       // A mutation is about to happen!
       log('onMutate', variables)
-      setUseropState('Requesting signature...')
+      setUseropState(t('rewards.status.requesting'))
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -149,7 +151,7 @@ function RewardsBalance() {
       // Boom baby!
       log('onSuccess', data, variables, context)
 
-      toast.show('Rewards claimed')
+      toast.show(t('rewards.toast.success'))
     },
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
@@ -200,7 +202,7 @@ function RewardsBalance() {
             coin={balanceCoin.coin || undefined}
           />
           <Paragraph size={'$7'} fontWeight={'500'}>
-            Rewards History
+            {t('rewards.history.title')}
           </Paragraph>
           <RewardsFeed />
         </YStack>
@@ -209,9 +211,10 @@ function RewardsBalance() {
       <YStack>
         {hasAnyRewards && !hasEnoughRewards && coin.data ? (
           <Paragraph color={'$color10'} ta="center" size="$3">
-            You need to have at least{' '}
-            {formatCoinAmount({ amount: MIN_REWARD_CLAIM, coin: coin.data })} {coin.data.symbol} to
-            claim rewards
+            {t('rewards.messages.minimum', {
+              amount: formatCoinAmount({ amount: MIN_REWARD_CLAIM, coin: coin.data }),
+              symbol: coin.data.symbol,
+            })}
           </Paragraph>
         ) : null}
 
@@ -240,7 +243,7 @@ function RewardsBalance() {
           disabled={!canClaim || mutation.isPending}
           iconAfter={mutation.isPending ? <Spinner size="small" /> : undefined}
         >
-          <PrimaryButton.Text>CLAIM REWARDS</PrimaryButton.Text>
+          <PrimaryButton.Text>{t('rewards.actions.claim')}</PrimaryButton.Text>
         </PrimaryButton>
       </YStack>
     </YStack>
@@ -253,16 +256,19 @@ const RewardsFeed = () => {
     useEarnRewardsActivityFeed({
       pageSize: 10,
     })
+  const { t, i18n } = useTranslation('earn')
 
   const sections = useMemo(() => {
     if (!data?.pages) return []
 
     const activities = data.pages.flat()
+    const locale = i18n.resolvedLanguage ?? i18n.language
     const groups = activities.reduce<Record<string, typeof activities>>((acc, activity) => {
-      const isToday = new Date(activity.created_at).toDateString() === new Date().toDateString()
+      const activityDate = new Date(activity.created_at)
+      const isToday = activityDate.toDateString() === new Date().toDateString()
       const dateKey = isToday
-        ? 'Today'
-        : new Date(activity.created_at).toLocaleDateString(undefined, {
+        ? t('rewards.feed.today')
+        : activityDate.toLocaleDateString(locale, {
             day: 'numeric',
             month: 'long',
           })
@@ -280,12 +286,12 @@ const RewardsFeed = () => {
       data,
       index,
     }))
-  }, [data?.pages])
+  }, [data?.pages, i18n.language, i18n.resolvedLanguage, t])
 
   if (!coin.isSuccess || !coin.data) return null
   if (isLoading) return <Spinner size="small" />
-  if (error) return <Paragraph>{error.message}</Paragraph>
-  if (!sections.length) return <Paragraph>No rewards activity</Paragraph>
+  if (error) return <Paragraph>{t('rewards.history.error', { message: error.message })}</Paragraph>
+  if (!sections.length) return <Paragraph>{t('rewards.history.empty')}</Paragraph>
 
   return (
     <Fade>

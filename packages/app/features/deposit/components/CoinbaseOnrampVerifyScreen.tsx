@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { fetchOnrampTransactionStatus } from '@coinbase/onchainkit/fund'
 import debug from 'debug'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:features:deposit:components:CoinbaseOnrampVerifyScreen')
 const CHECK_INTERVAL_MS = 5000
@@ -19,6 +20,7 @@ export function CoinbaseOnrampVerifyScreen({
   const { data: sendAccount } = useSendAccount()
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+  const { t } = useTranslation('deposit')
 
   useEffect(() => {
     // Set a timer that will trigger onFailure after MAX_TIMEOUT_MS
@@ -79,7 +81,7 @@ export function CoinbaseOnrampVerifyScreen({
       <Spinner size="large" color={isDarkTheme ? '$primary' : '$color12'} />
       <YStack ai={'center'} gap={'$2'}>
         <Paragraph size={'$8'} fontWeight={500} $gtLg={{ size: '$9' }} ta={'center'}>
-          Transaction Pending
+          {t('coinbase.status.pending.title')}
         </Paragraph>
         <Paragraph
           ta={'center'}
@@ -87,7 +89,7 @@ export function CoinbaseOnrampVerifyScreen({
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Coinbase is verifying your payment. This page will redirect when complete.
+          {t('coinbase.status.pending.description')}
         </Paragraph>
       </YStack>
     </FadeCard>

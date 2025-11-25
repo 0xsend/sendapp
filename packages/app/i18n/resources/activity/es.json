@@ -1,0 +1,83 @@
+{
+  "errors": {
+    "title": "Error",
+    "fallback": "Algo salió mal."
+  },
+  "empty": {
+    "noActivities": "Sin actividad",
+    "noActivitiesMobile": "Sin actividad, ¡solo envía!"
+  },
+  "sections": {
+    "today": "Hoy"
+  },
+  "details": {
+    "heading": "Detalles de la transacción",
+    "phraseOn": "{{phrase}} el",
+    "dateOnly": "El"
+  },
+  "events": {
+    "sendpot": {
+      "ticketPurchase": "Compra",
+      "win": "Premio de Sendpot"
+    },
+    "temporal": {
+      "depositFailed": "Depósito fallido"
+    },
+    "sendEarn": {
+      "deposit": "Depósito en Send Earn",
+      "withdraw": "Retiro de Send Earn"
+    },
+    "revenueShare": "Participación de ingresos",
+    "sendTokenUpgrade": "Actualización de Send Token",
+    "trade": "Intercambio",
+    "withdraw": "Retiro",
+    "deposit": "Depósito",
+    "received": "Recibido",
+    "sent": "Enviado",
+    "sendtagRegistered": "Sendtag registrado",
+    "referral": "Referencia",
+    "referredBy": "Referido por",
+    "rewards": "Recompensas",
+    "sendAccountSigningKeyAdded": "Clave de firma de cuenta agregada",
+    "sendAccountSigningKeyRemoved": "Clave de firma de cuenta eliminada"
+  },
+  "phrases": {
+    "sendpot": {
+      "win": "ganó",
+      "ticketPurchase": "compró"
+    },
+    "sendEarn": {
+      "affiliateReward": "Obtuvo recompensas",
+      "depositPending": "Depositando en Send Earn...",
+      "depositFailed": "No se pudo depositar en Send Earn",
+      "depositComplete": "Depositó en Send Earn",
+      "withdrawComplete": "Retiró de Send Earn"
+    },
+    "revenueShare": "Obtuvo participación de ingresos",
+    "upgrade": "Actualizó",
+    "trade": "Intercambio",
+    "withdraw": "Retiró",
+    "deposit": "Depositó",
+    "sentYou": "Te envió",
+    "received": "Recibido",
+    "sendtagsCreated": "Sendtags creados",
+    "sendtagCreated": "Sendtag creado",
+    "referred": "Refirió",
+    "referredYou": "Te refirió",
+    "sendAccountSigningKeyAdded": "Agregó"
+  },
+  "subtext": {
+    "tickets_one": "{{count}} boleto",
+    "tickets_other": "{{count}} boletos",
+    "sendEarn": "Send Earn",
+    "sendAccountSigningKey": "Clave de firma de cuenta de Send"
+  },
+  "status": {
+    "sending": "Enviando...",
+    "confirming": "Confirmando...",
+    "sent": "Enviado",
+    "failed": "Fallido",
+    "cancelled": "Cancelado",
+    "initializing": "Inicializando..."
+  }
+}

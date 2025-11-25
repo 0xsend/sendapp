@@ -19,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { MAX_JACKPOT_HISTORY } from 'app/data/sendpot'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { useRouter } from 'solito/router'
+import { useTranslation } from 'react-i18next'
 
 export const ClaimWinnings = () => {
   const toast = useAppToast()
@@ -31,6 +32,7 @@ export const ClaimWinnings = () => {
   } = useClaimableWinnings()
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
   const router = useRouter()
+  const { t } = useTranslation('sendpot')
 
   const {
     isPreparing,
@@ -44,12 +46,12 @@ export const ClaimWinnings = () => {
     onSuccess: () => {
       console.log('Withdrawal successful')
       queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
-      toast.show('Claim Successful')
+      toast.show(t('claim.toast.success'))
       router.push('/activity')
     },
     onError: (error) => {
       console.error('Withdrawal mutation failed:', error)
-      toast.error('Claim Failed')
+      toast.error(t('claim.toast.error'))
     },
   })
 
@@ -83,12 +85,14 @@ export const ClaimWinnings = () => {
 
     if (webauthnCreds.length === 0) {
       console.error('No WebAuthn credentials found for the account.')
-      toast.error('Error', { message: 'No Passkey found for this account.' })
+      toast.error(t('claim.toast.noPasskeyTitle'), {
+        message: t('claim.toast.noPasskeyDescription'),
+      })
       return
     }
 
     await withdrawAsync({ webauthnCreds })
-  }, [userOp, refetchPrepare, sendAccount, withdrawAsync, toast])
+  }, [userOp, refetchPrepare, sendAccount, withdrawAsync, toast, t])
 
   const isLoading = isLoadingWinnings || isLoadingDecimals || isSendAccountLoading
   const combinedError = prepareError || withdrawError
@@ -96,7 +100,7 @@ export const ClaimWinnings = () => {
 
   return (
     <FadeCard gap={'$7'} $gtLg={{ p: '$7', gap: '$7' }}>
-      <H2 fontWeight="600">You won!</H2>
+      <H2 fontWeight="600">{t('claim.title')}</H2>
       <XStack alignItems={'center'} gap={'$2'} justifyContent={'center'}>
         <Paragraph size={'$12'} fontWeight={600}>
           {formattedWinnings}
@@ -111,11 +115,11 @@ export const ClaimWinnings = () => {
                 <Spinner size="small" color="$color12" mr={'$2'} />
               </PrimaryButton.Icon>
               <PrimaryButton.Text>
-                {isWithdrawing ? 'Claiming...' : 'Preparing...'}
+                {isWithdrawing ? t('claim.cta.claiming') : t('claim.cta.preparing')}
               </PrimaryButton.Text>
             </>
           ) : (
-            <PrimaryButton.Text>Claim Winnings</PrimaryButton.Text>
+            <PrimaryButton.Text>{t('claim.cta.default')}</PrimaryButton.Text>
           )}
         </PrimaryButton>
         {combinedError && (

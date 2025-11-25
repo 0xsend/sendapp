@@ -15,6 +15,7 @@ import type { UseDistributionsResultData } from 'app/utils/distributions'
 import { IconX } from 'app/components/icons'
 import { Platform } from 'react-native'
 import { useThemeName } from 'tamagui'
+import { useTranslation } from 'react-i18next'
 
 const DistributionItem = ({
   isActive,
@@ -64,6 +65,7 @@ interface DistributionSelectProps {
 
 export const DistributionSelect = memo(
   ({ distributions, selectedIndex, onValueChange }: DistributionSelectProps) => {
+    const { t } = useTranslation('rewards')
     const [isOpen, setIsOpen] = useState(false)
     const selectTriggerRef = useRef<HTMLSelectElement>(null)
     const theme = useThemeName()
@@ -122,7 +124,7 @@ export const DistributionSelect = memo(
                 <Sheet.Handle py="$5" f={1} bc="transparent" jc={'space-between'} opacity={1} m={0}>
                   <XStack ai="center" jc="space-between" w="100%" px="$4">
                     <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
-                      Select Month
+                      {t('select.month')}
                     </Paragraph>
                     <Button
                       chromeless

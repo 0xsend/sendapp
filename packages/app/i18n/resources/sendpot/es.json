@@ -1,0 +1,112 @@
+{
+  "jackpot": {
+    "title": "Sendpot actual",
+    "loading": "Cargando...",
+    "actions": {
+      "buy": "Comprar boleto"
+    },
+    "messages": {
+      "geoBlocked": "Actualmente las compras de boletos no están disponibles en tu región."
+    }
+  },
+  "history": {
+    "title": "Historial de sorteos",
+    "upcoming": "Próximo",
+    "current": "Actual",
+    "winner": {
+      "label": "Ganador",
+      "pending": "(Pendiente)",
+      "you": "¡Ganaste!",
+      "none": "Ninguno",
+      "loading": "(Cargando...)"
+    },
+    "tickets": {
+      "none": "Compraste 0 boletos",
+      "purchased_one": "Compraste {{count}} boleto",
+      "purchased_other": "Compraste {{count}} boletos"
+    },
+    "totalPool": "Pozo total:",
+    "empty": "No hay historial de sorteos disponible.",
+    "notAvailable": "N/D"
+  },
+  "claim": {
+    "title": "¡Ganaste!",
+    "cta": {
+      "default": "Cobrar premio",
+      "claiming": "Reclamando...",
+      "preparing": "Preparando..."
+    },
+    "toast": {
+      "success": "Reclamo exitoso",
+      "error": "Reclamo fallido",
+      "noPasskeyTitle": "Error",
+      "noPasskeyDescription": "No se encontró una Passkey para esta cuenta."
+    }
+  },
+  "risk": {
+    "errorTitle": "Error",
+    "title": "Aviso importante",
+    "body": "Al comprar un boleto de Sendpot reconoces que las ganancias no están garantizadas y que el costo del boleto no es reembolsable. Los sorteos funcionan con Megapot y utilizan aleatoriedad verificable en cadena; juega con responsabilidad.",
+    "link": "Más información.",
+    "checkbox": "He leído y entiendo los términos.",
+    "actions": {
+      "cancel": "Cancelar",
+      "confirm": "Acepto y continúo"
+    }
+  },
+  "buy": {
+    "title": "¿Cuántos boletos deseas comprar?",
+    "input": {
+      "ticketsLabel": "Boletos"
+    },
+    "balance": {
+      "label": "Saldo:",
+      "insufficient": "Fondos insuficientes"
+    },
+    "ticketPrice": "Precio del boleto:",
+    "total": {
+      "label": "Costo total"
+    },
+    "button": {
+      "review": "Revisar"
+    },
+    "toast": {
+      "errorTitle": "Error",
+      "insufficientFunds": "Fondos insuficientes.",
+      "invalidQuantity": "Ingresa una cantidad válida de boletos.",
+      "loadingTitle": "Información",
+      "loadingMessage": "Espera, cargando datos..."
+    }
+  },
+  "confirm": {
+    "rows": {
+      "price": "Precio por boleto",
+      "total": "Costo total",
+      "fee": "Tarifa estimada de transacción"
+    },
+    "tickets": "Boletos",
+    "usd": "({{value}})",
+    "errors": {
+      "insufficientBalance": "Saldo insuficiente.",
+      "insufficientGas": "Gas insuficiente.",
+      "noPasskeyTitle": "Error",
+      "noPasskeyDescription": "No se encontró una Passkey para esta cuenta."
+    },
+    "toast": {
+      "success": "Compra exitosa",
+      "error": "Compra fallida"
+    },
+    "button": {
+      "processing": "Procesando...",
+      "preparing": "Preparando...",
+      "insufficientBalance": "Saldo insuficiente",
+      "insufficientGas": "Gas insuficiente",
+      "buy_one": "Comprar {{count}} boleto",
+      "buy_other": "Comprar {{count}} boletos"
+    },
+    "edit": {
+      "label": "Editar número de boletos",
+      "cta": "Editar"
+    }
+  }
+}

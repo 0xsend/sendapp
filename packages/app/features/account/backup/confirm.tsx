@@ -31,6 +31,7 @@ import { encodeFunctionData } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 const log = debug('app:settings:backup:confirm')
 
@@ -43,6 +44,7 @@ const { useParam } = createParam<Params>()
 export const ConfirmPasskeyScreen = () => {
   const [credId] = useParam('cred_id')
   const supabase = useSupabase()
+  const { t } = useTranslation('account')
   const { data, error, isLoading } = useQuery({
     queryKey: ['webauthn_credentials', credId],
     enabled: !!credId,
@@ -60,7 +62,7 @@ export const ConfirmPasskeyScreen = () => {
 
   return (
     <YStack w={'100%'} gap={'$3.5'}>
-      {Platform.OS === 'web' && <SettingsHeader>Passkeys</SettingsHeader>}
+      {Platform.OS === 'web' && <SettingsHeader>{t('passkeys.header')}</SettingsHeader>}
       {(() => {
         switch (true) {
           case isLoading:
@@ -74,7 +76,7 @@ export const ConfirmPasskeyScreen = () => {
           case !!data:
             return <AddPasskeySigner webauthnCred={data} />
           default:
-            return <Paragraph>No credential found for credential ID {credId}</Paragraph>
+            return <Paragraph>{t('passkeys.confirm.noCredential', { id: credId })}</Paragraph>
         }
       })()}
     </YStack>
@@ -82,6 +84,7 @@ export const ConfirmPasskeyScreen = () => {
 }
 
 const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
+  const { t } = useTranslation('account')
   return (
     <Fade gap={'$3.5'} $platform-android={{ height: 500 }}>
       <FormWrapper
@@ -95,15 +98,10 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
         f={0}
       >
         <H1 fontSize={'$8'} fontWeight={'600'} color="$color12">
-          Add Passkey as Signer
+          {t('passkeys.confirm.title')}
         </H1>
         <Paragraph size={'$5'} color={'$color10'}>
-          Your passkey{' '}
-          <Paragraph color={'$color12'} fontWeight={600}>
-            {webauthnCred?.display_name}
-          </Paragraph>{' '}
-          has been saved. Add your new passkey as a signer. This will allow you to sign transactions
-          on your account with your new passkey.
+          {t('passkeys.confirm.description', { name: webauthnCred?.display_name })}
         </Paragraph>
       </FormWrapper>
       <AddSignerButton webauthnCred={webauthnCred} />
@@ -114,6 +112,7 @@ const AddPasskeySigner = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cre
 const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_credentials'> }) => {
   const toast = useAppToast()
   const queryClient = useQueryClient()
+  const { t } = useTranslation('account')
   const {
     data: sendAccount,
     error: sendAccountError,
@@ -228,7 +227,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         receipt: { transactionHash },
       } = await sendUserOp({ userOp, webauthnCreds })
       console.log('sent user op', transactionHash)
-      toast.show('Success!')
+      toast.show(t('common.success'))
       queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
       router.replace('/account/backup')
     } catch (e) {
@@ -271,7 +270,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         {() => (
           <YStack gap={'$3.5'}>
             <SubmitButton onPress={() => form.handleSubmit(onSubmit)()} disabled={isLoading}>
-              <SubmitButton.Text>Add Passkey as Signer</SubmitButton.Text>
+              <SubmitButton.Text>{t('passkeys.confirm.submit')}</SubmitButton.Text>
             </SubmitButton>
             {form.formState.errors?.root?.message ? (
               <Paragraph size={'$6'} fontWeight={'300'} color={'$error'}>

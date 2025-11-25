@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "title": "Pay Gas with USDC",
+    "subtitle": "To pay for transaction fees with USDC, approve the paymaster to spend USDC on your behalf."
+  },
+  "allowances": {
+    "current": "Current Allowance",
+    "required": "Required Allowance",
+    "unlimited": "Unlimited"
+  },
+  "actions": {
+    "approve": "Approve Paymaster",
+    "approving": "Approving..."
+  },
+  "status": {
+    "ready": "Ready to approve",
+    "requesting": "Requesting approval...",
+    "sending": "Sending transaction...",
+    "waiting": "Waiting for confirmation...",
+    "retry": "Transaction failed, please retry"
+  },
+  "toast": {
+    "success": "Paymaster approved successfully!"
+  }
+}

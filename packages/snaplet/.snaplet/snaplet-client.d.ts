@@ -694,6 +694,17 @@ type Override = {
       event_id?: string;
     };
   }
+  sendpot_fee_history?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      block_num?: string;
+      block_time?: string;
+      tx_hash?: string;
+      fee_bps?: string;
+      created_at?: string;
+    };
+  }
   sendpot_jackpot_runs?: {
     name?: string;
     fields?: {
@@ -734,6 +745,7 @@ type Override = {
       tx_idx?: string;
       log_idx?: string;
       abi_idx?: string;
+      tickets_purchased_count?: string;
     };
   }
   sendtag_checkout_receipts?: {
@@ -1261,6 +1273,13 @@ export interface Fingerprint {
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
   }
+  sendpotFeeHistories?: {
+    id?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    feeBps?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+  }
   sendpotJackpotRuns?: {
     id?: FingerprintNumberField;
     chainId?: FingerprintNumberField;
@@ -1284,6 +1303,7 @@ export interface Fingerprint {
     txIdx?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+    ticketsPurchasedCount?: FingerprintNumberField;
   }
   sendtagCheckoutReceipts?: {
     id?: FingerprintNumberField;

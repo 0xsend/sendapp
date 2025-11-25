@@ -1,0 +1,22 @@
+{
+  "errors": {
+    "sessionExpired": "Sesión expirada. Redirigiendo para iniciar sesión...",
+    "unknown": "Error desconocido"
+  },
+  "form": {
+    "placeholder": "Ingresa el Sendtag deseado",
+    "submit": "Finalizar cuenta"
+  },
+  "passkey": {
+    "retry": "Reintentar verificación de integridad",
+    "status": {
+      "checking": "Verificando la integridad de firma de tu clave de acceso...",
+      "complete": "Verificación de integridad de la clave de acceso completa.",
+      "failureDetailed": "La verificación de estado de la clave de acceso falló. Intenta crear tu clave de acceso en un dispositivo con iCloud Keychain o Google Password Manager.",
+      "success": "Verificación de integridad de la clave de acceso aprobada."
+    },
+    "toastFailure": "La verificación de integridad de la clave de acceso falló."
+  },
+  "subtitle": "Elige tu Sendtag, tu nombre de usuario único en Send",
+  "title": "Finaliza tu cuenta"
+}

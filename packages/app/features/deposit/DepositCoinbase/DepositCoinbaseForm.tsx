@@ -7,6 +7,7 @@ import { useDepositScreenParams } from 'app/routers/params'
 import { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 const DepositFormScreenSchema = z.object({
   depositAmount: formFields.text,
@@ -21,6 +22,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
   const form = useForm<z.infer<typeof DepositFormScreenSchema>>()
   const [depositParams, setDepositParams] = useDepositScreenParams()
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const { t } = useTranslation('deposit')
 
   const formDepositAmount = form.watch('depositAmount')
   const parsedDepositAmount = BigInt(depositParams.depositAmount ?? '0')
@@ -57,15 +59,17 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
   const renderAfterContent = useCallback(
     ({ submit }: { submit: () => void }) => (
       <SubmitButton testID="onramp-button" onPress={submit} disabled={!canSubmit}>
-        <SubmitButton.Text>{isLoading ? 'processing...' : 'confirm deposit'}</SubmitButton.Text>
+        <SubmitButton.Text>
+          {isLoading ? t('coinbaseForm.submit.loading') : t('coinbaseForm.submit.default')}
+        </SubmitButton.Text>
       </SubmitButton>
     ),
-    [canSubmit, isLoading]
+    [canSubmit, isLoading, t]
   )
 
   return (
     <YStack w={'100%'} gap="$5" py={'$3.5'}>
-      <Paragraph size={'$7'}>Enter Deposit Amount</Paragraph>
+      <Paragraph size={'$7'}>{t('coinbaseForm.title')}</Paragraph>
       <FormProvider {...form}>
         <SchemaForm
           form={form}
@@ -180,7 +184,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
                   {depositAmount}
                 </XStack>
                 <Paragraph fontSize="$8" lineHeight={40} fontWeight={500}>
-                  USD
+                  {t('coinbaseForm.currency')}
                 </Paragraph>
                 <XStack
                   position="absolute"
@@ -205,7 +209,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
                       formDepositAmount && invalidDepositAmount ? '$error' : '$darkGrayTextField',
                   }}
                 >
-                  Min $10 - Max $500 per week
+                  {t('coinbaseForm.limits')}
                 </Paragraph>
                 <Paragraph
                   fontSize="$5"
@@ -214,7 +218,7 @@ export function DepositCoinbaseForm({ onConfirmTransaction, isLoading }: Deposit
                     color: '$darkGrayTextField',
                   }}
                 >
-                  Fees: $0.00
+                  {t('coinbaseForm.fees')}
                 </Paragraph>
               </XStack>
             </FadeCard>

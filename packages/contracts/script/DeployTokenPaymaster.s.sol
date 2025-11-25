@@ -12,7 +12,7 @@ contract DeployTokenPaymasterScript is Script, Helper {
     uint40 private constant BASE_FEE_DEFAULT = 5e4; // ¢5
 
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {
@@ -70,8 +70,7 @@ contract DeployTokenPaymasterScript is Script, Helper {
         console2.log("Deployed TokenPaymaster at address: ", address(paymaster));
         console2.log("Deployed TokenPaymaster owner: ", msg.sender);
 
-        IEntryPoint(entryPoint).depositTo{value: 0.025 ether}(address(paymaster));
-        paymaster.addStake{value: 0.025 ether}(1);
+        IEntryPoint(entryPoint).depositTo{value: 0.0005 ether}(address(paymaster));
         vm.stopBroadcast();
     }
 }

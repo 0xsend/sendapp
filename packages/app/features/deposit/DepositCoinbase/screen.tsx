@@ -9,6 +9,7 @@ import { useRouter } from 'solito/router'
 import { useEffect, useState } from 'react'
 import { DepositCoinbaseForm } from 'app/features/deposit/DepositCoinbase/DepositCoinbaseForm'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 interface DepositCoinbaseScreenProps {
   defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
@@ -32,6 +33,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
   const [status, setStatus] = useState<'idle' | 'failure'>('idle')
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+  const { t } = useTranslation('deposit')
 
   // Web-only: detect iOS Safari to guide users when popups are blocked
   const niceError = error ? toNiceError(error) : null
@@ -63,7 +65,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
               <IconError size={'$4'} color={'$error'} />
               <YStack ai={'center'} gap={'$2'}>
                 <Paragraph size={'$8'} fontWeight={500} ta={'center'}>
-                  Coinbase window was closed
+                  {t('coinbase.errors.windowClosed')}
                 </Paragraph>
                 <Paragraph
                   size={'$5'}
@@ -75,7 +77,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 </Paragraph>
               </YStack>
               <PrimaryButton onPress={closeOnramp}>
-                <PrimaryButton.Text>try again</PrimaryButton.Text>
+                <PrimaryButton.Text>{t('coinbase.actions.tryAgain')}</PrimaryButton.Text>
               </PrimaryButton>
             </FadeCard>
             {shouldShowIOSPopupHelp && (
@@ -85,7 +87,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Turn off &ldquo;Block Popups&rdquo; in iOS Safari Settings then try again.
+                {t('coinbase.help.iosPopup')}
               </Paragraph>
             )}
           </>
@@ -96,7 +98,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <Spinner size="large" color={isDarkTheme ? '$primary' : '$color12'} />
             <YStack ai={'center'} gap={'$2'}>
               <Paragraph size={'$8'} fontWeight={500} $gtLg={{ size: '$9' }} ta={'center'}>
-                Almost there...
+                {t('coinbase.status.almostThere.title')}
               </Paragraph>
               <Paragraph
                 ta={'center'}
@@ -104,7 +106,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Just wrapping up the final steps.
+                {t('coinbase.status.almostThere.description')}
               </Paragraph>
             </YStack>
           </FadeCard>
@@ -122,7 +124,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <Spinner size="large" color={isDarkTheme ? '$primary' : '$color12'} />
             <YStack ai={'center'} gap={'$2'}>
               <Paragraph size={'$8'} fontWeight={500} ta={'center'} $gtLg={{ size: '$9' }}>
-                Hold tight...
+                {t('coinbase.status.holdTight.title')}
               </Paragraph>
               <Paragraph
                 ta={'center'}
@@ -130,7 +132,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Complete the transaction in your Coinbase window.
+                {t('coinbase.status.holdTight.description')}
               </Paragraph>
             </YStack>
             <Button
@@ -152,7 +154,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 size={'$5'}
                 hoverStyle={{ color: '$primary' }}
               >
-                cancel
+                {t('coinbase.actions.cancel')}
               </Button.Text>
             </Button>
           </FadeCard>
@@ -163,7 +165,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <IconError size={'$4'} color={'$error'} />
             <YStack ai={'center'} gap={'$2'}>
               <Paragraph size={'$8'} fontWeight={500} ta={'center'} $gtLg={{ size: '$9' }}>
-                Transaction Timed Out
+                {t('coinbase.status.timedOut.title')}
               </Paragraph>
               <Paragraph
                 size={'$5'}
@@ -171,11 +173,11 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Your payment took too long to process. Please try again.
+                {t('coinbase.status.timedOut.description')}
               </Paragraph>
             </YStack>
             <PrimaryButton onPress={closeOnramp}>
-              <PrimaryButton.Text>try again</PrimaryButton.Text>
+              <PrimaryButton.Text>{t('coinbase.actions.tryAgain')}</PrimaryButton.Text>
             </PrimaryButton>
           </FadeCard>
         )
@@ -185,7 +187,7 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
             <IconError size={'$4'} color={'$error'} />
             <YStack ai={'center'} gap={'$2'}>
               <Paragraph size={'$8'} fontWeight={500} ta={'center'} $gtLg={{ size: '$9' }}>
-                Payment Failed
+                {t('coinbase.status.failed.title')}
               </Paragraph>
               <Paragraph
                 size={'$5'}
@@ -193,11 +195,11 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
                 color={'$lightGrayTextField'}
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Please check your connection or try a different card.
+                {t('coinbase.status.failed.description')}
               </Paragraph>
             </YStack>
             <PrimaryButton onPress={closeOnramp}>
-              <PrimaryButton.Text>try again</PrimaryButton.Text>
+              <PrimaryButton.Text>{t('coinbase.actions.tryAgain')}</PrimaryButton.Text>
             </PrimaryButton>
           </FadeCard>
         )

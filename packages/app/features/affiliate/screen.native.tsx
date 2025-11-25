@@ -18,6 +18,7 @@ import { ReferralLink } from 'app/components/ReferralLink'
 import { RecyclerListView } from 'recyclerlistview'
 import { useLink } from 'solito/link'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 type Referral = Pick<
   Functions<'profile_lookup'>[number],
@@ -32,6 +33,7 @@ type Referral = Pick<
 >
 
 export default function FriendsScreen() {
+  const { t } = useTranslation('affiliate')
   const friendsFeedQuery = useFriendsFeed({
     pageSize: 10,
   })
@@ -76,7 +78,7 @@ export default function FriendsScreen() {
   if (referrals.length === 0) {
     return (
       <YStack w={'100%'} ai={'flex-start'} pt={'$5'} gap={'$5'}>
-        <Paragraph size={'$5'}>Invite friends to Send using your referral code.</Paragraph>
+        <Paragraph size={'$5'}>{t('empty.description')}</Paragraph>
         <ReferralLink f={0} p={0} />
       </YStack>
     )
@@ -109,18 +111,20 @@ export default function FriendsScreen() {
 
 const FriendMobileRow = ({ referral }: { referral: Referral }) => {
   const linkProps = useLink({ href: `/profile/${referral.sendid}` })
+  const { t, i18n } = useTranslation('affiliate')
+  const locale = i18n.resolvedLanguage ?? i18n.language
   const birthday = referral.birthday
-    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(undefined, {
+    ? adjustUTCDateForTimezone(new Date(referral.birthday)).toLocaleString(locale, {
         day: 'numeric',
         month: 'long',
       })
-    : 'NA'
+    : t('list.birthdayFallback')
 
   const label = referral.tag
     ? `/${referral.tag}`
     : referral.name || referral.sendid
       ? `#${referral.sendid}`
-      : '??'
+      : t('list.unknownTag')
 
   return (
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} {...linkProps}>

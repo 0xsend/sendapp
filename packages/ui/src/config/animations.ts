@@ -3,6 +3,10 @@ import { Easing } from 'react-native-reanimated'
 import { delayAnimations200ms } from './delay200ms'
 
 export const animations = createAnimations({
+  '50ms': {
+    type: 'timing',
+    duration: 50,
+  },
   '100ms': {
     type: 'timing',
     duration: 100,

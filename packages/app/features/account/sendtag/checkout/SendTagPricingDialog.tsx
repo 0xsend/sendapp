@@ -23,10 +23,12 @@ import { Platform } from 'react-native'
 import { formatUnits } from 'viem'
 import { usdcCoin } from 'app/data/coins'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { useTranslation } from 'react-i18next'
 
 export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => total([{ name }]), [name])
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useTranslation('account')
 
   // Shared content component to avoid duplication
   const dialogContent = (
@@ -37,10 +39,10 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
         $theme-light={{ col: '$black' }}
         fontFamily={'$mono'}
       >
-        Sendtag Pricing
+        {t('sendtag.pricing.title')}
       </H2>
       <Paragraph size={'$4'} $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-        Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.
+        {t('sendtag.pricing.description')}
       </Paragraph>
       <YStack gap="$4" jc="center">
         {pricing.map((item) => (
@@ -70,7 +72,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
         {Platform.OS === 'web' && (
           <Dialog.Close asChild>
             <Button aria-label="Close">
-              <ButtonText color="$color12">OK</ButtonText>
+              <ButtonText color="$color12">{t('sendtag.pricing.ok')}</ButtonText>
             </Button>
           </Dialog.Close>
         )}
@@ -164,6 +166,7 @@ export function SendTagPricingDialog({ name = '' }: { name: Tables<'tags'>['name
 export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['name'] }) {
   const price = useMemo(() => total([{ name }]), [name])
   const [isOpen, setIsOpen] = React.useState(false)
+  const { t } = useTranslation('account')
   return (
     <Tooltip placement="right" delay={0} allowFlip={false} offset={84} onOpenChange={setIsOpen}>
       <XStack pos="relative">
@@ -212,10 +215,10 @@ export function SendTagPricingTooltip({ name = '' }: { name: Tables<'tags'>['nam
             $theme-light={{ col: '$black' }}
             fontFamily={'$mono'}
           >
-            Sendtag Pricing
+            {t('sendtag.pricing.title')}
           </H6>
           <Paragraph size={'$4'} $theme-dark={{ col: '$white' }} $theme-light={{ col: '$black' }}>
-            Sendtag price is based on length — the shorter it is, the higher the price.
+            {t('sendtag.pricing.tooltipDescription')}
           </Paragraph>
 
           <YStack gap="$4" jc="center">
@@ -261,6 +264,7 @@ const SendTagPricingButton = ({
 }) => {
   const { resolvedTheme } = useThemeSetting()
   const isDark = resolvedTheme?.startsWith('dark')
+  const { t } = useTranslation('account')
 
   return (
     <Button
@@ -285,9 +289,9 @@ const SendTagPricingButton = ({
         {(() => {
           switch (true) {
             case name.length === 0:
-              return 'Pricing'
+              return t('sendtag.pricing.button.label')
             case name.length > 0 && price === BigInt(0):
-              return 'Free'
+              return t('sendtag.pricing.button.free')
             default:
               return `${formatUnits(price, usdcCoin.decimals)} USDC`
           }

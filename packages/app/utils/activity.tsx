@@ -11,7 +11,7 @@ import { useAddressBook } from 'app/utils/useAddressBook'
 import type { Activity } from 'app/utils/zod/activity'
 import type { LiquidityPool } from 'app/utils/zod/LiquidityPoolSchema'
 import type { SwapRouter } from 'app/utils/zod/SwapRouterSchema'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { formatUnits, isAddressEqual } from 'viem'
 import formatAmount from './formatAmount'
 import { pgAddrCondValues } from './pgAddrCondValues'
@@ -38,6 +38,23 @@ import {
 import { calculateTicketsFromWei, SENDPOT_CONTRACT_ADDRESS } from 'app/data/sendpot'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { Spinner } from '@my/ui'
+import { useTranslation } from 'react-i18next'
+
+type ActivityTranslateFn = (
+  key: string,
+  defaultValue?: string,
+  options?: Record<string, unknown>
+) => string
+
+const translateWithDefault = (
+  t: ActivityTranslateFn | undefined,
+  key: string,
+  defaultValue: string,
+  options?: Record<string, unknown>
+) => {
+  if (!t) return defaultValue
+  return t(key, defaultValue, options)
+}
 
 const wagmiAddresWithLabel = (addresses: `0x${string}`[], label: string) =>
   Object.values(addresses).map((a) => [a, label])
@@ -315,10 +332,12 @@ export function eventNameFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
+  t,
 }: {
   activity: Activity
   swapRouters?: SwapRouter[]
   liquidityPools?: LiquidityPool[]
+  t?: ActivityTranslateFn
 }): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
@@ -328,44 +347,52 @@ export function eventNameFromActivity({
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
   const note = noteFromActivity(activity)
+  const translate = (key: string, defaultValue: string, options?: Record<string, unknown>) =>
+    translateWithDefault(t, key, defaultValue, options)
 
   switch (true) {
     case isSendPotTicketPurchase(activity):
-      return 'Bought'
+      return translate('events.sendpot.ticketPurchase', 'Bought')
     case isSendPotWin(activity):
-      return 'Sendpot Win'
+      return translate('events.sendpot.win', 'Sendpot Win')
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
-        ? 'Deposit Failed'
-        : temporalEventNameFromStatus(data.status)
+        ? translate('events.temporal.depositFailed', 'Deposit Failed')
+        : temporalEventNameFromStatus(data.status, (statusKey, defaultValue) =>
+            translate(statusKey, defaultValue)
+          )
     case isSendEarnDepositEvent(activity):
-      return 'Send Earn Deposit'
+      return translate('events.sendEarn.deposit', 'Send Earn Deposit')
     case isSendEarnWithdrawEvent(activity):
-      return 'Send Earn Withdraw'
+      return translate('events.sendEarn.withdraw', 'Send Earn Withdraw')
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
-      return 'Revenue Share'
+      return translate('events.revenueShare', 'Revenue Share')
     case isSendTokenUpgradeEvent(activity):
-      return 'Send Token Upgrade'
+      return translate('events.sendTokenUpgrade', 'Send Token Upgrade')
     case isERC20Transfer && to_user?.send_id === undefined:
       if (isSwapTransfer) {
-        return 'Trade'
+        return translate('events.trade', 'Trade')
       }
-      return 'Withdraw'
+      return translate('events.withdraw', 'Withdraw')
     case isTransferOrReceive && from_user === null:
       if (isSwapTransfer) {
-        return 'Trade'
+        return translate('events.trade', 'Trade')
       }
-      return 'Deposit'
+      return translate('events.deposit', 'Deposit')
     case (isTransferOrReceive || isTemporalTransfer) && !!to_user?.id:
-      return note || 'Received'
+      return note || translate('events.received', 'Received')
     case (isTransferOrReceive || isTemporalTransfer) && !!from_user?.id:
-      return note || 'Sent'
+      return note || translate('events.sent', 'Sent')
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
-      return 'Sendtag Registered'
+      return translate('events.sendtagRegistered', 'Sendtag Registered')
     case isReferralsEvent(activity) && !!from_user?.id:
-      return 'Referral'
+      return translate('events.referral', 'Referral')
     case isReferralsEvent(activity) && !!to_user?.id:
-      return 'Referred By'
+      return translate('events.referredBy', 'Referred By')
+    case event_name === 'send_account_signing_key_added':
+      return translate('events.sendAccountSigningKeyAdded', 'Send Account Signing Key Added')
+    case event_name === 'send_account_signing_key_removed':
+      return translate('events.sendAccountSigningKeyRemoved', 'Send Account Signing Key Removed')
 
     default:
       return event_name // catch-all i_am_rick_james -> I Am Rick James
@@ -393,23 +420,29 @@ export function useEventNameFromActivity({
 }): string {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
+  const { t } = useTranslation('activity')
+  const translator = useCallback(
+    (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
+      t(key, { defaultValue, ...options }),
+    [t]
+  )
 
   return useMemo(() => {
     if (
       isSendEarnDepositEvent(activity) &&
       addressBook?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
     ) {
-      return 'Rewards'
+      return translator('events.rewards', 'Rewards')
     }
     if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
-      return 'Deposit'
+      return translator('events.deposit', 'Deposit')
     }
     if (isERC20Transfer && addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
-      return 'Withdraw'
+      return translator('events.withdraw', 'Withdraw')
     }
     // this should have always been a hook
-    return eventNameFromActivity({ activity, swapRouters, liquidityPools })
-  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools])
+    return eventNameFromActivity({ activity, swapRouters, liquidityPools, t: translator })
+  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools, translator])
 }
 
 /**
@@ -423,10 +456,12 @@ export function phraseFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
+  t,
 }: {
   activity: Activity
   swapRouters?: SwapRouter[]
   liquidityPools?: LiquidityPool[]
+  t?: ActivityTranslateFn
 }): string {
   const { event_name, from_user, to_user, data } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
@@ -435,46 +470,50 @@ export function phraseFromActivity({
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+  const translate = (key: string, defaultValue: string, options?: Record<string, unknown>) =>
+    translateWithDefault(t, key, defaultValue, options)
 
   switch (true) {
     case isSendPotWin(activity):
-      return 'won'
+      return translate('phrases.sendpot.win', 'won')
     case isSendPotTicketPurchase(activity):
-      return 'bought'
+      return translate('phrases.sendpot.ticketPurchase', 'bought')
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
-        ? 'Failed to deposit to Send Earn'
-        : 'Depositing to Send Earn...'
+        ? translate('phrases.sendEarn.depositFailed', 'Failed to deposit to Send Earn')
+        : translate('phrases.sendEarn.depositPending', 'Depositing to Send Earn...')
     case isSendEarnDepositEvent(activity):
-      return 'Deposited to Send Earn'
+      return translate('phrases.sendEarn.depositComplete', 'Deposited to Send Earn')
     case isSendEarnWithdrawEvent(activity):
-      return 'Withdrew from Send Earn'
+      return translate('phrases.sendEarn.withdrawComplete', 'Withdrew from Send Earn')
     case isERC20Transfer && isAddressEqual(data.f, sendtagCheckoutAddress[baseMainnet.id]):
-      return 'Earned revenue share'
+      return translate('phrases.revenueShare', 'Earned revenue share')
     case isSendTokenUpgradeEvent(activity):
-      return 'Upgraded'
+      return translate('phrases.upgrade', 'Upgraded')
     case isERC20Transfer && to_user?.send_id === undefined:
       if (isSwapTransfer) {
-        return 'Trade'
+        return translate('phrases.trade', 'Trade')
       }
-      return 'Withdrew'
+      return translate('phrases.withdraw', 'Withdrew')
     case isTransferOrReceive && from_user === null:
       if (isSwapTransfer) {
-        return 'Trade'
+        return translate('phrases.trade', 'Trade')
       }
-      return 'Deposited'
+      return translate('phrases.deposit', 'Deposited')
     case (isTransferOrReceive || isTemporalTransfer) && !!to_user?.id:
-      return 'Sent you'
+      return translate('phrases.sentYou', 'Sent you')
     case (isTransferOrReceive || isTemporalTransfer) && !!from_user?.id:
-      return 'Received'
+      return translate('phrases.received', 'Received')
     case isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity):
-      return data.tags?.length > 1 ? 'Sendtags created' : 'Sendtag created'
+      return data.tags?.length > 1
+        ? translate('phrases.sendtagsCreated', 'Sendtags created')
+        : translate('phrases.sendtagCreated', 'Sendtag created')
     case isReferralsEvent(activity) && !!from_user?.id:
-      return 'Referred'
+      return translate('phrases.referred', 'Referred')
     case isReferralsEvent(activity) && !!to_user?.id:
-      return 'Referred you'
+      return translate('phrases.referredYou', 'Referred you')
     case event_name === 'send_account_signing_key_added':
-      return 'Added'
+      return translate('phrases.sendAccountSigningKeyAdded', 'Added')
     default:
       return event_name
         .split('_')
@@ -502,23 +541,37 @@ export function usePhraseFromActivity({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
   const isSendEarnDeposit = isSendEarnDepositEvent(activity)
+  const { t } = useTranslation('activity')
+  const translator = useCallback(
+    (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
+      t(key, { defaultValue, ...options }),
+    [t]
+  )
 
   return useMemo(() => {
     if (
       isSendEarnDeposit &&
       addressBook?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
     ) {
-      return 'Earned Rewards'
+      return translator('phrases.sendEarn.affiliateReward', 'Earned rewards')
     }
     if (isERC20Transfer && addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
-      return 'Deposited to Send Earn'
+      return translator('phrases.sendEarn.depositComplete', 'Deposited to Send Earn')
     }
     if (isERC20Transfer && addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
-      return 'Withdrew from Send Earn'
+      return translator('phrases.sendEarn.withdrawComplete', 'Withdrew from Send Earn')
     }
     // this should have always been a hook
-    return phraseFromActivity({ activity, swapRouters, liquidityPools })
-  }, [activity, addressBook, isERC20Transfer, isSendEarnDeposit, swapRouters, liquidityPools])
+    return phraseFromActivity({ activity, swapRouters, liquidityPools, t: translator })
+  }, [
+    activity,
+    addressBook,
+    isERC20Transfer,
+    isSendEarnDeposit,
+    swapRouters,
+    liquidityPools,
+    translator,
+  ])
 }
 
 /**
@@ -528,20 +581,28 @@ export function subtextFromActivity({
   activity,
   swapRouters = [],
   liquidityPools = [],
+  t,
 }: {
   activity: Activity
   swapRouters?: SwapRouter[]
   liquidityPools?: LiquidityPool[]
+  t?: ActivityTranslateFn
 }): string | null {
   const _user = counterpart(activity)
   const { from_user, to_user, data, event_name } = activity
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+  const translate = (key: string, defaultValue: string, options?: Record<string, unknown>) =>
+    translateWithDefault(t, key, defaultValue, options)
 
   if (isSendPotTicketPurchase(activity)) {
     const tickets = calculateTicketsFromWei(data.v)
-    return `${tickets} ticket${tickets > 1 ? 's' : ''}`
+    const ticketCount = typeof tickets === 'bigint' ? Number(tickets) : tickets
+    const defaultLabel = `${ticketCount} ticket${ticketCount === 1 ? '' : 's'}`
+    return translate('subtext.tickets', defaultLabel, {
+      count: ticketCount,
+    })
   }
 
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
@@ -595,7 +656,7 @@ export function subtextFromActivity({
     return labelAddress(activity.data.log_addr)
   }
   if (event_name === 'send_account_signing_key_added') {
-    return 'Send Account Signing Key'
+    return translate('subtext.sendAccountSigningKey', 'Send Account Signing Key')
   }
   return null
 }
@@ -611,27 +672,35 @@ export function useSubtextFromActivity({
 }): string | null {
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const { data: addressBook } = useAddressBook()
+  const { t } = useTranslation('activity')
+  const translator = useCallback(
+    (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
+      t(key, { defaultValue, ...options }),
+    [t]
+  )
   return useMemo(() => {
+    const sendEarnLabel = translator('subtext.sendEarn', 'Send Earn')
+
     if (isTemporalSendEarnDepositEvent(activity)) {
       if (activity.data.status === 'failed') {
-        return activity.data.error_message || 'Send Earn'
+        return activity.data.error_message || sendEarnLabel
       }
-      return 'Send Earn'
+      return sendEarnLabel
     }
     if (isSendEarnEvent(activity)) {
-      return 'Send Earn'
+      return sendEarnLabel
     }
     if (isERC20Transfer) {
       if (addressBook?.[activity.data.t] === ContractLabels.SendEarn) {
-        return 'Send Earn'
+        return sendEarnLabel
       }
       if (addressBook?.[activity.data.f] === ContractLabels.SendEarn) {
-        return 'Send Earn'
+        return sendEarnLabel
       }
     }
     // this should have always been a hook
-    return subtextFromActivity({ activity, swapRouters, liquidityPools })
-  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools])
+    return subtextFromActivity({ activity, swapRouters, liquidityPools, t: translator })
+  }, [activity, addressBook, isERC20Transfer, swapRouters, liquidityPools, translator])
 }
 
 /**
@@ -709,38 +778,44 @@ export function useDateFromActivity({ activity }: { activity: Activity }) {
   const { created_at, data } = activity
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+  const { t, i18n } = useTranslation('activity')
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
 
   if (isTemporalTransfer) {
     switch (data.status) {
       case 'failed':
+        return t('status.failed', { defaultValue: 'Failed' })
       case 'cancelled':
-        return 'Failed'
+        return t('status.cancelled', { defaultValue: 'Cancelled' })
       case 'confirmed':
-        return CommentsTime(new Date(created_at))
+        return CommentsTime(new Date(created_at), locale)
       default:
         return <Spinner size="small" color={'$color11'} />
     }
   }
 
-  return CommentsTime(new Date(created_at))
+  return CommentsTime(new Date(created_at), locale)
 }
 
 export function useDateDetailsFromActivity({ activity }: { activity: Activity }) {
   const { created_at, data } = activity
   const isTemporalTransfer =
     isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+  const { t, i18n } = useTranslation('activity')
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
 
   if (isTemporalTransfer) {
     switch (data.status) {
       case 'failed':
+        return t('status.failed', { defaultValue: 'Failed' })
       case 'cancelled':
-        return 'Failed'
+        return t('status.cancelled', { defaultValue: 'Cancelled' })
       case 'confirmed':
-        return created_at.toLocaleString()
+        return created_at.toLocaleString(locale)
       default:
         return <Spinner size="small" color={'$color11'} />
     }
   }
 
-  return created_at.toLocaleString()
+  return created_at.toLocaleString(locale)
 }

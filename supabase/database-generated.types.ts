@@ -1423,6 +1423,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sendpot_fee_history: {
+        Row: {
+          block_num: number
+          block_time: number
+          created_at: string
+          fee_bps: number
+          id: number
+          tx_hash: string | null
+        }
+        Insert: {
+          block_num: number
+          block_time: number
+          created_at?: string
+          fee_bps: number
+          id?: number
+          tx_hash?: string | null
+        }
+        Update: {
+          block_num?: number
+          block_time?: number
+          created_at?: string
+          fee_bps?: number
+          id?: number
+          tx_hash?: string | null
+        }
+        Relationships: []
+      }
       sendpot_jackpot_runs: {
         Row: {
           abi_idx: number | null
@@ -1494,6 +1521,7 @@ export type Database = {
           recipient: string | null
           referrer: string | null
           src_name: string | null
+          tickets_purchased_count: number | null
           tickets_purchased_total_bps: number | null
           tx_hash: string | null
           tx_idx: number | null
@@ -1512,6 +1540,7 @@ export type Database = {
           recipient?: string | null
           referrer?: string | null
           src_name?: string | null
+          tickets_purchased_count?: number | null
           tickets_purchased_total_bps?: number | null
           tx_hash?: string | null
           tx_idx?: number | null
@@ -1530,6 +1559,7 @@ export type Database = {
           recipient?: string | null
           referrer?: string | null
           src_name?: string | null
+          tickets_purchased_count?: number | null
           tickets_purchased_total_bps?: number | null
           tx_hash?: string | null
           tx_idx?: number | null
@@ -1848,6 +1878,10 @@ export type Database = {
         Args: { distribution_number: number }
         Returns: undefined
       }
+      calculate_tickets_from_bps_with_fee: {
+        Args: { block_num: number; bps_delta: number }
+        Returns: number
+      }
       can_delete_tag: {
         Args: { p_send_account_id: string; p_tag_id?: number }
         Returns: boolean
@@ -1982,6 +2016,10 @@ export type Database = {
           referral_count: number
           user_id: string
         }[]
+      }
+      get_fee_bps_at_block: {
+        Args: { target_block_num: number }
+        Returns: number
       }
       get_friends: {
         Args: never

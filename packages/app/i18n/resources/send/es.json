@@ -1,0 +1,54 @@
+{
+  "topNav": {
+    "default": "Enviar",
+    "enterAmount": "Ingresar monto",
+    "preview": "Revisar y enviar"
+  },
+  "form": {
+    "balanceLabel": "Saldo:",
+    "errors": {
+      "insufficientFunds": "Fondos insuficientes",
+      "minimum": "Mínimo: {{amount}} {{symbol}}",
+      "noteValidationFallback": "La nota no cumple con los requisitos"
+    },
+    "note": {
+      "maxCharacters": "Máximo: {{count}} caracteres"
+    },
+    "submit": "CONTINUAR"
+  },
+  "confirm": {
+    "edit": "editar",
+    "fees": "Comisiones",
+    "noteTitle": "Tu nota",
+    "button": {
+      "send": "ENVIAR"
+    },
+    "errors": {
+      "default": "Error al enviar",
+      "insufficientBalance": "Saldo insuficiente",
+      "insufficientGas": "Gas insuficiente"
+    }
+  },
+  "search": {
+    "placeholder": "Busca por send tag o dirección de wallet",
+    "errorHeading": "Error",
+    "unknownError": "Error desconocido"
+  },
+  "suggestions": {
+    "recent": "Actividad reciente",
+    "favorites": "Remitentes favoritos",
+    "top": "Remitentes destacados",
+    "birthdays": "Desea feliz cumpleaños"
+  },
+  "recipient": {
+    "label": "PARA",
+    "edit": "editar"
+  },
+  "noAccount": {
+    "title": "Sin cuenta de send",
+    "description": "no tiene una cuenta de send. Pídeles que creen una o envíales un cheque /send.",
+    "cta": "Escribir cheque /send",
+    "toast": "Próximamente",
+    "banner": "Cheques /send próximamente"
+  }
+}

@@ -12,6 +12,7 @@ import {
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export function ActivityScreen() {
   const theme = useTheme()
@@ -69,6 +70,7 @@ export function ActivityScreen() {
 function ActivityBody() {
   const { isLoading, results, error } = useTagSearch()
   const media = useMedia()
+  const { t } = useTranslation('activity')
 
   const recentActivity = (
     <YStack
@@ -104,8 +106,8 @@ function ActivityBody() {
 
       {error && (
         <YStack key="red" gap="$4" mb="$4">
-          <H4 theme={'alt2'}>Error</H4>
-          <Text>{error.message.split('.').at(0)}</Text>
+          <H4 theme={'alt2'}>{t('errors.title')}</H4>
+          <Text>{error.message.split('.').at(0) ?? t('errors.fallback')}</Text>
         </YStack>
       )}
 

@@ -1,0 +1,254 @@
+import type { InitOptions, i18n } from 'i18next'
+import i18next from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import type { Locale } from 'expo-localization'
+
+import { getStoredLocale, setStoredLocale } from '../utils/i18n/localeStorage'
+import commonEn from './resources/common/en.json'
+import commonEs from './resources/common/es.json'
+import accountEn from './resources/account/en.json'
+import accountEs from './resources/account/es.json'
+import affiliateEn from './resources/affiliate/en.json'
+import affiliateEs from './resources/affiliate/es.json'
+import activityEn from './resources/activity/en.json'
+import activityEs from './resources/activity/es.json'
+import exploreEn from './resources/explore/en.json'
+import exploreEs from './resources/explore/es.json'
+import investEn from './resources/invest/en.json'
+import investEs from './resources/invest/es.json'
+import depositEn from './resources/deposit/en.json'
+import depositEs from './resources/deposit/es.json'
+import leaderboardEn from './resources/leaderboard/en.json'
+import leaderboardEs from './resources/leaderboard/es.json'
+import earnEn from './resources/earn/en.json'
+import earnEs from './resources/earn/es.json'
+import cantonWalletEn from './resources/canton-wallet/en.json'
+import cantonWalletEs from './resources/canton-wallet/es.json'
+import rewardsEn from './resources/rewards/en.json'
+import rewardsEs from './resources/rewards/es.json'
+import sendpotEn from './resources/sendpot/en.json'
+import sendpotEs from './resources/sendpot/es.json'
+import sendEn from './resources/send/en.json'
+import sendEs from './resources/send/es.json'
+import secretShopEn from './resources/secret-shop/en.json'
+import secretShopEs from './resources/secret-shop/es.json'
+import sendTokenUpgradeEn from './resources/send-token-upgrade/en.json'
+import sendTokenUpgradeEs from './resources/send-token-upgrade/es.json'
+import paymasterAllowanceEn from './resources/paymaster-allowance/en.json'
+import paymasterAllowanceEs from './resources/paymaster-allowance/es.json'
+import tradeEn from './resources/trade/en.json'
+import tradeEs from './resources/trade/es.json'
+import homeEn from './resources/home/en.json'
+import homeEs from './resources/home/es.json'
+import navigationEn from './resources/navigation/en.json'
+import navigationEs from './resources/navigation/es.json'
+import maintenanceEn from './resources/maintenance/en.json'
+import maintenanceEs from './resources/maintenance/es.json'
+import onboardingEn from './resources/onboarding/en.json'
+import onboardingEs from './resources/onboarding/es.json'
+import settingsEn from './resources/settings/en.json'
+import settingsEs from './resources/settings/es.json'
+import splashEn from './resources/splash/en.json'
+import splashEs from './resources/splash/es.json'
+import unknownEn from './resources/unknown/en.json'
+import unknownEs from './resources/unknown/es.json'
+
+export const DEFAULT_NAMESPACE = 'common'
+export const DEFAULT_LOCALE = 'en'
+
+export const resources = {
+  en: {
+    [DEFAULT_NAMESPACE]: commonEn,
+    account: accountEn,
+    affiliate: affiliateEn,
+    activity: activityEn,
+    explore: exploreEn,
+    earn: earnEn,
+    invest: investEn,
+    deposit: depositEn,
+    leaderboard: leaderboardEn,
+    cantonWallet: cantonWalletEn,
+    rewards: rewardsEn,
+    sendpot: sendpotEn,
+    send: sendEn,
+    secretShop: secretShopEn,
+    sendTokenUpgrade: sendTokenUpgradeEn,
+    paymasterAllowance: paymasterAllowanceEn,
+    trade: tradeEn,
+    home: homeEn,
+    navigation: navigationEn,
+    maintenance: maintenanceEn,
+    onboarding: onboardingEn,
+    settings: settingsEn,
+    splash: splashEn,
+    unknown: unknownEn,
+  },
+  es: {
+    [DEFAULT_NAMESPACE]: commonEs,
+    account: accountEs,
+    affiliate: affiliateEs,
+    activity: activityEs,
+    explore: exploreEs,
+    earn: earnEs,
+    invest: investEs,
+    deposit: depositEs,
+    leaderboard: leaderboardEs,
+    cantonWallet: cantonWalletEs,
+    rewards: rewardsEs,
+    sendpot: sendpotEs,
+    send: sendEs,
+    secretShop: secretShopEs,
+    sendTokenUpgrade: sendTokenUpgradeEs,
+    paymasterAllowance: paymasterAllowanceEs,
+    trade: tradeEs,
+    home: homeEs,
+    navigation: navigationEs,
+    maintenance: maintenanceEs,
+    onboarding: onboardingEs,
+    settings: settingsEs,
+    splash: splashEs,
+    unknown: unknownEs,
+  },
+} as const
+
+const namespaces = Array.from(
+  new Set(Object.values(resources).flatMap((locale) => Object.keys(locale)))
+)
+
+export type AppResources = typeof resources
+export type AppLocale = keyof AppResources
+export type AppNamespaces = keyof AppResources[AppLocale]
+
+let sharedInstance: i18n | null = null
+let sharedInitPromise: Promise<i18n> | null = null
+
+const RTL_LANGS = new Set(['ar', 'fa', 'he', 'ku', 'ur'])
+
+type LocalizationModule = typeof import('expo-localization')
+
+let localizationModule: LocalizationModule | null | undefined
+
+async function loadLocalization(): Promise<LocalizationModule | null> {
+  if (localizationModule !== undefined) {
+    return localizationModule
+  }
+
+  try {
+    localizationModule = await import('expo-localization')
+  } catch (error) {
+    localizationModule = null
+  }
+
+  return localizationModule
+}
+
+async function detectSystemLocale(): Promise<string | undefined> {
+  try {
+    const localization = await loadLocalization()
+    const locales = (localization?.getLocales?.() ?? []) as Locale[]
+    if (Array.isArray(locales) && locales.length > 0) {
+      const locale = locales.find((entry) => entry.languageTag)
+      if (locale?.languageTag) {
+        return locale.languageTag
+      }
+    }
+  } catch (error) {
+    // expo-localization might not be available in SSR/test environments.
+  }
+
+  if (typeof navigator !== 'undefined') {
+    const browserLocale =
+      navigator.language ||
+      (Array.isArray(navigator.languages) ? navigator.languages[0] : undefined)
+    if (browserLocale) return browserLocale
+  }
+
+  return undefined
+}
+
+function buildInitOptions(language: string, overrides?: InitOptions): InitOptions {
+  return {
+    lng: language,
+    fallbackLng: DEFAULT_LOCALE,
+    defaultNS: DEFAULT_NAMESPACE,
+    ns: namespaces,
+    resources,
+    interpolation: {
+      escapeValue: false,
+    },
+    react: {
+      useSuspense: false,
+    },
+    ...overrides,
+  }
+}
+
+export async function resolvePreferredLocale(explicit?: string): Promise<string> {
+  if (explicit) return explicit
+
+  const stored = await getStoredLocale()
+  if (stored) return stored
+
+  // Auto-detection disabled - users must explicitly choose language in settings
+  // This ensures all new users default to English
+  return DEFAULT_LOCALE
+}
+
+async function initInstance(instance: i18n, language: string, options?: InitOptions) {
+  await instance.use(initReactI18next).init(buildInitOptions(language, options))
+
+  instance.on('languageChanged', (nextLanguage) => {
+    void setStoredLocale(nextLanguage)
+  })
+
+  return instance
+}
+
+interface CreateI18nOptions {
+  initialLanguage?: string
+  useGlobal?: boolean
+  initOptions?: InitOptions
+}
+
+export async function createI18nClient({
+  initialLanguage,
+  useGlobal = false,
+  initOptions,
+}: CreateI18nOptions = {}): Promise<i18n> {
+  if (useGlobal) {
+    if (sharedInstance && sharedInitPromise) {
+      return sharedInitPromise
+    }
+  }
+
+  const instance = i18next.createInstance()
+  const language = await resolvePreferredLocale(initialLanguage)
+  const initPromise = initInstance(instance, language, initOptions)
+
+  if (useGlobal) {
+    sharedInstance = instance
+    sharedInitPromise = initPromise.then(() => instance)
+    return sharedInitPromise
+  }
+
+  return initPromise
+}
+
+export function getI18n(): i18n | null {
+  return sharedInstance
+}
+
+export async function initSharedI18n(
+  options?: Omit<CreateI18nOptions, 'useGlobal'>
+): Promise<i18n> {
+  return createI18nClient({ ...options, useGlobal: true })
+}
+
+export function getDirection(locale?: string): 'ltr' | 'rtl' {
+  const targetLocale = locale ?? sharedInstance?.language ?? DEFAULT_LOCALE
+  const base = targetLocale.split('-')[0]?.toLowerCase()
+  if (base && RTL_LANGS.has(base)) {
+    return 'rtl'
+  }
+  return 'ltr'
+}

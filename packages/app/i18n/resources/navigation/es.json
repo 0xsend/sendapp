@@ -1,0 +1,87 @@
+{
+  "tabs": {
+    "home": "Inicio",
+    "activity": "Actividad",
+    "send": "Enviar",
+    "trade": "Operar",
+    "explore": "Explorar"
+  },
+  "sidebar": {
+    "account": "Cuenta",
+    "secretShop": "Tienda secreta"
+  },
+  "topNav": {
+    "tokens": {
+      "invest": "Invertir",
+      "cash": "Efectivo"
+    }
+  },
+  "stack": {
+    "account": {
+      "root": "Cuenta",
+      "profile": "Perfil",
+      "personalInfo": "Información personal",
+      "linkInBio": "Enlace en la bio",
+      "language": "Idioma",
+      "sendtags": "Sendtags",
+      "sendtagsAdd": "Registrar Sendtags",
+      "sendtagsCheckout": "Pagar",
+      "sendtagsFirst": "Primer Sendtag",
+      "passkeys": "Llaves de acceso",
+      "passkeysCreate": "Crear llave de acceso",
+      "passkeysConfirm": "Confirmar llave de acceso",
+      "referrals": "Referidos"
+    },
+    "activity": {
+      "details": "Detalles de la transacción"
+    },
+    "canton": {
+      "root": "Explorar Canton Wallet"
+    },
+    "deposit": {
+      "root": "Depositar",
+      "applePay": "Apple Pay",
+      "debitCard": "Tarjeta de débito",
+      "onBase": "Depositar en Base",
+      "success": "Éxito"
+    },
+    "earn": {
+      "root": "Ahorros",
+      "details": "Detalles",
+      "deposit": "Depositar",
+      "withdraw": "Retirar ahorros",
+      "balance": "Saldo",
+      "rewards": "Saldo de recompensas"
+    },
+    "investments": {
+      "root": "Invertir"
+    },
+    "notFound": "No encontrado",
+    "profile": {
+      "history": "Historial",
+      "about": "Acerca de"
+    },
+    "rewards": {
+      "root": "Recompensas"
+    },
+    "sendpot": {
+      "root": "Sendpot",
+      "buyTickets": "Comprar boletos",
+      "confirm": "Resumen de compra de boletos"
+    },
+    "send": {
+      "enterAmount": "Ingresar monto",
+      "previewAndSend": "Previsualizar y enviar"
+    },
+    "stables": {
+      "root": "Efectivo"
+    },
+    "token": {
+      "root": "Invertir"
+    },
+    "trade": {
+      "root": "Operar",
+      "summary": "Resumen de la operación"
+    }
+  }
+}

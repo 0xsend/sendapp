@@ -9,6 +9,7 @@ import {
 import { formatUnits } from 'viem'
 import { useCoin } from 'app/provider/coins'
 import formatAmount from 'app/utils/formatAmount'
+import { useTranslation } from 'react-i18next'
 
 type BuyTicketsScreenParams = {
   numberOfTickets?: string
@@ -22,6 +23,7 @@ export function BuyTicketsScreen() {
   const [ticketCount, setTicketCount] = useState('1')
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [queryTickets] = useParam('numberOfTickets')
+  const { t } = useTranslation('sendpot')
 
   useEffect(() => {
     if (typeof queryTickets === 'string' && /^\d+$/.test(queryTickets)) {
@@ -79,15 +81,15 @@ export function BuyTicketsScreen() {
 
   const handleProceedToConfirm = () => {
     if (insufficientFunds) {
-      toast.error('Error', { message: 'Insufficient funds.' })
+      toast.error(t('buy.toast.errorTitle'), { message: t('buy.toast.insufficientFunds') })
       return
     }
     if (numTickets <= 0n) {
-      toast.error('Error', { message: 'Please enter a valid number of tickets.' })
+      toast.error(t('buy.toast.errorTitle'), { message: t('buy.toast.invalidQuantity') })
       return
     }
     if (isDataLoading) {
-      toast.error('Info', { message: 'Please wait, loading data...' })
+      toast.error(t('buy.toast.loadingTitle'), { message: t('buy.toast.loadingMessage') })
       return
     }
 
@@ -105,7 +107,7 @@ export function BuyTicketsScreen() {
         <YStack gap="$5">
           <YStack gap="$2" ai="center">
             <Paragraph fontSize="$6" ta="center">
-              How many tickets would you like to purchase?
+              {t('buy.title')}
             </Paragraph>
           </YStack>
 
@@ -143,7 +145,7 @@ export function BuyTicketsScreen() {
                 autoFocus
               />
               <Paragraph fontSize="$6" fontWeight="500" color="$color10">
-                Tickets
+                {t('buy.input.ticketsLabel')}
               </Paragraph>
               <XStack
                 position="absolute"
@@ -163,7 +165,7 @@ export function BuyTicketsScreen() {
                     size="$5"
                     $theme-light={{ color: insufficientFunds ? '$error' : '$darkGrayTextField' }}
                   >
-                    Balance:
+                    {t('buy.balance.label')}
                   </Paragraph>
                   {isDataLoading ? (
                     <Spinner size="small" />
@@ -186,13 +188,13 @@ export function BuyTicketsScreen() {
                 </XStack>
                 {insufficientFunds && (
                   <Paragraph color="$error" size="$5">
-                    Insufficient funds
+                    {t('buy.balance.insufficient')}
                   </Paragraph>
                 )}
               </YStack>
               <XStack gap="$2" ai="center">
                 <Paragraph fontSize="$5" fontWeight="500" color="$color10">
-                  Ticket price:
+                  {t('buy.ticketPrice')}
                 </Paragraph>
                 <Paragraph
                   color={insufficientFunds ? '$error' : '$color12'}
@@ -207,7 +209,7 @@ export function BuyTicketsScreen() {
 
           <XStack jc="space-between" ai="center" flexWrap="wrap">
             <Paragraph fontSize="$6" fontWeight="500">
-              Total Cost
+              {t('buy.total.label')}
             </Paragraph>
             <H3 color="$color12">
               {isDataLoading ? <Spinner size="small" /> : displayTotalCost} SEND
@@ -228,7 +230,7 @@ export function BuyTicketsScreen() {
           disabledStyle={{ opacity: 0.5 }}
         >
           <Button.Text ff="$mono" fontWeight="500" tt="uppercase" size="$5" color="$black">
-            Review
+            {t('buy.button.review')}
           </Button.Text>
         </Button>
       </XStack>

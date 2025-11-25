@@ -1,0 +1,87 @@
+{
+  "tabs": {
+    "home": "Home",
+    "activity": "Activity",
+    "send": "Send",
+    "trade": "Trade",
+    "explore": "Explore"
+  },
+  "sidebar": {
+    "account": "Account",
+    "secretShop": "Secret shop"
+  },
+  "topNav": {
+    "tokens": {
+      "invest": "Invest",
+      "cash": "Cash"
+    }
+  },
+  "stack": {
+    "account": {
+      "root": "Account",
+      "profile": "Profile",
+      "personalInfo": "Personal information",
+      "linkInBio": "Link In Bio",
+      "language": "Language",
+      "sendtags": "Sendtags",
+      "sendtagsAdd": "Register Sendtags",
+      "sendtagsCheckout": "Checkout",
+      "sendtagsFirst": "First Sendtag",
+      "passkeys": "Passkeys",
+      "passkeysCreate": "Create Passkey",
+      "passkeysConfirm": "Confirm Passkey",
+      "referrals": "Referrals"
+    },
+    "activity": {
+      "details": "Transaction details"
+    },
+    "canton": {
+      "root": "Explore Canton Wallet"
+    },
+    "deposit": {
+      "root": "Deposit",
+      "applePay": "Apple Pay",
+      "debitCard": "Debit Card",
+      "onBase": "Deposit on Base",
+      "success": "Success"
+    },
+    "earn": {
+      "root": "Savings",
+      "details": "Details",
+      "deposit": "Deposit",
+      "withdraw": "Withdraw Savings",
+      "balance": "Balance",
+      "rewards": "Rewards Balance"
+    },
+    "investments": {
+      "root": "Invest"
+    },
+    "notFound": "Not Found",
+    "profile": {
+      "history": "History",
+      "about": "About"
+    },
+    "rewards": {
+      "root": "Rewards"
+    },
+    "sendpot": {
+      "root": "Sendpot",
+      "buyTickets": "Buy Tickets",
+      "confirm": "Buy Tickets Summary"
+    },
+    "send": {
+      "enterAmount": "Enter Amount",
+      "previewAndSend": "Preview and Send"
+    },
+    "stables": {
+      "root": "Cash"
+    },
+    "token": {
+      "root": "Invest"
+    },
+    "trade": {
+      "root": "Trade",
+      "summary": "Trade summary"
+    }
+  }
+}

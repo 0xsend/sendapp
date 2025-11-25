@@ -111,6 +111,7 @@ ENV TAMAGUI_TARGET=web
 # Build the specified service
 RUN --mount=type=cache,target=/tmp/yarn-cache \
   --mount=type=cache,target=/tmp/turbo-cache \
+  NODE_ENV=development \
   yarn turbo build --cache-dir=/tmp/turbo-cache --filter=${PACKAGE}
 
 # ==========================
@@ -156,6 +157,11 @@ CMD ["--bun", "run", "./src/server.ts"]
 # Workers runner
 FROM node:20-slim AS workers-runner
 WORKDIR /sendapp
+
+# Install ca-certificates for TLS connections
+RUN apt-get update && \
+  apt-get install -y ca-certificates && \
+  rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
 RUN addgroup --system --gid 900 nodejs && \

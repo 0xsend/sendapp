@@ -1,0 +1,16 @@
+{
+  "banner": {
+    "rewards": {
+      "title": "Recompensas",
+      "subtitle": "Haz que el dinero trabaje para ti"
+    },
+    "sendpot": {
+      "title": "Sendpot",
+      "subtitle": "Gira. Gana. Presume."
+    },
+    "cantonWallet": {
+      "title": "Cartera Canton",
+      "subtitle": "Entra primero. Mantente a la vanguardia."
+    }
+  }
+}

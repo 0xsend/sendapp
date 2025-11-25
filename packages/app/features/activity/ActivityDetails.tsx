@@ -33,6 +33,7 @@ import {
 } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
 import { useActivityDetails } from 'app/provider/activity-details'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export const ActivityDetails = (props: StackProps) => {
   const { selectedActivity } = useActivityDetails()
@@ -60,13 +61,14 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
     isERC20Transfer && addressBook?.data?.[activity.data.t] === ContractLabels.SendEarn
   const isERC20TransferFromSendEarn =
     isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
+  const { t } = useTranslation('activity')
 
   return (
     <Fade {...props}>
       <YStack w={'100%'} gap={'$3.5'}>
         {Platform.OS === 'web' && (
           <H4 fontWeight={'600'} size={'$7'}>
-            Transaction details
+            {t('details.heading')}
           </H4>
         )}
         <YStack
@@ -186,7 +188,9 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
                   color: '$darkGrayTextField',
                 }}
               >
-                {activityPhrase} on
+                {activityPhrase
+                  ? t('details.phraseOn', { phrase: activityPhrase })
+                  : t('details.dateOnly')}{' '}
               </Paragraph>
               <Paragraph
                 size={'$5'}

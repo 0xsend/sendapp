@@ -2,9 +2,11 @@ import { Check } from '@tamagui/lucide-icons'
 import { FadeCard, Paragraph, PrimaryButton, YStack } from '@my/ui'
 import { Platform } from 'react-native'
 import { useLink } from 'solito/link'
+import { useTranslation } from 'react-i18next'
 
 export function DepositSuccessScreen() {
   const linkProps = useLink({ href: Platform.OS === 'web' ? '/deposit' : '/(tabs)/home' })
+  const { t } = useTranslation('deposit')
 
   return (
     <YStack
@@ -20,7 +22,7 @@ export function DepositSuccessScreen() {
         <Check size={'$3'} color={'$primary'} $theme-light={{ color: '$color12' }} />
         <YStack ai={'center'} gap={'$2'}>
           <Paragraph size={'$8'} fontWeight={500} ta={'center'} $gtLg={{ size: '$9' }}>
-            Deposit Complete
+            {t('success.title')}
           </Paragraph>
           <Paragraph
             size={'$5'}
@@ -28,12 +30,14 @@ export function DepositSuccessScreen() {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            You’re all set — your funds will appear in your wallet soon
+            {t('success.description')}
           </Paragraph>
         </YStack>
         <PrimaryButton {...linkProps}>
           <PrimaryButton.Text>
-            {Platform.OS === 'web' ? 'deposit again' : 'continue'}
+            {Platform.OS === 'web'
+              ? t('success.actions.depositAgain')
+              : t('success.actions.continue')}
           </PrimaryButton.Text>
         </PrimaryButton>
       </FadeCard>

@@ -1,6 +1,9 @@
 import { LinkBanner, YStack } from '@my/ui'
+import { useTranslation } from 'react-i18next'
 
 export const InvestScreen = () => {
+  const { t } = useTranslation('invest')
+
   return (
     <YStack
       w={'100%'}
@@ -13,8 +16,8 @@ export const InvestScreen = () => {
       <LinkBanner
         href={'/earn'}
         imgUrl={'https://ghassets.send.app/app_images/deposit.jpg'}
-        title={'Earn'}
-        subtitle={'High-yield interest on your USDC — no lockups, no minimums, full control'}
+        title={t('banner.title')}
+        subtitle={t('banner.subtitle')}
         backgroundPosition={'center 15%'}
       />
     </YStack>

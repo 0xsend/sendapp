@@ -1,34 +1,29 @@
-import {
-  Button as ButtonOg,
-  Container,
-  H2,
-  Header,
-  isWeb,
-  Paragraph,
-  Stack,
-  XStack,
-  type ButtonProps,
-} from '@my/ui'
+import { Button, Container, H2, Header, Paragraph, Stack, XStack, Button as ButtonOg } from '@my/ui'
 import { IconArrowLeft, IconSendLogo } from 'app/components/icons'
-import { useSendScreenParams } from 'app/routers/params'
-import { usePathname } from 'app/utils/usePathname'
-import { useRouter } from 'solito/router'
 import { useUser } from 'app/utils/useUser'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
+import { useTranslation } from 'react-i18next'
+import { usePathname } from 'solito/navigation'
+import { useSendScreenParams } from 'app/routers/params'
+import { useRouter } from 'solito/router'
+import { Platform } from 'react-native'
 
 export function SendTopNav() {
-  const [sendParams] = useSendScreenParams()
-  const { back } = useRouter()
   const { profile } = useUser()
   const path = usePathname()
+  const { t } = useTranslation('send')
+  const [sendParams] = useSendScreenParams()
+  const { back } = useRouter()
+
+  const isTagSend = sendParams?.idType === 'tag'
 
   const handleBack = () => {
-    if (isWeb || window.history.length > 1) {
+    if (Platform.OS === 'web' || window.history.length > 1) {
       back()
     }
   }
 
-  const isOnSelectRecipient = !(path.includes('/confirm') || sendParams.recipient)
+  const isOnSelectRecipient = !(path?.includes('/confirm') || sendParams.recipient)
 
   return (
     <Header w="100%" $lg={{ py: '$3.5' }}>
@@ -39,7 +34,7 @@ export function SendTopNav() {
         safeAreaProps={{ edges: { bottom: 'off' } }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
-          {!isOnSelectRecipient && (
+          {!isOnSelectRecipient && !isTagSend && (
             <Button onPress={handleBack}>
               <ButtonOg.Icon>
                 <IconArrowLeft
@@ -51,18 +46,15 @@ export function SendTopNav() {
             </Button>
           )}
           <Paragraph fontWeight={'500'} size={isOnSelectRecipient ? '$9' : '$8'} col={'$color12'}>
-            {(() => {
-              switch (true) {
-                case path.includes('/confirm'):
-                  return 'Preview and Send'
-                case Boolean(sendParams.recipient):
-                  return 'Enter Amount'
-                default:
-                  return <IconSendLogo size={'$2.5'} color={'$color12'} />
-              }
-            })()}
+            {path?.includes('/confirm') ? (
+              t('topNav.preview')
+            ) : Boolean(sendParams.recipient) && !isTagSend ? (
+              t('topNav.enterAmount')
+            ) : (
+              <IconSendLogo size={'$2.5'} color={'$color12'} />
+            )}
           </Paragraph>
-          {isOnSelectRecipient && profile && (
+          {profile && (
             <XStack ml={'auto'}>
               <AvatarMenuButton profile={profile} />
             </XStack>
@@ -76,43 +68,14 @@ export function SendTopNav() {
             display={'flex'}
             $lg={{ als: 'flex-end' }}
           >
-            {(() => {
-              switch (true) {
-                case path.includes('/confirm'):
-                  return 'Preview and Send'
-                case Boolean(sendParams.recipient):
-                  return 'Enter Amount'
-                default:
-                  return 'Send'
-              }
-            })()}
+            {path?.includes('/confirm')
+              ? t('topNav.preview')
+              : Boolean(sendParams.recipient) && !isTagSend
+                ? t('topNav.enterAmount')
+                : t('topNav.default')}
           </H2>
         </Stack>
       </Container>
     </Header>
-  )
-}
-
-function Button(props: ButtonProps) {
-  return (
-    <ButtonOg
-      bc="transparent"
-      chromeless
-      circular
-      jc={'flex-start'}
-      ai={'center'}
-      bw={0}
-      hoverStyle={{
-        backgroundColor: 'transparent',
-      }}
-      pressStyle={{
-        backgroundColor: 'transparent',
-      }}
-      focusStyle={{
-        backgroundColor: 'transparent',
-      }}
-      theme="green_active"
-      {...props}
-    />
   )
 }

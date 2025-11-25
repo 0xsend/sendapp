@@ -14,10 +14,12 @@ import { useSendtagCheckout } from './checkout-utils'
 import { ConfirmButton } from './components/checkout-confirm-button'
 import { ReferredBy } from 'app/features/account/sendtag/components/ReferredBy'
 import { Platform } from 'react-native'
+import { useTranslation } from 'react-i18next'
 
 export const CheckoutForm = () => {
   const user = useUser()
   const router = useRouter()
+  const { t } = useTranslation('account')
 
   function onConfirmed() {
     user?.updateProfile()
@@ -36,7 +38,7 @@ export const CheckoutForm = () => {
     <>
       <YStack gap="$5">
         <YStack gap={'$3.5'}>
-          <RowLabel>Review purchase</RowLabel>
+          <RowLabel>{t('sendtag.checkout.review')}</RowLabel>
           <TotalPrice />
         </YStack>
         <ReferredBy />
@@ -51,6 +53,7 @@ function TotalPrice() {
   const { usdcFees, usdcFeesError, isLoadingUSDCFees } = useSendtagCheckout()
   const _total = useMemo(() => total(pendingTags ?? []), [pendingTags])
   const { coin: usdc, isLoading: isCoinLoading } = useCoin('USDC')
+  const { t } = useTranslation('account')
 
   return (
     <FadeCard>
@@ -60,7 +63,7 @@ function TotalPrice() {
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Total Price
+          {t('sendtag.checkout.totalPrice')}
         </Paragraph>
         <XStack jc={'space-between'} ai={'center'}>
           <Paragraph size={'$11'} fontWeight={'500'} lineHeight={50}>
@@ -80,7 +83,7 @@ function TotalPrice() {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Price
+            {t('sendtag.checkout.price')}
           </Paragraph>
           <Paragraph size={'$5'}>{formatUnits(_total, usdcCoin.decimals)} USDC</Paragraph>
         </XStack>
@@ -90,7 +93,7 @@ function TotalPrice() {
             color={'$lightGrayTextField'}
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Fees
+            {t('sendtag.checkout.fees')}
           </Paragraph>
           {(() => {
             switch (true) {
@@ -124,14 +127,14 @@ function TotalPrice() {
           color={'$lightGrayTextField'}
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Balance:
+          {t('sendtag.checkout.balance')}
         </Paragraph>
         {(() => {
           switch (true) {
             case isCoinLoading:
               return <Spinner color="$color11" />
             case !isCoinLoading && !usdc:
-              return <Paragraph color="$error">Error fetching balance info</Paragraph>
+              return <Paragraph color="$error">{t('sendtag.checkout.balanceError')}</Paragraph>
             case !usdc?.balance:
               return (
                 <Paragraph size={'$5'} fontWeight={'500'}>

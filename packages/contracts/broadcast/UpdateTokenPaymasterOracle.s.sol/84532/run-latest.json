@@ -1,0 +1,32 @@
+{
+  "transactions": [
+    {
+      "hash": null,
+      "transactionType": "CALL",
+      "contractName": null,
+      "contractAddress": "0x4c99cdaab0cfe32b4ba77d30342b5c51e0444e5b",
+      "function": "setOracleConfiguration((uint48,uint48,address,address,bool,bool,bool,uint256))",
+      "arguments": [
+        "(3600, 86400, 0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165, 0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1, false, false, false, 2000000000000000000000000)"
+      ],
+      "transaction": {
+        "from": "0xfb00d9cda6dad99994849d7c66fa2631f280f64f",
+        "to": "0x4c99cdaab0cfe32b4ba77d30342b5c51e0444e5b",
+        "gas": "0x17488",
+        "value": "0x0",
+        "input": "0x50e537330000000000000000000000000000000000000000000000000000000000000e100000000000000000000000000000000000000000000000000000000000015180000000000000000000000000d30e2101a97dcbaebcbc04f14c3f624e67a351650000000000000000000000004adc67696ba383f43dd60a9e78f2c97fbbfc7cb100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001a784379d99db42000000",
+        "nonce": "0x4a",
+        "chainId": "0x14a34"
+      },
+      "additionalContracts": [],
+      "isFixedGasLimit": false
+    }
+  ],
+  "receipts": [],
+  "libraries": [],
+  "pending": [],
+  "returns": {},
+  "timestamp": 1763870901,
+  "chain": 84532,
+  "commit": "750c359c"
+}

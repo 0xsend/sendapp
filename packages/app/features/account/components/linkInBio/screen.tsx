@@ -21,6 +21,7 @@ import {
 import { useUser } from 'app/utils/useUser'
 import { IconLinkInBio } from 'app/components/icons'
 import type { Database } from '@my/supabase/database-generated.types'
+import { useTranslation } from 'react-i18next'
 
 type LinkInBioDomainName = Database['public']['Enums']['link_in_bio_domain_names']
 
@@ -39,6 +40,7 @@ export const LinkInBioScreen = () => {
   const [domainHandles, setDomainHandles] = useState<Record<LinkInBioDomainName, string>>(
     {} as Record<LinkInBioDomainName, string>
   )
+  const { t } = useTranslation('account')
 
   const handleSubmit = useCallback(async () => {
     setErrorMessage(null)
@@ -83,7 +85,7 @@ export const LinkInBioScreen = () => {
     ({ submit }: { submit: () => void }) => (
       <YStack>
         <SubmitButton onPress={() => submit()}>
-          <SubmitButton.Text>SAVE CHANGES</SubmitButton.Text>
+          <SubmitButton.Text>{t('common.saveChanges')}</SubmitButton.Text>
         </SubmitButton>
         {errorMessage && (
           <Paragraph marginTop={'$5'} theme="red" color="$color9">
@@ -92,7 +94,7 @@ export const LinkInBioScreen = () => {
         )}
       </YStack>
     ),
-    [errorMessage]
+    [errorMessage, t]
   )
 
   const socialLinksForm = (
@@ -114,7 +116,9 @@ export const LinkInBioScreen = () => {
                   <YStack flex={1} bbc={'$color12'}>
                     <Input
                       placeholder={
-                        domain_name === 'WhatsApp' ? 'Whatsapp Phone Number' : domain_name
+                        domain_name === 'WhatsApp'
+                          ? t('linkInBio.placeholders.whatsapp')
+                          : domain_name
                       }
                       placeholderTextColor={'$color4'}
                       value={currentHandle}
@@ -151,11 +155,11 @@ export const LinkInBioScreen = () => {
             )
           })
         ) : (
-          <Text>No social links added yet.</Text>
+          <Text>{t('linkInBio.empty')}</Text>
         )}
       </FadeCard>
       <SubmitButton onPress={() => setFormState(FormState.LinkInBioForm)}>
-        <SubmitButton.Text>edit links</SubmitButton.Text>
+        <SubmitButton.Text>{t('linkInBio.cta.edit')}</SubmitButton.Text>
       </SubmitButton>
     </YStack>
   )
@@ -167,7 +171,7 @@ export const LinkInBioScreen = () => {
   return (
     <YStack w={'100%'}>
       <YStack gap={'$3.5'}>
-        {Platform.OS === 'web' && <SettingsHeader>Link In Bio</SettingsHeader>}
+        {Platform.OS === 'web' && <SettingsHeader>{t('linkInBio.header')}</SettingsHeader>}
         <FormProvider {...form}>
           {(() => {
             switch (formState) {

@@ -1,0 +1,230 @@
+{
+  "header": {
+    "verification": {
+      "notVerified": "Not verified"
+    },
+    "actions": {
+      "invite": "Invite Friends",
+      "share": "Share Profile"
+    }
+  },
+  "links": {
+    "sections": {
+      "settings": "Settings",
+      "support": "Support"
+    },
+    "items": {
+      "profile": "Profile",
+      "personalInfo": "Personal Information",
+      "language": "Language",
+      "linkInBio": "Link In Bio",
+      "passkeys": "Passkeys",
+      "sendtags": "Sendtags",
+      "rewards": "Rewards",
+      "referrals": "Referrals",
+      "learnMore": "Learn more about Send",
+      "liveChat": "Live Chat Support"
+    },
+    "signOut": "sign out"
+  },
+  "share": {
+    "title": "Share Profile",
+    "actions": {
+      "copy": "copy link"
+    },
+    "toast": {
+      "copied": "Profile link copied to clipboard",
+      "copyError": {
+        "title": "Failed to copy link",
+        "message": "Something went wrong while copying the link"
+      }
+    }
+  },
+  "upload": {
+    "errors": {
+      "noImage": "No image provided.",
+      "bufferNull": "ArrayBuffer is null."
+    }
+  },
+  "common": {
+    "saveChanges": "SAVE CHANGES",
+    "cancel": "CANCEL",
+    "remove": "REMOVE",
+    "confirm": "CONFIRM",
+    "success": "Success!",
+    "notAvailable": "N/A"
+  },
+  "profile": {
+    "header": "Profile",
+    "overview": {
+      "name": "Name",
+      "about": "About",
+      "visibility": {
+        "public": "Public Profile",
+        "private": "Private Profile"
+      },
+      "edit": "edit profile"
+    },
+    "form": {
+      "name": "Name",
+      "about": "About",
+      "aboutPlaceholder": "Tell us about yourself",
+      "makePublic": "Make Profile Public"
+    }
+  },
+  "personalInfo": {
+    "header": "Personal Information",
+    "toast": {
+      "phoneUpdated": "Phone number updated"
+    },
+    "labels": {
+      "dateOfBirth": "Date of Birth",
+      "nonEditable": "(non-editable)",
+      "xHandle": "X Handle",
+      "phone": "Phone number",
+      "xUsername": "X username",
+      "birthday": "birthday"
+    },
+    "overview": {
+      "edit": "edit personal information"
+    }
+  },
+  "linkInBio": {
+    "header": "Link In Bio",
+    "empty": "No social links added yet.",
+    "cta": {
+      "edit": "edit links"
+    },
+    "placeholders": {
+      "whatsapp": "Whatsapp Phone Number"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "description": "Send uses your selected language on every device signed into your account.",
+    "updating": "Applying language…"
+  },
+  "passkeys": {
+    "header": "Passkeys",
+    "empty": {
+      "noCredentials": "You have no WebAuthn credentials. This should never happen. Please reach out to <supportLink>support</supportLink> if you need help.",
+      "noAccount": "You have no Send Account.",
+      "learnCredentials": "Learn more about WebAuthn credentials",
+      "learnAccounts": "Learn more about Send Accounts",
+      "supportLink": "support"
+    },
+    "list": {
+      "add": "Add a Passkey",
+      "removePrompt": "Remove Passkey?",
+      "removeAction": "REMOVE PASSKEY",
+      "labels": {
+        "createdAt": "Created At",
+        "keySlot": "Key Slot",
+        "status": "Status"
+      },
+      "status": {
+        "notConfirmed": "Passkey is not confirmed onchain. Finish confirming the passkey onchain."
+      },
+      "remove": {
+        "title": "Removing \"{{name}}\" as a signer on your Send account.",
+        "warning": "This cannot be undone.",
+        "prompt": "Please enter \"{{name}}\" below"
+      },
+      "errors": {
+        "noBalance": "No USDC balance to pay for gas fees"
+      },
+      "updateKeySlot": {
+        "toast": "Updated key slot",
+        "message": "Onchain Slot, {{onchainSlot}}, does not match Webauthn Slot {{storageSlot}}. This should never happen. Please update the key slot below.",
+        "cta": "Update Key Slot"
+      }
+    },
+    "create": {
+      "title": "Secure Your Account with Passkeys",
+      "description": "Secure your Send Account by adding up to 20 passkeys. Passkeys are trusted devices authorized to sign your account's transactions.",
+      "submit": "Add a Passkey",
+      "accountNameLabel": "Passkey name"
+    },
+    "confirm": {
+      "title": "Add Passkey as Signer",
+      "description": "Your passkey {{name}} has been saved. Add your new passkey as a signer. This will allow you to sign transactions on your account with your new passkey.",
+      "submit": "Add Passkey as Signer",
+      "noCredential": "No credential found for credential ID {{id}}"
+    }
+  },
+  "sendtag": {
+    "header": {
+      "first": "Register first Sendtag",
+      "verified": "Verified Sendtags",
+      "description": "Own your identity on Send. Register up to 5 verified tags and make them yours."
+    },
+    "buttons": {
+      "registerFree": "register free sendtag",
+      "addNew": "add new",
+      "addTag": "ADD TAG",
+      "continue": "continue",
+      "changeMain": "Change Main Tag",
+      "register": "register"
+    },
+    "labels": {
+      "addAnother": "Add Another Sendtag",
+      "createNew": "Create a New Sendtag",
+      "sendtagName": "Sendtag name",
+      "enterName": "Enter Sendtag name",
+      "inputDesired": "Input desired Sendtag",
+      "pendingList": "Sendtags [{{pending}}/{{remaining}}]",
+      "name": "Name",
+      "price": "Price",
+      "total": "Total",
+      "referralCode": "Referral Code"
+    },
+    "messages": {
+      "securedAfterPayment": "Your Sendtag will be secured after payment confirmation",
+      "updatingMain": "Updating main tag...",
+      "choosePrimary": "Choose which tag appears as your primary identity",
+      "invalidInput": "Invalid input",
+      "alreadyTaken": "This Sendtag is already taken",
+      "genericError": "Something went wrong"
+    },
+    "sheet": {
+      "title": "Select Main Tag"
+    },
+    "toasts": {
+      "mainUpdated": "Main tag updated",
+      "mainUpdateFailed": "Failed to update main tag"
+    },
+    "referral": {
+      "placeholder": "Referral Code",
+      "empty": "Got a referral? Enter the code to get rewards!",
+      "validating": "Validating referral code",
+      "invalid": "Invalid referral code",
+      "applied": "Referral code applied"
+    },
+    "pricing": {
+      "title": "Sendtag Pricing",
+      "description": "Sendtags are priced based on their length. The shorter the Sendtag, the more it costs.",
+      "tooltipDescription": "Sendtag price is based on length — the shorter it is, the higher the price.",
+      "ok": "OK",
+      "button": {
+        "label": "Pricing",
+        "free": "Free"
+      }
+    },
+    "checkout": {
+      "review": "Review purchase",
+      "totalPrice": "Total Price",
+      "price": "Price",
+      "fees": "Fees",
+      "balance": "Balance:",
+      "balanceError": "Error fetching balance info",
+      "retry": "Retry",
+      "loading": "loading...",
+      "deposit": "Deposit USDC",
+      "requesting": "requesting...",
+      "processing": "processing...",
+      "registering": "registering...",
+      "complete": "complete purchase",
+      "error": "error"
+    }
+  }
+}
