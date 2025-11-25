@@ -196,9 +196,11 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
             : undefined
         }
       >
-        <BottomSheetView id="transaction-content">
-          {transaction && <TransactionContent transaction={transaction} onClose={onClose} />}
-        </BottomSheetView>
+        {transaction && (
+          <BottomSheetView id="transaction-content">
+            <TransactionContent transaction={transaction} onClose={onClose} />
+          </BottomSheetView>
+        )}
       </BottomSheet>
       <AnimatePresence>
         {open && (
