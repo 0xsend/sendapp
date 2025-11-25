@@ -51,6 +51,7 @@ import sendTokenUpgradeEs from './resources/send-token-upgrade/es.json'
 import sendTokenUpgradeZh from './resources/send-token-upgrade/zh.json'
 import paymasterAllowanceEn from './resources/paymaster-allowance/en.json'
 import paymasterAllowanceEs from './resources/paymaster-allowance/es.json'
+import paymasterAllowanceZh from './resources/paymaster-allowance/zh.json'
 import tradeEn from './resources/trade/en.json'
 import tradeEs from './resources/trade/es.json'
 import tradeZh from './resources/trade/zh.json'
@@ -147,6 +148,7 @@ export const resources = {
     maintenance: maintenanceZh,
     navigation: navigationZh,
     onboarding: onboardingZh,
+    paymasterAllowance: paymasterAllowanceZh,
     rewards: rewardsZh,
     secretShop: secretShopZh,
     send: sendZh,
