@@ -411,7 +411,6 @@ export const sendAccountRouter = createTRPCRouter({
           userop,
           sendAccountCalls,
           chainId: sendAccount.chain_id,
-          entryPoint,
           sendAccount: { address: sendAccount.address },
         })
 

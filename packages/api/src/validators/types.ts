@@ -20,7 +20,6 @@ export interface ValidatorParams {
     data: Hex
   }>
   chainId: number
-  entryPoint: Address
   sendAccount: { address: Address }
 }
 

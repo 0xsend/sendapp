@@ -1,11 +1,12 @@
 {
   "hero": {
-    "title": "Actualización de Paymaster Requerida",
-    "subtitle": "Hemos actualizado el contrato de paymaster. Por favor apruebe la nueva dirección para continuar usando transacciones sin gas."
+    "title": "Pagar Gas con USDC",
+    "subtitle": "Para pagar las tarifas de transacción con USDC, apruebe al paymaster para gastar USDC en su nombre."
   },
   "allowances": {
     "current": "Asignación Actual",
-    "required": "Asignación Requerida"
+    "required": "Asignación Requerida",
+    "unlimited": "Ilimitado"
   },
   "actions": {
     "approve": "Aprobar Paymaster",

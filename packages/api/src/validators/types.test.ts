@@ -18,7 +18,6 @@ describe('Validator types', () => {
         userop: { callData: string }
         sendAccountCalls?: Array<{ dest: string; value: bigint; data: string }>
         chainId: number
-        entryPoint: string
         sendAccount: { address: string }
       }): { ok: true; context: TContext } | { ok: false; reason: string }
     }
@@ -33,7 +32,6 @@ describe('Validator types', () => {
       mockValidator.validate({
         userop: { callData: '0x' },
         chainId: 1,
-        entryPoint: '0x',
         sendAccount: { address: '0x' },
       }).ok
     ).toBe(true)

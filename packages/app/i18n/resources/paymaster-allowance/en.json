@@ -1,11 +1,12 @@
 {
   "hero": {
-    "title": "Paymaster Update Required",
-    "subtitle": "We've upgraded the paymaster contract. Please approve the new address to continue using gas-free transactions."
+    "title": "Pay Gas with USDC",
+    "subtitle": "To pay for transaction fees with USDC, approve the paymaster to spend USDC on your behalf."
   },
   "allowances": {
     "current": "Current Allowance",
-    "required": "Required Allowance"
+    "required": "Required Allowance",
+    "unlimited": "Unlimited"
   },
   "actions": {
     "approve": "Approve Paymaster",

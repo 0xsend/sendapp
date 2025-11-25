@@ -61,11 +61,10 @@ export function PaymasterAllowanceScreen({ children }: { children?: React.ReactN
   const { data: sendAccount } = useSendAccount()
   const { t } = useTranslation('paymasterAllowance')
 
-  const { needsApproval, isLoading, error, currentAllowance, targetAmount } =
-    usePaymasterAllowanceCheck({
-      chainId,
-      sendAccount: sendAccount?.address,
-    })
+  const { needsApproval, isLoading, error, currentAllowance } = usePaymasterAllowanceCheck({
+    chainId,
+    sendAccount: sendAccount?.address,
+  })
 
   // If there's an error checking allowance, log it but don't block the user
   if (error) {
@@ -106,10 +105,7 @@ export function PaymasterAllowanceScreen({ children }: { children?: React.ReactN
               label={t('allowances.current')}
               amount={formatAmount((currentAllowance ?? 0n).toString(), 6, 2)}
             />
-            <AllowanceRow
-              label={t('allowances.required')}
-              amount={formatAmount(targetAmount.toString(), 6, 2)}
-            />
+            <AllowanceRow label={t('allowances.required')} amount={t('allowances.unlimited')} />
           </Card>
 
           <YStack gap="$4" w="100%" maw={500} ai="center">
