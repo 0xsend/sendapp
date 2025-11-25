@@ -140,7 +140,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
   return (
     <>
       <Portal zIndex={10}>
-        <Container open={open} setOpen={setOpen}>
+        <Container bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
           <SendChatContext.Provider
             activeSection={activeSection}
             setActiveSection={setActiveSection}
@@ -182,6 +182,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         onClose={() => {
                           if (activeSection === 'chat') {
                             setOpen(false)
+                            bottomSheetRef.current?.close()
                           } else {
                             setActiveSection('chat')
                           }
@@ -231,20 +232,12 @@ interface ContainerProps {
   children: React.ReactNode
   open: boolean
   setOpen: (open: boolean) => void
+  bottomSheetRef: React.RefObject<BottomSheet>
 }
 
-const Container = ({ children, open, setOpen }: ContainerProps) => {
+const Container = ({ children, open, setOpen, bottomSheetRef }: ContainerProps) => {
   const { lg } = useMedia()
-  const bottomSheetRef = useRef<BottomSheet>(null)
   const { bottom, top } = useSafeAreaInsets()
-
-  useEffect(() => {
-    if (open) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.close()
-    }
-  }, [open])
 
   if (lg) {
     return (
