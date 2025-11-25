@@ -1,20 +1,5 @@
-import {
-  AnimatePresence,
-  Portal,
-  useSafeAreaInsets,
-  View,
-  XStack,
-  YStack,
-  Paragraph,
-  Button,
-  SizableText,
-  useTheme,
-  useMedia,
-  Sheet,
-} from '@my/ui'
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import { useEffect, useRef } from 'react'
+import { useSafeAreaInsets, XStack, YStack, Paragraph, Button, SizableText, Sheet } from '@my/ui'
+import { useRef } from 'react'
 import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
@@ -22,10 +7,6 @@ import { IconCoin } from 'app/components/icons/IconCoin'
 import { counterpart, userNameFromActivityUser, noteFromActivity } from 'app/utils/activity'
 import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
-import { useSendScreenParams } from 'app/routers/params'
-import { formatUnits } from 'viem'
-import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
-import { allCoinsDict } from 'app/data/coins'
 import { AlertCircle } from '@tamagui/lucide-icons'
 
 interface TransactionProps {
@@ -49,8 +30,6 @@ const TransactionContent = ({
   const amountMatch = amountText.match(/^[+-]?\s*([\d,]+\.?\d*)\s*(\w+)?/)
   const numericAmount = amountMatch?.[1] || amountText
   const symbol = amountMatch?.[2] || coinSymbol || ''
-  const [queryParams] = useSendScreenParams()
-  const { sendToken, amount: amountParam } = queryParams
 
   const { bottom } = useSafeAreaInsets()
 
@@ -58,17 +37,8 @@ const TransactionContent = ({
     query: { data: prices },
   } = useTokenPrices()
 
-  const { coin: selectedCoin } = useCoinFromSendTokenParam()
-
-  const price = prices?.[sendToken] ?? 0
-  const amountInUSD =
-    price *
-    Number(
-      formatUnits(
-        BigInt(amountParam ?? ''),
-        selectedCoin?.decimals ?? allCoinsDict[sendToken]?.decimals ?? 0
-      )
-    )
+  const price = prices?.[transaction.data.coin?.token] ?? 0
+  const amountInUSD = price * Number(numericAmount)
 
   const isFailed =
     transaction?.data?.status === 'failed' || transaction?.data?.status === 'cancelled'
@@ -177,7 +147,16 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
       zIndex={100_000}
       animation="responsive"
     >
-      <Sheet.Frame bg="$color1" id="transaction-content" maxWidth={720} m={35} ml="auto">
+      <Sheet.Frame
+        bg="$color1"
+        id="transaction-content"
+        maxWidth={720}
+        m={35}
+        ml="auto"
+        $lg={{
+          mx: 'auto',
+        }}
+      >
         {transRef.current && (
           <TransactionContent transaction={transRef.current} onClose={onCloseProp} />
         )}

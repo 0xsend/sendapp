@@ -784,6 +784,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
       } finally {
         setLoadingSend(false)
+
+        setSendParams(
+          {
+            ...sendParams,
+            note: undefined,
+          },
+          { webBehavior: 'replace' }
+        )
       }
     }
   }
@@ -1287,6 +1295,17 @@ const groupActivitiesByDate = (activities: Activity[]): ListItem[] => {
   const grouped: ListItem[] = []
   let currentDate: Date | null = null
   let currentDateHeader: Date | null = null
+  let activitiesForCurrentDate: Activity[] = []
+
+  const flushCurrentDateGroup = () => {
+    if (activitiesForCurrentDate.length > 0 && currentDateHeader) {
+      for (const activity of activitiesForCurrentDate) {
+        grouped.push({ type: 'activity', activity })
+      }
+      grouped.push({ type: 'dateHeader', date: currentDateHeader })
+      activitiesForCurrentDate = []
+    }
+  }
 
   for (let i = 0; i < activities.length; i++) {
     const activity = activities[i]
@@ -1297,20 +1316,15 @@ const groupActivitiesByDate = (activities: Activity[]): ListItem[] => {
     activityDateOnly.setHours(0, 0, 0, 0)
 
     if (!currentDate || currentDate.getTime() !== activityDateOnly.getTime()) {
-      if (currentDateHeader !== null && i > 0) {
-        grouped.push({ type: 'dateHeader', date: currentDateHeader })
-      }
-
+      flushCurrentDateGroup()
       currentDate = activityDateOnly
       currentDateHeader = activityDate
     }
 
-    grouped.push({ type: 'activity', activity })
-
-    if (i === activities.length - 1 && currentDateHeader !== null) {
-      grouped.push({ type: 'dateHeader', date: currentDateHeader })
-    }
+    activitiesForCurrentDate.push(activity)
   }
+
+  flushCurrentDateGroup()
 
   return grouped
 }
@@ -1428,18 +1442,16 @@ const ChatList = YStack.styleable(() => {
           data={listItems}
           keyExtractor={(item, index) => {
             if (item.type === 'dateHeader') {
-              return `date-header-${item.date.toISOString().split('T')[0]}`
+              return `date-header-${item.date.toISOString().split('T')[0]}-${index}`
             }
             return `${item.activity.event_name}-${item.activity.created_at}-${item.activity?.from_user?.id}-${item.activity?.to_user?.id}`
           }}
           onEndReached={() => hasNextPage && fetchNextPage()}
-          ListFooterComponent={
-            !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
-          }
           inverted
           renderItem={renderItem}
           contentContainerStyle={{
             paddingHorizontal: 12,
+            opacity: !isLoadingActivities && isFetchingNextPageActivities ? 0.8 : 1,
           }}
         />
       )}
