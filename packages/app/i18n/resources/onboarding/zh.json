@@ -1,0 +1,22 @@
+{
+  "errors": {
+    "sessionExpired": "会话已过期。正在重定向到登录...",
+    "unknown": "未知错误"
+  },
+  "form": {
+    "placeholder": "输入想要的 Sendtag",
+    "submit": "完成帐户"
+  },
+  "passkey": {
+    "retry": "重试完整性检查",
+    "status": {
+      "checking": "正在检查您的通行密钥的签名完整性...",
+      "complete": "通行密钥完整性检查完成。",
+      "failureDetailed": "通行密钥健康检查失败。请尝试在具有 iCloud 钥匙串或 Google 密码管理器的设备上创建您的通行密钥。",
+      "success": "通行密钥完整性检查通过。"
+    },
+    "toastFailure": "通行密钥完整性检查失败。"
+  },
+  "subtitle": "选择您的 Sendtag — 您在 Send 上的唯一用户名",
+  "title": "完成您的帐户"
+}

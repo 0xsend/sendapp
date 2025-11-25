@@ -1,0 +1,87 @@
+{
+  "sidebar": {
+    "account": "帐户",
+    "secretShop": "秘密商店"
+  },
+  "stack": {
+    "account": {
+      "language": "语言",
+      "linkInBio": "个人主页链接",
+      "passkeys": "通行密钥",
+      "passkeysConfirm": "确认通行密钥",
+      "passkeysCreate": "创建通行密钥",
+      "personalInfo": "个人信息",
+      "profile": "个人资料",
+      "referrals": "推荐",
+      "root": "帐户",
+      "sendtags": "Sendtags",
+      "sendtagsAdd": "注册 Sendtags",
+      "sendtagsCheckout": "结账",
+      "sendtagsFirst": "首个 Sendtag"
+    },
+    "activity": {
+      "details": "交易详情"
+    },
+    "canton": {
+      "root": "探索 Canton 钱包"
+    },
+    "deposit": {
+      "applePay": "Apple Pay",
+      "debitCard": "借记卡",
+      "onBase": "在 Base 上充值",
+      "root": "充值",
+      "success": "成功"
+    },
+    "earn": {
+      "balance": "余额",
+      "deposit": "充值",
+      "details": "详情",
+      "rewards": "奖励余额",
+      "root": "储蓄",
+      "withdraw": "提取储蓄"
+    },
+    "investments": {
+      "root": "投资"
+    },
+    "notFound": "未找到",
+    "profile": {
+      "about": "关于",
+      "history": "历史记录"
+    },
+    "rewards": {
+      "root": "奖励"
+    },
+    "send": {
+      "enterAmount": "输入金额",
+      "previewAndSend": "预览并发送"
+    },
+    "sendpot": {
+      "buyTickets": "购买彩票",
+      "confirm": "购买彩票摘要",
+      "root": "Sendpot"
+    },
+    "stables": {
+      "root": "现金"
+    },
+    "token": {
+      "root": "投资"
+    },
+    "trade": {
+      "root": "交易",
+      "summary": "交易摘要"
+    }
+  },
+  "tabs": {
+    "activity": "活动",
+    "explore": "探索",
+    "home": "首页",
+    "send": "发送",
+    "trade": "交易"
+  },
+  "topNav": {
+    "tokens": {
+      "cash": "现金",
+      "invest": "投资"
+    }
+  }
+}

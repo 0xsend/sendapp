@@ -1,0 +1,67 @@
+{
+  "activity": {
+    "empty": "暂无可用奖励",
+    "error": {
+      "verifications": "获取验证时出错。{{message}}"
+    },
+    "title": {
+      "period": "{{period}} 奖励",
+      "total": "{{period}} 总计",
+      "fallback": "每月"
+    },
+    "sections": {
+      "tasks": "任务",
+      "multipliers": "倍数",
+      "progress": "进度"
+    }
+  },
+  "requirements": {
+    "title": "您的 SEND 余额",
+    "sendtag": "已购买 Sendtag",
+    "balance": "余额 {{amount}}",
+    "savings": "储蓄存款 ${{amount}}"
+  },
+  "tasks": {
+    "status": {
+      "completed": "已完成",
+      "ongoing": "进行中",
+      "pending": "待处理"
+    },
+    "types": {
+      "create_passkey": "创建通行密钥",
+      "send_ceiling": "",
+      "send_one_hundred": "100+ 次发送",
+      "send_streak": "发送连胜",
+      "send_ten": "10+ 次发送",
+      "sendpot_ticket_purchase": "SendPot 彩票",
+      "tag_referral": "推荐",
+      "tag_registration": "购买 Sendtag",
+      "total_tag_referrals": "推荐总数"
+    }
+  },
+  "multipliers": {
+    "referralTitle": "{{period}} {{title}}",
+    "title": "倍数"
+  },
+  "common": {
+    "na": "不适用",
+    "x": "X {{value}}"
+  },
+  "claim": {
+    "cta": {
+      "claimed": "$ 已领取",
+      "claiming": "领取中...",
+      "default": "$ 领取奖励",
+      "error": "错误",
+      "insufficientGas": "Gas 不足",
+      "notYet": "尚未可领取"
+    },
+    "heading": {
+      "period": "{{period}} 奖励",
+      "total": "{{period}} 总计"
+    }
+  },
+  "select": {
+    "month": "选择月份"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "addMoney": "添加资金",
+    "deposit": "存款",
+    "earn": "赚取",
+    "invest": "投资",
+    "send": "发送"
+  },
+  "cards": {
+    "investments": {
+      "cta": "投资",
+      "empty": "分散您的投资组合",
+      "error": "加载市场数据失败",
+      "title": "投资",
+      "weeklyDelta": "本周{{sign}}${{amount}}"
+    },
+    "referrals": {
+      "title": "推荐"
+    },
+    "rewards": {
+      "title": "奖励"
+    },
+    "savings": {
+      "earning": "赚取 {{percent}}%",
+      "fallback": "高达 10% 的利息",
+      "title": "储蓄"
+    },
+    "stables": {
+      "title": "现金余额",
+      "totalTitle": "总余额"
+    }
+  },
+  "fallback": {
+    "missingAccount": {
+      "description": "这不应该发生。",
+      "onboarding": "前往入门",
+      "signOut": "退出",
+      "sitemap": "站点地图",
+      "title": "未找到发送帐户"
+    }
+  },
+  "token": {
+    "chartError": "加载图表数据失败",
+    "keyMetrics": "关键指标",
+    "metrics": {
+      "circulatingSupply": "流通供应量",
+      "fdv": "FDV",
+      "marketCap": "市值",
+      "volume24h": "交易量（24 小时）"
+    },
+    "priceOverview": "价格概览"
+  }
+}

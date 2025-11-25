@@ -1,0 +1,30 @@
+{
+  "actions": {
+    "fundAccount": "充值帐户"
+  },
+  "dev": {
+    "buttons": {
+      "fundEth": "充值 10 ETH",
+      "fundSend": "充值 10 万 Send",
+      "fundSendV0": "充值 100 万 Send V0 - 1000 亿供应量",
+      "fundSpx": "充值 6.9 万 SPX6900",
+      "fundUsdc": "充值 100 USDC"
+    },
+    "toasts": {
+      "fundEth": "已充值 10 ETH",
+      "fundSend": "已充值 1 万 Send",
+      "fundSendV0": "已充值 100 万 Send V0",
+      "fundSpx": "已充值 6.9 万 SPX6900",
+      "fundUsdc": "已充值 100 USDC"
+    }
+  },
+  "result": {
+    "skipped": "{{type}}：余额过多。",
+    "title": "结果",
+    "transaction": "{{type}} 交易：{{hash}}"
+  },
+  "status": {
+    "missingAccount": "未找到 Send 帐户。您创建了吗？",
+    "networkNotice": "仅在 {{network}} 上可用。您的 Send 帐户地址："
+  }
+}

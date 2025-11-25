@@ -1,0 +1,44 @@
+{
+  "buttons": {
+    "cancel": "取消",
+    "save": "保存",
+    "verify": "验证"
+  },
+  "cards": {
+    "discoverable": "在 Canton Wallet 中可被发现",
+    "editTitle": "编辑 Canton Wallet 地址",
+    "verifiedTitle": "Canton Wallet 已验证"
+  },
+  "errors": {
+    "addressRequired": "需要 Canton Wallet 地址",
+    "invalidFormat": "Canton Wallet 地址格式无效。预期格式：cantonwallet-username::hash",
+    "invalidInput": "无效输入"
+  },
+  "header": {
+    "title": "获取 Canton Wallet 邀请"
+  },
+  "links": {
+    "createAccount": "创建 Canton Wallet 账户"
+  },
+  "messages": {
+    "addressChangeWarning": "更改您的 Canton Wallet 地址将暂停所有 $CC 奖励 24 小时",
+    "noDistribution": "无可用分发"
+  },
+  "placeholders": {
+    "address": "Canton Wallet 地址"
+  },
+  "requirements": {
+    "savingsVault": "将 ${{amount}} 存入储蓄金库",
+    "sendBalance": "持有至少 {{amount}} $SEND",
+    "sendTag": "已购买 Sendtag"
+  },
+  "toasts": {
+    "copyError": "无法复制",
+    "copySuccess": "已复制 Canton Wallet 地址",
+    "discoverableSuccess": "更新成功",
+    "updateError": "更新失败",
+    "updateSuccess": "Canton Wallet 地址已更新",
+    "verifyError": "验证失败",
+    "verifySuccess": "验证成功"
+  }
+}

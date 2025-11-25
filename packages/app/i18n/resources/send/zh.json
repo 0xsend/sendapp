@@ -1,0 +1,54 @@
+{
+  "confirm": {
+    "button": {
+      "send": "发送"
+    },
+    "edit": "编辑",
+    "errors": {
+      "default": "发送错误",
+      "insufficientBalance": "余额不足",
+      "insufficientGas": "Gas 不足"
+    },
+    "fees": "手续费",
+    "noteTitle": "您的备注"
+  },
+  "form": {
+    "balanceLabel": "余额：",
+    "errors": {
+      "insufficientFunds": "资金不足",
+      "minimum": "最低：{{amount}} {{symbol}}",
+      "noteValidationFallback": "备注未能满足验证约束"
+    },
+    "note": {
+      "maxCharacters": "最多：{{count}} 个字符"
+    },
+    "submit": "继续"
+  },
+  "noAccount": {
+    "banner": "/send 支票即将推出",
+    "cta": "写 /send 支票",
+    "description": "没有发送帐户！请他们创建一个或写一张 /send 支票。",
+    "title": "没有发送帐户",
+    "toast": "即将推出"
+  },
+  "recipient": {
+    "edit": "编辑",
+    "label": "至"
+  },
+  "search": {
+    "errorHeading": "错误",
+    "placeholder": "按发送标签或钱包地址搜索",
+    "unknownError": "未知错误"
+  },
+  "suggestions": {
+    "birthdays": "祝他们生日快乐",
+    "favorites": "收藏的发送者",
+    "recent": "最近活动",
+    "top": "热门发送者"
+  },
+  "topNav": {
+    "default": "发送",
+    "enterAmount": "输入金额",
+    "preview": "预览并发送"
+  }
+}

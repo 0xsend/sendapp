@@ -1,0 +1,67 @@
+{
+  "form": {
+    "buttons": {
+      "loading": "加载中",
+      "max": "最大",
+      "review": "复核"
+    },
+    "errors": {
+      "balance": "获取余额信息出错",
+      "slippageMax": "最大滑点值为 20%",
+      "slippageMin": "最小滑点值为 0%"
+    },
+    "labels": {
+      "pay": "您支付",
+      "priceImpact": "价格影响:",
+      "receive": "您收到"
+    },
+    "priceImpact": {
+      "levels": {
+        "high": "非常高",
+        "medium": "高"
+      }
+    },
+    "slippage": {
+      "customPlaceholder": "自定义",
+      "label": "最大滑点"
+    }
+  },
+  "priceImpactInfo": {
+    "description": "兑换大量资金会降低回报。可用汇率可能无法反映最佳交易。",
+    "dismiss": "知道了",
+    "tips": [
+      "将您的兑换分成较小的金额",
+      "在更多人交易时进行交易",
+      "使用较低的金额以获得更好的汇率"
+    ],
+    "tipsTitle": "如何获得更好的汇率：",
+    "title": "什么是价格影响？"
+  },
+  "risk": {
+    "buttons": {
+      "cancel": "取消",
+      "confirm": "我同意并继续"
+    },
+    "checkbox": "我已阅读并理解所涉及的风险。",
+    "description": "交易加密货币涉及高风险，可能不适合所有投资者。您可能会损失部分或全部本金，并且只应投资您能承受损失的资金。在继续之前，请仔细考虑您的投资目标、经验和风险承受能力。",
+    "errorTitle": "错误",
+    "learnMore": "了解更多。",
+    "title": "重要声明"
+  },
+  "summary": {
+    "buttons": {
+      "confirm": "确认交易",
+      "edit": "编辑",
+      "insufficientBalance": "余额不足",
+      "insufficientGas": "Gas 不足",
+      "loading": "交易中..."
+    },
+    "labels": {
+      "exchangeRate": "汇率",
+      "maxSlippage": "最大滑点",
+      "priceImpact": "价格影响",
+      "sendFee": "发送手续费",
+      "transactionFee": "交易手续费"
+    }
+  }
+}

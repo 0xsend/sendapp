@@ -1,0 +1,230 @@
+{
+  "common": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "notAvailable": "不适用",
+    "remove": "移除",
+    "saveChanges": "保存更改",
+    "success": "成功！"
+  },
+  "header": {
+    "actions": {
+      "invite": "邀请好友",
+      "share": "分享个人资料"
+    },
+    "verification": {
+      "notVerified": "未验证"
+    }
+  },
+  "language": {
+    "description": "Send 在登录到您帐户的每个设备上使用您选择的语言。",
+    "title": "语言",
+    "updating": "正在应用语言…"
+  },
+  "linkInBio": {
+    "cta": {
+      "edit": "编辑链接"
+    },
+    "empty": "尚未添加社交链接。",
+    "header": "个人简介链接",
+    "placeholders": {
+      "whatsapp": "Whatsapp 电话号码"
+    }
+  },
+  "links": {
+    "items": {
+      "language": "语言",
+      "learnMore": "了解更多关于 Send 的信息",
+      "linkInBio": "个人简介链接",
+      "liveChat": "在线聊天支持",
+      "passkeys": "通行密钥",
+      "personalInfo": "个人信息",
+      "profile": "个人资料",
+      "referrals": "推荐",
+      "rewards": "奖励",
+      "sendtags": "Sendtags"
+    },
+    "sections": {
+      "settings": "设置",
+      "support": "支持"
+    },
+    "signOut": "退出"
+  },
+  "passkeys": {
+    "confirm": {
+      "description": "您的通行密钥 {{name}} 已保存。 将您的新通行密钥添加为签名者。 这将允许您使用新的通行密钥在您的帐户上签署交易。",
+      "noCredential": "未找到凭据 ID {{id}} 的凭据",
+      "submit": "添加通行密钥作为签名者",
+      "title": "添加通行密钥作为签名者"
+    },
+    "create": {
+      "accountNameLabel": "通行密钥名称",
+      "description": "通过添加最多 20 个通行密钥来保护您的 Send 帐户。 通行密钥是授权签署您帐户交易的可信设备。",
+      "submit": "添加通行密钥",
+      "title": "使用通行密钥保护您的帐户"
+    },
+    "empty": {
+      "learnAccounts": "了解更多关于 Send 帐户的信息",
+      "learnCredentials": "了解更多关于 WebAuthn 凭据的信息",
+      "noAccount": "您没有 Send 帐户。",
+      "noCredentials": "您没有 WebAuthn 凭据。 这不应该发生。 如果您需要帮助，请联系<supportLink>支持</supportLink>。",
+      "supportLink": "支持"
+    },
+    "header": "通行密钥",
+    "list": {
+      "add": "添加通行密钥",
+      "errors": {
+        "noBalance": "没有 USDC 余额来支付 gas 费用"
+      },
+      "labels": {
+        "createdAt": "创建于",
+        "keySlot": "密钥槽",
+        "status": "状态"
+      },
+      "remove": {
+        "prompt": "请在下面输入“{{name}}”",
+        "title": "正在移除“{{name}}”作为您 Send 帐户上的签名者。",
+        "warning": "此操作无法撤消。"
+      },
+      "removeAction": "移除通行密钥",
+      "removePrompt": "移除通行密钥？",
+      "status": {
+        "notConfirmed": "通行密钥未在链上确认。 完成在链上确认通行密钥。"
+      },
+      "updateKeySlot": {
+        "cta": "更新密钥槽",
+        "message": "链上槽 {{onchainSlot}} 与 Webauthn 槽 {{storageSlot}} 不匹配。 这不应该发生。 请更新下面的密钥槽。",
+        "toast": "已更新密钥槽"
+      }
+    }
+  },
+  "personalInfo": {
+    "header": "个人信息",
+    "labels": {
+      "birthday": "生日",
+      "dateOfBirth": "出生日期",
+      "nonEditable": "（不可编辑）",
+      "phone": "电话号码",
+      "xHandle": "X 句柄",
+      "xUsername": "X 用户名"
+    },
+    "overview": {
+      "edit": "编辑个人信息"
+    },
+    "toast": {
+      "phoneUpdated": "电话号码已更新"
+    }
+  },
+  "profile": {
+    "form": {
+      "about": "关于",
+      "aboutPlaceholder": "介绍一下你自己",
+      "makePublic": "公开个人资料",
+      "name": "姓名"
+    },
+    "header": "个人资料",
+    "overview": {
+      "about": "关于",
+      "edit": "编辑个人资料",
+      "name": "姓名",
+      "visibility": {
+        "private": "私密个人资料",
+        "public": "公开个人资料"
+      }
+    }
+  },
+  "sendtag": {
+    "buttons": {
+      "addNew": "添加新的",
+      "addTag": "添加标签",
+      "changeMain": "更改主标签",
+      "continue": "继续",
+      "register": "注册",
+      "registerFree": "注册免费 sendtag"
+    },
+    "checkout": {
+      "balance": "余额：",
+      "balanceError": "获取余额信息时出错",
+      "complete": "完成购买",
+      "deposit": "存入 USDC",
+      "error": "错误",
+      "fees": "费用",
+      "loading": "加载中...",
+      "price": "价格",
+      "processing": "处理中...",
+      "registering": "注册中...",
+      "requesting": "请求中...",
+      "retry": "重试",
+      "review": "查看购买",
+      "totalPrice": "总价"
+    },
+    "header": {
+      "description": "拥有您在 Send 上的身份。 注册最多 5 个已验证的标签，并使其成为您的标签。",
+      "first": "注册第一个 Sendtag",
+      "verified": "已验证的 Sendtags"
+    },
+    "labels": {
+      "addAnother": "添加另一个 Sendtag",
+      "createNew": "创建一个新的 Sendtag",
+      "enterName": "输入 Sendtag 名称",
+      "inputDesired": "输入所需的 Sendtag",
+      "name": "名称",
+      "pendingList": "Sendtags [{{pending}}/{{remaining}}]",
+      "price": "价格",
+      "referralCode": "推荐码",
+      "sendtagName": "Sendtag 名称",
+      "total": "总计"
+    },
+    "messages": {
+      "alreadyTaken": "此 Sendtag 已被占用",
+      "choosePrimary": "选择哪个标签作为您的主要身份显示",
+      "genericError": "出了点问题",
+      "invalidInput": "无效的输入",
+      "securedAfterPayment": "您的 Sendtag 将在付款确认后受到保护",
+      "updatingMain": "正在更新主标签..."
+    },
+    "pricing": {
+      "button": {
+        "free": "免费",
+        "label": "定价"
+      },
+      "description": "Sendtag 的价格基于其长度。 Sendtag 越短，价格越高。",
+      "ok": "好的",
+      "title": "Sendtag 定价",
+      "tooltipDescription": "Sendtag 价格基于长度 - 越短，价格越高。"
+    },
+    "referral": {
+      "applied": "已应用推荐码",
+      "empty": "有推荐码吗？ 输入代码以获得奖励！",
+      "invalid": "无效的推荐码",
+      "placeholder": "推荐码",
+      "validating": "正在验证推荐码"
+    },
+    "sheet": {
+      "title": "选择主标签"
+    },
+    "toasts": {
+      "mainUpdateFailed": "更新主标签失败",
+      "mainUpdated": "主标签已更新"
+    }
+  },
+  "share": {
+    "actions": {
+      "copy": "复制链接"
+    },
+    "title": "分享个人资料",
+    "toast": {
+      "copied": "个人资料链接已复制到剪贴板",
+      "copyError": {
+        "message": "复制链接时出错",
+        "title": "复制链接失败"
+      }
+    }
+  },
+  "upload": {
+    "errors": {
+      "bufferNull": "ArrayBuffer 为空。",
+      "noImage": "未提供图片。"
+    }
+  }
+}
