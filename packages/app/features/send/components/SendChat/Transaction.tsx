@@ -155,7 +155,7 @@ export const Transaction = ({ open, onClose: onCloseProp, transaction }: Transac
 
   const transRef = useRef<Activity | undefined>(undefined)
 
-  if (!transRef.current) {
+  if (!transRef.current || transaction !== transRef.current) {
     transRef.current = transaction
   }
 
