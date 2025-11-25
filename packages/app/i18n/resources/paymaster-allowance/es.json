@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "title": "Pagar Gas con USDC",
+    "subtitle": "Para pagar las tarifas de transacción con USDC, apruebe al paymaster para gastar USDC en su nombre."
+  },
+  "allowances": {
+    "current": "Asignación Actual",
+    "required": "Asignación Requerida",
+    "unlimited": "Ilimitado"
+  },
+  "actions": {
+    "approve": "Aprobar Paymaster",
+    "approving": "Aprobando..."
+  },
+  "status": {
+    "ready": "Listo para aprobar",
+    "requesting": "Solicitando aprobación...",
+    "sending": "Enviando transacción...",
+    "waiting": "Esperando confirmación...",
+    "retry": "La transacción falló, por favor reinténtelo"
+  },
+  "toast": {
+    "success": "¡Paymaster aprobado exitosamente!"
+  }
+}
