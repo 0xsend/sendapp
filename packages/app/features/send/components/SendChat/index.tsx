@@ -239,10 +239,17 @@ const Container = ({ children, open, setOpen, bottomSheetRef }: ContainerProps) 
   const { lg } = useMedia()
   const { bottom, top } = useSafeAreaInsets()
 
-  if (lg) {
+  const [render, setRender] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      setRender(true)
+    }
+  }, [open])
+
+  if (lg && render) {
     return (
       <BottomSheet
-        index={-1}
         ref={bottomSheetRef}
         snapPoints={['95%']}
         style={{ backgroundColor: 'transparent' }}
@@ -278,11 +285,13 @@ const Container = ({ children, open, setOpen, bottomSheetRef }: ContainerProps) 
     )
   }
 
-  return (
-    <View p="$8" jc="center" ai="flex-end" pos="absolute" inset={0} zi={1000}>
-      {children}
-    </View>
-  )
+  if (!lg) {
+    return (
+      <View p="$8" jc="center" ai="flex-end" pos="absolute" inset={0} zi={1000}>
+        {children}
+      </View>
+    )
+  }
 }
 
 interface SendChatHeaderProps {
