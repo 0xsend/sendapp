@@ -784,6 +784,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
       } finally {
         setLoadingSend(false)
+
+        setSendParams(
+          {
+            ...sendParams,
+            note: undefined,
+          },
+          { webBehavior: 'replace' }
+        )
       }
     }
   }
