@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "title": "使用USDC支付Gas费",
+    "subtitle": "要使用USDC支付交易费用，请授权Paymaster代表您使用USDC。"
+  },
+  "allowances": {
+    "current": "当前授权额度",
+    "required": "所需授权额度",
+    "unlimited": "无限制"
+  },
+  "actions": {
+    "approve": "授权Paymaster",
+    "approving": "授权中..."
+  },
+  "status": {
+    "ready": "准备授权",
+    "requesting": "请求授权中...",
+    "sending": "发送交易中...",
+    "waiting": "等待确认中...",
+    "retry": "交易失败，请重试"
+  },
+  "toast": {
+    "success": "Paymaster授权成功！"
+  }
+}
