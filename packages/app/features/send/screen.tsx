@@ -50,16 +50,17 @@ export const SendScreen = () => {
   const [queryParams, setQueryParams] = useSendScreenParams()
 
   const [open, setOpen] = useState(false)
-  const closeRecipientTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (profile?.address) {
+    if (profile?.address && Number(queryParams.m) === 1) {
       Keyboard.dismiss()
       startTransition(() => {
         setOpen(true)
       })
+    } else {
+      setOpen(false)
     }
-  }, [profile])
+  }, [profile, queryParams.m])
 
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
@@ -96,23 +97,13 @@ export const SendScreen = () => {
           open={open}
           onOpenChange={(val) => {
             setOpen(val)
-            if (!val) {
-              if (closeRecipientTimeout.current) {
-                clearTimeout(closeRecipientTimeout.current)
-                closeRecipientTimeout.current = null
-              }
-
-              closeRecipientTimeout.current = setTimeout(() => {
-                setQueryParams(
-                  {
-                    ...queryParams,
-                    recipient: undefined,
-                  },
-                  { webBehavior: 'replace' }
-                )
-                closeRecipientTimeout.current = null
-              }, 200)
-            }
+            setQueryParams(
+              {
+                ...queryParams,
+                m: val ? 1 : 0,
+              },
+              { webBehavior: 'replace' }
+            )
           }}
         />
         {/* )} */}

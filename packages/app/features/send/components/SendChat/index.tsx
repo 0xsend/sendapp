@@ -140,7 +140,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
   return (
     <>
       <Portal zIndex={10}>
-        <Container open={open} setOpen={setOpen}>
+        <Container bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
           <SendChatContext.Provider
             activeSection={activeSection}
             setActiveSection={setActiveSection}
@@ -182,6 +182,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
                         onClose={() => {
                           if (activeSection === 'chat') {
                             setOpen(false)
+                            bottomSheetRef.current?.close()
                           } else {
                             setActiveSection('chat')
                           }
@@ -231,20 +232,12 @@ interface ContainerProps {
   children: React.ReactNode
   open: boolean
   setOpen: (open: boolean) => void
+  bottomSheetRef: React.RefObject<BottomSheet>
 }
 
-const Container = ({ children, open, setOpen }: ContainerProps) => {
+const Container = ({ children, open, setOpen, bottomSheetRef }: ContainerProps) => {
   const { lg } = useMedia()
-  const bottomSheetRef = useRef<BottomSheet>(null)
   const { bottom, top } = useSafeAreaInsets()
-
-  useEffect(() => {
-    if (open) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.close()
-    }
-  }, [open])
 
   if (lg) {
     return (
@@ -1409,11 +1402,6 @@ const ChatList = YStack.styleable(() => {
       opacity={activeSection === 'chat' ? 1 : 0}
       y={activeSection === 'chat' ? 0 : -50}
       f={1}
-      $platform-web={{
-        willChange: 'transform',
-        filter: activeSection === 'chat' ? 'blur(0px)' : 'blur(4px)',
-        transition: 'filter linear 100ms',
-      }}
       animateOnly={['transform', 'opacity']}
       px="$4.5"
       $xs={{

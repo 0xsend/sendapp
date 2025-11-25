@@ -475,10 +475,12 @@ function SearchResultRow({
         ? {
             recipient: profile.tag_name,
             idType: 'tag',
+            m: 1,
           }
         : {
             recipient: profile.send_id,
             idType: 'sendid',
+            m: 1,
           }),
     })
   }
