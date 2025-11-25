@@ -6,52 +6,75 @@ import type { Locale } from 'expo-localization'
 import { getStoredLocale, setStoredLocale } from '../utils/i18n/localeStorage'
 import commonEn from './resources/common/en.json'
 import commonEs from './resources/common/es.json'
+import commonZh from './resources/common/zh.json'
 import accountEn from './resources/account/en.json'
 import accountEs from './resources/account/es.json'
+import accountZh from './resources/account/zh.json'
 import affiliateEn from './resources/affiliate/en.json'
 import affiliateEs from './resources/affiliate/es.json'
+import affiliateZh from './resources/affiliate/zh.json'
 import activityEn from './resources/activity/en.json'
 import activityEs from './resources/activity/es.json'
+import activityZh from './resources/activity/zh.json'
 import exploreEn from './resources/explore/en.json'
 import exploreEs from './resources/explore/es.json'
+import exploreZh from './resources/explore/zh.json'
 import investEn from './resources/invest/en.json'
 import investEs from './resources/invest/es.json'
+import investZh from './resources/invest/zh.json'
 import depositEn from './resources/deposit/en.json'
 import depositEs from './resources/deposit/es.json'
+import depositZh from './resources/deposit/zh.json'
 import leaderboardEn from './resources/leaderboard/en.json'
 import leaderboardEs from './resources/leaderboard/es.json'
+import leaderboardZh from './resources/leaderboard/zh.json'
 import earnEn from './resources/earn/en.json'
 import earnEs from './resources/earn/es.json'
+import earnZh from './resources/earn/zh.json'
 import cantonWalletEn from './resources/canton-wallet/en.json'
 import cantonWalletEs from './resources/canton-wallet/es.json'
+import cantonWalletZh from './resources/canton-wallet/zh.json'
 import rewardsEn from './resources/rewards/en.json'
 import rewardsEs from './resources/rewards/es.json'
+import rewardsZh from './resources/rewards/zh.json'
 import sendpotEn from './resources/sendpot/en.json'
 import sendpotEs from './resources/sendpot/es.json'
+import sendpotZh from './resources/sendpot/zh.json'
 import sendEn from './resources/send/en.json'
 import sendEs from './resources/send/es.json'
+import sendZh from './resources/send/zh.json'
 import secretShopEn from './resources/secret-shop/en.json'
 import secretShopEs from './resources/secret-shop/es.json'
+import secretShopZh from './resources/secret-shop/zh.json'
 import sendTokenUpgradeEn from './resources/send-token-upgrade/en.json'
 import sendTokenUpgradeEs from './resources/send-token-upgrade/es.json'
+import sendTokenUpgradeZh from './resources/send-token-upgrade/zh.json'
 import paymasterAllowanceEn from './resources/paymaster-allowance/en.json'
 import paymasterAllowanceEs from './resources/paymaster-allowance/es.json'
 import tradeEn from './resources/trade/en.json'
 import tradeEs from './resources/trade/es.json'
+import tradeZh from './resources/trade/zh.json'
 import homeEn from './resources/home/en.json'
 import homeEs from './resources/home/es.json'
+import homeZh from './resources/home/zh.json'
 import navigationEn from './resources/navigation/en.json'
 import navigationEs from './resources/navigation/es.json'
+import navigationZh from './resources/navigation/zh.json'
 import maintenanceEn from './resources/maintenance/en.json'
 import maintenanceEs from './resources/maintenance/es.json'
+import maintenanceZh from './resources/maintenance/zh.json'
 import onboardingEn from './resources/onboarding/en.json'
 import onboardingEs from './resources/onboarding/es.json'
+import onboardingZh from './resources/onboarding/zh.json'
 import settingsEn from './resources/settings/en.json'
 import settingsEs from './resources/settings/es.json'
+import settingsZh from './resources/settings/zh.json'
 import splashEn from './resources/splash/en.json'
 import splashEs from './resources/splash/es.json'
+import splashZh from './resources/splash/zh.json'
 import unknownEn from './resources/unknown/en.json'
 import unknownEs from './resources/unknown/es.json'
+import unknownZh from './resources/unknown/zh.json'
 
 export const DEFAULT_NAMESPACE = 'common'
 export const DEFAULT_LOCALE = 'en'
@@ -108,6 +131,31 @@ export const resources = {
     settings: settingsEs,
     splash: splashEs,
     unknown: unknownEs,
+  },
+  zh: {
+    [DEFAULT_NAMESPACE]: commonZh,
+    account: accountZh,
+    activity: activityZh,
+    affiliate: affiliateZh,
+    cantonWallet: cantonWalletZh,
+    deposit: depositZh,
+    earn: earnZh,
+    explore: exploreZh,
+    home: homeZh,
+    invest: investZh,
+    leaderboard: leaderboardZh,
+    maintenance: maintenanceZh,
+    navigation: navigationZh,
+    onboarding: onboardingZh,
+    rewards: rewardsZh,
+    secretShop: secretShopZh,
+    send: sendZh,
+    sendTokenUpgrade: sendTokenUpgradeZh,
+    sendpot: sendpotZh,
+    settings: settingsZh,
+    splash: splashZh,
+    trade: tradeZh,
+    unknown: unknownZh,
   },
 } as const
 

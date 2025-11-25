@@ -3,6 +3,7 @@ import { resources, DEFAULT_LOCALE, type AppLocale } from './config'
 const FALLBACK_LABELS: Partial<Record<AppLocale, string>> = {
   en: 'English',
   es: 'Español',
+  zh: '中文',
 }
 
 export const SUPPORTED_LOCALES = Object.keys(resources) as AppLocale[]
