@@ -137,8 +137,8 @@ const TransactionContent = ({
         </YStack>
       ) : (
         <YStack ai="center" jc="center" gap="$4" h={150}>
-          <AlertCircle opacity={0.8} size="$5" color="$warning" />
-          <SizableText size="$8" color="$warning">
+          <AlertCircle opacity={0.8} size="$5" color="$yellow10" />
+          <SizableText size="$8" color="$yellow11">
             Transaction failed
           </SizableText>
         </YStack>
