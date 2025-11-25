@@ -10,6 +10,7 @@ import {
   SizableText,
   useTheme,
   useMedia,
+  Sheet,
 } from '@my/ui'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
@@ -107,7 +108,7 @@ const TransactionContent = ({
       </Button>
 
       {!isFailed ? (
-        <YStack gap="$4">
+        <YStack pb="$4" gap="$4">
           <XStack ai="center" gap="$3">
             <SizableText size="$9" fontWeight="600" fontFamily="$mono" color="$color12">
               {numericAmount}
@@ -137,8 +138,8 @@ const TransactionContent = ({
         </YStack>
       ) : (
         <YStack ai="center" jc="center" gap="$4" h={150}>
-          <AlertCircle opacity={0.8} size="$5" color="$warning" />
-          <SizableText size="$8" color="$warning">
+          <AlertCircle opacity={0.8} size="$5" color="$yellow10" />
+          <SizableText size="$8" color="$yellow11">
             Transaction failed
           </SizableText>
         </YStack>
@@ -148,75 +149,45 @@ const TransactionContent = ({
 }
 
 export const Transaction = ({ open, onClose: onCloseProp, transaction }: TransactionProps) => {
-  const bottomSheetRef = useRef<BottomSheet>(null)
-
-  useEffect(() => {
-    if (open) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.close()
-    }
-  }, [open])
-
-  const { gtLg } = useMedia()
-
-  const theme = useTheme()
-
   const onClose = () => {
-    bottomSheetRef.current?.close()
-    setTimeout(() => {
-      onCloseProp()
-    }, 200)
+    onCloseProp()
+  }
+
+  const transRef = useRef<Activity | undefined>(undefined)
+
+  if (!transRef.current) {
+    transRef.current = transaction
   }
 
   return (
-    <Portal zIndex={200}>
-      <BottomSheet
-        index={-1}
-        ref={bottomSheetRef}
-        snapPoints={[230]}
-        animationConfigs={{
-          stiffness: 1000,
-          damping: 80,
-        }}
-        enablePanDownToClose
-        handleComponent={null}
-        backgroundStyle={{
-          borderRadius: 0,
-          backgroundColor: theme.color1.val,
-        }}
-        containerStyle={
-          gtLg
-            ? {
-                maxWidth: 698,
-                margin: 47,
-                marginLeft: 'auto',
-                borderRadius: 20,
-              }
-            : undefined
+    <Sheet
+      open={open && !!transaction}
+      onOpenChange={(open) => {
+        if (!open) {
+          setTimeout(() => {
+            onClose()
+          }, 200)
         }
-      >
-        <BottomSheetView id="transaction-content">
-          {transaction && <TransactionContent transaction={transaction} onClose={onClose} />}
-        </BottomSheetView>
-      </BottomSheet>
-      <AnimatePresence>
-        {open && (
-          <View
-            pe="auto"
-            role="button"
-            aria-label="Close transaction"
-            animation="200ms"
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-            bg="$shadowColor"
-            pos="absolute"
-            inset={0}
-            onPress={onClose}
-            zi={-1}
-          />
+      }}
+      forceRemoveScrollEnabled={open}
+      modal
+      snapPoints={[250]}
+      snapPointsMode="constant"
+      dismissOnSnapToBottom
+      zIndex={100_000}
+      animation="responsive"
+    >
+      <Sheet.Frame bg="$color1" id="transaction-content" maxWidth={720} m={35} ml="auto">
+        {transRef.current && (
+          <TransactionContent transaction={transRef.current} onClose={onCloseProp} />
         )}
-      </AnimatePresence>
-    </Portal>
+      </Sheet.Frame>
+      <Sheet.Overlay
+        animation="100ms"
+        bg="$shadowColor"
+        enterStyle={{ o: 0 }}
+        exitStyle={{ o: 0 }}
+      />
+    </Sheet>
   )
 }
