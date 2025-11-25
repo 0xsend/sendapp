@@ -1402,11 +1402,6 @@ const ChatList = YStack.styleable(() => {
       opacity={activeSection === 'chat' ? 1 : 0}
       y={activeSection === 'chat' ? 0 : -50}
       f={1}
-      $platform-web={{
-        willChange: 'transform',
-        filter: activeSection === 'chat' ? 'blur(0px)' : 'blur(4px)',
-        transition: 'filter linear 100ms',
-      }}
       animateOnly={['transform', 'opacity']}
       px="$4.5"
       $xs={{
