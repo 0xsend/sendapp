@@ -34,13 +34,13 @@ Reference: [Apple's Account Deletion Requirements](https://developer.apple.com/s
 | distribution_verifications | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | link_in_bio | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | profiles | Table | public | ✅ Yes (direct) | ✅ No action needed |
-| receipts | Table | public | ✅ Yes (direct) | |
+| receipts | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | referrals | Table | public | ✅ Yes (via profiles) | |
 | send_account_credentials | Table | public | ✅ Yes (via send_accounts) | ✅ No action needed |
-| send_account_tags | Table | public | ✅ Yes (via send_accounts) | |
+| send_account_tags | Table | public | ✅ Yes (via send_accounts) | ✅ No action needed |
 | send_accounts | Table | public | ✅ Yes (direct) | ✅ No action needed |
-| tag_receipts | Table | public | ✅ Yes (via tags) | |
-| tags | Table | public | ✅ Yes (direct) | |
+| tag_receipts | Table | public | ✅ Yes (via tags) | ✅ No action needed |
+| tags | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | leaderboard_referrals_all_time | Table | private | ✅ Yes (direct) | |
 | send_account_transfers | Table | temporal | ❌ No (temporal data) | ⚠️ Manual deletion required |
 | send_earn_deposits | Table | temporal | ✅ Yes (via activity) | ✅ No action needed |
