@@ -11,6 +11,7 @@ void (async function main() {
   // base mainnet fork
   $.env.PAYMASTER = '0x592e1224D203Be4214B15e205F6081FbbaCFcD2D'
   $.env.DEPOSIT = await $`cast to-wei 100 ether`.then((r) => r.stdout.trim())
+  const PAYMASTER_OWNER = '0x436454a68BEF94901014E2AF90f86E7355a029F3'
 
   console.log(chalk.blue('Adding deposit to paymaster...'), $.env.DEPOSIT)
   await $`forge script ./script/AddTokenPaymasterDeposit.s.sol:AddTokenPaymasterDepositScript \
@@ -19,6 +20,23 @@ void (async function main() {
               --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
               --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
               --broadcast`
+
+  console.log(chalk.blue('Updating oracle configuration for localnet (30 day max age)...'))
+  await $`cast rpc --rpc-url base-local anvil_impersonateAccount ${PAYMASTER_OWNER}`
+  await $`cast send ${$.env.PAYMASTER} \
+              "setOracleConfiguration((uint48,uint48,address,address,bool,bool,bool,uint256))" \
+              "(43200,2592000,0x7e860098F58bBFC8648a4311b374B1D669a2bc6B,0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70,false,false,false,12000000000000000000000000)" \
+              --rpc-url base-local \
+              --from ${PAYMASTER_OWNER} \
+              --unlocked`
+
+  console.log(chalk.blue('Updating cached price...'))
+  await $`cast send ${$.env.PAYMASTER} \
+              "updateCachedPrice(bool)" \
+              "true" \
+              --rpc-url base-local \
+              --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
+              --unlocked`
 
   console.log(chalk.blue('Disable auto-mining...'))
   await $`cast rpc --rpc-url base-local evm_setAutomine false`
