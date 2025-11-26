@@ -21188,6 +21188,7 @@ __metadata:
     expo-image-picker: "npm:~17.0.8"
     expo-linear-gradient: "npm:~15.0.7"
     expo-linking: "npm:~8.0.8"
+    expo-localization: "npm:~17.0.7"
     expo-navigation-bar: "npm:~5.0.9"
     expo-notifications: "npm:~0.32.12"
     expo-router: "npm:~6.0.14"
@@ -21196,6 +21197,7 @@ __metadata:
     expo-status-bar: "npm:~3.0.8"
     expo-system-ui: "npm:~6.0.8"
     expo-web-browser: "npm:~15.0.8"
+    intl-pluralrules: "npm:^2.0.1"
     metro-minify-terser: "npm:^0.74.1"
     react: "npm:19.1.0"
     react-dom: "npm:19.1.0"
@@ -21482,6 +21484,18 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10/33315abc13f1a4435a98f0252b6967cf0f8c4b5a6f52bbc4a23fcfee01c4c1b429964b526fcf6d6374c35e0664b9170fdec05ce156abfcc8ba5304e9cf0af52f
+  languageName: node
+  linkType: hard
+
+"expo-localization@npm:~17.0.7":
+  version: 17.0.7
+  resolution: "expo-localization@npm:17.0.7"
+  dependencies:
+    rtl-detect: "npm:^1.0.2"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+  checksum: 10/2e8567eb9b6b62497492451ffa5ca244081bd60d73816efd4c359253eaccb080dc0c17e8a5ffc8ce9c95ef0411eebefcb82e71ead8e3bcaf81a612fcb57de2a9
   languageName: node
   linkType: hard
 
@@ -24009,6 +24023,13 @@ __metadata:
     hasown: "npm:^2.0.2"
     side-channel: "npm:^1.1.0"
   checksum: 10/1d5219273a3dab61b165eddf358815eefc463207db33c20fcfca54717da02e3f492003757721f972fd0bf21e4b426cab389c5427b99ceea4b8b670dc88ee6d4a
+  languageName: node
+  linkType: hard
+
+"intl-pluralrules@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "intl-pluralrules@npm:2.0.1"
+  checksum: 10/562964d81c4477ab0b66e051c31cdbb2ca599307ffdfdc88a1e16d2cf137e481082b90d5ad81f9d2d5f6767ec5528d764a44462f6752109ac035c04604973e23
   languageName: node
   linkType: hard
 
