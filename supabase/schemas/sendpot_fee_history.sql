@@ -122,27 +122,9 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $function$
 DECLARE
-    prev_total_bps numeric;
-    bps_delta numeric;
     tickets_count numeric;
 BEGIN
-    SELECT tickets_purchased_total_bps INTO prev_total_bps
-    FROM sendpot_user_ticket_purchases
-    WHERE buyer = NEW.buyer
-      AND (
-        block_num < NEW.block_num
-        OR (block_num = NEW.block_num AND tx_idx < NEW.tx_idx)
-        OR (block_num = NEW.block_num AND tx_idx = NEW.tx_idx AND log_idx < NEW.log_idx)
-      )
-    ORDER BY block_num DESC, tx_idx DESC, log_idx DESC
-    LIMIT 1;
-
-    IF prev_total_bps IS NULL THEN
-        prev_total_bps := 0;
-    END IF;
-
-    bps_delta := NEW.tickets_purchased_total_bps - prev_total_bps;
-    tickets_count := calculate_tickets_from_bps_with_fee(bps_delta, NEW.block_num);
+    tickets_count := calculate_tickets_from_bps_with_fee(NEW.tickets_purchased_total_bps, NEW.block_num);
     NEW.tickets_purchased_count := tickets_count;
 
     RETURN NEW;
