@@ -104,6 +104,7 @@ export default () => {
       },
     },
     transpilePackages: [
+      'recyclerlistview',
       'solito',
       'react-native-web',
       'react-native-reanimated',

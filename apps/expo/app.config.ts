@@ -93,6 +93,7 @@ module.exports = {
         iosApiKey: process.env.NEXT_PUBLIC_INTERCOM_IOS_API_KEY,
       },
     ],
+    'expo-localization',
   ],
   extra: {
     eas: {

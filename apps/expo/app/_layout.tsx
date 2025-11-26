@@ -1,3 +1,4 @@
+import 'intl-pluralrules'
 import type { Session } from '@supabase/supabase-js'
 import { loadThemePromise, Provider } from 'app/provider'
 import { getI18n, initSharedI18n } from 'app/i18n'
