@@ -129,8 +129,11 @@ BEGIN
             AND t.status = 'confirmed'
             AND sat.tag_id != OLD.tag_id
             AND EXISTS (
-                SELECT 1 FROM tag_receipts tr
+                SELECT 1
+                FROM tag_receipts tr
+                JOIN receipts r ON r.event_id = tr.event_id
                 WHERE tr.tag_id = t.id
+                AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
             )) = 0 THEN
             RAISE EXCEPTION 'Cannot delete this sendtag. You must maintain at least one paid sendtag.';
         END IF;
