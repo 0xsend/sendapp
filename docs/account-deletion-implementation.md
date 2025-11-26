@@ -28,24 +28,24 @@ Reference: [Apple's Account Deletion Requirements](https://developer.apple.com/s
 |------|------|--------|--------------------------|-------------|
 | activity | Table | public | ✅ Yes (direct) | |
 | affiliate_stats | Table | public | ✅ Yes (via profiles) | |
-| canton_party_verifications | Table | public | ✅ Yes (direct) | |
-| chain_addresses | Table | public | ✅ Yes (direct) | |
-| distribution_shares | Table | public | ✅ Yes (direct) | |
-| distribution_verifications | Table | public | ✅ Yes (direct) | |
-| link_in_bio | Table | public | ✅ Yes (direct) | |
-| profiles | Table | public | ✅ Yes (direct) | |
+| canton_party_verifications | Table | public | ✅ Yes (direct) | ✅ No action needed |
+| chain_addresses | Table | public | ✅ Yes (direct) | ✅ No action needed |
+| distribution_shares | Table | public | ✅ Yes (direct) | ✅ No action needed |
+| distribution_verifications | Table | public | ✅ Yes (direct) | ✅ No action needed |
+| link_in_bio | Table | public | ✅ Yes (direct) | ✅ No action needed |
+| profiles | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | receipts | Table | public | ✅ Yes (direct) | |
 | referrals | Table | public | ✅ Yes (via profiles) | |
-| send_account_credentials | Table | public | ✅ Yes (via send_accounts) | |
+| send_account_credentials | Table | public | ✅ Yes (via send_accounts) | ✅ No action needed |
 | send_account_tags | Table | public | ✅ Yes (via send_accounts) | |
-| send_accounts | Table | public | ✅ Yes (direct) | |
+| send_accounts | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | tag_receipts | Table | public | ✅ Yes (via tags) | |
 | tags | Table | public | ✅ Yes (direct) | |
 | leaderboard_referrals_all_time | Table | private | ✅ Yes (direct) | |
 | send_account_transfers | Table | temporal | ❌ No (temporal data) | ⚠️ Manual deletion required |
-| send_earn_deposits | Table | temporal | ✅ Yes (via activity) | |
-| send_scores_history | Materialized View | private | ✅ Yes (derived from user data) | |
-| webauthn_credentials | Table | public | ✅ Yes (direct) | |
+| send_earn_deposits | Table | temporal | ✅ Yes (via activity) | ✅ No action needed |
+| send_scores_history | Materialized View | private | ✅ Yes (derived from user data) | ✅ No action needed |
+| webauthn_credentials | Table | public | ✅ Yes (direct) | ✅ No action needed |
 
 **Summary**:
 - **Verified CASCADE**: 18 tables with confirmed CASCADE relationships
