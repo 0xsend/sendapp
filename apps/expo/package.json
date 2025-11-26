@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24",
-    "@tamagui/babel-plugin": "^1.135.4",
+    "@tamagui/babel-plugin": "^1.138.5",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",
     "babel-preset-expo": "~54.0.0",
     "eslint-config-custom": "workspace:*",
