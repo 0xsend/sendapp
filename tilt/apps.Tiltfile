@@ -64,7 +64,7 @@ else:
         "next:web",
         "yarn workspace next-app next:build" if CI else "",  # In CI, only build the web app
         labels = labels,
-        links = ["http://localhost:" + os.getenv("NEXTJS_PORT", 3000)],
+        links = ["http://localhost:" + os.getenv("NEXTJS_PORT", "3000")],
         readiness_probe = None if CI else probe(
             http_get = http_get_action(
                 path = "/api/healthz",
@@ -75,7 +75,7 @@ else:
         resource_deps = next_app_resource_deps,
         serve_cmd =
             "" if CI else "yarn next-app dev -p $NEXTJS_PORT",  # In CI, playwright tests start the web server
-        serve_env = {"NEXTJS_PORT": os.getenv("NEXTJS_PORT", 3000)},
+        serve_env = {"NEXTJS_PORT": os.getenv("NEXTJS_PORT", "3000")},
     )
 
 local_resource(
