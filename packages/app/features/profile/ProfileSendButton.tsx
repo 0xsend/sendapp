@@ -8,7 +8,7 @@ export default function ProfileSendButton({ sendId }: { sendId?: number | null }
     <LinkableButton
       href={{
         pathname: '/send',
-        query: { recipient: sendId, idType: 'sendid' },
+        query: { recipient: sendId, idType: 'sendid', m: 1 },
       }}
       borderRadius={'$4'}
       jc="center"

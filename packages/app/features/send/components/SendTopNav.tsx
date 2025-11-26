@@ -34,7 +34,7 @@ export function SendTopNav() {
         safeAreaProps={{ edges: { bottom: 'off' } }}
       >
         <XStack ai="center" $lg={{ f: 1 }} w="20%" $gtLg={{ display: 'none' }}>
-          {!isOnSelectRecipient && !isTagSend && (
+          {!isOnSelectRecipient && !isTagSend && !sendParams.m && (
             <Button onPress={handleBack}>
               <ButtonOg.Icon>
                 <IconArrowLeft
@@ -48,7 +48,7 @@ export function SendTopNav() {
           <Paragraph fontWeight={'500'} size={isOnSelectRecipient ? '$9' : '$8'} col={'$color12'}>
             {path?.includes('/confirm') ? (
               t('topNav.preview')
-            ) : Boolean(sendParams.recipient) && !isTagSend ? (
+            ) : Boolean(sendParams.recipient) && !isTagSend && !sendParams.m ? (
               t('topNav.enterAmount')
             ) : (
               <IconSendLogo size={'$2.5'} color={'$color12'} />
@@ -70,7 +70,7 @@ export function SendTopNav() {
           >
             {path?.includes('/confirm')
               ? t('topNav.preview')
-              : Boolean(sendParams.recipient) && !isTagSend
+              : Boolean(sendParams.recipient) && !isTagSend && !sendParams.m
                 ? t('topNav.enterAmount')
                 : t('topNav.default')}
           </H2>
