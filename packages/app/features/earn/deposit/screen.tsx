@@ -184,10 +184,19 @@ export function DepositForm() {
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
   const { t } = useTranslation('earn')
 
+  const isErc7677 = shouldUseErc7677(sender)
   const uop = useUserOp({
     sender,
     calls: calls.data ?? undefined,
-    skipGasEstimation: shouldUseErc7677(sender), // Skip gas estimation only for ERC-7677 flow
+    skipGasEstimation: isErc7677,
+    // For Send Paymaster flow, explicitly use sendVerifyingPaymasterAddress
+    ...(isErc7677
+      ? {}
+      : {
+          paymaster: sendVerifyingPaymasterAddress[chainId],
+          paymasterVerificationGasLimit: 200000n,
+          paymasterPostOpGasLimit: 200000n,
+        }),
   })
   const webauthnCreds = useMemo(
     () =>
