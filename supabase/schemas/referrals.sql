@@ -131,6 +131,23 @@ $$;
 
 ALTER FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+    -- Decrement the referral count for the referrer
+    -- Use GREATEST to ensure we never go below 0
+    UPDATE private.leaderboard_referrals_all_time
+    SET referrals = GREATEST(0, referrals - 1),
+        updated_at = now()
+    WHERE user_id = OLD.referrer_id;
+
+    RETURN OLD;
+END;
+$$;
+
+ALTER FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -387,11 +404,15 @@ CREATE OR REPLACE TRIGGER "referrals_insert_activity_trigger" AFTER INSERT ON "p
 
 CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_referrals" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"();
 
+CREATE OR REPLACE TRIGGER "decrement_leaderboard_referrals" AFTER DELETE ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "private"."decrement_leaderboard_referrals_on_delete"();
+
 -- RLS
 ALTER TABLE "public"."referrals" ENABLE ROW LEVEL SECURITY;
 
 -- Grants
 REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() FROM PUBLIC;
+
+REVOKE ALL ON FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() FROM PUBLIC;
 
 REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() FROM PUBLIC;
 
