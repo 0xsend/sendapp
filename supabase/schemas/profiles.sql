@@ -289,5 +289,3 @@ REVOKE ALL ON FUNCTION "public"."cleanup_referral_verifications_on_user_delete"(
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "avoid_send_id_change" BEFORE UPDATE ON "public"."profiles" FOR EACH ROW EXECUTE FUNCTION "public"."stop_change_send_id"();
-
-CREATE OR REPLACE TRIGGER "cleanup_referral_verifications_before_profile_delete" BEFORE DELETE ON "public"."profiles" FOR EACH ROW EXECUTE FUNCTION "public"."cleanup_referral_verifications_on_user_delete"();
