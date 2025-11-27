@@ -189,6 +189,8 @@ ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION public.recent_senders()
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
 AS $function$
 BEGIN
 RETURN QUERY

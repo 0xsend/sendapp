@@ -30,7 +30,7 @@ export const UserSchema = z.object({
    */
   tags: z.array(z.string()).nullable().default([]),
   /**
-   * Verification status based on distribution shares
+   * Verification status derived from profile verified_at
    */
   is_verified: z.boolean().nullable().default(false),
 })
