@@ -8,6 +8,29 @@ solc_version = "0.8.23"
 optimizer = true
 optimizer_runs = 999_999
 
+# Forge 1.5.0 introduced new linting rules that produce 200+ warnings in our codebase.
+# These are disabled globally to avoid noise. When doing significant contract work,
+# consider re-enabling these lints and fixing them incrementally:
+# - Style: unaliased-plain-import, screaming-snake-case-*, mixed-case-*, named-struct-fields
+# - Safety: unsafe-typecast, incorrect-shift, erc20-unchecked-transfer, unwrapped-modifier-logic
+# - Cleanup: unused-import, asm-keccak256
+[lint]
+exclude_lints = [
+    "asm-keccak256",
+    "erc20-unchecked-transfer",
+    "incorrect-shift",
+    "mixed-case-function",
+    "mixed-case-variable",
+    "named-struct-fields",
+    "screaming-snake-case-const",
+    "screaming-snake-case-immutable",
+    "unaliased-plain-import",
+    "unsafe-cheatcode",
+    "unsafe-typecast",
+    "unused-import",
+    "unwrapped-modifier-logic",
+]
+
 [profile.ci]
 verbosity = 4
 fuzz.runs = 512
