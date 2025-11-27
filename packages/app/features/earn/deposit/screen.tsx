@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -184,19 +184,10 @@ export function DepositForm() {
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
   const { t } = useTranslation('earn')
 
-  const isErc7677 = shouldUseErc7677(sender)
   const uop = useUserOp({
     sender,
     calls: calls.data ?? undefined,
-    skipGasEstimation: isErc7677,
-    // For Send Paymaster flow, explicitly use sendVerifyingPaymasterAddress
-    ...(isErc7677
-      ? {}
-      : {
-          paymaster: sendVerifyingPaymasterAddress[chainId],
-          paymasterVerificationGasLimit: 200000n,
-          paymasterPostOpGasLimit: 200000n,
-        }),
+    skipGasEstimation: shouldUseErc7677(sender),
   })
   const webauthnCreds = useMemo(
     () =>
@@ -291,7 +282,6 @@ export function DepositForm() {
         // Update userOp with Send paymaster data
         sponsoredUserOp = {
           ...uop.data,
-          paymaster: sendVerifyingPaymasterAddress[chainId],
           paymasterData: paymasterResult.paymasterData,
         }
       }
