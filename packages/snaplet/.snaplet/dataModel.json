@@ -1981,6 +1981,20 @@
           "maxLength": null
         },
         {
+          "id": "public.distributions.sendpot_ticket_increment",
+          "name": "sendpot_ticket_increment",
+          "columnName": "sendpot_ticket_increment",
+          "type": "int4",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "distribution_shares",
           "type": "distribution_shares",
           "isRequired": false,

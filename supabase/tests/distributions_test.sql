@@ -1127,7 +1127,7 @@ VALUES (
     '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     '\xB0B0000000000000000000000000000000000000',
     '\xB0B0000000000000000000000000000000000000',
-    100,
+    70000,  -- 10 tickets worth of BPS (10 * 7000)
     1000000000000000000,
     'sendpot_user_ticket_purchases',
     'sendpot_user_ticket_purchases',
@@ -1149,8 +1149,8 @@ SELECT
         SELECT weight::integer FROM distribution_verifications
         WHERE user_id = tests.get_supabase_uid('bob')
         AND type = 'sendpot_ticket_purchase' $$, $$
-        VALUES (100) $$,
-        'Weight should equal tickets purchased bps');
+        VALUES (1) $$,
+        'Weight should be 1 (10 tickets / 10 increment)');
 
 -- Insert another ticket purchase in same period (should update existing verification)
 INSERT INTO sendpot_user_ticket_purchases(
@@ -1176,7 +1176,7 @@ VALUES (
     '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
     '\xB0B0000000000000000000000000000000000000',
     '\xB0B0000000000000000000000000000000000000',
-    50,
+    35000,  -- 5 tickets worth of BPS (5 * 7000)
     500000000000000000,
     'sendpot_user_ticket_purchases',
     'sendpot_user_ticket_purchases',
@@ -1198,8 +1198,8 @@ SELECT
         SELECT weight::integer FROM distribution_verifications
         WHERE user_id = tests.get_supabase_uid('bob')
         AND type = 'sendpot_ticket_purchase' $$, $$
-        VALUES (150) $$,
-        'Weight should be sum of all tickets (100 + 50)');
+        VALUES (1) $$,
+        'Weight should be 1 (15 tickets / 10 increment = floor(1.5) = 1)');
 
 -- Insert a jackpot run
 INSERT INTO sendpot_jackpot_runs(
@@ -1258,7 +1258,7 @@ VALUES (
     '\xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
     '\xB0B0000000000000000000000000000000000000',
     '\xB0B0000000000000000000000000000000000000',
-    200,
+    140000,  -- 20 tickets worth of BPS (20 * 7000)
     2000000000000000000,
     'sendpot_user_ticket_purchases',
     'sendpot_user_ticket_purchases',
@@ -1282,8 +1282,8 @@ SELECT
         AND type = 'sendpot_ticket_purchase'
         ORDER BY created_at DESC
         LIMIT 1 $$, $$
-        VALUES (200) $$,
-        'New period verification should have weight of 200');
+        VALUES (2) $$,
+        'New period verification should have weight of 2 (20 tickets / 10 increment)');
 
 -- Insert another ticket purchase in the new period (should update the latest verification)
 INSERT INTO sendpot_user_ticket_purchases(
@@ -1309,7 +1309,7 @@ VALUES (
     '\xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
     '\xB0B0000000000000000000000000000000000000',
     '\xB0B0000000000000000000000000000000000000',
-    75,
+    70000,  -- 10 more tickets worth of BPS (10 * 7000)
     750000000000000000,
     'sendpot_user_ticket_purchases',
     'sendpot_user_ticket_purchases',
@@ -1333,8 +1333,8 @@ SELECT
         AND type = 'sendpot_ticket_purchase'
         ORDER BY created_at DESC
         LIMIT 1 $$, $$
-        VALUES (275) $$,
-        'Latest verification weight should be sum of tickets in new period (200 + 75)');
+        VALUES (3) $$,
+        'Latest verification weight should be 3 (30 tickets / 10 increment)');
 
 SELECT finish();
 ROLLBACK;
