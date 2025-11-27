@@ -17,7 +17,7 @@ import { calculateWeights, Mode, PERC_DENOM } from './weights'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import type { Address } from 'viem'
-import { BPS_PER_TICKET, COST_PER_TICKET_WEI } from 'packages/app/data/sendpot'
+import { COST_PER_TICKET_WEI } from 'packages/app/data/sendpot'
 
 type Multiplier = {
   value?: number
@@ -540,8 +540,7 @@ export class DistributorV2Worker {
     )
 
     // TODO: index onchain data in the case these values change
-    // Hardcoded jackpot values for sendpot_ticket_purchase calculations
-    const ticketBps = BPS_PER_TICKET // ticketBps = 10,000 - feeBps (where feeBps = 3000)
+    // Hardcoded ticket price for sendpot_ticket_purchase calculations
     const ticketPrice = COST_PER_TICKET_WEI
 
     // Calculate fixed pool share weights
@@ -581,26 +580,23 @@ export class DistributorV2Worker {
 
         const weight = verification.weight
 
-        // Handle sendpot_ticket_purchase specially
+        // Standard fixed value calculation for all verification types
+        if (verificationValue.fixedValue) {
+          userFixedAmount += verificationValue.fixedValue * BigInt(weight)
+        }
+
+        // For sendpot_ticket_purchase, also calculate ticket purchase value
         if (
           verification.type ===
           ('sendpot_ticket_purchase' as Database['public']['Enums']['verification_type'])
         ) {
-          if (verificationValue.fixedValue) {
-            // Calculate number of tickets: ticketCount = ticketsPurchasedBps / ticketBps
-            // Calculate amount spent: usedAmount = ticketCount * ticketPrice
-            // Every 10 tickets adds fixedValue
-            const numberOfTickets = BigInt(weight) / BigInt(ticketBps)
-            const groupsOfTenTickets = numberOfTickets / 10n
-            userFixedAmount += verificationValue.fixedValue * groupsOfTenTickets
-
-            // Calculate the amount spent on tickets: usedAmount = ticketCount * ticketPrice
-            const ticketPurchaseValue = numberOfTickets * ticketPrice
+          // Get raw ticket count from metadata
+          const ticketCount = BigInt(verification.metadata?.value || 0)
+          if (ticketCount > 0n) {
+            // Calculate amount spent: ticketCount * ticketPrice
+            const ticketPurchaseValue = ticketCount * ticketPrice
             totalTicketPurchaseValue += ticketPurchaseValue
           }
-          // Normally we multiply fixed by weight
-        } else if (verificationValue.fixedValue) {
-          userFixedAmount += verificationValue.fixedValue * BigInt(weight)
         }
 
         if (!multiplierInfo) continue
