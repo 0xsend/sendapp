@@ -29,4 +29,8 @@ export const UserSchema = z.object({
    * Confirmed sendtags
    */
   tags: z.array(z.string()).nullable().default([]),
+  /**
+   * Verification status based on distribution shares
+   */
+  is_verified: z.boolean().nullable().default(false),
 })

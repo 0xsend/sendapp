@@ -20,6 +20,7 @@ describe('UserSchema', () => {
       tags: [],
       main_tag_id: null,
       main_tag_name: null,
+      is_verified: false,
     })
   })
 })

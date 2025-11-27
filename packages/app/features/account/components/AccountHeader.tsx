@@ -33,7 +33,7 @@ const icons = {
 }
 
 export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
-  const { profile, distributionShares } = useUser()
+  const { profile } = useUser()
   const hoverStyles = useHoverStyles()
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const { t } = useTranslation('account')
@@ -49,10 +49,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
     [referralCode]
   )
 
-  const isVerified = useMemo(
-    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
-    [distributionShares]
-  )
+  const isVerified = useMemo(() => Boolean(profile?.verified_at), [profile?.verified_at])
 
   const handleSharePress = useCallback(async () => {
     if (!referralHref) return

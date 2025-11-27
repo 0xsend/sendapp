@@ -10,7 +10,9 @@ on:
   workflow_dispatch:
 jobs:
   deploy-docker-dev:
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     steps:
       - name: Configure ssh & Deploy
         shell: bash

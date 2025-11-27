@@ -341,6 +341,7 @@ type Override = {
       x_username?: string;
       birthday?: string;
       banner_url?: string;
+      verified_at?: string;
       users?: string;
       affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;
@@ -1092,6 +1093,7 @@ export interface Fingerprint {
   profiles?: {
     sendId?: FingerprintNumberField;
     birthday?: FingerprintDateField;
+    verifiedAt?: FingerprintDateField;
     i?: FingerprintRelationField;
     affiliateStatsByUserId?: FingerprintRelationField;
     referralsByReferredId?: FingerprintRelationField;
