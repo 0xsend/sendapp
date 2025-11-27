@@ -9,6 +9,7 @@ import {
   Separator,
   SideBar,
   useMedia,
+  useThemeName,
   XStack,
   YStack,
   type YStackProps,
@@ -17,6 +18,7 @@ import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconArrowUp,
+  IconBadgeCheckSolid2,
   IconChart,
   IconClock,
   IconCompass,
@@ -105,6 +107,9 @@ const DesktopAccountMenuEntry = () => {
   const isActiveRoute =
     location === 'account' || parts.includes('account') || 'account'.startsWith(`/${parts[0]}`)
   const { t } = useTranslation('navigation')
+  const theme = useThemeName()
+  const isDark = theme.includes('dark')
+  const isVerified = Boolean(profile?.verified_at)
 
   return (
     <LinkableButton
@@ -121,12 +126,27 @@ const DesktopAccountMenuEntry = () => {
       pressStyle={hoverStyles}
       focusStyle={hoverStyles}
     >
-      <Avatar circular={true} size={'$3.5'}>
-        <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
-        <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
-          <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
-        </Avatar.Fallback>
-      </Avatar>
+      <XStack position="relative">
+        <Avatar circular={true} size={'$3.5'}>
+          <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
+          <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
+            <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
+          </Avatar.Fallback>
+        </Avatar>
+        {isVerified && (
+          <XStack zi={100} pos="absolute" bottom={-2} right={-2}>
+            <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+            <IconBadgeCheckSolid2
+              size="$1"
+              scale={0.65}
+              color="$neon8"
+              $theme-dark={{ color: '$neon7' }}
+              // @ts-expect-error - checkColor is not typed
+              checkColor={isDark ? '#082B1B' : '#fff'}
+            />
+          </XStack>
+        )}
+      </XStack>
       <Paragraph
         size={'$6'}
         color={isActiveRoute ? '$color12' : '$lightGrayTextField'}
@@ -144,16 +164,34 @@ const HomeBottomSheet = () => {
   const avatarUrl = profile?.avatar_url
   const { t } = useTranslation('navigation')
   const links = useMemo(() => buildNavigationLinks(t), [t])
+  const theme = useThemeName()
+  const isDark = theme.includes('dark')
+  const isVerified = Boolean(profile?.verified_at)
 
   return (
     <NavSheet navId="home">
       <XStack gap="$4" ai="center" bg={'$color1'} p={'$4'} borderRadius={'$6'} mb={'$4'}>
-        <LinkableAvatar size="$7" br={'$4'} href={`/profile/${profile?.send_id}`}>
-          <Avatar.Image src={avatarUrl ?? ''} />
-          <Avatar.Fallback jc={'center'} ai={'center'} delayMs={200}>
-            <IconAccount size="$4.5" color="$olive" />
-          </Avatar.Fallback>
-        </LinkableAvatar>
+        <XStack position="relative">
+          <LinkableAvatar size="$7" br={'$4'} href={`/profile/${profile?.send_id}`}>
+            <Avatar.Image src={avatarUrl ?? ''} />
+            <Avatar.Fallback jc={'center'} ai={'center'} delayMs={200}>
+              <IconAccount size="$4.5" color="$olive" />
+            </Avatar.Fallback>
+          </LinkableAvatar>
+          {isVerified && (
+            <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
+              <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+              <IconBadgeCheckSolid2
+                size="$1"
+                scale={0.8}
+                color="$neon8"
+                $theme-dark={{ color: '$neon7' }}
+                // @ts-expect-error - checkColor is not typed
+                checkColor={isDark ? '#082B1B' : '#fff'}
+              />
+            </XStack>
+          )}
+        </XStack>
         <YStack flex={1} gap={'$2'}>
           <Paragraph size={'$7'}>{profile?.name ?? `#${profile?.send_id}`}</Paragraph>
           <Separator width="100%" borderColor="$decay" />
