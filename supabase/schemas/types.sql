@@ -47,7 +47,8 @@ CREATE TYPE "public"."activity_feed_user" AS (
 	"send_id" integer,
 	"main_tag_id" bigint,
 	"main_tag_name" "text",
-	"tags" "text"[]
+	"tags" "text"[],
+	"is_verified" boolean
 );
 ALTER TYPE "public"."activity_feed_user" OWNER TO "postgres";
 

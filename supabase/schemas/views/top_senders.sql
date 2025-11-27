@@ -41,7 +41,8 @@ valid_users AS (
         p.avatar_url,
         p.send_id,
         us.send_score,
-        ARRAY_AGG(t.name) AS tag_names
+        ARRAY_AGG(t.name) AS tag_names,
+        (p.verified_at IS NOT NULL) AS is_verified
     FROM user_scores us
     INNER JOIN user_earn_balances ueb ON ueb.user_id = us.user_id
     INNER JOIN profiles p ON p.id = us.user_id
@@ -57,7 +58,7 @@ valid_users AS (
           ORDER BY d.qualification_start DESC
           LIMIT 1
       )
-    GROUP BY p.id, p.name, p.avatar_url, p.send_id, us.send_score
+    GROUP BY p.id, p.name, p.avatar_url, p.send_id, us.send_score, p.verified_at
 )
 -- Return top N with all requirements met
 SELECT (
@@ -68,7 +69,8 @@ SELECT (
         vu.send_id,
         NULL::bigint,  -- Hide main_tag_id for privacy
         main_tag.name,
-        vu.tag_names
+        vu.tag_names,
+        vu.is_verified
     )::activity_feed_user
 ).*
 FROM valid_users vu

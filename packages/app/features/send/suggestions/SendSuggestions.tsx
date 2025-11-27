@@ -173,7 +173,6 @@ const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
         ? `#${item.send_id}`
         : '??'
 
-  //@ts-expect-error - is_verified is not typed
   const isVerified = item?.is_verified ?? false
   const avatarUrl = item?.avatar_url ?? ''
 

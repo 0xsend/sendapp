@@ -434,6 +434,7 @@ export type Database = {
           name: string | null
           referral_code: string | null
           send_id: number
+          verified_at: string | null
           x_username: string | null
           canton_party_verifications: {
             canton_wallet_address: string
@@ -492,6 +493,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          verified_at?: string | null
           x_username?: string | null
         }
         Update: {
@@ -504,6 +506,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          verified_at?: string | null
           x_username?: string | null
         }
         Relationships: []
@@ -2217,6 +2220,7 @@ export type Database = {
           referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
       }
+      refresh_profile_verification_status: { Args: never; Returns: undefined }
       refresh_send_scores_history: { Args: never; Returns: undefined }
       register_first_sendtag: {
         Args: {
@@ -2391,6 +2395,7 @@ export type Database = {
         main_tag_id: number | null
         main_tag_name: string | null
         tags: string[] | null
+        is_verified: boolean | null
       }
       canton_tag_search_result: {
         avatar_url: string | null

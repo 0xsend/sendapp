@@ -1,5 +1,6 @@
 {
   "adapter": "pg",
   "targetDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
-  "sourceDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres"
+  "sourceDatabaseUrl": "postgresql://postgres:postgres@localhost:54322/postgres",
+  "projectDescription": "This project is about managing a platform for sending and receiving account transactions, managing liquidity pools, processing revenues and referrals, handling user profiles and challenges, tracking activities and integrations, and interacting with blockchain addresses."
 }
