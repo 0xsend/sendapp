@@ -23,3 +23,5 @@ ALTER FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() OWNER TO 
 REVOKE ALL ON FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() FROM PUBLIC;
 
 CREATE TRIGGER decrement_leaderboard_referrals AFTER DELETE ON public.referrals FOR EACH ROW EXECUTE FUNCTION private.decrement_leaderboard_referrals_on_delete();
+
+
