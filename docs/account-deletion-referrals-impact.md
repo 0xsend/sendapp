@@ -11,6 +11,7 @@ This document provides a detailed analysis of how account deletion affects the r
 - **Migration**: `20251127111203_referrals_triggers_on_account_delete.sql`
 - **Tests**: `supabase/tests/account_deletion_referrals_test.sql` (27 test cases - all passing)
 - **Date Completed**: 2025-11-27
+- **Date Updated**: 2025-11-27 - Fixed `total_tag_referrals` calculation to match `update_referral_verifications` logic
 
 ## Executive Summary
 
@@ -461,8 +462,24 @@ Recalculate `total_tag_referrals` weight for affected referrers in **current dis
 **Calculation Logic**:
 ```sql
 -- Count remaining referrals (excluding deleted user)
-new_weight = COUNT(remaining_referrals)
+-- IMPORTANT: Must match update_referral_verifications logic
+-- Only count referrals who have distribution_shares in CURRENT distribution
+COUNT(*) FILTER (
+    WHERE r.referred_id != OLD.id
+    AND EXISTS (
+        SELECT 1
+        FROM distribution_shares ds
+        WHERE ds.user_id = r.referred_id
+        AND ds.distribution_id = current_dist_id
+        AND ds.amount > 0
+    )
+)
 ```
+
+**Why this logic?**
+- The `update_referral_verifications()` function (called by the distributor during calculation) uses the **current distribution's shares** to set weights
+- The deletion handler must match this logic to maintain consistency
+- This counts only referred users who are actively qualifying in the current distribution
 
 ### Testing Requirements
 
@@ -560,6 +577,8 @@ BEGIN
 
         -- Recalculate total_tag_referrals for affected referrers
         -- in current distribution
+        -- Match update_referral_verifications logic: only count referrals
+        -- who have distribution_shares in CURRENT distribution
         WITH affected_referrers AS (
             SELECT DISTINCT r.referrer_id
             FROM referrals r
@@ -568,7 +587,16 @@ BEGIN
         referral_counts AS (
             SELECT
                 r.referrer_id,
-                COUNT(*) FILTER (WHERE r.referred_id != OLD.id) as new_count
+                COUNT(*) FILTER (
+                    WHERE r.referred_id != OLD.id
+                    AND EXISTS (
+                        SELECT 1
+                        FROM distribution_shares ds
+                        WHERE ds.user_id = r.referred_id
+                        AND ds.distribution_id = current_dist_id
+                        AND ds.amount > 0
+                    )
+                ) as new_count
             FROM referrals r
             WHERE r.referrer_id IN (SELECT referrer_id FROM affected_referrers)
             GROUP BY r.referrer_id

@@ -247,6 +247,8 @@ BEGIN
 
         -- Recalculate total_tag_referrals for affected referrers
         -- in current distribution
+        -- Match update_referral_verifications logic: only count referrals
+        -- who have distribution_shares in CURRENT distribution
         WITH affected_referrers AS (
             SELECT DISTINCT r.referrer_id
             FROM referrals r
@@ -255,7 +257,16 @@ BEGIN
         referral_counts AS (
             SELECT
                 r.referrer_id,
-                COUNT(*) FILTER (WHERE r.referred_id != OLD.id) as new_count
+                COUNT(*) FILTER (
+                    WHERE r.referred_id != OLD.id
+                    AND EXISTS (
+                        SELECT 1
+                        FROM distribution_shares ds
+                        WHERE ds.user_id = r.referred_id
+                        AND ds.distribution_id = current_dist_id
+                        AND ds.amount > 0
+                    )
+                ) as new_count
             FROM referrals r
             WHERE r.referrer_id IN (SELECT referrer_id FROM affected_referrers)
             GROUP BY r.referrer_id
