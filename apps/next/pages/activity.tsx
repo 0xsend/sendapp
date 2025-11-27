@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react'
 import { ActivityScreen } from 'app/features/activity/screen'
 import { HomeLayout } from 'app/features/home/layout.web'
 import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from './_app'
 import { TopNav } from 'app/components/TopNav'
 import { PAGE_TITLES, PAGE_DESCRIPTIONS } from 'utils/seoHelpers'
+import { useTranslation } from 'react-i18next'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -14,8 +16,16 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-Page.getLayout = (children) => (
-  <HomeLayout TopNav={<TopNav header="Activity" showOnGtLg={true} />}>{children}</HomeLayout>
-)
+function ActivityLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('navigation')
+
+  return (
+    <HomeLayout TopNav={<TopNav header={t('tabs.activity')} showOnGtLg={true} />}>
+      {children}
+    </HomeLayout>
+  )
+}
+
+Page.getLayout = (children) => <ActivityLayout>{children}</ActivityLayout>
 
 export default Page

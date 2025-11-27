@@ -1,0 +1,112 @@
+{
+  "buy": {
+    "balance": {
+      "insufficient": "资金不足",
+      "label": "余额："
+    },
+    "button": {
+      "review": "查看"
+    },
+    "input": {
+      "ticketsLabel": "彩票"
+    },
+    "ticketPrice": "彩票价格：",
+    "title": "您想购买多少张彩票？",
+    "toast": {
+      "errorTitle": "错误",
+      "insufficientFunds": "资金不足。",
+      "invalidQuantity": "请输入有效的彩票数量。",
+      "loadingMessage": "请稍候，正在加载数据...",
+      "loadingTitle": "信息"
+    },
+    "total": {
+      "label": "总成本"
+    }
+  },
+  "claim": {
+    "cta": {
+      "claiming": "领取中...",
+      "default": "领取奖金",
+      "preparing": "准备中..."
+    },
+    "title": "您赢了！",
+    "toast": {
+      "error": "领取失败",
+      "noPasskeyDescription": "此帐户未找到通行密钥。",
+      "noPasskeyTitle": "错误",
+      "success": "领取成功"
+    }
+  },
+  "confirm": {
+    "button": {
+      "buy_one": "购买 {{count}} 张彩票",
+      "buy_other": "购买 {{count}} 张彩票",
+      "insufficientBalance": "余额不足",
+      "insufficientGas": "Gas 不足",
+      "preparing": "准备中...",
+      "processing": "处理中..."
+    },
+    "edit": {
+      "cta": "编辑",
+      "label": "编辑彩票数量"
+    },
+    "errors": {
+      "insufficientBalance": "余额不足。",
+      "insufficientGas": "Gas 不足。",
+      "noPasskeyDescription": "此帐户未找到通行密钥。",
+      "noPasskeyTitle": "错误"
+    },
+    "rows": {
+      "fee": "预计交易费用",
+      "price": "每张彩票的价格",
+      "total": "总成本"
+    },
+    "tickets": "彩票",
+    "toast": {
+      "error": "购买失败",
+      "success": "购买成功"
+    },
+    "usd": "（{{value}}）"
+  },
+  "history": {
+    "current": "当前",
+    "empty": "没有可用的开奖历史。",
+    "notAvailable": "不适用",
+    "tickets": {
+      "none": "您购买了 0 张彩票",
+      "purchased_one": "您购买了 {{count}} 张彩票",
+      "purchased_other": "您购买了 {{count}} 张彩票"
+    },
+    "title": "开奖历史",
+    "totalPool": "奖金池总额：",
+    "upcoming": "即将开奖",
+    "winner": {
+      "label": "中奖者",
+      "loading": "（加载中...）",
+      "none": "无",
+      "pending": "（待定）",
+      "you": "您赢了！"
+    }
+  },
+  "jackpot": {
+    "actions": {
+      "buy": "购买彩票"
+    },
+    "loading": "加载中...",
+    "messages": {
+      "geoBlocked": "您所在的地区目前无法购买彩票。"
+    },
+    "title": "当前 Sendpot"
+  },
+  "risk": {
+    "actions": {
+      "cancel": "取消",
+      "confirm": "我同意并继续"
+    },
+    "body": "购买 Sendpot 彩票即表示您承认不能保证中奖，且彩票费用不予退还。开奖由 Megapot 提供支持，并使用可证明公平的链上随机性——请理性参与。",
+    "checkbox": "我已阅读并理解这些条款。",
+    "errorTitle": "错误",
+    "link": "了解更多。",
+    "title": "重要声明"
+  }
+}

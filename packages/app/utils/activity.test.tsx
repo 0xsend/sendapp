@@ -418,6 +418,7 @@ describe('isSwapBuyTransfer', () => {
         tags: [],
         main_tag_id: 1,
         main_tag_name: 'test',
+        is_verified: null,
       },
       to_user: null,
       data: {
@@ -448,6 +449,7 @@ describe('isSwapBuyTransfer', () => {
         tags: [],
         main_tag_id: 1,
         main_tag_name: 'test',
+        is_verified: null,
       },
       data: {
         sender: '0x5b8B88f0A15c27B7C1ecf78aFfD6e7f4C54b96F0',

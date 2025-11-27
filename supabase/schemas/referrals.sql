@@ -32,13 +32,6 @@ begin
     if lookup_type is null then raise exception 'lookup_type cannot be null'; end if;
 
     RETURN QUERY
-    WITH current_distribution_id AS (
-        SELECT id FROM distributions
-        WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-          AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-        ORDER BY qualification_start DESC
-        LIMIT 1
-    )
     SELECT
         case when p.id = ( select auth.uid() ) then p.id end,
         p.avatar_url::text,
@@ -79,15 +72,13 @@ begin
         ELSE NULL
         END,
         p.banner_url::text,
-        CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified
+        (p.verified_at IS NOT NULL) AS is_verified
     from profiles p
     join auth.users a on a.id = p.id
     left join send_accounts sa on sa.user_id = p.id
     left join tags mt on mt.id = sa.main_tag_id
     left join send_account_tags sat on sat.send_account_id = sa.id
     left join tags t on t.id = sat.tag_id and t.status = 'confirmed'::tag_status
-    left join distribution_shares ds on ds.user_id = p.id
-        and ds.distribution_id = (select id from current_distribution_id)
     where ((lookup_type = 'sendid' and p.send_id::text = identifier) or
         (lookup_type = 'tag' and t.name = identifier::citext) or
         (lookup_type = 'refcode' and p.referral_code = identifier) or
@@ -139,6 +130,23 @@ end
 $$;
 
 ALTER FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+BEGIN
+    -- Decrement the referral count for the referrer
+    -- Use GREATEST to ensure we never go below 0
+    UPDATE private.leaderboard_referrals_all_time
+    SET referrals = GREATEST(0, referrals - 1),
+        updated_at = now()
+    WHERE user_id = OLD.referrer_id;
+
+    RETURN OLD;
+END;
+$$;
+
+ALTER FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -260,7 +268,8 @@ begin
                          p.send_id, -- send_id
                          sa.main_tag_id, -- main_tag_id
                          mt.name, -- main_tag_name
-                         ( select array_agg(name) from tags where user_id = p.id and status = 'confirmed' ) -- tags
+                         ( select array_agg(name) from tags where user_id = p.id and status = 'confirmed' ), -- tags
+                         (p.verified_at IS NOT NULL)::boolean -- is_verified
                             )::activity_feed_user                      as "user"
                  from private.leaderboard_referrals_all_time l
                           join profiles p on p.id = user_id
@@ -395,11 +404,15 @@ CREATE OR REPLACE TRIGGER "referrals_insert_activity_trigger" AFTER INSERT ON "p
 
 CREATE OR REPLACE TRIGGER "update_leaderboard_referrals_all_time_referrals" AFTER INSERT ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"();
 
+CREATE OR REPLACE TRIGGER "decrement_leaderboard_referrals" AFTER DELETE ON "public"."referrals" FOR EACH ROW EXECUTE FUNCTION "private"."decrement_leaderboard_referrals_on_delete"();
+
 -- RLS
 ALTER TABLE "public"."referrals" ENABLE ROW LEVEL SECURITY;
 
 -- Grants
 REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_referrals"() FROM PUBLIC;
+
+REVOKE ALL ON FUNCTION "private"."decrement_leaderboard_referrals_on_delete"() FROM PUBLIC;
 
 REVOKE ALL ON FUNCTION "private"."update_leaderboard_referrals_all_time_sendtag_checkout_receipts"() FROM PUBLIC;
 
@@ -449,14 +462,7 @@ CREATE OR REPLACE FUNCTION public.get_friends()
 AS $function$
 BEGIN
     RETURN QUERY
-        WITH current_distribution_id AS (
-            SELECT id FROM distributions
-            WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-              AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-            ORDER BY qualification_start DESC
-            LIMIT 1
-        ),
-        ordered_referrals AS(
+        WITH ordered_referrals AS(
             SELECT
                 DISTINCT ON (r.referred_id)
                 p.avatar_url,
@@ -483,7 +489,7 @@ BEGIN
                 CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
                 t.name AS tag,
                 t.created_at,
-                CASE WHEN ds.user_id IS NOT NULL THEN true ELSE false END AS is_verified,
+                (p.verified_at IS NOT NULL) AS is_verified,
                 COALESCE((
                              SELECT
                                  SUM(amount)
@@ -496,8 +502,6 @@ BEGIN
                     LEFT JOIN affiliate_stats a ON a.user_id = r.referred_id
                     LEFT JOIN profiles p ON p.id = r.referred_id
                     LEFT JOIN tags t ON t.user_id = r.referred_id
-                    LEFT JOIN distribution_shares ds ON ds.user_id = p.id
-                        AND ds.distribution_id = (SELECT id FROM current_distribution_id)
             WHERE
                 r.referrer_id = (SELECT auth.uid())
                 AND t.status = 'confirmed'::tag_status

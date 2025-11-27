@@ -1,8 +1,15 @@
-import { Avatar, LinkableAvatar, type LinkableAvatarProps, Spinner, XStack } from '@my/ui'
+import {
+  Avatar,
+  LinkableAvatar,
+  type LinkableAvatarProps,
+  Spinner,
+  useThemeName,
+  XStack,
+} from '@my/ui'
 import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
-import { IconUpgrade } from 'app/components/icons'
+import { IconUpgrade, IconBadgeCheckSolid2 } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { ContractLabels } from 'app/data/contract-labels'
@@ -39,6 +46,8 @@ export function ActivityAvatar({
   const isERC20Transfer = isSendAccountTransfersEvent(activity)
   const isETHReceive = isSendAccountReceiveEvent(activity)
   const addressBook = useAddressBook()
+  const theme = useThemeName()
+  const isDark = theme.includes('dark')
 
   if (isSendPotTicketPurchase(activity) || isSendPotWin(activity)) {
     return (
@@ -100,7 +109,19 @@ export function ActivityAvatar({
             </Avatar>
           </Avatar.Fallback>
         </LinkableAvatar>
-        {/*<TransferDirectionIndicator activity={activity} />*/}
+        {user.is_verified && (
+          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
+            <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+            <IconBadgeCheckSolid2
+              size="$1"
+              scale={0.7}
+              color="$neon8"
+              $theme-dark={{ color: '$neon7' }}
+              // @ts-expect-error - checkColor is not typed
+              checkColor={isDark ? '#082B1B' : '#fff'}
+            />
+          </XStack>
+        )}
       </XStack>
     )
   }

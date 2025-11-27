@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "description": "使用您的推荐码邀请朋友加入 Send。"
+  },
+  "list": {
+    "birthdayFallback": "不适用",
+    "invitedYou": "（邀请您加入 Send）",
+    "unknownTag": "？?"
+  },
+  "referralLink": {
+    "labels": {
+      "referralCode": "推荐码：",
+      "sendId": "Send ID："
+    },
+    "toast": {
+      "copied": "已将您的推荐链接复制到剪贴板",
+      "errorMessage": "无法将您的推荐链接复制到剪贴板",
+      "errorTitle": "发生错误"
+    }
+  },
+  "table": {
+    "birthday": "生日",
+    "position": "#",
+    "sendtag": "sendtag",
+    "social": "社交链接"
+  }
+}

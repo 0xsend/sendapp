@@ -5555,6 +5555,20 @@
           "maxLength": null
         },
         {
+          "id": "public.profiles.verified_at",
+          "name": "verified_at",
+          "columnName": "verified_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,

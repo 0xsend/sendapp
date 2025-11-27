@@ -10,7 +10,7 @@ export default function SendButton({
   idType: string
 }) {
   const linkProps = useLink({
-    href: `/send?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}`,
+    href: `/send?idType=${idType}&recipient=${identifier}&sendToken=${sendTokenAddress[baseMainnet.id]}&m=1`,
   })
 
   return (

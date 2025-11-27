@@ -11,6 +11,7 @@ export const mockReceivedTransfer = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   data: {
     f: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
@@ -35,6 +36,7 @@ export const mockSentTransfer = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   to_user: {
     id: null,
@@ -44,6 +46,7 @@ export const mockSentTransfer = {
     tags: ['dan'],
     main_tag_id: 1,
     main_tag_name: 'dan',
+    is_verified: false,
   },
   data: {
     f: '\\x760e2928c3aa3af87897be52eb4833d42bbb27cf',
@@ -69,6 +72,7 @@ export const mockSwapSellErc20Transfer = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   to_user: null,
   data: {
@@ -95,6 +99,7 @@ export const mockSwapBuyErc20Transfer = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   data: {
     f: '\\x6131b5fae19ea4f9d964eac0408e4408b66337b5',
@@ -120,6 +125,7 @@ export const mockSwapBuyEthTransfer = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   data: {
     value: '10000000000000000',
@@ -143,6 +149,7 @@ export const mockTagReceipt = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   to_user: null,
   data: {
@@ -167,6 +174,7 @@ export const mockTagReceiptUSDC = {
     tags: ['asdf', 'teq'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   to_user: null,
   data: {
@@ -191,6 +199,7 @@ export const mockReferral = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   to_user: {
     id: null,
@@ -200,6 +209,7 @@ export const mockReferral = {
     tags: ['disconnect_whorl7351'],
     main_tag_id: 2,
     main_tag_name: 'disconnect_whorl7351',
+    is_verified: false,
   },
   data: {
     tags: ['disconnect_whorl7351'],
@@ -217,6 +227,7 @@ export const mockSendAccountReceive = {
     tags: null,
     main_tag_id: null,
     main_tag_name: null,
+    is_verified: false,
   },
   to_user: {
     id: '97476407-bf7f-4ebe-86aa-c9d18a0b388a',
@@ -226,6 +237,7 @@ export const mockSendAccountReceive = {
     tags: ['asdf', 'teq', 'yuw'],
     main_tag_id: 1,
     main_tag_name: 'asdf',
+    is_verified: false,
   },
   data: {
     value: '10000000000000000',
@@ -251,6 +263,7 @@ export const mockSendtagReferralRewardUSDC = {
     tags: null,
     main_tag_id: null,
     main_tag_name: null,
+    is_verified: false,
   },
   data: {
     f: '\\xfC1e51BBae1C1Ee9e6Cc629ea0023329EA5023a6',
@@ -275,6 +288,7 @@ const mockSigningKeyAdded = {
     tags: null,
     main_tag_id: null,
     main_tag_name: null,
+    is_verified: false,
   },
   to_user: null,
   data: {
@@ -303,6 +317,7 @@ const mockSigningKeyRemoved = {
     tags: null,
     main_tag_id: null,
     main_tag_name: null,
+    is_verified: false,
   },
   to_user: null,
   data: {
@@ -332,6 +347,7 @@ export const mockSendTokenUpgradeEvent = {
     tags: ['asfd'],
     main_tag_id: 1,
     main_tag_name: 'asfd',
+    is_verified: false,
   },
   data: {
     f: '\\x0000000000000000000000000000000000000000',
@@ -356,6 +372,7 @@ export const mockSendEarnDepositEvent = {
     tags: ['asfd'],
     main_tag_id: 1,
     main_tag_name: 'asfd',
+    is_verified: false,
   },
   to_user: null,
   data: {
@@ -383,6 +400,7 @@ export const mockSendEarnWithdrawEvent = {
     tags: ['asfd'],
     main_tag_id: 1,
     main_tag_name: 'asfd',
+    is_verified: false,
   },
   data: {
     log_addr: '\\x5afe000000000000000000000000000000000000',

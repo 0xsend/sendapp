@@ -793,6 +793,9 @@ BEGIN
     unnest(shares) shares
 ORDER BY
   shares.address;
+  -- Refresh profile verification status after batch update
+  -- This ensures verified_at is correctly set based on the updated shares
+  PERFORM refresh_profile_verification_status();
 END;
 $_$;
 
@@ -1308,3 +1311,16 @@ GRANT ALL ON FUNCTION "public"."insert_verification_sendpot_ticket_purchase"() T
 REVOKE ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) FROM authenticated;
 GRANT ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) TO service_role;
+
+-- Triggers for profile verified_at sync (functions defined in profiles.sql)
+DROP TRIGGER IF EXISTS "update_profile_verified_at_on_insert" ON "public"."distribution_shares";
+CREATE TRIGGER "update_profile_verified_at_on_insert"
+    AFTER INSERT ON "public"."distribution_shares"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."update_profile_verified_at_on_share_insert"();
+
+DROP TRIGGER IF EXISTS "update_profile_verified_at_on_delete" ON "public"."distribution_shares";
+CREATE TRIGGER "update_profile_verified_at_on_delete"
+    AFTER DELETE ON "public"."distribution_shares"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."update_profile_verified_at_on_share_delete"();

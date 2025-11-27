@@ -1,0 +1,92 @@
+{
+  "coinbase": {
+    "actions": {
+      "cancel": "取消",
+      "tryAgain": "重试"
+    },
+    "errors": {
+      "windowClosed": "Coinbase 窗口已关闭"
+    },
+    "help": {
+      "iosPopup": "在 iOS Safari 设置中关闭“阻止弹出窗口”，然后重试。"
+    },
+    "status": {
+      "almostThere": {
+        "description": "正在完成最后的步骤。",
+        "title": "即将完成..."
+      },
+      "failed": {
+        "description": "请检查您的连接或尝试其他卡。",
+        "title": "付款失败"
+      },
+      "holdTight": {
+        "description": "在您的 Coinbase 窗口中完成交易。",
+        "title": "请稍候..."
+      },
+      "pending": {
+        "description": "Coinbase 正在验证您的付款。完成后，此页面将重定向。",
+        "title": "交易待处理"
+      },
+      "timedOut": {
+        "description": "您的付款处理时间过长。请重试。",
+        "title": "交易超时"
+      }
+    }
+  },
+  "coinbaseForm": {
+    "currency": "美元",
+    "fees": "费用：$0.00",
+    "limits": "最低 $10 - 每周最高 $500",
+    "submit": {
+      "default": "确认存款",
+      "loading": "处理中..."
+    },
+    "title": "输入存款金额"
+  },
+  "copyAddressDialog": {
+    "actions": {
+      "cancel": "取消",
+      "confirm": "我同意并继续"
+    },
+    "intro": "请在继续之前确认您同意以下内容：",
+    "steps": {
+      "baseNetwork": "外部地址位于 Base 网络上，并且<supportLink>可以接收来自智能合约的转账</supportLink>",
+      "liability": "我明白如果我犯了任何错误，将无法找回资金。",
+      "tokens": "我已仔细检查代币 {{coins}} 是否位于 Base 网络上。"
+    },
+    "title": "确认外部存款"
+  },
+  "crypto": {
+    "networkLabel": "Base 网络",
+    "qr": {
+      "reveal": "点击显示二维码"
+    },
+    "toast": {
+      "errorMessage": "我们无法将您的地址复制到剪贴板",
+      "errorTitle": "发生错误"
+    },
+    "walletAddress": "钱包地址"
+  },
+  "options": {
+    "applePay": {
+      "description": "仅限借记卡",
+      "title": "Apple Pay"
+    },
+    "crypto": {
+      "description": "从外部钱包存款",
+      "title": "加密货币钱包"
+    },
+    "debitCard": {
+      "description": "每周快速存款，最高 $500",
+      "title": "借记卡"
+    }
+  },
+  "success": {
+    "actions": {
+      "continue": "继续",
+      "depositAgain": "再次存款"
+    },
+    "description": "一切就绪 — 您的资金将很快出现在您的钱包中",
+    "title": "存款完成"
+  }
+}

@@ -149,12 +149,20 @@ AS $function$
     WITH tag_info AS (
         SELECT
             COUNT(*) FILTER (WHERE EXISTS (
-                SELECT 1 FROM tag_receipts tr WHERE tr.tag_id = t.id
+                SELECT 1
+                FROM tag_receipts tr
+                JOIN receipts r ON r.event_id = tr.event_id
+                WHERE tr.tag_id = t.id
+                AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
             ))::integer as paid_tag_count,
             CASE
                 WHEN p_tag_id IS NULL THEN false
                 ELSE bool_or(t.id = p_tag_id AND EXISTS (
-                    SELECT 1 FROM tag_receipts tr WHERE tr.tag_id = p_tag_id
+                    SELECT 1
+                    FROM tag_receipts tr
+                    JOIN receipts r ON r.event_id = tr.event_id
+                    WHERE tr.tag_id = p_tag_id
+                    AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
                 ))
             END as is_deleting_paid_tag
         FROM send_account_tags sat

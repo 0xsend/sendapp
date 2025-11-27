@@ -17,8 +17,9 @@ jobs:
     name: Build Next.js Docker Image
     # Only build images for PRs and manual triggers, not for pushes to main/dev (handled by deploy workflows)
     if: false
-    # runs-on: ubuntu-latest
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     outputs:
@@ -48,8 +49,9 @@ jobs:
           cat .env.local | grep -v '^#' | grep -v '^$' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Setup Blacksmith Builder
-        uses: useblacksmith/setup-docker-builder@v1
+      # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+      # - name: Setup Blacksmith Builder
+      #   uses: useblacksmith/setup-docker-builder@v1
 
       - name: Generate unique image tag
         id: image-tag
@@ -57,7 +59,9 @@ jobs:
 
       - name: Build Docker image
         id: build
-        uses: useblacksmith/build-push-action@v2
+        # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+        # uses: useblacksmith/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
@@ -86,7 +90,9 @@ jobs:
 
   supabase-schema-drift-check:
     name: Supabase Schema Drift Check
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
@@ -96,7 +102,9 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
@@ -141,7 +149,9 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: blacksmith-8vcpu-ubuntu-2404
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-8vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
@@ -197,9 +207,9 @@ jobs:
     needs: [build_next_image]
     # Only run playwright tests when we build the image (PRs and manual triggers)
     if: false
-    # arc-runner-set had a good run
-    runs-on: blacksmith-4vcpu-ubuntu-2404
-    # runs-on: ubuntu-latest
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     strategy:
       # Don't stop all shards if one fails
       fail-fast: false
@@ -378,7 +388,9 @@ jobs:
 
   playwright-merge-reports:
     name: Playwright Merge Reports
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     if: false
     needs: [playwright-tests]
     # for writing PR comments
@@ -440,7 +452,9 @@ jobs:
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
+    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     permissions:
       contents: read

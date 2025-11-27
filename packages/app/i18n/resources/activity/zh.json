@@ -1,0 +1,83 @@
+{
+  "details": {
+    "dateOnly": "于",
+    "heading": "交易详情",
+    "phraseOn": "{{phrase}} 于"
+  },
+  "empty": {
+    "noActivities": "没有活动",
+    "noActivitiesMobile": "没有活动，立即发送！"
+  },
+  "errors": {
+    "fallback": "出了点问题。",
+    "title": "错误"
+  },
+  "events": {
+    "deposit": "存款",
+    "received": "已收到",
+    "referral": "推荐",
+    "referredBy": "被推荐人",
+    "revenueShare": "收入分成",
+    "rewards": "奖励",
+    "sendAccountSigningKeyAdded": "已添加 Send 帐户签名密钥",
+    "sendAccountSigningKeyRemoved": "已移除 Send 帐户签名密钥",
+    "sendEarn": {
+      "deposit": "Send Earn 存款",
+      "withdraw": "Send Earn 取款"
+    },
+    "sendTokenUpgrade": "Send 代币升级",
+    "sendpot": {
+      "ticketPurchase": "已购买",
+      "win": "Sendpot 赢取"
+    },
+    "sendtagRegistered": "Sendtag 已注册",
+    "sent": "已发送",
+    "temporal": {
+      "depositFailed": "存款失败"
+    },
+    "trade": "交易",
+    "withdraw": "取款"
+  },
+  "phrases": {
+    "deposit": "已存款",
+    "received": "已收到",
+    "referred": "已推荐",
+    "referredYou": "推荐了您",
+    "revenueShare": "赚取收入分成",
+    "sendAccountSigningKeyAdded": "已添加",
+    "sendEarn": {
+      "affiliateReward": "赚取奖励",
+      "depositComplete": "已存入 Send Earn",
+      "depositFailed": "存入 Send Earn 失败",
+      "depositPending": "正在存入 Send Earn...",
+      "withdrawComplete": "已从 Send Earn 取款"
+    },
+    "sendpot": {
+      "ticketPurchase": "买了",
+      "win": "赢了"
+    },
+    "sendtagCreated": "Sendtag 已创建",
+    "sendtagsCreated": "Sendtags 已创建",
+    "sentYou": "向您发送了",
+    "trade": "交易",
+    "upgrade": "已升级",
+    "withdraw": "已取款"
+  },
+  "sections": {
+    "today": "今天"
+  },
+  "status": {
+    "cancelled": "已取消",
+    "confirming": "正在确认...",
+    "failed": "失败",
+    "initializing": "正在初始化...",
+    "sending": "正在发送...",
+    "sent": "已发送"
+  },
+  "subtext": {
+    "sendAccountSigningKey": "Send 帐户签名密钥",
+    "sendEarn": "Send Earn",
+    "tickets_one": "{{count}} 张票",
+    "tickets_other": "{{count}} 张票"
+  }
+}

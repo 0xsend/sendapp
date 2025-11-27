@@ -59,7 +59,7 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
                FROM ((tags t
                  JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
                  JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-              WHERE ((sa.user_id = from_p.id) AND (t.status = 'confirmed'::tag_status))))::text[])::activity_feed_user
+              WHERE ((sa.user_id = from_p.id) AND (t.status = 'confirmed'::tag_status))))::text[], (from_p.verified_at IS NOT NULL)::boolean)::activity_feed_user
             ELSE NULL::activity_feed_user
         END AS from_user,
         CASE
@@ -75,7 +75,7 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
                FROM ((tags t
                  JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
                  JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-              WHERE ((sa.user_id = to_p.id) AND (t.status = 'confirmed'::tag_status))))::text[])::activity_feed_user
+              WHERE ((sa.user_id = to_p.id) AND (t.status = 'confirmed'::tag_status))))::text[], (to_p.verified_at IS NOT NULL)::boolean)::activity_feed_user
             ELSE NULL::activity_feed_user
         END AS to_user,
     a.data
@@ -87,7 +87,7 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
      LEFT JOIN send_accounts to_sa ON ((to_sa.user_id = to_p.id)))
      LEFT JOIN tags to_main_tag ON ((to_main_tag.id = to_sa.main_tag_id)))
   WHERE ((a.from_user_id = ( SELECT auth.uid() AS uid)) OR ((a.to_user_id = ( SELECT auth.uid() AS uid)) AND (a.event_name !~~ 'temporal_%'::text)))
-  GROUP BY a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name;
+  GROUP BY a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name, from_p.verified_at, to_p.verified_at;
 
 -- Functions (that depend on activity_feed view)
 
@@ -154,10 +154,22 @@ with_user_id AS (
 )
 
 -- Select the top 10 counterparties by send score with earn balance requirement
-SELECT (counterparty).* -- only fields from activity feed
+SELECT (
+    (
+        (counterparty).id,
+        (counterparty).name,
+        (counterparty).avatar_url,
+        (counterparty).send_id,
+        (counterparty).main_tag_id,
+        (counterparty).main_tag_name,
+        (counterparty).tags,
+        (p.verified_at IS NOT NULL)::boolean
+    )::activity_feed_user
+).*
 FROM with_user_id wui
 INNER JOIN user_send_scores uss ON uss.user_id = wui.user_id
 INNER JOIN user_earn_balances ueb ON ueb.user_id = wui.user_id
+INNER JOIN profiles p ON p.id = wui.user_id
 WHERE ueb.earn_balance >= (
     SELECT d.earn_min_balance
     FROM distributions d
@@ -177,6 +189,8 @@ ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION public.recent_senders()
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
 AS $function$
 BEGIN
 RETURN QUERY
@@ -205,9 +219,21 @@ RETURN QUERY
         FROM user_transfers
     )
 
--- Step 3: Select only the most recent transfer for each counterparty
-SELECT (counterparty).*  -- Return only the counterparty details
+-- Step 3: Select only the most recent transfer for each counterparty with profile data
+SELECT (
+    (
+        (counterparty).id,
+        (counterparty).name,
+        (counterparty).avatar_url,
+        (counterparty).send_id,
+        (counterparty).main_tag_id,
+        (counterparty).main_tag_name,
+        (counterparty).tags,
+        (p.verified_at IS NOT NULL)::boolean
+    )::activity_feed_user
+).*
 FROM numbered
+LEFT JOIN profiles p ON p.send_id = (counterparty).send_id
 WHERE occurrence_counter = 1  -- Only the most recent interaction with each counterparty
 ORDER BY created_at DESC      -- Order the result by most recent transfer
     LIMIT 10;                     -- Return only the 10 most recent counterparties
@@ -315,7 +341,7 @@ user_earn_balances AS (
 ),
 -- Ensure user has historical send activity and sufficient earn balance
 filtered_profiles AS (
-    SELECT bp.*, uss.total_score as send_score
+    SELECT bp.*, uss.total_score as send_score, (bp.verified_at IS NOT NULL) AS is_verified
     FROM birthday_profiles bp
     INNER JOIN user_send_scores uss ON uss.user_id = bp.id
     INNER JOIN user_earn_balances ueb ON ueb.user_id = bp.id
@@ -352,7 +378,8 @@ SELECT (
             FROM tags t
             WHERE t.user_id = fp.id
               AND t.status = 'confirmed'
-        )
+        ),
+        fp.is_verified
    )::activity_feed_user
 ).*
 FROM filtered_profiles fp

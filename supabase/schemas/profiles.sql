@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "x_username" "text",
     "birthday" "date",
     "banner_url" "text",
+    "verified_at" timestamp with time zone DEFAULT NULL,
     CONSTRAINT "profiles_about_update" CHECK (("length"("about") < 255)),
     CONSTRAINT "profiles_name_update" CHECK (("length"("name") < 63)),
     CONSTRAINT "profiles_x_username_update" CHECK (("length"("x_username") <= 64))
@@ -60,6 +61,7 @@ ALTER TABLE ONLY "public"."profiles"
 CREATE INDEX "profiles_send_id_idx" ON "public"."profiles" USING "btree" ("send_id");
 -- Partial covering index for top_senders query: filters and includes all selected columns
 CREATE INDEX "profiles_public_avatar_idx" ON "public"."profiles" USING "btree" ("id", "name", "avatar_url", "send_id") WHERE "is_public" = TRUE AND "avatar_url" IS NOT NULL;
+CREATE INDEX IF NOT EXISTS "profiles_verified_at_idx" ON "public"."profiles" ("verified_at") WHERE "verified_at" IS NOT NULL;
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."profiles"
@@ -123,6 +125,100 @@ REVOKE ALL ON FUNCTION "public"."stop_change_send_id"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "anon";
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "service_role";
+
+-- Functions for verified_at sync
+CREATE OR REPLACE FUNCTION public.update_profile_verified_at_on_share_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    curr_distribution_id bigint;
+BEGIN
+    -- Get current distribution
+    SELECT id INTO curr_distribution_id
+    FROM distributions
+    WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+      AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    ORDER BY qualification_start DESC
+    LIMIT 1;
+
+    -- Only update if inserting a share for the current distribution
+    IF curr_distribution_id IS NOT NULL AND NEW.distribution_id = curr_distribution_id THEN
+        UPDATE profiles
+        SET verified_at = NOW()
+        WHERE id = NEW.user_id
+          AND verified_at IS NULL;
+    END IF;
+
+    RETURN NEW;
+END;
+$function$;
+
+ALTER FUNCTION "public"."update_profile_verified_at_on_share_insert"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."update_profile_verified_at_on_share_insert"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."update_profile_verified_at_on_share_insert"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_profile_verified_at_on_share_insert"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_profile_verified_at_on_share_insert"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION public.update_profile_verified_at_on_share_delete()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    -- No-op: once verified, always verified
+    -- We don't clear verified_at when shares are deleted
+    RETURN OLD;
+END;
+$function$;
+
+ALTER FUNCTION "public"."update_profile_verified_at_on_share_delete"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."update_profile_verified_at_on_share_delete"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."update_profile_verified_at_on_share_delete"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_profile_verified_at_on_share_delete"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_profile_verified_at_on_share_delete"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION public.refresh_profile_verification_status()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    curr_distribution_id bigint;
+BEGIN
+    -- Get current distribution
+    SELECT id INTO curr_distribution_id
+    FROM distributions
+    WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+      AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    ORDER BY qualification_start DESC
+    LIMIT 1;
+
+    -- Only set verified_at for users with shares in current distribution
+    -- Never clear verified_at - once verified, always verified
+    IF curr_distribution_id IS NOT NULL THEN
+        UPDATE profiles
+        SET verified_at = NOW()
+        WHERE id IN (
+            SELECT DISTINCT user_id
+            FROM distribution_shares
+            WHERE distribution_id = curr_distribution_id
+        )
+        AND verified_at IS NULL;
+    END IF;
+END;
+$function$;
+
+ALTER FUNCTION "public"."refresh_profile_verification_status"() OWNER TO "postgres";
+-- service_role ONLY: This function can reset all verification status and should not be callable by clients
+REVOKE ALL ON FUNCTION "public"."refresh_profile_verification_status"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."refresh_profile_verification_status"() FROM anon;
+REVOKE ALL ON FUNCTION "public"."refresh_profile_verification_status"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."refresh_profile_verification_status"() TO "service_role";
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "avoid_send_id_change" BEFORE UPDATE ON "public"."profiles" FOR EACH ROW EXECUTE FUNCTION "public"."stop_change_send_id"();
