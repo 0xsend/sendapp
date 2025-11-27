@@ -25,11 +25,9 @@ BEGIN
     ORDER BY qualification_start DESC
     LIMIT 1;
 
-    IF curr_distribution_id IS NULL THEN
-        -- No current distribution, set all verified_at to NULL
-        UPDATE profiles SET verified_at = NULL WHERE verified_at IS NOT NULL;
-    ELSE
-        -- Set verified_at for users with shares in current distribution
+    -- Only set verified_at for users with shares in current distribution
+    -- Never clear verified_at - once verified, always verified
+    IF curr_distribution_id IS NOT NULL THEN
         UPDATE profiles
         SET verified_at = NOW()
         WHERE id IN (
@@ -38,16 +36,6 @@ BEGIN
             WHERE distribution_id = curr_distribution_id
         )
         AND verified_at IS NULL;
-
-        -- Clear verified_at for users without shares in current distribution
-        UPDATE profiles
-        SET verified_at = NULL
-        WHERE id NOT IN (
-            SELECT DISTINCT user_id
-            FROM distribution_shares
-            WHERE distribution_id = curr_distribution_id
-        )
-        AND verified_at IS NOT NULL;
     END IF;
 END;
 $function$
@@ -59,34 +47,9 @@ CREATE OR REPLACE FUNCTION public.update_profile_verified_at_on_share_delete()
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-DECLARE
-    curr_distribution_id bigint;
-    remaining_shares integer;
 BEGIN
-    -- Get current distribution
-    SELECT id INTO curr_distribution_id
-    FROM distributions
-    WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-      AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-    ORDER BY qualification_start DESC
-    LIMIT 1;
-
-    -- Only update if deleting a share for the current distribution
-    IF curr_distribution_id IS NOT NULL AND OLD.distribution_id = curr_distribution_id THEN
-        -- Check if user has any other shares in current distribution
-        SELECT COUNT(*) INTO remaining_shares
-        FROM distribution_shares
-        WHERE user_id = OLD.user_id
-          AND distribution_id = curr_distribution_id;
-
-        -- If no shares remain, set verified_at to NULL
-        IF remaining_shares = 0 THEN
-            UPDATE profiles
-            SET verified_at = NULL
-            WHERE id = OLD.user_id;
-        END IF;
-    END IF;
-
+    -- No-op: once verified, always verified
+    -- We don't clear verified_at when shares are deleted
     RETURN OLD;
 END;
 $function$
