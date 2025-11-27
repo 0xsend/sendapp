@@ -11,6 +11,8 @@ export type AvatarProfileProps = {
 
 export function AvatarProfile({
   profile,
+  $gtSm,
+  mx,
   ...rest
 }: AvatarProps & { profile?: AvatarProfileProps }) {
   const theme = useThemeName()
@@ -19,8 +21,8 @@ export function AvatarProfile({
   const isVerified = profile?.is_verified || Boolean(profile?.verified_at)
 
   return (
-    <XStack position="relative" mx="auto" $gtSm={{ mx: 0 }}>
-      <Avatar testID="avatar" size="$8" br="$4" gap="$2" {...rest}>
+    <XStack position="relative" mx={mx ?? 'auto'} $gtSm={{ mx: 0, ...$gtSm }}>
+      <Avatar testID="avatar" size="$8" br="$4" gap="$2" mx={mx} $gtSm={$gtSm} {...rest}>
         {Platform.OS === 'android' && !profile?.avatar_url ? (
           <IconAccount size="$6" color="$olive" />
         ) : (
