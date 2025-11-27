@@ -46,7 +46,7 @@ BEGIN
             sa.user_id,
             CASE
                 -- If matched a completed jackpot period, use that
-                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time -- USING START OF PERIOD
+                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time
                 -- If purchase is after max jackpot, use max jackpot (pending period)
                 WHEN (SELECT max_block_time FROM max_jackpot) > 0
                      AND utp.block_time > (SELECT max_block_time FROM max_jackpot)
@@ -54,7 +54,7 @@ BEGIN
                 -- Otherwise, use 0 (before first jackpot or no jackpots exist)
                 ELSE 0
             END AS jackpot_block_time,
-            SUM(utp.tickets_purchased_count) AS total_ticket_count, -- CORRECTED COLUMN NAME
+            SUM(utp.tickets_purchased_count) AS total_ticket_count,
             MAX(to_timestamp(utp.block_time) AT TIME ZONE 'UTC') AS last_purchase_time
         FROM sendpot_user_ticket_purchases utp
         JOIN send_accounts sa ON sa.address_bytes = utp.buyer
@@ -69,7 +69,7 @@ BEGIN
         ))
         GROUP BY sa.user_id,
             CASE
-                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time -- USING START OF PERIOD
+                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time
                 WHEN (SELECT max_block_time FROM max_jackpot) > 0
                      AND utp.block_time > (SELECT max_block_time FROM max_jackpot)
                 THEN (SELECT max_block_time FROM max_jackpot)
@@ -94,7 +94,8 @@ BEGIN
     FROM purchases_by_period pbp
     WHERE pbp.user_id IS NOT NULL;
 END;
-$function$;
+$function$
+;
 
 -- 2. Data Migration
 DO $$
