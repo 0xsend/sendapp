@@ -261,6 +261,28 @@ SELECT
 FROM distributions d
 WHERE d.number = 10000;
 
+-- Create distribution_shares for referred users in ACTIVE distribution
+-- This simulates that these users have qualified (have shares > 0)
+-- This is required for the total_tag_referrals recalculation logic
+INSERT INTO distribution_shares (distribution_id, user_id, address, amount, fixed_pool_amount, hodler_pool_amount, bonus_pool_amount, index)
+SELECT
+    d.id,
+    ref_id,
+    '0x' || encode(gen_random_bytes(20), 'hex'),
+    '1000',
+    '500',
+    '500',
+    '0',
+    row_number() OVER () -- Generate sequential index
+FROM distributions d
+CROSS JOIN (
+    VALUES
+        (tests.get_supabase_uid('dist_referred1')),
+        (tests.get_supabase_uid('dist_referred2')),
+        (tests.get_supabase_uid('dist_referred3'))
+) AS refs(ref_id)
+WHERE d.number = 10000;
+
 -- Test 8: Verify initial state - 3 tag_referral verifications with weight=1
 SELECT results_eq(
     $$
