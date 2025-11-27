@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS "public"."distributions" (
     "token_addr" "bytea",
     "token_decimals" numeric,
     "tranche_id" integer NOT NULL,
-    "earn_min_balance" bigint NOT NULL DEFAULT 0
+    "earn_min_balance" bigint NOT NULL DEFAULT 0,
+    "sendpot_ticket_increment" integer DEFAULT 10
 );
 
 ALTER TABLE "public"."distributions" OWNER TO "postgres";
@@ -1008,12 +1009,14 @@ DECLARE
     curr_distribution_end_epoch numeric;
     buyer_user_id uuid;
     max_jackpot_block_time numeric;
+    ticket_increment integer;
+    total_tickets numeric;
     recalculated_weight numeric;
     existing_verification_id bigint;
 BEGIN
-    -- Get the current active distribution
-    SELECT id, EXTRACT(EPOCH FROM qualification_start), EXTRACT(EPOCH FROM qualification_end)
-    INTO curr_distribution_id, curr_distribution_start_epoch, curr_distribution_end_epoch
+    -- Get the current active distribution and ticket increment
+    SELECT id, EXTRACT(EPOCH FROM qualification_start), EXTRACT(EPOCH FROM qualification_end), COALESCE(sendpot_ticket_increment, 10)
+    INTO curr_distribution_id, curr_distribution_start_epoch, curr_distribution_end_epoch, ticket_increment
     FROM distributions
     WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
       AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
@@ -1040,12 +1043,15 @@ BEGIN
     END IF;
 
     -- Calculate total tickets for this user in current distribution that are AFTER the last jackpot
-    SELECT COALESCE(SUM(tickets_purchased_total_bps), 0) INTO recalculated_weight
+    SELECT COALESCE(SUM(tickets_purchased_count), 0) INTO total_tickets
     FROM sendpot_user_ticket_purchases
     WHERE buyer = NEW.buyer
       AND block_time >= curr_distribution_start_epoch
       AND block_time < curr_distribution_end_epoch
       AND block_time > max_jackpot_block_time;
+    
+    -- Calculate weight: integer division by ticket increment
+    recalculated_weight := FLOOR(total_tickets / ticket_increment);
 
     -- Find existing verification for this user/distribution/type in the same jackpot period
     -- If created_at > max_jackpot_block_time, it's in the current pending period
@@ -1072,14 +1078,14 @@ BEGIN
             buyer_user_id,
             'sendpot_ticket_purchase',
             recalculated_weight,
-            jsonb_build_object('lastJackpotEndTime', max_jackpot_block_time),
+            jsonb_build_object('lastJackpotEndTime', max_jackpot_block_time, 'value', total_tickets),
             to_timestamp(NEW.block_time) AT TIME ZONE 'UTC'
         );
     ELSE
         UPDATE distribution_verifications
         SET weight = recalculated_weight,
             created_at = to_timestamp(NEW.block_time) AT TIME ZONE 'UTC',
-            metadata = jsonb_build_object('lastJackpotEndTime', max_jackpot_block_time)
+            metadata = jsonb_build_object('lastJackpotEndTime', max_jackpot_block_time, 'value', total_tickets)
         WHERE id = existing_verification_id;
     END IF;
 
@@ -1099,7 +1105,8 @@ BEGIN
         SELECT
             id,
             qualification_start,
-            qualification_end
+            qualification_end,
+            COALESCE(sendpot_ticket_increment, 10) AS ticket_increment
         FROM
             distributions
         WHERE
@@ -1140,7 +1147,7 @@ BEGIN
                 -- Otherwise, use 0 (before first jackpot or no jackpots exist)
                 ELSE 0
             END AS jackpot_block_time,
-            SUM(utp.tickets_purchased_total_bps) AS total_tickets,
+            SUM(utp.tickets_purchased_count) AS total_ticket_count,
             MAX(to_timestamp(utp.block_time) AT TIME ZONE 'UTC') AS last_purchase_time
         FROM sendpot_user_ticket_purchases utp
         JOIN send_accounts sa ON sa.address_bytes = utp.buyer
@@ -1174,8 +1181,8 @@ BEGIN
         (SELECT id FROM distribution_info),
         pbp.user_id,
         'sendpot_ticket_purchase'::public.verification_type,
-        pbp.total_tickets,
-        jsonb_build_object('lastJackpotEndTime', pbp.jackpot_block_time),
+        FLOOR(pbp.total_ticket_count / (SELECT ticket_increment FROM distribution_info)),
+        jsonb_build_object('lastJackpotEndTime', pbp.jackpot_block_time, 'value', pbp.total_ticket_count),
         pbp.last_purchase_time
     FROM purchases_by_period pbp
     WHERE pbp.user_id IS NOT NULL;

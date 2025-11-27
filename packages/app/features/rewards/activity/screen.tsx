@@ -37,7 +37,6 @@ import { useSendEarnBalancesAtBlock } from 'app/features/earn/hooks'
 import { useThemeName } from 'tamagui'
 import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
-import { calculateTicketsFromBps } from 'app/data/sendpot'
 import { Link } from 'solito/link'
 import { useTranslation } from 'react-i18next'
 
@@ -471,10 +470,9 @@ const TaskCard = ({
   const type = verification.type
   const metadata = (verification.metadata ?? []) as Json[]
   const weight = verification.weight
-  const latestWeight = verification.latestWeight
-  const value = ['send_ten', 'send_one_hundred'].includes(type)
+  const value = ['send_ten', 'send_one_hundred', 'sendpot_ticket_purchase'].includes(type)
     ? //@ts-expect-error these two verfiications will always have "value" in the metadata
-      BigInt(metadata?.[0]?.value ?? 0)
+      metadata.reduce((sum, m) => sum + BigInt(m.value ?? 0), 0n)
     : weight
   // Find the largest lastJackpotEndTime in the metadata array
   const lastJackpotEndTime =
@@ -483,11 +481,13 @@ const TaskCard = ({
           .map((m) => {
             const time = (m as { lastJackpotEndTime?: string | number })?.lastJackpotEndTime
             // Convert to number if it's a string (Unix seconds)
-            return time ? Number(time) : null
+            // Handle 0 as a valid value (not falsy)
+            return time !== undefined && time !== null ? Number(time) : null
           })
           .filter((time): time is number => time !== null)
-          .reduce((max, time) => (!max || time > max ? time : max), null as number | null)
+          .reduce((max, time) => (max === null || time > max ? time : max), null as number | null)
       : null
+  console.log('lastJackpotEndTime', metadata)
   const isSendStreak = type === 'send_streak'
 
   const getIsCompleted = () => {
@@ -498,7 +498,8 @@ const TaskCard = ({
           (Boolean(weight) && isQualificationOver)
         )
       case 'sendpot_ticket_purchase': {
-        if (!latestWeight || !lastJackpotEndTime) return false
+        // Handle 0 as a valid value (check for null/undefined explicitly)
+        if (lastJackpotEndTime === null || lastJackpotEndTime === undefined) return false
         // Convert Unix seconds to Date object (multiply by 1000 to get milliseconds)
         const lastJackpotEndDate = new Date(lastJackpotEndTime * 1000)
         const createdAtDate = new Date(verification.created_at)
@@ -507,7 +508,13 @@ const TaskCard = ({
           return false
         }
 
-        const numTickets = calculateTicketsFromBps(Number(latestWeight))
+        // Use the raw ticket count from metadata.value
+        const numTickets = metadata
+          .map((m) => {
+            const val = (m as { value?: string | number })?.value
+            return val ? Number(val) : 0
+          })
+          .reduce((sum, count) => sum + count, 0)
         return numTickets >= 1
       }
       default:
@@ -519,8 +526,6 @@ const TaskCard = ({
     switch (type) {
       case 'tag_registration':
         return verification.count.toString()
-      case 'sendpot_ticket_purchase':
-        return weight ? calculateTicketsFromBps(Number(weight)).toString() : '0'
       default:
         return value.toString()
     }

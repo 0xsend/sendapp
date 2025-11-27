@@ -315,6 +315,7 @@ export type Database = {
           number: number
           qualification_end: string
           qualification_start: string
+          sendpot_ticket_increment: number | null
           snapshot_block_num: number | null
           token_addr: string | null
           token_decimals: number | null
@@ -338,6 +339,7 @@ export type Database = {
           number: number
           qualification_end: string
           qualification_start: string
+          sendpot_ticket_increment?: number | null
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
@@ -361,6 +363,7 @@ export type Database = {
           number?: number
           qualification_end?: string
           qualification_start?: string
+          sendpot_ticket_increment?: number | null
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null

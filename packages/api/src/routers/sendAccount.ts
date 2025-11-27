@@ -391,21 +391,6 @@ export const sendAccountRouter = createTRPCRouter({
           })
         }
 
-        // Validate paymaster matches expected verifying paymaster for chain
-        if (
-          userop.paymaster &&
-          userop.paymaster !== sendVerifyingPaymasterAddress[sendAccount.chain_id]
-        ) {
-          log('Invalid paymaster', {
-            provided: userop.paymaster,
-            expected: sendVerifyingPaymasterAddress[sendAccount.chain_id],
-          })
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: `Invalid paymaster. Expected ${sendVerifyingPaymasterAddress[sendAccount.chain_id]}, got ${userop.paymaster}`,
-          })
-        }
-
         // Validate operation using validator registry
         const validationResult = validateUserOp({
           userop,
