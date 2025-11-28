@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -279,9 +279,11 @@ export function DepositForm() {
         })
         log('Send paymaster signature received', paymasterResult)
 
-        // Update userOp with Send paymaster data
+        // Update userOp with Send paymaster - must override paymaster address
+        // since gas estimation used tokenPaymasterAddress
         sponsoredUserOp = {
           ...uop.data,
+          paymaster: sendVerifyingPaymasterAddress[chainId],
           paymasterData: paymasterResult.paymasterData,
         }
       }
