@@ -26,7 +26,7 @@ Reference: [Apple's Account Deletion Requirements](https://developer.apple.com/s
 
 | Name | Type | Schema | Cascades on User Delete? | Need Action |
 |------|------|--------|--------------------------|-------------|
-| activity | Table | public | ✅ Yes (direct) | ✅ No action needed |
+| activity | Table | public | ✅ Yes (direct) | ⚠️ **Action required - Hybrid approach** |
 | affiliate_stats | Table | public | ✅ Yes (via profiles) | ✅ No action needed |
 | canton_party_verifications | Table | public | ✅ Yes (direct) | ✅ No action needed |
 | chain_addresses | Table | public | ✅ Yes (direct) | ✅ No action needed |
@@ -48,9 +48,10 @@ Reference: [Apple's Account Deletion Requirements](https://developer.apple.com/s
 | webauthn_credentials | Table | public | ✅ Yes (direct) | ✅ No action needed |
 
 **Summary**:
-- **Verified CASCADE**: 18 tables with confirmed CASCADE relationships
+- **Verified CASCADE**: 17 tables with confirmed CASCADE relationships (no special handling needed)
+- **Hybrid approach required**: 1 table (activity - preserve multi-user transactions, CASCADE solo activities)
 - **Manual deletion required**: 1 table (temporal.send_account_transfers - contains user_id without FK constraint)
-- **Referrals impact**: 3 items require special handling (see detailed analysis below)
+- **Referrals impact**: 3 items require special handling (referrals table, distribution_verifications, leaderboard)
 
 **Note**: 15 blockchain indexer tables (send_account_created, send_account_receives, send_token_transfers, sendtag_checkout_receipts, etc.) have been excluded from this list as they only store blockchain addresses with no direct user foreign keys. The connection between users and addresses is severed when chain_addresses and send_accounts cascade on user deletion.
 
@@ -163,6 +164,143 @@ When a referred user deletes their account, this has cascading effects on the re
 3. **Historical data**: Closed distributions remain unchanged
 4. **CASCADE deletes**: Automatic cleanup of referral records
 
+## Activity Table Impact
+
+### Overview
+
+The activity table contains transaction history and user activities. When a user deletes their account, we need to preserve transaction history for other users while cleaning up solo activities. **Analysis completed and fixes implemented** ✅
+
+### Summary of Implementation
+
+| Activity Type | Behavior | Status |
+|--------------|----------|--------|
+| Multi-user transfers | Preserved with NULL | ✅ FIXED |
+| Multi-user receives | Preserved with NULL | ✅ FIXED |
+| Temporal transfers | Preserved with NULL | ✅ FIXED |
+| Referrals | CASCADE deleted | ✅ Handled by referrals CASCADE chain |
+| Tag purchases (solo) | CASCADE deleted | ✅ No action needed |
+| Earn deposits (solo) | CASCADE deleted | ✅ No action needed |
+| Self-transfers | CASCADE deleted | ✅ No action needed |
+
+### Problem Statement
+
+**Challenge**: The activity table has CASCADE delete on `from_user_id` and `to_user_id`, which would delete ALL activities when a user is deleted. However:
+- Bob sends $100 to Alice → Both have activity records
+- If Alice deletes her account, Bob should still see "Sent $100 to [Deleted User]"
+- But with pure CASCADE, Bob's activity would be deleted too (broken transaction history)
+
+**Solution**: Hybrid trigger + CASCADE approach
+- BEFORE user deletion: Set user_id to NULL for multi-user transaction activities
+- Allow CASCADE to clean up solo activities (tags, earn deposits, referrals)
+
+### Implementation Details
+
+**Trigger Function** (`public.preserve_activity_before_user_deletion()`)
+- Fires: BEFORE DELETE on `auth.users`
+- Updates: `from_user_id` or `to_user_id` to NULL for transaction activities
+- Scope: Only transaction event types (`send_account_transfers`, `send_account_receives`, `temporal_send_account_transfers`)
+- Conditions:
+  - Only preserves if "other user" exists and is different from deleted user
+  - Excludes referrals (handled by separate CASCADE chain via `profiles` → `referrals` → activity)
+  - Self-transfers are CASCADE deleted (same user for both from/to)
+
+**Migration**: `20251128102256_activity_triggers_on_account_delete.sql`
+
+### Behavior Examples
+
+**Example 1: Multi-user Transfer (Preserved)**
+```
+Before deletion:
+- Activity: from_user_id=Alice, to_user_id=Bob, event_name='send_account_transfers'
+
+Alice deletes account:
+- Activity: from_user_id=NULL, to_user_id=Bob, event_name='send_account_transfers'
+- Bob still sees: "Received $100 from [Deleted User]" ✅
+```
+
+**Example 2: Solo Activity (CASCADE Deleted)**
+```
+Before deletion:
+- Activity: from_user_id=Alice, to_user_id=NULL, event_name='tag_receipt_usdc'
+
+Alice deletes account:
+- Activity: DELETED by CASCADE ✅
+- No other user involved, so no need to preserve
+```
+
+**Example 3: Referral (CASCADE Deleted)**
+```
+Before deletion:
+- Referral: referrer_id=Alice, referred_id=Bob
+- Activity: from_user_id=Alice, to_user_id=Bob, event_name='referrals'
+
+Bob deletes account:
+- Profile CASCADE deletes → Referral CASCADE deleted → Activity CASCADE deleted ✅
+- Alice loses referral credit (as intended)
+- Leaderboard decrements via trigger (Phase 0)
+```
+
+**Example 4: Self-transfer (CASCADE Deleted)**
+```
+Before deletion:
+- Activity: from_user_id=Alice, to_user_id=Alice, event_name='send_account_transfers'
+
+Alice deletes account:
+- Activity: DELETED by CASCADE ✅
+- No "other user" to preserve for (from_user != to_user condition fails)
+```
+
+### Test Coverage
+
+Three comprehensive test files with 29 total tests:
+
+**1. Preservation Tests** (`supabase/tests/activity_account_deletion_preservation_test.sql` - 12 tests)
+- Multi-user transfer preservation with NULL from_user_id
+- Multi-user receive preservation with NULL to_user_id
+- Temporal transfer preservation
+- Solo activity CASCADE deletion (tags, earn deposits)
+- Data integrity verification
+- Profile CASCADE behavior
+- Total activity counts
+
+**2. Edge Cases** (`supabase/tests/activity_account_deletion_edge_cases_test.sql` - 11 tests)
+- Self-transfers (same user for from/to) → CASCADE deleted
+- Multiple activities between same users → All preserved
+- Activity chains involving multiple users → Preserved correctly
+- Mix of different event types → Each handled correctly
+- Activities with already-NULL user fields → Stable behavior
+- Backfill resilience (UPSERT pattern prevents duplicates)
+
+**3. Referral Integration** (`supabase/tests/activity_account_deletion_referrals_test.sql` - 6 tests)
+- Referral CASCADE deletion through profiles → referrals → activity chain
+- Referrer profile preservation
+- Activity cleanup verification
+- Integration with Phase 0 referrals fixes
+
+### Frontend Compatibility
+
+✅ **No frontend changes required**
+- Activity components already support nullable `from_user_id` and `to_user_id` fields
+- Display logic already handles "[Deleted User]" or similar placeholders
+- Tested in existing codebase
+
+### Key Technical Details
+
+1. **Trigger timing**: BEFORE DELETE ensures user ID is still available in WHERE clauses
+2. **Other user check**: Only preserves when `to_user_id != OLD.id` (or `from_user_id != OLD.id`)
+3. **Referral exclusion**: Referrals explicitly excluded from preservation (separate CASCADE chain)
+4. **CASCADE cleanup**: Solo activities automatically cleaned up by existing CASCADE behavior
+5. **Backfill safety**: UPSERT pattern in activity creation prevents duplicate preservation
+6. **NULL support**: Frontend already supports NULL user fields (verified in existing code)
+
+### Key Principles
+
+1. **Preserve transaction history**: Other users shouldn't lose their transaction records
+2. **Clean up solo activities**: No orphaned data for single-user activities
+3. **Respect referral chain**: Referrals handled by existing CASCADE chain (intentional deletion)
+4. **Leverage CASCADE**: Use existing CASCADE for cleanup, trigger only for preservation
+5. **Self-contained transactions**: Self-transfers are solo activities (CASCADE deleted)
+
 ## Compliance Considerations
 
 ### Financial Record Retention
@@ -213,6 +351,74 @@ Analysis completed and fixes implemented for referral system to handle account d
 - Test count: 8 tests covering all scenarios
 - Status: All tests passing ✅
 - Coverage: Leaderboard increment/decrement, multiple referrals, sequential deletions, edge cases
+
+### Phase 0.5: Activity Table Handling ✅ COMPLETED
+
+Analysis completed and fixes implemented for activity table to handle account deletions correctly using a hybrid trigger + CASCADE approach.
+
+**Pull Request**: [#2264 - Account deletion: activity impact](https://github.com/0xsend/sendapp/pull/2264)
+
+#### Implementation Summary
+
+**Strategy**: Hybrid trigger + CASCADE approach
+- Multi-user transactions (transfers/receives) → Preserved with NULL for deleted user
+- Referrals → Auto-deleted via existing CASCADE chain (intentional)
+- Solo activities (tags, earn deposits) → CASCADE deleted (no orphaned data)
+
+**1. Activity Preservation Trigger** ✅ IMPLEMENTED
+- Function: `public.preserve_activity_before_user_deletion()`
+- Trigger: BEFORE DELETE on `auth.users`
+- Migration: `20251128102256_activity_triggers_on_account_delete.sql`
+- Purpose: Sets `from_user_id` or `to_user_id` to NULL for multi-user transaction activities
+- Scope: Only applies to transaction event types (`send_account_transfers`, `send_account_receives`, `temporal_send_account_transfers`)
+- Preserves: Activities where another user (sender or recipient) exists and is different from deleted user
+
+**2. Behavior by Activity Type**
+
+| Activity Type | Behavior | Rationale |
+|--------------|----------|-----------|
+| Multi-user transfers | Preserved with NULL | Other user should still see "Received $100 from [Deleted User]" |
+| Multi-user receives | Preserved with NULL | Other user should still see their transaction history |
+| Temporal transfers | Preserved with NULL | Same as regular transfers |
+| Referrals | CASCADE deleted | Handled by existing `profiles` → `referrals` CASCADE chain |
+| Tag purchases | CASCADE deleted | Solo activity, no other user involved |
+| Earn deposits | CASCADE deleted | Solo activity, no other user involved |
+| Self-transfers | CASCADE deleted | Same user for both from/to, no preservation needed |
+
+**3. Comprehensive Tests** ✅ IMPLEMENTED
+
+Three test files with 29 total tests:
+
+- `supabase/tests/activity_account_deletion_preservation_test.sql` (12 tests)
+  - Multi-user transfer preservation
+  - Multi-user receive preservation
+  - Temporal transfer preservation
+  - Solo activity CASCADE deletion
+  - Data integrity verification
+
+- `supabase/tests/activity_account_deletion_edge_cases_test.sql` (11 tests)
+  - Self-transfers (same user for from/to)
+  - Multiple activities between same users
+  - Activity chains involving multiple users
+  - Mix of different event types
+  - Activities with already-NULL user fields
+  - Backfill resilience (UPSERT pattern)
+
+- `supabase/tests/activity_account_deletion_referrals_test.sql` (6 tests)
+  - Referral CASCADE deletion verification
+  - Referrer profile preservation
+  - Activity cleanup through CASCADE chain
+
+**4. Frontend Compatibility** ✅ VERIFIED
+- Frontend activity components already support nullable `from_user_id` and `to_user_id` fields
+- No frontend changes required
+
+**5. Key Technical Details**
+- Trigger fires BEFORE user deletion, allowing access to user ID in WHERE clauses
+- Only updates activities where "other user" exists and is different (`to_user_id != OLD.id`)
+- Excludes referrals from preservation logic (handled by separate CASCADE chain)
+- Leverages existing CASCADE behavior for cleanup of solo activities
+- Backfill-safe: Uses UPSERT pattern in activity creation to prevent duplicates
 
 ### Phase 1: Database Function
 
@@ -307,16 +513,22 @@ Create tests to verify:
    - Test distribution verification updates
 
 2. **Referrals System Tests** (`supabase/tests/account_deletion_referrals_test.sql`)
-   - Already created in Phase 0.3 (see above)
+   - Already created in Phase 0 (see above)
    - Run these tests first to validate Phase 0 fixes
 
-3. **tRPC Endpoint Tests** (`packages/api/`)
+3. **Activity Table Tests** ✅ COMPLETED IN PHASE 0.5
+   - Already created in Phase 0.5 (see above)
+   - `supabase/tests/activity_account_deletion_preservation_test.sql` (12 tests)
+   - `supabase/tests/activity_account_deletion_edge_cases_test.sql` (11 tests)
+   - `supabase/tests/activity_account_deletion_referrals_test.sql` (6 tests)
+
+4. **tRPC Endpoint Tests** (`packages/api/`)
    - Authenticated user can delete account
    - Unauthenticated request fails
    - Session is invalidated after deletion
    - Error handling works correctly
 
-4. **Integration Tests**
+5. **Integration Tests**
    - End-to-end account deletion flow
    - Verify user cannot access data after deletion
    - Verify blockchain data remains accessible on-chain
@@ -347,9 +559,21 @@ Create tests to verify:
 - ✅ No errors when deleting user with no active distribution
 - ✅ All pgTAP tests pass for referrals system (8/8 tests passing)
 
+### Activity Table Integrity (Phase 0.5) ✅ COMPLETED
+- ✅ Multi-user transactions preserved with NULL for deleted user
+- ✅ Other users still see transaction history (e.g., "Received $100 from [Deleted User]")
+- ✅ Referral activities properly CASCADE deleted
+- ✅ Solo activities (tags, earn deposits) CASCADE deleted
+- ✅ Self-transfers properly CASCADE deleted
+- ✅ Activity chains with multiple users handled correctly
+- ✅ Activities with already-NULL fields remain stable
+- ✅ Backfill-resilient (UPSERT pattern prevents duplicates)
+- ✅ All pgTAP tests pass for activity handling (29/29 tests passing)
+
 ### Testing & Validation
-- ✅ Phase 0: Referrals system tests complete and passing
-- ⏳ All pgTAP tests pass for account deletion
+- ✅ Phase 0: Referrals system tests complete and passing (8 tests)
+- ✅ Phase 0.5: Activity table tests complete and passing (29 tests)
+- ⏳ All pgTAP tests pass for core account deletion function
 - ⏳ Data validation queries show no inconsistencies
 - ⏳ Staging environment testing completed successfully
 - ⏳ Performance impact assessed and acceptable
@@ -367,6 +591,8 @@ Create tests to verify:
 *Last updated: 2025-11-28*
 
 ### Changelog
-- **2025-11-28**: Phase 0 completed - Referrals system fixes implemented and tested
+- **2025-11-28**:
+  - Phase 0.5 completed - Activity table preservation logic implemented and tested (29 tests)
+  - Phase 0 completed - Referrals system fixes implemented and tested (8 tests)
 - **2025-11-26**: Initial implementation plan created
 - **2025-11-25**: Document created with database schema analysis
