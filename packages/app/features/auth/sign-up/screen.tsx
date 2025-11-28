@@ -34,6 +34,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { z } from 'zod'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { ReferrerBanner } from 'app/components/ReferrerBanner'
 import { Platform } from 'react-native'
 import useIsScreenFocused from 'app/utils/useIsScreenFocused'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
@@ -427,6 +428,7 @@ export const SignUpScreen = () => {
         >
           Choose your Sendtag — your unique username on Send
         </Paragraph>
+        <ReferrerBanner />
       </YStack>
       <FadeCard
         borderColor={validationError ? '$error' : 'transparent'}
