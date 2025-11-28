@@ -76,7 +76,7 @@ export function ReferrerBanner() {
                 is_verified: referrer.is_verified,
               }}
               size="$2"
-              br="$10"
+              br="$2"
               mx={0}
             />
           )}
