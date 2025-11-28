@@ -580,75 +580,105 @@ Three test files with 29 total tests:
 - Leverages existing CASCADE behavior for cleanup of solo activities
 - Backfill-safe: Uses UPSERT pattern in activity creation to prevent duplicates
 
-### Phase 1: Database Function
+### Phase 1: Database Function ✅ COMPLETED
 
-Create a PostgreSQL function in Supabase:
+PostgreSQL function created in Supabase to handle account deletion.
 
 **File**: `supabase/schemas/account_deletion.sql`
+**Migration**: `supabase/migrations/20251128165500_account_deletion.sql`
 
+#### Implementation Summary
+
+**Function**: `public.delete_user_account(user_id_to_delete uuid)`
+
+**Key Design Decisions:**
+- **Parameter-based**: Takes `user_id_to_delete` as parameter instead of using `auth.uid()`
+- **Service role only**: Function is only accessible to service_role (admin), not authenticated users
+- **Security model**: Prevents direct user access; tRPC endpoint acts as secure gateway
+- **Manual cleanup**: Explicitly deletes from `temporal.send_account_transfers` (no FK constraint)
+- **CASCADE trigger**: Deletion from `auth.users` triggers CASCADE across all related tables
+
+**Permissions:**
 ```sql
-CREATE OR REPLACE FUNCTION public.delete_user_account()
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = 'public'
-AS $$
-DECLARE
-    current_user_id uuid;
-BEGIN
-    -- Get the authenticated user's ID
-    current_user_id := auth.uid();
+-- Revoked from all public access
+REVOKE ALL ON FUNCTION public.delete_user_account(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.delete_user_account(uuid) FROM anon;
+REVOKE ALL ON FUNCTION public.delete_user_account(uuid) FROM authenticated;
 
-    IF current_user_id IS NULL THEN
-        RAISE EXCEPTION 'User must be authenticated to delete account';
-    END IF;
-
-    -- Delete the user from auth.users
-    -- This will trigger CASCADE deletes across all related tables
-    DELETE FROM auth.users WHERE id = current_user_id;
-
-    -- Note: The user's session will be invalidated after this operation
-END;
-$$;
-
--- Grant permissions
-GRANT EXECUTE ON FUNCTION public.delete_user_account() TO authenticated;
+-- Only service_role (admin) can execute
+GRANT EXECUTE ON FUNCTION public.delete_user_account(uuid) TO service_role;
 ```
 
-### Phase 2: tRPC Endpoint
+**What gets deleted:**
+1. Manual: `temporal.send_account_transfers` (no FK, must be explicit)
+2. CASCADE: All tables with foreign keys to `auth.users`:
+   - `profiles`, `send_accounts`, `tags`, `chain_addresses`
+   - `receipts`, `activity`, `referrals`, `distribution_verifications`
+   - `webauthn_credentials`, `link_in_bio`, `canton_party_verifications`
+   - And all downstream CASCADE relationships
 
-Create a tRPC mutation endpoint:
+### Phase 2: tRPC Endpoint ✅ COMPLETED
+
+tRPC mutation endpoint created to provide secure access to account deletion.
 
 **File**: `packages/api/src/routers/auth/router.ts`
+**Commit**: `a8de4734`
 
-Add a new procedure:
+#### Implementation Summary
 
+**Procedure**: `deleteAccount` (protectedProcedure)
+
+**Key Design Decisions:**
+- **Authentication required**: Uses `protectedProcedure` to ensure user is authenticated
+- **Admin client pattern**: Creates `supabaseAdmin` client to call service_role function
+- **User ID from session**: Extracts `session.user.id` to pass to database function
+- **Automatic signout**: Signs out user after successful deletion
+- **Error handling**: Proper TRPCError with INTERNAL_SERVER_ERROR code
+
+**Implementation:**
 ```typescript
-deleteAccount: protectedProcedure
-  .mutation(async ({ ctx: { supabase } }) => {
-    log('Deleting user account');
+deleteAccount: protectedProcedure.mutation(async ({ ctx: { supabase, session } }) => {
+  const userId = session.user.id
+  log('Deleting user account:', userId)
 
-    try {
-      // Call the database function to delete the account
-      const { error } = await supabase.rpc('delete_user_account');
+  try {
+    // Use admin client to call the delete function
+    // The function is only accessible to service_role
+    const supabaseAdmin = createSupabaseAdminClient()
 
-      if (error) {
-        throw new Error(error.message || 'Failed to delete account');
-      }
+    const { error } = await supabaseAdmin.rpc('delete_user_account', {
+      user_id_to_delete: userId,
+    })
 
-      // Sign out the user
-      await supabase.auth.signOut();
-
-      return { success: true };
-    } catch (error) {
-      log('Error deleting account: ', error);
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: `Failed to delete account: ${error.message}`,
-      });
+    if (error) {
+      throw new Error(error.message || 'Failed to delete account')
     }
-  })
+
+    // Sign out the user from their session
+    await supabase.auth.signOut()
+
+    return { success: true }
+  } catch (error) {
+    log('Error deleting account:', error)
+    throw new TRPCError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: `Failed to delete account: ${error.message}`,
+    })
+  }
+})
 ```
+
+**Security Flow:**
+1. User must be authenticated (protectedProcedure)
+2. tRPC extracts user ID from authenticated session
+3. Admin client calls service_role-only function with user's ID
+4. Function validates and deletes the specific user
+5. User session is invalidated via signOut()
+
+This pattern ensures:
+- Users can only delete their own accounts (session-based ID)
+- Database function remains admin-only (not exposed to authenticated users)
+- Separation of concerns (authentication vs. deletion logic)
 
 ### Phase 3: Frontend Integration
 
@@ -730,10 +760,19 @@ Create tests to verify:
 - ✅ Backfill-resilient (UPSERT pattern prevents duplicates)
 - ✅ All pgTAP tests pass for activity handling (29/29 tests passing)
 
+### Backend Implementation (Phases 1-2) ✅ COMPLETED
+- ✅ Database function created (`delete_user_account`)
+- ✅ tRPC endpoint implemented (`deleteAccount`)
+- ✅ Service role security model implemented
+- ✅ Manual deletion for `temporal.send_account_transfers`
+- ✅ CASCADE deletion triggers configured
+- ✅ Session invalidation on successful deletion
+
 ### Testing & Validation
 - ✅ Phase 0: Referrals system tests complete and passing (8 tests)
 - ✅ Phase 0.5: Activity table tests complete and passing (29 tests)
-- ⏳ All pgTAP tests pass for core account deletion function
+- ⏳ Phase 1: Core account deletion function tests
+- ⏳ Phase 2: tRPC endpoint tests
 - ⏳ Data validation queries show no inconsistencies
 - ⏳ Staging environment testing completed successfully
 - ⏳ Performance impact assessed and acceptable
@@ -752,6 +791,11 @@ Create tests to verify:
 
 ### Changelog
 - **2025-11-28**:
+  - **Phase 1 & 2 completed** - Database function and tRPC endpoint implemented
+    - Created `delete_user_account(user_id_to_delete uuid)` function with service_role security
+    - Implemented `deleteAccount` tRPC endpoint with admin client pattern
+    - Migration: `20251128165500_account_deletion.sql`
+    - Commits: `2bf523e2` (schema), `5095eb15` (migration), `a8de4734` (endpoint)
   - Send Earn revenue sharing analysis completed - Identified potential revenue loss issue when referrer deletes account
   - Phase 0.5 completed - Activity table preservation logic implemented and tested (29 tests)
   - Phase 0 completed - Referrals system fixes implemented and tested (8 tests)
