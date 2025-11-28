@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import debug from 'debug'
 import { z } from 'zod'
-import { createTRPCRouter, publicProcedure } from '../../trpc'
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../../trpc'
 
 const log = debug('api:auth')
 
@@ -82,4 +82,33 @@ export const authRouter = createTRPCRouter({
         })
       }
     }),
+  deleteAccount: protectedProcedure.mutation(async ({ ctx: { supabase, session } }) => {
+    const userId = session.user.id
+    log('Deleting user account:', userId)
+
+    try {
+      // Use admin client to call the delete function
+      // The function is only accessible to service_role
+      const supabaseAdmin = createSupabaseAdminClient()
+
+      const { error } = await supabaseAdmin.rpc('delete_user_account', {
+        user_id_to_delete: userId,
+      })
+
+      if (error) {
+        throw new Error(error.message || 'Failed to delete account')
+      }
+
+      // Sign out the user from their session
+      await supabase.auth.signOut()
+
+      return { success: true }
+    } catch (error) {
+      log('Error deleting account:', error)
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: `Failed to delete account: ${error.message}`,
+      })
+    }
+  }),
 })
