@@ -522,7 +522,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   )
 
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
-  const amountInputRef = useRef<InputOG>(null)
+  const [amountInputRef, setAmountInputRef] = useState<InputOG | null>(null)
 
   const noteValidationError = form.formState.errors.note
 
@@ -574,16 +574,19 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   // Delay keyboard appearance to allow animation to complete
   useEffect(() => {
-    if (activeSection === 'enterAmount' && amountInputRef.current) {
-      const timeoutId = setTimeout(() => {
-        amountInputRef.current?.focus()
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    if (activeSection === 'enterAmount' && amountInputRef) {
+      timeoutId = setTimeout(() => {
+        amountInputRef?.focus()
       }, 500)
+    }
 
-      return () => {
+    return () => {
+      if (timeoutId) {
         clearTimeout(timeoutId)
       }
     }
-  }, [activeSection])
+  }, [activeSection, amountInputRef])
 
   const parsedAmount = BigInt(sendParams.amount ?? '0')
 
@@ -882,7 +885,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                         render={({ field: { value, onBlur } }) => (
                           <Input
                             unstyled
-                            ref={amountInputRef}
+                            ref={setAmountInputRef}
                             value={value}
                             bbw={1.5}
                             boc="$gray8"
@@ -962,17 +965,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             </YStack>
           </View>
           <View
-            //@ts-expect-error - delay is not typed in tamagui
-            animation={
-              present
-                ? [
-                    '200ms',
-                    {
-                      delay: isWeb ? 0.2 : 200,
-                    },
-                  ]
-                : null
-            }
+            animation={present ? '200ms' : null}
             // changing animation at runtime require a key change to remount the component and avoid hook errors
             key={present ? 'note-input-enter' : 'note-input-exit'}
             opacity={present ? 1 : 0}
@@ -1394,7 +1387,7 @@ const ChatList = YStack.styleable(() => {
       animation={[
         'responsive',
         {
-          opacity: '50ms',
+          opacity: '100ms',
           transform: 'responsive',
         },
       ]}
