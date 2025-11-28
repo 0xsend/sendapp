@@ -11,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { entryPointAddress, sendEarnAddress } from '@my/wagmi'
+import { entryPointAddress, sendEarnAddress, sendVerifyingPaymasterAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { ReferredBy } from 'app/components/ReferredBy'
@@ -187,7 +187,7 @@ export function DepositForm() {
   const uop = useUserOp({
     sender,
     calls: calls.data ?? undefined,
-    skipGasEstimation: shouldUseErc7677(sender),
+    skipGasEstimation: shouldUseErc7677(sender), // Skip gas estimation only for ERC-7677 flow
   })
   const webauthnCreds = useMemo(
     () =>
@@ -283,6 +283,7 @@ export function DepositForm() {
         // since gas estimation used tokenPaymasterAddress
         sponsoredUserOp = {
           ...uop.data,
+          paymaster: sendVerifyingPaymasterAddress[chainId],
           paymasterData: paymasterResult.paymasterData,
         }
       }
