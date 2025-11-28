@@ -110,56 +110,58 @@ When a user initiates account deletion:
 
 ### Overview
 
-When a referred user deletes their account, this has cascading effects on the referrer's data and distribution verifications. **Critical issues have been identified** that must be fixed before enabling account deletion.
+When a referred user deletes their account, this has cascading effects on the referrer's data and distribution verifications. **Analysis completed and fixes implemented** ✅
 
-### Summary of Issues
+### Summary of Implementation
 
-| Issue | Component | Severity | Action Required |
-|-------|-----------|----------|-----------------|
-| 1 | Leaderboard referral counts | 🔴 CRITICAL | Add DELETE trigger |
-| 2 | Tag registration verifications | ✅ None | Already handles correctly |
-| 3 | Tag referral verifications | 🟡 MEDIUM | Set weight=0 for current distribution |
-| 4 | Total referrals verifications | 🟡 MEDIUM | Recalculate weight for current distribution |
+| Issue | Component | Status | Solution |
+|-------|-----------|--------|----------|
+| 1 | Leaderboard referral counts | ✅ FIXED | DELETE trigger implemented |
+| 2 | Tag registration verifications | ✅ No action needed | Already handles correctly |
+| 3 | Tag referral verifications | ✅ No action needed | Distributor service handles automatically |
+| 4 | Total referrals verifications | ✅ No action needed | Distributor service handles automatically |
 
 ### Key Findings
 
-**Issue 1: Leaderboard Referral Counts** (🔴 CRITICAL)
-- Referral count increments on INSERT but never decrements on DELETE
-- Result: Leaderboard becomes permanently inflated over time
-- **Fix Required**: Add DELETE trigger to decrement count
+**Issue 1: Leaderboard Referral Counts** (✅ FIXED)
+- **Problem**: Referral count incremented on INSERT but never decremented on DELETE
+- **Impact**: Leaderboard would become permanently inflated over time
+- **Solution**: Implemented `decrement_leaderboard_referrals_on_delete()` trigger
+- **Migration**: `20251127194424_referrals_triggers_on_account_delete.sql`
+- **Tests**: 8 pgTAP tests in `account_deletion_referrals_test.sql` - all passing ✅
 
-**Issue 2: Tag Registration Verifications** (✅ No Action)
-- Function already filters `WHERE user_id IS NOT NULL`
-- Deleted users' tags won't create new verifications
-- Historical verifications preserved correctly
+**Issues 2-4: Distribution Verifications** (✅ No Action Needed)
+- **Discovery**: Distributor service (`apps/distributor/src/distributorv2.ts:846`) runs hourly
+- **Automatic handling**: Calls `update_referral_verifications()` which:
+  - Recalculates all `tag_referral` and `total_tag_referrals` weights
+  - Automatically excludes deleted referrals (CASCADE deleted from database)
+  - Uses current referrals and shares to compute accurate weights
+- **Maximum staleness**: 1 hour (production) / 50 seconds (dev)
+- **Process**: When user deletes account → referrals CASCADE delete → next distributor run corrects weights
 
-**Issue 3: Tag Referral Verifications** (🟡 MEDIUM)
-- Individual referral verifications become orphaned in current distribution
-- Weight remains 1 even after referred user is deleted
-- **Fix Required**: Set weight=0 for current distribution only
+### Implementation Details
 
-**Issue 4: Total Referrals Verifications** (🟡 MEDIUM)
-- Aggregate referral count becomes incorrect
-- Weight shows old count after referred user deletion
-- **Fix Required**: Recalculate weight for current distribution only
+**Trigger Function** (`private.decrement_leaderboard_referrals_on_delete`)
+- Fires AFTER DELETE on `public.referrals` table
+- Decrements referrer's count in `private.leaderboard_referrals_all_time`
+- Uses `GREATEST(0, referrals - 1)` to prevent negative counts
+- Updates `updated_at` timestamp
+
+**Test Coverage** (`supabase/tests/account_deletion_referrals_test.sql`)
+1. Leaderboard increments on referral creation
+2. Leaderboard decrements on referred user deletion
+3. Multiple referrals handling (3 referrals → delete 1 → verify count)
+4. Sequential deletions (3 → 2 → 1 → 0)
+5. Complete deletion to zero
+6. Edge case: count never goes negative
+7. Concurrent deletion safety
 
 ### Key Principles
 
-1. **Historical data preserved**: Closed distributions remain unchanged
-2. **Current distribution affected**: Only the active distribution needs adjustment
-3. **Future distributions protected**: New distributions won't have referral records for deleted users
-4. **Leaderboard reflects current state**: Should show current referrals, not historical
-
-### Detailed Analysis
-
-For complete analysis including:
-- Detailed problem scenarios
-- SQL implementation examples
-- Comprehensive testing requirements
-- Data validation queries
-- Deployment procedures
-
-**See**: [Account Deletion: Referrals & Distribution Verifications Impact](./account-deletion-referrals-impact.md)
+1. **Leaderboard**: Real-time updates via DELETE trigger
+2. **Distribution verifications**: Hourly updates via distributor service
+3. **Historical data**: Closed distributions remain unchanged
+4. **CASCADE deletes**: Automatic cleanup of referral records
 
 ## Compliance Considerations
 
@@ -184,39 +186,33 @@ For complete analysis including:
 
 ## Implementation Plan
 
-### Phase 0: Referrals & Distribution Verifications Fixes
+### Phase 0: Referrals & Distribution Verifications Fixes ✅ COMPLETED
 
-Before implementing the main account deletion feature, we must fix the referral system to handle account deletions correctly. This is a **critical prerequisite** and must be deployed before enabling account deletion.
+Analysis completed and fixes implemented for referral system to handle account deletions correctly.
 
-#### Overview
+**Pull Request**: [#2252 - Account deletion: referrals impact](https://github.com/0xsend/sendapp/pull/2252)
 
-Three main tasks:
-1. Add leaderboard decrement trigger (🔴 CRITICAL)
-2. Handle distribution verifications on user deletion (🟡 MEDIUM)
-3. Create comprehensive pgTAP tests
+#### Implementation Summary
 
-#### Implementation Components
-
-**1. Leaderboard Decrement Trigger**
+**1. Leaderboard Decrement Trigger** ✅ IMPLEMENTED
 - Function: `private.decrement_leaderboard_referrals_on_delete()`
 - Trigger: AFTER DELETE on `public.referrals`
-- Purpose: Decrement referral count when a referral is deleted
+- Migration: `20251127194424_referrals_triggers_on_account_delete.sql`
+- Purpose: Decrements referral count when a referral is deleted
+- Safety: Uses `GREATEST(0, referrals - 1)` to prevent negative counts
 
-**2. Distribution Verification Cleanup Trigger**
-- Function: `public.cleanup_referral_verifications_on_user_delete()`
-- Trigger: BEFORE DELETE on `public.profiles`
-- Purpose: Set weight=0 for tag_referral and recalculate total_tag_referrals in current distribution only
+**2. Distribution Verification Cleanup** ✅ NO ACTION NEEDED
+- Discovery: Distributor service already handles this automatically
+- Service: `apps/distributor/src/distributorv2.ts:846`
+- Runs: Hourly (production) / 50 seconds (dev)
+- Function: `update_referral_verifications()` recalculates weights based on current referrals
+- Result: Deleted referrals are automatically excluded in next distributor run
 
-**3. Comprehensive Tests**
+**3. Comprehensive Tests** ✅ IMPLEMENTED
 - File: `supabase/tests/account_deletion_referrals_test.sql`
-- Test categories: Leaderboard, Tag referrals, Total referrals, Edge cases
-- Must pass before deployment
-
-#### Detailed Implementation
-
-For complete SQL implementations, testing requirements, and deployment procedures:
-
-**See**: [Account Deletion: Referrals & Distribution Verifications Impact](./account-deletion-referrals-impact.md) - Implementation Plan section
+- Test count: 8 tests covering all scenarios
+- Status: All tests passing ✅
+- Coverage: Leaderboard increment/decrement, multiple referrals, sequential deletions, edge cases
 
 ### Phase 1: Database Function
 
@@ -336,27 +332,27 @@ Create tests to verify:
 ## Success Criteria
 
 ### Core Account Deletion
-- ✅ User can initiate account deletion from mobile app
-- ✅ All personal data is removed from database
-- ✅ Blockchain data remains accessible on-chain
-- ✅ Apple App Store approval obtained
-- ✅ Tests verify complete deletion
-- ✅ No orphaned data remains in database
+- ⏳ User can initiate account deletion from mobile app
+- ⏳ All personal data is removed from database
+- ⏳ Blockchain data remains accessible on-chain
+- ⏳ Apple App Store approval obtained
+- ⏳ Tests verify complete deletion
+- ⏳ No orphaned data remains in database
 
-### Referrals System Integrity
+### Referrals System Integrity (Phase 0) ✅ COMPLETED
 - ✅ Leaderboard referral counts accurately reflect current referrals
 - ✅ Leaderboard decrements when referred user deletes account
-- ✅ Tag referral verifications in current distribution set to weight=0 when referred user deletes
-- ✅ Total referrals verifications in current distribution recalculated correctly
+- ✅ Distribution verifications automatically handled by distributor service
 - ✅ Closed (historical) distributions remain unchanged
 - ✅ No errors when deleting user with no active distribution
+- ✅ All pgTAP tests pass for referrals system (8/8 tests passing)
 
 ### Testing & Validation
-- ✅ All pgTAP tests pass for referrals system
-- ✅ All pgTAP tests pass for account deletion
-- ✅ Data validation queries show no inconsistencies
-- ✅ Staging environment testing completed successfully
-- ✅ Performance impact assessed and acceptable
+- ✅ Phase 0: Referrals system tests complete and passing
+- ⏳ All pgTAP tests pass for account deletion
+- ⏳ Data validation queries show no inconsistencies
+- ⏳ Staging environment testing completed successfully
+- ⏳ Performance impact assessed and acceptable
 
 ## References
 
@@ -365,10 +361,12 @@ Create tests to verify:
 - [Supabase Auth: Delete User](https://supabase.com/docs/reference/javascript/auth-admin-deleteuser)
 - [GDPR Right to Erasure](https://gdpr-info.eu/art-17-gdpr/)
 
-### Related Documentation
-- [Account Deletion: Referrals & Distribution Verifications Impact](./account-deletion-referrals-impact.md) - Detailed analysis and implementation plan for referrals system fixes
-
 ---
 
 *Document created: 2025-11-25*
-*Last updated: 2025-11-26*
+*Last updated: 2025-11-28*
+
+### Changelog
+- **2025-11-28**: Phase 0 completed - Referrals system fixes implemented and tested
+- **2025-11-26**: Initial implementation plan created
+- **2025-11-25**: Document created with database schema analysis
