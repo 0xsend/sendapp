@@ -47,7 +47,7 @@ export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => 
           dismissOnSnapToBottom
           snapPoints={[isWeb ? 95 : 80]}
           snapPointsMode="percent"
-          animation="fastHeavy"
+          animation="smoothResponsive"
           zIndex={100_000}
         >
           <Sheet.Frame pb={100} elevation="$5" bc="$color1">
@@ -116,9 +116,9 @@ const ConisModalContent = styled(Popover.Content, {
   enterStyle: { o: 0, y: 50 },
   exitStyle: { o: 0, y: 50 },
   elevation: '$5',
-  shadowOpacity: 0.08,
+  shadowOpacity: 0.3,
   '$theme-dark': {
-    shadowOpacity: 0.3,
+    elevation: '$5',
   },
   animateOnly: ['transform', 'opacity', 'filter'],
   w: '100%',

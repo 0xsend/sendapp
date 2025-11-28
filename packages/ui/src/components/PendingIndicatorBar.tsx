@@ -77,7 +77,7 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
         width="100%"
         bc="$primary"
         opacity={!render || (render && progress === 0) ? 0 : 1}
-        animation="fastHeavy"
+        animation="100ms"
         x={`-${translate}%`}
         animateOnly={['transform']}
       />
