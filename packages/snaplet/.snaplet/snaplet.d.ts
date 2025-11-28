@@ -152,6 +152,7 @@ interface Table_public_distributions {
   token_decimals: number | null;
   tranche_id: number;
   earn_min_balance: number;
+  sendpot_ticket_increment: number | null;
 }
 interface Table_realtime_extensions {
   id: string;
@@ -393,6 +394,7 @@ interface Table_public_profiles {
   x_username: string | null;
   birthday: string | null;
   banner_url: string | null;
+  verified_at: string | null;
 }
 interface Table_public_receipts {
   hash: string | null;

@@ -315,6 +315,7 @@ export type Database = {
           number: number
           qualification_end: string
           qualification_start: string
+          sendpot_ticket_increment: number | null
           snapshot_block_num: number | null
           token_addr: string | null
           token_decimals: number | null
@@ -338,6 +339,7 @@ export type Database = {
           number: number
           qualification_end: string
           qualification_start: string
+          sendpot_ticket_increment?: number | null
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
@@ -361,6 +363,7 @@ export type Database = {
           number?: number
           qualification_end?: string
           qualification_start?: string
+          sendpot_ticket_increment?: number | null
           snapshot_block_num?: number | null
           token_addr?: string | null
           token_decimals?: number | null
@@ -434,6 +437,7 @@ export type Database = {
           name: string | null
           referral_code: string | null
           send_id: number
+          verified_at: string | null
           x_username: string | null
           canton_party_verifications: {
             canton_wallet_address: string
@@ -492,6 +496,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          verified_at?: string | null
           x_username?: string | null
         }
         Update: {
@@ -504,6 +509,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          verified_at?: string | null
           x_username?: string | null
         }
         Relationships: []
@@ -1944,6 +1950,10 @@ export type Database = {
         Args: { send_account_id: string; tag_name: string }
         Returns: number
       }
+      delete_user_account: {
+        Args: { user_id_to_delete: string }
+        Returns: undefined
+      }
       did_user_swap: { Args: never; Returns: boolean }
       distribution_hodler_addresses: {
         Args: { distribution_id: number }
@@ -2217,6 +2227,7 @@ export type Database = {
           referrer: Database["public"]["CompositeTypes"]["profile_lookup_result"]
         }[]
       }
+      refresh_profile_verification_status: { Args: never; Returns: undefined }
       refresh_send_scores_history: { Args: never; Returns: undefined }
       register_first_sendtag: {
         Args: {
@@ -2391,6 +2402,7 @@ export type Database = {
         main_tag_id: number | null
         main_tag_name: string | null
         tags: string[] | null
+        is_verified: boolean | null
       }
       canton_tag_search_result: {
         avatar_url: string | null
