@@ -341,6 +341,126 @@ The app has revenue sharing mechanisms where referrers earn a percentage of reve
 - Database function: `supabase/schemas/referrals.sql:587-629` (`referrer_lookup`)
 - Reward calculation: `packages/app/data/sendtags.ts:42-55`
 
+### Send Earn Interest Revenue Sharing (Split Between Owner, App, and Referrer)
+
+**How it works:**
+1. User opens a Send Earn vault with optional referrer → Frontend calls `useSendEarnDepositCalls()`
+2. Referrer lookup → `useReferrer()` calls `profile_lookup()` to get referrer's blockchain address from `send_accounts.address`
+3. Vault creation logic (`SendEarnFactory.createAndDeposit`):
+   - If referrer exists: Creates affiliate vault via `SendEarnAffiliate` contract
+   - If no referrer: Uses default vault (no affiliate)
+4. Interest accrual → `SendEarn._accrueFee()` mints fee shares to `feeRecipient` address
+5. Fee distribution:
+   - **Without referrer**: Interest split between vault owner and platform (app)
+   - **With referrer**: `SendEarnAffiliate.pay()` splits fees between platform and affiliate using `splitConfig.split()`
+
+**Architecture:**
+```
+User Vault (SendEarn)
+  └─> feeRecipient = SendEarnAffiliate contract (if referrer exists)
+                     or Platform address (if no referrer)
+
+SendEarnAffiliate (when referrer exists)
+  ├─> affiliate: Referrer's address
+  ├─> platformVault: Platform's vault (gets platform's share)
+  └─> payVault: Referrer's vault (gets referrer's share)
+```
+
+**When referrer deletes account:**
+
+✅ **CRITICAL ANALYSIS - Potential Revenue Loss Risk**
+
+**The Problem:**
+Unlike sendtag purchases (where the smart contract is called with `zeroAddress` and skips payment), the Send Earn system has already created an **immutable** `SendEarnAffiliate` contract with the referrer's address hardcoded in the constructor.
+
+**Contract Immutability:**
+```solidity
+// SendEarnAffiliate.sol constructor (line 33)
+constructor(address _affiliate, ...) {
+    affiliate = _affiliate;  // IMMUTABLE - cannot be changed
+    ...
+}
+
+// SendEarnAffiliate.payWithAmount (line 68)
+payVault.deposit(affiliateSplit, affiliate);  // Always sends to original address
+```
+
+**What Happens:**
+
+1. **Before referrer deletion:**
+   - Affiliate vault exists with `affiliate = referrerAddress`
+   - User's vault has `feeRecipient = SendEarnAffiliate` contract
+   - Interest accrues → fees minted to affiliate contract
+   - `SendEarnAffiliate.pay()` called → splits to platform and referrer
+
+2. **After referrer deletes account:**
+   - `send_accounts` CASCADE deleted
+   - Referrer's blockchain address (`0x123...`) still exists on-chain
+   - **Affiliate contract unchanged** (immutable smart contract)
+   - Interest accrues → fees still minted to affiliate contract
+   - `SendEarnAffiliate.pay()` still splits fees:
+     - Platform gets their share ✅
+     - **Referrer's share sent to deleted user's address** ❌
+
+**Status:** ⚠️ **PROBLEM IDENTIFIED**
+
+**Issue:** When a referrer deletes their account, their users' affiliate vaults continue sending the referrer's fee share to the deleted user's blockchain address. The app does NOT receive this portion—it's effectively lost.
+
+**Impact Assessment:**
+- Referrer's share is sent to an address that the deleted user no longer controls (webauthn credentials deleted)
+- Funds accumulate in the deleted user's vault but are inaccessible
+- App does NOT receive 100% of fees (unlike sendtag purchases)
+- Platform still receives its configured share
+
+**Why This Differs from Sendtag Checkout:**
+| Aspect | Sendtag Checkout | Send Earn |
+|--------|------------------|-----------|
+| Contract interaction | Called per-transaction with referrer address | Affiliate contract created once, address immutable |
+| Database lookup | Happens at checkout time | Happens only at vault creation time |
+| Deleted referrer handling | Returns `zeroAddress` → full payment to app | Contract still has original address → payment to deleted user |
+| App receives 100%? | ✅ Yes | ❌ No - referrer share sent to inaccessible address |
+
+**Mitigation Options:**
+
+**Option 1: Accept the Loss (Simplest)**
+- Document this as expected behavior
+- Deleted referrers forfeit future referral earnings
+- Funds remain in their on-chain vault (immutable blockchain)
+- Rationale: User chose to delete account, forfeiting future benefits
+
+**Option 2: Affiliate Contract Upgrade (Complex)**
+- Modify `SendEarnAffiliate` to allow affiliate address changes
+- Requires smart contract upgrade mechanism
+- When referrer deletes → call `setAffiliate(platformAddress)`
+- Challenges: Gas costs, who triggers the update, contract upgradeability
+
+**Option 3: Database Trigger + Off-chain Process (Moderate)**
+- On account deletion, log affected affiliate contracts
+- Periodically call `SendEarnAffiliate.pay()` to settle fees
+- Redirect referrer's shares via custom payment logic
+- Challenges: Off-chain coordination, gas costs
+
+**Recommendation:**
+
+**Option 1 (Accept the Loss)** is the most pragmatic approach because:
+1. **Blockchain immutability**: Smart contracts are designed to be immutable
+2. **User choice**: Deleting account is voluntary—user forfeits future benefits
+3. **Minimal impact**: Only affects users with active referrals who delete accounts
+4. **Apple compliance**: Doesn't affect App Store requirements (focuses on PII deletion)
+5. **Simplicity**: No complex smart contract changes or off-chain processes
+6. **Industry norm**: Many Web3 apps handle similar scenarios this way
+
+**Documentation Note:** Should warn users before deletion:
+> "If you have referred other users who are earning interest in Send Earn, you will forfeit any future referral earnings. Your referral share will remain in your blockchain vault but will be inaccessible after account deletion."
+
+**Key files:**
+- Smart contract: `node_modules/@0xsend/send-earn-contracts/src/SendEarnAffiliate.sol:33-38,68`
+- Smart contract: `node_modules/@0xsend/send-earn-contracts/src/SendEarnFactory.sol:119-135`
+- Smart contract: `node_modules/@0xsend/send-earn-contracts/src/SendEarn.sol:334-357`
+- Frontend logic: `packages/app/features/earn/deposit/hooks/index.ts:179-264`
+- Referrer lookup: `packages/app/utils/referrer.ts:96-111`
+- Database function: `supabase/schemas/referrals.sql:25-75` (`profile_lookup`)
+
 ## Compliance Considerations
 
 ### Financial Record Retention
@@ -632,6 +752,7 @@ Create tests to verify:
 
 ### Changelog
 - **2025-11-28**:
+  - Send Earn revenue sharing analysis completed - Identified potential revenue loss issue when referrer deletes account
   - Phase 0.5 completed - Activity table preservation logic implemented and tested (29 tests)
   - Phase 0 completed - Referrals system fixes implemented and tested (8 tests)
 - **2025-11-26**: Initial implementation plan created
