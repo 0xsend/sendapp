@@ -13,7 +13,6 @@ import {
   Shimmer,
   SizableText,
   Spinner,
-  styled,
   Text,
   useAppToast,
   useControllableState,
@@ -799,6 +798,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const isSendButtonDisabled =
     loadingSend || (activeSection === 'enterAmount' ? !canSubmitSendReview : !canSubmitSend)
 
+  const [isPresent] = usePresence()
+
   return (
     <FormProvider {...form}>
       <YStack
@@ -815,27 +816,18 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         animation="responsive"
         exitStyle={{
           opacity: 0,
-          y: 20,
         }}
       >
         <YStack gap="$3.5">
           <View
-            animation={[
-              'responsive',
-              {
-                opacity: '100ms',
-                transform: 'responsive',
-              },
-            ]}
+            animation={'responsive'}
             animateOnly={['opacity', 'transform']}
             enterStyle={{
               opacity: 0,
-              y: -20,
+              y: -100,
             }}
-            exitStyle={{
-              opacity: 0,
-              y: -20,
-            }}
+            y={isPresent ? 0 : -100}
+            o={isPresent ? 1 : 0}
             gap="$2.5"
           >
             <XStack ai="center" w="100%" jc="space-between">
@@ -880,10 +872,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     <XStack
                       key="enter-amount-box"
                       animation="100ms"
-                      filter="blur(0px)"
                       enterStyle={{
                         opacity: 0,
-                        filter: 'blur(4px)',
                       }}
                     >
                       <Controller
@@ -978,7 +968,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                 ? [
                     '200ms',
                     {
-                      delay: 200,
+                      delay: isWeb ? 0.2 : 200,
                     },
                   ]
                 : null
@@ -1045,16 +1035,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         <Button
           bg="$neon7"
           br="$4"
-          animation={[
-            'smoothResponsive',
-            {
-              //@ts-expect-error - delay is not typed in tamagui
-              delay: present ? 50 : 0,
-            },
-          ]}
+          animation={'responsive'}
           animateOnly={['opacity', 'transform']}
           bw={0}
-          y={present ? 0 : 20}
+          y={present ? 0 : 100}
           enterStyle={{
             opacity: 0,
             y: 20,
@@ -1076,21 +1060,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               <View
                 animation="responsive"
                 animateOnly={['opacity', 'transform']}
-                filter="blur(0px)"
                 pos="absolute"
                 enterStyle={{
                   opacity: 0,
                   y: -40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
                 }}
                 exitStyle={{
                   opacity: 0,
                   y: 40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
                 }}
               >
                 <Spinner size="small" color="$gray1Dark" />
