@@ -8,7 +8,15 @@ import {
   type XStackProps,
   YStack,
 } from '@my/ui'
-import { Adapt, isWeb, Popover, styled, useControllableState, type PopoverProps } from 'tamagui'
+import {
+  Adapt,
+  isWeb,
+  Popover,
+  styled,
+  useControllableState,
+  useThemeName,
+  type PopoverProps,
+} from 'tamagui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { coin } from 'app/data/coins'
 
@@ -18,6 +26,7 @@ interface CoinsModalProps extends PopoverProps {
 
 export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => {
   const media = useMedia()
+  const themeName = useThemeName()
 
   const [open, setOpen] = useControllableState({
     prop: props.open,
@@ -54,12 +63,11 @@ export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => 
             <Adapt.Contents />
           </Sheet.Frame>
           <Sheet.Overlay
-            animation="100ms"
+            key="coins-modal-overlay"
+            animation="200ms"
             enterStyle={{ opacity: 0 }}
             exitStyle={{ opacity: 0 }}
-            $theme-dark={{
-              o: 0,
-            }}
+            opacity={themeName?.startsWith('dark') && isWeb ? 0 : 0.5}
           />
         </Sheet>
       </Adapt>
