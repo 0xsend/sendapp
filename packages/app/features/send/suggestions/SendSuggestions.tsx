@@ -38,17 +38,13 @@ export const SendSuggestions = () => {
       <SuggestionsList
         query={favouriteSendersQuery}
         title={t('suggestions.favorites')}
-        delay={isWeb ? 0.1 : 100}
+        delay={100}
       />
-      <SuggestionsList
-        query={topSendersQuery}
-        title={t('suggestions.top')}
-        delay={isWeb ? 0.15 : 150}
-      />
+      <SuggestionsList query={topSendersQuery} title={t('suggestions.top')} delay={150} />
       <SuggestionsList
         query={todayBirthdaySendersQuery}
         title={t('suggestions.birthdays')}
-        delay={isWeb ? 0.2 : 200}
+        delay={200}
       />
     </>
   )
