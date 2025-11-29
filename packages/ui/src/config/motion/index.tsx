@@ -59,9 +59,21 @@ export function createAnimations<A extends Record<string, AnimationConfig>>(
   // @ts-expect-error avoid doing a spread for no reason, sub-constraint type issue
   const animations: A = {}
   for (const key in animationsProp) {
+    const animationConfig = animationsProp[key]
+    if (animationConfig) {
+      if (typeof animationConfig.delay === 'number') {
+        animationConfig.delay = animationConfig.delay * 0.001
+      }
+      if (typeof animationConfig.duration === 'number') {
+        animationConfig.duration = animationConfig.duration * 0.001
+      }
+      if (typeof animationConfig.repeatDelay === 'number') {
+        animationConfig.repeatDelay = animationConfig.repeatDelay * 0.001
+      }
+    }
     animations[key] = {
       type: 'spring',
-      ...animationsProp[key],
+      ...animationConfig,
     }
   }
 
@@ -501,7 +513,12 @@ export function createAnimations<A extends Record<string, AnimationConfig>>(
 
     for (const key in specificAnimations) {
       if (animationConfigKeys.has(key)) {
-        defaultConfig[key] = specificAnimations[key]
+        const value = specificAnimations[key]
+        if (timeKeys.has(key)) {
+          defaultConfig[key] = (value as unknown as number) * 0.001
+        } else {
+          defaultConfig[key] = value
+        }
       } else {
         hasPropertySpecific = true
         propertySpecificAnimations[key] = specificAnimations[key]
@@ -518,7 +535,17 @@ export function createAnimations<A extends Record<string, AnimationConfig>>(
         if (typeof animationNameOrConfig === 'string') {
           result[propName] = animations[animationNameOrConfig]
         } else if (animationNameOrConfig && typeof animationNameOrConfig === 'object') {
-          result[propName] = Object.assign({}, defaultConfig, animationNameOrConfig)
+          const config = animationNameOrConfig as AnimationConfig
+          if (typeof config.delay === 'number') {
+            config.delay = config.delay * 0.001
+          }
+          if (typeof config.duration === 'number') {
+            config.duration = config.duration * 0.001
+          }
+          if (typeof config.repeatDelay === 'number') {
+            config.repeatDelay = config.repeatDelay * 0.001
+          }
+          result[propName] = Object.assign({}, defaultConfig, config)
         }
       }
     }
@@ -542,6 +569,8 @@ const animationConfigKeys = new Set([
   'times',
   'yoyo',
 ])
+
+const timeKeys = new Set(['delay', 'duration', 'repeatDelay'])
 
 function removeRemovedStyles(
   prev: Record<string, unknown>,
