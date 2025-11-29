@@ -8,7 +8,15 @@ import {
   type XStackProps,
   YStack,
 } from '@my/ui'
-import { Adapt, isWeb, Popover, styled, useControllableState, type PopoverProps } from 'tamagui'
+import {
+  Adapt,
+  isWeb,
+  Popover,
+  styled,
+  useControllableState,
+  useThemeName,
+  type PopoverProps,
+} from 'tamagui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { coin } from 'app/data/coins'
 
@@ -18,6 +26,7 @@ interface CoinsModalProps extends PopoverProps {
 
 export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => {
   const media = useMedia()
+  const themeName = useThemeName()
 
   const [open, setOpen] = useControllableState({
     prop: props.open,
@@ -47,19 +56,18 @@ export const CoinsModal = ({ children, trigger, ...props }: CoinsModalProps) => 
           dismissOnSnapToBottom
           snapPoints={[isWeb ? 95 : 80]}
           snapPointsMode="percent"
-          animation="fastHeavy"
+          animation="smoothResponsive"
           zIndex={100_000}
         >
           <Sheet.Frame pb={100} elevation="$5" bc="$color1">
             <Adapt.Contents />
           </Sheet.Frame>
           <Sheet.Overlay
-            animation="100ms"
+            key="coins-modal-overlay"
+            animation="200ms"
             enterStyle={{ opacity: 0 }}
             exitStyle={{ opacity: 0 }}
-            $theme-dark={{
-              o: 0,
-            }}
+            opacity={themeName?.startsWith('dark') && isWeb ? 0 : 0.5}
           />
         </Sheet>
       </Adapt>
@@ -116,9 +124,9 @@ const ConisModalContent = styled(Popover.Content, {
   enterStyle: { o: 0, y: 50 },
   exitStyle: { o: 0, y: 50 },
   elevation: '$5',
-  shadowOpacity: 0.08,
+  shadowOpacity: 0.3,
   '$theme-dark': {
-    shadowOpacity: 0.3,
+    elevation: '$5',
   },
   animateOnly: ['transform', 'opacity', 'filter'],
   w: '100%',
