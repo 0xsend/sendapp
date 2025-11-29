@@ -965,7 +965,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             </YStack>
           </View>
           <View
-            animation={present ? '200ms' : null}
+            // @ts-expect-error - delay is not typed properly
+            animation={present ? ['200ms', { delay: 200 }] : null}
             // changing animation at runtime require a key change to remount the component and avoid hook errors
             key={present ? 'note-input-enter' : 'note-input-exit'}
             opacity={present ? 1 : 0}
@@ -1077,21 +1078,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                 enterStyle={{
                   opacity: 0,
                   y: -40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
                 }}
                 exitStyle={{
                   opacity: 0,
                   y: 40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
-                }}
-                $platform-web={{
-                  filter: 'blur(0px)',
-                  willChange: 'transform, opacity, filter',
-                  transition: 'filter linear 200ms',
                 }}
               >
                 {activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
