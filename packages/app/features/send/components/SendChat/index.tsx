@@ -872,13 +872,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                   />
                 ) : (
                   <>
-                    <XStack
-                      key="enter-amount-box"
-                      animation="100ms"
-                      enterStyle={{
-                        opacity: 0,
-                      }}
-                    >
+                    <XStack key="enter-amount-box">
                       <Controller
                         control={form.control}
                         name="amount"
@@ -1156,20 +1150,7 @@ const ReviewSendAmountBox = YStack.styleable<ReviewSendAmountBoxProps>((props) =
     ...rest
   } = props
   return (
-    <YStack
-      key="review-send-amount-box"
-      animation="200ms"
-      gap="$3"
-      animateOnly={['opacity']}
-      enterStyle={{
-        opacity: 0,
-      }}
-      exitStyle={{
-        opacity: 0,
-      }}
-      jc="center"
-      {...rest}
-    >
+    <YStack key="review-send-amount-box" gap="$3" jc="center" {...rest}>
       <YStack gap="$4">
         <XStack gap="$2" ai="center">
           <IconCoin
