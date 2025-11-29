@@ -388,7 +388,7 @@ const RightPanel = () => {
     <View f={1} group>
       <AnimatePresence exitBeforeEnter>
         <View
-          key={page?.pathname || queryParams.token || 'default'}
+          key={`${page?.pathname || queryParams.token || selectedCoin?.symbol || 'default'}right-panel-home`}
           fd="row"
           f={1}
           animation="100ms"

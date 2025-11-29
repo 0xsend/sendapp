@@ -279,7 +279,8 @@ export function DepositForm() {
         })
         log('Send paymaster signature received', paymasterResult)
 
-        // Update userOp with Send paymaster data
+        // Update userOp with Send paymaster - must override paymaster address
+        // since gas estimation used tokenPaymasterAddress
         sponsoredUserOp = {
           ...uop.data,
           paymaster: sendVerifyingPaymasterAddress[chainId],

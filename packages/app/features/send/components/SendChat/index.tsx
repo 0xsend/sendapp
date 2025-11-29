@@ -13,7 +13,6 @@ import {
   Shimmer,
   SizableText,
   Spinner,
-  styled,
   Text,
   useAppToast,
   useControllableState,
@@ -523,7 +522,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   )
 
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
-  const amountInputRef = useRef<InputOG>(null)
+  const [amountInputRef, setAmountInputRef] = useState<InputOG | null>(null)
 
   const noteValidationError = form.formState.errors.note
 
@@ -575,16 +574,19 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   // Delay keyboard appearance to allow animation to complete
   useEffect(() => {
-    if (activeSection === 'enterAmount' && amountInputRef.current) {
-      const timeoutId = setTimeout(() => {
-        amountInputRef.current?.focus()
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    if (activeSection === 'enterAmount' && amountInputRef) {
+      timeoutId = setTimeout(() => {
+        amountInputRef?.focus()
       }, 500)
+    }
 
-      return () => {
+    return () => {
+      if (timeoutId) {
         clearTimeout(timeoutId)
       }
     }
-  }, [activeSection])
+  }, [activeSection, amountInputRef])
 
   const parsedAmount = BigInt(sendParams.amount ?? '0')
 
@@ -799,6 +801,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const isSendButtonDisabled =
     loadingSend || (activeSection === 'enterAmount' ? !canSubmitSendReview : !canSubmitSend)
 
+  const [isPresent] = usePresence()
+
   return (
     <FormProvider {...form}>
       <YStack
@@ -815,27 +819,18 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         animation="responsive"
         exitStyle={{
           opacity: 0,
-          y: 20,
         }}
       >
         <YStack gap="$3.5">
           <View
-            animation={[
-              'responsive',
-              {
-                opacity: '100ms',
-                transform: 'responsive',
-              },
-            ]}
+            animation={'responsive'}
             animateOnly={['opacity', 'transform']}
             enterStyle={{
               opacity: 0,
-              y: -20,
+              y: -100,
             }}
-            exitStyle={{
-              opacity: 0,
-              y: -20,
-            }}
+            y={isPresent ? 0 : -100}
+            o={isPresent ? 1 : 0}
             gap="$2.5"
           >
             <XStack ai="center" w="100%" jc="space-between">
@@ -877,22 +872,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                   />
                 ) : (
                   <>
-                    <XStack
-                      key="enter-amount-box"
-                      animation="100ms"
-                      filter="blur(0px)"
-                      enterStyle={{
-                        opacity: 0,
-                        filter: 'blur(4px)',
-                      }}
-                    >
+                    <XStack key="enter-amount-box">
                       <Controller
                         control={form.control}
                         name="amount"
                         render={({ field: { value, onBlur } }) => (
                           <Input
                             unstyled
-                            ref={amountInputRef}
+                            ref={setAmountInputRef}
                             value={value}
                             bbw={1.5}
                             boc="$gray8"
@@ -972,17 +959,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             </YStack>
           </View>
           <View
-            //@ts-expect-error - delay is not typed in tamagui
-            animation={
-              present
-                ? [
-                    '200ms',
-                    {
-                      delay: 200,
-                    },
-                  ]
-                : null
-            }
+            // @ts-expect-error - delay is not typed properly
+            animation={present ? ['200ms', { delay: 200 }] : null}
             // changing animation at runtime require a key change to remount the component and avoid hook errors
             key={present ? 'note-input-enter' : 'note-input-exit'}
             opacity={present ? 1 : 0}
@@ -1045,16 +1023,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         <Button
           bg="$neon7"
           br="$4"
-          animation={[
-            'smoothResponsive',
-            {
-              //@ts-expect-error - delay is not typed in tamagui
-              delay: present ? 50 : 0,
-            },
-          ]}
+          animation={'responsive'}
           animateOnly={['opacity', 'transform']}
           bw={0}
-          y={present ? 0 : 20}
+          y={present ? 0 : 100}
           enterStyle={{
             opacity: 0,
             y: 20,
@@ -1076,21 +1048,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               <View
                 animation="responsive"
                 animateOnly={['opacity', 'transform']}
-                filter="blur(0px)"
                 pos="absolute"
                 enterStyle={{
                   opacity: 0,
                   y: -40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
                 }}
                 exitStyle={{
                   opacity: 0,
                   y: 40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
                 }}
               >
                 <Spinner size="small" color="$gray1Dark" />
@@ -1107,21 +1072,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                 enterStyle={{
                   opacity: 0,
                   y: -40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
                 }}
                 exitStyle={{
                   opacity: 0,
                   y: 40,
-                  ...(isWeb && {
-                    filter: 'blur(4px)',
-                  }),
-                }}
-                $platform-web={{
-                  filter: 'blur(0px)',
-                  willChange: 'transform, opacity, filter',
-                  transition: 'filter linear 200ms',
                 }}
               >
                 {activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
@@ -1196,20 +1150,7 @@ const ReviewSendAmountBox = YStack.styleable<ReviewSendAmountBoxProps>((props) =
     ...rest
   } = props
   return (
-    <YStack
-      key="review-send-amount-box"
-      animation="200ms"
-      gap="$3"
-      animateOnly={['opacity']}
-      enterStyle={{
-        opacity: 0,
-      }}
-      exitStyle={{
-        opacity: 0,
-      }}
-      jc="center"
-      {...rest}
-    >
+    <YStack key="review-send-amount-box" gap="$3" jc="center" {...rest}>
       <YStack gap="$4">
         <XStack gap="$2" ai="center">
           <IconCoin
@@ -1417,7 +1358,7 @@ const ChatList = YStack.styleable(() => {
       animation={[
         'responsive',
         {
-          opacity: '50ms',
+          opacity: '100ms',
           transform: 'responsive',
         },
       ]}

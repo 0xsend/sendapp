@@ -8,6 +8,7 @@
     "cta": "有推荐码吗？输入代码以获得奖励！",
     "invalid": "无效的推荐码",
     "placeholder": "推荐码",
+    "referredBy": "推荐人",
     "validating": "正在验证推荐码"
   }
 }

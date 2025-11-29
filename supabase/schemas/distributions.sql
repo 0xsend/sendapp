@@ -1139,7 +1139,7 @@ BEGIN
             sa.user_id,
             CASE
                 -- If matched a completed jackpot period, use that
-                WHEN jp.block_time IS NOT NULL THEN jp.block_time
+                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time
                 -- If purchase is after max jackpot, use max jackpot (pending period)
                 WHEN (SELECT max_block_time FROM max_jackpot) > 0
                      AND utp.block_time > (SELECT max_block_time FROM max_jackpot)
@@ -1162,7 +1162,7 @@ BEGIN
         ))
         GROUP BY sa.user_id,
             CASE
-                WHEN jp.block_time IS NOT NULL THEN jp.block_time
+                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time
                 WHEN (SELECT max_block_time FROM max_jackpot) > 0
                      AND utp.block_time > (SELECT max_block_time FROM max_jackpot)
                 THEN (SELECT max_block_time FROM max_jackpot)

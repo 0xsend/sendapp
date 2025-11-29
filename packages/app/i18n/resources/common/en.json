@@ -8,6 +8,7 @@
     "validating": "Validating referral code",
     "invalid": "Invalid referral code",
     "applied": "Referral code applied",
-    "cta": "Got a referral? Enter the code to get rewards!"
+    "cta": "Got a referral? Enter the code to get rewards!",
+    "referredBy": "Referred by"
   }
 }

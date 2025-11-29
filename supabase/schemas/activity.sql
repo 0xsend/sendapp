@@ -432,8 +432,44 @@ $function$;
 
 ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
 
+-- Function to preserve multi-user activities before user deletion
+-- Only preserves transaction-related activities (transfers and receives)
+-- Referrals are auto-handled by CASCADE + existing delete trigger
+CREATE OR REPLACE FUNCTION public.preserve_activity_before_user_deletion()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Set from_user_id to NULL only where to_user_id exists and is different
+    -- Only for transaction activities (not referrals - they're auto-deleted)
+    UPDATE activity
+    SET from_user_id = NULL
+    WHERE from_user_id = OLD.id
+      AND to_user_id IS NOT NULL
+      AND to_user_id != OLD.id
+      AND event_name IN ('send_account_transfers', 'send_account_receives', 'temporal_send_account_transfers');
+
+    -- Set to_user_id to NULL only where from_user_id exists and is different
+    -- Only for transaction activities (not referrals - they're auto-deleted)
+    UPDATE activity
+    SET to_user_id = NULL
+    WHERE to_user_id = OLD.id
+      AND from_user_id IS NOT NULL
+      AND from_user_id != OLD.id
+      AND event_name IN ('send_account_transfers', 'send_account_receives', 'temporal_send_account_transfers');
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+ALTER FUNCTION "public"."preserve_activity_before_user_deletion"() OWNER TO "postgres";
+
 -- Triggers
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_update_transfer_activit" BEFORE INSERT ON "public"."activity" FOR EACH ROW EXECUTE FUNCTION "public"."update_transfer_activity_before_insert"();
+
+-- Trigger that fires BEFORE user deletion to preserve multi-user activities
+CREATE TRIGGER preserve_activity_on_user_deletion
+    BEFORE DELETE ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.preserve_activity_before_user_deletion();
 
 -- RLS
 alter table activity enable row level security;
@@ -471,6 +507,8 @@ REVOKE ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() FROM 
 GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "anon";
 GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."preserve_activity_before_user_deletion"() FROM PUBLIC;
 
 GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "anon";
 GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "authenticated";

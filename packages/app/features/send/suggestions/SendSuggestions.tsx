@@ -1,5 +1,6 @@
 import {
   Avatar,
+  isWeb,
   LinearGradient,
   Paragraph,
   Text,
