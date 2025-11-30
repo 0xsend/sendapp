@@ -4,6 +4,7 @@ const FALLBACK_LABELS: Partial<Record<AppLocale, string>> = {
   en: 'English',
   es: 'Español',
   zh: '中文',
+  de: 'Deutsch',
 }
 
 export const SUPPORTED_LOCALES = Object.keys(resources) as AppLocale[]
