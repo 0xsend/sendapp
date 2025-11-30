@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "description": "Lade Freunde mit deinem Empfehlungscode zu Send ein."
+  },
+  "list": {
+    "birthdayFallback": "N/A",
+    "invitedYou": "(Hat dich zu Send eingeladen)",
+    "unknownTag": "??"
+  },
+  "referralLink": {
+    "labels": {
+      "referralCode": "Empfehlungscode:",
+      "sendId": "Send-ID:"
+    },
+    "toast": {
+      "copied": "Empfehlungslink in die Zwischenablage kopiert",
+      "errorMessage": "Wir konnten deinen Empfehlungslink nicht in die Zwischenablage kopieren",
+      "errorTitle": "Etwas ist schief gelaufen"
+    }
+  },
+  "table": {
+    "birthday": "Geburtstag",
+    "position": "#",
+    "sendtag": "sendtag",
+    "social": "Social-Link"
+  }
+}

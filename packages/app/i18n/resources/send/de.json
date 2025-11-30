@@ -1,0 +1,54 @@
+{
+  "confirm": {
+    "button": {
+      "send": "SENDEN"
+    },
+    "edit": "Bearbeiten",
+    "errors": {
+      "default": "Fehler beim Senden",
+      "insufficientBalance": "Nicht genügend Guthaben",
+      "insufficientGas": "Nicht genügend Gas"
+    },
+    "fees": "Gebühren",
+    "noteTitle": "Ihre Notiz"
+  },
+  "form": {
+    "balanceLabel": "Guthaben:",
+    "errors": {
+      "insufficientFunds": "Nicht genügend Guthaben",
+      "minimum": "Minimum: {{amount}} {{symbol}}",
+      "noteValidationFallback": "Notiz entsprach nicht den Validierungsbedingungen"
+    },
+    "note": {
+      "maxCharacters": "Max.: {{count}} Zeichen"
+    },
+    "submit": "WEITER"
+  },
+  "noAccount": {
+    "banner": "/send-Checks folgen in Kürze",
+    "cta": "/send-Check schreiben",
+    "description": "hat kein Send-Konto! Bitten Sie sie, eines zu erstellen oder einen /send-Check zu schreiben.",
+    "title": "Kein Send-Konto",
+    "toast": "Kommt bald"
+  },
+  "recipient": {
+    "edit": "Bearbeiten",
+    "label": "AN"
+  },
+  "search": {
+    "errorHeading": "Fehler",
+    "placeholder": "Suche nach Sende-Tag oder Wallet-Adresse",
+    "unknownError": "Unbekannter Fehler"
+  },
+  "suggestions": {
+    "birthdays": "Alles Gute zum Geburtstag wünschen",
+    "favorites": "Favorisierte Absender",
+    "recent": "Letzte Aktivitäten",
+    "top": "Top-Absender"
+  },
+  "topNav": {
+    "default": "Senden",
+    "enterAmount": "Betrag eingeben",
+    "preview": "Vorschau und Senden"
+  }
+}

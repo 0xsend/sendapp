@@ -1,0 +1,30 @@
+{
+  "actions": {
+    "fundAccount": "Konto aufladen"
+  },
+  "dev": {
+    "buttons": {
+      "fundEth": "Mit 10 ETH aufladen",
+      "fundSend": "Mit 100K Send aufladen",
+      "fundSendV0": "Mit 1M Send V0 aufladen - 100B Angebot",
+      "fundSpx": "Mit 69K SPX6900 aufladen",
+      "fundUsdc": "Mit 100 USDC aufladen"
+    },
+    "toasts": {
+      "fundEth": "Mit 10 ETH aufgeladen",
+      "fundSend": "Mit 10K Send aufgeladen",
+      "fundSendV0": "Mit 1M Send V0 aufgeladen",
+      "fundSpx": "Mit 69K SPX6900 aufgeladen",
+      "fundUsdc": "Mit 100 USDC aufgeladen"
+    }
+  },
+  "result": {
+    "skipped": "{{type}}: Zu viel Guthaben.",
+    "title": "Ergebnis",
+    "transaction": "{{type}}-Transaktion: {{hash}}"
+  },
+  "status": {
+    "missingAccount": "Kein Send-Konto gefunden. Haben Sie eins erstellt?",
+    "networkNotice": "Nur auf {{network}} verfügbar. Ihre Send-Konto-Adresse:"
+  }
+}

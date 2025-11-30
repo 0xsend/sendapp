@@ -1,0 +1,13 @@
+{
+  "app": {
+    "loading": "Lädt",
+    "name": "Send"
+  },
+  "referral": {
+    "applied": "Empfehlungscode angewendet",
+    "cta": "Hast du eine Empfehlung? Gib den Code ein, um Belohnungen zu erhalten!",
+    "invalid": "Ungültiger Empfehlungscode",
+    "placeholder": "Empfehlungscode",
+    "validating": "Validierung des Empfehlungscodes"
+  }
+}

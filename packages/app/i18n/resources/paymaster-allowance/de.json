@@ -1,0 +1,25 @@
+{
+  "actions": {
+    "approve": "Paymaster genehmigen",
+    "approving": "Genehmigung läuft..."
+  },
+  "allowances": {
+    "current": "Aktuelle Genehmigung",
+    "required": "Erforderliche Genehmigung",
+    "unlimited": "Unbegrenzt"
+  },
+  "hero": {
+    "subtitle": "Um Transaktionsgebühren mit USDC zu bezahlen, genehmigen Sie dem Paymaster, USDC in Ihrem Namen auszugeben.",
+    "title": "Gas mit USDC bezahlen"
+  },
+  "status": {
+    "ready": "Bereit zur Genehmigung",
+    "requesting": "Genehmigung wird angefordert...",
+    "retry": "Transaktion fehlgeschlagen, bitte erneut versuchen",
+    "sending": "Transaktion wird gesendet...",
+    "waiting": "Warten auf Bestätigung..."
+  },
+  "toast": {
+    "success": "Paymaster erfolgreich genehmigt!"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "coinbase": {
+    "actions": {
+      "cancel": "Abbrechen",
+      "tryAgain": "Erneut versuchen"
+    },
+    "errors": {
+      "windowClosed": "Coinbase-Fenster wurde geschlossen"
+    },
+    "help": {
+      "iosPopup": "Deaktivieren Sie \"Pop-ups blockieren\" in den iOS Safari-Einstellungen und versuchen Sie es erneut."
+    },
+    "status": {
+      "almostThere": {
+        "description": "Wir schließen gerade die letzten Schritte ab.",
+        "title": "Fast fertig..."
+      },
+      "failed": {
+        "description": "Bitte überprüfen Sie Ihre Verbindung oder versuchen Sie es mit einer anderen Karte.",
+        "title": "Zahlung fehlgeschlagen"
+      },
+      "holdTight": {
+        "description": "Schließen Sie die Transaktion in Ihrem Coinbase-Fenster ab.",
+        "title": "Bitte warten..."
+      },
+      "pending": {
+        "description": "Coinbase verifiziert Ihre Zahlung. Diese Seite wird nach Abschluss weitergeleitet.",
+        "title": "Transaktion ausstehend"
+      },
+      "timedOut": {
+        "description": "Die Bearbeitung Ihrer Zahlung hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+        "title": "Zeitüberschreitung bei der Transaktion"
+      }
+    }
+  },
+  "coinbaseForm": {
+    "currency": "USD",
+    "fees": "Gebühren: 0,00 $",
+    "limits": "Min. 10 $ – Max. 500 $ pro Woche",
+    "submit": {
+      "default": "Einzahlung bestätigen",
+      "loading": "Wird verarbeitet..."
+    },
+    "title": "Einzahlungsbetrag eingeben"
+  },
+  "copyAddressDialog": {
+    "actions": {
+      "cancel": "Abbrechen",
+      "confirm": "Ich stimme zu & fahre fort"
+    },
+    "intro": "Bitte bestätigen Sie, dass Sie Folgendem zustimmen, bevor Sie fortfahren:",
+    "steps": {
+      "baseNetwork": "Die externe Adresse befindet sich im Base-Netzwerk und <supportLink>kann Überweisungen von Smart Contracts empfangen</supportLink>",
+      "liability": "Ich verstehe, dass es keine Möglichkeit gibt, die Gelder wiederzuerlangen, wenn ich Fehler mache.",
+      "tokens": "Ich habe nochmals überprüft, dass sich die Token {{coins}} im Base-Netzwerk befinden."
+    },
+    "title": "Externe Einzahlung bestätigen"
+  },
+  "crypto": {
+    "networkLabel": "Base-Netzwerk",
+    "qr": {
+      "reveal": "Klicken, um den QR-Code anzuzeigen"
+    },
+    "toast": {
+      "errorMessage": "Wir konnten Ihre Adresse nicht in die Zwischenablage kopieren",
+      "errorTitle": "Etwas ist schief gelaufen"
+    },
+    "walletAddress": "Wallet-Adresse"
+  },
+  "options": {
+    "applePay": {
+      "description": "Nur Debitkarte",
+      "title": "Apple Pay"
+    },
+    "crypto": {
+      "description": "Einzahlung von einer externen Wallet",
+      "title": "Krypto-Wallet"
+    },
+    "debitCard": {
+      "description": "Schnelle Einzahlungen bis zu 500 $/Woche",
+      "title": "Debitkarte"
+    }
+  },
+  "success": {
+    "actions": {
+      "continue": "Weiter",
+      "depositAgain": "Erneut einzahlen"
+    },
+    "description": "Alles erledigt – Ihr Guthaben wird bald in Ihrer Wallet angezeigt",
+    "title": "Einzahlung abgeschlossen"
+  }
+}

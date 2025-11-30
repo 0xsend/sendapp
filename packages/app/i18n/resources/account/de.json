@@ -1,0 +1,230 @@
+{
+  "common": {
+    "cancel": "ABBRECHEN",
+    "confirm": "BESTÄTIGEN",
+    "notAvailable": "N/V",
+    "remove": "ENTFERNEN",
+    "saveChanges": "ÄNDERUNGEN SPEICHERN",
+    "success": "Erfolgreich!"
+  },
+  "header": {
+    "actions": {
+      "invite": "Freunde einladen",
+      "share": "Profil teilen"
+    },
+    "verification": {
+      "notVerified": "Nicht verifiziert"
+    }
+  },
+  "language": {
+    "description": "Send verwendet Ihre ausgewählte Sprache auf jedem Gerät, das in Ihrem Konto angemeldet ist.",
+    "title": "Sprache",
+    "updating": "Sprache wird angewendet…"
+  },
+  "linkInBio": {
+    "cta": {
+      "edit": "Links bearbeiten"
+    },
+    "empty": "Noch keine Social-Links hinzugefügt.",
+    "header": "Link in Bio",
+    "placeholders": {
+      "whatsapp": "Whatsapp Telefonnummer"
+    }
+  },
+  "links": {
+    "items": {
+      "language": "Sprache",
+      "learnMore": "Mehr über Send erfahren",
+      "linkInBio": "Link in Bio",
+      "liveChat": "Live-Chat-Support",
+      "passkeys": "Passkeys",
+      "personalInfo": "Persönliche Informationen",
+      "profile": "Profil",
+      "referrals": "Empfehlungen",
+      "rewards": "Belohnungen",
+      "sendtags": "Sendtags"
+    },
+    "sections": {
+      "settings": "Einstellungen",
+      "support": "Support"
+    },
+    "signOut": "Abmelden"
+  },
+  "passkeys": {
+    "confirm": {
+      "description": "Ihr Passkey {{name}} wurde gespeichert. Fügen Sie Ihren neuen Passkey als Signierer hinzu. Dadurch können Sie Transaktionen in Ihrem Konto mit Ihrem neuen Passkey signieren.",
+      "noCredential": "Keine Anmeldeinformationen für die Anmeldeinformations-ID {{id}} gefunden",
+      "submit": "Passkey als Signierer hinzufügen",
+      "title": "Passkey als Signierer hinzufügen"
+    },
+    "create": {
+      "accountNameLabel": "Passkey-Name",
+      "description": "Sichern Sie Ihr Send-Konto, indem Sie bis zu 20 Passkeys hinzufügen. Passkeys sind vertrauenswürdige Geräte, die berechtigt sind, die Transaktionen Ihres Kontos zu signieren.",
+      "submit": "Passkey hinzufügen",
+      "title": "Sichern Sie Ihr Konto mit Passkeys"
+    },
+    "empty": {
+      "learnAccounts": "Mehr über Send-Konten erfahren",
+      "learnCredentials": "Mehr über WebAuthn-Anmeldeinformationen erfahren",
+      "noAccount": "Sie haben kein Send-Konto.",
+      "noCredentials": "Sie haben keine WebAuthn-Anmeldeinformationen. Das sollte nie passieren. Bitte wenden Sie sich an den <supportLink>Support</supportLink>, wenn Sie Hilfe benötigen.",
+      "supportLink": "Support"
+    },
+    "header": "Passkeys",
+    "list": {
+      "add": "Passkey hinzufügen",
+      "errors": {
+        "noBalance": "Kein USDC-Guthaben zur Bezahlung von Gasgebühren"
+      },
+      "labels": {
+        "createdAt": "Erstellt am",
+        "keySlot": "Key-Slot",
+        "status": "Status"
+      },
+      "remove": {
+        "prompt": "Bitte geben Sie unten \"{{name}}\" ein",
+        "title": "\"{{name}}\" als Signierer in Ihrem Send-Konto entfernen.",
+        "warning": "Dies kann nicht rückgängig gemacht werden."
+      },
+      "removeAction": "PASSKEY ENTFERNEN",
+      "removePrompt": "Passkey entfernen?",
+      "status": {
+        "notConfirmed": "Passkey ist nicht On-Chain bestätigt. Schließen Sie die Bestätigung des Passkeys On-Chain ab."
+      },
+      "updateKeySlot": {
+        "cta": "Key-Slot aktualisieren",
+        "message": "Onchain-Slot, {{onchainSlot}}, stimmt nicht mit Webauthn-Slot {{storageSlot}} überein. Das sollte nie passieren. Bitte aktualisieren Sie den Key-Slot unten.",
+        "toast": "Key-Slot aktualisiert"
+      }
+    }
+  },
+  "personalInfo": {
+    "header": "Persönliche Informationen",
+    "labels": {
+      "birthday": "Geburtstag",
+      "dateOfBirth": "Geburtsdatum",
+      "nonEditable": "(nicht editierbar)",
+      "phone": "Telefonnummer",
+      "xHandle": "X-Handle",
+      "xUsername": "X-Benutzername"
+    },
+    "overview": {
+      "edit": "Persönliche Informationen bearbeiten"
+    },
+    "toast": {
+      "phoneUpdated": "Telefonnummer aktualisiert"
+    }
+  },
+  "profile": {
+    "form": {
+      "about": "Über",
+      "aboutPlaceholder": "Erzähl uns etwas über dich",
+      "makePublic": "Profil öffentlich machen",
+      "name": "Name"
+    },
+    "header": "Profil",
+    "overview": {
+      "about": "Über",
+      "edit": "Profil bearbeiten",
+      "name": "Name",
+      "visibility": {
+        "private": "Privates Profil",
+        "public": "Öffentliches Profil"
+      }
+    }
+  },
+  "sendtag": {
+    "buttons": {
+      "addNew": "neuen hinzufügen",
+      "addTag": "TAG HINZUFÜGEN",
+      "changeMain": "Haupt-Tag ändern",
+      "continue": "fortsetzen",
+      "register": "registrieren",
+      "registerFree": "kostenlosen Sendtag registrieren"
+    },
+    "checkout": {
+      "balance": "Guthaben:",
+      "balanceError": "Fehler beim Abrufen der Guthabeninformationen",
+      "complete": "Kauf abschließen",
+      "deposit": "USDC einzahlen",
+      "error": "Fehler",
+      "fees": "Gebühren",
+      "loading": "wird geladen...",
+      "price": "Preis",
+      "processing": "wird verarbeitet...",
+      "registering": "wird registriert...",
+      "requesting": "wird angefordert...",
+      "retry": "Wiederholen",
+      "review": "Kauf überprüfen",
+      "totalPrice": "Gesamtpreis"
+    },
+    "header": {
+      "description": "Besitze deine Identität auf Send. Registriere bis zu 5 verifizierte Tags und mache sie zu deinen.",
+      "first": "Ersten Sendtag registrieren",
+      "verified": "Verifizierte Sendtags"
+    },
+    "labels": {
+      "addAnother": "Weiteren Sendtag hinzufügen",
+      "createNew": "Neuen Sendtag erstellen",
+      "enterName": "Sendtag-Namen eingeben",
+      "inputDesired": "Gewünschten Sendtag eingeben",
+      "name": "Name",
+      "pendingList": "Sendtags [{{pending}}/{{remaining}}]",
+      "price": "Preis",
+      "referralCode": "Empfehlungscode",
+      "sendtagName": "Sendtag-Name",
+      "total": "Gesamt"
+    },
+    "messages": {
+      "alreadyTaken": "Dieser Sendtag ist bereits vergeben",
+      "choosePrimary": "Wähle aus, welcher Tag als deine primäre Identität angezeigt wird",
+      "genericError": "Etwas ist schief gelaufen",
+      "invalidInput": "Ungültige Eingabe",
+      "securedAfterPayment": "Dein Sendtag wird nach Zahlungsbestätigung gesichert",
+      "updatingMain": "Haupt-Tag wird aktualisiert..."
+    },
+    "pricing": {
+      "button": {
+        "free": "Kostenlos",
+        "label": "Preise"
+      },
+      "description": "Sendtags werden basierend auf ihrer Länge bepreist. Je kürzer der Sendtag, desto mehr kostet er.",
+      "ok": "OK",
+      "title": "Sendtag-Preise",
+      "tooltipDescription": "Der Sendtag-Preis basiert auf der Länge – je kürzer er ist, desto höher ist der Preis."
+    },
+    "referral": {
+      "applied": "Empfehlungscode angewendet",
+      "empty": "Hast du eine Empfehlung? Gib den Code ein, um Belohnungen zu erhalten!",
+      "invalid": "Ungültiger Empfehlungscode",
+      "placeholder": "Empfehlungscode",
+      "validating": "Empfehlungscode wird validiert"
+    },
+    "sheet": {
+      "title": "Haupt-Tag auswählen"
+    },
+    "toasts": {
+      "mainUpdateFailed": "Haupt-Tag konnte nicht aktualisiert werden",
+      "mainUpdated": "Haupt-Tag aktualisiert"
+    }
+  },
+  "share": {
+    "actions": {
+      "copy": "Link kopieren"
+    },
+    "title": "Profil teilen",
+    "toast": {
+      "copied": "Profil-Link in die Zwischenablage kopiert",
+      "copyError": {
+        "message": "Beim Kopieren des Links ist ein Fehler aufgetreten",
+        "title": "Link konnte nicht kopiert werden"
+      }
+    }
+  },
+  "upload": {
+    "errors": {
+      "bufferNull": "ArrayBuffer ist Null.",
+      "noImage": "Kein Bild bereitgestellt."
+    }
+  }
+}
