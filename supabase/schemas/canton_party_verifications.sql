@@ -104,8 +104,7 @@ BEGIN
         FROM canton_party_verifications cpv
         INNER JOIN profiles p ON p.id = cpv.user_id
         INNER JOIN tags t ON t.user_id = p.id
-        WHERE p.is_public = TRUE
-          AND t.status = 'confirmed'
+        WHERE t.status = 'confirmed'
           AND cpv.is_discoverable = TRUE
         GROUP BY p.id, p.name, p.avatar_url, p.send_id, cpv.canton_wallet_address
     ),
@@ -196,8 +195,7 @@ BEGIN
         INNER JOIN profiles p ON p.id = cpv.user_id
         INNER JOIN tags t ON t.user_id = p.id
         LEFT JOIN scores ON scores.user_id = p.id
-        WHERE p.is_public = TRUE
-          AND t.status = 'confirmed'
+        WHERE t.status = 'confirmed'
           AND cpv.is_discoverable = TRUE
           AND (
               -- Use ILIKE '%' only when NOT exact to avoid excluding true exact matches

@@ -1,0 +1,133 @@
+{
+  "active": {
+    "addMore": "Weitere Einlagen hinzufügen",
+    "breakdown": {
+      "deposits": "Einlagen",
+      "earnings": "Einnahmen",
+      "rewards": "Belohnungen"
+    },
+    "buttons": {
+      "earnings": "Einnahmen",
+      "rewards": "Belohnungen",
+      "withdraw": "Abheben"
+    }
+  },
+  "cta": {
+    "badge": "Einnahmen",
+    "bullets": {
+      "apy": "Hoher APY: bis zu 12 % auf Ihre Einlagen",
+      "flex": "Volle Flexibilität: Greifen Sie jederzeit auf Ihr Guthaben zu",
+      "rewards": "Belohnungen: Bonus-SEND-Token"
+    },
+    "buttons": {
+      "start": "Jetzt verdienen"
+    },
+    "title": "Steigern Sie sofort Ihre Ersparnisse"
+  },
+  "deposit": {
+    "balance": {
+      "insufficient": "Nicht genügend Guthaben",
+      "label": "Guthaben:"
+    },
+    "benefits": {
+      "apy": {
+        "dynamicLabel": "APY",
+        "placeholder": "bis zu {{value}}",
+        "staticLabel": "Einzahlungs-APY"
+      },
+      "monthlyEarning": {
+        "label": "Geschätzte monatliche Einnahmen",
+        "symbol": "{{symbol}}"
+      },
+      "rewards": {
+        "fallback": "Bonus-{{token}}-Token",
+        "label": "Belohnungen",
+        "symbol": "{{token}}"
+      },
+      "title": "Vorteile",
+      "withdraw": {
+        "label": "Jederzeit abheben",
+        "value": "Volle Flexibilität"
+      }
+    },
+    "buttons": {
+      "confirm": "Einzahlung bestätigen"
+    },
+    "heading": "Einzahlungsbetrag",
+    "terms": {
+      "text": "Ich akzeptiere die <tos>Nutzungsbedingungen</tos>, die <privacy>Datenschutzrichtlinie</privacy> und den <disclaimer>Haftungsausschluss des Send Earn Programms</disclaimer>"
+    },
+    "toast": {
+      "error": {
+        "title": "Einzahlungsfehler"
+      },
+      "success": {
+        "message": "Ihre Einzahlung wird bearbeitet.",
+        "title": "Einzahlung eingereicht"
+      }
+    },
+    "validation": {
+      "minimum": "Mindesteinzahlung beträgt {{amount}} {{symbol}}"
+    }
+  },
+  "errors": {
+    "notEnoughForFees": "Nicht genügend USDC, um die Transaktionsgebühren zu decken"
+  },
+  "rewards": {
+    "actions": {
+      "claim": "Belohnungen beanspruchen"
+    },
+    "feed": {
+      "today": "Heute"
+    },
+    "history": {
+      "empty": "Keine Belohnungsaktivität",
+      "error": "Belohnungen konnten nicht geladen werden: {{message}}",
+      "title": "Belohnungshistorie"
+    },
+    "messages": {
+      "minimum": "Sie benötigen mindestens {{amount}} {{symbol}}, um Belohnungen zu beanspruchen"
+    },
+    "status": {
+      "requesting": "Signatur wird angefordert...",
+      "sending": "Transaktion wird gesendet...",
+      "waiting": "Warten auf Bestätigung..."
+    },
+    "toast": {
+      "success": "Belohnungen beansprucht"
+    }
+  },
+  "summary": {
+    "badge": "Aktive Einnahmen",
+    "buttons": {
+      "viewDetails": "Details anzeigen"
+    },
+    "labels": {
+      "deposits": "Einlagen",
+      "earnings": "Einnahmen",
+      "rewards": "Belohnungen",
+      "total": "Gesamtwert"
+    }
+  },
+  "withdraw": {
+    "balance": {
+      "insufficient": "Nicht genügend Guthaben",
+      "label": "Einzahlungsguthaben:"
+    },
+    "buttons": {
+      "confirm": "Auszahlung bestätigen"
+    },
+    "heading": "Auszahlungsbetrag",
+    "status": {
+      "requesting": "Signatur wird angefordert...",
+      "sending": "Transaktion wird gesendet...",
+      "waiting": "Warten auf Bestätigung..."
+    },
+    "toast": {
+      "success": "Erfolgreich abgehoben"
+    },
+    "validation": {
+      "insufficient": "Nicht genügend Guthaben"
+    }
+  }
+}

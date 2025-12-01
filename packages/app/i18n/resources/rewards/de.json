@@ -1,0 +1,67 @@
+{
+  "activity": {
+    "empty": "Keine Belohnungen verfügbar",
+    "error": {
+      "verifications": "Fehler beim Abrufen der Verifizierungen. {{message}}"
+    },
+    "title": {
+      "period": "{{period}} Belohnungen",
+      "total": "Gesamt {{period}}",
+      "fallback": "Monatlich"
+    },
+    "sections": {
+      "tasks": "Aufgaben",
+      "multipliers": "Multiplikator",
+      "progress": "Fortschritt"
+    }
+  },
+  "requirements": {
+    "title": "Dein SEND-Guthaben",
+    "sendtag": "Sendtag gekauft",
+    "balance": "Guthaben {{amount}}",
+    "savings": "Spareinlage ${{amount}}"
+  },
+  "tasks": {
+    "status": {
+      "completed": "Abgeschlossen",
+      "ongoing": "Laufend",
+      "pending": "Ausstehend"
+    },
+    "types": {
+      "create_passkey": "Passkey erstellen",
+      "tag_registration": "Sendtag kaufen",
+      "send_ten": "10+ Sends",
+      "send_one_hundred": "100+ Sends",
+      "tag_referral": "Empfehlungen",
+      "total_tag_referrals": "Empfehlungen gesamt",
+      "send_streak": "Send-Serie",
+      "sendpot_ticket_purchase": "SendPot-Tickets",
+      "send_ceiling": ""
+    }
+  },
+  "multipliers": {
+    "title": "Multiplikator",
+    "referralTitle": "{{period}} {{title}}"
+  },
+  "common": {
+    "x": "X {{value}}",
+    "na": "N/V"
+  },
+  "claim": {
+    "heading": {
+      "period": "{{period}} Belohnungen",
+      "total": "Gesamt {{period}}"
+    },
+    "cta": {
+      "default": "$ Belohnung einlösen",
+      "claiming": "Wird eingelöst...",
+      "claimed": "$ Eingelöst",
+      "insufficientGas": "Nicht genügend Gas",
+      "notYet": "Noch nicht einlösbar",
+      "error": "Fehler"
+    }
+  },
+  "select": {
+    "month": "Monat auswählen"
+  }
+}

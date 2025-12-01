@@ -1950,6 +1950,10 @@ export type Database = {
         Args: { send_account_id: string; tag_name: string }
         Returns: number
       }
+      delete_user_account: {
+        Args: { user_id_to_delete: string }
+        Returns: undefined
+      }
       did_user_swap: { Args: never; Returns: boolean }
       distribution_hodler_addresses: {
         Args: { distribution_id: number }
@@ -2035,6 +2039,7 @@ export type Database = {
           created_at: string
           is_verified: boolean
           links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
+          main_tag: string
           name: string
           sendid: number
           tag: string

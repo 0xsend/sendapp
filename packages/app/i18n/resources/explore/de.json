@@ -1,0 +1,16 @@
+{
+  "banner": {
+    "cantonWallet": {
+      "subtitle": "Sei der Erste. Bleib vorn.",
+      "title": "Canton Wallet"
+    },
+    "rewards": {
+      "subtitle": "Lass dein Geld für dich arbeiten",
+      "title": "Prämien"
+    },
+    "sendpot": {
+      "subtitle": "Drehen. Gewinnen. Angeben.",
+      "title": "Sendpot"
+    }
+  }
+}

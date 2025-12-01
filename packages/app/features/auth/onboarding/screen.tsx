@@ -32,6 +32,7 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { ReferrerBanner } from 'app/components/ReferrerBanner'
 import { Platform } from 'react-native'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
@@ -385,6 +386,7 @@ export function OnboardingScreen() {
         >
           {t('subtitle')}
         </Paragraph>
+        <ReferrerBanner />
       </YStack>
       <FadeCard
         borderColor={validationError ? '$error' : 'transparent'}

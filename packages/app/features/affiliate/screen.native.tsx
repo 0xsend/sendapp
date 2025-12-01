@@ -30,7 +30,9 @@ type Referral = Pick<
   | 'name'
   | 'sendid'
   | 'is_verified'
->
+> & {
+  main_tag?: string | null
+}
 
 export default function FriendsScreen() {
   const { t } = useTranslation('affiliate')
@@ -110,6 +112,7 @@ export default function FriendsScreen() {
 }
 
 const FriendMobileRow = ({ referral }: { referral: Referral }) => {
+  const displayTag = referral.main_tag || referral.tag
   const linkProps = useLink({ href: `/profile/${referral.sendid}` })
   const { t, i18n } = useTranslation('affiliate')
   const locale = i18n.resolvedLanguage ?? i18n.language
@@ -120,8 +123,8 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
       })
     : t('list.birthdayFallback')
 
-  const label = referral.tag
-    ? `/${referral.tag}`
+  const label = displayTag
+    ? `/${displayTag}`
     : referral.name || referral.sendid
       ? `#${referral.sendid}`
       : t('list.unknownTag')
@@ -133,7 +136,7 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
           {Platform.OS === 'android' && !referral.avatar_url ? (
             <Avatar size="$4.5" br="$4">
               <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                src={`https://ui-avatars.com/api/?name=${displayTag}&size=256&format=png&background=86ad7f`}
               />
             </Avatar>
           ) : (
@@ -142,7 +145,7 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
               <Avatar.Fallback jc="center" bc="$olive">
                 <Avatar size="$4.5" br="$4">
                   <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                    src={`https://ui-avatars.com/api/?name=${displayTag}&size=256&format=png&background=86ad7f`}
                   />
                 </Avatar>
               </Avatar.Fallback>

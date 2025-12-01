@@ -6,6 +6,7 @@ import {
   ButtonText,
   Paragraph,
   useAppToast,
+  View,
   XStack,
 } from '@my/ui'
 import { useUser } from 'app/utils/useUser'
@@ -38,16 +39,7 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
           color={'$primary'}
           $theme-light={{ color: '$color12' }}
           key="referral-link-icon"
-          animation="bouncy"
           flexShrink={0}
-          enterStyle={{
-            opacity: 0,
-            scale: 0.9,
-          }}
-          exitStyle={{
-            opacity: 0,
-            scale: 0.9,
-          }}
         />
       ),
     }),
@@ -130,7 +122,20 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
         </ButtonText>
         <ButtonIcon>
           <AnimatePresence exitBeforeEnter>
-            {hasCopied ? icons.checkCheck : icons.copy}
+            <View
+              key={hasCopied ? 'check-check' : 'copy'}
+              animation="100ms"
+              enterStyle={{
+                opacity: 0,
+                scale: 0.5,
+              }}
+              exitStyle={{
+                opacity: 0,
+                scale: 0.5,
+              }}
+            >
+              {hasCopied ? icons.checkCheck : icons.copy}
+            </View>
           </AnimatePresence>
         </ButtonIcon>
       </Button>

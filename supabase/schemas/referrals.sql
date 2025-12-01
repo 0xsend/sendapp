@@ -455,7 +455,7 @@ GRANT ALL ON FUNCTION "public"."profile_lookup"("lookup_type" "public"."lookup_t
 -- Functions
 
 CREATE OR REPLACE FUNCTION public.get_friends()
- RETURNS TABLE(avatar_url text, name text, sendid int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, created_at timestamp with time zone, is_verified boolean)
+ RETURNS TABLE(avatar_url text, name text, sendid int, x_username text, links_in_bio link_in_bio[], birthday date, tag citext, main_tag citext, created_at timestamp with time zone, is_verified boolean)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
@@ -488,6 +488,7 @@ BEGIN
                 END AS links_in_bio,
                 CASE WHEN p.is_public THEN p.birthday ELSE NULL END AS birthday,
                 t.name AS tag,
+                mt.name AS main_tag,
                 t.created_at,
                 (p.verified_at IS NOT NULL) AS is_verified,
                 COALESCE((
@@ -501,6 +502,8 @@ BEGIN
                 referrals r
                     LEFT JOIN affiliate_stats a ON a.user_id = r.referred_id
                     LEFT JOIN profiles p ON p.id = r.referred_id
+                    LEFT JOIN send_accounts sa ON sa.user_id = r.referred_id
+                    LEFT JOIN tags mt ON mt.id = sa.main_tag_id
                     LEFT JOIN tags t ON t.user_id = r.referred_id
             WHERE
                 r.referrer_id = (SELECT auth.uid())
@@ -516,6 +519,7 @@ BEGIN
             o.links_in_bio,
             o.birthday,
             o.tag,
+            o.main_tag,
             o.created_at,
             o.is_verified
         FROM

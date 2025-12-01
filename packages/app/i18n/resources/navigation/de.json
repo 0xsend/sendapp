@@ -1,0 +1,87 @@
+{
+  "sidebar": {
+    "account": "Konto",
+    "secretShop": "Geheimer Shop"
+  },
+  "stack": {
+    "account": {
+      "language": "Sprache",
+      "linkInBio": "Link in Bio",
+      "passkeys": "Passkeys",
+      "passkeysConfirm": "Passkey bestätigen",
+      "passkeysCreate": "Passkey erstellen",
+      "personalInfo": "Persönliche Daten",
+      "profile": "Profil",
+      "referrals": "Empfehlungen",
+      "root": "Konto",
+      "sendtags": "Sendtags",
+      "sendtagsAdd": "Sendtags registrieren",
+      "sendtagsCheckout": "Zur Kasse",
+      "sendtagsFirst": "Erster Sendtag"
+    },
+    "activity": {
+      "details": "Transaktionsdetails"
+    },
+    "canton": {
+      "root": "Canton Wallet entdecken"
+    },
+    "deposit": {
+      "applePay": "Apple Pay",
+      "debitCard": "Debitkarte",
+      "onBase": "Auf Base einzahlen",
+      "root": "Einzahlen",
+      "success": "Erfolgreich"
+    },
+    "earn": {
+      "balance": "Guthaben",
+      "deposit": "Einzahlen",
+      "details": "Details",
+      "rewards": "Prämienguthaben",
+      "root": "Sparen",
+      "withdraw": "Ersparnisse abheben"
+    },
+    "investments": {
+      "root": "Investieren"
+    },
+    "notFound": "Nicht gefunden",
+    "profile": {
+      "about": "Über",
+      "history": "Verlauf"
+    },
+    "rewards": {
+      "root": "Prämien"
+    },
+    "send": {
+      "enterAmount": "Betrag eingeben",
+      "previewAndSend": "Vorschau und Senden"
+    },
+    "sendpot": {
+      "buyTickets": "Tickets kaufen",
+      "confirm": "Zusammenfassung Ticketkauf",
+      "root": "Sendpot"
+    },
+    "stables": {
+      "root": "Cash"
+    },
+    "token": {
+      "root": "Investieren"
+    },
+    "trade": {
+      "root": "Handeln",
+      "summary": "Handelszusammenfassung"
+    }
+  },
+  "tabs": {
+    "activity": "Aktivität",
+    "explore": "Entdecken",
+    "home": "Startseite",
+    "send": "Senden",
+    "trade": "Handeln"
+  },
+  "topNav": {
+    "tokens": {
+      "cash": "Cash",
+      "invest": "Investieren"
+    }
+  }
+}
