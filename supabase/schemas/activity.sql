@@ -301,7 +301,13 @@ WITH birthday_profiles AS (
         SELECT 1
         FROM tags t
         JOIN tag_receipts tr ON tr.tag_name = t.name
-        JOIN receipts r ON r.event_id = tr.event_id
+        JOIN receipts r ON (
+            -- Match on event_id when available (new records)
+            (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+            OR
+            -- Fall back to hash matching for old records where event_id is NULL
+            (tr.event_id IS NULL AND r.event_id = tr.hash)
+        )
         WHERE t.user_id = p.id
         AND t.status = 'confirmed'  -- Only confirmed tags
         AND r.user_id = t.user_id  -- Ensure receipt belongs to current owner
