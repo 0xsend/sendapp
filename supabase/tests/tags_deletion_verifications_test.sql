@@ -52,7 +52,7 @@ INSERT INTO distributions (
     5000,
     2500,
     2500,
-    NOW() - INTERVAL '1 day',
+    NOW() - INTERVAL '10 seconds',
     NOW() + INTERVAL '1 month',
     1e6::bigint,
     NOW() + INTERVAL '2 months',
