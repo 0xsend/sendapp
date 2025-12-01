@@ -2039,6 +2039,7 @@ export type Database = {
           created_at: string
           is_verified: boolean
           links_in_bio: Database["public"]["Tables"]["link_in_bio"]["Row"][]
+          main_tag: string
           name: string
           sendid: number
           tag: string
