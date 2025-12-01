@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import type { i18n } from 'i18next'
 import { Concerns } from 'app/concerns'
+import { VersionUpdater } from 'app/components/VersionUpdater'
 import { getI18n } from 'app/i18n'
 import ScrollDirectionProvider from 'app/provider/scroll/ScrollDirectionProvider'
 import type React from 'react'
@@ -44,6 +45,7 @@ export function Provider({
         <ShimmerProvider duration={2000}>
           <Providers>
             <Concerns>{children}</Concerns>
+            <VersionUpdater />
             {process.env.NEXT_PUBLIC_REACT_QUERY_DEV_TOOLS && <ReactQueryDevtools />}
           </Providers>
         </ShimmerProvider>
