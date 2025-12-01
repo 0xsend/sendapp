@@ -34,7 +34,9 @@ type Referral = Pick<
   | 'name'
   | 'sendid'
   | 'is_verified'
->
+> & {
+  main_tag?: string | null
+}
 
 export default function FriendsScreen() {
   const { t } = useTranslation('affiliate')
@@ -173,8 +175,9 @@ const FriendMobileRow = ({
       })
     : t('list.birthdayFallback')
 
-  const label = referral.tag
-    ? `/${referral.tag}`
+  const displayTag = referral.main_tag || referral.tag
+  const label = displayTag
+    ? `/${displayTag}`
     : referral.name || referral.sendid
       ? `#${referral.sendid}`
       : t('list.unknownTag')
@@ -184,7 +187,7 @@ const FriendMobileRow = ({
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} cursor={'pointer'} hoverStyle={hoverStyles}>
       <XStack f={1} w={'100%'} ai={'center'}>
         <Link
-          href={referral.tag ? `/${referral.tag}` : `/profile/${referral.sendid}`}
+          href={displayTag ? `/${displayTag}` : `/profile/${referral.sendid}`}
           containerProps={{
             f: 1,
           }}
@@ -195,7 +198,7 @@ const FriendMobileRow = ({
               <Avatar.Fallback jc="center" bc="$olive">
                 <Avatar size="$4.5" br="$4">
                   <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                    src={`https://ui-avatars.com/api/?name=${displayTag}&size=256&format=png&background=86ad7f`}
                   />
                 </Avatar>
               </Avatar.Fallback>
@@ -249,8 +252,10 @@ const FriendDesktopRow = ({
       })
     : t('list.birthdayFallback')
 
+  const displayTag = referral.main_tag || referral.tag
+
   return (
-    <Link href={`/${referral.tag}`}>
+    <Link href={`/${displayTag}`}>
       <XStack
         gap={'$3.5'}
         px={'$3.5'}
@@ -275,15 +280,15 @@ const FriendDesktopRow = ({
             <Avatar.Fallback jc="center" bc="$olive">
               <Avatar size="$2" br="$2">
                 <Avatar.Image
-                  src={`https://ui-avatars.com/api/?name=${referral.tag}&size=256&format=png&background=86ad7f`}
+                  src={`https://ui-avatars.com/api/?name=${displayTag}&size=256&format=png&background=86ad7f`}
                 />
               </Avatar>
             </Avatar.Fallback>
           </Avatar>
           <XStack ai="center" gap="$2">
             <Paragraph lineHeight={20}>
-              /{referral.tag}
-              {referral.tag === referrer?.tag ? ` ${invitedCopy}` : ''}
+              /{displayTag}
+              {displayTag === (referrer?.main_tag || referrer?.tag) ? ` ${invitedCopy}` : ''}
             </Paragraph>
             {referral.is_verified ? (
               <IconBadgeCheckSolid
