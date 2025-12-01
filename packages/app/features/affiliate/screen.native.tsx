@@ -113,7 +113,7 @@ export default function FriendsScreen() {
 
 const FriendMobileRow = ({ referral }: { referral: Referral }) => {
   const displayTag = referral.main_tag || referral.tag
-  const linkProps = useLink({ href: displayTag ? `/${displayTag}` : `/profile/${referral.sendid}` })
+  const linkProps = useLink({ href: `/profile/${referral.sendid}` })
   const { t, i18n } = useTranslation('affiliate')
   const locale = i18n.resolvedLanguage ?? i18n.language
   const birthday = referral.birthday
