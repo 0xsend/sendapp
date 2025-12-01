@@ -1,0 +1,27 @@
+{
+  "actions": {
+    "upgrade": "Upgrade",
+    "upgrading": "Wird aktualisiert..."
+  },
+  "balances": {
+    "after": "Danach",
+    "current": "Aktuell"
+  },
+  "hero": {
+    "subtitle": "Upgrade erforderlich, um Send weiterhin zu nutzen. Neue Gesamtversorgung: 100 Mrd. → 1 Mrd.",
+    "title": "Token-Upgrade"
+  },
+  "links": {
+    "docs": "Mehr über das Upgrade erfahren"
+  },
+  "status": {
+    "ready": "Klicken Sie auf „Upgrade“, um fortzufahren.",
+    "requesting": "Signatur wird angefordert...",
+    "retry": "Klicken Sie auf „Upgrade“, um fortzufahren. Bitte versuchen Sie es erneut.",
+    "sending": "Transaktion wird gesendet...",
+    "waiting": "Warten auf Bestätigung..."
+  },
+  "toast": {
+    "success": "Upgrade erfolgreich"
+  }
+}

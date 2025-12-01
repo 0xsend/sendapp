@@ -1,0 +1,12 @@
+{
+  "actions": {
+    "signIn": "ANMELDEN",
+    "signInLoading": "ANMELDEN...",
+    "signUp": "ANMELDEN"
+  },
+  "headline": {
+    "line1": "Willkommen",
+    "line2": "bei Send",
+    "subtitle": "Mit Ihrem Passkey anmelden"
+  }
+}

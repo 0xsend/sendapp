@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "addMoney": "Geld hinzufügen",
+    "deposit": "Einzahlen",
+    "earn": "Verdienen",
+    "invest": "Investieren",
+    "send": "Senden"
+  },
+  "cards": {
+    "investments": {
+      "cta": "INVESTIEREN",
+      "empty": "Diversifiziere dein Portfolio",
+      "error": "Marktdaten konnten nicht geladen werden",
+      "title": "Investieren",
+      "weeklyDelta": "{{sign}}${{amount}} diese Woche"
+    },
+    "referrals": {
+      "title": "Empfehlungen"
+    },
+    "rewards": {
+      "title": "Belohnungen"
+    },
+    "savings": {
+      "earning": "{{percent}}% Zinsen",
+      "fallback": "Bis zu 10 % Zinsen",
+      "title": "Sparen"
+    },
+    "stables": {
+      "title": "Barguthaben",
+      "totalTitle": "Gesamtguthaben"
+    }
+  },
+  "fallback": {
+    "missingAccount": {
+      "description": "Dies sollte nie passieren.",
+      "onboarding": "Zum Onboarding",
+      "signOut": "Abmelden",
+      "sitemap": "Sitemap",
+      "title": "Kein Send-Konto gefunden"
+    }
+  },
+  "token": {
+    "chartError": "Diagrammdaten konnten nicht geladen werden",
+    "keyMetrics": "Kennzahlen",
+    "metrics": {
+      "circulatingSupply": "Umlaufmenge",
+      "fdv": "FDV",
+      "marketCap": "Marktkapitalisierung",
+      "volume24h": "Volumen (24h)"
+    },
+    "priceOverview": "Preisübersicht"
+  }
+}

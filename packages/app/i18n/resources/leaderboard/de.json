@@ -1,0 +1,22 @@
+{
+  "boards": {
+    "referrals": {
+      "title": "Empfehlungen"
+    }
+  },
+  "errors": {
+    "noData": "Bestenlistendaten konnten nicht gefunden werden"
+  },
+  "hero": {
+    "description": "Registriere einen Sendtag, halte das Mindestguthaben und wirb andere, um in den Rängen aufzusteigen.",
+    "title": "Klassenbester"
+  },
+  "table": {
+    "columns": {
+      "identifier": "Sendtag",
+      "rank": "#",
+      "referrals": "Empfehlungen",
+      "transactions": "Gesamtzahl Transaktionen"
+    }
+  }
+}

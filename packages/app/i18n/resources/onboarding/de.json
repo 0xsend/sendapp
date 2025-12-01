@@ -1,0 +1,22 @@
+{
+  "errors": {
+    "sessionExpired": "Sitzung abgelaufen. Weiterleitung zur Anmeldung...",
+    "unknown": "Unbekannter Fehler"
+  },
+  "form": {
+    "placeholder": "Gewünschten Sendtag eingeben",
+    "submit": "Konto abschließen"
+  },
+  "passkey": {
+    "retry": "Integritätsprüfung wiederholen",
+    "status": {
+      "checking": "Überprüfe die Signaturintegrität deines Passkeys...",
+      "complete": "Passkey-Integritätsprüfung abgeschlossen.",
+      "failureDetailed": "Passkey-Integritätsprüfung fehlgeschlagen. Versuche, deinen Passkey auf einem Gerät mit iCloud-Schlüsselbund oder Google Passwortmanager zu erstellen.",
+      "success": "Passkey-Integritätsprüfung bestanden."
+    },
+    "toastFailure": "Passkey-Integritätsprüfung fehlgeschlagen."
+  },
+  "subtitle": "Wähle deinen Sendtag – dein eindeutiger Benutzername auf Send",
+  "title": "Konto abschließen"
+}

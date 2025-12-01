@@ -1,0 +1,67 @@
+{
+  "form": {
+    "labels": {
+      "pay": "Du zahlst",
+      "receive": "Du erhältst",
+      "priceImpact": "Preisauswirkung:"
+    },
+    "buttons": {
+      "review": "Überprüfen",
+      "loading": "Lädt...",
+      "max": "Max"
+    },
+    "slippage": {
+      "label": "Max. Slippage",
+      "customPlaceholder": "Benutzerdefiniert"
+    },
+    "errors": {
+      "balance": "Fehler beim Abrufen des Guthabens",
+      "slippageMin": "Minimaler Slippage-Wert ist 0%",
+      "slippageMax": "Maximaler Slippage-Wert ist 20%"
+    },
+    "priceImpact": {
+      "levels": {
+        "medium": "Hoch",
+        "high": "Sehr hoch"
+      }
+    }
+  },
+  "summary": {
+    "labels": {
+      "exchangeRate": "Wechselkurs",
+      "transactionFee": "Transaktionsgebühr",
+      "sendFee": "Send-Gebühr",
+      "priceImpact": "Preisauswirkung",
+      "maxSlippage": "Max. Slippage"
+    },
+    "buttons": {
+      "edit": "Bearbeiten",
+      "insufficientBalance": "Guthaben nicht ausreichend",
+      "insufficientGas": "Gas nicht ausreichend",
+      "loading": "Wird getauscht...",
+      "confirm": "Tausch bestätigen"
+    }
+  },
+  "risk": {
+    "errorTitle": "Fehler",
+    "title": "Wichtiger Hinweis",
+    "description": "Der Handel mit Kryptowährungen birgt ein hohes Risiko und ist möglicherweise nicht für alle Anleger geeignet. Du könntest einen Teil oder dein gesamtes Kapital verlieren und solltest nur Geld investieren, dessen Verlust du dir leisten kannst. Berücksichtige sorgfältig deine Anlageziele, Erfahrung und Risikobereitschaft, bevor du fortfährst.",
+    "learnMore": "Mehr erfahren.",
+    "checkbox": "Ich habe die Risiken gelesen und verstanden.",
+    "buttons": {
+      "cancel": "Abbrechen",
+      "confirm": "Ich stimme zu und fahre fort"
+    }
+  },
+  "priceImpactInfo": {
+    "title": "Was ist Preisauswirkung?",
+    "description": "Der Tausch großer Beträge verringert die Rendite. Der verfügbare Kurs spiegelt möglicherweise nicht das beste Angebot wider.",
+    "tipsTitle": "So erhältst du bessere Kurse:",
+    "tips": [
+      "Teile deinen Tausch in kleinere Beträge auf",
+      "Handle, wenn mehr Leute handeln",
+      "Verwende kleinere Beträge für bessere Kurse"
+    ],
+    "dismiss": "Verstanden"
+  }
+}

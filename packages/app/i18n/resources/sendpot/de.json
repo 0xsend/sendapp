@@ -1,0 +1,112 @@
+{
+  "buy": {
+    "balance": {
+      "insufficient": "Unzureichende Mittel",
+      "label": "Guthaben:"
+    },
+    "button": {
+      "review": "Überprüfen"
+    },
+    "input": {
+      "ticketsLabel": "Tickets"
+    },
+    "ticketPrice": "Ticketpreis:",
+    "title": "Wie viele Tickets möchtest du kaufen?",
+    "toast": {
+      "errorTitle": "Fehler",
+      "insufficientFunds": "Unzureichende Mittel.",
+      "invalidQuantity": "Bitte gib eine gültige Anzahl an Tickets ein.",
+      "loadingMessage": "Bitte warten, Daten werden geladen...",
+      "loadingTitle": "Info"
+    },
+    "total": {
+      "label": "Gesamtkosten"
+    }
+  },
+  "claim": {
+    "cta": {
+      "claiming": "Fordert an...",
+      "default": "Gewinn anfordern",
+      "preparing": "Vorbereitung..."
+    },
+    "title": "Du hast gewonnen!",
+    "toast": {
+      "error": "Anforderung fehlgeschlagen",
+      "noPasskeyDescription": "Kein Passkey für dieses Konto gefunden.",
+      "noPasskeyTitle": "Fehler",
+      "success": "Anforderung erfolgreich"
+    }
+  },
+  "confirm": {
+    "button": {
+      "buy_one": "{{count}} Ticket kaufen",
+      "buy_other": "{{count}} Tickets kaufen",
+      "insufficientBalance": "Unzureichendes Guthaben",
+      "insufficientGas": "Unzureichendes Gas",
+      "preparing": "Vorbereitung...",
+      "processing": "Verarbeitung..."
+    },
+    "edit": {
+      "cta": "Bearbeiten",
+      "label": "Anzahl der Tickets bearbeiten"
+    },
+    "errors": {
+      "insufficientBalance": "Unzureichendes Guthaben.",
+      "insufficientGas": "Unzureichendes Gas.",
+      "noPasskeyDescription": "Kein Passkey für dieses Konto gefunden.",
+      "noPasskeyTitle": "Fehler"
+    },
+    "rows": {
+      "fee": "Geschätzte Transaktionsgebühr",
+      "price": "Preis pro Ticket",
+      "total": "Gesamtkosten"
+    },
+    "tickets": "Tickets",
+    "toast": {
+      "error": "Kauf fehlgeschlagen",
+      "success": "Kauf erfolgreich"
+    },
+    "usd": "({{value}})"
+  },
+  "history": {
+    "current": "Aktuell",
+    "empty": "Kein Ziehungsverlauf verfügbar.",
+    "notAvailable": "N/A",
+    "tickets": {
+      "none": "Du hast 0 Tickets gekauft",
+      "purchased_one": "Du hast {{count}} Ticket gekauft",
+      "purchased_other": "Du hast {{count}} Tickets gekauft"
+    },
+    "title": "Ziehungsverlauf",
+    "totalPool": "Gesamt-Pool:",
+    "upcoming": "Bevorstehend",
+    "winner": {
+      "label": "Gewinner",
+      "loading": "(Lädt...)",
+      "none": "Keine",
+      "pending": "(Ausstehend)",
+      "you": "Du hast gewonnen!"
+    }
+  },
+  "jackpot": {
+    "actions": {
+      "buy": "Ticket kaufen"
+    },
+    "loading": "Lädt...",
+    "messages": {
+      "geoBlocked": "Ticketkäufe sind in deiner Region derzeit nicht verfügbar."
+    },
+    "title": "Aktueller Sendpot"
+  },
+  "risk": {
+    "actions": {
+      "cancel": "Abbrechen",
+      "confirm": "Ich stimme zu & fahre fort"
+    },
+    "body": "Mit dem Kauf eines Sendpot-Tickets bestätigst du, dass Gewinne nicht garantiert sind und Ticketkosten nicht erstattet werden. Ziehungen werden von Megapot betrieben und verwenden nachweislich faire On-Chain-Zufälligkeit – bitte spiele verantwortungsbewusst.",
+    "checkbox": "Ich habe die Bedingungen gelesen und verstanden.",
+    "errorTitle": "Fehler",
+    "link": "Mehr erfahren.",
+    "title": "Wichtiger Haftungsausschluss"
+  }
+}

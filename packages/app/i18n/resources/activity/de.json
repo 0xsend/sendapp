@@ -1,0 +1,83 @@
+{
+  "details": {
+    "dateOnly": "Am",
+    "heading": "Transaktionsdetails",
+    "phraseOn": "{{phrase}} am"
+  },
+  "empty": {
+    "noActivities": "Keine Aktivitäten",
+    "noActivitiesMobile": "Keine Aktivitäten, einfach senden!"
+  },
+  "errors": {
+    "fallback": "Etwas ist schief gelaufen.",
+    "title": "Fehler"
+  },
+  "events": {
+    "deposit": "Einzahlung",
+    "received": "Empfangen",
+    "referral": "Empfehlung",
+    "referredBy": "Empfohlen von",
+    "revenueShare": "Umsatzbeteiligung",
+    "rewards": "Belohnungen",
+    "sendAccountSigningKeyAdded": "Send Account Signing Key hinzugefügt",
+    "sendAccountSigningKeyRemoved": "Send Account Signing Key entfernt",
+    "sendEarn": {
+      "deposit": "Send Earn Einzahlung",
+      "withdraw": "Send Earn Auszahlung"
+    },
+    "sendTokenUpgrade": "Send Token Upgrade",
+    "sendpot": {
+      "ticketPurchase": "Gekauft",
+      "win": "Sendpot-Gewinn"
+    },
+    "sendtagRegistered": "Sendtag registriert",
+    "sent": "Gesendet",
+    "temporal": {
+      "depositFailed": "Einzahlung fehlgeschlagen"
+    },
+    "trade": "Handel",
+    "withdraw": "Auszahlung"
+  },
+  "phrases": {
+    "deposit": "Eingezahlt",
+    "received": "Empfangen",
+    "referred": "Empfohlen",
+    "referredYou": "Dich empfohlen",
+    "revenueShare": "Umsatzbeteiligung verdient",
+    "sendAccountSigningKeyAdded": "Hinzugefügt",
+    "sendEarn": {
+      "affiliateReward": "Belohnungen verdient",
+      "depositComplete": "In Send Earn eingezahlt",
+      "depositFailed": "Einzahlung in Send Earn fehlgeschlagen",
+      "depositPending": "Einzahlung in Send Earn läuft...",
+      "withdrawComplete": "Von Send Earn abgehoben"
+    },
+    "sendpot": {
+      "ticketPurchase": "gekauft",
+      "win": "gewonnen"
+    },
+    "sendtagCreated": "Sendtag erstellt",
+    "sendtagsCreated": "Sendtags erstellt",
+    "sentYou": "Dir gesendet",
+    "trade": "Handel",
+    "upgrade": "Aktualisiert",
+    "withdraw": "Abgehoben"
+  },
+  "sections": {
+    "today": "Heute"
+  },
+  "status": {
+    "cancelled": "Abgebrochen",
+    "confirming": "Bestätigen...",
+    "failed": "Fehlgeschlagen",
+    "initializing": "Initialisierung...",
+    "sending": "Senden...",
+    "sent": "Gesendet"
+  },
+  "subtext": {
+    "sendAccountSigningKey": "Send Account Signing Key",
+    "sendEarn": "Send Earn",
+    "tickets_one": "{{count}} Ticket",
+    "tickets_other": "{{count}} Tickets"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "buttons": {
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "verify": "Verifizieren"
+  },
+  "cards": {
+    "discoverable": "Konto in Canton Wallet auffindbar",
+    "editTitle": "Canton Wallet Adresse bearbeiten",
+    "verifiedTitle": "Canton Wallet verifiziert"
+  },
+  "errors": {
+    "addressRequired": "Canton Wallet Adresse ist erforderlich",
+    "invalidFormat": "Ungültiges Canton Wallet Adressformat. Erwartet: cantonwallet-username::hash",
+    "invalidInput": "Ungültige Eingabe"
+  },
+  "header": {
+    "title": "Hol dir eine Einladung zur Canton Wallet"
+  },
+  "links": {
+    "createAccount": "Canton Wallet Konto erstellen"
+  },
+  "messages": {
+    "addressChangeWarning": "Das Ändern deiner Canton Wallet Adresse pausiert alle $CC-Belohnungen für 24 Stunden",
+    "noDistribution": "Keine Verteilung verfügbar"
+  },
+  "placeholders": {
+    "address": "Canton Wallet Adresse"
+  },
+  "requirements": {
+    "savingsVault": "Zahle ${{amount}} in den Sparkassen-Tresor ein",
+    "sendBalance": "Halte mindestens {{amount}} $SEND",
+    "sendTag": "Sendtag gekauft"
+  },
+  "toasts": {
+    "copyError": "Kopieren fehlgeschlagen",
+    "copySuccess": "Canton Wallet Adresse kopiert",
+    "discoverableSuccess": "Erfolgreich aktualisiert",
+    "updateError": "Aktualisierung fehlgeschlagen",
+    "updateSuccess": "Canton Wallet Adresse aktualisiert",
+    "verifyError": "Verifizierung fehlgeschlagen",
+    "verifySuccess": "Erfolgreich verifiziert"
+  }
+}
