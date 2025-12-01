@@ -41,7 +41,7 @@ export function AvatarProfile({
         )}
       </Avatar>
       {isVerified && (
-        <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
+        <XStack zi={100} pos="absolute" b="-25%" r="-25%">
           <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
           <IconBadgeCheckSolid2
             size="$1"
