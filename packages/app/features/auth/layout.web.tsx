@@ -14,8 +14,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         ref={ref}
         mih="100%"
         contentContainerStyle={{
-          mih: '100%',
-          height: '100%',
+          minHeight: '100%',
         }}
         scrollEventThrottle={128}
         onScroll={onScroll}
@@ -35,14 +34,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           flexDirection={'column'}
         >
           {!(xxs && !isPwa) && (
-            <XStack
-              w={'100%'}
-              alignSelf={'center'}
-              jc={'center'}
-              position={'absolute'}
-              top={0}
-              pt={'$3'}
-            >
+            <XStack w={'100%'} alignSelf={'center'} jc={'center'} pt={'$3'} pb={'$4'}>
               <Link href={'/'}>
                 <IconSendLogo size={'$3.5'} color={'$color12'} />
               </Link>
