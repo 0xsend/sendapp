@@ -23,6 +23,7 @@ export const distributionRouter = createTRPCRouter({
           .from('distribution_shares')
           .select('index, address, amount::text, user_id', { count: 'exact' })
           .eq('distribution_id', distributionId)
+          .gt('amount', 0)
           .order('index', { ascending: true })
       )
 
