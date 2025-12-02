@@ -1,0 +1,278 @@
+set check_function_bodies = off;
+
+CREATE OR REPLACE FUNCTION public.can_delete_tag(p_send_account_id uuid, p_tag_id bigint DEFAULT NULL::bigint)
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+    WITH tag_info AS (
+        SELECT
+            COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1
+                FROM tag_receipts tr
+                JOIN receipts r ON (
+                    -- Match on event_id when available (new records)
+                    (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+                    OR
+                    -- Fall back to hash matching for old records where event_id is NULL
+                    (tr.event_id IS NULL AND r.event_id = tr.hash)
+                )
+                WHERE tr.tag_id = t.id
+                AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
+            ))::integer as paid_tag_count,
+            CASE
+                WHEN p_tag_id IS NULL THEN false
+                ELSE bool_or(t.id = p_tag_id AND EXISTS (
+                    SELECT 1
+                    FROM tag_receipts tr
+                    JOIN receipts r ON (
+                        -- Match on event_id when available (new records)
+                        (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+                        OR
+                        -- Fall back to hash matching for old records where event_id is NULL
+                        (tr.event_id IS NULL AND r.event_id = tr.hash)
+                    )
+                    WHERE tr.tag_id = p_tag_id
+                    AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
+                ))
+            END as is_deleting_paid_tag
+        FROM send_account_tags sat
+        JOIN tags t ON t.id = sat.tag_id
+        WHERE sat.send_account_id = p_send_account_id
+        AND t.status = 'confirmed'
+    )
+    SELECT CASE
+        -- If no tag_id provided, check if user can delete any tag (has >= 2 paid tags)
+        WHEN p_tag_id IS NULL THEN paid_tag_count >= 2
+        -- If tag_id provided, check if this specific tag can be deleted
+        WHEN is_deleting_paid_tag AND paid_tag_count <= 1 THEN false
+        ELSE true
+    END
+    FROM tag_info
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.insert_tag_registration_verifications(distribution_num integer)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+    -- Idempotent insert: avoid duplicating rows per (distribution_id, user_id, type, tag)
+    INSERT INTO public.distribution_verifications(
+        distribution_id,
+        user_id,
+        type,
+        metadata,
+        weight,
+        created_at
+    )
+    SELECT
+        (
+            SELECT id
+            FROM distributions
+            WHERE "number" = distribution_num
+            LIMIT 1
+        ) AS distribution_id,
+        t.user_id,
+        'tag_registration'::public.verification_type AS type,
+        jsonb_build_object('tag', t."name") AS metadata,
+        CASE
+            WHEN LENGTH(t.name) >= 6 THEN 1
+            WHEN LENGTH(t.name) = 5 THEN 2
+            WHEN LENGTH(t.name) = 4 THEN 3 -- Increase reward value of shorter tags
+            WHEN LENGTH(t.name) > 0  THEN 4
+            ELSE 0
+        END AS weight,
+        t.created_at AS created_at
+    FROM tags t
+    INNER JOIN tag_receipts tr ON tr.tag_name = t.name
+    AND tr.id = (
+        SELECT MAX(id)
+        FROM tag_receipts
+        WHERE tag_name = t.name
+    )
+    INNER JOIN receipts r ON (
+        -- Match on event_id when available (new records)
+        (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+        OR
+        -- Fall back to hash matching for old records where event_id is NULL
+        (tr.event_id IS NULL AND r.event_id = tr.hash)
+    )
+    WHERE t.user_id IS NOT NULL  -- Exclude deleted/available tags
+    AND t.status = 'confirmed'  -- Only confirmed tags
+    AND r.user_id = t.user_id  -- Ensure receipt belongs to current owner
+    AND NOT EXISTS (
+        SELECT 1
+        FROM public.distribution_verifications dv
+        WHERE dv.distribution_id = (
+            SELECT id FROM distributions WHERE "number" = distribution_num LIMIT 1
+        )
+        AND dv.user_id = t.user_id
+        AND dv.type = 'tag_registration'::public.verification_type
+        AND dv.metadata->>'tag' = t.name
+    );
+END;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.prevent_last_confirmed_tag_deletion()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    -- Check if this deletion would leave the user with zero PAID confirmed tags
+    -- Only prevent deletion if the tag being deleted is confirmed AND has a receipt (paid)
+    IF current_setting('role')::text = 'authenticated' AND
+        (SELECT status FROM tags WHERE id = OLD.tag_id) = 'confirmed' THEN
+
+        -- Count remaining PAID confirmed tags after this deletion
+        -- A paid tag is one that has a receipt (not the free first sendtag)
+        IF (SELECT COUNT(*)
+            FROM send_account_tags sat
+            JOIN tags t ON t.id = sat.tag_id
+            WHERE sat.send_account_id = OLD.send_account_id
+            AND t.status = 'confirmed'
+            AND sat.tag_id != OLD.tag_id
+            AND EXISTS (
+                SELECT 1
+                FROM tag_receipts tr
+                JOIN receipts r ON (
+                    -- Match on event_id when available (new records)
+                    (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+                    OR
+                    -- Fall back to hash matching for old records where event_id is NULL
+                    (tr.event_id IS NULL AND r.event_id = tr.hash)
+                )
+                WHERE tr.tag_id = t.id
+                AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
+            )) = 0 THEN
+            RAISE EXCEPTION 'Cannot delete this sendtag. You must maintain at least one paid sendtag.';
+        END IF;
+    END IF;
+
+    RETURN OLD;
+END;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.today_birthday_senders()
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+BEGIN
+RETURN QUERY
+
+WITH birthday_profiles AS (
+    SELECT p.*
+    FROM profiles p
+    WHERE p.is_public = TRUE -- only public profiles
+    AND p.birthday IS NOT NULL -- Ensure birthday is set
+    AND p.avatar_url IS NOT NULL -- Ensure avatar is set
+    AND EXTRACT(MONTH FROM p.birthday) = EXTRACT(MONTH FROM CURRENT_DATE) -- Match current month
+    AND EXTRACT(DAY FROM p.birthday) = EXTRACT(DAY FROM CURRENT_DATE) -- Match current day
+    -- Ensure user has at least one tag associated via tag_receipts, 1 paid tag
+    -- This where can be removed after
+    AND EXISTS (
+        SELECT 1
+        FROM tags t
+        JOIN tag_receipts tr ON tr.tag_name = t.name
+        JOIN receipts r ON (
+            -- Match on event_id when available (new records)
+            (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+            OR
+            -- Fall back to hash matching for old records where event_id is NULL
+            (tr.event_id IS NULL AND r.event_id = tr.hash)
+        )
+        WHERE t.user_id = p.id
+        AND t.status = 'confirmed'  -- Only confirmed tags
+        AND r.user_id = t.user_id  -- Ensure receipt belongs to current owner
+        AND tr.id = (
+            SELECT MAX(id)
+            FROM tag_receipts
+            WHERE tag_name = t.name
+        )
+    )
+),
+user_send_scores AS (
+    SELECT
+        ss.user_id,
+        COALESCE(SUM(ss.unique_sends), 0) AS total_sends,
+        COALESCE(SUM(ss.score), 0) AS total_score
+    FROM (
+        SELECT user_id, score, unique_sends
+        FROM private.send_scores_history
+        WHERE user_id IN (SELECT id FROM birthday_profiles)
+        UNION ALL
+        SELECT user_id, score, unique_sends
+        FROM public.send_scores_current
+        WHERE user_id IN (SELECT id FROM birthday_profiles)
+    ) ss
+    GROUP BY ss.user_id
+),
+user_earn_balances AS (
+    SELECT
+        sa.user_id,
+        COALESCE(MAX(seb.assets), 0) AS earn_balance
+    FROM send_accounts sa
+    JOIN birthday_profiles bp ON bp.id = sa.user_id
+    INNER JOIN send_earn_balances seb ON (
+        sa.address_bytes = seb.owner
+    )
+    GROUP BY sa.user_id
+),
+-- Ensure user has historical send activity and sufficient earn balance
+filtered_profiles AS (
+    SELECT bp.*, uss.total_score as send_score, (bp.verified_at IS NOT NULL) AS is_verified
+    FROM birthday_profiles bp
+    INNER JOIN user_send_scores uss ON uss.user_id = bp.id
+    INNER JOIN user_earn_balances ueb ON ueb.user_id = bp.id
+WHERE uss.total_sends > 100
+      AND uss.total_score > (
+          SELECT hodler_min_balance
+          FROM distributions
+          WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ORDER BY qualification_start DESC
+          LIMIT 1
+      )
+      AND ueb.earn_balance >= (
+          SELECT d.earn_min_balance
+          FROM distributions d
+          WHERE d.qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            AND d.qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ORDER BY d.qualification_start DESC
+          LIMIT 1
+      )
+)
+
+SELECT (
+   (
+        NULL, -- Placeholder for the 'id' field in activity_feed_user, don't want to show users' IDs
+        fp.name,
+        fp.avatar_url,
+        fp.send_id,
+        sa.main_tag_id,
+        main_tag.name,
+        (
+            -- Aggregate all confirmed tags for the user into an array
+            SELECT ARRAY_AGG(t.name)
+            FROM tags t
+            WHERE t.user_id = fp.id
+              AND t.status = 'confirmed'
+        ),
+        fp.is_verified
+   )::activity_feed_user
+).*
+FROM filtered_profiles fp
+LEFT JOIN send_accounts sa ON sa.user_id = fp.id
+LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
+ORDER BY fp.send_score DESC;
+END;
+$function$
+;
+
+
