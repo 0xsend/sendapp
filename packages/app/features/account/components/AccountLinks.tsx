@@ -15,8 +15,9 @@ import {
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AccountDeletionFlow } from './AccountDeletionFlow'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -30,6 +31,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
   const { openChat } = useIntercom()
   const { t } = useTranslation('account')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const handleSignOut = useCallback(() => {
     void supabase.auth.signOut()
@@ -110,7 +112,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.deleteAccount')}
-              onPress={() => {}}
+              onPress={() => setDeleteDialogOpen(true)}
               icon={icons.trash}
             />
           </YGroup.Item>
@@ -142,6 +144,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
         </PrimaryButton.Icon>
         <PrimaryButton.Text>{t('links.signOut')}</PrimaryButton.Text>
       </PrimaryButton>
+      <AccountDeletionFlow open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} />
     </YStack>
   )
 })
