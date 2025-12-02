@@ -396,7 +396,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
             {renderWarningBanner()}
             <YStack gap="$2" w="100%">
               <Paragraph fontSize="$4" color="$color12">
-                Type 'DELETE' to confirm
+                Type &apos;DELETE&apos; to confirm
               </Paragraph>
               <Input
                 size="$4"
