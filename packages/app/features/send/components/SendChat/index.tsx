@@ -1319,7 +1319,7 @@ const ChatList = YStack.styleable(() => {
 
   const loadingSkeletons =
     listItems.length === 0 && (isLoadingActivities || isLoadingOtherUserProfile) ? (
-      <YStack jc="flex-end" f={1} gap="$6" p="$6">
+      <YStack jc="flex-end" f={1} gap="$10" p="$8" px="$2">
         <Shimmer w={280} h={100} br="$4" />
         <Shimmer als="flex-end" w={280} h={100} br="$4" />
       </YStack>
