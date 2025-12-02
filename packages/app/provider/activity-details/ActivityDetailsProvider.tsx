@@ -1,6 +1,7 @@
 import { useState, useCallback, type ReactNode } from 'react'
 import { ActivityDetailsContext, type ActivityDetailsContextValue } from './ActivityDetailsContext'
 import { useRootScreenParams } from 'app/routers/params'
+import { useEvent } from '@my/ui'
 import type { Activity } from 'app/utils/zod/activity'
 import { Platform } from 'react-native'
 import { usePush } from 'app/utils/usePush'
@@ -14,16 +15,13 @@ export const ActivityDetailsProvider = ({ children }: ActivityDetailsProviderPro
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null)
   const push = usePush()
 
-  const selectActivity = useCallback(
-    (activity: Activity) => {
-      if (Platform.OS !== 'web') {
-        push('/activity/details')
-      }
-      setParams({ ...queryParams, activity: 'details' })
-      setSelectedActivity(activity)
-    },
-    [queryParams, setParams, push]
-  )
+  const selectActivity = useEvent((activity: Activity) => {
+    if (Platform.OS !== 'web') {
+      push('/activity/details')
+    }
+    setParams({ ...queryParams, activity: 'details' })
+    setSelectedActivity(activity)
+  })
 
   const closeActivityDetails = useCallback(() => {
     setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
