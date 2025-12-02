@@ -1,7 +1,6 @@
 import {
   Button,
   Dialog,
-  H2,
   Input,
   Paragraph,
   PrimaryButton,
@@ -12,7 +11,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { IconCoin, IconDollar, IconStar, IconX } from 'app/components/icons'
+import { IconDollar, IconStar } from 'app/components/icons'
 import { AlertTriangle, Ticket } from '@tamagui/lucide-icons'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { allCoins, type CoinWithBalance } from 'app/data/coins'

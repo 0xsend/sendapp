@@ -1,29 +1,25 @@
 import {
+  Button,
+  type ButtonProps,
   Card,
   type CardProps,
   Paragraph,
   type ParagraphProps,
+  Shimmer,
   Theme,
   ThemeableStack,
+  useMedia,
+  View,
   withStaticProperties,
   XStack,
   type XStackProps,
   YStack,
-  useMedia,
-  type ButtonProps,
-  Button,
-  View,
-  Shimmer,
 } from '@my/ui'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from './utils/useIsPriceHidden'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import {
-  type CoinWithBalance,
-  investmentCoins,
-  investmentCoins as investmentCoinsList,
-} from 'app/data/coins'
+import { type CoinWithBalance, investmentCoins } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
 import { useTokensMarketData } from 'app/utils/coin-gecko'
 import { useMemo, useRef } from 'react'
