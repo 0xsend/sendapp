@@ -28,6 +28,7 @@ import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { bytesToHex, hexToBytes } from 'viem'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { OverlappingCoinIcons } from 'app/features/home/InvestmentsBalanceCard'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 
 interface AccountDeletionFlowProps {
   open: boolean
@@ -44,6 +45,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
   const router = useRouter()
   const media = useMedia()
   const hoverStyles = useHoverStyles()
+  const supabase = useSupabase()
 
   const { dollarBalances } = useSendAccountBalances()
   const { data: sendAccount } = useSendAccount()
@@ -81,6 +83,11 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
     onSuccess: async () => {
       toast.show('Account deleted successfully')
       onOpenChange(false)
+
+      // Sign out on the client side to update local session state
+      await supabase.auth.signOut()
+
+      // Navigate to home - the auth state change will trigger proper routing
       router.replace('/')
     },
     onError: (error) => {
