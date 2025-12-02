@@ -10,7 +10,9 @@
   },
   "links": {
     "sections": {
-      "settings": "Settings",
+      "profile": "Profile",
+      "features": "Features",
+      "security": "Security",
       "support": "Support"
     },
     "items": {
@@ -22,6 +24,7 @@
       "sendtags": "Sendtags",
       "rewards": "Rewards",
       "referrals": "Referrals",
+      "deleteAccount": "Delete Account",
       "learnMore": "Learn more about Send",
       "liveChat": "Live Chat Support"
     },
