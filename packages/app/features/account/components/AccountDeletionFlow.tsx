@@ -4,6 +4,7 @@ import {
   H2,
   Input,
   Paragraph,
+  PrimaryButton,
   Sheet,
   Spinner,
   useAppToast,
@@ -14,7 +15,7 @@ import {
 import { IconCoin, IconDollar, IconStar, IconX } from 'app/components/icons'
 import { AlertTriangle, Ticket } from '@tamagui/lucide-icons'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import { allCoins } from 'app/data/coins'
+import { allCoins, type CoinWithBalance } from 'app/data/coins'
 import { useMemo, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 import { api } from 'app/utils/api'
@@ -26,6 +27,8 @@ import { signChallenge } from 'app/utils/signChallenge'
 import { webauthnCredToAllowedCredentials } from 'app/utils/signUserOp'
 import { RecoveryOptions } from '@my/api/src/routers/account-recovery/types'
 import { bytesToHex, hexToBytes } from 'viem'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { OverlappingCoinIcons } from 'app/features/home/InvestmentsBalanceCard'
 
 interface AccountDeletionFlowProps {
   open: boolean
@@ -41,6 +44,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
   const toast = useAppToast()
   const router = useRouter()
   const media = useMedia()
+  const hoverStyles = useHoverStyles()
 
   const { dollarBalances } = useSendAccountBalances()
   const { data: sendAccount } = useSendAccount()
@@ -167,97 +171,112 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
   const isPending = isDeleting || isAuthenticating
   const isDeleteEnabled = deleteConfirmation.toUpperCase() === 'DELETE'
 
-  const renderWarningBanner = () => (
-    <XStack
-      gap="$3"
-      p="$3"
-      br="$4"
-      backgroundColor="$red3"
-      $theme-light={{ backgroundColor: '$red2' }}
-      ai="center"
-    >
-      <AlertTriangle size={20} color="$red11" />
-      <Paragraph flex={1} fontSize="$4" color="$red11" fontWeight="500">
-        {step === 'warning' || step === 'confirm'
-          ? 'Deleting your account is permanent.'
-          : "This action is permanent. You'll lose all access to your wallet, profile, history and any remaining assets. This cannot be undone."}
-      </Paragraph>
-    </XStack>
-  )
+  const renderWarningBanner = () => {
+    return (
+      <XStack
+        gap="$3"
+        p="$3"
+        br="$4"
+        backgroundColor="#DE474733"
+        $theme-light={{ backgroundColor: '$red2' }}
+        ai="center"
+        borderWidth={1}
+        borderColor={'$error'}
+      >
+        {step !== 'confirm' && <AlertTriangle size={20} color="$error" />}
+        <Paragraph flex={1} fontSize="$4" color="$error">
+          {step === 'confirm'
+            ? "This action is permanent. You'll lose all access to your wallet, profile, history and any remaining assets. This cannot be undone."
+            : 'Deleting your account is permanent.'}
+        </Paragraph>
+      </XStack>
+    )
+  }
 
   const renderStep = () => {
     switch (step) {
       case 'warning':
         return (
           <>
-            <H2 fontSize="$7" ta="center">
+            <Paragraph fontSize="$7" fontWeight={500}>
               Delete your Send account
-            </H2>
-            {renderWarningBanner()}
-            <Paragraph ta="center" size="$4" color="$color11">
-              You will permanently lose access to your profile, wallet and all features tied to your
-              Send account.
             </Paragraph>
-            <XStack gap="$3" w="100%">
+            <YStack gap="$4" w="100%">
+              {renderWarningBanner()}
+              <Paragraph size="$4" color="$color4">
+                You will permanently lose access to your profile, wallet and all features tied to
+                your Send account.
+              </Paragraph>
+            </YStack>
+            <YStack gap="$2" w="100%">
+              <PrimaryButton
+                flex={1}
+                size="$4"
+                height={44}
+                onPress={handleContinue}
+                disabled={isPending}
+              >
+                <PrimaryButton.Text fontSize="$5" textTransform={'none'} fontWeight={400}>
+                  Continue
+                </PrimaryButton.Text>
+              </PrimaryButton>
               <Button
                 flex={1}
                 size="$4"
+                height={44}
                 onPress={handleCancel}
                 disabled={isPending}
                 pressStyle={{ o: 0.8 }}
               >
                 <Button.Text fontSize="$5">Cancel</Button.Text>
               </Button>
-              <Button
-                flex={1}
-                size="$4"
-                backgroundColor="$color12"
-                onPress={handleContinue}
-                disabled={isPending}
-                pressStyle={{ o: 0.8 }}
-                hoverStyle={{ backgroundColor: '$color11' }}
-              >
-                <Button.Text fontSize="$5" color="$color1">
-                  Continue
-                </Button.Text>
-              </Button>
-            </XStack>
+            </YStack>
           </>
         )
 
       case 'funds':
         return (
           <>
-            <H2 fontSize="$7" ta="center">
+            <Paragraph fontSize="$7" fontWeight={500}>
               You still have funds
-            </H2>
-            <YStack
-              gap="$2"
-              p="$4"
-              br="$4"
-              backgroundColor="$color3"
-              $theme-light={{ backgroundColor: '$color2' }}
-            >
-              <Paragraph fontSize="$5" fontWeight="600" color="$color12">
-                Balance
-              </Paragraph>
-              <XStack ai="center" gap="$2">
-                <Paragraph fontSize="$8" fontWeight="700" color="$color12">
-                  ${formatAmount(totalBalance, 9, 0)}
-                </Paragraph>
-                <XStack gap="$1" ai="center">
-                  {balancesWithIcons.map((item) => {
-                    if (!item.coin) return null
-                    return <IconCoin key={item.token} symbol={item.coin.symbol} size={20} />
-                  })}
-                </XStack>
-              </XStack>
-            </YStack>
-            <Paragraph ta="center" size="$4" color="$color11">
-              Send your funds before continuing. You won&apos;t be able to access them once the
-              account is deleted.
             </Paragraph>
-            <XStack gap="$3" w="100%">
+            <YStack gap="$4" w="100%">
+              <YStack
+                gap="$4"
+                p="$5"
+                pb={'$6'}
+                br="$4"
+                backgroundColor={hoverStyles.backgroundColor}
+              >
+                <Paragraph color="$color4">Balance</Paragraph>
+                <XStack ai="center" justifyContent={'space-between'} gap="$2">
+                  <Paragraph fontSize="$10" fontWeight="600" color="$color12">
+                    ${formatAmount(totalBalance, 9, 2)}
+                  </Paragraph>
+                  <OverlappingCoinIcons
+                    coins={
+                      balancesWithIcons.filter(Boolean).map((x) => x.coin) as CoinWithBalance[]
+                    }
+                  />
+                </XStack>
+              </YStack>
+              <Paragraph size="$4" color="$color4">
+                Send your funds before continuing. You won&apos;t be able to access them once the
+                account is deleted.
+              </Paragraph>
+            </YStack>
+            <YStack gap="$2" w="100%">
+              <PrimaryButton
+                flex={1}
+                size="$4"
+                onPress={handleContinue}
+                disabled={isPending}
+                height={44}
+              >
+                <PrimaryButton.Text fontSize="$5" textTransform={'none'} fontWeight={400}>
+                  Continue
+                </PrimaryButton.Text>
+              </PrimaryButton>
               <Button
                 flex={1}
                 size="$4"
@@ -267,30 +286,17 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
               >
                 <Button.Text fontSize="$5">Cancel</Button.Text>
               </Button>
-              <Button
-                flex={1}
-                size="$4"
-                backgroundColor="$color12"
-                onPress={handleContinue}
-                disabled={isPending}
-                pressStyle={{ o: 0.8 }}
-                hoverStyle={{ backgroundColor: '$color11' }}
-              >
-                <Button.Text fontSize="$5" color="$color1">
-                  Continue
-                </Button.Text>
-              </Button>
-            </XStack>
+            </YStack>
           </>
         )
 
       case 'assets':
         return (
           <>
-            <H2 fontSize="$7" ta="center">
+            <Paragraph fontSize="$7" fontWeight={500}>
               You may have active assets
-            </H2>
-            <YStack gap="$3">
+            </Paragraph>
+            <YStack gap="$4">
               <XStack gap="$3" ai="center">
                 <YStack
                   w={40}
@@ -298,43 +304,47 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                   ai="center"
                   jc="center"
                   br="$4"
-                  backgroundColor="$color3"
-                  $theme-light={{ backgroundColor: '$color2' }}
+                  backgroundColor={hoverStyles.backgroundColor}
                 >
-                  <Ticket size={20} color="$color12" />
+                  <Ticket
+                    size={20}
+                    color="$primary"
+                    $theme-light={{
+                      color: '$color12',
+                    }}
+                  />
                 </YStack>
                 <YStack flex={1} gap="$1">
-                  <Paragraph fontSize="$5" fontWeight="600" color="$color12">
-                    Sendpot tickets
-                  </Paragraph>
-                  <Paragraph fontSize="$3" color="$color11">
+                  <Paragraph fontSize="$5">Sendpot tickets</Paragraph>
+                  <Paragraph fontSize="$2" color="$color4">
                     Unused tickets won&apos;t carry over or be refunded
                   </Paragraph>
                 </YStack>
               </XStack>
-
-              <XStack gap="$3" ai="center">
+              <XStack gap="$4" ai="center">
                 <YStack
                   w={40}
                   h={40}
                   ai="center"
                   jc="center"
                   br="$4"
-                  backgroundColor="$color3"
-                  $theme-light={{ backgroundColor: '$color2' }}
+                  backgroundColor={hoverStyles.backgroundColor}
                 >
-                  <IconStar size="$1" color="$color12" />
+                  <IconStar
+                    size="$1"
+                    color="$primary"
+                    $theme-light={{
+                      color: '$color12',
+                    }}
+                  />
                 </YStack>
                 <YStack flex={1} gap="$1">
-                  <Paragraph fontSize="$5" fontWeight="600" color="$color12">
-                    Unclaimed Rewards
-                  </Paragraph>
-                  <Paragraph fontSize="$3" color="$color11">
+                  <Paragraph fontSize="$5">Unclaimed Rewards</Paragraph>
+                  <Paragraph fontSize="$2" color="$color4">
                     You may still have unclaimed rewards in your wallet
                   </Paragraph>
                 </YStack>
               </XStack>
-
               <XStack gap="$3" ai="center">
                 <YStack
                   w={40}
@@ -342,25 +352,39 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                   ai="center"
                   jc="center"
                   br="$4"
-                  backgroundColor="$color3"
-                  $theme-light={{ backgroundColor: '$color2' }}
+                  backgroundColor={hoverStyles.backgroundColor}
                 >
-                  <IconDollar size="$1" color="$color12" />
+                  <IconDollar
+                    size="$1.5"
+                    color="$primary"
+                    $theme-light={{
+                      color: '$color12',
+                    }}
+                  />
                 </YStack>
                 <YStack flex={1} gap="$1">
-                  <Paragraph fontSize="$5" fontWeight="600" color="$color12">
-                    Active savings
-                  </Paragraph>
-                  <Paragraph fontSize="$3" color="$color11">
+                  <Paragraph fontSize="$5">Active savings</Paragraph>
+                  <Paragraph fontSize="$2" color="$color4">
                     You may still have active earnings in your wallet
                   </Paragraph>
                 </YStack>
               </XStack>
             </YStack>
-            <Paragraph ta="center" size="$4" color="$color11">
+            <Paragraph size="$4" color="$color4">
               Deleting your account is permanent. You won&apos;t be able to recover these assets.
             </Paragraph>
-            <XStack gap="$3" w="100%">
+            <YStack gap="$2" w="100%">
+              <PrimaryButton
+                flex={1}
+                size="$4"
+                onPress={handleContinue}
+                disabled={isPending}
+                height={44}
+              >
+                <PrimaryButton.Text fontSize="$5" textTransform={'none'} fontWeight={400}>
+                  Continue
+                </PrimaryButton.Text>
+              </PrimaryButton>
               <Button
                 flex={1}
                 size="$4"
@@ -370,54 +394,37 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
               >
                 <Button.Text fontSize="$5">Cancel</Button.Text>
               </Button>
-              <Button
-                flex={1}
-                size="$4"
-                backgroundColor="$color12"
-                onPress={handleContinue}
-                disabled={isPending}
-                pressStyle={{ o: 0.8 }}
-                hoverStyle={{ backgroundColor: '$color11' }}
-              >
-                <Button.Text fontSize="$5" color="$color1">
-                  Continue
-                </Button.Text>
-              </Button>
-            </XStack>
+            </YStack>
           </>
         )
 
       case 'confirm':
         return (
           <>
-            <H2 fontSize="$7" ta="center">
+            <Paragraph fontSize="$7" fontWeight={500}>
               Confirm account deletion
-            </H2>
+            </Paragraph>
             {renderWarningBanner()}
             <YStack gap="$2" w="100%">
               <Paragraph fontSize="$4" color="$color12">
-                Type &apos;DELETE&apos; to confirm
+                Type <strong>DELETE</strong> to confirm
               </Paragraph>
               <Input
                 size="$4"
-                placeholder="DELETE"
                 value={deleteConfirmation}
                 onChangeText={setDeleteConfirmation}
                 autoCapitalize="characters"
                 autoCorrect={false}
                 disabled={isPending}
+                placeholder={'DELETE'}
+                placeholderTextColor={'$color4'}
+                borderColor={deleteConfirmation.toUpperCase() === 'DELETE' ? '$error' : undefined}
+                focusStyle={{
+                  borderColor: deleteConfirmation.toUpperCase() === 'DELETE' ? '$error' : undefined,
+                }}
               />
             </YStack>
-            <XStack gap="$3" w="100%">
-              <Button
-                flex={1}
-                size="$4"
-                onPress={handleCancel}
-                disabled={isPending}
-                pressStyle={{ o: 0.8 }}
-              >
-                <Button.Text fontSize="$5">Cancel</Button.Text>
-              </Button>
+            <YStack gap="$2" w="100%">
               <Button
                 flex={1}
                 size="$4"
@@ -425,6 +432,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                 onPress={handleDelete}
                 disabled={isPending || !isDeleteEnabled}
                 pressStyle={{ o: 0.8 }}
+                disabledStyle={{ opacity: 0.5 }}
                 icon={isPending ? <Spinner size="small" color="$white" /> : undefined}
                 hoverStyle={{
                   backgroundColor: '$red9',
@@ -441,32 +449,22 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                       : 'Delete Account'}
                 </Button.Text>
               </Button>
-            </XStack>
+              <Button
+                flex={1}
+                size="$4"
+                onPress={handleCancel}
+                disabled={isPending}
+                pressStyle={{ o: 0.8 }}
+              >
+                <Button.Text fontSize="$5">Cancel</Button.Text>
+              </Button>
+            </YStack>
           </>
         )
     }
   }
 
-  const dialogContent = (
-    <>
-      {renderStep()}
-      {Platform.OS === 'web' && (
-        <Dialog.Close asChild>
-          <Button
-            position="absolute"
-            top="$3"
-            right="$3"
-            size="$2"
-            circular
-            icon={<IconX size={16} color="$color12" />}
-            onPress={handleCancel}
-          />
-        </Dialog.Close>
-      )}
-    </>
-  )
-
-  if (Platform.OS === 'web' && media.gtMd) {
+  if (Platform.OS === 'web' && media.gtSm) {
     return (
       <Dialog modal open={open} onOpenChange={handleClose}>
         <Dialog.Portal>
@@ -492,11 +490,11 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
             ]}
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-            gap="$4"
-            width="90%"
-            maxWidth={500}
+            gap="$6"
+            width={430}
+            padding={'$6'}
           >
-            {dialogContent}
+            {renderStep()}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog>
@@ -514,8 +512,8 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
       snapPoints={['fit']}
       snapPointsMode="fit"
     >
-      <Sheet.Frame key="account-deletion-sheet" gap="$4" padding="$4" pb="$6">
-        {dialogContent}
+      <Sheet.Frame key="account-deletion-sheet" gap="$6" padding="$6">
+        {renderStep()}
       </Sheet.Frame>
       <Sheet.Overlay />
     </Sheet>

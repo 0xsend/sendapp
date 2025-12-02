@@ -211,7 +211,7 @@ function InvestmentsPreview(props: XStackProps) {
   )
 }
 
-function OverlappingCoinIcons({
+export function OverlappingCoinIcons({
   coins,
   length = 3,
   ...props
