@@ -131,7 +131,13 @@ BEGIN
             AND EXISTS (
                 SELECT 1
                 FROM tag_receipts tr
-                JOIN receipts r ON r.event_id = tr.event_id
+                JOIN receipts r ON (
+                    -- Match on event_id when available (new records)
+                    (tr.event_id IS NOT NULL AND r.event_id = tr.event_id)
+                    OR
+                    -- Fall back to hash matching for old records where event_id is NULL
+                    (tr.event_id IS NULL AND r.event_id = tr.hash)
+                )
                 WHERE tr.tag_id = t.id
                 AND r.user_id = t.user_id  -- Ensure receipt belongs to current tag owner
             )) = 0 THEN
