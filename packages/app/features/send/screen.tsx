@@ -7,6 +7,7 @@ import {
   Fade,
   H4,
   Label,
+  LazyMount,
   LinkableAvatar,
   Paragraph,
   Shimmer,
@@ -93,19 +94,21 @@ export const SendScreen = () => {
         </YStack>
         {!search && <SendSuggestions />}
         {/* {!gtLg && ( */}
-        <SendChat
-          open={open}
-          onOpenChange={(val) => {
-            setOpen(val)
-            setQueryParams(
-              {
-                ...queryParams,
-                m: val ? 1 : 0,
-              },
-              { webBehavior: 'replace' }
-            )
-          }}
-        />
+        <LazyMount when={open}>
+          <SendChat
+            open={open}
+            onOpenChange={(val) => {
+              setOpen(val)
+              setQueryParams(
+                {
+                  ...queryParams,
+                  m: val ? 1 : 0,
+                },
+                { webBehavior: 'replace' }
+              )
+            }}
+          />
+        </LazyMount>
         {/* )} */}
         <SendSearchBody />
       </YStack>

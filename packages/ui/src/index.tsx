@@ -36,3 +36,4 @@ export { Card, CardBackground, CardFooter, CardHeader, type CardProps } from './
 export * from './components/PrimaryButton'
 export * from './components/AnimatedCharts'
 export { Sheet as SSheet } from './components/Sheet'
+export * from './components/LazyMount'

@@ -1,6 +1,6 @@
 // External libs & UI
 import { ChevronRight, Upload } from '@tamagui/lucide-icons'
-import { type PropsWithChildren, useState } from 'react'
+import { type PropsWithChildren, useEffect, useRef, useState } from 'react'
 import {
   Anchor,
   Avatar,
@@ -17,11 +17,12 @@ import {
   useThemeName,
   XStack,
   YStack,
+  LazyMount,
 } from '@my/ui'
 
 // Internal
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { useProfileScreenParams } from 'app/routers/params'
+import { useProfileScreenParams, useSendScreenParams } from 'app/routers/params'
 import { IconAccount, IconLinkInBio, IconBadgeCheckSolid } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
 import type { Functions } from '@my/supabase/database.types'
@@ -35,6 +36,7 @@ import { Linking, Platform, Pressable } from 'react-native'
 import ProfileSendButton from 'app/features/profile/ProfileSendButton'
 import ViewHistoryButton from 'app/features/profile/ViewHistoryButton'
 import VibeButton from 'app/features/profile/VibeButton'
+import { SendChat } from '../send/components/SendChat'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -43,6 +45,25 @@ interface ProfileScreenProps {
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const media = useMedia()
   const [{ sendid: paramSendid }] = useProfileScreenParams()
+  const [sendParams, setSendParams] = useSendScreenParams()
+  const [sendChatOpen, setSendChatOpen] = useState(false)
+
+  useEffect(() => {
+    if (sendParams.recipient && Number(sendParams.m) === 1) {
+      setSendChatOpen(true)
+    }
+  }, [sendParams.recipient, sendParams.m])
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
+  useEffect(() => {
+    if (!sendChatOpen) {
+      setSendParams({
+        ...sendParams,
+        m: undefined,
+      })
+    }
+  }, [sendChatOpen])
+
   const otherUserId = propSendid || Number(paramSendid)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const isDark = useThemeName()?.startsWith('dark')
@@ -51,6 +72,10 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     isLoading: isLoadingProfile,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
+
+  const imagePlaceholder = useRef(
+    `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
+  )
 
   const {
     query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
@@ -96,7 +121,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               uri:
                 otherUserProfile?.banner_url ??
                 otherUserProfile?.avatar_url ??
-                `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`,
+                imagePlaceholder.current,
               width: 428,
               height: 200,
             }}
@@ -247,6 +272,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           />
         ) : null}
       </YStack>
+      <LazyMount when={sendChatOpen}>
+        <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
+      </LazyMount>
     </YStack>
   )
 }

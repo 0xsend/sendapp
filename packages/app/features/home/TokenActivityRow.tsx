@@ -23,7 +23,7 @@ import {
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import type { ReactNode } from 'react'
 import { memo, useCallback } from 'react'
-import { usePush } from 'app/utils/usePush'
+import { useSendScreenParams } from 'app/routers/params'
 
 export const TokenActivityRow = ({
   activity,
@@ -32,7 +32,6 @@ export const TokenActivityRow = ({
   activity: Activity
   onPress?: (activity: Activity) => void
 }) => {
-  const push = usePush()
   const { profile } = useUser()
   const { data: swapRouters } = useSwapRouters()
   const { data: liquidityPools } = useLiquidityPools()
@@ -50,24 +49,33 @@ export const TokenActivityRow = ({
     Boolean(to_user?.send_id) &&
     Boolean(from_user?.send_id)
 
+  const [sendParams, setSendParams] = useSendScreenParams()
+
   const handlePress = useCallback(() => {
     if (onPress) {
       if (isUserTransfer) {
-        push(
-          `/profile/${profile?.send_id === from_user?.send_id ? to_user?.send_id : from_user?.send_id}/history`
-        )
+        setSendParams({
+          ...sendParams,
+          recipient:
+            profile?.send_id === from_user?.send_id
+              ? to_user?.send_id?.toString()
+              : from_user?.send_id?.toString(),
+          idType: 'sendid',
+          m: 1,
+        })
         return
       }
       onPress(activity)
     }
   }, [
     onPress,
-    isUserTransfer,
-    push,
     profile?.send_id,
     from_user?.send_id,
     to_user?.send_id,
     activity,
+    sendParams,
+    setSendParams,
+    isUserTransfer,
   ])
 
   return (
