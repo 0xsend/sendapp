@@ -4,7 +4,7 @@ import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { memo, type PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { H4, Paragraph, Spinner, YStack } from '@my/ui'
+import { H4, LazyMount, Paragraph, Spinner, YStack } from '@my/ui'
 import { SectionList } from 'react-native'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useTranslation } from 'react-i18next'
@@ -108,7 +108,9 @@ export default function ActivityFeed({
         isLoadingActivities={isLoadingActivities}
         isFetchingNextPageActivities={isFetchingNextPageActivities}
       />
-      <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
+      <LazyMount when={sendChatOpen}>
+        <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
+      </LazyMount>
     </>
   )
 }
