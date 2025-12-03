@@ -12,6 +12,8 @@ import {
   IconSlash,
   IconStarOutline,
   IconTrash,
+  IconWorldSearch,
+  IconXLogo,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
@@ -41,9 +43,11 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
     () => ({
       account: <IconAccount {...iconProps} />,
       idCard: <IconIdCard {...iconProps} />,
+      xLogo: <IconXLogo {...iconProps} />,
       fingerprint: <IconFingerprint {...iconProps} />,
       slash: <IconSlash {...iconProps} />,
       starOutline: <IconStarOutline {...iconProps} />,
+      worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
       trash: <IconTrash {...iconProps} />,
       infoCircle: <IconInfoCircle {...iconProps} />,
@@ -73,9 +77,16 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink
-              text={t('links.items.sendtags')}
-              href="/account/sendtag"
-              icon={icons.slash}
+              text={t('links.items.language')}
+              href="/account/language"
+              icon={icons.worldSearch}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.linkInBio')}
+              href="/account/link-in-bio"
+              icon={icons.xLogo}
             />
           </YGroup.Item>
         </YGroup>
@@ -83,6 +94,13 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       <YStack gap={'$3.5'}>
         <RowLabel>{t('links.sections.features')}</RowLabel>
         <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.sendtags')}
+              href="/account/sendtag"
+              icon={icons.slash}
+            />
+          </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.referrals')}
