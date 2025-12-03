@@ -37,9 +37,9 @@ import { formatUnits, isAddress } from 'viem'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
-import { IconBadgeCheckSolid2, IconCoin, IconEthereum } from 'app/components/icons'
+import { IconBadgeCheckSolid2, IconCoin } from 'app/components/icons'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
-import { History, X } from '@tamagui/lucide-icons'
+import { AlertCircle, CheckCheck, Clock4, History, X } from '@tamagui/lucide-icons'
 import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
@@ -1406,6 +1406,7 @@ import {
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import { Transaction } from './Transaction'
+import type { Database } from '@my/supabase/database.types'
 
 interface DateHeaderProps {
   date: Date
@@ -1438,6 +1439,7 @@ interface ItemProps {
   currentUserProfile: ReturnType<typeof useUser>['profile']
 }
 
+type SentItemStatus = Database['temporal']['Enums']['transfer_status']
 const Item = YStack.styleable<ItemProps>((props) => {
   const { setTransaction } = SendChatContext.useStyledContext()
   const { item, currentUserProfile } = props
@@ -1446,9 +1448,20 @@ const Item = YStack.styleable<ItemProps>((props) => {
   const amount = amountFromActivity(item)
   const date = useTransactionEntryDate({ activity: item, sent: isSent })
 
+  const isTemporalTransfer =
+    isTemporalEthTransfersEvent(item) || isTemporalTokenTransfersEvent(item)
+
+  const status: SentItemStatus = isTemporalTransfer
+    ? item.data.status || 'initialized'
+    : 'confirmed'
+
+  const isFailed = status === 'failed' || status === 'cancelled'
+  const isConfirmed = status === 'confirmed'
+  const isPending = status === 'initialized' || status === 'submitted' || status === 'sent'
+
   return (
-    <View py="$4" onPress={() => setTransaction(item)} cursor="pointer">
-      <YStack gap="$2">
+    <View fd="row" ai="center" py="$4" onPress={() => setTransaction(item)} cursor="pointer">
+      <YStack x={isFailed ? '$-4' : 0} f={1} gap="$2">
         <YStack
           w="60%"
           bg={isSent ? '$aztec6' : '$aztec4'}
@@ -1482,10 +1495,21 @@ const Item = YStack.styleable<ItemProps>((props) => {
             </View>
           )}
         </YStack>
-        <SizableText als={isSent ? 'flex-end' : 'flex-start'} size="$2" color="$gray10">
-          {date}
-        </SizableText>
+        <XStack als={isSent ? 'flex-end' : 'flex-start'} gap="$1.5" ai="center">
+          {isFailed ? (
+            <SizableText size="$2" color="$error">
+              Failed to send
+            </SizableText>
+          ) : (
+            <SizableText size="$2" color="$gray10">
+              {date}
+            </SizableText>
+          )}
+          {isPending && <Clock4 color="$gray10" size={12} />}
+          {isConfirmed && <CheckCheck color="$gray10" size={12} />}
+        </XStack>
       </YStack>
+      {isFailed && <AlertCircle fs={0} color="$error" size="$1" />}
     </View>
   )
 })
