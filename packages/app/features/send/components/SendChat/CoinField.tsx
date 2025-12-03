@@ -207,7 +207,13 @@ export const CoinField = memo(
                       <Adapt.Contents />
                     </ScrollView>
                   </Sheet.Frame>
-                  <Sheet.Overlay opacity={0.5} />
+                  <Sheet.Overlay
+                    animation="200ms"
+                    enterStyle={{ opacity: 0 }}
+                    exitStyle={{ opacity: 0 }}
+                    animateOnly={['opacity']}
+                    opacity={0.4}
+                  />
                 </Sheet>
               </Adapt>
 
