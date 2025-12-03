@@ -8,6 +8,7 @@ import { counterpart, userNameFromActivityUser, noteFromActivity } from 'app/uti
 import { useAmountFromActivity } from 'app/utils/activity-hooks'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { AlertCircle } from '@tamagui/lucide-icons'
+import { isWeb } from '@tamagui/constants'
 
 interface TransactionProps {
   open: boolean
@@ -18,7 +19,10 @@ interface TransactionProps {
 const TransactionContent = ({
   transaction,
   onClose,
-}: { transaction: Activity; onClose: () => void }) => {
+}: {
+  transaction: Activity
+  onClose: () => void
+}) => {
   const amount = useAmountFromActivity(transaction)
   const otherUser = counterpart(transaction)
   const isReceived = !!transaction.to_user?.id
@@ -46,7 +50,7 @@ const TransactionContent = ({
   return (
     <YStack bg="$color1" p="$4" py="$5" gap="$6" pb={bottom}>
       {!isFailed && (
-        <XStack ai="center" gap="$3" f={1}>
+        <XStack ai="center" gap="$3" f={isWeb ? 1 : undefined}>
           <ActivityAvatar activity={transaction} size="$5" circular={true} />
           <YStack>
             <Paragraph size="$6" color="$color11">

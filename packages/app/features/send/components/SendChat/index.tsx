@@ -83,11 +83,13 @@ const SendChatContext = createStyledContext<{
   setActiveSection: React.Dispatch<React.SetStateAction<Sections>>
   setTransaction: React.Dispatch<React.SetStateAction<Activity | undefined>>
   transaction: Activity | undefined
+  useSendScreenParams: typeof useSendScreenParams
 }>({
   activeSection: 'chat',
   setActiveSection: () => {},
   setTransaction: () => {},
   transaction: undefined,
+  useSendScreenParams: (() => [{}, () => {}]) as unknown as typeof useSendScreenParams,
 })
 
 interface SendChatProps {
@@ -112,6 +114,10 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
 
   const [activeSection, setActiveSection] = useState<Sections>('chat')
   const bottomSheetRef = useRef<BottomSheet>(null)
+
+  // Capture the hook result BEFORE entering Portal
+  // This creates a stable reference to params that works inside Portal
+  const sendScreenParamsResult = useSendScreenParams()
 
   useEffect(() => {
     if (open) {
@@ -147,6 +153,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
             setActiveSection={setActiveSection}
             setTransaction={setTransaction}
             transaction={transaction}
+            useSendScreenParams={() => sendScreenParamsResult}
           >
             <AnimatePresence>
               {(open || !gtLg) && (
@@ -304,6 +311,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
 
   const isDark = themeName.includes('dark')
 
+  const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
@@ -428,18 +436,20 @@ const SendChatInput = Input.styleable((props) => {
         animateOnly={['opacity']}
         opacity={activeSection === 'chat' ? 1 : 0}
       >
-        <LinearGradient
-          // Use the actual aztec3 color value as in line 129
-          colors={gradientColors}
-          locations={[0, 0.36, 1]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          pointerEvents="none"
-          w="100%"
-          h={20}
-          y={-18}
-          pos="absolute"
-        />
+        {isWeb && (
+          <LinearGradient
+            // Use the actual aztec3 color value as in line 129
+            colors={gradientColors}
+            locations={[0, 0.36, 1]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+            pointerEvents="none"
+            w="100%"
+            h={20}
+            y={-18}
+            pos="absolute"
+          />
+        )}
       </View>
       <YStack w="100%" zi={1}>
         <XStack py="$4" px="$4">
@@ -489,6 +499,7 @@ const SendAmountSchema = z.object({
 
 // all inputs are here
 const EnterAmountNoteSection = YStack.styleable((props) => {
+  const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [sendParams, setSendParams] = useSendScreenParams()
 
   const { coin } = useCoinFromSendTokenParam()
@@ -1066,6 +1077,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     }}
                     placeholderTextColor="$gray11"
                     disabled={activeSection === 'reviewAndSend'}
+                    pointerEvents={activeSection === 'reviewAndSend' ? 'none' : 'auto'}
                     placeholder="Add a note..."
                     fos="$5"
                     br="$3"
@@ -1354,8 +1366,8 @@ const groupActivitiesByDate = (activities: Activity[]): ListItem[] => {
 }
 
 const ChatList = YStack.styleable(() => {
+  const { useSendScreenParams, activeSection } = SendChatContext.useStyledContext()
   const [{ recipient: recipientParam, idType: idTypeParam }] = useSendScreenParams()
-  const { activeSection } = SendChatContext.useStyledContext()
   const { profile: currentUserProfile } = useUser()
 
   const {
