@@ -71,6 +71,8 @@ import type { UserOperation } from 'permissionless'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
+import { Events } from 'app/utils/zod/activity'
+import type { InfiniteData } from '@tanstack/react-query'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -303,11 +305,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
   const isDark = themeName.includes('dark')
 
   const [{ recipient, idType }] = useSendScreenParams()
-  const {
-    data: profile,
-    isLoading,
-    error: errorProfileLookup,
-  } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+  const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
   const href = profile ? `/profile/${profile?.sendid}` : ''
 
@@ -623,8 +621,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   const [loadingSend, setLoadingSend] = useState(false)
 
-  // states for auth flow
-  const [error, setError] = useState<Error | null>(null)
+  const [, setError] = useState<Error | null>(null)
   const {
     mutateAsync: transfer,
     isPending: isTransferPending,
@@ -754,24 +751,110 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         const validatedUserOp = await validateUserOp(userOp)
         assert(!!validatedUserOp, 'Operation expected to fail')
 
-        const { workflowId } = await transfer({
-          userOp: validatedUserOp,
-          ...(note && { note: encodeURIComponent(note) }),
+        // optimistic activity entry
+        const optimisticActivity: Activity = {
+          event_name: Events.TemporalSendAccountTransfers,
+          created_at: new Date(),
+          from_user: currentUserProfile
+            ? {
+                id: currentUserProfile.id,
+                name: currentUserProfile.name ?? null,
+                avatar_url: currentUserProfile.avatar_url ?? null,
+                send_id: currentUserProfile.send_id,
+                main_tag_id: currentUserProfile.main_tag?.id ?? null,
+                main_tag_name: currentUserProfile.main_tag?.name ?? null,
+                tags: currentUserProfile.tags?.map((t) => t.name) ?? null,
+                is_verified: null,
+              }
+            : null,
+          to_user: profile
+            ? {
+                id: null,
+                name: profile.name ?? null,
+                avatar_url: profile.avatar_url ?? null,
+                send_id: profile.sendid ?? 0,
+                main_tag_id: null,
+                main_tag_name: null,
+                tags: null,
+                is_verified: null,
+              }
+            : null,
+          data:
+            sendToken === 'eth'
+              ? {
+                  status: 'initialized' as const,
+                  log_addr: '0x0000000000000000000000000000000000000000' as `0x${string}`,
+                  sender: sender,
+                  value: BigInt(amount ?? '0'),
+                  note: note || undefined,
+                  coin: selectedCoin,
+                }
+              : {
+                  status: 'initialized' as const,
+                  log_addr: sendToken as `0x${string}`,
+                  f: sender,
+                  t: (profile?.address ?? recipient) as `0x${string}`,
+                  v: BigInt(amount ?? '0'),
+                  note: note || undefined,
+                  coin: selectedCoin,
+                },
+        }
+
+        queryClient.setQueryData<InfiniteData<Activity[]>>(['activity_feed'], (old) => {
+          if (!old) return old
+          return {
+            ...old,
+            pages: old.pages.map((page, index) =>
+              index === 0 ? [optimisticActivity, ...page] : page
+            ),
+          }
         })
 
-        if (workflowId) {
-          // Don't await - fire and forget to avoid iOS hanging on cache operations
-          void queryClient.invalidateQueries({
+        queryClient.setQueryData<InfiniteData<Activity[]>>(
+          ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
+          (old) => {
+            if (!old) return old
+            return {
+              ...old,
+              pages: old.pages.map((page, index) =>
+                index === 0 ? [optimisticActivity, ...page] : page
+              ),
+            }
+          }
+        )
+
+        let workflowId: string | undefined
+        try {
+          const result = await transfer({
+            userOp: validatedUserOp,
+            ...(note && { note: encodeURIComponent(note) }),
+          })
+          workflowId = result.workflowId
+
+          if (workflowId) {
+            // Don't await - fire and forget to avoid iOS hanging on cache operations
+            void queryClient.invalidateQueries({
+              queryKey: ['activity_feed'],
+              exact: false,
+            })
+
+            void queryClient.invalidateQueries({
+              queryKey: ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
+              exact: false,
+            })
+
+            setActiveSection('chat')
+          }
+        } catch (transferError) {
+          void queryClient.resetQueries({
             queryKey: ['activity_feed'],
             exact: false,
           })
-
           void queryClient.resetQueries({
             queryKey: ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
             exact: false,
           })
-
-          setActiveSection('chat')
+          throw transferError
         }
       } catch (e) {
         // @TODO: handle sending repeated tx when nonce is still pending
