@@ -2,10 +2,11 @@ import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   dataProviderMakerNative,
   layoutProviderMakerNative,
+  LazyMount,
   Paragraph,
   Spinner,
   XStack,
@@ -17,6 +18,8 @@ import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useIsFocused } from '@react-navigation/native'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { SendChat } from 'app/features/send/components/SendChat'
+import { useSendScreenParams } from 'app/routers/params'
 
 // Date separator component
 const DateSeparatorRow = ({ dateKey }: { dateKey: string }) => (
@@ -43,6 +46,25 @@ export default function ActivityFeed({
   const isFocused = useIsFocused()
   const justLoadedRef = useRef(false)
   const { t, i18n } = useTranslation('activity')
+
+  const [sendChatOpen, setSendChatOpen] = useState(false)
+  const [sendParams, setSendParams] = useSendScreenParams()
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
+  useEffect(() => {
+    if (!sendChatOpen) {
+      setSendParams({
+        ...sendParams,
+        m: undefined,
+      })
+    }
+  }, [sendChatOpen])
+
+  useEffect(() => {
+    if (sendParams.recipient && Number(sendParams.m) === 1) {
+      setSendChatOpen(true)
+    }
+  }, [sendParams.recipient, sendParams.m])
 
   const {
     data,
@@ -215,6 +237,9 @@ export default function ActivityFeed({
         onEndReachedThreshold={1000}
         renderAheadOffset={2000}
       />
+      <LazyMount when={sendChatOpen}>
+        <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
+      </LazyMount>
     </YStack>
   )
 }
