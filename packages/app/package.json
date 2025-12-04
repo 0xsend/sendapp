@@ -84,7 +84,7 @@
     "@tanstack/eslint-plugin-query": "^5.20.1",
     "@testing-library/react-native": "^13.3.3",
     "@types/jsonwebtoken": "^9.0.2",
-    "@types/react": "^18.2.15",
+    "@types/react": "19.1.2",
     "babel-preset-expo": "~54.0.0",
     "debug": "^4.4.1",
     "eslint": "^8.46.0",

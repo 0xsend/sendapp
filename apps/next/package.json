@@ -53,7 +53,7 @@
     "@next/eslint-plugin-next": "^14.0.4",
     "@tamagui/next-plugin": "^1.138.5",
     "@testing-library/jest-dom": "^6.1.5",
-    "@testing-library/react": "^14.1.2",
+    "@testing-library/react": "^16.3.0",
     "@types/next-seo": "^2.1.2",
     "@types/node": "^20",
     "dotenv-cli": "^7.3.0",

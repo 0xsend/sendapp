@@ -44,6 +44,10 @@
   "resolutions": {
     "react": "19.1.2",
     "react-dom": "19.1.2",
+    "react-test-renderer": "19.1.2",
+    "react-is": "19.2.1",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
     "react-refresh": "^0.14.0",
     "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.0",
