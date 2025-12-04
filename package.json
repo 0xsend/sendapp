@@ -42,8 +42,10 @@
     "i18n:translate": "node packages/app/scripts/i18n-translate.cjs"
   },
   "resolutions": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "next": "15.5.7",
+    "react": "19.1.2",
+    "react-dom": "19.1.2",
+    "react-test-renderer": "19.1.2",
     "react-refresh": "^0.14.0",
     "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.0",
