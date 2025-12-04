@@ -1,14 +1,29 @@
-import { Button, LinkableButton, useThemeName } from '@my/ui'
+import { Button, useThemeName } from '@my/ui'
 import { IconArrowUp } from 'app/components/icons'
+import { useSendScreenParams } from 'app/routers/params'
 
-export default function ProfileSendButton({ sendId }: { sendId?: number | null }) {
+interface ProfileSendButtonProps {
+  sendId?: number | null
+  onSendChatOpenChange?: (open: boolean) => void
+}
+
+export default function ProfileSendButton({
+  sendId,
+  onSendChatOpenChange,
+}: ProfileSendButtonProps) {
   const isDark = useThemeName()?.startsWith('dark')
+  const [sendParams, setSendParams] = useSendScreenParams()
 
   return (
-    <LinkableButton
-      href={{
-        pathname: '/send',
-        query: { recipient: sendId, idType: 'sendid', m: 1 },
+    <Button
+      onPress={() => {
+        setSendParams({
+          ...sendParams,
+          recipient: sendId?.toString() ?? '',
+          idType: 'sendid',
+          m: 1,
+        })
+        onSendChatOpenChange?.(true)
       }}
       borderRadius={'$4'}
       jc="center"
@@ -24,6 +39,6 @@ export default function ProfileSendButton({ sendId }: { sendId?: number | null }
       <Button.Text color="$color12" fontSize={'$4'} fontWeight={'400'} textAlign="center">
         Send
       </Button.Text>
-    </LinkableButton>
+    </Button>
   )
 }

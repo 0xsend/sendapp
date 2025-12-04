@@ -78,6 +78,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
           p={'$4'}
           gap={'$3.5'}
           elevation={'$0.75'}
+          shadowOpacity={0.2}
           $gtLg={{
             p: '$7',
           }}

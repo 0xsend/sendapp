@@ -11,13 +11,15 @@ import {
   IconQuestionCircle,
   IconSlash,
   IconStarOutline,
+  IconTrash,
   IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AccountDeletionFlow } from './AccountDeletionFlow'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -31,6 +33,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
   const { openChat } = useIntercom()
   const { t } = useTranslation('account')
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const handleSignOut = useCallback(() => {
     void supabase.auth.signOut()
@@ -46,6 +49,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       starOutline: <IconStarOutline {...iconProps} />,
       worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
+      trash: <IconTrash {...iconProps} />,
       infoCircle: <IconInfoCircle {...iconProps} />,
       questionCircle: <IconQuestionCircle {...iconProps} />,
     }),
@@ -55,7 +59,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   return (
     <YStack gap={'$5'} pb={'$3.5'}>
       <YStack gap={'$3.5'}>
-        <RowLabel>{t('links.sections.settings')}</RowLabel>
+        <RowLabel>{t('links.sections.profile')}</RowLabel>
         <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
             <AccountNavLink
@@ -85,13 +89,11 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               icon={icons.xLogo}
             />
           </YGroup.Item>
-          <YGroup.Item>
-            <AccountNavLink
-              text={t('links.items.passkeys')}
-              href="/account/backup"
-              icon={icons.fingerprint}
-            />
-          </YGroup.Item>
+        </YGroup>
+      </YStack>
+      <YStack gap={'$3.5'}>
+        <RowLabel>{t('links.sections.features')}</RowLabel>
+        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.sendtags')}
@@ -101,16 +103,35 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink
+              text={t('links.items.referrals')}
+              href="/account/affiliate"
+              icon={icons.dollar}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
               text={t('links.items.rewards')}
               href="/rewards"
               icon={icons.starOutline}
             />
           </YGroup.Item>
+        </YGroup>
+      </YStack>
+      <YStack gap={'$3.5'}>
+        <RowLabel>{t('links.sections.security')}</RowLabel>
+        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
           <YGroup.Item>
             <AccountNavLink
-              text={t('links.items.referrals')}
-              href="/account/affiliate"
-              icon={icons.dollar}
+              text={t('links.items.passkeys')}
+              href="/account/backup"
+              icon={icons.fingerprint}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.deleteAccount')}
+              onPress={() => setDeleteDialogOpen(true)}
+              icon={icons.trash}
             />
           </YGroup.Item>
         </YGroup>
@@ -141,6 +162,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
         </PrimaryButton.Icon>
         <PrimaryButton.Text>{t('links.signOut')}</PrimaryButton.Text>
       </PrimaryButton>
+      <AccountDeletionFlow open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} />
     </YStack>
   )
 })

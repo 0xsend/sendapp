@@ -7,6 +7,7 @@ import {
   Fade,
   H4,
   Label,
+  LazyMount,
   LinkableAvatar,
   Paragraph,
   Shimmer,
@@ -21,7 +22,7 @@ import Search from './components/SearchBarSend'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react'
+import { startTransition, useDeferredValue, useEffect, useState } from 'react'
 import { SendAmountForm } from './SendAmountForm'
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
@@ -93,19 +94,21 @@ export const SendScreen = () => {
         </YStack>
         {!search && <SendSuggestions />}
         {/* {!gtLg && ( */}
-        <SendChat
-          open={open}
-          onOpenChange={(val) => {
-            setOpen(val)
-            setQueryParams(
-              {
-                ...queryParams,
-                m: val ? 1 : 0,
-              },
-              { webBehavior: 'replace' }
-            )
-          }}
-        />
+        <LazyMount when={open}>
+          <SendChat
+            open={open}
+            onOpenChange={(val) => {
+              setOpen(val)
+              setQueryParams(
+                {
+                  ...queryParams,
+                  m: val ? 1 : 0,
+                },
+                { webBehavior: 'replace' }
+              )
+            }}
+          />
+        </LazyMount>
         {/* )} */}
         <SendSearchBody />
       </YStack>
