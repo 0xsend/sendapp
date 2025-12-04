@@ -6,6 +6,9 @@ module.exports = {
   slug: 'send',
   scheme: 'send',
   version: '1.0.0',
+  experiments: {
+    reactCanary: true,
+  },
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
