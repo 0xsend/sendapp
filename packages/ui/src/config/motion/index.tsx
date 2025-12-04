@@ -643,7 +643,12 @@ function createMotionView(defaultTag: string) {
     const { forwardedRef, animation, tag = defaultTag, style, ...propsRest } = propsIn
     const [scope, animate] = useAnimate()
     const hostRef = useRef<HTMLElement>(null)
-    const composedRefs = useComposedRefs(forwardedRef, ref, hostRef, scope)
+    const composedRefs = useComposedRefs(
+      forwardedRef as React.Ref<HTMLElement>,
+      ref,
+      hostRef,
+      scope
+    )
 
     const stateRef = useRef<{ host: HTMLElement | null; startedUnhydrated: boolean } | null>(null)
     if (!stateRef.current) {
@@ -708,7 +713,7 @@ function createMotionView(defaultTag: string) {
     )
 
     const props = getProps({ ...propsRest, style: nonAnimatedStyles })
-    const Element = tag || 'div'
+    const Element = (tag || 'div') as React.ElementType
     // @ts-expect-error - stateRef matches the expected shape at runtime
     const transformedProps = hooks.usePropsTransform?.(tag, props, stateRef, false)
 
