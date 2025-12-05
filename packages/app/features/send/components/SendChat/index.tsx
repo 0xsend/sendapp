@@ -1,10 +1,12 @@
 import type React from 'react'
-import { useCallback, useState, useRef, useMemo, useEffect, type PropsWithChildren } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AnimatePresence,
   Avatar,
   Button,
   createStyledContext,
+  GorhomSheetInput,
+  Input as InputOG,
   LinearGradient,
   Link,
   Paragraph,
@@ -23,18 +25,16 @@ import {
   useThemeName,
   useWindowDimensions,
   View,
+  type ViewProps,
   XStack,
   YStack,
-  GorhomSheetInput,
-  Input as InputOG,
-  type ViewProps,
 } from '@my/ui'
 
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
 import { formatUnits, isAddress } from 'viem'
 
+import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
 import { IconBadgeCheckSolid2, IconCoin } from 'app/components/icons'
@@ -44,7 +44,6 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
 import { isAndroid, isWeb } from '@tamagui/constants'
-import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { formFields } from 'app/utils/SchemaForm'
@@ -61,7 +60,7 @@ import { useAccountNonce } from 'app/utils/userop'
 import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
-import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
@@ -72,7 +71,13 @@ import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { Events } from 'app/utils/zod/activity'
-import type { InfiniteData } from '@tanstack/react-query'
+import { amountFromActivity } from 'app/utils/activity'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import { Transaction } from './Transaction'
+import type { Database } from '@my/supabase/database.types'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -503,7 +508,7 @@ const SendAmountSchema = z.object({
 const EnterAmountNoteSection = YStack.styleable((props) => {
   const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [sendParams, setSendParams] = useSendScreenParams()
-  const { coin } = useCoin(sendParams.sendToken)
+  const { coin } = useCoin(sendParams.sendToken || usdcAddress[baseMainnet.id])
 
   const themeName = useThemeName()
 
@@ -629,7 +634,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin } = useCoin(sendToken)
+  const { coin: selectedCoin } = useCoin(sendToken || usdcAddress[baseMainnet.id])
   const { profile: currentUserProfile } = useUser()
 
   const [loadingSend, setLoadingSend] = useState(false)
@@ -1496,14 +1501,6 @@ const ChatList = YStack.styleable(() => {
     </View>
   )
 })
-
-import { amountFromActivity } from 'app/utils/activity'
-import {
-  isTemporalEthTransfersEvent,
-  isTemporalTokenTransfersEvent,
-} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
-import { Transaction } from './Transaction'
-import type { Database } from '@my/supabase/database.types'
 
 interface DateHeaderProps {
   date: Date
