@@ -1,6 +1,6 @@
 import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { type ColorTokens, PrimaryButton, type SizeTokens, YGroup, YStack } from '@my/ui'
+import { Button, type ColorTokens, type SizeTokens, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
   IconDollar,
@@ -28,6 +28,18 @@ const iconProps = {
     color: '$color12' as ColorTokens,
   },
 }
+
+const shadowProps = {
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+
+  elevationAndroid: 7,
+} as const
 
 export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const supabase = useSupabase()
@@ -60,7 +72,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
     <YStack gap={'$5'} pb={'$3.5'}>
       <YStack gap={'$3.5'}>
         <RowLabel>{t('links.sections.profile')}</RowLabel>
-        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+        <YGroup bc="$color1" p="$2" $gtLg={{ p: '$3.5' }} {...shadowProps}>
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.profile')}
@@ -93,7 +105,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       </YStack>
       <YStack gap={'$3.5'}>
         <RowLabel>{t('links.sections.features')}</RowLabel>
-        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+        <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }} {...shadowProps}>
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.sendtags')}
@@ -119,7 +131,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       </YStack>
       <YStack gap={'$3.5'}>
         <RowLabel>{t('links.sections.security')}</RowLabel>
-        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+        <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }} {...shadowProps}>
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.passkeys')}
@@ -138,7 +150,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       </YStack>
       <YStack gap={'$3.5'}>
         <RowLabel>{t('links.sections.support')}</RowLabel>
-        <YGroup elevation={'$0.75'} bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }}>
+        <YGroup bc={'$color1'} p={'$2'} $gtLg={{ p: '$3.5' }} {...shadowProps}>
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.learnMore')}
@@ -156,12 +168,12 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
         </YGroup>
       </YStack>
-      <PrimaryButton onPress={handleSignOut}>
-        <PrimaryButton.Icon>
-          <IconLogout {...iconProps} color={'$black'} />
-        </PrimaryButton.Icon>
-        <PrimaryButton.Text>{t('links.signOut')}</PrimaryButton.Text>
-      </PrimaryButton>
+      <Button onPress={handleSignOut} {...shadowProps}>
+        <Button.Icon>
+          <IconLogout {...iconProps} $theme-dark={{ color: '$gray12' }} />
+        </Button.Icon>
+        <Button.Text>{t('links.signOut')}</Button.Text>
+      </Button>
       <AccountDeletionFlow open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} />
     </YStack>
   )
