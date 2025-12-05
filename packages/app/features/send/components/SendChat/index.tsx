@@ -335,36 +335,38 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
       {...props}
     >
-      <Link
-        hoverStyle={{
-          opacity: 0.8,
-        }}
-        focusStyle={{
-          opacity: 0.8,
-        }}
-        pressStyle={{
-          scale: 0.95,
-        }}
-        href={href}
-      >
-        <Avatar circular size="$4.5" elevation="$0.75">
-          {isAndroid && !profile?.avatar_url ? (
-            <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-            />
-          ) : (
-            <>
-              <Avatar.Image src={profile?.avatar_url ?? ''} />
-              <Avatar.Fallback jc="center" bc="$olive">
-                <Avatar size="$4.5" circular>
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-                  />
-                </Avatar>
-              </Avatar.Fallback>
-            </>
-          )}
-        </Avatar>
+      <XStack>
+        <Link
+          hoverStyle={{
+            opacity: 0.8,
+          }}
+          focusStyle={{
+            opacity: 0.8,
+          }}
+          pressStyle={{
+            scale: 0.95,
+          }}
+          href={href}
+        >
+          <Avatar circular size="$4.5" elevation="$0.75">
+            {isAndroid && !profile?.avatar_url ? (
+              <Avatar.Image
+                src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+              />
+            ) : (
+              <>
+                <Avatar.Image src={profile?.avatar_url ?? ''} />
+                <Avatar.Fallback jc="center" bc="$olive">
+                  <Avatar size="$4.5" circular>
+                    <Avatar.Image
+                      src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+                    />
+                  </Avatar>
+                </Avatar.Fallback>
+              </>
+            )}
+          </Avatar>
+        </Link>
         {profile?.is_verified && (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
@@ -378,7 +380,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
             />
           </XStack>
         )}
-      </Link>
+      </XStack>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
           {profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
