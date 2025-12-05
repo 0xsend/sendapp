@@ -1,10 +1,9 @@
 import {
   Avatar,
-  isWeb,
   LinearGradient,
   Paragraph,
   Text,
-  useEvent,
+  useTheme,
   useThemeName,
   View,
   XStack,
@@ -12,7 +11,6 @@ import {
 } from '@my/ui'
 import { FlatList, Platform } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
-import { Link } from 'solito/link'
 import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
@@ -62,6 +60,7 @@ const SuggestionsList = memo(
   }) => {
     const { error, data } = query
     const { t } = useTranslation('send')
+    const theme = useTheme()
 
     const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
       return <SenderSuggestion item={item} />
@@ -139,7 +138,7 @@ const SuggestionsList = memo(
                 display="none"
                 $sm={{ display: 'flex' }}
                 pointerEvents="none"
-                colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+                colors={[`${theme.background.val}00`, '$aztec1']}
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
                 width="$4"

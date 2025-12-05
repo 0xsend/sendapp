@@ -930,12 +930,7 @@ function CantonWalletDiscoverableCard() {
                 borderColor: isDiscoverable ? '#33C940' : '#999999',
               }}
             >
-              <Switch.Thumb
-                animation="100ms"
-                $theme-light={{
-                  backgroundColor: '$white',
-                }}
-              />
+              <Switch.Thumb animation="100ms" backgroundColor={'$white'} />
             </Switch>
           )}
         </XStack>

@@ -69,7 +69,7 @@ export const LanguagePreferences = () => {
                     {isPending ? (
                       <Spinner size="small" />
                     ) : isActive ? (
-                      <Check size={16} color={'$primary'} />
+                      <Check size={16} color={'$primary'} $theme-light={{ color: '$color12' }} />
                     ) : null}
                   </XStack>
                 </Pressable>

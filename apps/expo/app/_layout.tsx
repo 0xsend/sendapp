@@ -1,3 +1,23 @@
+// Expo Intl backfills, order matter
+// 1. Canonical locales (foundation)
+import '@formatjs/intl-getcanonicallocales/polyfill'
+
+// 2. Locale (needed by other polyfills)
+import '@formatjs/intl-locale/polyfill'
+
+// 3. PluralRules (required by RelativeTimeFormat)
+import '@formatjs/intl-pluralrules/polyfill'
+import '@formatjs/intl-pluralrules/locale-data/en' // English
+import '@formatjs/intl-pluralrules/locale-data/de' // German
+import '@formatjs/intl-pluralrules/locale-data/es' // Spanish
+import '@formatjs/intl-pluralrules/locale-data/zh' // Chinese
+// 4. RelativeTimeFormat (depends on above)
+import '@formatjs/intl-relativetimeformat/polyfill'
+import '@formatjs/intl-relativetimeformat/locale-data/en' // English
+import '@formatjs/intl-relativetimeformat/locale-data/de' // German
+import '@formatjs/intl-relativetimeformat/locale-data/es' // Spanish
+import '@formatjs/intl-relativetimeformat/locale-data/zh' // Chinese
+
 import 'intl-pluralrules'
 import type { Session } from '@supabase/supabase-js'
 import { loadThemePromise, Provider } from 'app/provider'

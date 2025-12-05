@@ -1,10 +1,12 @@
 import type React from 'react'
-import { useCallback, useState, useRef, useMemo, useEffect, type PropsWithChildren } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AnimatePresence,
   Avatar,
   Button,
   createStyledContext,
+  GorhomSheetInput,
+  Input as InputOG,
   LinearGradient,
   Link,
   Paragraph,
@@ -23,18 +25,16 @@ import {
   useThemeName,
   useWindowDimensions,
   View,
+  type ViewProps,
   XStack,
   YStack,
-  GorhomSheetInput,
-  Input as InputOG,
-  type ViewProps,
 } from '@my/ui'
 
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
 import { formatUnits, isAddress } from 'viem'
 
+import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
 import { IconBadgeCheckSolid2, IconCoin } from 'app/components/icons'
@@ -44,7 +44,6 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
 import { isAndroid, isWeb } from '@tamagui/constants'
-import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { formFields } from 'app/utils/SchemaForm'
@@ -61,7 +60,7 @@ import { useAccountNonce } from 'app/utils/userop'
 import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
-import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
@@ -72,7 +71,13 @@ import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { Events } from 'app/utils/zod/activity'
-import type { InfiniteData } from '@tanstack/react-query'
+import { amountFromActivity } from 'app/utils/activity'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import { Transaction } from './Transaction'
+import type { Database } from '@my/supabase/database.types'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -83,11 +88,13 @@ const SendChatContext = createStyledContext<{
   setActiveSection: React.Dispatch<React.SetStateAction<Sections>>
   setTransaction: React.Dispatch<React.SetStateAction<Activity | undefined>>
   transaction: Activity | undefined
+  useSendScreenParams: typeof useSendScreenParams
 }>({
   activeSection: 'chat',
   setActiveSection: () => {},
   setTransaction: () => {},
   transaction: undefined,
+  useSendScreenParams: (() => [{}, () => {}]) as unknown as typeof useSendScreenParams,
 })
 
 interface SendChatProps {
@@ -112,6 +119,10 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
 
   const [activeSection, setActiveSection] = useState<Sections>('chat')
   const bottomSheetRef = useRef<BottomSheet>(null)
+
+  // Capture the hook result BEFORE entering Portal
+  // This creates a stable reference to params that works inside Portal
+  const sendScreenParamsResult = useSendScreenParams()
 
   useEffect(() => {
     if (open) {
@@ -147,6 +158,7 @@ export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: Sen
             setActiveSection={setActiveSection}
             setTransaction={setTransaction}
             transaction={transaction}
+            useSendScreenParams={() => sendScreenParamsResult}
           >
             <AnimatePresence>
               {(open || !gtLg) && (
@@ -304,6 +316,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
 
   const isDark = themeName.includes('dark')
 
+  const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
@@ -327,36 +340,38 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
       {...props}
     >
-      <Link
-        hoverStyle={{
-          opacity: 0.8,
-        }}
-        focusStyle={{
-          opacity: 0.8,
-        }}
-        pressStyle={{
-          scale: 0.95,
-        }}
-        href={href}
-      >
-        <Avatar circular size="$4.5" elevation="$0.75">
-          {isAndroid && !profile?.avatar_url ? (
-            <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-            />
-          ) : (
-            <>
-              <Avatar.Image src={profile?.avatar_url ?? ''} />
-              <Avatar.Fallback jc="center" bc="$olive">
-                <Avatar size="$4.5" circular>
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-                  />
-                </Avatar>
-              </Avatar.Fallback>
-            </>
-          )}
-        </Avatar>
+      <XStack>
+        <Link
+          hoverStyle={{
+            opacity: 0.8,
+          }}
+          focusStyle={{
+            opacity: 0.8,
+          }}
+          pressStyle={{
+            scale: 0.95,
+          }}
+          href={href}
+        >
+          <Avatar circular size="$4.5" elevation="$0.75">
+            {isAndroid && !profile?.avatar_url ? (
+              <Avatar.Image
+                src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+              />
+            ) : (
+              <>
+                <Avatar.Image src={profile?.avatar_url ?? ''} />
+                <Avatar.Fallback jc="center" bc="$olive">
+                  <Avatar size="$4.5" circular>
+                    <Avatar.Image
+                      src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+                    />
+                  </Avatar>
+                </Avatar.Fallback>
+              </>
+            )}
+          </Avatar>
+        </Link>
         {profile?.is_verified && (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
@@ -370,7 +385,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
             />
           </XStack>
         )}
-      </Link>
+      </XStack>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
           {profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
@@ -428,18 +443,20 @@ const SendChatInput = Input.styleable((props) => {
         animateOnly={['opacity']}
         opacity={activeSection === 'chat' ? 1 : 0}
       >
-        <LinearGradient
-          // Use the actual aztec3 color value as in line 129
-          colors={gradientColors}
-          locations={[0, 0.36, 1]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          pointerEvents="none"
-          w="100%"
-          h={20}
-          y={-18}
-          pos="absolute"
-        />
+        {isWeb && (
+          <LinearGradient
+            // Use the actual aztec3 color value as in line 129
+            colors={gradientColors}
+            locations={[0, 0.36, 1]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+            pointerEvents="none"
+            w="100%"
+            h={20}
+            y={-18}
+            pos="absolute"
+          />
+        )}
       </View>
       <YStack w="100%" zi={1}>
         <XStack py="$4" px="$4">
@@ -489,9 +506,9 @@ const SendAmountSchema = z.object({
 
 // all inputs are here
 const EnterAmountNoteSection = YStack.styleable((props) => {
+  const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [sendParams, setSendParams] = useSendScreenParams()
-
-  const { coin } = useCoinFromSendTokenParam()
+  const { coin } = useCoin(sendParams.sendToken || usdcAddress[baseMainnet.id])
 
   const themeName = useThemeName()
 
@@ -573,7 +590,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   // Delay keyboard appearance to allow animation to complete
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
-    if (activeSection === 'enterAmount' && amountInputRef) {
+    // disabled autofocus on native coz its tricky to change token
+    if (activeSection === 'enterAmount' && amountInputRef && isWeb) {
       timeoutId = setTimeout(() => {
         amountInputRef?.focus()
       }, 500)
@@ -616,7 +634,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { coin: selectedCoin } = useCoin(sendToken || usdcAddress[baseMainnet.id])
   const { profile: currentUserProfile } = useUser()
 
   const [loadingSend, setLoadingSend] = useState(false)
@@ -1066,6 +1084,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     }}
                     placeholderTextColor="$gray11"
                     disabled={activeSection === 'reviewAndSend'}
+                    pointerEvents={activeSection === 'reviewAndSend' ? 'none' : 'auto'}
                     placeholder="Add a note..."
                     fos="$5"
                     br="$3"
@@ -1354,8 +1373,8 @@ const groupActivitiesByDate = (activities: Activity[]): ListItem[] => {
 }
 
 const ChatList = YStack.styleable(() => {
+  const { useSendScreenParams, activeSection } = SendChatContext.useStyledContext()
   const [{ recipient: recipientParam, idType: idTypeParam }] = useSendScreenParams()
-  const { activeSection } = SendChatContext.useStyledContext()
   const { profile: currentUserProfile } = useUser()
 
   const {
@@ -1483,14 +1502,6 @@ const ChatList = YStack.styleable(() => {
   )
 })
 
-import { amountFromActivity } from 'app/utils/activity'
-import {
-  isTemporalEthTransfersEvent,
-  isTemporalTokenTransfersEvent,
-} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
-import { Transaction } from './Transaction'
-import type { Database } from '@my/supabase/database.types'
-
 interface DateHeaderProps {
   date: Date
 }
@@ -1565,7 +1576,12 @@ const Item = YStack.styleable<ItemProps>((props) => {
             {isSent ? 'You sent' : 'You received'}
           </SizableText>
           <XStack ai="center" gap="$3">
-            <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
+            <SizableText
+              size="$8"
+              fow="500"
+              color={isSent ? '$color' : '$neon9'}
+              lineHeight={isWeb ? undefined : 28}
+            >
               {amount?.replace('+ ', '')}
             </SizableText>
             <IconCoin symbol={item.data?.coin?.symbol ?? ''} size="$1" />

@@ -1,18 +1,21 @@
 import { Button, useThemeName } from '@my/ui'
 import { IconArrowUp } from 'app/components/icons'
-import { useRouter } from 'expo-router'
+import { useSendScreenParams } from 'app/routers/params'
 
 export default function ProfileSendButton({ sendId }: { sendId?: number | null }) {
   const isDark = useThemeName()?.startsWith('dark')
-  const router = useRouter()
-
-  const onPress = () => {
-    router.push({ pathname: '/send/form', params: { recipient: sendId, idType: 'sendid' } })
-  }
+  const [sendParams, setSendParams] = useSendScreenParams()
 
   return (
     <Button
-      onPress={onPress}
+      onPress={() => {
+        setSendParams({
+          ...sendParams,
+          recipient: sendId?.toString() ?? '',
+          idType: 'sendid',
+          m: 1,
+        })
+      }}
       borderRadius={'$4'}
       jc="center"
       ai="center"
