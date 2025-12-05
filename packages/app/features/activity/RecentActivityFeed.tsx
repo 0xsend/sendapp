@@ -263,7 +263,14 @@ MyList.displayName = 'MyList'
 function RowLabel({ children, first }: PropsWithChildren & { first?: boolean }) {
   return (
     <View w="100%">
-      <H4 fontWeight={'600'} size={'$7'} pt={first ? 0 : '$3.5'} pb="$3.5" bc="$background">
+      <H4
+        size="$7"
+        fontWeight="400"
+        pt={first ? 0 : '$3.5'}
+        pb="$3.5"
+        bc="$background"
+        col="$gray11"
+      >
         {children}
       </H4>
     </View>
