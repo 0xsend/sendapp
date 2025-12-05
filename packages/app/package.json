@@ -16,6 +16,10 @@
   "dependencies": {
     "@0xsend/send-earn-contracts": "^0.1.0",
     "@coinbase/onchainkit": "^0.38.1",
+    "@formatjs/intl-getcanonicallocales": "^2.5.6",
+    "@formatjs/intl-locale": "^4.2.13",
+    "@formatjs/intl-pluralrules": "^5.4.6",
+    "@formatjs/intl-relativetimeformat": "^11.4.13",
     "@gorhom/bottom-sheet": "^5.2.6",
     "@intercom/intercom-react-native": "^8.6.0",
     "@intercom/messenger-js-sdk": "^0.0.14",
