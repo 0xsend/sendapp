@@ -586,7 +586,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   // Delay keyboard appearance to allow animation to complete
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
-    if (activeSection === 'enterAmount' && amountInputRef) {
+    // disabled autofocus on native coz its tricky to change token
+    if (activeSection === 'enterAmount' && amountInputRef && isWeb) {
       timeoutId = setTimeout(() => {
         amountInputRef?.focus()
       }, 500)
