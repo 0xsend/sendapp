@@ -1579,7 +1579,12 @@ const Item = YStack.styleable<ItemProps>((props) => {
             {isSent ? 'You sent' : 'You received'}
           </SizableText>
           <XStack ai="center" gap="$3">
-            <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
+            <SizableText
+              size="$8"
+              fow="500"
+              color={isSent ? '$color' : '$neon9'}
+              lineHeight={isWeb ? undefined : 28}
+            >
               {amount?.replace('+ ', '')}
             </SizableText>
             <IconCoin symbol={item.data?.coin?.symbol ?? ''} size="$1" />
