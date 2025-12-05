@@ -503,8 +503,7 @@ const SendAmountSchema = z.object({
 const EnterAmountNoteSection = YStack.styleable((props) => {
   const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [sendParams, setSendParams] = useSendScreenParams()
-
-  const { coin } = useCoinFromSendTokenParam()
+  const { coin } = useCoin(sendParams.sendToken)
 
   const themeName = useThemeName()
 
@@ -630,7 +629,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { coin: selectedCoin } = useCoin(sendToken)
   const { profile: currentUserProfile } = useUser()
 
   const [loadingSend, setLoadingSend] = useState(false)
