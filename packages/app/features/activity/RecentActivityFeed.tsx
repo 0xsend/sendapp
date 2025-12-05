@@ -55,12 +55,14 @@ export default function ActivityFeed({
     }
   }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
+  const pages = data?.pages
+  const locale = i18n.resolvedLanguage ?? i18n.language
+
   const { flattenedData, stickyIndices } = useMemo(() => {
-    if (!data?.pages) return { flattenedData: [], stickyIndices: [] }
+    if (!pages) return { flattenedData: [], stickyIndices: [] }
 
-    const activities = data.pages.flat()
+    const activities = pages.flat()
 
-    const locale = i18n.resolvedLanguage ?? i18n.language
     const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
       const dateKey = isToday
@@ -93,7 +95,7 @@ export default function ActivityFeed({
     })
 
     return { flattenedData: result, stickyIndices: headerIndices }
-  }, [data?.pages, t, i18n.language, i18n.resolvedLanguage])
+  }, [pages, t, locale])
 
   if (isLoadingActivities) {
     return <Spinner size="small" />
