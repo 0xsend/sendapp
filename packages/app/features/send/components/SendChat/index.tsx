@@ -904,6 +904,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   const [isPresent] = usePresence()
 
+  const isButtonPressed = useRef(false)
+
+  useEffect(() => {
+    if (activeSection === 'chat') {
+      isButtonPressed.current = false
+    }
+  }, [activeSection])
+
   return (
     <FormProvider {...form}>
       <YStack
@@ -1125,7 +1133,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         <Button
           bg="$neon7"
           br="$4"
-          animation={'responsive'}
+          animation="responsive"
           animateOnly={['opacity', 'transform']}
           bw={0}
           y={present ? 0 : 100}
@@ -1140,7 +1148,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             bg: '$neon7',
             scale: 0.98,
           }}
-          onPress={form.handleSubmit(onSubmit)}
+          onPress={() => {
+            isButtonPressed.current = true
+            form.handleSubmit(onSubmit)()
+          }}
           ov="hidden"
           disabled={isSendButtonDisabled}
           o={isSendButtonDisabled ? 0.5 : 1}
@@ -1164,21 +1175,27 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               </View>
             ) : (
               <Button.Text
-                key={activeSection === 'reviewAndSend' ? 'review-button-text' : 'send-button-text'}
+                key={
+                  isButtonPressed.current
+                    ? `send-button-text-animated${activeSection}`
+                    : 'send-button-text-no-animate'
+                }
                 fos="$5"
                 col="$gray1"
                 $theme-light={{ col: '$gray12' }}
-                animation="responsive"
-                animateOnly={['opacity', 'transform']}
                 pos="absolute"
-                enterStyle={{
-                  opacity: 0,
-                  y: -40,
-                }}
-                exitStyle={{
-                  opacity: 0,
-                  y: 40,
-                }}
+                {...(isButtonPressed.current && {
+                  animation: 'responsive',
+                  animateOnly: ['opacity', 'transform'],
+                  enterStyle: {
+                    opacity: 0,
+                    y: -40,
+                  },
+                  exitStyle: {
+                    opacity: 0,
+                    y: 40,
+                  },
+                })}
               >
                 {activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
               </Button.Text>
