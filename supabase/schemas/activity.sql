@@ -91,12 +91,26 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
 
 -- Functions (that depend on activity_feed view)
 
-CREATE OR REPLACE FUNCTION public.favourite_senders()
+CREATE OR REPLACE FUNCTION public.favourite_senders(page_number integer DEFAULT 0, page_size integer DEFAULT 10)
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
  SECURITY DEFINER
 AS $function$
 BEGIN
+    -- Validate and cap page_size to prevent abuse
+    IF page_size > 50 THEN
+        page_size := 50;
+    END IF;
+
+    IF page_size < 1 THEN
+        page_size := 1;
+    END IF;
+
+    -- Ensure page_number is not negative
+    IF page_number < 0 THEN
+        page_number := 0;
+    END IF;
+
 RETURN QUERY
 
 -- Query each expensive view exactly once
@@ -179,20 +193,39 @@ WHERE ueb.earn_balance >= (
     LIMIT 1
 )
 ORDER BY uss.total_score DESC
-LIMIT 10; -- return top 10 send score users
+LIMIT page_size
+OFFSET page_number * page_size;
 
 END;
 $function$
 ;
-ALTER FUNCTION "public"."favourite_senders"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION public.recent_senders()
+ALTER FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) OWNER TO "postgres";
+
+CREATE OR REPLACE FUNCTION public.recent_senders(
+    page_number integer DEFAULT 0,
+    page_size integer DEFAULT 10
+)
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
 BEGIN
+    -- Validate and cap page_size to prevent abuse
+    IF page_size > 50 THEN
+        page_size := 50;
+    END IF;
+
+    IF page_size < 1 THEN
+        page_size := 1;
+    END IF;
+
+    -- Ensure page_number is not negative
+    IF page_number < 0 THEN
+        page_number := 0;
+    END IF;
+
 RETURN QUERY
 
     -- Step 1: Filter relevant transfers and determine the counterparty
@@ -236,13 +269,14 @@ FROM numbered
 LEFT JOIN profiles p ON p.send_id = (counterparty).send_id
 WHERE occurrence_counter = 1  -- Only the most recent interaction with each counterparty
 ORDER BY created_at DESC      -- Order the result by most recent transfer
-    LIMIT 10;                     -- Return only the 10 most recent counterparties
+LIMIT page_size
+OFFSET page_number * page_size;
 
 END;
 $function$
 ;
 
-ALTER FUNCTION "public"."recent_senders"() OWNER TO "postgres";
+ALTER FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) OWNER TO "postgres";
 
 CREATE OR REPLACE FUNCTION public.did_user_swap()
  RETURNS boolean
@@ -279,12 +313,29 @@ $function$
 ALTER FUNCTION "public"."did_user_swap"() OWNER TO "postgres";
 
 -- Functions (that depend on activity table directly)
-CREATE OR REPLACE FUNCTION public.today_birthday_senders()
+CREATE OR REPLACE FUNCTION public.today_birthday_senders(
+    page_number integer DEFAULT 0,
+    page_size integer DEFAULT 10
+)
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
  SECURITY DEFINER
 AS $function$
 BEGIN
+    -- Validate and cap page_size to prevent abuse
+    IF page_size > 50 THEN
+        page_size := 50;
+    END IF;
+
+    IF page_size < 1 THEN
+        page_size := 1;
+    END IF;
+
+    -- Ensure page_number is not negative
+    IF page_number < 0 THEN
+        page_number := 0;
+    END IF;
+
 RETURN QUERY
 
 WITH birthday_profiles AS (
@@ -391,10 +442,14 @@ SELECT (
 FROM filtered_profiles fp
 LEFT JOIN send_accounts sa ON sa.user_id = fp.id
 LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
-ORDER BY fp.send_score DESC;
+ORDER BY fp.send_score DESC
+LIMIT page_size
+OFFSET page_number * page_size;
 END;
 $function$
 ;
+
+ALTER FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) OWNER TO "postgres";
 
 -- Function
 
@@ -489,20 +544,20 @@ GRANT ALL ON TABLE "public"."activity_feed" TO "anon";
 GRANT ALL ON TABLE "public"."activity_feed" TO "authenticated";
 GRANT ALL ON TABLE "public"."activity_feed" TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."favourite_senders"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "anon";
-GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."favourite_senders"() TO "service_role";
+REVOKE ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."recent_senders"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."recent_senders"() TO "anon";
-GRANT ALL ON FUNCTION "public"."recent_senders"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."recent_senders"() TO "service_role";
+REVOKE ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."today_birthday_senders"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "anon";
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"() TO "service_role";
+REVOKE ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."did_user_swap"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."did_user_swap"() TO "anon";

@@ -1999,7 +1999,7 @@ export type Database = {
         }
       }
       favourite_senders: {
-        Args: never
+        Args: { page_number?: number; page_size?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
         SetofOptions: {
           from: "*"
@@ -2212,7 +2212,7 @@ export type Database = {
         }
       }
       recent_senders: {
-        Args: never
+        Args: { page_number?: number; page_size?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
         SetofOptions: {
           from: "*"
@@ -2324,7 +2324,7 @@ export type Database = {
         }
       }
       today_birthday_senders: {
-        Args: never
+        Args: { page_number?: number; page_size?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
         SetofOptions: {
           from: "*"
