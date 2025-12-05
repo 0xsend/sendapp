@@ -1,7 +1,8 @@
-CREATE OR REPLACE FUNCTION public.top_senders(
-    page_number integer DEFAULT 0,
-    page_size integer DEFAULT 10
-)
+drop function if exists "public"."top_senders"(limit_count integer);
+
+set check_function_bodies = off;
+
+CREATE OR REPLACE FUNCTION public.top_senders(page_number integer DEFAULT 0, page_size integer DEFAULT 10)
  RETURNS SETOF activity_feed_user
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -100,9 +101,4 @@ END;
 $function$
 ;
 
-ALTER FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) OWNER TO "postgres";
 
-REVOKE ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) TO "service_role";

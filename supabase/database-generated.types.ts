@@ -2334,7 +2334,7 @@ export type Database = {
         }
       }
       top_senders: {
-        Args: { limit_count?: number }
+        Args: { page_number?: number; page_size?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
         SetofOptions: {
           from: "*"
