@@ -1,5 +1,5 @@
-import { AnimatePresence, Button, Circle, Dialog, H2, Paragraph, YStack } from '@my/ui'
-import { Sparkles } from '@tamagui/lucide-icons'
+import { AnimatePresence, Button, Dialog, H2, Paragraph, YStack } from '@my/ui'
+import { Rocket } from '@tamagui/lucide-icons'
 import { useVersionUpdater } from 'app/utils/useVersionUpdater'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -66,24 +66,14 @@ export function VersionUpdater(props: { intervalTimeInSeconds?: number }) {
             >
               <YStack gap="$5" testID="versionUpdaterDialog" ai="center">
                 {/* Icon container with brand green background */}
-                <Circle
-                  size={80}
-                  backgroundColor="$neon7"
-                  ai="center"
-                  jc="center"
-                  animation="200ms"
-                  enterStyle={{ scale: 0 }}
-                  scale={1}
-                >
-                  <Sparkles size={40} color="$black" strokeWidth={2.5} />
-                </Circle>
+                <Rocket size={45} color="$gray10" />
 
                 {/* Title and description */}
                 <YStack gap="$3" ai="center">
                   <H2 size="$8" ta="center" fontWeight="600">
                     {t('versionUpdater.title')}
                   </H2>
-                  <Paragraph size="$5" ta="center" color="$color11" maxWidth={340} lineHeight="$5">
+                  <Paragraph color="$gray10" size="$5" ta="center" maxWidth={340} lineHeight="$5">
                     {t('versionUpdater.description')}
                   </Paragraph>
                 </YStack>
@@ -109,7 +99,7 @@ export function VersionUpdater(props: { intervalTimeInSeconds?: number }) {
                     color="$gray1"
                     $theme-light={{ color: '$gray12' }}
                     fontSize="$5"
-                    fontWeight="600"
+                    fontWeight="500"
                   >
                     {t('versionUpdater.actions.refresh')}
                   </Button.Text>
