@@ -38,7 +38,8 @@
     "recent": "Recent Activity",
     "favorites": "Favorite Senders",
     "top": "Top Senders",
-    "birthdays": "Wish Them Happy Birthday"
+    "birthdays": "Wish Them Happy Birthday",
+    "viewMore": "View More"
   },
   "recipient": {
     "label": "TO",

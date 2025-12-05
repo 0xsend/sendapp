@@ -1,7 +1,9 @@
 import {
   Avatar,
+  Button,
   LinearGradient,
   Paragraph,
+  Spinner,
   Text,
   useTheme,
   useThemeName,
@@ -14,6 +16,7 @@ import { useSendScreenParams } from 'app/routers/params'
 import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
+  SendSuggestionsPaginatedQueryResult,
 } from 'app/features/send/suggestions/SendSuggestion.types'
 import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
@@ -38,7 +41,7 @@ export const SendSuggestions = () => {
         title={t('suggestions.favorites')}
         delay={100}
       />
-      <SuggestionsList query={topSendersQuery} title={t('suggestions.top')} delay={150} />
+      <SuggestionsListPaginated query={topSendersQuery} title={t('suggestions.top')} delay={150} />
       <SuggestionsList
         query={todayBirthdaySendersQuery}
         title={t('suggestions.birthdays')}
@@ -62,6 +65,8 @@ const SuggestionsList = memo(
     const { t } = useTranslation('send')
     const theme = useTheme()
 
+    const items = data || []
+
     const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
       return <SenderSuggestion item={item} />
     }, [])
@@ -70,7 +75,7 @@ const SuggestionsList = memo(
       return item?.send_id?.toString() ?? String(index)
     }, [])
 
-    if (!data || data.length === 0) {
+    if (!items || items.length === 0) {
       return null
     }
 
@@ -121,7 +126,7 @@ const SuggestionsList = memo(
               <FlatList
                 horizontal
                 bounces={true}
-                data={data || []}
+                data={items || []}
                 renderItem={renderItem}
                 keyExtractor={keyExtractor}
                 showsHorizontalScrollIndicator={false}
@@ -157,6 +162,136 @@ const SuggestionsList = memo(
 )
 
 SuggestionsList.displayName = 'SuggestionsList'
+
+const SuggestionsListPaginated = memo(
+  ({
+    query,
+    title,
+    delay = 0,
+  }: {
+    query: SendSuggestionsPaginatedQueryResult
+    title: string
+    delay?: number
+  }) => {
+    const { error, data, hasNextPage, fetchNextPage, isFetchingNextPage } = query
+    const { t } = useTranslation('send')
+
+    const pages = data?.pages || []
+
+    const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
+      return <SenderSuggestion item={item} />
+    }, [])
+
+    const keyExtractor = useCallback((item: SendSuggestionItem, index: number) => {
+      return item?.send_id?.toString() ?? String(index)
+    }, [])
+
+    // Check if there's any data in any page
+    const hasAnyData = pages.some((page) => page && page.length > 0)
+
+    if (!hasAnyData) {
+      return null
+    }
+
+    return (
+      <YStack gap="$3">
+        <Paragraph
+          animation={[
+            '200ms',
+            {
+              opacity: {
+                delay: delay,
+              },
+              transform: {
+                delay: delay,
+              },
+            },
+          ]}
+          enterStyle={{ opacity: 0, y: 20 }}
+          size="$7"
+          fontWeight={600}
+          col="$color10"
+        >
+          {title}
+        </Paragraph>
+        {error ? (
+          <Paragraph color={'$error'}>
+            {error.message?.split('.')[0] ?? t('search.unknownError')}
+          </Paragraph>
+        ) : (
+          <>
+            {pages.map((pageItems, pageIndex) => (
+              <View
+                key={`page-${pageIndex}-${pageItems[0]?.send_id ?? pageIndex}`}
+                animation={[
+                  '200ms',
+                  {
+                    opacity: {
+                      delay: delay,
+                    },
+                    transform: {
+                      delay: delay,
+                    },
+                  },
+                ]}
+                enterStyle={{ opacity: 0, y: 10 }}
+                exitStyle={{ opacity: 0, y: 10 }}
+                mx={-24}
+                pos="relative"
+              >
+                <FlatList
+                  horizontal
+                  bounces={true}
+                  data={pageItems}
+                  renderItem={renderItem}
+                  keyExtractor={keyExtractor}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingRight: 24,
+                    paddingHorizontal: 24,
+                    paddingVertical: 8,
+                  }}
+                  $platform-native={{
+                    overflow: 'visible',
+                  }}
+                />
+                <LinearGradient
+                  display="none"
+                  $sm={{ display: 'flex' }}
+                  pointerEvents="none"
+                  colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  width="$4"
+                  height="100%"
+                  zi={100}
+                  pos="absolute"
+                  top={0}
+                  right={0}
+                />
+              </View>
+            ))}
+            {hasNextPage && fetchNextPage && (
+              <XStack jc="center" mt="$2">
+                <Button
+                  size="$3"
+                  onPress={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  chromeless
+                  color="$color11"
+                >
+                  {isFetchingNextPage ? <Spinner size="small" /> : t('suggestions.viewMore')}
+                </Button>
+              </XStack>
+            )}
+          </>
+        )}
+      </YStack>
+    )
+  }
+)
+
+SuggestionsListPaginated.displayName = 'SuggestionsListPaginated'
 
 const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
   const [sendParams, setSendParams] = useSendScreenParams()
