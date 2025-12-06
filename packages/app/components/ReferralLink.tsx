@@ -115,7 +115,7 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
           bc="transparent"
           maxWidth={'85%'}
           hoverStyle={{
-            color: '$primary',
+            opacity: 0.6,
           }}
         >
           {referralCode}

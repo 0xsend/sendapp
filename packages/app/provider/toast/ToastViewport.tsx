@@ -6,6 +6,7 @@ export interface ToastViewportProps {
 export const ToastViewport = ({ noSafeArea }: ToastViewportProps) => {
   return (
     <ToastViewportOg
+      portalToRoot
       left={noSafeArea ? 0 : 10}
       right={noSafeArea ? 0 : 10}
       top={noSafeArea ? 0 : 10}

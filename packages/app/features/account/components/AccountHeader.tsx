@@ -27,10 +27,22 @@ import { ShareProfileDialog } from './ShareProfileDialog'
 import { useTranslation } from 'react-i18next'
 
 const icons = {
-  account: <IconAccount color={'$primary'} $theme-light={{ color: '$color12' }} />,
+  account: <IconAccount color={'$primary'} $theme-light={{ color: '$gray11' }} />,
   share: <IconShare size={'$1.5'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
   qrFull: <IconQRFull size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />,
 }
+
+const shadowProps = {
+  shadowColor: '#000',
+  shadowOffset: {
+    width: 0,
+    height: 3,
+  },
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+
+  elevationAndroid: 7,
+} as const
 
 export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   const { profile } = useUser()
@@ -105,14 +117,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   return (
     <YStack gap={'$3.5'} {...props}>
       <Link href={`/profile/${profile?.send_id}`}>
-        <FadeCard
-          w={'100%'}
-          gap={'$3.5'}
-          br={'$5'}
-          p={'$5'}
-          $gtLg={{ p: '$7', gap: '$5' }}
-          elevation={1}
-        >
+        <FadeCard w={'100%'} gap={'$3.5'} br={'$5'} p={'$5'} $gtLg={{ p: '$7', gap: '$5' }}>
           <XStack gap={'$3.5'}>
             <Avatar size={'$7'} br={'$4'}>
               {avatarContent}
@@ -124,7 +129,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                   {name || '---'}
                 </Paragraph>
                 {!isVerified ? (
-                  <Tooltip placement={'bottom'} delay={0}>
+                  <Tooltip placement={'bottom'} offset={5} delay={0}>
                     <Tooltip.Content
                       enterStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
                       exitStyle={{ x: 0, y: -5, opacity: 0, scale: 0.9 }}
@@ -133,24 +138,18 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                       y={0}
                       opacity={1}
                       animation={[
-                        'quick',
+                        'responsive',
                         {
                           opacity: {
                             overshootClamping: true,
                           },
                         },
                       ]}
-                      boc={'$error'}
                       borderWidth={1}
-                      $theme-dark={{ bc: '$black' }}
-                      $theme-light={{ bc: '$white' }}
+                      bg="$gray1"
+                      {...shadowProps}
                     >
-                      <Tooltip.Arrow borderColor={'$error'} bw={4} />
-                      <Paragraph
-                        size={'$4'}
-                        $theme-dark={{ col: '$white' }}
-                        $theme-light={{ col: '$black' }}
-                      >
+                      <Paragraph color="$gray12" size={'$4'}>
                         {t('header.verification.notVerified')}
                       </Paragraph>
                     </Tooltip.Content>
@@ -170,7 +169,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
                   <VerificationIcon />
                 )}
               </XStack>
-              <Separator width="100%" borderColor="$decay" />
+              <Separator width="100%" borderColor="$gray6" />
               <ReferralLink p={0} w="100%" jc="flex-start" />
             </YStack>
           </XStack>
@@ -179,7 +178,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
       <Fade>
         <XStack gap={'$3.5'}>
           <Button
-            elevation={'$0.75'}
+            {...shadowProps}
             f={1}
             py={'$5'}
             bw={0}
@@ -192,7 +191,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
             <Button.Text size={'$5'}>{t('header.actions.invite')}</Button.Text>
           </Button>
           <Button
-            elevation="$0.75"
+            {...shadowProps}
             f={1}
             py="$5"
             h="auto"

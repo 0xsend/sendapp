@@ -116,8 +116,7 @@ const DesktopAccountMenuEntry = () => {
       href={'/account'}
       width={'100%'}
       jc={'flex-start'}
-      px={'$3.5'}
-      py={'$2.5'}
+      p={'$3'}
       h={'auto'}
       br={'$4'}
       bw={0}
@@ -127,10 +126,10 @@ const DesktopAccountMenuEntry = () => {
       focusStyle={hoverStyles}
     >
       <XStack position="relative">
-        <Avatar circular={true} size={'$3.5'}>
+        <Avatar circular={true} size={'$3'}>
           <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
           <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
-            <IconAccount size={'$2'} $theme-light={{ color: '$color12' }} />
+            <IconAccount size={'$2'} color="$color1" $theme-light={{ color: '$gray1' }} />
           </Avatar.Fallback>
         </Avatar>
         {isVerified && (
