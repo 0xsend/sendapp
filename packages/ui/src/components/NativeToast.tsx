@@ -42,16 +42,10 @@ export const NativeToast = () => {
       br="$6"
       {...(isError ? errorStyles : {})}
     >
-      <XStack
-        y={-2}
-        ai="flex-start"
-        w="100%"
-        p={isError ? '$3' : '$2'}
-        py={isError ? '$1.5' : '$2'}
-      >
+      <XStack ai="flex-start" w="100%" p={isError ? '$3' : '$2'} py={isError ? '$1.5' : '$2'}>
         {isError && (
           <XStack pos="absolute" x="-150%" y="5%">
-            <AlertTriangle size={16} color="$red9" />
+            <AlertTriangle size={16} color="$red11" />
           </XStack>
         )}
         <YStack gap="$1.5" fs={0}>
