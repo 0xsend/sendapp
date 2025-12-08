@@ -1,10 +1,11 @@
 import {
   Avatar,
-  isWeb,
+  Button,
   LinearGradient,
   Paragraph,
+  Shimmer,
   Text,
-  useEvent,
+  useTheme,
   useThemeName,
   View,
   XStack,
@@ -12,7 +13,6 @@ import {
 } from '@my/ui'
 import { FlatList, Platform } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
-import { Link } from 'solito/link'
 import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
@@ -21,7 +21,7 @@ import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useId } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
 
@@ -60,8 +60,12 @@ const SuggestionsList = memo(
     title: string
     delay?: number
   }) => {
-    const { error, data } = query
+    const { error, data, hasNextPage, fetchNextPage, isFetchingNextPage } = query
     const { t } = useTranslation('send')
+    const skeletonBaseId = useId()
+    const skeletonKeys = Array.from({ length: 10 }, (_, i) => `${skeletonBaseId}-${i}`)
+
+    const pages = data?.pages || []
 
     const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
       return <SenderSuggestion item={item} />
@@ -71,7 +75,10 @@ const SuggestionsList = memo(
       return item?.send_id?.toString() ?? String(index)
     }, [])
 
-    if (!data || data.length === 0) {
+    // Check if there's any data in any page
+    const hasAnyData = pages.some((page) => page && page.length > 0)
+
+    if (!hasAnyData) {
       return null
     }
 
@@ -102,54 +109,77 @@ const SuggestionsList = memo(
           </Paragraph>
         ) : (
           <>
-            <View
-              animation={[
-                '200ms',
-                {
-                  opacity: {
-                    delay: delay,
+            {pages.map((pageItems, pageIndex) => (
+              <View
+                key={`page-${pageIndex}-${pageItems[0]?.send_id ?? pageIndex}`}
+                animation={[
+                  '200ms',
+                  {
+                    opacity: {
+                      delay: delay,
+                    },
+                    transform: {
+                      delay: delay,
+                    },
                   },
-                  transform: {
-                    delay: delay,
-                  },
-                },
-              ]}
-              enterStyle={{ opacity: 0, y: 10 }}
-              exitStyle={{ opacity: 0, y: 10 }}
-              mx={-24}
-              pos="relative"
-            >
-              <FlatList
-                horizontal
-                bounces={true}
-                data={data || []}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingRight: 24,
-                  paddingHorizontal: 24,
-                  paddingVertical: 8,
-                }}
-                $platform-native={{
-                  overflow: 'visible',
-                }}
-              />
-              <LinearGradient
-                display="none"
-                $sm={{ display: 'flex' }}
-                pointerEvents="none"
-                colors={['rgba(255, 255, 255, 0)', '$aztec1']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                width="$4"
-                height="100%"
-                zi={100}
-                pos="absolute"
-                top={0}
-                right={0}
-              />
-            </View>
+                ]}
+                enterStyle={{ opacity: 0, y: 10 }}
+                exitStyle={{ opacity: 0, y: 10 }}
+                mx={-24}
+                pos="relative"
+              >
+                <FlatList
+                  horizontal
+                  bounces={true}
+                  data={pageItems}
+                  renderItem={renderItem}
+                  keyExtractor={keyExtractor}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingRight: 24,
+                    paddingHorizontal: 24,
+                    paddingVertical: 8,
+                  }}
+                  $platform-native={{
+                    overflow: 'visible',
+                  }}
+                />
+                <LinearGradient
+                  display="none"
+                  $sm={{ display: 'flex' }}
+                  pointerEvents="none"
+                  colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  width="$4"
+                  height="100%"
+                  zi={100}
+                  pos="absolute"
+                  top={0}
+                  right={0}
+                />
+              </View>
+            ))}
+            {hasNextPage && isFetchingNextPage ? (
+              <XStack gap="$2">
+                {skeletonKeys.map((key) => (
+                  <Shimmer key={key} ov="hidden" br="$12" w="$7" h="$7" bg="$color1" />
+                ))}
+              </XStack>
+            ) : hasNextPage ? (
+              <XStack mt="$2">
+                <Button
+                  size="$3"
+                  onPress={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  chromeless
+                >
+                  <Button.Text textDecorationLine="underline" color="$color10">
+                    {t('suggestions.viewMore')}
+                  </Button.Text>
+                </Button>
+              </XStack>
+            ) : null}
           </>
         )}
       </YStack>

@@ -3,6 +3,7 @@ import type {
   leaderboard_referrals_all_timeInputs,
   SeedClient,
   SeedClientOptions,
+  send_token_transfersInputs,
   usersInputs,
 } from '@snaplet/seed'
 import crypto from 'node:crypto'
@@ -137,6 +138,58 @@ export const models: SeedClientOptions['models'] = {
       log_addr: () => Buffer.from(hexToBytes('0x0a0a5611b9a1071a1d8a308882065c48650baee8b')),
       referrer: () => Buffer.from(hexToBytes('0x0000000000000000000000000000000000000000')),
       tickets_purchased_total_bps: (ctx) => copycat.int(ctx.seed, { min: 10000, max: 50000 }),
+    },
+  },
+  distributions: {
+    data: {
+      number: (ctx) => copycat.int(ctx.seed, { min: 1, max: 100 }),
+      name: (ctx) => `Distribution #${copycat.int(ctx.seed, { min: 1, max: 100 })}`,
+      description: (ctx) => 'Distribution of 3,000,000 SEND tokens to early hodlers',
+      amount: 3000000000000000000000000, // 3,000,000 SEND (18 decimals)
+      hodler_pool_bips: 10000, // 100%
+      bonus_pool_bips: 0,
+      fixed_pool_bips: 10000, // 100%
+      qualification_start: () => {
+        // Start of current month
+        const now = new Date()
+        return new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+      },
+      qualification_end: () => {
+        // End of current month (last second)
+        const now = new Date()
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0)
+        return new Date(nextMonth.getTime() - 1000) // 1 second before next month
+      },
+      claim_end: 'infinity',
+      hodler_min_balance: 1000000000000000000000, // 1,000 SEND (18 decimals)
+      earn_min_balance: 5000000, // 5 USDC (6 decimals)
+      chain_id: 8453, // Base mainnet
+      merkle_drop_addr: () => Buffer.from(hexToBytes('0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57')),
+      token_addr: () => Buffer.from(hexToBytes('0xEab49138BA2Ea6dd776220fE26b7b8E446638956')),
+      token_decimals: 18,
+      tranche_id: (ctx) => {
+        // tranche_id is typically distribution number - 7 (based on migration pattern)
+        const distNum = copycat.int(ctx.seed, { min: 1, max: 100 })
+        return Math.max(1, distNum - 7)
+      },
+      snapshot_block_num: null,
+      sendpot_ticket_increment: 10,
+    },
+  },
+  send_token_transfers: {
+    data: {
+      src_name: 'base_logs',
+      ig_name: 'send_token_transfers',
+      chain_id: 845337,
+      abi_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      tx_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      log_idx: (ctx) => copycat.int(ctx.seed, { min: 0, max: 1000 }),
+      block_num: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
+      block_time: Math.floor(new Date().getTime() / 1000),
+      tx_hash: Buffer.from(hexToBytes(generatePrivateKey())),
+      f: () => Buffer.from(hexToBytes(generatePrivateKey())),
+      t: () => Buffer.from(hexToBytes(generatePrivateKey())),
+      v: (ctx) => copycat.int(ctx.seed, { min: 0, max: 100_000_000 }),
     },
   },
 }
@@ -350,6 +403,131 @@ export const createMultipleUsersWithTags = async (
       chainAddresses: plan.chain_addresses.filter((_, caIndex) => caIndex === index),
     }
   })
+}
+
+/**
+ * Helper to create a distribution config for the old token era (pre-distribution 11)
+ * @param config Distribution configuration
+ * @returns Distribution input config
+ */
+export const createOldTokenDistribution = (config: {
+  number: number
+  name?: string
+  description?: string
+  amount: number // No decimals for old token
+  hodler_pool_bips?: number
+  bonus_pool_bips?: number
+  fixed_pool_bips?: number
+  qualification_start: Date
+  qualification_end: Date
+  claim_end?: Date | 'infinity'
+  hodler_min_balance: number
+  tranche_id: number
+}) => ({
+  number: config.number,
+  name: config.name || `Distribution #${config.number}`,
+  description: config.description || 'Distribution of tokens to early hodlers',
+  amount: config.amount,
+  hodler_pool_bips: config.hodler_pool_bips ?? 10000,
+  bonus_pool_bips: config.bonus_pool_bips ?? 0,
+  fixed_pool_bips: config.fixed_pool_bips ?? 10000,
+  qualification_start: config.qualification_start,
+  qualification_end: config.qualification_end,
+  claim_end: config.claim_end || 'infinity',
+  hodler_min_balance: config.hodler_min_balance,
+  earn_min_balance: 0,
+  chain_id: 845337,
+  merkle_drop_addr: Buffer.from(hexToBytes('0x614f5273fdb63c1e1972fe1457ce77df1ca440a6')),
+  token_addr: Buffer.from(hexToBytes('0x3f14920c99beb920afa163031c4e47a3e03b3e4a')),
+  token_decimals: 0,
+  tranche_id: config.tranche_id,
+  snapshot_block_num: null,
+  sendpot_ticket_increment: 10,
+})
+
+/**
+ * Helper to create a distribution config for the new token era (distribution 11+)
+ * @param config Distribution configuration
+ * @returns Distribution input config
+ */
+export const createNewTokenDistribution = (config: {
+  number: number
+  name?: string
+  description?: string
+  amount: number // With 18 decimals
+  hodler_pool_bips?: number
+  bonus_pool_bips?: number
+  fixed_pool_bips?: number
+  qualification_start: Date
+  qualification_end: Date
+  claim_end?: Date | 'infinity'
+  hodler_min_balance: number
+  earn_min_balance?: number
+  tranche_id: number
+}) => ({
+  number: config.number,
+  name: config.name || `Distribution #${config.number}`,
+  description: config.description || 'Distribution of 3,000,000 SEND tokens to early hodlers',
+  amount: config.amount,
+  hodler_pool_bips: config.hodler_pool_bips ?? 10000,
+  bonus_pool_bips: config.bonus_pool_bips ?? 0,
+  fixed_pool_bips: config.fixed_pool_bips ?? 10000,
+  qualification_start: config.qualification_start,
+  qualification_end: config.qualification_end,
+  claim_end: config.claim_end || 'infinity',
+  hodler_min_balance: config.hodler_min_balance,
+  earn_min_balance: config.earn_min_balance ?? 0,
+  chain_id: 845337,
+  merkle_drop_addr: Buffer.from(hexToBytes('0x2c1630cd8f40d0458b7b5849e6cc2904a7d18a57')),
+  token_addr: Buffer.from(hexToBytes('0xEab49138BA2Ea6dd776220fE26b7b8E446638956')),
+  token_decimals: 18,
+  tranche_id: config.tranche_id,
+  snapshot_block_num: null,
+  sendpot_ticket_increment: 10,
+})
+
+/**
+ * Helper to create send_token_transfers within a distribution's qualification period
+ * @param config Transfer configuration
+ * @returns send_token_transfers input config
+ */
+export const createTransferInDistribution = (config: {
+  from_address_bytes: Buffer
+  to_address_bytes: Buffer
+  amount: number
+  distribution_start_epoch: number
+  distribution_end_epoch: number
+  offset_from_start_seconds?: number // Optional offset from distribution start
+}): send_token_transfersInputs => {
+  const block_time = config.offset_from_start_seconds
+    ? config.distribution_start_epoch + config.offset_from_start_seconds
+    : config.distribution_start_epoch +
+      copycat.int(
+        `${config.from_address_bytes.toString('hex')}-${config.to_address_bytes.toString('hex')}`,
+        {
+          min: 0,
+          max: config.distribution_end_epoch - config.distribution_start_epoch,
+        }
+      )
+
+  // Use block_time as seed for tx-specific random values to ensure determinism
+  const txSeed = `${block_time}-${config.from_address_bytes.toString('hex')}`
+
+  return {
+    src_name: 'base_logs',
+    ig_name: 'send_token_transfers',
+    chain_id: 845337,
+    log_addr: Buffer.from(hexToBytes('0xEab49138BA2Ea6dd776220fE26b7b8E446638956')), // SEND token address
+    block_time,
+    tx_hash: Buffer.from(hexToBytes(generatePrivateKey())),
+    f: config.from_address_bytes,
+    t: config.to_address_bytes,
+    v: config.amount,
+    block_num: Math.floor(block_time / 12), // Approximate block number (12 sec blocks)
+    tx_idx: copycat.int(`${txSeed}-tx`, { min: 0, max: 99 }),
+    log_idx: copycat.int(`${txSeed}-log`, { min: 0, max: 9 }),
+    abi_idx: 0,
+  }
 }
 
 /**

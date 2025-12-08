@@ -10,6 +10,7 @@ import {
   useMedia,
   XStack,
   YStack,
+  Text,
 } from '@my/ui'
 import { IconDollar, IconStar } from 'app/components/icons'
 import { AlertTriangle, Ticket } from '@tamagui/lucide-icons'
@@ -219,6 +220,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                 flex={1}
                 size="$4"
                 height={44}
+                p={0}
                 onPress={handleContinue}
                 disabled={isPending}
               >
@@ -256,7 +258,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
               >
                 <Paragraph color="$color4">Balance</Paragraph>
                 <XStack ai="center" justifyContent={'space-between'} gap="$2">
-                  <Paragraph fontSize="$10" fontWeight="600" color="$color12">
+                  <Paragraph fontSize="$10" fontWeight="600" color="$color12" lineHeight={42}>
                     ${formatAmount(totalBalance, 9, 2)}
                   </Paragraph>
                   <OverlappingCoinIcons
@@ -278,6 +280,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                 onPress={handleContinue}
                 disabled={isPending}
                 height={44}
+                p={0}
               >
                 <PrimaryButton.Text fontSize="$5" textTransform={'none'} fontWeight={400}>
                   Continue
@@ -386,6 +389,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                 onPress={handleContinue}
                 disabled={isPending}
                 height={44}
+                p={0}
               >
                 <PrimaryButton.Text fontSize="$5" textTransform={'none'} fontWeight={400}>
                   Continue
@@ -413,7 +417,11 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
             {renderWarningBanner()}
             <YStack gap="$2" w="100%">
               <Paragraph fontSize="$4" color="$color12">
-                Type <strong>DELETE</strong> to confirm
+                Type&nbsp;
+                <Text fontSize="$4" color="$color12" fontWeight={600}>
+                  DELETE
+                </Text>
+                &nbsp;to confirm
               </Paragraph>
               <Input
                 size="$4"
@@ -434,7 +442,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
               <Button
                 flex={1}
                 size="$4"
-                backgroundColor="$red8"
+                backgroundColor="$red9"
                 onPress={handleDelete}
                 disabled={isPending || !isDeleteEnabled}
                 pressStyle={{ o: 0.8 }}
@@ -442,9 +450,6 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
                 icon={isPending ? <Spinner size="small" color="$white" /> : undefined}
                 hoverStyle={{
                   backgroundColor: '$red9',
-                }}
-                $theme-light={{
-                  backgroundColor: '$red11',
                 }}
               >
                 <Button.Text fontSize="$5" color="$white">

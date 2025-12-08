@@ -186,6 +186,7 @@ function Hero() {
                   blurDataURL={carouselImage.base64}
                   src={carouselImage.img.src}
                   fill={true}
+                  sizes="(max-width: 768px) 100vw, 720px"
                   contentPosition={media.gtMd ? undefined : mobileImagePosition}
                   resizeMode="cover"
                   alt="splash-screen-carousel"

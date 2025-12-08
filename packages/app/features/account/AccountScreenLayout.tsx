@@ -27,6 +27,9 @@ const DesktopAccountLayout = ({ children }: SettingsLayoutProps) => {
         showsVerticalScrollIndicator={false}
         maxWidth={'49%'}
         overflow="visible"
+        contentContainerStyle={{
+          gap: '$3',
+        }}
       >
         <AccountHeader mb={'$3.5'} />
         <AccountLinks />
@@ -53,6 +56,7 @@ export const MobileAccountLayout = ({ children }: SettingsLayoutProps) => {
         testID={'settings-links'}
         display={children ? 'none' : 'flex'}
         pb={Platform.OS === 'web' ? height : 0}
+        gap={'$3'}
       >
         <AccountHeader mb={'$3.5'} />
         <AccountLinks />

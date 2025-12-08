@@ -1,10 +1,20 @@
 import type React from 'react'
-import { useCallback, useState, useRef, useMemo, useEffect, type PropsWithChildren } from 'react'
+import {
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  memo,
+} from 'react'
 import {
   AnimatePresence,
   Avatar,
   Button,
   createStyledContext,
+  GorhomSheetInput,
+  Input as InputOG,
   LinearGradient,
   Link,
   Paragraph,
@@ -23,18 +33,16 @@ import {
   useThemeName,
   useWindowDimensions,
   View,
+  type ViewProps,
   XStack,
   YStack,
-  GorhomSheetInput,
-  Input as InputOG,
-  type ViewProps,
 } from '@my/ui'
 
-import BottomSheet from '@gorhom/bottom-sheet'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
 import { formatUnits, isAddress } from 'viem'
 
+import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
 import { IconBadgeCheckSolid2, IconCoin } from 'app/components/icons'
@@ -44,7 +52,6 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { shorten } from 'app/utils/strings'
 import { isAndroid, isWeb } from '@tamagui/constants'
-import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { formFields } from 'app/utils/SchemaForm'
@@ -61,7 +68,7 @@ import { useAccountNonce } from 'app/utils/userop'
 import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
-import { baseMainnet, baseMainnetClient, entryPointAddress } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
 
@@ -72,7 +79,13 @@ import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
 import { useInterUserActivityFeed } from 'app/features/profile/utils/useInterUserActivityFeed'
 import type { Activity } from 'app/utils/zod/activity'
 import { Events } from 'app/utils/zod/activity'
-import type { InfiniteData } from '@tanstack/react-query'
+import { amountFromActivity } from 'app/utils/activity'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import { Transaction } from './Transaction'
+import type { Database } from '@my/supabase/database.types'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -83,11 +96,13 @@ const SendChatContext = createStyledContext<{
   setActiveSection: React.Dispatch<React.SetStateAction<Sections>>
   setTransaction: React.Dispatch<React.SetStateAction<Activity | undefined>>
   transaction: Activity | undefined
+  useSendScreenParams: typeof useSendScreenParams
 }>({
   activeSection: 'chat',
   setActiveSection: () => {},
   setTransaction: () => {},
   transaction: undefined,
+  useSendScreenParams: (() => [{}, () => {}]) as unknown as typeof useSendScreenParams,
 })
 
 interface SendChatProps {
@@ -97,137 +112,146 @@ interface SendChatProps {
 
 const Input = (isWeb ? InputOG : GorhomSheetInput) as unknown as typeof InputOG
 
-export const SendChat = ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
-  const { height } = useWindowDimensions()
+export const SendChat = memo(
+  ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
+    const { height } = useWindowDimensions()
 
-  const { gtLg } = useMedia()
+    const { gtLg } = useMedia()
 
-  const [open, setOpen] = useControllableState({
-    defaultProp: false,
-    prop: openProp,
-    onChange: onOpenChangeProp,
-  })
+    const [open, setOpen] = useControllableState({
+      defaultProp: false,
+      prop: openProp,
+      onChange: onOpenChangeProp,
+    })
 
-  const [transaction, setTransaction] = useState<Activity>()
+    const [transaction, setTransaction] = useState<Activity>()
 
-  const [activeSection, setActiveSection] = useState<Sections>('chat')
-  const bottomSheetRef = useRef<BottomSheet>(null)
+    const [activeSection, setActiveSection] = useState<Sections>('chat')
+    const bottomSheetRef = useRef<BottomSheet>(null)
 
-  useEffect(() => {
-    if (open) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.close()
-    }
-  }, [open])
+    // Capture the hook result BEFORE entering Portal
+    // This creates a stable reference to params that works inside Portal
+    const sendScreenParamsResult = useSendScreenParams()
 
-  const animateOnMount = gtLg
-    ? ({
-        animation: 'responsive',
-        animateOnly: ['opacity', 'transform'],
-        enterStyle: {
-          opacity: 0,
-          scale: 0.98,
-          x: 100,
-        },
-        exitStyle: {
-          opacity: 0,
-          scale: 0.98,
-          x: 100,
-        },
-      } as ViewProps)
-    : {}
+    useEffect(() => {
+      if (open) {
+        bottomSheetRef.current?.expand()
+      } else {
+        bottomSheetRef.current?.close()
+      }
+    }, [open])
 
-  return (
-    <>
-      <Portal zIndex={10}>
-        <Container bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
-          <SendChatContext.Provider
-            activeSection={activeSection}
-            setActiveSection={setActiveSection}
-            setTransaction={setTransaction}
-            transaction={transaction}
-          >
-            <AnimatePresence>
-              {(open || !gtLg) && (
-                <View
-                  w={700}
-                  mih="100%"
-                  maw="95%"
-                  pe="auto"
-                  jc="flex-end"
-                  f={1}
-                  {...animateOnMount}
-                >
-                  <YStack
-                    animation="responsive"
-                    h={
-                      activeSection === 'chat'
-                        ? height
-                        : activeSection === 'enterAmount'
-                          ? 500
-                          : 570
-                    }
-                    animateOnly={['height']}
-                    mah="100%"
+    const animateOnMount = gtLg
+      ? ({
+          animation: 'responsive',
+          animateOnly: ['opacity', 'transform'],
+          enterStyle: {
+            opacity: 0,
+            scale: 0.98,
+            x: 100,
+          },
+          exitStyle: {
+            opacity: 0,
+            scale: 0.98,
+            x: 100,
+          },
+        } as ViewProps)
+      : {}
+
+    return (
+      <>
+        <Portal zIndex={10}>
+          <Container bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
+            <SendChatContext.Provider
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              setTransaction={setTransaction}
+              transaction={transaction}
+              useSendScreenParams={() => sendScreenParamsResult}
+            >
+              <AnimatePresence>
+                {(open || !gtLg) && (
+                  <View
+                    w={700}
+                    mih="100%"
+                    maw="95%"
+                    pe="auto"
+                    jc="flex-end"
+                    f={1}
+                    {...animateOnMount}
                   >
                     <YStack
-                      br="$6"
-                      elevation="$9"
-                      shadowOpacity={0.4}
-                      ov="hidden"
-                      f={1}
-                      bg="$color1"
+                      animation="responsive"
+                      h={
+                        activeSection === 'chat'
+                          ? height
+                          : activeSection === 'enterAmount'
+                            ? 500
+                            : 570
+                      }
+                      animateOnly={['height']}
+                      mah="100%"
                     >
-                      <SendChatHeader
-                        onClose={() => {
-                          if (activeSection === 'chat') {
-                            setOpen(false)
-                            bottomSheetRef.current?.close()
-                          } else {
-                            setActiveSection('chat')
-                          }
-                        }}
-                        zi={2}
-                      />
-                      <ChatList />
-                      <SendChatInput />
+                      <YStack
+                        br="$6"
+                        elevation="$9"
+                        shadowOpacity={0.4}
+                        ov="hidden"
+                        f={1}
+                        bg="$color1"
+                      >
+                        <SendChatHeader
+                          onClose={() => {
+                            if (activeSection === 'chat') {
+                              setOpen(false)
+                              bottomSheetRef.current?.close()
+                            } else {
+                              setActiveSection('chat')
+                            }
+                          }}
+                          zi={2}
+                        />
+                        <ChatList />
+                        {isAndroid ? <SendChatInputAndroid /> : <SendChatInput />}
 
-                      <AnimatePresence>
-                        {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
-                      </AnimatePresence>
+                        <AnimatePresence>
+                          {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
+                        </AnimatePresence>
+                      </YStack>
                     </YStack>
-                  </YStack>
-                </View>
-              )}
-            </AnimatePresence>
-          </SendChatContext.Provider>
-        </Container>
-        <AnimatePresence>
-          {open && (
-            <View
-              pe="auto"
-              cursor="pointer"
-              onPress={() => setOpen(false)}
-              animation="200ms"
-              enterStyle={{ opacity: 0 }}
-              exitStyle={{ opacity: 0 }}
-              bg="$shadowColor"
-              pos="absolute"
-              inset={0}
-              zi={-1}
-            />
-          )}
-        </AnimatePresence>
-      </Portal>
-      <Transaction
-        open={!!transaction}
-        onClose={() => setTransaction(undefined)}
-        transaction={transaction}
-      />
-    </>
-  )
-}
+                  </View>
+                )}
+              </AnimatePresence>
+            </SendChatContext.Provider>
+          </Container>
+          <AnimatePresence>
+            {open && (
+              <View
+                pe="auto"
+                cursor="pointer"
+                onPress={() => setOpen(false)}
+                animation="200ms"
+                enterStyle={{ opacity: 0 }}
+                exitStyle={{ opacity: 0 }}
+                bg="$shadowColor"
+                pos="absolute"
+                inset={0}
+                zi={-1}
+              />
+            )}
+          </AnimatePresence>
+        </Portal>
+        <Transaction
+          open={!!transaction}
+          onClose={() => setTransaction(undefined)}
+          transaction={transaction}
+        />
+      </>
+    )
+  }
+)
+
+SendChat.displayName = 'SendChat'
 
 interface ContainerProps {
   children: React.ReactNode
@@ -304,6 +328,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
 
   const isDark = themeName.includes('dark')
 
+  const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
@@ -327,36 +352,38 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
       {...props}
     >
-      <Link
-        hoverStyle={{
-          opacity: 0.8,
-        }}
-        focusStyle={{
-          opacity: 0.8,
-        }}
-        pressStyle={{
-          scale: 0.95,
-        }}
-        href={href}
-      >
-        <Avatar circular size="$4.5" elevation="$0.75">
-          {isAndroid && !profile?.avatar_url ? (
-            <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-            />
-          ) : (
-            <>
-              <Avatar.Image src={profile?.avatar_url ?? ''} />
-              <Avatar.Fallback jc="center" bc="$olive">
-                <Avatar size="$4.5" circular>
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-                  />
-                </Avatar>
-              </Avatar.Fallback>
-            </>
-          )}
-        </Avatar>
+      <XStack>
+        <Link
+          hoverStyle={{
+            opacity: 0.8,
+          }}
+          focusStyle={{
+            opacity: 0.8,
+          }}
+          pressStyle={{
+            scale: 0.95,
+          }}
+          href={href}
+        >
+          <Avatar circular size="$4.5" elevation="$0.75">
+            {isAndroid && !profile?.avatar_url ? (
+              <Avatar.Image
+                src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+              />
+            ) : (
+              <>
+                <Avatar.Image src={profile?.avatar_url ?? ''} />
+                <Avatar.Fallback jc="center" bc="$olive">
+                  <Avatar size="$4.5" circular>
+                    <Avatar.Image
+                      src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
+                    />
+                  </Avatar>
+                </Avatar.Fallback>
+              </>
+            )}
+          </Avatar>
+        </Link>
         {profile?.is_verified && (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
@@ -370,7 +397,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
             />
           </XStack>
         )}
-      </Link>
+      </XStack>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
           {profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
@@ -407,6 +434,47 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
   )
 })
 
+const SendChatInputAndroid = YStack.styleable(() => {
+  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
+
+  if (activeSection !== 'chat') {
+    return null
+  }
+
+  return (
+    <YStack zi={1}>
+      <YStack w="100%" zi={1}>
+        <XStack py="$4" px="$4">
+          <View
+            animation="responsive"
+            animateOnly={['height', 'transform']}
+            h={activeSection === 'chat' ? 47 : 80}
+            y={activeSection === 'chat' ? 0 : -84}
+            f={1}
+            tabIndex={0}
+            onPress={() => setActiveSection('enterAmount')}
+          >
+            <View
+              bg="$aztec5"
+              $theme-light={{
+                bg: '$gray3',
+              }}
+              f={1}
+              br="$3"
+              p="$3"
+              jc="center"
+            >
+              <SizableText size="$5" color="$gray11">
+                {activeSection === 'chat' ? 'Type amount, add a note...' : 'Add a note...'}
+              </SizableText>
+            </View>
+          </View>
+        </XStack>
+      </YStack>
+    </YStack>
+  )
+})
+
 const SendChatInput = Input.styleable((props) => {
   const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
 
@@ -428,18 +496,20 @@ const SendChatInput = Input.styleable((props) => {
         animateOnly={['opacity']}
         opacity={activeSection === 'chat' ? 1 : 0}
       >
-        <LinearGradient
-          // Use the actual aztec3 color value as in line 129
-          colors={gradientColors}
-          locations={[0, 0.36, 1]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          pointerEvents="none"
-          w="100%"
-          h={20}
-          y={-18}
-          pos="absolute"
-        />
+        {isWeb && (
+          <LinearGradient
+            // Use the actual aztec3 color value as in line 129
+            colors={gradientColors}
+            locations={[0, 0.36, 1]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 0, y: 0 }}
+            pointerEvents="none"
+            w="100%"
+            h={20}
+            y={-18}
+            pos="absolute"
+          />
+        )}
       </View>
       <YStack w="100%" zi={1}>
         <XStack py="$4" px="$4">
@@ -489,9 +559,9 @@ const SendAmountSchema = z.object({
 
 // all inputs are here
 const EnterAmountNoteSection = YStack.styleable((props) => {
+  const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [sendParams, setSendParams] = useSendScreenParams()
-
-  const { coin } = useCoinFromSendTokenParam()
+  const { coin } = useCoin(sendParams.sendToken || usdcAddress[baseMainnet.id])
 
   const themeName = useThemeName()
 
@@ -573,7 +643,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   // Delay keyboard appearance to allow animation to complete
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
-    if (activeSection === 'enterAmount' && amountInputRef) {
+    // disabled autofocus on native coz its tricky to change token
+    if (activeSection === 'enterAmount' && amountInputRef && isWeb) {
       timeoutId = setTimeout(() => {
         amountInputRef?.focus()
       }, 500)
@@ -616,7 +687,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin } = useCoinFromSendTokenParam()
+  const { coin: selectedCoin } = useCoin(sendToken || usdcAddress[baseMainnet.id])
   const { profile: currentUserProfile } = useUser()
 
   const [loadingSend, setLoadingSend] = useState(false)
@@ -886,6 +957,14 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   const [isPresent] = usePresence()
 
+  const isButtonPressed = useRef(false)
+
+  useEffect(() => {
+    if (activeSection === 'chat') {
+      isButtonPressed.current = false
+    }
+  }, [activeSection])
+
   return (
     <FormProvider {...form}>
       <YStack
@@ -1043,7 +1122,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           </View>
           <View
             // @ts-expect-error - delay is not typed properly
-            animation={present ? ['200ms', { delay: 200 }] : null}
+            animation={present && !isAndroid ? ['200ms', { delay: 200 }] : null}
             // changing animation at runtime require a key change to remount the component and avoid hook errors
             key={present ? 'note-input-enter' : 'note-input-exit'}
             opacity={present ? 1 : 0}
@@ -1066,6 +1145,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     }}
                     placeholderTextColor="$gray11"
                     disabled={activeSection === 'reviewAndSend'}
+                    pointerEvents={activeSection === 'reviewAndSend' ? 'none' : 'auto'}
+                    editable={activeSection !== 'reviewAndSend'}
                     placeholder="Add a note..."
                     fos="$5"
                     br="$3"
@@ -1106,7 +1187,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         <Button
           bg="$neon7"
           br="$4"
-          animation={'responsive'}
+          animation="responsive"
           animateOnly={['opacity', 'transform']}
           bw={0}
           y={present ? 0 : 100}
@@ -1121,7 +1202,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             bg: '$neon7',
             scale: 0.98,
           }}
-          onPress={form.handleSubmit(onSubmit)}
+          onPress={() => {
+            isButtonPressed.current = true
+            form.handleSubmit(onSubmit)()
+          }}
           ov="hidden"
           disabled={isSendButtonDisabled}
           o={isSendButtonDisabled ? 0.5 : 1}
@@ -1145,21 +1229,27 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               </View>
             ) : (
               <Button.Text
-                key={activeSection === 'reviewAndSend' ? 'review-button-text' : 'send-button-text'}
+                key={
+                  isButtonPressed.current
+                    ? `send-button-text-animated${activeSection}`
+                    : 'send-button-text-no-animate'
+                }
                 fos="$5"
                 col="$gray1"
                 $theme-light={{ col: '$gray12' }}
-                animation="responsive"
-                animateOnly={['opacity', 'transform']}
                 pos="absolute"
-                enterStyle={{
-                  opacity: 0,
-                  y: -40,
-                }}
-                exitStyle={{
-                  opacity: 0,
-                  y: 40,
-                }}
+                {...(isButtonPressed.current && {
+                  animation: 'responsive',
+                  animateOnly: ['opacity', 'transform'],
+                  enterStyle: {
+                    opacity: 0,
+                    y: -40,
+                  },
+                  exitStyle: {
+                    opacity: 0,
+                    y: 40,
+                  },
+                })}
               >
                 {activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
               </Button.Text>
@@ -1354,8 +1444,8 @@ const groupActivitiesByDate = (activities: Activity[]): ListItem[] => {
 }
 
 const ChatList = YStack.styleable(() => {
+  const { useSendScreenParams, activeSection } = SendChatContext.useStyledContext()
   const [{ recipient: recipientParam, idType: idTypeParam }] = useSendScreenParams()
-  const { activeSection } = SendChatContext.useStyledContext()
   const { profile: currentUserProfile } = useUser()
 
   const {
@@ -1483,14 +1573,6 @@ const ChatList = YStack.styleable(() => {
   )
 })
 
-import { amountFromActivity } from 'app/utils/activity'
-import {
-  isTemporalEthTransfersEvent,
-  isTemporalTokenTransfersEvent,
-} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
-import { Transaction } from './Transaction'
-import type { Database } from '@my/supabase/database.types'
-
 interface DateHeaderProps {
   date: Date
 }
@@ -1565,7 +1647,12 @@ const Item = YStack.styleable<ItemProps>((props) => {
             {isSent ? 'You sent' : 'You received'}
           </SizableText>
           <XStack ai="center" gap="$3">
-            <SizableText size="$8" fow="500" color={isSent ? '$color' : '$neon9'}>
+            <SizableText
+              size="$8"
+              fow="500"
+              color={isSent ? '$color' : '$neon9'}
+              lineHeight={isWeb ? undefined : 28}
+            >
               {amount?.replace('+ ', '')}
             </SizableText>
             <IconCoin symbol={item.data?.coin?.symbol ?? ''} size="$1" />
@@ -1578,7 +1665,12 @@ const Item = YStack.styleable<ItemProps>((props) => {
             </View>
           )}
         </YStack>
-        <XStack als={isSent ? 'flex-end' : 'flex-start'} gap="$1.5" ai="center">
+        <XStack
+          flexDirection={isSent ? 'row' : 'row-reverse'}
+          als={isSent ? 'flex-end' : 'flex-start'}
+          gap="$1.5"
+          ai="center"
+        >
           {isFailed ? (
             <SizableText size="$2" color="$error">
               Failed to send

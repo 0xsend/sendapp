@@ -14,6 +14,7 @@ import {
   Spinner,
   Text,
   useAppToast,
+  useEvent,
   XStack,
   YStack,
   type YStackProps,
@@ -47,7 +48,6 @@ export const SendScreen = () => {
   const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
   const finalIsLoading = isLoadingRecipient && deferredIsLoadingRecipient
 
-  // const router = useRouter()
   const [queryParams, setQueryParams] = useSendScreenParams()
 
   const [open, setOpen] = useState(false)
@@ -63,6 +63,17 @@ export const SendScreen = () => {
     }
   }, [profile, queryParams.m])
 
+  const onSendChatOpenChange = useEvent((open: boolean) => {
+    setOpen(open)
+    setQueryParams(
+      {
+        ...queryParams,
+        m: open ? 1 : 0,
+      },
+      { webBehavior: 'replace' }
+    )
+  })
+
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)
 
   if (idType === 'address' && isAddress(recipient as Address)) {
@@ -71,7 +82,6 @@ export const SendScreen = () => {
 
   if (profile && !profile.address) return <NoSendAccount profile={profile} />
 
-  // if (!gtLg || !profile || isLoadingRecipient)
   return (
     <TagSearchProvider>
       <YStack
@@ -93,31 +103,13 @@ export const SendScreen = () => {
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
         </YStack>
         {!search && <SendSuggestions />}
-        {/* {!gtLg && ( */}
         <LazyMount when={open}>
-          <SendChat
-            open={open}
-            onOpenChange={(val) => {
-              setOpen(val)
-              setQueryParams(
-                {
-                  ...queryParams,
-                  m: val ? 1 : 0,
-                },
-                { webBehavior: 'replace' }
-              )
-            }}
-          />
+          <SendChat open={open} onOpenChange={onSendChatOpenChange} />
         </LazyMount>
-        {/* )} */}
         <SendSearchBody />
       </YStack>
     </TagSearchProvider>
   )
-
-  // if (gtLg) {
-  //   return <SendAmountForm />
-  // }
 }
 
 function SendSearchBody() {

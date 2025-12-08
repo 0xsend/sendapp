@@ -10,5 +10,12 @@
     "applied": "Referral code applied",
     "cta": "Got a referral? Enter the code to get rewards!",
     "referredBy": "Referred by"
+  },
+  "versionUpdater": {
+    "title": "Update Available",
+    "description": "We've released a new version with improvements and fixes. Update now to continue.",
+    "actions": {
+      "refresh": "Update Now"
+    }
   }
 }

@@ -5,11 +5,18 @@
  * Learn more about the Seed Client by following our guide: https://docs.snaplet.dev/seed/getting-started
  */
 import { baseMainnetClient } from '@my/wagmi'
+import { copycat } from '@snaplet/copycat'
 import { createSeedClient } from '@snaplet/seed'
 import pg from 'pg'
 import { hexToBytes } from 'viem'
-import { models } from '../src'
-import { leaderboardReferralsAllTimes, userOnboarded } from '../src/models'
+import {
+  createNewTokenDistribution,
+  createOldTokenDistribution,
+  createTransferInDistribution,
+  leaderboardReferralsAllTimes,
+  models,
+  userOnboarded,
+} from '../src'
 import { select } from '../src/select'
 import { pravatar } from '../src/utils'
 const { Client } = pg
@@ -37,6 +44,110 @@ await seed.swap_routers([
     chain_id: baseMainnetClient.chain.id,
   },
 ])
+// Seed distributions
+console.log('Seeding distributions...')
+const now = new Date()
+const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0)
+currentMonthEnd.setSeconds(currentMonthEnd.getSeconds() - 1)
+
+const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0)
+const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0)
+lastMonthEnd.setSeconds(lastMonthEnd.getSeconds() - 1)
+
+const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0, 0)
+const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 1, 0, 0, 0, 0)
+nextMonthEnd.setSeconds(nextMonthEnd.getSeconds() - 1)
+
+await seed.distributions([
+  // Distribution #6 - Last of the early era (old token, no decimals, bonus pools)
+  createOldTokenDistribution({
+    number: 6,
+    description: 'Sixth distributions of 200,000,000 SEND tokens to early hodlers',
+    amount: 200000000,
+    hodler_pool_bips: 9000,
+    bonus_pool_bips: 1000,
+    fixed_pool_bips: 500,
+    qualification_start: new Date('2024-05-17T00:00:00Z'),
+    qualification_end: new Date('2024-05-31T23:59:59Z'),
+    claim_end: new Date('2024-07-31T23:59:59Z'),
+    hodler_min_balance: 150000,
+    tranche_id: 5,
+  }),
+  // Distribution #7 - First of simplified era (old token, no decimals, no bonus pool)
+  createOldTokenDistribution({
+    number: 7,
+    description: 'Seventh distributions of 300,000,000 SEND tokens to early hodlers',
+    amount: 300000000,
+    qualification_start: new Date('2024-09-01T00:00:00Z'),
+    qualification_end: new Date('2024-09-30T23:59:59Z'),
+    hodler_min_balance: 300000,
+    tranche_id: 6,
+  }),
+  // Distribution #10 - Last of old token era
+  createOldTokenDistribution({
+    number: 10,
+    description: 'Tenth distribution of 500,000,000 SEND tokens to early hodlers',
+    amount: 500000000,
+    qualification_start: new Date('2024-12-01T00:00:00Z'),
+    qualification_end: new Date('2024-12-31T23:59:59Z'),
+    hodler_min_balance: 400000,
+    tranche_id: 9,
+  }),
+  // Distribution #11 - MAJOR CHANGE: New token with 18 decimals, much higher amounts
+  createNewTokenDistribution({
+    number: 11,
+    description: 'Eleventh distribution of 3,000,000 SEND tokens to early hodlers',
+    amount: 3000000000000000000000000, // 3M with 18 decimals
+    qualification_start: new Date('2025-01-01T00:00:00Z'),
+    qualification_end: new Date('2025-01-31T23:59:59Z'),
+    hodler_min_balance: 7500000000000000000000, // 7500 SEND
+    tranche_id: 4,
+  }),
+  // Distribution #16 - First with earn_min_balance requirement
+  createNewTokenDistribution({
+    number: 16,
+    description: 'Sixteenth distribution of 3,000,000 SEND tokens to early hodlers',
+    amount: 3000000000000000000000000,
+    qualification_start: new Date('2025-06-01T00:00:00Z'),
+    qualification_end: new Date('2025-06-30T23:59:59Z'),
+    hodler_min_balance: 1000000000000000000000, // 1000 SEND
+    earn_min_balance: 5000000, // 5 USDC
+    tranche_id: 9,
+  }),
+  // Last month's distribution (ended, using recent pattern)
+  createNewTokenDistribution({
+    number: 50,
+    amount: 3000000000000000000000000,
+    qualification_start: lastMonthStart,
+    qualification_end: lastMonthEnd,
+    hodler_min_balance: 1000000000000000000000,
+    earn_min_balance: 5000000,
+    tranche_id: 43,
+  }),
+  // Current month's distribution (active)
+  createNewTokenDistribution({
+    number: 51,
+    amount: 3000000000000000000000000,
+    qualification_start: currentMonthStart,
+    qualification_end: currentMonthEnd,
+    hodler_min_balance: 1000000000000000000000,
+    earn_min_balance: 5000000,
+    tranche_id: 44,
+  }),
+  // Next month's distribution (future)
+  createNewTokenDistribution({
+    number: 52,
+    amount: 3000000000000000000000000,
+    qualification_start: nextMonthStart,
+    qualification_end: nextMonthEnd,
+    hodler_min_balance: 1000000000000000000000,
+    earn_min_balance: 5000000,
+    tranche_id: 45,
+  }),
+])
+
+console.log('Seeded 8 distributions representing different eras (6, 7, 10, 11, 16, 50, 51, 52)')
 
 // Create users with tags and send accounts
 const seededUsers = await seed.users([
@@ -130,6 +241,54 @@ if (!dryRun) {
   try {
     await client.connect()
 
+    // Insert distribution verification values and send_slash for each distribution
+    console.log('Setting up distribution verification values and send_slash...')
+
+    const verificationTypes = [
+      'tag_registration',
+      'create_passkey',
+      'send_ten',
+      'send_one_hundred',
+      'total_tag_referrals',
+      'tag_referral',
+      'send_streak',
+      'send_ceiling',
+    ]
+
+    for (const distNumber of [6, 7, 10, 11, 16, 50, 51, 52]) {
+      // Insert verification values for each type
+      for (const vType of verificationTypes) {
+        // For distributions without an immediate predecessor (6, 10, 11, 16, 50),
+        // we need to provide default multiplier values
+        const needsDefaults = [6, 10, 11, 16, 50].includes(distNumber)
+        if (needsDefaults) {
+          await client.query(
+            `SELECT insert_verification_value(
+              distribution_number => $1,
+              type => $2::public.verification_type,
+              multiplier_min => 1.0,
+              multiplier_max => 1.0,
+              multiplier_step => 0.0
+            )`,
+            [distNumber, vType]
+          )
+        } else {
+          await client.query(
+            `SELECT insert_verification_value(
+              distribution_number => $1,
+              type => $2::public.verification_type
+            )`,
+            [distNumber, vType]
+          )
+        }
+      }
+
+      // Insert send_slash config
+      await client.query('SELECT insert_send_slash(distribution_number => $1)', [distNumber])
+
+      console.log(`  Configured distribution ${distNumber}`)
+    }
+
     // First, update tags with their user_id using the send_account_tags relationship
     // Since tags are created with send_account_tags relationships, we can use this to set the user_id
     const tagUpdateResult = await client.query(`
@@ -199,6 +358,75 @@ if (!dryRun) {
     const sendAccounts = sendAccountsResult.rows
 
     if (sendAccounts.length > 0) {
+      // Seed transfers within distribution periods
+      console.log('Seeding send_token_transfers within distribution periods...')
+
+      // Get distribution date ranges
+      const distributionsResult = await client.query(`
+        SELECT number, 
+               EXTRACT(EPOCH FROM qualification_start) AS start_epoch,
+               EXTRACT(EPOCH FROM qualification_end) AS end_epoch
+        FROM distributions
+        WHERE number IN (6, 7, 10, 11, 16, 50, 51, 52)
+        ORDER BY number
+      `)
+
+      const distributionPeriods = distributionsResult.rows
+      const transfers: ReturnType<typeof createTransferInDistribution>[] = []
+
+      // Create transfers for each distribution period
+      for (const dist of distributionPeriods) {
+        // Create 5-10 transfers per distribution for a subset of accounts
+        const numTransfers = copycat.int(`dist-${dist.number}-count`, { min: 5, max: 10 })
+
+        for (let i = 0; i < numTransfers; i++) {
+          const fromIdx = copycat.int(`dist-${dist.number}-from-${i}`, {
+            min: 0,
+            max: Math.min(sendAccounts.length, 10) - 1,
+          })
+          const toIdx = copycat.int(`dist-${dist.number}-to-${i}`, {
+            min: 0,
+            max: Math.min(sendAccounts.length, 10) - 1,
+          })
+
+          const fromAccount = sendAccounts[fromIdx]
+          const toAccount = sendAccounts[toIdx]
+
+          // Skip if same account
+          if (fromAccount.address_bytes.equals(toAccount.address_bytes)) continue
+
+          // Amount: random between 10-1000 SEND (with 18 decimals for dist 11+, no decimals for earlier)
+          const isNewToken = dist.number >= 11
+          const baseAmount = copycat.int(`dist-${dist.number}-amount-${i}`, { min: 10, max: 1000 })
+          const amount = isNewToken ? baseAmount * 1e18 : baseAmount
+
+          const timespanSeconds = dist.end_epoch - dist.start_epoch
+          const offsetSeconds = copycat.int(`dist-${dist.number}-offset-${i}`, {
+            min: 0,
+            max: Math.floor(timespanSeconds),
+          })
+
+          transfers.push(
+            createTransferInDistribution({
+              from_address_bytes: fromAccount.address_bytes,
+              to_address_bytes: toAccount.address_bytes,
+              amount,
+              distribution_start_epoch: Math.floor(dist.start_epoch),
+              distribution_end_epoch: Math.floor(dist.end_epoch),
+              offset_from_start_seconds: offsetSeconds,
+            })
+          )
+        }
+      }
+
+      // Seed all transfers
+      if (transfers.length > 0) {
+        await seed.send_token_transfers(transfers)
+        console.log(
+          `Seeded ${transfers.length} send_token_transfers across ${distributionPeriods.length} distributions`
+        )
+      }
+
       const aliceAddress = sendAccounts[0].address_bytes
       const nowSeconds = Math.floor(Date.now() / 1000)
       const zeroReferrer = Buffer.from('0000000000000000000000000000000000000000', 'hex')
@@ -308,6 +536,11 @@ if (!dryRun) {
 
       console.log('Seeded sendpot data: 3 jackpot runs and ticket purchases')
     }
+
+    // Refresh the send_scores_history materialized view
+    console.log('Refreshing send_scores_history materialized view...')
+    await client.query('SELECT public.refresh_send_scores_history()')
+    console.log('send_scores_history materialized view refreshed successfully')
   } finally {
     await client.end()
   }
