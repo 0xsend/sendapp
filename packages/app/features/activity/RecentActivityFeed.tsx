@@ -4,8 +4,8 @@ import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { memo, type PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { H4, LazyMount, Paragraph, Spinner, View, YStack } from '@my/ui'
-import { LegendList } from '@legendapp/list'
+import { H4, LazyMount, Paragraph, Spinner, YStack } from '@my/ui'
+import { SectionList } from 'react-native'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
@@ -55,14 +55,11 @@ export default function ActivityFeed({
     }
   }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
-  const pages = data?.pages
-  const locale = i18n.resolvedLanguage ?? i18n.language
+  const sections = useMemo(() => {
+    if (!data?.pages) return []
 
-  const { flattenedData, stickyIndices } = useMemo(() => {
-    if (!pages) return { flattenedData: [], stickyIndices: [] }
-
-    const activities = pages.flat()
-
+    const activities = data.pages.flat()
+    const locale = i18n.resolvedLanguage ?? i18n.language
     const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
       const dateKey = isToday
@@ -80,22 +77,12 @@ export default function ActivityFeed({
       return acc
     }, {})
 
-    const result: (Activity | { type: 'header'; title: string; sectionIndex: number })[] = []
-    const headerIndices: number[] = []
-
-    Object.entries(groups).forEach(([title, sectionData], sectionIndex) => {
-      headerIndices.push(result.length)
-      result.push({
-        type: 'header',
-        title,
-        sectionIndex,
-      })
-
-      result.push(...sectionData)
-    })
-
-    return { flattenedData: result, stickyIndices: headerIndices }
-  }, [pages, t, locale])
+    return Object.entries(groups).map(([title, data], index) => ({
+      title,
+      data,
+      index,
+    }))
+  }, [data?.pages, t, i18n.language, i18n.resolvedLanguage])
 
   if (isLoadingActivities) {
     return <Spinner size="small" />
@@ -109,15 +96,14 @@ export default function ActivityFeed({
     )
   }
 
-  if (!flattenedData.length) {
+  if (!sections.length) {
     return <RowLabel>{t('empty.noActivities')}</RowLabel>
   }
 
   return (
-    <View w="100%" pos="absolute" h="120%" $gtLg={{ h: '105%' }}>
+    <>
       <MyList
-        data={flattenedData}
-        stickyIndices={stickyIndices}
+        sections={sections}
         onActivityPress={onActivityPress}
         isLoadingActivities={isLoadingActivities}
         isFetchingNextPageActivities={isFetchingNextPageActivities}
@@ -125,15 +111,16 @@ export default function ActivityFeed({
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
       </LazyMount>
-    </View>
+    </>
   )
 }
 
-type ListItem = Activity | { type: 'header'; title: string; sectionIndex: number }
-
 interface MyListProps {
-  data: ListItem[]
-  stickyIndices: number[]
+  sections: {
+    title: string
+    data: Activity[]
+    index: number
+  }[]
   onActivityPress: (activity: Activity) => void
   isLoadingActivities: boolean
   isFetchingNextPageActivities: boolean
@@ -141,120 +128,56 @@ interface MyListProps {
 
 const MyList = memo(
   ({
-    data,
-    stickyIndices,
+    sections,
     onActivityPress,
     isLoadingActivities,
     isFetchingNextPageActivities,
   }: MyListProps) => {
-    const sectionDataMap = useMemo(() => {
-      const map = new Map<number, { firstIndex: number; lastIndex: number }>()
-      let currentSectionIndex = -1
-      let firstIndexInSection = -1
-
-      data.forEach((item, index) => {
-        if ('type' in item && item.type === 'header') {
-          if (currentSectionIndex >= 0) {
-            const prevSection = map.get(currentSectionIndex)
-            if (prevSection) {
-              prevSection.lastIndex = index - 1
-            }
-          }
-          currentSectionIndex = item.sectionIndex
-          firstIndexInSection = index + 1
-          map.set(currentSectionIndex, { firstIndex: firstIndexInSection, lastIndex: -1 })
-        }
-      })
-
-      if (currentSectionIndex >= 0) {
-        const lastSection = map.get(currentSectionIndex)
-        if (lastSection) {
-          lastSection.lastIndex = data.length - 1
-        }
-      }
-
-      return map
-    }, [data])
-
-    const getItemType = (item: ListItem) => {
-      return 'type' in item && item.type === 'header' ? 'header' : 'activity'
-    }
-
-    const keyExtractor = (item: ListItem): string => {
-      if ('type' in item && item.type === 'header') {
-        return `header-${item.sectionIndex}-${item.title}`
-      }
-      const activity = item as Activity
-      return `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-    }
-
-    const renderItem = ({ item, index }: { item: ListItem; index: number }) => {
-      if ('type' in item && item.type === 'header') {
-        return <RowLabel first={item.sectionIndex === 0}>{item.title}</RowLabel>
-      }
-
-      let sectionInfo: { firstIndex: number; lastIndex: number } | undefined
-      for (let i = index; i >= 0; i--) {
-        const prevItem = data[i]
-        if (!prevItem) continue
-        if ('type' in prevItem && prevItem.type === 'header') {
-          sectionInfo = sectionDataMap.get(prevItem.sectionIndex)
-          break
-        }
-      }
-
-      const isFirst = sectionInfo?.firstIndex === index
-      const isLast = sectionInfo?.lastIndex === index
-
-      return (
-        <YStack
-          bc="$color1"
-          px="$2"
-          $gtLg={{
-            px: '$3.5',
-          }}
-          {...(isFirst && {
-            pt: '$2',
-            $gtLg: {
-              pt: '$3.5',
-              px: '$3.5',
-            },
-            borderTopLeftRadius: '$4',
-            borderTopRightRadius: '$4',
-          })}
-          {...(isLast && {
-            pb: '$2',
-            $gtLg: {
-              pb: '$3.5',
-              px: '$3.5',
-            },
-            borderBottomLeftRadius: '$4',
-            borderBottomRightRadius: '$4',
-          })}
-        >
-          <TokenActivityRow activity={item as Activity} onPress={onActivityPress} />
-        </YStack>
-      )
-    }
-
     return (
-      <LegendList
+      <SectionList
         style={{ flex: 1 }}
-        data={data}
+        sections={sections}
         testID={'RecentActivity'}
         showsVerticalScrollIndicator={false}
-        keyExtractor={keyExtractor}
-        getItemType={getItemType}
-        renderItem={renderItem}
-        stickyIndices={stickyIndices}
-        estimatedItemSize={65}
-        contentContainerStyle={{
-          paddingBottom: 150,
-        }}
+        keyExtractor={(activity) =>
+          `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+        }
+        renderItem={({ item: activity, index, section }) => (
+          <YStack
+            bc="$color1"
+            px="$2"
+            $gtLg={{
+              px: '$3.5',
+            }}
+            {...(index === 0 && {
+              pt: '$2',
+              $gtLg: {
+                pt: '$3.5',
+                px: '$3.5',
+              },
+              borderTopLeftRadius: '$4',
+              borderTopRightRadius: '$4',
+            })}
+            {...(index === section.data.length - 1 && {
+              pb: '$2',
+              $gtLg: {
+                pb: '$3.5',
+                px: '$3.5',
+              },
+              borderBottomLeftRadius: '$4',
+              borderBottomRightRadius: '$4',
+            })}
+          >
+            <TokenActivityRow activity={activity} onPress={onActivityPress} />
+          </YStack>
+        )}
+        renderSectionHeader={({ section: { title, index } }) => (
+          <RowLabel first={index === 0}>{title}</RowLabel>
+        )}
         ListFooterComponent={
           !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
         }
-        recycleItems
+        stickySectionHeadersEnabled={true}
       />
     )
   }
@@ -264,17 +187,8 @@ MyList.displayName = 'MyList'
 
 function RowLabel({ children, first }: PropsWithChildren & { first?: boolean }) {
   return (
-    <View w="100%">
-      <H4
-        size="$7"
-        fontWeight="400"
-        pt={first ? 0 : '$3.5'}
-        pb="$3.5"
-        bc="$background"
-        col="$gray11"
-      >
-        {children}
-      </H4>
-    </View>
+    <H4 fontWeight={'600'} size={'$7'} pt={first ? 0 : '$3.5'} pb="$3.5" bc="$background">
+      {children}
+    </H4>
   )
 }
