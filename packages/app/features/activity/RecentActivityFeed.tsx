@@ -4,7 +4,7 @@ import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { memo, type PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { H4, LazyMount, Paragraph, Spinner, View, YStack } from '@my/ui'
+import { H4, LazyMount, Paragraph, Spinner, YStack } from '@my/ui'
 import { SectionList } from 'react-native'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useTranslation } from 'react-i18next'
@@ -101,7 +101,7 @@ export default function ActivityFeed({
   }
 
   return (
-    <View w="100%" pos="absolute" h="120%" $gtLg={{ h: '105%' }}>
+    <>
       <MyList
         sections={sections}
         onActivityPress={onActivityPress}
@@ -111,7 +111,7 @@ export default function ActivityFeed({
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
       </LazyMount>
-    </View>
+    </>
   )
 }
 
@@ -136,9 +136,6 @@ const MyList = memo(
     return (
       <SectionList
         style={{ flex: 1 }}
-        contentContainerStyle={{
-          paddingBottom: 150,
-        }}
         sections={sections}
         testID={'RecentActivity'}
         showsVerticalScrollIndicator={false}
