@@ -212,7 +212,7 @@ export const SendChat = memo(
                           zi={2}
                         />
                         <ChatList />
-                        <SendChatInput />
+                        {isAndroid ? <SendChatInputAndroid /> : <SendChatInput />}
 
                         <AnimatePresence>
                           {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
@@ -431,6 +431,47 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
         </Button.Icon>
       </Button>
     </XStack>
+  )
+})
+
+const SendChatInputAndroid = YStack.styleable(() => {
+  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
+
+  if (activeSection !== 'chat') {
+    return null
+  }
+
+  return (
+    <YStack zi={1}>
+      <YStack w="100%" zi={1}>
+        <XStack py="$4" px="$4">
+          <View
+            animation="responsive"
+            animateOnly={['height', 'transform']}
+            h={activeSection === 'chat' ? 47 : 80}
+            y={activeSection === 'chat' ? 0 : -84}
+            f={1}
+            tabIndex={0}
+            onPress={() => setActiveSection('enterAmount')}
+          >
+            <View
+              bg="$aztec5"
+              $theme-light={{
+                bg: '$gray3',
+              }}
+              f={1}
+              br="$3"
+              p="$3"
+              jc="center"
+            >
+              <SizableText size="$5" color="$gray11">
+                {activeSection === 'chat' ? 'Type amount, add a note...' : 'Add a note...'}
+              </SizableText>
+            </View>
+          </View>
+        </XStack>
+      </YStack>
+    </YStack>
   )
 })
 
@@ -1081,7 +1122,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           </View>
           <View
             // @ts-expect-error - delay is not typed properly
-            animation={present ? ['200ms', { delay: 200 }] : null}
+            animation={present && !isAndroid ? ['200ms', { delay: 200 }] : null}
             // changing animation at runtime require a key change to remount the component and avoid hook errors
             key={present ? 'note-input-enter' : 'note-input-exit'}
             opacity={present ? 1 : 0}
@@ -1105,6 +1146,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                     placeholderTextColor="$gray11"
                     disabled={activeSection === 'reviewAndSend'}
                     pointerEvents={activeSection === 'reviewAndSend' ? 'none' : 'auto'}
+                    editable={activeSection !== 'reviewAndSend'}
                     placeholder="Add a note..."
                     fos="$5"
                     br="$3"
