@@ -487,7 +487,6 @@ const TaskCard = ({
           .filter((time): time is number => time !== null)
           .reduce((max, time) => (max === null || time > max ? time : max), null as number | null)
       : null
-  console.log('lastJackpotEndTime', metadata)
   const isSendStreak = type === 'send_streak'
 
   const getIsCompleted = () => {
