@@ -3,7 +3,7 @@ import {
   Button,
   LinearGradient,
   Paragraph,
-  Spinner,
+  Shimmer,
   Text,
   useTheme,
   useThemeName,
@@ -16,13 +16,12 @@ import { useSendScreenParams } from 'app/routers/params'
 import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
-  SendSuggestionsPaginatedQueryResult,
 } from 'app/features/send/suggestions/SendSuggestion.types'
 import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useId } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
 
@@ -41,7 +40,7 @@ export const SendSuggestions = () => {
         title={t('suggestions.favorites')}
         delay={100}
       />
-      <SuggestionsListPaginated query={topSendersQuery} title={t('suggestions.top')} delay={150} />
+      <SuggestionsList query={topSendersQuery} title={t('suggestions.top')} delay={150} />
       <SuggestionsList
         query={todayBirthdaySendersQuery}
         title={t('suggestions.birthdays')}
@@ -61,120 +60,10 @@ const SuggestionsList = memo(
     title: string
     delay?: number
   }) => {
-    const { error, data } = query
-    const { t } = useTranslation('send')
-    const theme = useTheme()
-
-    const items = data || []
-
-    const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
-      return <SenderSuggestion item={item} />
-    }, [])
-
-    const keyExtractor = useCallback((item: SendSuggestionItem, index: number) => {
-      return item?.send_id?.toString() ?? String(index)
-    }, [])
-
-    if (!items || items.length === 0) {
-      return null
-    }
-
-    return (
-      <YStack gap="$3">
-        <Paragraph
-          animation={[
-            '200ms',
-            {
-              opacity: {
-                delay: delay,
-              },
-              transform: {
-                delay: delay,
-              },
-            },
-          ]}
-          enterStyle={{ opacity: 0, y: 20 }}
-          size="$7"
-          fontWeight={600}
-          col="$color10"
-        >
-          {title}
-        </Paragraph>
-        {error ? (
-          <Paragraph color={'$error'}>
-            {error.message?.split('.')[0] ?? t('search.unknownError')}
-          </Paragraph>
-        ) : (
-          <>
-            <View
-              animation={[
-                '200ms',
-                {
-                  opacity: {
-                    delay: delay,
-                  },
-                  transform: {
-                    delay: delay,
-                  },
-                },
-              ]}
-              enterStyle={{ opacity: 0, y: 10 }}
-              exitStyle={{ opacity: 0, y: 10 }}
-              mx={-24}
-              pos="relative"
-            >
-              <FlatList
-                horizontal
-                bounces={true}
-                data={items || []}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingRight: 24,
-                  paddingHorizontal: 24,
-                  paddingVertical: 8,
-                }}
-                $platform-native={{
-                  overflow: 'visible',
-                }}
-              />
-              <LinearGradient
-                display="none"
-                $sm={{ display: 'flex' }}
-                pointerEvents="none"
-                colors={[`${theme.background.val}00`, '$aztec1']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                width="$4"
-                height="100%"
-                zi={100}
-                pos="absolute"
-                top={0}
-                right={0}
-              />
-            </View>
-          </>
-        )}
-      </YStack>
-    )
-  }
-)
-
-SuggestionsList.displayName = 'SuggestionsList'
-
-const SuggestionsListPaginated = memo(
-  ({
-    query,
-    title,
-    delay = 0,
-  }: {
-    query: SendSuggestionsPaginatedQueryResult
-    title: string
-    delay?: number
-  }) => {
     const { error, data, hasNextPage, fetchNextPage, isFetchingNextPage } = query
     const { t } = useTranslation('send')
+    const skeletonBaseId = useId()
+    const skeletonKeys = Array.from({ length: 10 }, (_, i) => `${skeletonBaseId}-${i}`)
 
     const pages = data?.pages || []
 
@@ -271,19 +160,26 @@ const SuggestionsListPaginated = memo(
                 />
               </View>
             ))}
-            {hasNextPage && fetchNextPage && (
-              <XStack jc="center" mt="$2">
+            {hasNextPage && isFetchingNextPage ? (
+              <XStack gap="$2">
+                {skeletonKeys.map((key) => (
+                  <Shimmer key={key} ov="hidden" br="$12" w="$7" h="$7" bg="$color1" />
+                ))}
+              </XStack>
+            ) : hasNextPage ? (
+              <XStack mt="$2">
                 <Button
                   size="$3"
                   onPress={() => fetchNextPage()}
                   disabled={isFetchingNextPage}
                   chromeless
-                  color="$color11"
                 >
-                  {isFetchingNextPage ? <Spinner size="small" /> : t('suggestions.viewMore')}
+                  <Button.Text textDecorationLine="underline" color="$color10">
+                    {t('suggestions.viewMore')}
+                  </Button.Text>
                 </Button>
               </XStack>
-            )}
+            ) : null}
           </>
         )}
       </YStack>
@@ -291,7 +187,7 @@ const SuggestionsListPaginated = memo(
   }
 )
 
-SuggestionsListPaginated.displayName = 'SuggestionsListPaginated'
+SuggestionsList.displayName = 'SuggestionsList'
 
 const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
   const [sendParams, setSendParams] = useSendScreenParams()

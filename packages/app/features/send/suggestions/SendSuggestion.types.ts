@@ -1,9 +1,6 @@
 import type { z } from 'zod'
 import type { UserSchema } from 'app/utils/zod/activity/UserSchema'
-import type { UseQueryResult, UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query'
+import type { UseInfiniteQueryResult, InfiniteData } from '@tanstack/react-query'
 
 export type SendSuggestionItem = z.infer<typeof UserSchema>
-export type SendSuggestionsQueryResult = UseQueryResult<SendSuggestionItem[]>
-export type SendSuggestionsPaginatedQueryResult = UseInfiniteQueryResult<
-  InfiniteData<SendSuggestionItem[]>
->
+export type SendSuggestionsQueryResult = UseInfiniteQueryResult<InfiniteData<SendSuggestionItem[]>>

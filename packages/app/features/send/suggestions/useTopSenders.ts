@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { UserSchema } from 'app/utils/zod/activity/UserSchema'
 import { z } from 'zod'
-import type { SendSuggestionsPaginatedQueryResult } from 'app/features/send/suggestions/SendSuggestion.types'
+import type { SendSuggestionsQueryResult } from 'app/features/send/suggestions/SendSuggestion.types'
 
 const QUERY_KEY = 'top_senders'
 
@@ -12,7 +12,7 @@ const QUERY_KEY = 'top_senders'
  */
 export const useTopSenders = ({
   pageSize = 10,
-}: { pageSize?: number } = {}): SendSuggestionsPaginatedQueryResult => {
+}: { pageSize?: number } = {}): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   async function fetchTopSenders({ pageParam }: { pageParam: number }) {
