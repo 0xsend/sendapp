@@ -5,7 +5,6 @@ import {
   Paragraph,
   Shimmer,
   ThemeableStack,
-  View,
   XStack,
   type XStackProps,
 } from '@my/ui'
@@ -18,6 +17,7 @@ import { HomeBodyCard } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useReferrer } from 'app/utils/useReferrer'
 
 export const FRIENDS_CARD_HREF = '/account/affiliate'
 
@@ -25,8 +25,23 @@ export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
   const linkProps = useLink({ href: FRIENDS_CARD_HREF })
   const limit = 3
   const { data, isLoading } = useFriends(limit)
+  const { data: referrer, isLoading: isReferrerLoading } = useReferrer()
   const hoverStyles = useHoverStyles()
   const { t } = useTranslation('home')
+
+  const displayFriends = (() => {
+    const friends = data?.friends || []
+    if (referrer && friends.length < 3) {
+      return [
+        {
+          tag: referrer.main_tag_name || referrer.tag || undefined,
+          avatar_url: referrer.avatar_url || undefined,
+        },
+        ...friends,
+      ].slice(0, 3)
+    }
+    return friends
+  })()
 
   return (
     <HomeBodyCard {...linkProps} {...props}>
@@ -47,11 +62,11 @@ export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
         />
       </Card.Header>
       <Card.Footer padded pt={0} fd="column">
-        {isLoading ? (
+        {isLoading || isReferrerLoading ? (
           <Shimmer br={100} w={35} h={35} als="flex-end" />
         ) : (
           <XStack ai="center" jc="space-between">
-            {data?.friends && <OverlappingFriendAvatars friends={data.friends} />}
+            <OverlappingFriendAvatars friends={displayFriends} />
             <ThemeableStack
               circular
               ai="center"
@@ -63,7 +78,7 @@ export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
               miw={0}
             >
               <Paragraph fontSize={'$2'} fontWeight="400">
-                {`${data?.count ?? 0}`}
+                {`${(data?.count ?? 0) + (referrer ? 1 : 0)}`}
               </Paragraph>
             </ThemeableStack>
           </XStack>
