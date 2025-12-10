@@ -1,5 +1,5 @@
 import { Text, XStack, YStack } from '@my/ui'
-import { Paragraph } from 'tamagui'
+import { Paragraph, useEvent } from 'tamagui'
 import {
   useDateFromActivity,
   useEventNameFromActivity,
@@ -23,14 +23,16 @@ import {
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import type { ReactNode } from 'react'
 import { memo, useCallback } from 'react'
-import { useSendScreenParams } from 'app/routers/params'
+import type { useSendScreenParams } from 'app/routers/params'
 
 export const TokenActivityRow = ({
   activity,
   onPress,
+  sendParamsRef,
 }: {
   activity: Activity
   onPress?: (activity: Activity) => void
+  sendParamsRef: React.RefObject<ReturnType<typeof useSendScreenParams>>
 }) => {
   const { profile } = useUser()
   const { data: swapRouters } = useSwapRouters()
@@ -49,12 +51,12 @@ export const TokenActivityRow = ({
     Boolean(to_user?.send_id) &&
     Boolean(from_user?.send_id)
 
-  const [sendParams, setSendParams] = useSendScreenParams()
+  const [sendParams, setSendParams] = sendParamsRef.current ?? []
 
-  const handlePress = useCallback(() => {
+  const handlePress = useEvent(() => {
     if (onPress) {
       if (isUserTransfer) {
-        setSendParams({
+        setSendParams?.({
           ...sendParams,
           recipient:
             profile?.send_id === from_user?.send_id
@@ -67,16 +69,7 @@ export const TokenActivityRow = ({
       }
       onPress(activity)
     }
-  }, [
-    onPress,
-    profile?.send_id,
-    from_user?.send_id,
-    to_user?.send_id,
-    activity,
-    sendParams,
-    setSendParams,
-    isUserTransfer,
-  ])
+  })
 
   return (
     <TokenActivityRowContent

@@ -6069,9 +6069,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@legendapp/list@npm:3.0.0-beta.7":
-  version: 3.0.0-beta.7
-  resolution: "@legendapp/list@npm:3.0.0-beta.7"
+"@legendapp/list@npm:3.0.0-beta.8":
+  version: 3.0.0-beta.8
+  resolution: "@legendapp/list@npm:3.0.0-beta.8"
   dependencies:
     use-sync-external-store: "npm:^1.5.0"
   peerDependencies:
@@ -6081,7 +6081,7 @@ __metadata:
       optional: true
     react-native:
       optional: true
-  checksum: 10/e7a1e0bc85ede802d06d357b8cab1854159114080ce56c6b50ed8cc77880f7fc12af326e95f6b88660d2ec74ad6f8124e5f684e18444c87f4b1a888ef113eee8
+  checksum: 10/940218f906c6d6d8f67ab4d40ccd4d1987cd7bf100bcb98815971443f7f0f0389d227b87560d30311eb86a57c76eeb17c136156dfc517f95be17333de4368d78
   languageName: node
   linkType: hard
 
@@ -15000,7 +15000,7 @@ __metadata:
     "@intercom/intercom-react-native": "npm:^8.6.0"
     "@intercom/messenger-js-sdk": "npm:^0.0.14"
     "@jest/globals": "npm:^29"
-    "@legendapp/list": "npm:3.0.0-beta.7"
+    "@legendapp/list": "npm:3.0.0-beta.8"
     "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
@@ -27926,6 +27926,7 @@ __metadata:
     "@types/node": "npm:^20"
     "@vercel/og": "npm:^0.6.8"
     app: "workspace:*"
+    babel-plugin-react-compiler: "npm:^1.0.0"
     dotenv-cli: "npm:^7.3.0"
     eslint-config-next: "npm:^14.0.4"
     expo-sharing: "npm:13.0.1"

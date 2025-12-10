@@ -3,9 +3,9 @@ import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { memo, type PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { H4, LazyMount, Paragraph, Spinner, YStack } from '@my/ui'
-import { SectionList } from 'react-native'
+import { memo, type PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { H4, LazyMount, LinearGradient, Paragraph, Shimmer, Spinner, View, YStack } from '@my/ui'
+import { LegendList } from '@legendapp/list'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
@@ -22,7 +22,11 @@ export default function ActivityFeed({
   const { t, i18n } = useTranslation('activity')
 
   const [sendChatOpen, setSendChatOpen] = useState(false)
-  const [sendParams, setSendParams] = useSendScreenParams()
+  const sendParamsAndSet = useSendScreenParams()
+  const [sendParams, setSendParams] = sendParamsAndSet
+
+  const sendParamsRef = useRef(sendParamsAndSet)
+  sendParamsRef.current = sendParamsAndSet
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
@@ -55,11 +59,20 @@ export default function ActivityFeed({
     }
   }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
-  const sections = useMemo(() => {
-    if (!data?.pages) return []
+  const pages = data?.pages
+  const locale = i18n.resolvedLanguage ?? i18n.language
 
-    const activities = data.pages.flat()
-    const locale = i18n.resolvedLanguage ?? i18n.language
+  const { flattenedData } = useMemo(() => {
+    if (!pages) return { flattenedData: [], stickyIndices: [] }
+
+    const activities = pages.flat()
+
+    if (activities.length === 0) {
+      console.info('no activities')
+    } else {
+      console.info('activities', activities.length)
+    }
+
     const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
       const dateKey = isToday
@@ -77,15 +90,25 @@ export default function ActivityFeed({
       return acc
     }, {})
 
-    return Object.entries(groups).map(([title, data], index) => ({
-      title,
-      data,
-      index,
-    }))
-  }, [data?.pages, t, i18n.language, i18n.resolvedLanguage])
+    const result: (Activity | { type: 'header'; title: string; sectionIndex: number })[] = []
+    const headerIndices: number[] = []
+
+    Object.entries(groups).forEach(([title, sectionData], sectionIndex) => {
+      headerIndices.push(result.length)
+      result.push({
+        type: 'header',
+        title,
+        sectionIndex,
+      })
+
+      result.push(...sectionData)
+    })
+
+    return { flattenedData: result, stickyIndices: headerIndices }
+  }, [pages, t, locale])
 
   if (isLoadingActivities) {
-    return <Spinner size="small" />
+    return <ListLoadingShimmer />
   }
 
   if (activitiesError) {
@@ -96,99 +119,198 @@ export default function ActivityFeed({
     )
   }
 
-  if (!sections.length) {
+  if (!flattenedData.length) {
     return <RowLabel>{t('empty.noActivities')}</RowLabel>
   }
 
   return (
-    <>
+    <View br={10} ov="hidden" w="100%" pos="absolute" h="120%" $gtLg={{ h: '105%' }}>
       <MyList
-        sections={sections}
+        data={flattenedData}
+        // stickyIndices={stickyIndices}
         onActivityPress={onActivityPress}
         isLoadingActivities={isLoadingActivities}
         isFetchingNextPageActivities={isFetchingNextPageActivities}
+        sendParamsRef={sendParamsRef}
       />
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
       </LazyMount>
-    </>
+      <LinearGradient
+        display="none"
+        $gtSm={{
+          display: 'flex',
+        }}
+        animation="100ms"
+        animateOnly={['opacity']}
+        enterStyle={{ opacity: 0 }}
+        exitStyle={{ opacity: 0 }}
+        pe="none"
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        colors={['$background', 'rgba(0, 0, 0, 0)']}
+        locations={[0, 1]}
+        pos="absolute"
+        l={0}
+        r={0}
+        opacity={0.7}
+        h={20}
+      />
+    </View>
   )
 }
 
+type ListItem = Activity | { type: 'header'; title: string; sectionIndex: number }
+
 interface MyListProps {
-  sections: {
-    title: string
-    data: Activity[]
-    index: number
-  }[]
+  data: ListItem[]
+  stickyIndices?: number[]
   onActivityPress: (activity: Activity) => void
   isLoadingActivities: boolean
   isFetchingNextPageActivities: boolean
+  sendParamsRef: React.RefObject<ReturnType<typeof useSendScreenParams>>
+}
+
+const getItemType = (item: ListItem) => {
+  return 'type' in item && item.type === 'header' ? 'header' : 'activity'
+}
+
+const keyExtractor = (item: ListItem): string => {
+  if ('type' in item && item.type === 'header') {
+    return `header-${item.sectionIndex}-${item.title}`
+  }
+  const activity = item as Activity
+  return `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+}
+const getFixedItemSize = (_: number, __: ListItem, type?: string) => {
+  if (type === 'header') {
+    return 56
+  }
+  return 122
 }
 
 const MyList = memo(
   ({
-    sections,
+    data,
+    stickyIndices,
     onActivityPress,
     isLoadingActivities,
     isFetchingNextPageActivities,
+    sendParamsRef,
   }: MyListProps) => {
+    const sectionDataMap = useMemo(() => {
+      const map = new Map<number, { firstIndex: number; lastIndex: number }>()
+      let currentSectionIndex = -1
+      let firstIndexInSection = -1
+
+      data.forEach((item, index) => {
+        if ('type' in item && item.type === 'header') {
+          if (currentSectionIndex >= 0) {
+            const prevSection = map.get(currentSectionIndex)
+            if (prevSection) {
+              prevSection.lastIndex = index - 1
+            }
+          }
+          currentSectionIndex = item.sectionIndex
+          firstIndexInSection = index + 1
+          map.set(currentSectionIndex, { firstIndex: firstIndexInSection, lastIndex: -1 })
+        }
+      })
+
+      if (currentSectionIndex >= 0) {
+        const lastSection = map.get(currentSectionIndex)
+        if (lastSection) {
+          lastSection.lastIndex = data.length - 1
+        }
+      }
+
+      return map
+    }, [data])
+
+    const renderItem = ({ item, index }: { item: ListItem; index: number }) => {
+      if ('type' in item && item.type === 'header') {
+        return <RowLabel>{item.title}</RowLabel>
+      }
+
+      let sectionInfo: { firstIndex: number; lastIndex: number } | undefined
+      for (let i = index; i >= 0; i--) {
+        const prevItem = data[i]
+        if (!prevItem) continue
+        if ('type' in prevItem && prevItem.type === 'header') {
+          sectionInfo = sectionDataMap.get(prevItem.sectionIndex)
+          break
+        }
+      }
+
+      const isFirst = sectionInfo?.firstIndex === index
+      const isLast = sectionInfo?.lastIndex === index
+
+      return (
+        <YStack
+          bc="$color1"
+          p={10}
+          {...(isFirst && {
+            borderTopLeftRadius: '$4',
+            borderTopRightRadius: '$4',
+          })}
+          {...(isLast && {
+            borderBottomLeftRadius: '$4',
+            borderBottomRightRadius: '$4',
+          })}
+        >
+          <TokenActivityRow
+            activity={item as Activity}
+            onPress={onActivityPress}
+            sendParamsRef={sendParamsRef}
+          />
+        </YStack>
+      )
+    }
+
     return (
-      <SectionList
-        style={{ flex: 1 }}
-        sections={sections}
-        testID={'RecentActivity'}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) =>
-          `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-        }
-        renderItem={({ item: activity, index, section }) => (
-          <YStack
-            bc="$color1"
-            px="$2"
-            $gtLg={{
-              px: '$3.5',
-            }}
-            {...(index === 0 && {
-              pt: '$2',
-              $gtLg: {
-                pt: '$3.5',
-                px: '$3.5',
-              },
-              borderTopLeftRadius: '$4',
-              borderTopRightRadius: '$4',
-            })}
-            {...(index === section.data.length - 1 && {
-              pb: '$2',
-              $gtLg: {
-                pb: '$3.5',
-                px: '$3.5',
-              },
-              borderBottomLeftRadius: '$4',
-              borderBottomRightRadius: '$4',
-            })}
-          >
-            <TokenActivityRow activity={activity} onPress={onActivityPress} />
-          </YStack>
-        )}
-        renderSectionHeader={({ section: { title, index } }) => (
-          <RowLabel first={index === 0}>{title}</RowLabel>
-        )}
-        ListFooterComponent={
-          !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
-        }
-        stickySectionHeadersEnabled={true}
-      />
+      <View className="hide-scroll" display="contents">
+        <LegendList
+          style={{ flex: 1 }}
+          data={data}
+          testID={'RecentActivity'}
+          // stickyHeaderIndices={stickyIndices}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={keyExtractor}
+          getItemType={getItemType}
+          getFixedItemSize={getFixedItemSize}
+          renderItem={renderItem}
+          // drawDistance={0}
+          estimatedItemSize={109}
+          contentContainerStyle={{
+            paddingBottom: 150,
+          }}
+          ListFooterComponent={
+            !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
+          }
+          recycleItems
+        />
+      </View>
     )
   }
 )
 
+function ListLoadingShimmer() {
+  return (
+    <YStack w="100%" gap={25}>
+      <Shimmer componentName="Card" $theme-light={{ bg: '$background' }} w={100} h={30} />
+      <Shimmer br={10} componentName="Card" $theme-light={{ bg: '$background' }} w="100%" h={306} />
+    </YStack>
+  )
+}
+
 MyList.displayName = 'MyList'
 
-function RowLabel({ children, first }: PropsWithChildren & { first?: boolean }) {
+function RowLabel({ children }: PropsWithChildren) {
   return (
-    <H4 fontWeight={'600'} size={'$7'} pt={first ? 0 : '$3.5'} pb="$3.5" bc="$background">
-      {children}
-    </H4>
+    <View h={56} w="100%">
+      <H4 size="$7" fontWeight="400" py="$3.5" bc="$background" col="$gray11">
+        {children}
+      </H4>
+    </View>
   )
 }
