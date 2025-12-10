@@ -16,7 +16,7 @@ import { Events } from 'app/utils/zod/activity/events'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
-import { useRootScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { RecyclerListView, type Dimension } from 'recyclerlistview/web'
 import type { CoinWithBalance } from 'app/data/coins'
 
@@ -97,9 +97,20 @@ export default function TokenActivityFeed({
     getHeightOrWidth: () => 102,
   })
 
+  const sendParamsAndSet = useSendScreenParams()
+
+  const sendParamsRef = useRef(sendParamsAndSet)
+  sendParamsRef.current = sendParamsAndSet
+
   const _renderRow = useCallback(
     (type, activity: Activity) => {
-      return <TokenActivityRow activity={activity} onPress={onActivityPress} />
+      return (
+        <TokenActivityRow
+          activity={activity}
+          onPress={onActivityPress}
+          sendParamsRef={sendParamsRef}
+        />
+      )
     },
     [onActivityPress]
   )

@@ -26,7 +26,7 @@ import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
 import debug from 'debug'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Platform, SectionList } from 'react-native'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
@@ -34,6 +34,7 @@ import { useEarnRewardsActivityFeed } from './hooks'
 import { TokenDetailsMarketData } from 'app/features/home/TokenDetailsHeader'
 import { useCoin } from 'app/provider/coins'
 import { useTranslation } from 'react-i18next'
+import { useSendScreenParams } from 'app/routers/params'
 
 const log = debug('app:features:earn:rewards')
 
@@ -288,6 +289,11 @@ const RewardsFeed = () => {
     }))
   }, [data?.pages, i18n.language, i18n.resolvedLanguage, t])
 
+  const sendParamsAndSet = useSendScreenParams()
+
+  const sendParamsRef = useRef(sendParamsAndSet)
+  sendParamsRef.current = sendParamsAndSet
+
   if (!coin.isSuccess || !coin.data) return null
   if (isLoading) return <Spinner size="small" />
   if (error) return <Paragraph>{t('rewards.history.error', { message: error.message })}</Paragraph>
@@ -324,7 +330,7 @@ const RewardsFeed = () => {
               borderBottomRightRadius: '$6',
             })}
           >
-            <TokenActivityRow activity={activity} />
+            <TokenActivityRow activity={activity} sendParamsRef={sendParamsRef} />
           </YStack>
         )}
         renderSectionHeader={({ section: { title, index } }) =>

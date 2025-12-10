@@ -46,9 +46,15 @@ body {
   scrollbar-width: none;
 }
 
-.hide-scroll::-webkit-scrollbar {
+.hide-scroll::-webkit-scrollbar,
+.hide-scroll *::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none;
   -webkit-appearance: none;
+}
+
+.hide-scroll * {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

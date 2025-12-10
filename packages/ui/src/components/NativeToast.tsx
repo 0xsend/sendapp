@@ -38,7 +38,6 @@ export const NativeToast = () => {
         shadowOpacity: 0.3,
         bg: '#fff',
       }}
-      o={0.8}
       br="$6"
       {...(isError ? errorStyles : {})}
     >
@@ -48,7 +47,7 @@ export const NativeToast = () => {
             <AlertTriangle size={16} color="$red11" />
           </XStack>
         )}
-        <YStack gap="$1.5" fs={0}>
+        <YStack f={1} fs={1} gap="$1.5">
           <Toast.Title>{currentToast.title}</Toast.Title>
           {!!currentToast.message && (
             <Toast.Description col="$gray11">{currentToast.message}</Toast.Description>
