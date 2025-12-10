@@ -2,9 +2,16 @@ import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
-import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import { memo, type PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import { H4, LazyMount, LinearGradient, Paragraph, Shimmer, Spinner, View, YStack } from '@my/ui'
+import {
+  memo,
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { H4, isWeb, LazyMount, LinearGradient, Paragraph, Shimmer, View, YStack } from '@my/ui'
 import { LegendList } from '@legendapp/list'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
 import { useTranslation } from 'react-i18next'
@@ -18,7 +25,6 @@ export default function ActivityFeed({
   activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
   onActivityPress: (activity: Activity) => void
 }) {
-  const { isAtEnd } = useScrollDirection()
   const { t, i18n } = useTranslation('activity')
 
   const [sendChatOpen, setSendChatOpen] = useState(false)
@@ -53,11 +59,11 @@ export default function ActivityFeed({
     hasNextPage,
   } = activityFeedQuery
 
-  useEffect(() => {
-    if (isAtEnd && hasNextPage && !isFetchingNextPageActivities) {
+  const onEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPageActivities) {
       fetchNextPage()
     }
-  }, [isAtEnd, hasNextPage, fetchNextPage, isFetchingNextPageActivities])
+  }, [hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
   const pages = data?.pages
   const locale = i18n.resolvedLanguage ?? i18n.language
@@ -66,12 +72,6 @@ export default function ActivityFeed({
     if (!pages) return { flattenedData: [], stickyIndices: [] }
 
     const activities = pages.flat()
-
-    if (activities.length === 0) {
-      console.info('no activities')
-    } else {
-      console.info('activities', activities.length)
-    }
 
     const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
@@ -132,6 +132,8 @@ export default function ActivityFeed({
         isLoadingActivities={isLoadingActivities}
         isFetchingNextPageActivities={isFetchingNextPageActivities}
         sendParamsRef={sendParamsRef}
+        onEndReached={onEndReached}
+        hasNextPage={hasNextPage}
       />
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
@@ -169,6 +171,8 @@ interface MyListProps {
   isLoadingActivities: boolean
   isFetchingNextPageActivities: boolean
   sendParamsRef: React.RefObject<ReturnType<typeof useSendScreenParams>>
+  onEndReached: () => void
+  hasNextPage: boolean
 }
 
 const getItemType = (item: ListItem) => {
@@ -197,6 +201,8 @@ const MyList = memo(
     isLoadingActivities,
     isFetchingNextPageActivities,
     sendParamsRef,
+    onEndReached,
+    hasNextPage,
   }: MyListProps) => {
     const sectionDataMap = useMemo(() => {
       const map = new Map<number, { firstIndex: number; lastIndex: number }>()
@@ -270,22 +276,23 @@ const MyList = memo(
     return (
       <View className="hide-scroll" display="contents">
         <LegendList
-          style={{ flex: 1 }}
           data={data}
           testID={'RecentActivity'}
           // stickyHeaderIndices={stickyIndices}
           showsVerticalScrollIndicator={false}
           keyExtractor={keyExtractor}
           getItemType={getItemType}
-          getFixedItemSize={getFixedItemSize}
+          onEndReached={onEndReached}
+          {...(!isWeb && {
+            getFixedItemSize: getFixedItemSize,
+            estimatedItemSize: 122,
+          })}
           renderItem={renderItem}
-          // drawDistance={0}
-          estimatedItemSize={109}
           contentContainerStyle={{
-            paddingBottom: 150,
+            paddingBottom: hasNextPage ? 0 : 150,
           }}
           ListFooterComponent={
-            !isLoadingActivities && isFetchingNextPageActivities ? <Spinner size="small" /> : null
+            !isLoadingActivities && isFetchingNextPageActivities ? <ListFooterComponent /> : null
           }
           recycleItems
         />
@@ -294,6 +301,18 @@ const MyList = memo(
   }
 )
 
+function ListFooterComponent() {
+  return (
+    <Shimmer
+      br={10}
+      mt={10}
+      componentName="Card"
+      $theme-light={{ bg: '$background' }}
+      w="100%"
+      h={122}
+    />
+  )
+}
 function ListLoadingShimmer() {
   return (
     <YStack w="100%" gap={25}>
