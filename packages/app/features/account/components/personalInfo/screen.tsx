@@ -1,13 +1,4 @@
-import {
-  FadeCard,
-  isWeb,
-  Paragraph,
-  Separator,
-  SubmitButton,
-  Text,
-  useAppToast,
-  YStack,
-} from '@my/ui'
+import { FadeCard, isWeb, Paragraph, SubmitButton, useAppToast, YStack } from '@my/ui'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
@@ -125,28 +116,6 @@ export const PersonalInfoScreen = () => {
       schema={AuthUserSchema}
       onSubmit={handleSubmit}
       props={{
-        phone: {
-          'aria-label': t('personalInfo.labels.phone'),
-          autoComplete: 'tel',
-          keyboardType: 'phone-pad',
-          autoCapitalize: 'none',
-          bc: '$color0',
-        },
-        xUsername: {
-          'aria-label': t('personalInfo.labels.xUsername'),
-          bc: '$color0',
-          pl: '$8',
-          iconBefore: (
-            <Text
-              ml={Platform.OS === 'web' ? 0 : '$4'}
-              color="$color10"
-              userSelect={'none'}
-              fontSize={'$6'}
-            >
-              @
-            </Text>
-          ),
-        },
         birthday: {
           'aria-label': t('personalInfo.labels.birthday'),
           bc: '$color0',
@@ -166,7 +135,7 @@ export const PersonalInfoScreen = () => {
         }),
       }}
     >
-      {({ birthday, xUsername }) => (
+      {({ birthday }) => (
         <YStack gap={'$3.5'}>
           <FadeCard>
             <FieldWithLabel
@@ -175,10 +144,6 @@ export const PersonalInfoScreen = () => {
               gap={'$2'}
             >
               {birthday}
-            </FieldWithLabel>
-            <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-            <FieldWithLabel label={t('personalInfo.labels.xHandle')} gap={'$2'}>
-              {xUsername}
             </FieldWithLabel>
           </FadeCard>
           <SubmitButton onPress={() => form.handleSubmit(handleSubmit)()}>
@@ -201,11 +166,6 @@ export const PersonalInfoScreen = () => {
           label={t('personalInfo.labels.dateOfBirth')}
           text={formatDate(birthday) || '-'}
           additionalInfo={t('personalInfo.labels.nonEditable')}
-        />
-        <Separator boc={'$silverChalice'} $theme-light={{ boc: '$darkGrayTextField' }} />
-        <ReadOnlyFieldWithLabel
-          label={t('personalInfo.labels.xHandle')}
-          text={profile?.x_username ? `@ ${profile?.x_username}` : '-'}
         />
       </FadeCard>
       <SubmitButton onPress={() => setFormState(FormState.PersonalInfoForm)}>
