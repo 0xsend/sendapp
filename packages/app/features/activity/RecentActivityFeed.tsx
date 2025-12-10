@@ -287,6 +287,7 @@ const MyList = memo(
           data={data}
           testID={'RecentActivity'}
           keyExtractor={keyExtractor}
+          showsVerticalScrollIndicator={false}
           getItemType={getItemType}
           onEndReached={onEndReached}
           renderItem={renderItem}
