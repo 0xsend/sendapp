@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "addMoney": "Ajouter des fonds",
+    "deposit": "Déposer",
+    "earn": "Gagner",
+    "invest": "Investir",
+    "send": "Envoyer"
+  },
+  "cards": {
+    "investments": {
+      "cta": "INVESTIR",
+      "empty": "Diversifiez votre portefeuille",
+      "error": "Impossible de charger les données du marché",
+      "title": "Investissements",
+      "weeklyDelta": "{{sign}}${{amount}} cette semaine"
+    },
+    "referrals": {
+      "title": "Parrainages"
+    },
+    "rewards": {
+      "title": "Récompenses"
+    },
+    "savings": {
+      "earning": "Gagnez {{percent}}%",
+      "fallback": "Jusqu’à 10 % d’intérêt",
+      "title": "Épargner"
+    },
+    "stables": {
+      "title": "Solde de trésorerie",
+      "totalTitle": "Solde total"
+    }
+  },
+  "fallback": {
+    "missingAccount": {
+      "description": "Ceci ne devrait jamais arriver.",
+      "onboarding": "Accéder à l’intégration",
+      "signOut": "Se déconnecter",
+      "sitemap": "Plan du site",
+      "title": "Aucun compte Send trouvé"
+    }
+  },
+  "token": {
+    "chartError": "Impossible de charger les données du graphique",
+    "keyMetrics": "Indicateurs clés",
+    "metrics": {
+      "circulatingSupply": "Offre en circulation",
+      "fdv": "FDV",
+      "marketCap": "Capitalisation boursière",
+      "volume24h": "Volume (24 h)"
+    },
+    "priceOverview": "Aperçu des prix"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "actions": {
+    "signIn": "SE CONNECTER",
+    "signInLoading": "CONNEXION...",
+    "signUp": "S’INSCRIRE"
+  },
+  "headline": {
+    "line1": "Bienvenue",
+    "line2": "sur Send",
+    "subtitle": "Se connecter avec votre clé d'identification"
+  }
+}

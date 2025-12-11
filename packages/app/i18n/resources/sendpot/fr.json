@@ -1,0 +1,112 @@
+{
+  "buy": {
+    "balance": {
+      "insufficient": "Fonds insuffisants",
+      "label": "Solde :"
+    },
+    "button": {
+      "review": "Vérifier"
+    },
+    "input": {
+      "ticketsLabel": "Billets"
+    },
+    "ticketPrice": "Prix du billet :",
+    "title": "Combien de billets souhaitez-vous acheter ?",
+    "toast": {
+      "errorTitle": "Erreur",
+      "insufficientFunds": "Fonds insuffisants.",
+      "invalidQuantity": "Veuillez saisir un nombre de billets valide.",
+      "loadingMessage": "Veuillez patienter, chargement des données...",
+      "loadingTitle": "Info"
+    },
+    "total": {
+      "label": "Coût total"
+    }
+  },
+  "claim": {
+    "cta": {
+      "claiming": "Réclamation en cours...",
+      "default": "Réclamer les gains",
+      "preparing": "Préparation..."
+    },
+    "title": "Vous avez gagné !",
+    "toast": {
+      "error": "Échec de la réclamation",
+      "noPasskeyDescription": "Aucune clé d'identification trouvée pour ce compte.",
+      "noPasskeyTitle": "Erreur",
+      "success": "Réclamation réussie"
+    }
+  },
+  "confirm": {
+    "button": {
+      "buy_one": "Acheter {{count}} billet",
+      "buy_other": "Acheter {{count}} billets",
+      "insufficientBalance": "Solde insuffisant",
+      "insufficientGas": "Gaz insuffisant",
+      "preparing": "Préparation...",
+      "processing": "Traitement en cours..."
+    },
+    "edit": {
+      "cta": "Modifier",
+      "label": "Modifier le nombre de billets"
+    },
+    "errors": {
+      "insufficientBalance": "Solde insuffisant.",
+      "insufficientGas": "Gaz insuffisant.",
+      "noPasskeyDescription": "Aucune clé d'identification trouvée pour ce compte.",
+      "noPasskeyTitle": "Erreur"
+    },
+    "rows": {
+      "fee": "Frais de transaction estimés",
+      "price": "Prix par billet",
+      "total": "Coût total"
+    },
+    "tickets": "Billets",
+    "toast": {
+      "error": "Échec de l'achat",
+      "success": "Achat réussi"
+    },
+    "usd": "({{value}})"
+  },
+  "history": {
+    "current": "Actuel",
+    "empty": "Aucun historique de tirage disponible.",
+    "notAvailable": "N/A",
+    "tickets": {
+      "none": "Vous avez acheté 0 billet",
+      "purchased_one": "Vous avez acheté {{count}} billet",
+      "purchased_other": "Vous avez acheté {{count}} billets"
+    },
+    "title": "Historique des tirages",
+    "totalPool": "Cagnotte totale :",
+    "upcoming": "À venir",
+    "winner": {
+      "label": "Gagnant",
+      "loading": "(Chargement...)",
+      "none": "Aucun",
+      "pending": "(En attente)",
+      "you": "Vous avez gagné !"
+    }
+  },
+  "jackpot": {
+    "actions": {
+      "buy": "Acheter un billet"
+    },
+    "loading": "Chargement...",
+    "messages": {
+      "geoBlocked": "L'achat de billets n'est pas disponible dans votre région pour le moment."
+    },
+    "title": "Sendpot actuel"
+  },
+  "risk": {
+    "actions": {
+      "cancel": "Annuler",
+      "confirm": "J'accepte et je continue"
+    },
+    "body": "En achetant un billet Sendpot, vous reconnaissez que les gains ne sont pas garantis et que le coût des billets n'est pas remboursable. Les tirages sont alimentés par Megapot et utilisent un caractère aléatoire en chaîne prouvable ; veuillez jouer de manière responsable.",
+    "checkbox": "J'ai lu et compris les conditions.",
+    "errorTitle": "Erreur",
+    "link": "En savoir plus.",
+    "title": "Avis de non-responsabilité important"
+  }
+}

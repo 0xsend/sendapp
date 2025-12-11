@@ -1,0 +1,83 @@
+{
+  "details": {
+    "dateOnly": "Le",
+    "heading": "Détails de la transaction",
+    "phraseOn": "{{phrase}} le"
+  },
+  "empty": {
+    "noActivities": "Aucune activité",
+    "noActivitiesMobile": "Aucune activité, envoyez simplement !"
+  },
+  "errors": {
+    "fallback": "Une erreur s'est produite.",
+    "title": "Erreur"
+  },
+  "events": {
+    "deposit": "Dépôt",
+    "received": "Reçu",
+    "referral": "Parrainage",
+    "referredBy": "Parrainé par",
+    "revenueShare": "Partage des revenus",
+    "rewards": "Récompenses",
+    "sendAccountSigningKeyAdded": "Clé de signature de compte Send ajoutée",
+    "sendAccountSigningKeyRemoved": "Clé de signature de compte Send supprimée",
+    "sendEarn": {
+      "deposit": "Dépôt Send Earn",
+      "withdraw": "Retrait Send Earn"
+    },
+    "sendTokenUpgrade": "Mise à niveau du jeton Send",
+    "sendpot": {
+      "ticketPurchase": "Acheté",
+      "win": "Gain Sendpot"
+    },
+    "sendtagRegistered": "Sendtag enregistré",
+    "sent": "Envoyé",
+    "temporal": {
+      "depositFailed": "Dépôt échoué"
+    },
+    "trade": "Trade",
+    "withdraw": "Retrait"
+  },
+  "phrases": {
+    "deposit": "Déposé",
+    "received": "Reçu",
+    "referred": "Parrainé",
+    "referredYou": "Vous a parrainé",
+    "revenueShare": "Partage des revenus gagnés",
+    "sendAccountSigningKeyAdded": "Ajouté",
+    "sendEarn": {
+      "affiliateReward": "Récompenses obtenues",
+      "depositComplete": "Déposé sur Send Earn",
+      "depositFailed": "Échec du dépôt sur Send Earn",
+      "depositPending": "Dépôt en cours sur Send Earn...",
+      "withdrawComplete": "Retiré de Send Earn"
+    },
+    "sendpot": {
+      "ticketPurchase": "acheté",
+      "win": "gagné"
+    },
+    "sendtagCreated": "Sendtag créé",
+    "sendtagsCreated": "Sendtags créés",
+    "sentYou": "Vous a envoyé",
+    "trade": "Trade",
+    "upgrade": "Mis à niveau",
+    "withdraw": "Retiré"
+  },
+  "sections": {
+    "today": "Aujourd'hui"
+  },
+  "status": {
+    "cancelled": "Annulé",
+    "confirming": "Confirmation en cours...",
+    "failed": "Échec",
+    "initializing": "Initialisation...",
+    "sending": "Envoi en cours...",
+    "sent": "Envoyé"
+  },
+  "subtext": {
+    "sendAccountSigningKey": "Clé de signature de compte Send",
+    "sendEarn": "Send Earn",
+    "tickets_one": "{{count}} billet",
+    "tickets_other": "{{count}} billets"
+  }
+}

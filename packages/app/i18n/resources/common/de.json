@@ -8,6 +8,7 @@
     "cta": "Hast du eine Empfehlung? Gib den Code ein, um Belohnungen zu erhalten!",
     "invalid": "Ungültiger Empfehlungscode",
     "placeholder": "Empfehlungscode",
+    "referredBy": "Empfohlen von",
     "validating": "Validierung des Empfehlungscodes"
   }
 }

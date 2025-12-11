@@ -1,0 +1,67 @@
+{
+  "form": {
+    "labels": {
+      "pay": "Vous payez",
+      "receive": "Vous recevez",
+      "priceImpact": "Impact sur le prix :"
+    },
+    "buttons": {
+      "review": "vérifier",
+      "loading": "chargement",
+      "max": "max"
+    },
+    "slippage": {
+      "label": "Glissement maximal",
+      "customPlaceholder": "Personnalisé"
+    },
+    "errors": {
+      "balance": "Erreur lors de la récupération des informations de solde",
+      "slippageMin": "La valeur de glissement minimale est de 0 %",
+      "slippageMax": "La valeur de glissement maximale est de 20 %"
+    },
+    "priceImpact": {
+      "levels": {
+        "medium": "Élevé",
+        "high": "Très élevé"
+      }
+    }
+  },
+  "summary": {
+    "labels": {
+      "exchangeRate": "Taux de change",
+      "transactionFee": "Frais de transaction",
+      "sendFee": "Frais d'envoi",
+      "priceImpact": "Impact sur le prix",
+      "maxSlippage": "Glissement maximal"
+    },
+    "buttons": {
+      "edit": "modifier",
+      "insufficientBalance": "solde insuffisant",
+      "insufficientGas": "gaz insuffisant",
+      "loading": "échange en cours...",
+      "confirm": "confirmer l'échange"
+    }
+  },
+  "risk": {
+    "errorTitle": "Erreur",
+    "title": "Avis de non-responsabilité important",
+    "description": "Le trading de cryptomonnaies comporte un niveau de risque élevé et peut ne pas convenir à tous les investisseurs. Vous pourriez perdre une partie ou la totalité de votre capital et ne devriez investir que l'argent que vous pouvez vous permettre de perdre. Examinez attentivement vos objectifs d'investissement, votre expérience et votre tolérance au risque avant de continuer.",
+    "learnMore": "En savoir plus.",
+    "checkbox": "J'ai lu et je comprends les risques encourus.",
+    "buttons": {
+      "cancel": "Annuler",
+      "confirm": "J'accepte et je continue"
+    }
+  },
+  "priceImpactInfo": {
+    "title": "Qu'est-ce que l'impact sur le prix ?",
+    "description": "L'échange de grandes quantités réduit le rendement. Le taux disponible peut ne pas refléter la meilleure offre.",
+    "tipsTitle": "Comment obtenir de meilleurs taux :",
+    "tips": [
+      "Divisez votre échange en plus petites quantités",
+      "Effectuez des échanges lorsque plus de personnes négocient",
+      "Utilisez un montant inférieur pour de meilleurs taux"
+    ],
+    "dismiss": "Compris"
+  }
+}

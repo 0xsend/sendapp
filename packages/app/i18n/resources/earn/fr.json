@@ -1,0 +1,133 @@
+{
+  "active": {
+    "addMore": "Ajouter plus de dépôts",
+    "breakdown": {
+      "deposits": "Dépôts",
+      "earnings": "Gains",
+      "rewards": "Récompenses"
+    },
+    "buttons": {
+      "earnings": "Gains",
+      "rewards": "Récompenses",
+      "withdraw": "Retirer"
+    }
+  },
+  "cta": {
+    "badge": "Gains",
+    "bullets": {
+      "apy": "APY élevé : jusqu'à 12 % sur vos dépôts",
+      "flex": "Flexibilité totale : accédez à vos fonds à tout moment",
+      "rewards": "Récompenses : jetons SEND bonus"
+    },
+    "buttons": {
+      "start": "Commencer à gagner"
+    },
+    "title": "Boostez vos économies instantanément"
+  },
+  "deposit": {
+    "balance": {
+      "insufficient": "Fonds insuffisants",
+      "label": "Solde :"
+    },
+    "benefits": {
+      "apy": {
+        "dynamicLabel": "APY",
+        "placeholder": "jusqu'à {{value}}",
+        "staticLabel": "APY du dépôt"
+      },
+      "monthlyEarning": {
+        "label": "Gains mensuels estimés",
+        "symbol": "{{symbol}}"
+      },
+      "rewards": {
+        "fallback": "Jetons {{token}} bonus",
+        "label": "Récompenses",
+        "symbol": "{{token}}"
+      },
+      "title": "Avantages",
+      "withdraw": {
+        "label": "Retrait à tout moment",
+        "value": "Flexibilité totale"
+      }
+    },
+    "buttons": {
+      "confirm": "Confirmer le dépôt"
+    },
+    "heading": "Montant du dépôt",
+    "terms": {
+      "text": "J'accepte les <tos>Conditions d'utilisation</tos>, la <privacy>Politique de confidentialité</privacy> et l'<disclaimer>Avis de non-responsabilité du programme Send Earn</disclaimer>"
+    },
+    "toast": {
+      "error": {
+        "title": "Erreur de dépôt"
+      },
+      "success": {
+        "message": "Votre dépôt est en cours de traitement.",
+        "title": "Dépôt soumis"
+      }
+    },
+    "validation": {
+      "minimum": "Le dépôt minimum est de {{amount}} {{symbol}}"
+    }
+  },
+  "errors": {
+    "notEnoughForFees": "Pas assez d'USDC pour couvrir les frais de transaction"
+  },
+  "rewards": {
+    "actions": {
+      "claim": "Réclamer des récompenses"
+    },
+    "feed": {
+      "today": "Aujourd'hui"
+    },
+    "history": {
+      "empty": "Aucune activité de récompense",
+      "error": "Impossible de charger les récompenses : {{message}}",
+      "title": "Historique des récompenses"
+    },
+    "messages": {
+      "minimum": "Vous devez avoir au moins {{amount}} {{symbol}} pour réclamer des récompenses"
+    },
+    "status": {
+      "requesting": "Demande de signature...",
+      "sending": "Envoi de la transaction...",
+      "waiting": "En attente de confirmation..."
+    },
+    "toast": {
+      "success": "Récompenses réclamées"
+    }
+  },
+  "summary": {
+    "badge": "Gains actifs",
+    "buttons": {
+      "viewDetails": "Voir les détails"
+    },
+    "labels": {
+      "deposits": "Dépôts",
+      "earnings": "Gains",
+      "rewards": "Récompenses",
+      "total": "Valeur totale"
+    }
+  },
+  "withdraw": {
+    "balance": {
+      "insufficient": "Fonds insuffisants",
+      "label": "Solde du dépôt :"
+    },
+    "buttons": {
+      "confirm": "Confirmer le retrait"
+    },
+    "heading": "Montant du retrait",
+    "status": {
+      "requesting": "Demande de signature...",
+      "sending": "Envoi de la transaction...",
+      "waiting": "En attente de confirmation..."
+    },
+    "toast": {
+      "success": "Retrait réussi"
+    },
+    "validation": {
+      "insufficient": "Fonds insuffisants"
+    }
+  }
+}
