@@ -33,6 +33,7 @@
   },
   "links": {
     "items": {
+      "deleteAccount": "Supprimer le compte",
       "language": "Langue",
       "learnMore": "En savoir plus sur Send",
       "linkInBio": "Lien dans la bio",
@@ -45,6 +46,9 @@
       "sendtags": "Sendtags"
     },
     "sections": {
+      "features": "Fonctionnalités",
+      "profile": "Profil",
+      "security": "Sécurité",
       "settings": "Paramètres",
       "support": "Assistance"
     },

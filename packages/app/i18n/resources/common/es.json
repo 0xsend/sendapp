@@ -10,5 +10,12 @@
     "applied": "Código de referido aplicado",
     "cta": "¿Tienes un referido? ¡Ingresa el código para obtener recompensas!",
     "referredBy": "Referido por"
+  },
+  "versionUpdater": {
+    "title": "Actualización disponible",
+    "description": "Hemos lanzado una nueva versión con mejoras y correcciones. Actualiza ahora para continuar.",
+    "actions": {
+      "refresh": "Actualizar ahora"
+    }
   }
 }

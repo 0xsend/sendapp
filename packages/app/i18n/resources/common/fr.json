@@ -5,10 +5,17 @@
   },
   "referral": {
     "applied": "Code de parrainage appliqué",
-    "cta": "Vous avez un code de parrainage ? Saisissez-le pour obtenir des récompenses !",
+    "cta": "Vous avez un code de parrainage ? Saisissez-le pour obtenir des récompenses !",
     "invalid": "Code de parrainage invalide",
     "placeholder": "Code de parrainage",
     "referredBy": "Parrainé par",
     "validating": "Validation du code de parrainage"
+  },
+  "versionUpdater": {
+    "title": "Mise à jour disponible",
+    "description": "Nous avons publié une nouvelle version avec des améliorations et des corrections. Mettez à jour maintenant pour continuer.",
+    "actions": {
+      "refresh": "Mettre à jour"
+    }
   }
 }

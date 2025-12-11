@@ -10,5 +10,12 @@
     "placeholder": "Empfehlungscode",
     "referredBy": "Empfohlen von",
     "validating": "Validierung des Empfehlungscodes"
+  },
+  "versionUpdater": {
+    "title": "Update verfügbar",
+    "description": "Wir haben eine neue Version mit Verbesserungen und Fehlerbehebungen veröffentlicht. Aktualisieren Sie jetzt, um fortzufahren.",
+    "actions": {
+      "refresh": "Jetzt aktualisieren"
+    }
   }
 }

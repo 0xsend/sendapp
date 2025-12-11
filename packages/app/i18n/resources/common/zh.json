@@ -10,5 +10,12 @@
     "placeholder": "推荐码",
     "referredBy": "推荐人",
     "validating": "正在验证推荐码"
+  },
+  "versionUpdater": {
+    "title": "有可用更新",
+    "description": "我们发布了包含改进和修复的新版本。立即更新以继续。",
+    "actions": {
+      "refresh": "立即更新"
+    }
   }
 }
