@@ -6146,22 +6146,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@legendapp/list@npm:3.0.0-beta.8":
-  version: 3.0.0-beta.8
-  resolution: "@legendapp/list@npm:3.0.0-beta.8"
-  dependencies:
-    use-sync-external-store: "npm:^1.5.0"
-  peerDependencies:
-    react: "*"
-  peerDependenciesMeta:
-    react-dom:
-      optional: true
-    react-native:
-      optional: true
-  checksum: 10/940218f906c6d6d8f67ab4d40ccd4d1987cd7bf100bcb98815971443f7f0f0389d227b87560d30311eb86a57c76eeb17c136156dfc517f95be17333de4368d78
-  languageName: node
-  linkType: hard
-
 "@lit-labs/ssr-dom-shim@npm:^1.0.0, @lit-labs/ssr-dom-shim@npm:^1.1.0":
   version: 1.1.2
   resolution: "@lit-labs/ssr-dom-shim@npm:1.1.2"
@@ -9203,6 +9187,17 @@ __metadata:
     "@sentry/types": "npm:7.48.0"
     tslib: "npm:^1.9.3"
   checksum: 10/cf703418539a68117ef552011a1acd3947d76fb598c31e337a2f969a2af668adfdeacc13f25300c77ff3715f80b9c8bc41e49e1fb13db5437a2372071e2a613c
+  languageName: node
+  linkType: hard
+
+"@shopify/flash-list@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@shopify/flash-list@npm:2.2.0"
+  peerDependencies:
+    "@babel/runtime": "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10/482e32e2e229d32a50312f8e83b02b99e323bb18dafca0fc547ac8faab712eec36d10560da4b01b4efba53271838deb8455d0831a2751218a6f1ca42e178131a
   languageName: node
   linkType: hard
 
@@ -15077,7 +15072,6 @@ __metadata:
     "@intercom/intercom-react-native": "npm:^8.6.0"
     "@intercom/messenger-js-sdk": "npm:^0.0.14"
     "@jest/globals": "npm:^29"
-    "@legendapp/list": "npm:3.0.0-beta.8"
     "@marsidev/react-turnstile": "npm:^0.7.1"
     "@my/supabase": "workspace:*"
     "@my/ui": "workspace:*"
@@ -15088,6 +15082,7 @@ __metadata:
     "@react-native-async-storage/async-storage": "npm:2.2.0"
     "@rehookify/datepicker": "npm:^6.6.7"
     "@scure/base": "npm:^1.1.5"
+    "@shopify/flash-list": "npm:^2.2.0"
     "@simplewebauthn/typescript-types": "npm:^8.0.0"
     "@supabase/auth-helpers-nextjs": "npm:^0.10.0"
     "@supabase/auth-helpers-react": "npm:^0.5.0"

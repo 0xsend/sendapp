@@ -5,18 +5,20 @@ import type { ZodError } from 'zod'
 import {
   memo,
   type PropsWithChildren,
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
-import { H4, isWeb, LazyMount, LinearGradient, Paragraph, Shimmer, View, YStack } from '@my/ui'
-import { LegendList } from '@legendapp/list'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { H4, LazyMount, LinearGradient, Paragraph, Shimmer, useEvent, View, YStack } from '@my/ui'
+import { FlashList } from '@shopify/flash-list'
+import { TokenActivityRow } from 'app/features/home/TokenActivityRowV2'
 import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
 import { useSendScreenParams } from 'app/routers/params'
+import { useUser } from 'app/utils/useUser'
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -37,10 +39,12 @@ export default function ActivityFeed({
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
     if (!sendChatOpen) {
-      setSendParams({
-        ...sendParams,
-        m: undefined,
-      })
+      setTimeout(() => {
+        setSendParams({
+          ...sendParams,
+          m: undefined,
+        })
+      }, 400)
     }
   }, [sendChatOpen])
 
@@ -90,7 +94,7 @@ export default function ActivityFeed({
       return acc
     }, {})
 
-    const result: (Activity | { type: 'header'; title: string; sectionIndex: number })[] = []
+    const result: ListItem[] = []
     const headerIndices: number[] = []
 
     Object.entries(groups).forEach(([title, sectionData], sectionIndex) => {
@@ -101,7 +105,7 @@ export default function ActivityFeed({
         sectionIndex,
       })
 
-      result.push(...sectionData)
+      result.push(...sectionData.map((activity) => ({ ...activity, sectionIndex })))
     })
 
     return { flattenedData: result, stickyIndices: headerIndices }
@@ -162,7 +166,9 @@ export default function ActivityFeed({
   )
 }
 
-type ListItem = Activity | { type: 'header'; title: string; sectionIndex: number }
+type ListItem =
+  | (Activity & { sectionIndex: number })
+  | { type: 'header'; title: string; sectionIndex: number }
 
 interface MyListProps {
   data: ListItem[]
@@ -179,31 +185,41 @@ const getItemType = (item: ListItem) => {
   return 'type' in item && item.type === 'header' ? 'header' : 'activity'
 }
 
-const keyExtractor = (item: ListItem): string => {
+const keyExtractor = (item: ListItem, index: number): string => {
   if ('type' in item && item.type === 'header') {
-    return `header-${item.sectionIndex}-${item.title}`
+    return `header-${item.sectionIndex}-${item.title}-${index}`
   }
-  const activity = item as Activity
-  return `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
+  const activity = item as Activity & { sectionIndex: number }
+  return `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}-${index}`
 }
-const getFixedItemSize = (_: number, __: ListItem, type?: string) => {
-  if (type === 'header') {
-    return 56
-  }
-  return 122
-}
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useAddressBook } from 'app/utils/useAddressBook'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const MyList = memo(
   ({
     data,
-    stickyIndices,
+    stickyIndices: _stickyIndices,
     onActivityPress,
-    isLoadingActivities,
-    isFetchingNextPageActivities,
+    isLoadingActivities: _isLoadingActivities,
+    isFetchingNextPageActivities: _isFetchingNextPageActivities,
     sendParamsRef,
     onEndReached,
     hasNextPage,
   }: MyListProps) => {
+    // for TokenActivityRowV2
+
+    const { profile } = useUser()
+
+    const { data: swapRouters } = useSwapRouters()
+    const { data: liquidityPools } = useLiquidityPools()
+    const addressBook = useAddressBook()
+
+    //
+
+    const hoverStyles = useHoverStyles()
+
     const sectionDataMap = useMemo(() => {
       const map = new Map<number, { firstIndex: number; lastIndex: number }>()
       let currentSectionIndex = -1
@@ -233,20 +249,12 @@ const MyList = memo(
       return map
     }, [data])
 
-    const renderItem = ({ item, index }: { item: ListItem; index: number }) => {
+    const renderItem = useEvent(({ item, index }: { item: ListItem; index: number }) => {
       if ('type' in item && item.type === 'header') {
         return <RowLabel>{item.title}</RowLabel>
       }
 
-      let sectionInfo: { firstIndex: number; lastIndex: number } | undefined
-      for (let i = index; i >= 0; i--) {
-        const prevItem = data[i]
-        if (!prevItem) continue
-        if ('type' in prevItem && prevItem.type === 'header') {
-          sectionInfo = sectionDataMap.get(prevItem.sectionIndex)
-          break
-        }
-      }
+      const sectionInfo = sectionDataMap.get(item.sectionIndex)
 
       const isFirst = sectionInfo?.firstIndex === index
       const isLast = sectionInfo?.lastIndex === index
@@ -255,6 +263,8 @@ const MyList = memo(
         <YStack
           bc="$color1"
           p={10}
+          h={122}
+          mah={122}
           {...(isFirst && {
             borderTopLeftRadius: '$4',
             borderTopRightRadius: '$4',
@@ -265,41 +275,40 @@ const MyList = memo(
           })}
         >
           <TokenActivityRow
+            swapRouters={swapRouters}
+            liquidityPools={liquidityPools}
+            profile={profile}
             activity={item as Activity}
             onPress={onActivityPress}
             sendParamsRef={sendParamsRef}
+            addressBook={addressBook}
+            hoverStyle={hoverStyles}
           />
         </YStack>
       )
-    }
+    })
 
     return (
       <View className="hide-scroll" display="contents">
-        <LegendList
+        <FlashList
           data={data}
           testID={'RecentActivity'}
-          // stickyHeaderIndices={stickyIndices}
-          showsVerticalScrollIndicator={false}
           keyExtractor={keyExtractor}
+          showsVerticalScrollIndicator={false}
           getItemType={getItemType}
           onEndReached={onEndReached}
-          {...(!isWeb && {
-            getFixedItemSize: getFixedItemSize,
-            estimatedItemSize: 122,
-          })}
           renderItem={renderItem}
-          contentContainerStyle={{
-            paddingBottom: hasNextPage ? 0 : 150,
-          }}
-          ListFooterComponent={
-            !isLoadingActivities && isFetchingNextPageActivities ? <ListFooterComponent /> : null
-          }
-          recycleItems
+          contentContainerStyle={!hasNextPage ? flashListContentContainerStyle : undefined}
+          ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
         />
       </View>
     )
   }
 )
+
+const flashListContentContainerStyle = {
+  paddingBottom: 200,
+}
 
 function ListFooterComponent() {
   return (
