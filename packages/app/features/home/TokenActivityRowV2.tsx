@@ -14,18 +14,18 @@ import {
 } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatarV2'
 
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { useUser } from 'app/utils/useUser'
 import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import type { ReactNode } from 'react'
-import { memo, useCallback } from 'react'
+import { memo } from 'react'
 import type { useSendScreenParams } from 'app/routers/params'
 import type { useSwapRouters } from 'app/utils/useSwapRouters'
 import type { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import type { useAddressBook } from 'app/utils/useAddressBook'
+import type { useHoverStyles } from 'app/utils/useHoverStyles'
 
 interface TokenActivityRowV2Props {
   profile: ReturnType<typeof useUser>['profile']
@@ -35,6 +35,7 @@ interface TokenActivityRowV2Props {
   swapRouters: ReturnType<typeof useSwapRouters>['data']
   liquidityPools: ReturnType<typeof useLiquidityPools>['data']
   addressBook: ReturnType<typeof useAddressBook>
+  hoverStyle: ReturnType<typeof useHoverStyles>
 }
 
 export const TokenActivityRow = ({
@@ -45,6 +46,7 @@ export const TokenActivityRow = ({
   swapRouters,
   liquidityPools,
   addressBook,
+  hoverStyle,
 }: TokenActivityRowV2Props) => {
   const { from_user, to_user } = activity
   const amount = useAmountFromActivity(activity, swapRouters, liquidityPools)
@@ -92,6 +94,7 @@ export const TokenActivityRow = ({
       swapRouters={swapRouters}
       liquidityPools={liquidityPools}
       addressBook={addressBook}
+      hoverStyle={hoverStyle}
     />
   )
 }
@@ -110,6 +113,7 @@ const TokenActivityRowContent = memo(
     swapRouters,
     liquidityPools,
     addressBook,
+    hoverStyle,
   }: {
     amount: ReactNode
     date: ReactNode
@@ -121,9 +125,8 @@ const TokenActivityRowContent = memo(
     swapRouters: ReturnType<typeof useSwapRouters>['data']
     liquidityPools: ReturnType<typeof useLiquidityPools>['data']
     addressBook: ReturnType<typeof useAddressBook>
+    hoverStyle: ReturnType<typeof useHoverStyles>
   }) => {
-    const hoverStyles = useHoverStyles()
-
     return (
       <XStack
         width="100%"
@@ -134,41 +137,41 @@ const TokenActivityRowContent = memo(
         p="$3.5"
         br="$4"
         borderWidth={1}
-        borderColor={'$color1'}
-        cursor={onPress ? 'pointer' : 'default'}
-        testID={'TokenActivityRow'}
-        hoverStyle={onPress ? hoverStyles : null}
+        borderColor="$color1"
+        cursor="pointer"
+        testID="TokenActivityRow"
+        hoverStyle={hoverStyle}
         onPress={onPress}
       >
-        <XStack gap="$3.5" width={'100%'} f={1} alignItems={'flex-start'}>
+        <XStack gap="$3.5" width="100%" f={1} alignItems="flex-start">
           <ActivityAvatar
             activity={activity}
             addressBook={addressBook}
             swapRouters={swapRouters}
             liquidityPools={liquidityPools}
           />
-          <YStack width={'100%'} f={1} height={'auto'} overflow="hidden" gap={'$1'}>
-            <XStack jc="space-between" gap="$1.5" width={'100%'}>
-              <Text color="$color12" fontSize="$5" fontWeight={'500'}>
+          <YStack width="100%" f={1} height="auto" overflow="hidden" gap="$1">
+            <XStack jc="space-between" gap="$1.5" width="100%">
+              <Text color="$color12" fontSize="$5" fontWeight="500">
                 {isUserTransfer ? subtext : eventName}
               </Text>
               <Text>&nbsp;</Text>
-              <Text color="$color12" fontSize="$5" fontWeight={'500'} ta="right">
+              <Text color="$color12" fontSize="$5" fontWeight="500" ta="right">
                 {amount}
               </Text>
             </XStack>
             <Paragraph
-              color={'$color10'}
-              size={'$4'}
-              maxWidth={'100%'}
-              overflow={'hidden'}
-              textOverflow={'ellipsis'}
+              color="$color10"
+              size="$4"
+              maxWidth="100%"
+              overflow="hidden"
+              textOverflow="ellipsis"
               numberOfLines={2}
               lineHeight={18}
             >
               {isUserTransfer ? eventName : subtext}
             </Paragraph>
-            <Paragraph color={'$color10'} size={'$3'} flexShrink={0} display={'flex'} opacity={0.6}>
+            <Paragraph color="$color10" size="$3" flexShrink={0} display="flex" opacity={0.6}>
               {date}
             </Paragraph>
           </YStack>

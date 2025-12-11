@@ -35,6 +35,7 @@ import {
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity'
 import { Platform } from 'react-native'
+import { memo } from 'react'
 
 interface ActivityAvatarProps extends Omit<LinkableAvatarProps, 'children' | 'href'> {
   activity: Activity
@@ -42,168 +43,165 @@ interface ActivityAvatarProps extends Omit<LinkableAvatarProps, 'children' | 'hr
   liquidityPools: ReturnType<typeof useLiquidityPools>['data']
   addressBook: ReturnType<typeof useAddressBook>
 }
-export function ActivityAvatar({
-  activity,
-  swapRouters,
-  liquidityPools,
-  addressBook,
-  ...props
-}: ActivityAvatarProps) {
-  const user = counterpart(activity)
-  const { from_user, to_user, data } = activity
-  const isERC20Transfer = isSendAccountTransfersEvent(activity)
-  const isETHReceive = isSendAccountReceiveEvent(activity)
-  const theme = useThemeName()
-  const isDark = theme.includes('dark')
+export const ActivityAvatar = memo(
+  ({ activity, swapRouters, liquidityPools, addressBook, ...props }: ActivityAvatarProps) => {
+    const user = counterpart(activity)
+    const { from_user, to_user, data } = activity
+    const isERC20Transfer = isSendAccountTransfersEvent(activity)
+    const isETHReceive = isSendAccountReceiveEvent(activity)
+    const theme = useThemeName()
+    const isDark = theme.includes('dark')
 
-  if (isSendPotTicketPurchase(activity) || isSendPotWin(activity)) {
-    return (
-      <XStack w="$4.5" h={'$4.5'} br="$4" bc={'$olive'}>
-        <IconSendPotTicket color={'$color2'} />
-      </XStack>
-    )
-  }
+    if (isSendPotTicketPurchase(activity) || isSendPotWin(activity)) {
+      return (
+        <XStack w="$4.5" h={'$4.5'} br="$4" bc={'$olive'}>
+          <IconSendPotTicket color={'$color2'} />
+        </XStack>
+      )
+    }
 
-  if (isActivitySwapTransfer(activity, swapRouters, liquidityPools)) {
-    return <TradeActivityAvatar activity={activity} />
-  }
+    if (isActivitySwapTransfer(activity, swapRouters, liquidityPools)) {
+      return <TradeActivityAvatar activity={activity} />
+    }
 
-  if (user) {
-    return (
-      <XStack
-        onPress={(e) => {
-          e.stopPropagation()
-        }}
-        position={'relative'}
-      >
-        <LinkableAvatar
-          size="$5"
-          gap="$2"
-          href={`/profile/${user.send_id}`}
-          circular={true}
-          {...props}
+    if (user) {
+      return (
+        <XStack
+          onPress={(e) => {
+            e.stopPropagation()
+          }}
+          position={'relative'}
         >
-          {(() => {
-            switch (true) {
-              case !user.avatar_url:
-                return Platform.OS === 'android' ? (
-                  <UserImage user={user} />
-                ) : (
-                  <Avatar.Image src={undefined} />
-                )
-              case Boolean(to_user?.send_id) && Boolean(from_user?.send_id):
-                return <Avatar.Image src={user.avatar_url} />
-              case isERC20Transfer || isETHReceive:
-                return (
-                  <IconCoin
-                    symbol={
-                      allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''
-                    }
-                  />
-                )
-              default:
-                return Platform.OS === 'android' && !user?.avatar_url ? (
-                  <UserImage user={user} />
-                ) : (
-                  <Avatar.Image src={user?.avatar_url ?? undefined} />
-                )
-            }
-          })()}
+          <LinkableAvatar
+            size="$5"
+            gap="$2"
+            href={`/profile/${user.send_id}`}
+            circular={true}
+            {...props}
+          >
+            {(() => {
+              switch (true) {
+                case !user.avatar_url:
+                  return Platform.OS === 'android' ? (
+                    <UserImage user={user} />
+                  ) : (
+                    <Avatar.Image src={undefined} />
+                  )
+                case Boolean(to_user?.send_id) && Boolean(from_user?.send_id):
+                  return <Avatar.Image src={user.avatar_url} />
+                case isERC20Transfer || isETHReceive:
+                  return (
+                    <IconCoin
+                      symbol={
+                        allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''
+                      }
+                    />
+                  )
+                default:
+                  return Platform.OS === 'android' && !user?.avatar_url ? (
+                    <UserImage user={user} />
+                  ) : (
+                    <Avatar.Image src={user?.avatar_url ?? undefined} />
+                  )
+              }
+            })()}
 
-          <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$5" {...props}>
-              <UserImage user={user} />
-            </Avatar>
-          </Avatar.Fallback>
-        </LinkableAvatar>
-        {user.is_verified && (
-          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
-            <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
-            <IconBadgeCheckSolid2
-              size="$1"
-              scale={0.7}
-              color="$neon8"
-              $theme-dark={{ color: '$neon7' }}
-              // @ts-expect-error - checkColor is not typed
-              checkColor={isDark ? '#082B1B' : '#fff'}
-            />
-          </XStack>
-        )}
-      </XStack>
-    )
-  }
-
-  if (isSendTokenUpgradeEvent(activity)) {
-    return (
-      <Avatar size="$4.5" br="$4" gap="$2" {...props}>
-        <IconUpgrade size="$4.5" br="$4" gap="$2" />
-      </Avatar>
-    )
-  }
-
-  if (isSendEarnEvent(activity)) {
-    if (isSendEarnDepositEvent(activity)) {
-      return <AvatarSendEarnDeposit {...props} />
-    }
-    if (isSendEarnWithdrawEvent(activity)) {
-      return <AvatarSendEarnWithdraw {...props} />
-    }
-  }
-
-  if (isERC20Transfer) {
-    // is transfer, but an unknown user
-    const address = from_user?.id ? activity.data.t : activity.data.f
-    const name = addressBook?.data?.[address] ?? address
-
-    if (name === ContractLabels.SendEarn) {
-      if (from_user?.id) {
-        return <AvatarSendEarnDeposit {...props} />
-      }
-      if (to_user?.id) {
-        return <AvatarSendEarnWithdraw {...props} />
-      }
+            <Avatar.Fallback jc="center" bc="$olive">
+              <Avatar size="$5" {...props}>
+                <UserImage user={user} />
+              </Avatar>
+            </Avatar.Fallback>
+          </LinkableAvatar>
+          {user.is_verified && (
+            <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
+              <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+              <IconBadgeCheckSolid2
+                size="$1"
+                scale={0.7}
+                color="$neon8"
+                $theme-dark={{ color: '$neon7' }}
+                // @ts-expect-error - checkColor is not typed
+                checkColor={isDark ? '#082B1B' : '#fff'}
+              />
+            </XStack>
+          )}
+        </XStack>
+      )
     }
 
-    if (addressBook.isLoading) {
+    if (isSendTokenUpgradeEvent(activity)) {
       return (
         <Avatar size="$4.5" br="$4" gap="$2" {...props}>
-          <Spinner size="small" />
+          <IconUpgrade size="$4.5" br="$4" gap="$2" />
         </Avatar>
       )
     }
 
+    if (isSendEarnEvent(activity)) {
+      if (isSendEarnDepositEvent(activity)) {
+        return <AvatarSendEarnDeposit {...props} />
+      }
+      if (isSendEarnWithdrawEvent(activity)) {
+        return <AvatarSendEarnWithdraw {...props} />
+      }
+    }
+
+    if (isERC20Transfer) {
+      // is transfer, but an unknown user
+      const address = from_user?.id ? activity.data.t : activity.data.f
+      const name = addressBook?.data?.[address] ?? address
+
+      if (name === ContractLabels.SendEarn) {
+        if (from_user?.id) {
+          return <AvatarSendEarnDeposit {...props} />
+        }
+        if (to_user?.id) {
+          return <AvatarSendEarnWithdraw {...props} />
+        }
+      }
+
+      if (addressBook.isLoading) {
+        return (
+          <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+            <Spinner size="small" />
+          </Avatar>
+        )
+      }
+
+      return (
+        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+          <Avatar.Image
+            src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
+          />
+          <Avatar.Fallback jc="center" bc="$olive">
+            <Avatar size="$4.5" br="$4" {...props}>
+              <Avatar.Image
+                src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
+              />
+            </Avatar>
+          </Avatar.Fallback>
+        </Avatar>
+      )
+    }
+
+    // @todo make this an icon instead of a fallback TODO
     return (
       <Avatar size="$4.5" br="$4" gap="$2" {...props}>
         <Avatar.Image
-          src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
+          src={'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'}
         />
         <Avatar.Fallback jc="center" bc="$olive">
           <Avatar size="$4.5" br="$4" {...props}>
             <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
+              src={'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'}
             />
           </Avatar>
         </Avatar.Fallback>
       </Avatar>
     )
   }
-
-  // @todo make this an icon instead of a fallback TODO
-  return (
-    <Avatar size="$4.5" br="$4" gap="$2" {...props}>
-      <Avatar.Image
-        src={'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'}
-      />
-      <Avatar.Fallback jc="center" bc="$olive">
-        <Avatar size="$4.5" br="$4" {...props}>
-          <Avatar.Image
-            src={'https://ui-avatars.com/api/?name=TODO&size=256&format=png&background=86ad7f'}
-          />
-        </Avatar>
-      </Avatar.Fallback>
-    </Avatar>
-  )
-}
+)
+ActivityAvatar.displayName = 'ActivityAvatar'
 
 const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
   const { data: swapRouters } = useSwapRouters()

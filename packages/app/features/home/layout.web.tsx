@@ -24,40 +24,26 @@ export function HomeLayout({
       <BottomNavBarWrapper>
         <TagSearchProvider>
           <PendingIndicatorBar pending={isPending} />
-          <ScrollView
-            ref={ref}
-            mih="100%"
-            contentContainerStyle={{
-              mih: '100%',
-              height: fullHeight ? '100%' : 'auto',
+          <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
+            {TopNav}
+          </YStack>
+          <Container
+            safeAreaProps={{
+              style: { flex: 1 },
+              edges: {
+                top: 'off',
+                bottom: 'maximum',
+                left: 'additive',
+                right: 'additive',
+              },
             }}
-            scrollEventThrottle={128}
-            onScroll={onScroll}
-            onContentSizeChange={onContentSizeChange}
-            showsVerticalScrollIndicator={false}
-            {...props}
+            pb={height}
+            group
+            $gtLg={{ pt: '$5', pb: '$0' }}
+            height={fullHeight ? '100%' : 'auto'}
           >
-            <YStack gap="$3" $gtLg={{ pt: 80 }} w={'100%'}>
-              {TopNav}
-            </YStack>
-            <Container
-              safeAreaProps={{
-                style: { flex: 1 },
-                edges: {
-                  top: 'off',
-                  bottom: 'maximum',
-                  left: 'additive',
-                  right: 'additive',
-                },
-              }}
-              pb={height}
-              group
-              $gtLg={{ pt: '$5', pb: '$0' }}
-              height={fullHeight ? '100%' : 'auto'}
-            >
-              {children}
-            </Container>
-          </ScrollView>
+            {children}
+          </Container>
         </TagSearchProvider>
       </BottomNavBarWrapper>
     </HomeSideBarWrapper>

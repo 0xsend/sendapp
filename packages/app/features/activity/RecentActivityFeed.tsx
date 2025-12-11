@@ -5,6 +5,7 @@ import type { ZodError } from 'zod'
 import {
   memo,
   type PropsWithChildren,
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -38,10 +39,12 @@ export default function ActivityFeed({
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
     if (!sendChatOpen) {
-      setSendParams({
-        ...sendParams,
-        m: undefined,
-      })
+      setTimeout(() => {
+        setSendParams({
+          ...sendParams,
+          m: undefined,
+        })
+      }, 400)
     }
   }, [sendChatOpen])
 
@@ -192,6 +195,7 @@ const keyExtractor = (item: ListItem, index: number): string => {
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
+import { useHoverStyles } from 'app/utils/useHoverStyles'
 
 const MyList = memo(
   ({
@@ -213,6 +217,8 @@ const MyList = memo(
     const addressBook = useAddressBook()
 
     //
+
+    const hoverStyles = useHoverStyles()
 
     const sectionDataMap = useMemo(() => {
       const map = new Map<number, { firstIndex: number; lastIndex: number }>()
@@ -276,6 +282,7 @@ const MyList = memo(
             onPress={onActivityPress}
             sendParamsRef={sendParamsRef}
             addressBook={addressBook}
+            hoverStyle={hoverStyles}
           />
         </YStack>
       )
@@ -291,15 +298,17 @@ const MyList = memo(
           getItemType={getItemType}
           onEndReached={onEndReached}
           renderItem={renderItem}
-          contentContainerStyle={{
-            paddingBottom: hasNextPage ? 0 : 150,
-          }}
+          contentContainerStyle={!hasNextPage ? flashListContentContainerStyle : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
         />
       </View>
     )
   }
 )
+
+const flashListContentContainerStyle = {
+  paddingBottom: 200,
+}
 
 function ListFooterComponent() {
   return (
