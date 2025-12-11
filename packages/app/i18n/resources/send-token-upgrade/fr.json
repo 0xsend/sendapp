@@ -1,0 +1,27 @@
+{
+  "actions": {
+    "upgrade": "Mettre à niveau",
+    "upgrading": "Mise à niveau en cours..."
+  },
+  "balances": {
+    "after": "Après",
+    "current": "Actuel"
+  },
+  "hero": {
+    "subtitle": "Mise à niveau requise pour continuer à utiliser Send. Nouvelle offre totale : 100 milliards → 1 milliard",
+    "title": "Mise à niveau du jeton"
+  },
+  "links": {
+    "docs": "En savoir plus sur la mise à niveau"
+  },
+  "status": {
+    "ready": "Cliquez sur « Mettre à niveau » pour continuer.",
+    "requesting": "Demande de signature...",
+    "retry": "Cliquez sur « Mettre à niveau » pour continuer. Veuillez réessayer.",
+    "sending": "Envoi de la transaction...",
+    "waiting": "En attente de confirmation..."
+  },
+  "toast": {
+    "success": "Mise à niveau réussie"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "description": "Invitez des amis à utiliser Send avec votre code de parrainage."
+  },
+  "list": {
+    "birthdayFallback": "N/A",
+    "invitedYou": "(Vous a invité à Send)",
+    "unknownTag": "??"
+  },
+  "referralLink": {
+    "labels": {
+      "referralCode": "Code de parrainage :",
+      "sendId": "ID Send :"
+    },
+    "toast": {
+      "copied": "Lien de parrainage copié dans le presse-papiers",
+      "errorMessage": "Impossible de copier votre lien de parrainage dans le presse-papiers",
+      "errorTitle": "Une erreur s’est produite"
+    }
+  },
+  "table": {
+    "birthday": "date de naissance",
+    "position": "#",
+    "sendtag": "sendtag",
+    "social": "lien social"
+  }
+}

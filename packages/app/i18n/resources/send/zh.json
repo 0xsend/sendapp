@@ -44,7 +44,8 @@
     "birthdays": "祝他们生日快乐",
     "favorites": "收藏的发送者",
     "recent": "最近活动",
-    "top": "热门发送者"
+    "top": "热门发送者",
+    "viewMore": "查看更多"
   },
   "topNav": {
     "default": "发送",

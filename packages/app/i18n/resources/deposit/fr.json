@@ -1,0 +1,92 @@
+{
+  "coinbase": {
+    "actions": {
+      "cancel": "Annuler",
+      "tryAgain": "Réessayer"
+    },
+    "errors": {
+      "windowClosed": "La fenêtre Coinbase a été fermée"
+    },
+    "help": {
+      "iosPopup": "Désactivez « Bloquer les pop-up » dans les paramètres Safari d'iOS, puis réessayez."
+    },
+    "status": {
+      "almostThere": {
+        "description": "Nous terminons les dernières étapes.",
+        "title": "Presque là..."
+      },
+      "failed": {
+        "description": "Veuillez vérifier votre connexion ou essayer une autre carte.",
+        "title": "Échec du paiement"
+      },
+      "holdTight": {
+        "description": "Effectuez la transaction dans votre fenêtre Coinbase.",
+        "title": "Veuillez patienter..."
+      },
+      "pending": {
+        "description": "Coinbase vérifie votre paiement. Cette page sera redirigée une fois terminée.",
+        "title": "Transaction en attente"
+      },
+      "timedOut": {
+        "description": "Le traitement de votre paiement a pris trop de temps. Veuillez réessayer.",
+        "title": "Délai de transaction dépassé"
+      }
+    }
+  },
+  "coinbaseForm": {
+    "currency": "USD",
+    "fees": "Frais : 0,00 $",
+    "limits": "Min. 10 $ - Max. 500 $ par semaine",
+    "submit": {
+      "default": "Confirmer le dépôt",
+      "loading": "Traitement en cours..."
+    },
+    "title": "Saisir le montant du dépôt"
+  },
+  "copyAddressDialog": {
+    "actions": {
+      "cancel": "Annuler",
+      "confirm": "J'accepte et je continue"
+    },
+    "intro": "Veuillez confirmer que vous acceptez ce qui suit avant de continuer :",
+    "steps": {
+      "baseNetwork": "L'adresse externe est sur le réseau Base et <supportLink>peut recevoir des transferts depuis des contrats intelligents</supportLink>",
+      "liability": "Je comprends que si je fais des erreurs, il n'y a aucun moyen de récupérer les fonds.",
+      "tokens": "J'ai vérifié que les jetons {{coins}} sont sur le réseau Base."
+    },
+    "title": "Confirmer le dépôt externe"
+  },
+  "crypto": {
+    "networkLabel": "Réseau Base",
+    "qr": {
+      "reveal": "Cliquez pour afficher le code QR"
+    },
+    "toast": {
+      "errorMessage": "Nous n'avons pas pu copier votre adresse dans le presse-papiers",
+      "errorTitle": "Une erreur s'est produite"
+    },
+    "walletAddress": "Adresse du portefeuille"
+  },
+  "options": {
+    "applePay": {
+      "description": "Carte de débit uniquement",
+      "title": "Apple Pay"
+    },
+    "crypto": {
+      "description": "Déposer depuis un portefeuille externe",
+      "title": "Portefeuille Crypto"
+    },
+    "debitCard": {
+      "description": "Dépôts rapides jusqu'à 500 $/semaine",
+      "title": "Carte de débit"
+    }
+  },
+  "success": {
+    "actions": {
+      "continue": "Continuer",
+      "depositAgain": "Déposer à nouveau"
+    },
+    "description": "Tout est prêt : vos fonds apparaîtront bientôt dans votre portefeuille",
+    "title": "Dépôt terminé"
+  }
+}

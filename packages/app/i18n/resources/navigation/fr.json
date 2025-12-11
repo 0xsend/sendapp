@@ -1,0 +1,87 @@
+{
+  "sidebar": {
+    "account": "Compte",
+    "secretShop": "Boutique secrète"
+  },
+  "stack": {
+    "account": {
+      "language": "Langue",
+      "linkInBio": "Lien dans la bio",
+      "passkeys": "Clés d'identification",
+      "passkeysConfirm": "Confirmer la clé d'identification",
+      "passkeysCreate": "Créer une clé d'identification",
+      "personalInfo": "Informations personnelles",
+      "profile": "Profil",
+      "referrals": "Parrainages",
+      "root": "Compte",
+      "sendtags": "Sendtags",
+      "sendtagsAdd": "Enregistrer Sendtags",
+      "sendtagsCheckout": "Paiement",
+      "sendtagsFirst": "Premier Sendtag"
+    },
+    "activity": {
+      "details": "Détails de la transaction"
+    },
+    "canton": {
+      "root": "Explorer le portefeuille Canton"
+    },
+    "deposit": {
+      "applePay": "Apple Pay",
+      "debitCard": "Carte de débit",
+      "onBase": "Déposer sur Base",
+      "root": "Déposer",
+      "success": "Succès"
+    },
+    "earn": {
+      "balance": "Solde",
+      "deposit": "Déposer",
+      "details": "Détails",
+      "rewards": "Solde des récompenses",
+      "root": "Épargne",
+      "withdraw": "Retirer de l'épargne"
+    },
+    "investments": {
+      "root": "Investir"
+    },
+    "notFound": "Introuvable",
+    "profile": {
+      "about": "À propos",
+      "history": "Historique"
+    },
+    "rewards": {
+      "root": "Récompenses"
+    },
+    "send": {
+      "enterAmount": "Entrer le montant",
+      "previewAndSend": "Aperçu et envoi"
+    },
+    "sendpot": {
+      "buyTickets": "Acheter des billets",
+      "confirm": "Résumé de l'achat des billets",
+      "root": "Sendpot"
+    },
+    "stables": {
+      "root": "Cash"
+    },
+    "token": {
+      "root": "Investir"
+    },
+    "trade": {
+      "root": "Trade",
+      "summary": "Résumé du trade"
+    }
+  },
+  "tabs": {
+    "activity": "Activité",
+    "explore": "Explorer",
+    "home": "Accueil",
+    "send": "Envoyer",
+    "trade": "Trade"
+  },
+  "topNav": {
+    "tokens": {
+      "cash": "Cash",
+      "invest": "Investir"
+    }
+  }
+}

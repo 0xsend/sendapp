@@ -1,0 +1,30 @@
+{
+  "actions": {
+    "fundAccount": "Approvisionner le compte"
+  },
+  "dev": {
+    "buttons": {
+      "fundEth": "Approvisionner avec 10 ETH",
+      "fundSend": "Approvisionner avec 100 K Send",
+      "fundSendV0": "Approvisionner avec 1 M Send V0 - Approvisionnement de 100 B",
+      "fundSpx": "Approvisionner avec 69 K SPX6900",
+      "fundUsdc": "Approvisionner avec 100 USDC"
+    },
+    "toasts": {
+      "fundEth": "Approvisionné avec 10 ETH",
+      "fundSend": "Approvisionné avec 10 K Send",
+      "fundSendV0": "Approvisionné avec 1 M Send V0",
+      "fundSpx": "Approvisionné avec 69 K SPX6900",
+      "fundUsdc": "Approvisionné avec 100 USDC"
+    }
+  },
+  "result": {
+    "skipped": "{{type}} : solde trop élevé.",
+    "title": "Résultat",
+    "transaction": "Transaction {{type}} : {{hash}}"
+  },
+  "status": {
+    "missingAccount": "Aucun compte Send trouvé. En avez-vous créé un ?",
+    "networkNotice": "Disponible sur {{network}} uniquement. Votre adresse de compte Send :"
+  }
+}

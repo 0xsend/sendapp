@@ -1,0 +1,22 @@
+{
+  "boards": {
+    "referrals": {
+      "title": "Parrainages"
+    }
+  },
+  "errors": {
+    "noData": "Impossible de trouver les données du classement"
+  },
+  "hero": {
+    "description": "Enregistrez un Sendtag, maintenez le solde minimum et parrainez d'autres personnes pour grimper dans le classement.",
+    "title": "Les meilleurs de leur catégorie"
+  },
+  "table": {
+    "columns": {
+      "identifier": "Sendtag",
+      "rank": "#",
+      "referrals": "Parrainages",
+      "transactions": "Nombre total de transactions"
+    }
+  }
+}
