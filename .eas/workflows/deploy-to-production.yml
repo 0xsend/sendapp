@@ -113,11 +113,29 @@ jobs:
           which forge || echo "WARNING: forge not in PATH"
           which bun || echo "WARNING: bun not in PATH"
 
-          # Navigate to monorepo root (same as EAS post-install hook)
-          cd ../..
+          # Find monorepo root by looking for package.json with workspaces
+          echo "Current directory: $(pwd)"
+          echo "Looking for monorepo root..."
 
-          # Build monorepo
+          # Start from current directory and search upwards for package.json with workspaces
+          MONOREPO_ROOT=$(pwd)
+          while [ "$MONOREPO_ROOT" != "/" ]; do
+            if [ -f "$MONOREPO_ROOT/package.json" ] && grep -q "workspaces" "$MONOREPO_ROOT/package.json"; then
+              echo "Found monorepo root at: $MONOREPO_ROOT"
+              break
+            fi
+            MONOREPO_ROOT=$(dirname "$MONOREPO_ROOT")
+          done
+
+          if [ "$MONOREPO_ROOT" = "/" ]; then
+            echo "ERROR: Could not find monorepo root (package.json with workspaces)"
+            exit 1
+          fi
+
+          # Navigate to monorepo root and build
+          cd "$MONOREPO_ROOT"
           echo "Building monorepo from $(pwd)..."
+          ls -la package.json
           yarn build
 
       - name: Publish update
@@ -180,11 +198,29 @@ jobs:
 #          which forge || echo "WARNING: forge not in PATH"
 #          which bun || echo "WARNING: bun not in PATH"
 #
-#          # Navigate to monorepo root (same as EAS post-install hook)
-#          cd ../..
+#          # Find monorepo root by looking for package.json with workspaces
+#          echo "Current directory: $(pwd)"
+#          echo "Looking for monorepo root..."
 #
-#          # Build monorepo
+#          # Start from current directory and search upwards for package.json with workspaces
+#          MONOREPO_ROOT=$(pwd)
+#          while [ "$MONOREPO_ROOT" != "/" ]; do
+#            if [ -f "$MONOREPO_ROOT/package.json" ] && grep -q "workspaces" "$MONOREPO_ROOT/package.json"; then
+#              echo "Found monorepo root at: $MONOREPO_ROOT"
+#              break
+#            fi
+#            MONOREPO_ROOT=$(dirname "$MONOREPO_ROOT")
+#          done
+#
+#          if [ "$MONOREPO_ROOT" = "/" ]; then
+#            echo "ERROR: Could not find monorepo root (package.json with workspaces)"
+#            exit 1
+#          fi
+#
+#          # Navigate to monorepo root and build
+#          cd "$MONOREPO_ROOT"
 #          echo "Building monorepo from $(pwd)..."
+#          ls -la package.json
 #          yarn build
 #
 #      - name: Publish update
