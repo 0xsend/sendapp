@@ -824,6 +824,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
         // optimistic activity entry
         const optimisticActivity: Activity = {
+          event_id: `optimistic/${Date.now()}/${Math.random()}`,
           event_name: Events.TemporalSendAccountTransfers,
           created_at: new Date(),
           from_user: currentUserProfile

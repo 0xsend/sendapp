@@ -23,6 +23,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "v": 19032n,
     },
+    "event_id": "shovel/send_transfer/15164540/0/2",
     "event_name": "send_account_transfers",
     "from_user": null,
     "to_user": {
@@ -61,6 +62,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "value": 20000000000000000n,
     },
+    "event_id": "shovel/tag_receipt/15164541/0/2",
     "event_name": "tag_receipts",
     "from_user": {
       "avatar_url": null,
@@ -85,6 +87,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
         "disconnect_whorl7351",
       ],
     },
+    "event_id": "shovel/referral/15164541/0/0",
     "event_name": "referrals",
     "from_user": {
       "avatar_url": null,
@@ -128,6 +131,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_hash": "\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
       "tx_idx": "0",
     },
+    "event_id": "shovel/signing_key_added/15164541/0/2",
     "event_name": "send_account_signing_key_added",
     "from_user": {
       "avatar_url": null,
@@ -156,6 +160,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_hash": "\\x8c5eeeaf3c97bc2378854be36a99536dd181a1273b359ea714b9c1d4ed6c1e85",
       "tx_idx": "0",
     },
+    "event_id": "shovel/signing_key_removed/15164542/0/2",
     "event_name": "send_account_signing_key_removed",
     "from_user": {
       "avatar_url": null,
@@ -191,6 +196,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "v": 77777n,
     },
+    "event_id": "shovel/send_transfer/15164541/0/2",
     "event_name": "send_account_transfers",
     "from_user": {
       "avatar_url": null,
@@ -239,6 +245,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "value": 10000000000000000n,
     },
+    "event_id": "shovel/send_receive/15681483/0/0",
     "event_name": "send_account_receives",
     "from_user": {
       "avatar_url": null,
@@ -287,6 +294,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "value": 2000000n,
     },
+    "event_id": "shovel/tag_receipt_usdc/15164541/0/2",
     "event_name": "tag_receipt_usdc",
     "from_user": {
       "avatar_url": null,
@@ -324,6 +332,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "v": 8000000n,
     },
+    "event_id": "shovel/send_transfer/17270890/0/4",
     "event_name": "send_account_transfers",
     "from_user": null,
     "to_user": {
@@ -358,6 +367,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_idx": 0n,
       "v": 10000000000000000000000n,
     },
+    "event_id": "shovel/send_transfer/25254355/0/5",
     "event_name": "send_account_transfers",
     "from_user": null,
     "to_user": {
@@ -386,6 +396,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
       "tx_idx": 0n,
     },
+    "event_id": "shovel/send_earn_deposit/12345/0/0",
     "event_name": "send_earn_deposit",
     "from_user": {
       "avatar_url": null,
@@ -415,6 +426,7 @@ exports[`EventArraySchema should parse a valid event array 1`] = `
       "tx_hash": "0x1234567890123456789012345678901234567890123456789012345678901234",
       "tx_idx": 0n,
     },
+    "event_id": "shovel/send_earn_withdraw/12345/0/0",
     "event_name": "send_earn_withdraw",
     "from_user": null,
     "to_user": {

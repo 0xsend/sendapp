@@ -1,96 +1,72 @@
--- Types
--- Note: activity_feed_user is defined in types.sql
+-- Migration: Add event_id field to activity_feed view
+-- The activity_feed view currently lacks a unique identifier. This migration exposes
+-- the activity.event_id column in the view to enable unique identification of activity
+-- feed entries for pagination, caching, and UI keys.
+-- Note: event_id is preferred over the sequential id field to avoid exposing internal
+-- database IDs. The (event_name, event_id) pair is guaranteed unique via a unique index.
 
--- Sequences
-CREATE SEQUENCE IF NOT EXISTS "public"."activity_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER TABLE "public"."activity_id_seq" OWNER TO "postgres";
+-- Step 1: Drop functions that depend on activity_feed view
+-- These functions query activity_feed but don't need modifications since they
+-- don't access the new id field
+DROP FUNCTION IF EXISTS public.favourite_senders(integer, integer);
+DROP FUNCTION IF EXISTS public.recent_senders(integer, integer);
+DROP FUNCTION IF EXISTS public.did_user_swap();
+DROP FUNCTION IF EXISTS public.today_birthday_senders(integer, integer);
+DROP FUNCTION IF EXISTS public.top_senders(integer, integer);
 
--- Table
-CREATE TABLE IF NOT EXISTS "public"."activity" (
-    "id" integer NOT NULL,
-    "event_name" "text" NOT NULL,
-    "event_id" character varying(255) NOT NULL,
-    "from_user_id" "uuid",
-    "to_user_id" "uuid",
-    "data" "jsonb",
-    "created_at" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE "public"."activity" OWNER TO "postgres";
+-- Step 2: Drop and recreate the activity_feed view with the event_id column
+DROP VIEW IF EXISTS public.activity_feed;
 
--- Sequence ownership and defaults
-ALTER SEQUENCE "public"."activity_id_seq" OWNED BY "public"."activity"."id";
-ALTER TABLE ONLY "public"."activity" ALTER COLUMN "id" SET DEFAULT "nextval"('"public"."activity_id_seq"'::"regclass");
-
--- Primary Keys and Constraints
-ALTER TABLE ONLY "public"."activity"
-    ADD CONSTRAINT "activity_pkey" PRIMARY KEY ("id");
-
--- Indexes
-CREATE INDEX "activity_created_at_idx" ON "public"."activity" USING "btree" ("created_at");
-CREATE UNIQUE INDEX "activity_event_name_event_id_idx" ON "public"."activity" USING "btree" ("event_name", "event_id");
-CREATE INDEX "activity_from_user_id_event_name_idx" ON "public"."activity" USING "btree" ("from_user_id", "created_at", "event_name");
-CREATE INDEX "activity_to_user_id_event_name_idx" ON "public"."activity" USING "btree" ("to_user_id", "created_at", "event_name");
-
--- Foreign Keys
-ALTER TABLE ONLY "public"."activity"
-    ADD CONSTRAINT "activity_from_user_id_fkey" FOREIGN KEY ("from_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-ALTER TABLE ONLY "public"."activity"
-    ADD CONSTRAINT "activity_to_user_id_fkey" FOREIGN KEY ("to_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
-
--- Views
-create or replace view "public"."activity_feed" as  SELECT a.event_id,
+CREATE OR REPLACE VIEW public.activity_feed AS
+SELECT
+    a.event_id,
     a.created_at,
     a.event_name,
+    CASE
+        WHEN (a.from_user_id = from_p.id) THEN ROW(
         CASE
-            WHEN (a.from_user_id = from_p.id) THEN ROW(
-            CASE
-                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
-                ELSE NULL::uuid
-            END, from_p.name, from_p.avatar_url, from_p.send_id,
-            CASE
-                WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN from_sa.main_tag_id
-                ELSE NULL::bigint
-            END, (from_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
-               FROM ((tags t
-                 JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
-                 JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-              WHERE ((sa.user_id = from_p.id) AND (t.status = 'confirmed'::tag_status))))::text[], (from_p.verified_at IS NOT NULL)::boolean)::activity_feed_user
-            ELSE NULL::activity_feed_user
-        END AS from_user,
+            WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
+            ELSE NULL::uuid
+        END, from_p.name, from_p.avatar_url, from_p.send_id,
         CASE
-            WHEN (a.to_user_id = to_p.id) THEN ROW(
-            CASE
-                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
-                ELSE NULL::uuid
-            END, to_p.name, to_p.avatar_url, to_p.send_id,
-            CASE
-                WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN to_sa.main_tag_id
-                ELSE NULL::bigint
-            END, (to_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
-               FROM ((tags t
-                 JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
-                 JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
-              WHERE ((sa.user_id = to_p.id) AND (t.status = 'confirmed'::tag_status))))::text[], (to_p.verified_at IS NOT NULL)::boolean)::activity_feed_user
-            ELSE NULL::activity_feed_user
-        END AS to_user,
+            WHEN (a.from_user_id = ( SELECT auth.uid() AS uid)) THEN from_sa.main_tag_id
+            ELSE NULL::bigint
+        END, (from_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+           FROM ((tags t
+             JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
+             JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+          WHERE ((sa.user_id = from_p.id) AND (t.status = 'confirmed'::tag_status))))::text[], (from_p.verified_at IS NOT NULL)::boolean)::activity_feed_user
+        ELSE NULL::activity_feed_user
+    END AS from_user,
+    CASE
+        WHEN (a.to_user_id = to_p.id) THEN ROW(
+        CASE
+            WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN ( SELECT auth.uid() AS uid)
+            ELSE NULL::uuid
+        END, to_p.name, to_p.avatar_url, to_p.send_id,
+        CASE
+            WHEN (a.to_user_id = ( SELECT auth.uid() AS uid)) THEN to_sa.main_tag_id
+            ELSE NULL::bigint
+        END, (to_main_tag.name)::text, (( SELECT array_agg(t.name) AS array_agg
+           FROM ((tags t
+             JOIN send_account_tags sat ON ((sat.tag_id = t.id)))
+             JOIN send_accounts sa ON ((sa.id = sat.send_account_id)))
+          WHERE ((sa.user_id = to_p.id) AND (t.status = 'confirmed'::tag_status))))::text[], (to_p.verified_at IS NOT NULL)::boolean)::activity_feed_user
+        ELSE NULL::activity_feed_user
+    END AS to_user,
     a.data
-   FROM ((((((activity a
-     LEFT JOIN profiles from_p ON ((a.from_user_id = from_p.id)))
-     LEFT JOIN profiles to_p ON ((a.to_user_id = to_p.id)))
-     LEFT JOIN send_accounts from_sa ON ((from_sa.user_id = from_p.id)))
-     LEFT JOIN tags from_main_tag ON ((from_main_tag.id = from_sa.main_tag_id)))
-     LEFT JOIN send_accounts to_sa ON ((to_sa.user_id = to_p.id)))
-     LEFT JOIN tags to_main_tag ON ((to_main_tag.id = to_sa.main_tag_id)))
-  WHERE ((a.from_user_id = ( SELECT auth.uid() AS uid)) OR ((a.to_user_id = ( SELECT auth.uid() AS uid)) AND (a.event_name !~~ 'temporal_%'::text)))
-  GROUP BY a.event_id, a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name, from_p.verified_at, to_p.verified_at;
+FROM ((((((activity a
+    LEFT JOIN profiles from_p ON ((a.from_user_id = from_p.id)))
+    LEFT JOIN profiles to_p ON ((a.to_user_id = to_p.id)))
+    LEFT JOIN send_accounts from_sa ON ((from_sa.user_id = from_p.id)))
+    LEFT JOIN tags from_main_tag ON ((from_main_tag.id = from_sa.main_tag_id)))
+    LEFT JOIN send_accounts to_sa ON ((to_sa.user_id = to_p.id)))
+    LEFT JOIN tags to_main_tag ON ((to_main_tag.id = to_sa.main_tag_id)))
+WHERE ((a.from_user_id = ( SELECT auth.uid() AS uid)) OR ((a.to_user_id = ( SELECT auth.uid() AS uid)) AND (a.event_name !~~ 'temporal_%'::text)))
+GROUP BY a.event_id, a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name, from_p.verified_at, to_p.verified_at;
 
--- Functions (that depend on activity_feed view)
+-- Step 3: Recreate dependent functions
+-- These functions remain unchanged except for being recreated after the view modification
 
 CREATE OR REPLACE FUNCTION public.favourite_senders(page_number integer DEFAULT 0, page_size integer DEFAULT 10)
  RETURNS SETOF activity_feed_user
@@ -313,7 +289,6 @@ $function$
 
 ALTER FUNCTION "public"."did_user_swap"() OWNER TO "postgres";
 
--- Functions (that depend on activity table directly)
 CREATE OR REPLACE FUNCTION public.today_birthday_senders(
     page_number integer DEFAULT 0,
     page_size integer DEFAULT 10
@@ -452,126 +427,111 @@ $function$
 
 ALTER FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) OWNER TO "postgres";
 
--- Function
-
-CREATE OR REPLACE FUNCTION public.update_transfer_activity_before_insert()
-    RETURNS TRIGGER
-    LANGUAGE plpgsql
-    AS $function$
-DECLARE
-    note text;
-    temporal_event_id text;
+CREATE OR REPLACE FUNCTION public.top_senders(
+    page_number integer DEFAULT 0,
+    page_size integer DEFAULT 10
+)
+ RETURNS SETOF activity_feed_user
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
 BEGIN
-    IF (
-    NEW.event_name = 'send_account_transfers'
-    OR NEW.event_name = 'send_account_receives'
-    )
-    AND NEW.from_user_id IS NOT NULL
-    AND NEW.to_user_id IS NOT NULL
-    THEN
-        SELECT
-            data->>'note',
-            t_sat.workflow_id INTO note, temporal_event_id
-        FROM temporal.send_account_transfers t_sat
-        WHERE t_sat.send_account_transfers_activity_event_id = NEW.event_id
-        AND t_sat.send_account_transfers_activity_event_name = NEW.event_name;
-
-        IF note IS NOT NULL THEN
-            NEW.data = NEW.data || jsonb_build_object('note', note);
-        END IF;
-
-        -- Delete any temporal activity that might exist
-        IF temporal_event_id IS NOT NULL THEN
-            DELETE FROM public.activity
-            WHERE event_id = temporal_event_id
-            AND event_name = 'temporal_send_account_transfers';
-        END IF;
+    -- Validate and cap page_size to prevent abuse
+    IF page_size > 50 THEN
+        page_size := 50;
     END IF;
-    RETURN NEW;
+
+    IF page_size < 1 THEN
+        page_size := 1;
+    END IF;
+
+    -- Ensure page_number is not negative
+    IF page_number < 0 THEN
+        page_number := 0;
+    END IF;
+
+    RETURN QUERY
+WITH user_scores AS (
+    SELECT
+        ss.user_id,
+        COALESCE(SUM(ss.score), 0) AS send_score,
+        COALESCE(SUM(ss.unique_sends), 0) AS total_sends
+    FROM (
+        SELECT user_id, score, unique_sends FROM private.send_scores_history
+        UNION ALL
+        SELECT user_id, score, unique_sends FROM public.send_scores_current
+    ) ss
+    GROUP BY ss.user_id
+    HAVING COALESCE(SUM(ss.score), 0) > 0
+       AND COALESCE(SUM(ss.unique_sends), 0) > 0
+),
+user_earn_balances AS (
+    SELECT
+        sa.user_id,
+        COALESCE(MAX(seb.assets), 0) AS earn_balance
+    FROM send_accounts sa
+    JOIN user_scores us ON us.user_id = sa.user_id
+    LEFT JOIN (
+        SELECT
+            owner,
+            SUM(assets) AS assets
+        FROM send_earn_balances
+        GROUP BY owner
+    ) seb ON sa.address_bytes = seb.owner
+    GROUP BY sa.user_id
+),
+valid_users AS (
+    SELECT
+        p.id,
+        p.name,
+        p.avatar_url,
+        p.send_id,
+        us.send_score,
+        ARRAY_AGG(t.name) AS tag_names,
+        (p.verified_at IS NOT NULL) AS is_verified
+    FROM user_scores us
+    INNER JOIN user_earn_balances ueb ON ueb.user_id = us.user_id
+    INNER JOIN profiles p ON p.id = us.user_id
+    INNER JOIN tags t ON t.user_id = p.id
+    WHERE p.is_public = TRUE
+      AND p.avatar_url IS NOT NULL
+      AND t.status = 'confirmed'
+      AND ueb.earn_balance >= (
+          SELECT d.earn_min_balance
+          FROM distributions d
+          WHERE d.qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+            AND d.qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+          ORDER BY d.qualification_start DESC
+          LIMIT 1
+      )
+    GROUP BY p.id, p.name, p.avatar_url, p.send_id, us.send_score, p.verified_at
+)
+-- Return top N with all requirements met
+SELECT (
+    (
+        NULL, -- Placeholder for the 'id' field in activity_feed_user, don't want to show users' IDs
+        vu.name,
+        vu.avatar_url,
+        vu.send_id,
+        NULL::bigint,  -- Hide main_tag_id for privacy
+        main_tag.name,
+        vu.tag_names,
+        vu.is_verified
+    )::activity_feed_user
+).*
+FROM valid_users vu
+LEFT JOIN send_accounts sa ON sa.user_id = vu.id
+LEFT JOIN tags main_tag ON main_tag.id = sa.main_tag_id
+ORDER BY vu.send_score DESC
+LIMIT page_size
+OFFSET page_number * page_size;
 END;
-$function$;
+$function$
+;
 
+ALTER FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) OWNER TO "postgres";
 
-ALTER FUNCTION "public"."update_transfer_activity_before_insert"() OWNER TO "postgres";
-
--- Function to preserve multi-user activities before user deletion
--- Only preserves transaction-related activities (transfers and receives)
--- Referrals are auto-handled by CASCADE + existing delete trigger
-CREATE OR REPLACE FUNCTION public.preserve_activity_before_user_deletion()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Set from_user_id to NULL only where to_user_id exists and is different
-    -- Only for transaction activities (not referrals - they're auto-deleted)
-    UPDATE activity
-    SET from_user_id = NULL
-    WHERE from_user_id = OLD.id
-      AND to_user_id IS NOT NULL
-      AND to_user_id != OLD.id
-      AND event_name IN ('send_account_transfers', 'send_account_receives', 'temporal_send_account_transfers');
-
-    -- Set to_user_id to NULL only where from_user_id exists and is different
-    -- Only for transaction activities (not referrals - they're auto-deleted)
-    UPDATE activity
-    SET to_user_id = NULL
-    WHERE to_user_id = OLD.id
-      AND from_user_id IS NOT NULL
-      AND from_user_id != OLD.id
-      AND event_name IN ('send_account_transfers', 'send_account_receives', 'temporal_send_account_transfers');
-
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-ALTER FUNCTION "public"."preserve_activity_before_user_deletion"() OWNER TO "postgres";
-
--- Triggers
-CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_update_transfer_activit" BEFORE INSERT ON "public"."activity" FOR EACH ROW EXECUTE FUNCTION "public"."update_transfer_activity_before_insert"();
-
--- Trigger that fires BEFORE user deletion to preserve multi-user activities
-CREATE TRIGGER preserve_activity_on_user_deletion
-    BEFORE DELETE ON auth.users
-    FOR EACH ROW
-    EXECUTE FUNCTION public.preserve_activity_before_user_deletion();
-
--- RLS
-alter table activity enable row level security;
-
--- Grants
-GRANT ALL ON TABLE "public"."activity" TO "anon";
-GRANT ALL ON TABLE "public"."activity" TO "authenticated";
-GRANT ALL ON TABLE "public"."activity" TO "service_role";
-
-GRANT ALL ON TABLE "public"."activity_feed" TO "anon";
-GRANT ALL ON TABLE "public"."activity_feed" TO "authenticated";
-GRANT ALL ON TABLE "public"."activity_feed" TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."favourite_senders"("page_number" integer, "page_size" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."recent_senders"("page_number" integer, "page_size" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) TO "anon";
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."today_birthday_senders"("page_number" integer, "page_size" integer) TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."did_user_swap"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."did_user_swap"() TO "anon";
-GRANT ALL ON FUNCTION "public"."did_user_swap"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."did_user_swap"() TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "anon";
-GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "authenticated";
-GRANT ALL ON FUNCTION "public"."update_transfer_activity_before_insert"() TO "service_role";
-
-REVOKE ALL ON FUNCTION "public"."preserve_activity_before_user_deletion"() FROM PUBLIC;
-
-GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "anon";
-GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "authenticated";
-GRANT ALL ON SEQUENCE "public"."activity_id_seq" TO "service_role";
+REVOKE ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) TO "anon";
+GRANT ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."top_senders"("page_number" integer, "page_size" integer) TO "service_role";

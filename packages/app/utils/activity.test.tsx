@@ -408,6 +408,7 @@ describe('isSwapBuyTransfer', () => {
     // This test verifies the fix for the InvalidAddressError
     // SendAccountTransfers events have 'f' and 't' fields, not 'sender'
     activity = {
+      event_id: 'test/send_transfer/1/0/0',
       event_name: 'send_account_transfers',
       created_at: new Date(),
       from_user: {
@@ -438,6 +439,7 @@ describe('isSwapBuyTransfer', () => {
   it('should handle SendAccountReceive events without f field correctly', () => {
     // SendAccountReceive events have 'sender' field, not 'f' and 't'
     activity = {
+      event_id: 'test/send_receive/1/0/0',
       event_name: 'send_account_receives',
       created_at: new Date(),
       from_user: null,

@@ -106,7 +106,7 @@ export const EarningsFeed = () => {
       <SectionList
         sections={sections}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
+        keyExtractor={(activity) => activity.event_id}
         renderItem={({ item: activity, index, section }) => (
           <YStack
             bc="$color1"
