@@ -1,4 +1,5 @@
 import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { isWeb } from '@tamagui/constants'
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
 import type { ZodError } from 'zod'
@@ -77,7 +78,17 @@ export default function ActivityFeed({
 
     const activities = pages.flat()
 
-    const groups = activities.reduce<Record<string, Activity[]>>((acc, activity) => {
+    // Remove duplicates
+    const seenEventIds = new Set<string>()
+    const uniqueActivities = activities.filter((activity) => {
+      if (seenEventIds.has(activity.event_id)) {
+        return false
+      }
+      seenEventIds.add(activity.event_id)
+      return true
+    })
+
+    const groups = uniqueActivities.reduce<Record<string, Activity[]>>((acc, activity) => {
       const isToday = activity.created_at.toDateString() === new Date().toDateString()
       const dateKey = isToday
         ? t('sections.today')
@@ -128,7 +139,22 @@ export default function ActivityFeed({
   }
 
   return (
-    <View br={10} ov="hidden" w="100%" pos="absolute" h="120%" $gtLg={{ h: '105%' }}>
+    <View
+      br={10}
+      ov="hidden"
+      w="100%"
+      pos="absolute"
+      h="100%"
+      zIndex={10}
+      y={-20}
+      $gtLg={{
+        y: 20,
+      }}
+      $platform-native={{
+        h: '150%',
+        y: 0,
+      }}
+    >
       <MyList
         data={flattenedData}
         // stickyIndices={stickyIndices}
@@ -142,26 +168,6 @@ export default function ActivityFeed({
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
       </LazyMount>
-      <LinearGradient
-        display="none"
-        $gtSm={{
-          display: 'flex',
-        }}
-        animation="100ms"
-        animateOnly={['opacity']}
-        enterStyle={{ opacity: 0 }}
-        exitStyle={{ opacity: 0 }}
-        pe="none"
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        colors={['$background', 'rgba(0, 0, 0, 0)']}
-        locations={[0, 1]}
-        pos="absolute"
-        l={0}
-        r={0}
-        opacity={0.7}
-        h={20}
-      />
     </View>
   )
 }
@@ -292,13 +298,14 @@ const MyList = memo(
       <View className="hide-scroll" display="contents">
         <FlashList
           data={data}
+          style={styles.flashListStyle}
           testID={'RecentActivity'}
           keyExtractor={keyExtractor}
           showsVerticalScrollIndicator={false}
           getItemType={getItemType}
           onEndReached={onEndReached}
           renderItem={renderItem}
-          contentContainerStyle={!hasNextPage ? flashListContentContainerStyle : undefined}
+          contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
         />
       </View>
@@ -306,9 +313,14 @@ const MyList = memo(
   }
 )
 
-const flashListContentContainerStyle = {
-  paddingBottom: 200,
-}
+const styles = {
+  flashListContentContainer: {
+    paddingBottom: !isWeb ? 300 : 200,
+  },
+  flashListStyle: {
+    flex: 1,
+  },
+} as const
 
 function ListFooterComponent() {
   return (

@@ -149,8 +149,10 @@ export type Database = MergeDeep<
       Views: {
         activity_feed: {
           Row: {
+            event_id: string
             created_at: string
             event_name: string
+            data: DatabaseGenerated['public']['Views']['activity_feed']['Row']['data']
             from_user: Merge<
               DatabaseGenerated['public']['CompositeTypes']['activity_feed_user'],
               { tags: string[] }

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { ActivityScreen } from 'app/features/activity/screen'
-import { HomeLayout } from 'app/features/home/layout.web'
+import { HomeLayout } from 'app/features/activity/layout.web'
 import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from './_app'
 import { TopNav } from 'app/components/TopNav'
