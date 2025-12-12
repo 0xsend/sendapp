@@ -1,0 +1,22 @@
+{
+  "errors": {
+    "sessionExpired": "Session expirée. Redirection vers la page de connexion...",
+    "unknown": "Erreur inconnue"
+  },
+  "form": {
+    "placeholder": "Saisissez le Sendtag souhaité",
+    "submit": "terminer le compte"
+  },
+  "passkey": {
+    "retry": "Réessayer le contrôle d’intégrité",
+    "status": {
+      "checking": "Vérification de l’intégrité de signature de votre clé d’identification...",
+      "complete": "Vérification de l’intégrité de la clé d’identification terminée.",
+      "failureDetailed": "Échec du contrôle d’intégrité de la clé d’identification. Essayez de créer votre clé d’identification sur un appareil doté du trousseau iCloud ou du gestionnaire de mots de passe Google.",
+      "success": "La vérification de l’intégrité de la clé d’identification a réussi."
+    },
+    "toastFailure": "Échec du contrôle d’intégrité de la clé d’identification."
+  },
+  "subtitle": "Choisissez votre Sendtag : votre nom d’utilisateur unique sur Send",
+  "title": "Terminez votre compte"
+}

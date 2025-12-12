@@ -13,6 +13,7 @@ import type { Functions } from '@my/supabase/database.types'
 import { toNiceError } from 'app/utils/toNiceError'
 import { IconBirthday, IconBadgeCheckSolid } from 'app/components/icons'
 import { adjustUTCDateForTimezone } from 'app/utils/dateHelper'
+import { useReferrer } from 'app/utils/useReferrer'
 import { useFriendsFeed } from 'app/features/affiliate/utils/useFriendsFeed'
 import { ReferralLink } from 'app/components/ReferralLink'
 import { RecyclerListView } from 'recyclerlistview'
@@ -41,8 +42,21 @@ export default function FriendsScreen() {
   })
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     friendsFeedQuery
+  const { data: referrer, isLoading: isReferrerLoading } = useReferrer()
 
-  const referrals = useMemo(() => data?.pages.flat() || [], [data])
+  const referrals = useMemo(() => {
+    const refs: Referral[] = []
+
+    if (referrer) {
+      refs.push(referrer)
+    }
+
+    if (data?.pages) {
+      refs.push(...(data.pages.flat() as Referral[]))
+    }
+
+    return refs
+  }, [data, referrer])
 
   const dataProvider = useMemo(() => {
     return dataProviderMakerNative(referrals)
@@ -57,8 +71,10 @@ export default function FriendsScreen() {
   )
 
   const rowRenderer = useCallback(
-    (type: string | number, item: Referral) => <FriendMobileRow referral={item} />,
-    []
+    (type: string | number, item: Referral) => (
+      <FriendMobileRow referral={item} referrer={referrer} />
+    ),
+    [referrer]
   )
 
   const handleEndReach = useCallback(() => {
@@ -67,7 +83,7 @@ export default function FriendsScreen() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
-  if (isLoading) return <Spinner size="small" />
+  if (isLoading || isReferrerLoading) return <Spinner size="small" />
 
   if (error !== null) {
     return (
@@ -111,7 +127,13 @@ export default function FriendsScreen() {
   )
 }
 
-const FriendMobileRow = ({ referral }: { referral: Referral }) => {
+const FriendMobileRow = ({
+  referral,
+  referrer,
+}: {
+  referral: Referral
+  referrer?: Referral | null
+}) => {
   const displayTag = referral.main_tag || referral.tag
   const linkProps = useLink({ href: `/profile/${referral.sendid}` })
   const { t, i18n } = useTranslation('affiliate')
@@ -128,6 +150,7 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
     : referral.name || referral.sendid
       ? `#${referral.sendid}`
       : t('list.unknownTag')
+  const invitedCopy = t('list.invitedYou')
 
   return (
     <Card w={'100%'} gap={'$3.5'} br={'$5'} p={'$3.5'} {...linkProps}>
@@ -153,7 +176,10 @@ const FriendMobileRow = ({ referral }: { referral: Referral }) => {
           )}
           <YStack gap={'$2'} f={1}>
             <XStack ai="center" gap="$2">
-              <Paragraph lineHeight={20}>{label}</Paragraph>
+              <Paragraph lineHeight={20}>
+                {label}
+                {referral.sendid === referrer?.sendid ? ` ${invitedCopy}` : ''}
+              </Paragraph>
               {referral.is_verified ? (
                 <IconBadgeCheckSolid
                   size={'$1'}

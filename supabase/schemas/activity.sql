@@ -44,7 +44,8 @@ ALTER TABLE ONLY "public"."activity"
     ADD CONSTRAINT "activity_to_user_id_fkey" FOREIGN KEY ("to_user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 -- Views
-create or replace view "public"."activity_feed" as  SELECT a.created_at,
+create or replace view "public"."activity_feed" as  SELECT a.event_id,
+    a.created_at,
     a.event_name,
         CASE
             WHEN (a.from_user_id = from_p.id) THEN ROW(
@@ -87,7 +88,7 @@ create or replace view "public"."activity_feed" as  SELECT a.created_at,
      LEFT JOIN send_accounts to_sa ON ((to_sa.user_id = to_p.id)))
      LEFT JOIN tags to_main_tag ON ((to_main_tag.id = to_sa.main_tag_id)))
   WHERE ((a.from_user_id = ( SELECT auth.uid() AS uid)) OR ((a.to_user_id = ( SELECT auth.uid() AS uid)) AND (a.event_name !~~ 'temporal_%'::text)))
-  GROUP BY a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name, from_p.verified_at, to_p.verified_at;
+  GROUP BY a.event_id, a.created_at, a.event_name, a.from_user_id, a.to_user_id, from_p.id, from_p.name, from_p.avatar_url, from_p.send_id, to_p.id, to_p.name, to_p.avatar_url, to_p.send_id, a.data, from_sa.main_tag_id, from_main_tag.name, to_sa.main_tag_id, to_main_tag.name, from_p.verified_at, to_p.verified_at;
 
 -- Functions (that depend on activity_feed view)
 

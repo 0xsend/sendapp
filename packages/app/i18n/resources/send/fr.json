@@ -1,0 +1,55 @@
+{
+  "confirm": {
+    "button": {
+      "send": "ENVOYER"
+    },
+    "edit": "modifier",
+    "errors": {
+      "default": "Erreur lors de l’envoi",
+      "insufficientBalance": "Solde insuffisant",
+      "insufficientGas": "Gaz insuffisant"
+    },
+    "fees": "Frais",
+    "noteTitle": "Votre note"
+  },
+  "form": {
+    "balanceLabel": "Solde :",
+    "errors": {
+      "insufficientFunds": "Fonds insuffisants",
+      "minimum": "Minimum : {{amount}} {{symbol}}",
+      "noteValidationFallback": "La note n’a pas pu correspondre aux contraintes de validation"
+    },
+    "note": {
+      "maxCharacters": "Max. : {{count}} caractères"
+    },
+    "submit": "CONTINUER"
+  },
+  "noAccount": {
+    "banner": "Chèques /send bientôt disponibles",
+    "cta": "Écrire un chèque /send",
+    "description": "n’a pas de compte d’envoi ! Demandez-lui d’en créer un ou d’écrire un chèque /send.",
+    "title": "Aucun compte d’envoi",
+    "toast": "Bientôt disponible"
+  },
+  "recipient": {
+    "edit": "modifier",
+    "label": "À"
+  },
+  "search": {
+    "errorHeading": "Erreur",
+    "placeholder": "Rechercher par balise d’envoi ou adresse de portefeuille",
+    "unknownError": "Erreur inconnue"
+  },
+  "suggestions": {
+    "birthdays": "Souhaitez-leur un joyeux anniversaire",
+    "favorites": "Expéditeurs favoris",
+    "recent": "Activité récente",
+    "top": "Meilleurs expéditeurs",
+    "viewMore": "Voir plus"
+  },
+  "topNav": {
+    "default": "Envoyer",
+    "enterAmount": "Saisir le montant",
+    "preview": "Aperçu et envoi"
+  }
+}

@@ -408,23 +408,8 @@ WHERE
                     number = 123));
 
 -- Test sendpot_ticket_purchase verification trigger
--- Add verification value for sendpot_ticket_purchase
-INSERT INTO public.distribution_verification_values(
-    type,
-    fixed_value,
-    bips_value,
-    multiplier_min,
-    multiplier_max,
-    multiplier_step,
-    distribution_id)
-VALUES (
-    'sendpot_ticket_purchase',
-    3000000000000000000,
-    0,
-    1.0,
-    1.0,
-    0.0,
-    (SELECT id FROM distributions WHERE number = 123));
+-- Note: sendpot_ticket_purchase verification value is now automatically inherited
+-- from the previous distribution via the INSERT above (lines 364-408)
 
 SELECT
     results_eq($$

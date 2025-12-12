@@ -124,6 +124,7 @@ export default () => {
       'react-hook-form',
       'react-native-passkeys',
       'react-native-qrcode-svg',
+      '@shopify/flash-list',
     ],
     experimental: {
       optimizePackageImports: [

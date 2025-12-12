@@ -1,0 +1,234 @@
+{
+  "common": {
+    "cancel": "ANNULER",
+    "confirm": "CONFIRMER",
+    "notAvailable": "N/A",
+    "remove": "SUPPRIMER",
+    "saveChanges": "ENREGISTRER LES MODIFICATIONS",
+    "success": "Succès !"
+  },
+  "header": {
+    "actions": {
+      "invite": "Inviter des amis",
+      "share": "Partager le profil"
+    },
+    "verification": {
+      "notVerified": "Non vérifié"
+    }
+  },
+  "language": {
+    "description": "Send utilise la langue sélectionnée sur chaque appareil connecté à votre compte.",
+    "title": "Langue",
+    "updating": "Application de la langue…"
+  },
+  "linkInBio": {
+    "cta": {
+      "edit": "modifier les liens"
+    },
+    "empty": "Aucun lien social ajouté pour le moment.",
+    "header": "Lien dans la bio",
+    "placeholders": {
+      "whatsapp": "Numéro de téléphone Whatsapp"
+    }
+  },
+  "links": {
+    "items": {
+      "deleteAccount": "Supprimer le compte",
+      "language": "Langue",
+      "learnMore": "En savoir plus sur Send",
+      "linkInBio": "Lien dans la bio",
+      "liveChat": "Assistance par chat en direct",
+      "passkeys": "Clés d'identification",
+      "personalInfo": "Informations personnelles",
+      "profile": "Profil",
+      "referrals": "Parrainages",
+      "rewards": "Récompenses",
+      "sendtags": "Sendtags"
+    },
+    "sections": {
+      "features": "Fonctionnalités",
+      "profile": "Profil",
+      "security": "Sécurité",
+      "settings": "Paramètres",
+      "support": "Assistance"
+    },
+    "signOut": "se déconnecter"
+  },
+  "passkeys": {
+    "confirm": {
+      "description": "Votre clé d'identification {{name}} a été enregistrée. Ajoutez votre nouvelle clé d'identification en tant que signataire. Cela vous permettra de signer des transactions sur votre compte avec votre nouvelle clé d'identification.",
+      "noCredential": "Aucun identifiant trouvé pour l'ID d'identifiant {{id}}",
+      "submit": "Ajouter une clé d'identification en tant que signataire",
+      "title": "Ajouter une clé d'identification en tant que signataire"
+    },
+    "create": {
+      "accountNameLabel": "Nom de la clé d'identification",
+      "description": "Sécurisez votre compte Send en ajoutant jusqu'à 20 clés d'identification. Les clés d'identification sont des appareils de confiance autorisés à signer les transactions de votre compte.",
+      "submit": "Ajouter une clé d'identification",
+      "title": "Sécurisez votre compte avec des clés d'identification"
+    },
+    "empty": {
+      "learnAccounts": "En savoir plus sur les comptes Send",
+      "learnCredentials": "En savoir plus sur les identifiants WebAuthn",
+      "noAccount": "Vous n'avez pas de compte Send.",
+      "noCredentials": "Vous n'avez pas d'identifiants WebAuthn. Cela ne devrait jamais arriver. Veuillez contacter <supportLink>l'assistance</supportLink> si vous avez besoin d'aide.",
+      "supportLink": "assistance"
+    },
+    "header": "Clés d'identification",
+    "list": {
+      "add": "Ajouter une clé d'identification",
+      "errors": {
+        "noBalance": "Aucun solde USDC pour payer les frais de gaz"
+      },
+      "labels": {
+        "createdAt": "Créé le",
+        "keySlot": "Emplacement de la clé",
+        "status": "Statut"
+      },
+      "remove": {
+        "prompt": "Veuillez saisir « {{name}} » ci-dessous",
+        "title": "Suppression de « {{name}} » en tant que signataire de votre compte Send.",
+        "warning": "Cette action est irréversible."
+      },
+      "removeAction": "SUPPRIMER LA CLÉ D'IDENTIFICATION",
+      "removePrompt": "Supprimer la clé d'identification ?",
+      "status": {
+        "notConfirmed": "La clé d'identification n'est pas confirmée sur la chaîne. Terminez de confirmer la clé d'identification sur la chaîne."
+      },
+      "updateKeySlot": {
+        "cta": "Mettre à jour l'emplacement de la clé",
+        "message": "L'emplacement sur la chaîne, {{onchainSlot}}, ne correspond pas à l'emplacement Webauthn {{storageSlot}}. Cela ne devrait jamais arriver. Veuillez mettre à jour l'emplacement de la clé ci-dessous.",
+        "toast": "Emplacement de la clé mis à jour"
+      }
+    }
+  },
+  "personalInfo": {
+    "header": "Informations personnelles",
+    "labels": {
+      "birthday": "date de naissance",
+      "dateOfBirth": "Date de naissance",
+      "nonEditable": "(non modifiable)",
+      "phone": "Numéro de téléphone",
+      "xHandle": "Pseudo X",
+      "xUsername": "Nom d'utilisateur X"
+    },
+    "overview": {
+      "edit": "modifier les informations personnelles"
+    },
+    "toast": {
+      "phoneUpdated": "Numéro de téléphone mis à jour"
+    }
+  },
+  "profile": {
+    "form": {
+      "about": "À propos",
+      "aboutPlaceholder": "Parlez-nous de vous",
+      "makePublic": "Rendre le profil public",
+      "name": "Nom"
+    },
+    "header": "Profil",
+    "overview": {
+      "about": "À propos",
+      "edit": "modifier le profil",
+      "name": "Nom",
+      "visibility": {
+        "private": "Profil privé",
+        "public": "Profil public"
+      }
+    }
+  },
+  "sendtag": {
+    "buttons": {
+      "addNew": "ajouter un nouveau",
+      "addTag": "AJOUTER UN TAG",
+      "changeMain": "Changer de tag principal",
+      "continue": "continuer",
+      "register": "enregistrer",
+      "registerFree": "enregistrer un sendtag gratuit"
+    },
+    "checkout": {
+      "balance": "Solde :",
+      "balanceError": "Erreur lors de la récupération des informations de solde",
+      "complete": "finaliser l'achat",
+      "deposit": "Déposer de l'USDC",
+      "error": "erreur",
+      "fees": "Frais",
+      "loading": "chargement...",
+      "price": "Prix",
+      "processing": "traitement en cours...",
+      "registering": "enregistrement en cours...",
+      "requesting": "demande en cours...",
+      "retry": "Réessayer",
+      "review": "Vérifier l'achat",
+      "totalPrice": "Prix total"
+    },
+    "header": {
+      "description": "Appropriez-vous votre identité sur Send. Enregistrez jusqu'à 5 tags vérifiés et faites-en les vôtres.",
+      "first": "Enregistrer le premier Sendtag",
+      "verified": "Sendtags vérifiés"
+    },
+    "labels": {
+      "addAnother": "Ajouter un autre Sendtag",
+      "createNew": "Créer un nouveau Sendtag",
+      "enterName": "Saisir le nom du Sendtag",
+      "inputDesired": "Saisir le Sendtag souhaité",
+      "name": "Nom",
+      "pendingList": "Sendtags [{{pending}}/{{remaining}}]",
+      "price": "Prix",
+      "referralCode": "Code de parrainage",
+      "sendtagName": "Nom du Sendtag",
+      "total": "Total"
+    },
+    "messages": {
+      "alreadyTaken": "Ce Sendtag est déjà pris",
+      "choosePrimary": "Choisissez le tag qui apparaît comme votre identité principale",
+      "genericError": "Une erreur s'est produite",
+      "invalidInput": "Saisie non valide",
+      "securedAfterPayment": "Votre Sendtag sera sécurisé après la confirmation du paiement",
+      "updatingMain": "Mise à jour du tag principal..."
+    },
+    "pricing": {
+      "button": {
+        "free": "Gratuit",
+        "label": "Tarification"
+      },
+      "description": "Le prix des Sendtags est basé sur leur longueur. Plus le Sendtag est court, plus il coûte cher.",
+      "ok": "OK",
+      "title": "Tarification des Sendtags",
+      "tooltipDescription": "Le prix du Sendtag est basé sur la longueur : plus il est court, plus le prix est élevé."
+    },
+    "referral": {
+      "applied": "Code de parrainage appliqué",
+      "empty": "Vous avez un parrainage ? Saisissez le code pour obtenir des récompenses !",
+      "invalid": "Code de parrainage non valide",
+      "placeholder": "Code de parrainage",
+      "validating": "Validation du code de parrainage"
+    },
+    "sheet": {
+      "title": "Sélectionner le tag principal"
+    },
+    "toasts": {
+      "mainUpdateFailed": "Échec de la mise à jour du tag principal",
+      "mainUpdated": "Tag principal mis à jour"
+    }
+  },
+  "share": {
+    "actions": {
+      "copy": "copier le lien"
+    },
+    "title": "Partager le profil",
+    "toast": {
+      "copied": "Lien du profil copié dans le presse-papiers",
+      "copyError": {
+        "message": "Une erreur s'est produite lors de la copie du lien",
+        "title": "Échec de la copie du lien"
+      }
+    }
+  },
+  "upload": {
+    "errors": {
+      "bufferNull": "ArrayBuffer est nul.",
+      "noImage": "Aucune image fournie."
+    }
+  }
+}

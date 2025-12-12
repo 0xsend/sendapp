@@ -1,0 +1,25 @@
+{
+  "actions": {
+    "approve": "Approuver le payeur",
+    "approving": "Approbation en cours..."
+  },
+  "allowances": {
+    "current": "Allocation actuelle",
+    "required": "Allocation requise",
+    "unlimited": "Illimité"
+  },
+  "hero": {
+    "subtitle": "Pour payer les frais de transaction avec USDC, autorisez le payeur à dépenser USDC en votre nom.",
+    "title": "Payez le gaz avec USDC"
+  },
+  "status": {
+    "ready": "Prêt à approuver",
+    "requesting": "Demande d'approbation...",
+    "retry": "La transaction a échoué, veuillez réessayer",
+    "sending": "Envoi de la transaction...",
+    "waiting": "En attente de confirmation..."
+  },
+  "toast": {
+    "success": "Payeur approuvé avec succès !"
+  }
+}

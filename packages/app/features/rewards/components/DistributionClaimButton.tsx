@@ -19,7 +19,7 @@ import { toNiceError } from 'app/utils/toNiceError'
 import { useAccountNonce } from 'app/utils/userop'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEffect, useState } from 'react'
-import { type Hex, isAddress } from 'viem'
+import { type Hex, isAddress, formatUnits } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useTranslation } from 'react-i18next'
 
@@ -147,11 +147,19 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   ])
 
   useEffect(() => {
-    if (error) {
+    if (error && share) {
+      console.log(error)
+      const formattedAddress = share.address
+        ? `${share.address.slice(0, 6)}...${share.address.slice(-4)}`
+        : 'unknown'
+      const formattedAmount = formatUnits(BigInt(share.amount), distribution.token_decimals ?? 18)
+      const errorMessage = `${toNiceError(error)} | [${share.index}, ${formattedAddress}, ${formattedAmount}]`
+      toast.error(errorMessage)
+    } else if (error) {
       console.log(error)
       toast.error(toNiceError(error))
     }
-  }, [error, toast])
+  }, [error, toast, share, distribution.token_decimals])
 
   async function onSubmit() {
     try {

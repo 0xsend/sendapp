@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { ActivityScreen } from 'app/features/activity/screen'
-import { HomeLayout } from 'app/features/home/layout.web'
+import { HomeLayout } from 'app/features/activity/layout.web'
 import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from './_app'
 import { TopNav } from 'app/components/TopNav'
@@ -20,7 +20,10 @@ function ActivityLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation('navigation')
 
   return (
-    <HomeLayout TopNav={<TopNav header={t('tabs.activity')} showOnGtLg={true} />}>
+    <HomeLayout
+      scrollEnabled={false}
+      TopNav={<TopNav header={t('tabs.activity')} showOnGtLg={true} />}
+    >
       {children}
     </HomeLayout>
   )

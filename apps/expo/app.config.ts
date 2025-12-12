@@ -14,6 +14,10 @@ module.exports = {
   newArchEnabled: true,
   updates: {
     fallbackToCacheTimeout: 0,
+    url: 'https://u.expo.dev/21a964cb-0d04-42e5-bc00-7f8bf0fd5064',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
   },
   assetBundlePatterns: ['**/*'],
   ios: {

@@ -17,7 +17,7 @@ import { Events } from 'app/utils/zod/activity/events'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { ZodError } from 'zod'
 import { TokenActivityRow } from './TokenActivityRow'
-import { useRootScreenParams } from 'app/routers/params'
+import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { RecyclerListView } from 'recyclerlistview'
 import type { CoinWithBalance } from 'app/data/coins'
 
@@ -147,6 +147,11 @@ export default function TokenActivityFeed({
     [listData]
   )
 
+  const sendParamsAndSet = useSendScreenParams()
+
+  const sendParamsRef = useRef(sendParamsAndSet)
+  sendParamsRef.current = sendParamsAndSet
+
   const rowRenderer = useCallback(
     (type: string | number, item: ListItem, index: number) => {
       const isFirst = index === firstActivityIndex
@@ -170,7 +175,11 @@ export default function TokenActivityFeed({
               borderBottomLeftRadius={isLast ? '$6' : 0}
               borderBottomRightRadius={isLast ? '$6' : 0}
             >
-              <TokenActivityRow activity={item.data} onPress={onActivityPress} />
+              <TokenActivityRow
+                activity={item.data}
+                onPress={onActivityPress}
+                sendParamsRef={sendParamsRef}
+              />
             </XStack>
           )
         case 'loader':

@@ -1,0 +1,16 @@
+{
+  "banner": {
+    "cantonWallet": {
+      "subtitle": "Soyez le premier. Gardez une longueur d'avance.",
+      "title": "Portefeuille Canton"
+    },
+    "rewards": {
+      "subtitle": "Faites fructifier votre argent",
+      "title": "Récompenses"
+    },
+    "sendpot": {
+      "subtitle": "Tournez. Gagnez. Frimez.",
+      "title": "Sendpot"
+    }
+  }
+}

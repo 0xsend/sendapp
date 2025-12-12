@@ -8,6 +8,7 @@ import { Platform, SectionList } from 'react-native'
 import { useERC20AssetCoin } from '../params'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
+import { useSendScreenParams } from 'app/routers/params'
 
 export const EarningsBalance = () => {
   return (
@@ -90,6 +91,11 @@ export const EarningsFeed = () => {
     }))
   }, [data?.pages])
 
+  const sendParamsAndSet = useSendScreenParams()
+
+  const sendParamsRef = useRef(sendParamsAndSet)
+  sendParamsRef.current = sendParamsAndSet
+
   if (!coin.isSuccess || !coin.data) return null
   if (isLoading) return <Spinner size="small" />
   if (error) return <Paragraph>{error.message}</Paragraph>
@@ -100,7 +106,7 @@ export const EarningsFeed = () => {
       <SectionList
         sections={sections}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
+        keyExtractor={(activity) => activity.event_id}
         renderItem={({ item: activity, index, section }) => (
           <YStack
             bc="$color1"
@@ -126,7 +132,7 @@ export const EarningsFeed = () => {
               borderBottomRightRadius: '$6',
             })}
           >
-            <TokenActivityRow activity={activity} />
+            <TokenActivityRow activity={activity} sendParamsRef={sendParamsRef} />
           </YStack>
         )}
         renderSectionHeader={({ section: { title, index } }) =>
