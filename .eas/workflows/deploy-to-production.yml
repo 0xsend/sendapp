@@ -168,9 +168,23 @@ jobs:
           which eas
           eas --version
 
-          # eas update needs to run from the expo app directory
+          # Find the Expo app directory (should be apps/expo in the monorepo)
+          EXPO_APP_DIR="$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+
+          if [ -z "$EXPO_APP_DIR" ] || [ ! -d "$EXPO_APP_DIR" ]; then
+            echo "ERROR: Could not find Expo app directory"
+            echo "Searching for app.json files:"
+            find /home/expo/workingdir -name "app.json" -type f 2>/dev/null | head -5
+            exit 1
+          fi
+
+          # Navigate to Expo app directory
+          cd "$EXPO_APP_DIR"
           echo "Publishing update from $(pwd)..."
-          eas update --branch production --platform android --non-interactive
+          ls -la app.json eas.json
+
+          # Publish update with message
+          eas update --branch production --platform android --message "Automated update from EAS Workflow" --non-interactive
 
 #  publish_ios_update:
 #    name: Publish iOS update
@@ -282,6 +296,20 @@ jobs:
 #          which eas
 #          eas --version
 #
-#          # eas update needs to run from the expo app directory
+#          # Find the Expo app directory (should be apps/expo in the monorepo)
+#          EXPO_APP_DIR="$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+#
+#          if [ -z "$EXPO_APP_DIR" ] || [ ! -d "$EXPO_APP_DIR" ]; then
+#            echo "ERROR: Could not find Expo app directory"
+#            echo "Searching for app.json files:"
+#            find /home/expo/workingdir -name "app.json" -type f 2>/dev/null | head -5
+#            exit 1
+#          fi
+#
+#          # Navigate to Expo app directory
+#          cd "$EXPO_APP_DIR"
 #          echo "Publishing update from $(pwd)..."
-#          eas update --branch production --platform ios --non-interactive
+#          ls -la app.json eas.json
+#
+#          # Publish update with message
+#          eas update --branch production --platform ios --message "Automated update from EAS Workflow" --non-interactive
