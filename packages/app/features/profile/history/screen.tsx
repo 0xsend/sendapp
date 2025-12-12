@@ -103,9 +103,7 @@ export function ProfileHistoryScreen({ sendid: propSendid }: ProfileScreenProps)
                   testID="TokenActivityFeed"
                   style={{ flex: 1 }}
                   data={activities}
-                  keyExtractor={(activity) =>
-                    `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}`
-                  }
+                  keyExtractor={(activity) => activity.event_id}
                   renderItem={({ item: activity, index }) => {
                     const date = activity.created_at.toLocaleDateString()
                     const nextDate = activities[index + 1]?.created_at.toLocaleDateString()

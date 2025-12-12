@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { UserSchema } from './UserSchema'
 
 export const BaseEventSchema = z.object({
+  event_id: z.string(),
   created_at: z
     .string()
     .transform((v, ctx) => {

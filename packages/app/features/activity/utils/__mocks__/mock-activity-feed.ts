@@ -1,5 +1,6 @@
 // Mock activity feed on it's own for maximum portability. esm vs cjs(playwright)
 export const mockReceivedTransfer = {
+  event_id: 'shovel/send_transfer/15164540/0/2',
   created_at: '2024-05-26T13:38:25+00:00',
   event_name: 'send_account_transfers',
   from_user: null,
@@ -26,6 +27,7 @@ export const mockReceivedTransfer = {
 }
 
 export const mockSentTransfer = {
+  event_id: 'shovel/send_transfer/15164541/0/2',
   created_at: '2024-05-27T13:36:07.15651+00:00',
   event_name: 'send_account_transfers',
   from_user: {
@@ -62,6 +64,7 @@ export const mockSentTransfer = {
 }
 
 export const mockSwapSellErc20Transfer = {
+  event_id: 'shovel/send_transfer/15164541/0/2',
   created_at: '2025-03-21T13:36:07.15651+00:00',
   event_name: 'send_account_transfers',
   from_user: {
@@ -88,6 +91,7 @@ export const mockSwapSellErc20Transfer = {
 }
 
 export const mockSwapBuyErc20Transfer = {
+  event_id: 'shovel/send_transfer/15164541/0/2',
   created_at: '2025-03-21T14:36:07.15651+00:00',
   event_name: 'send_account_transfers',
   from_user: null,
@@ -114,6 +118,7 @@ export const mockSwapBuyErc20Transfer = {
 }
 
 export const mockSwapBuyEthTransfer = {
+  event_id: 'shovel/send_receive/15681483/0/0',
   created_at: '2024-06-12T00:31:48+00:00',
   event_name: 'send_account_receives',
   from_user: null,
@@ -139,6 +144,7 @@ export const mockSwapBuyEthTransfer = {
 } as const
 
 export const mockTagReceipt = {
+  event_id: 'shovel/tag_receipt/15164541/0/2',
   created_at: '2024-05-26T19:41:05.370+00:00',
   event_name: 'tag_receipts',
   from_user: {
@@ -164,6 +170,7 @@ export const mockTagReceipt = {
 }
 
 export const mockTagReceiptUSDC = {
+  event_id: 'shovel/tag_receipt_usdc/15164541/0/2',
   created_at: '2024-05-26T19:41:05.370+00:00',
   event_name: 'tag_receipt_usdc',
   from_user: {
@@ -189,6 +196,7 @@ export const mockTagReceiptUSDC = {
 }
 
 export const mockReferral = {
+  event_id: 'shovel/referral/15164541/0/0',
   created_at: '2024-05-26T19:41:05.370062+00:00',
   event_name: 'referrals',
   from_user: {
@@ -217,6 +225,7 @@ export const mockReferral = {
 }
 
 export const mockSendAccountReceive = {
+  event_id: 'shovel/send_receive/15681483/0/0',
   created_at: '2024-06-12T00:31:48+00:00',
   event_name: 'send_account_receives',
   from_user: {
@@ -252,6 +261,7 @@ export const mockSendAccountReceive = {
 } as const
 
 export const mockSendtagReferralRewardUSDC = {
+  event_id: 'shovel/send_transfer/17270890/0/4',
   created_at: '2024-07-18T19:32:08+00:00',
   event_name: 'send_account_transfers',
   from_user: null,
@@ -278,6 +288,7 @@ export const mockSendtagReferralRewardUSDC = {
 }
 
 const mockSigningKeyAdded = {
+  event_id: 'shovel/signing_key_added/15164541/0/2',
   created_at: '2024-05-29T13:34:26+00:00',
   event_name: 'send_account_signing_key_added',
   from_user: {
@@ -307,6 +318,7 @@ const mockSigningKeyAdded = {
 }
 
 const mockSigningKeyRemoved = {
+  event_id: 'shovel/signing_key_removed/15164542/0/2',
   created_at: '2024-05-29T13:34:26+00:00',
   event_name: 'send_account_signing_key_removed',
   from_user: {
@@ -336,6 +348,7 @@ const mockSigningKeyRemoved = {
 }
 
 export const mockSendTokenUpgradeEvent = {
+  event_id: 'shovel/send_transfer/25254355/0/5',
   created_at: '2024-05-29T14:47:36+00:00',
   event_name: 'send_account_transfers',
   from_user: null,
@@ -362,6 +375,7 @@ export const mockSendTokenUpgradeEvent = {
 }
 
 export const mockSendEarnDepositEvent = {
+  event_id: 'shovel/send_earn_deposit/12345/0/0',
   created_at: '2025-01-29T14:47:36+00:00',
   event_name: 'send_earn_deposit',
   from_user: {
@@ -389,6 +403,7 @@ export const mockSendEarnDepositEvent = {
 }
 
 export const mockSendEarnWithdrawEvent = {
+  event_id: 'shovel/send_earn_withdraw/12345/0/0',
   created_at: '2025-02-15T14:47:36+00:00',
   event_name: 'send_earn_withdraw',
   from_user: null,

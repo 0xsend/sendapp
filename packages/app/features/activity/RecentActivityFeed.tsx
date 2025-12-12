@@ -190,7 +190,7 @@ const keyExtractor = (item: ListItem, index: number): string => {
     return `header-${item.sectionIndex}-${item.title}-${index}`
   }
   const activity = item as Activity & { sectionIndex: number }
-  return `${activity.event_name}-${activity.created_at}-${activity?.from_user?.id}-${activity?.to_user?.id}-${index}`
+  return activity.event_id
 }
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'

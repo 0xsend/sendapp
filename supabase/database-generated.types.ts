@@ -1761,6 +1761,7 @@ export type Database = {
         Row: {
           created_at: string | null
           data: Json | null
+          event_id: string | null
           event_name: string | null
           from_user:
             | Database["public"]["CompositeTypes"]["activity_feed_user"]
