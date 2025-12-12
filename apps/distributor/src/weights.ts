@@ -1,6 +1,11 @@
 import type { Address } from 'viem'
 
-type WeightedShare = { address: `0x${string}`; amount: bigint; userId: string }
+type WeightedShare = {
+  address: `0x${string}`
+  amount: bigint
+  userId: string
+  balanceRank?: number
+}
 
 export enum Mode {
   Linear = 'linear',
@@ -109,6 +114,9 @@ export function calculateWeights(
   const poolWeights: Record<Address, bigint> = {}
   const totalBalance = balances.reduce((acc, { balance }) => acc + balance, 0n)
 
+  // Calculate raw rank for all modes (0-based index, where higher = higher balance)
+  const balanceRanks = new Map<Address, number>()
+
   if (mode === Mode.EaseInOut || mode === Mode.Sigmoid) {
     // Create proper ranking based on grouped identical balances
     const { balanceGroups, rankMap } = createBalanceGroupsAndRanks(balances)
@@ -121,11 +129,21 @@ export function calculateWeights(
         rankScaled = (BigInt(rank) * PERC_DENOM) / BigInt(n - 1)
       }
       poolWeights[address] = calculateWeightByMode(balance, totalBalance, n, mode, rankScaled)
+
+      // Store raw rank (0-based index)
+      balanceRanks.set(address, rank)
     }
   } else {
-    // For other modes, rank doesn't matter
+    // For other modes, rank doesn't affect weights but we still calculate ranks
+    const { balanceGroups, rankMap } = createBalanceGroupsAndRanks(balances)
+    const n = balanceGroups.length
+
     for (const { address, balance } of balances) {
       poolWeights[address] = calculateWeightByMode(balance, totalBalance, balances.length, mode)
+
+      // Store raw rank (0-based index)
+      const rank = rankMap.get(balance) ?? 0
+      balanceRanks.set(address, rank)
     }
   }
 
@@ -165,6 +183,7 @@ export function calculateWeights(
         amount,
         userId,
         address,
+        balanceRank: balanceRanks.get(address),
       }
     }
   }
