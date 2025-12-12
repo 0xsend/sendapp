@@ -145,10 +145,17 @@ jobs:
             exit 1
           fi
 
-          # Navigate to monorepo root and build
+          # Navigate to monorepo root
           cd "$MONOREPO_ROOT"
-          echo "Building monorepo from $(pwd)..."
+          echo "Found monorepo at $(pwd)"
           ls -la package.json
+
+          # Install dependencies
+          echo "Installing dependencies..."
+          yarn install --immutable
+
+          # Build monorepo
+          echo "Building monorepo..."
           yarn build
 
       - name: Publish update
@@ -243,10 +250,17 @@ jobs:
 #            exit 1
 #          fi
 #
-#          # Navigate to monorepo root and build
+#          # Navigate to monorepo root
 #          cd "$MONOREPO_ROOT"
-#          echo "Building monorepo from $(pwd)..."
+#          echo "Found monorepo at $(pwd)"
 #          ls -la package.json
+#
+#          # Install dependencies
+#          echo "Installing dependencies..."
+#          yarn install --immutable
+#
+#          # Build monorepo
+#          echo "Building monorepo..."
 #          yarn build
 #
 #      - name: Publish update
