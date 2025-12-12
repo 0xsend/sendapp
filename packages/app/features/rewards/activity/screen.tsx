@@ -39,6 +39,7 @@ import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
 import { Link } from 'solito/link'
 import { useTranslation } from 'react-i18next'
+import { calculateSlashPercentage, PERC_DENOM } from 'apps/distributor/src/fixed-pool-calculation'
 
 //@todo get this from the db
 const verificationTypeTitleKey = {
@@ -754,15 +755,14 @@ const ProgressCard = ({
       0n
     ) || BigInt(distribution.hodler_min_balance)
 
-  const scaledPreviousReward = BigInt(previousReward) / BigInt(sendSlash?.scaling_divisor)
   const sendCeilingWeight = sendCeiling?.weight ?? BigInt(0)
+  const slashPercentage = calculateSlashPercentage(
+    sendCeilingWeight,
+    previousReward,
+    sendSlash.scaling_divisor
+  )
   // up to 2 decimals for the progress bar
-  const progress =
-    scaledPreviousReward === 0n
-      ? 0
-      : Number(
-          (min(sendCeilingWeight, scaledPreviousReward) * BigInt(10000)) / scaledPreviousReward
-        ) / 100
+  const progress = Number((slashPercentage * BigInt(100)) / PERC_DENOM) / 100
 
   return (
     <YStack w={'100%'} gap="$5">

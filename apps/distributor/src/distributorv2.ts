@@ -14,17 +14,16 @@ import {
 } from './supabase'
 import { fetchAllBalances, isMerkleDropActive } from './wagmi'
 import { calculateWeights, Mode, PERC_DENOM } from './weights'
+import {
+  calculateMultiplier,
+  calculateCombinedMultiplier,
+  calculateSlashPercentage,
+  type Multiplier,
+} from './fixed-pool-calculation'
 import { assert } from 'app/utils/assert'
 import { byteaToHex } from 'app/utils/byteaToHex'
 import type { Address } from 'viem'
 import { COST_PER_TICKET_WEI } from 'packages/app/data/sendpot'
-
-type Multiplier = {
-  value?: number
-  min: number
-  max: number
-  step: number
-}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -601,30 +600,15 @@ export class DistributorV2Worker {
 
         if (!multiplierInfo) continue
 
-        // Apply multiplier logic
-        // Skip verifications with 0 weight
-        if (weight === 0) continue
-        if (weight === 1) {
-          if (multiplierInfo.value === undefined) {
-            multiplierInfo.value = multiplierInfo.min
-          } else if (multiplierInfo.value < multiplierInfo.max) {
-            multiplierInfo.value = Math.min(
-              multiplierInfo.value + multiplierInfo.step,
-              multiplierInfo.max
-            )
-          }
-        } else {
-          multiplierInfo.value = Math.min(
-            multiplierInfo.min + (weight - 1) * multiplierInfo.step,
-            multiplierInfo.max
-          )
-        }
+        // Apply multiplier logic using helper
+        multiplierInfo.value = calculateMultiplier(weight, multiplierInfo.value, {
+          min: multiplierInfo.min,
+          max: multiplierInfo.max,
+          step: multiplierInfo.step,
+        })
       }
 
-      const finalMultiplier = Object.values(multipliers).reduce(
-        (acc, info) => acc * (info.value ?? 1.0),
-        1.0
-      )
+      const finalMultiplier = calculateCombinedMultiplier(multipliers)
 
       // Get initial hodler amount - default to 0 if not found
       // Add ticket purchase value to hodlerCapAmount (amount spent on tickets)
@@ -636,25 +620,18 @@ export class DistributorV2Worker {
       let amount =
         (userFixedAmount * BigInt(Math.round(finalMultiplier * Number(PERC_DENOM)))) / PERC_DENOM
 
-      // Calculate slashed amount
+      // Calculate slashed amount using helper
       const sendCeilingData = sendCeilingByUserId[userId]
       const previousReward =
         previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
 
       if (sendCeilingData && sendCeilingData.weight > 0n) {
-        const scaledPreviousReward =
-          (previousReward * PERC_DENOM) / BigInt(sendSlash.scaling_divisor)
-        const scaledWeight = sendCeilingData.weight * PERC_DENOM
-
-        const cappedSendScore =
-          scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
-
-        if (scaledPreviousReward > 0n) {
-          const slashPercentage = (cappedSendScore * PERC_DENOM) / scaledPreviousReward
-          amount = (amount * slashPercentage) / PERC_DENOM
-        } else {
-          amount = 0n
-        }
+        const slashPercentage = calculateSlashPercentage(
+          sendCeilingData.weight,
+          previousReward,
+          sendSlash.scaling_divisor
+        )
+        amount = (amount * slashPercentage) / PERC_DENOM
       } else {
         amount = 0n
       }
