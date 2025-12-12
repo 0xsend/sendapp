@@ -160,7 +160,16 @@ jobs:
 
       - name: Publish update
         run: |
+          # Install EAS CLI
+          echo "Installing EAS CLI..."
+          npm install -g eas-cli
+
+          # Verify installation
+          which eas
+          eas --version
+
           # eas update needs to run from the expo app directory
+          echo "Publishing update from $(pwd)..."
           eas update --branch production --platform android --non-interactive
 
 #  publish_ios_update:
@@ -265,5 +274,14 @@ jobs:
 #
 #      - name: Publish update
 #        run: |
+#          # Install EAS CLI
+#          echo "Installing EAS CLI..."
+#          npm install -g eas-cli
+#
+#          # Verify installation
+#          which eas
+#          eas --version
+#
 #          # eas update needs to run from the expo app directory
+#          echo "Publishing update from $(pwd)..."
 #          eas update --branch production --platform ios --non-interactive
