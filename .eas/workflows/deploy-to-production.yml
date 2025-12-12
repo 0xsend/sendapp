@@ -169,14 +169,25 @@ jobs:
           eas --version
 
           # Find the Expo app directory (should be apps/expo in the monorepo)
-          EXPO_APP_DIR="$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+          echo "Searching for Expo app directory..."
+          echo "Looking in: /home/expo/workingdir"
 
-          if [ -z "$EXPO_APP_DIR" ] || [ ! -d "$EXPO_APP_DIR" ]; then
-            echo "ERROR: Could not find Expo app directory"
-            echo "Searching for app.json files:"
-            find /home/expo/workingdir -name "app.json" -type f 2>/dev/null | head -5
+          # First, find all app.json files
+          echo "All app.json files found:"
+          find /home/expo/workingdir -name "app.json" -type f 2>/dev/null || echo "No app.json files found"
+
+          # Find the one in apps/expo
+          APP_JSON_PATH=$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1)
+
+          if [ -z "$APP_JSON_PATH" ]; then
+            echo "ERROR: Could not find app.json in apps/expo"
+            echo "Trying to find any apps/expo directory:"
+            find /home/expo/workingdir -type d -name "expo" -path "*/apps/expo" 2>/dev/null || echo "No apps/expo directory found"
             exit 1
           fi
+
+          EXPO_APP_DIR=$(dirname "$APP_JSON_PATH")
+          echo "Found Expo app at: $EXPO_APP_DIR"
 
           # Navigate to Expo app directory
           cd "$EXPO_APP_DIR"
@@ -297,14 +308,25 @@ jobs:
 #          eas --version
 #
 #          # Find the Expo app directory (should be apps/expo in the monorepo)
-#          EXPO_APP_DIR="$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+#          echo "Searching for Expo app directory..."
+#          echo "Looking in: /home/expo/workingdir"
 #
-#          if [ -z "$EXPO_APP_DIR" ] || [ ! -d "$EXPO_APP_DIR" ]; then
-#            echo "ERROR: Could not find Expo app directory"
-#            echo "Searching for app.json files:"
-#            find /home/expo/workingdir -name "app.json" -type f 2>/dev/null | head -5
+#          # First, find all app.json files
+#          echo "All app.json files found:"
+#          find /home/expo/workingdir -name "app.json" -type f 2>/dev/null || echo "No app.json files found"
+#
+#          # Find the one in apps/expo
+#          APP_JSON_PATH=$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1)
+#
+#          if [ -z "$APP_JSON_PATH" ]; then
+#            echo "ERROR: Could not find app.json in apps/expo"
+#            echo "Trying to find any apps/expo directory:"
+#            find /home/expo/workingdir -type d -name "expo" -path "*/apps/expo" 2>/dev/null || echo "No apps/expo directory found"
 #            exit 1
 #          fi
+#
+#          EXPO_APP_DIR=$(dirname "$APP_JSON_PATH")
+#          echo "Found Expo app at: $EXPO_APP_DIR"
 #
 #          # Navigate to Expo app directory
 #          cd "$EXPO_APP_DIR"
