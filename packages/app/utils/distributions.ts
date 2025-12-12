@@ -75,6 +75,7 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
       token_decimals,
       updated_at,
       earn_min_balance::text,
+      verified_count,
       distribution_shares(
         address,
         amount::text,
