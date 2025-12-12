@@ -1,14 +1,5 @@
 import { RecentActivity } from './RecentActivity'
-import {
-  AnimatePresence,
-  H4,
-  LinearGradient,
-  Spinner,
-  Text,
-  useMedia,
-  useTheme,
-  YStack,
-} from '@my/ui'
+import { H4, LinearGradient, Spinner, Text, useMedia, useTheme, YStack } from '@my/ui'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
 import { Platform } from 'react-native'
@@ -59,9 +50,7 @@ export function ActivityScreen() {
             </YStack>
           </>
         )}
-        <AnimatePresence>
-          <ActivityBody />
-        </AnimatePresence>
+        <ActivityBody />
       </YStack>
     </TagSearchProvider>
   )
