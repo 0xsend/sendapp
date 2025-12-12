@@ -492,12 +492,12 @@ SELECT
                         id
                     FROM distributions
                     WHERE
-                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares,(NULL,(
+                        number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1, 0)::distribution_shares,(NULL,(
             SELECT
                 id
             FROM distributions
             WHERE
-                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares]);
+                number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1, 1)::distribution_shares]);
 $$,
 'permission denied for function update_distribution_shares',
 'Only the service role can update distribution shares.');
@@ -515,12 +515,12 @@ SELECT
                 id
             FROM distributions
             WHERE
-                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares,(NULL,(
+                number = 123), tests.get_supabase_uid('bob'), '0xfB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1,0)::distribution_shares,(NULL,(
         SELECT
             id
         FROM distributions
         WHERE
-            number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1)::distribution_shares]);
+            number = 123), tests.get_supabase_uid('alice'), '0xaB00d9CDA6DaD99994849d7C66Fa2631f280F64f', 950, 500, 200, 300, NOW(), NOW(), 1, 1)::distribution_shares]);
 -- Check insert by service_role
 SELECT
     results_eq('SELECT COUNT(*)::integer FROM distribution_shares WHERE distribution_id = (
