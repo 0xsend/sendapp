@@ -168,31 +168,32 @@ jobs:
           which eas
           eas --version
 
-          # Find the Expo app directory (should be apps/expo in the monorepo)
-          echo "Searching for Expo app directory..."
-          echo "Looking in: /home/expo/workingdir"
+          # Find monorepo root (same as Build step)
+          echo "Searching for monorepo root..."
+          MONOREPO_ROOT=$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)
 
-          # First, find all app.json files
-          echo "All app.json files found:"
-          find /home/expo/workingdir -name "app.json" -type f 2>/dev/null || echo "No app.json files found"
-
-          # Find the one in apps/expo
-          APP_JSON_PATH=$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1)
-
-          if [ -z "$APP_JSON_PATH" ]; then
-            echo "ERROR: Could not find app.json in apps/expo"
-            echo "Trying to find any apps/expo directory:"
-            find /home/expo/workingdir -type d -name "expo" -path "*/apps/expo" 2>/dev/null || echo "No apps/expo directory found"
+          if [ -z "$MONOREPO_ROOT" ]; then
+            echo "ERROR: Could not find monorepo root"
             exit 1
           fi
 
-          EXPO_APP_DIR=$(dirname "$APP_JSON_PATH")
+          echo "Found monorepo at: $MONOREPO_ROOT"
+
+          # Construct Expo app path
+          EXPO_APP_DIR="$MONOREPO_ROOT/apps/expo"
+
+          if [ ! -d "$EXPO_APP_DIR" ]; then
+            echo "ERROR: Expo app directory does not exist at: $EXPO_APP_DIR"
+            exit 1
+          fi
+
           echo "Found Expo app at: $EXPO_APP_DIR"
 
           # Navigate to Expo app directory
           cd "$EXPO_APP_DIR"
           echo "Publishing update from $(pwd)..."
-          ls -la app.json eas.json
+          echo "Contents:"
+          ls -la | head -20
 
           # Publish update with message
           eas update --branch production --platform android --message "Automated update from EAS Workflow" --non-interactive
@@ -307,31 +308,32 @@ jobs:
 #          which eas
 #          eas --version
 #
-#          # Find the Expo app directory (should be apps/expo in the monorepo)
-#          echo "Searching for Expo app directory..."
-#          echo "Looking in: /home/expo/workingdir"
+#          # Find monorepo root (same as Build step)
+#          echo "Searching for monorepo root..."
+#          MONOREPO_ROOT=$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)
 #
-#          # First, find all app.json files
-#          echo "All app.json files found:"
-#          find /home/expo/workingdir -name "app.json" -type f 2>/dev/null || echo "No app.json files found"
-#
-#          # Find the one in apps/expo
-#          APP_JSON_PATH=$(find /home/expo/workingdir -type f -name "app.json" -path "*/apps/expo/app.json" 2>/dev/null | head -1)
-#
-#          if [ -z "$APP_JSON_PATH" ]; then
-#            echo "ERROR: Could not find app.json in apps/expo"
-#            echo "Trying to find any apps/expo directory:"
-#            find /home/expo/workingdir -type d -name "expo" -path "*/apps/expo" 2>/dev/null || echo "No apps/expo directory found"
+#          if [ -z "$MONOREPO_ROOT" ]; then
+#            echo "ERROR: Could not find monorepo root"
 #            exit 1
 #          fi
 #
-#          EXPO_APP_DIR=$(dirname "$APP_JSON_PATH")
+#          echo "Found monorepo at: $MONOREPO_ROOT"
+#
+#          # Construct Expo app path
+#          EXPO_APP_DIR="$MONOREPO_ROOT/apps/expo"
+#
+#          if [ ! -d "$EXPO_APP_DIR" ]; then
+#            echo "ERROR: Expo app directory does not exist at: $EXPO_APP_DIR"
+#            exit 1
+#          fi
+#
 #          echo "Found Expo app at: $EXPO_APP_DIR"
 #
 #          # Navigate to Expo app directory
 #          cd "$EXPO_APP_DIR"
 #          echo "Publishing update from $(pwd)..."
-#          ls -la app.json eas.json
+#          echo "Contents:"
+#          ls -la | head -20
 #
 #          # Publish update with message
 #          eas update --branch production --platform ios --message "Automated update from EAS Workflow" --non-interactive
