@@ -93,7 +93,7 @@ export const ActivityAvatar = memo(
             ) : Boolean(to_user?.send_id) && Boolean(from_user?.send_id) ? (
               <FastImage
                 contentFit="cover"
-                source={user.avatar_url}
+                src={user.avatar_url}
                 width={52}
                 height={52}
                 borderRadius={1000_000}
