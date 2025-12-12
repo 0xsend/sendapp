@@ -113,22 +113,35 @@ jobs:
           which forge || echo "WARNING: forge not in PATH"
           which bun || echo "WARNING: bun not in PATH"
 
-          # Find monorepo root by looking for package.json with workspaces
+          # Debug: show where we are and what's here
+          echo "===== Debugging directory structure ====="
           echo "Current directory: $(pwd)"
-          echo "Looking for monorepo root..."
+          echo "Directory contents:"
+          ls -la
+          echo "=========================================="
 
-          # Start from current directory and search upwards for package.json with workspaces
-          MONOREPO_ROOT=$(pwd)
-          while [ "$MONOREPO_ROOT" != "/" ]; do
-            if [ -f "$MONOREPO_ROOT/package.json" ] && grep -q "workspaces" "$MONOREPO_ROOT/package.json"; then
+          # Look for common EAS source locations
+          POSSIBLE_LOCATIONS=(
+            "$(pwd)"
+            "/home/expo/workingdir"
+            "$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+          )
+
+          MONOREPO_ROOT=""
+          for location in "${POSSIBLE_LOCATIONS[@]}"; do
+            if [ -n "$location" ] && [ -f "$location/package.json" ] && grep -q "workspaces" "$location/package.json" 2>/dev/null; then
+              MONOREPO_ROOT="$location"
               echo "Found monorepo root at: $MONOREPO_ROOT"
               break
             fi
-            MONOREPO_ROOT=$(dirname "$MONOREPO_ROOT")
           done
 
-          if [ "$MONOREPO_ROOT" = "/" ]; then
-            echo "ERROR: Could not find monorepo root (package.json with workspaces)"
+          if [ -z "$MONOREPO_ROOT" ]; then
+            echo "ERROR: Could not find monorepo root"
+            echo "Searched locations:"
+            printf '%s\n' "${POSSIBLE_LOCATIONS[@]}"
+            echo "Trying to find any package.json files:"
+            find /home/expo/workingdir -name package.json -type f 2>/dev/null | head -5
             exit 1
           fi
 
@@ -198,22 +211,35 @@ jobs:
 #          which forge || echo "WARNING: forge not in PATH"
 #          which bun || echo "WARNING: bun not in PATH"
 #
-#          # Find monorepo root by looking for package.json with workspaces
+#          # Debug: show where we are and what's here
+#          echo "===== Debugging directory structure ====="
 #          echo "Current directory: $(pwd)"
-#          echo "Looking for monorepo root..."
+#          echo "Directory contents:"
+#          ls -la
+#          echo "=========================================="
 #
-#          # Start from current directory and search upwards for package.json with workspaces
-#          MONOREPO_ROOT=$(pwd)
-#          while [ "$MONOREPO_ROOT" != "/" ]; do
-#            if [ -f "$MONOREPO_ROOT/package.json" ] && grep -q "workspaces" "$MONOREPO_ROOT/package.json"; then
+#          # Look for common EAS source locations
+#          POSSIBLE_LOCATIONS=(
+#            "$(pwd)"
+#            "/home/expo/workingdir"
+#            "$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+#          )
+#
+#          MONOREPO_ROOT=""
+#          for location in "${POSSIBLE_LOCATIONS[@]}"; do
+#            if [ -n "$location" ] && [ -f "$location/package.json" ] && grep -q "workspaces" "$location/package.json" 2>/dev/null; then
+#              MONOREPO_ROOT="$location"
 #              echo "Found monorepo root at: $MONOREPO_ROOT"
 #              break
 #            fi
-#            MONOREPO_ROOT=$(dirname "$MONOREPO_ROOT")
 #          done
 #
-#          if [ "$MONOREPO_ROOT" = "/" ]; then
-#            echo "ERROR: Could not find monorepo root (package.json with workspaces)"
+#          if [ -z "$MONOREPO_ROOT" ]; then
+#            echo "ERROR: Could not find monorepo root"
+#            echo "Searched locations:"
+#            printf '%s\n' "${POSSIBLE_LOCATIONS[@]}"
+#            echo "Trying to find any package.json files:"
+#            find /home/expo/workingdir -name package.json -type f 2>/dev/null | head -5
 #            exit 1
 #          fi
 #
