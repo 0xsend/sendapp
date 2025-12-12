@@ -87,7 +87,8 @@ function fetchDistributions(supabase: SupabaseClient<Database>) {
         id,
         index,
         updated_at,
-        user_id
+        user_id,
+        balance_rank
       ),
       distribution_verification_values (
         bips_value,
