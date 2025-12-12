@@ -72,20 +72,52 @@ jobs:
 
       - name: Install Foundry
         run: |
-          curl -L https://foundry.paradigm.xyz | bash
+          # Install Foundry (ignore shell detection errors)
+          curl -L https://foundry.paradigm.xyz | bash || true
+
+          # Manually add to PATH for this session
           export PATH="$HOME/.foundry/bin:$PATH"
-          $HOME/.foundry/bin/foundryup
+
+          # Run foundryup directly from its installed location
+          if [ -f "$HOME/.foundry/bin/foundryup" ]; then
+            $HOME/.foundry/bin/foundryup
+          else
+            echo "ERROR: foundryup not found at $HOME/.foundry/bin/foundryup"
+            exit 1
+          fi
 
       - name: Install Bun
         run: |
-          curl -fsSL https://bun.sh/install | bash
+          # Install Bun (ignore shell detection errors)
+          curl -fsSL https://bun.sh/install | bash || true
+
+          # Manually add to PATH for this session
           export PATH="$HOME/.bun/bin:$PATH"
+
+          # Verify Bun is installed
+          if [ -f "$HOME/.bun/bin/bun" ]; then
+            echo "✓ Bun installed successfully"
+            $HOME/.bun/bin/bun --version
+          else
+            echo "ERROR: bun not found at $HOME/.bun/bin/bun"
+            exit 1
+          fi
 
       - name: Build monorepo
         run: |
+          # Add tools to PATH
+          export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+
+          # Verify tools are available
+          echo "Verifying tools..."
+          which forge || echo "WARNING: forge not in PATH"
+          which bun || echo "WARNING: bun not in PATH"
+
           # Navigate to monorepo root (same as EAS post-install hook)
           cd ../..
-          export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+
+          # Build monorepo
+          echo "Building monorepo from $(pwd)..."
           yarn build
 
       - name: Publish update
@@ -107,20 +139,52 @@ jobs:
 #
 #      - name: Install Foundry
 #        run: |
-#          curl -L https://foundry.paradigm.xyz | bash
+#          # Install Foundry (ignore shell detection errors)
+#          curl -L https://foundry.paradigm.xyz | bash || true
+#
+#          # Manually add to PATH for this session
 #          export PATH="$HOME/.foundry/bin:$PATH"
-#          $HOME/.foundry/bin/foundryup
+#
+#          # Run foundryup directly from its installed location
+#          if [ -f "$HOME/.foundry/bin/foundryup" ]; then
+#            $HOME/.foundry/bin/foundryup
+#          else
+#            echo "ERROR: foundryup not found at $HOME/.foundry/bin/foundryup"
+#            exit 1
+#          fi
 #
 #      - name: Install Bun
 #        run: |
-#          curl -fsSL https://bun.sh/install | bash
+#          # Install Bun (ignore shell detection errors)
+#          curl -fsSL https://bun.sh/install | bash || true
+#
+#          # Manually add to PATH for this session
 #          export PATH="$HOME/.bun/bin:$PATH"
+#
+#          # Verify Bun is installed
+#          if [ -f "$HOME/.bun/bin/bun" ]; then
+#            echo "✓ Bun installed successfully"
+#            $HOME/.bun/bin/bun --version
+#          else
+#            echo "ERROR: bun not found at $HOME/.bun/bin/bun"
+#            exit 1
+#          fi
 #
 #      - name: Build monorepo
 #        run: |
+#          # Add tools to PATH
+#          export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+#
+#          # Verify tools are available
+#          echo "Verifying tools..."
+#          which forge || echo "WARNING: forge not in PATH"
+#          which bun || echo "WARNING: bun not in PATH"
+#
 #          # Navigate to monorepo root (same as EAS post-install hook)
 #          cd ../..
-#          export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+#
+#          # Build monorepo
+#          echo "Building monorepo from $(pwd)..."
 #          yarn build
 #
 #      - name: Publish update
