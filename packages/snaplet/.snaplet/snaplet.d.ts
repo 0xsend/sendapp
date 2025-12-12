@@ -109,6 +109,7 @@ interface Table_public_distribution_shares {
   created_at: string;
   updated_at: string;
   index: number;
+  balance_rank: number | null;
 }
 interface Table_public_distribution_verification_values {
   type: Enum_public_verification_type;
@@ -153,6 +154,7 @@ interface Table_public_distributions {
   tranche_id: number;
   earn_min_balance: number;
   sendpot_ticket_increment: number | null;
+  verified_count: number;
   merkle_tree: Json | null;
 }
 interface Table_realtime_extensions {

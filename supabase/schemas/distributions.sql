@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS "public"."distributions" (
     "tranche_id" integer NOT NULL,
     "earn_min_balance" bigint NOT NULL DEFAULT 0,
     "sendpot_ticket_increment" integer DEFAULT 10,
-    "merkle_tree" jsonb
+    "merkle_tree" jsonb,
+    "verified_count" integer DEFAULT 0 NOT NULL
 );
 
 ALTER TABLE "public"."distributions" OWNER TO "postgres";
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS "public"."distribution_shares" (
     "created_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "updated_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "index" bigint NOT NULL,
+    "balance_rank" integer,
     CONSTRAINT "distribution_shares_address_check" CHECK ((("length"(("address")::"text") = 42) AND ("address" OPERATOR("public".~) '^0x[A-Fa-f0-9]{40}$'::"public"."citext")))
 );
 
@@ -801,6 +803,14 @@ BEGIN
     unnest(shares) shares
 ORDER BY
   shares.address;
+  -- Update the verified_count on the distribution
+  UPDATE distributions
+  SET verified_count = (
+    SELECT COUNT(*)
+    FROM distribution_shares
+    WHERE distribution_shares.distribution_id = $1
+  )
+  WHERE id = $1;
   -- Refresh profile verification status after batch update
   -- This ensures verified_at is correctly set based on the updated shares
   PERFORM refresh_profile_verification_status();
