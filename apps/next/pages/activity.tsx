@@ -20,7 +20,10 @@ function ActivityLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation('navigation')
 
   return (
-    <HomeLayout TopNav={<TopNav header={t('tabs.activity')} showOnGtLg={true} />}>
+    <HomeLayout
+      scrollEnabled={false}
+      TopNav={<TopNav header={t('tabs.activity')} showOnGtLg={true} />}
+    >
       {children}
     </HomeLayout>
   )

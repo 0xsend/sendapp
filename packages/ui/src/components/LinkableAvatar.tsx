@@ -1,6 +1,6 @@
 import { type AvatarProps, Avatar } from 'tamagui'
 import type { LinkProps } from './Link'
-import { Link } from 'solito/link'
+import { Link, useLink } from 'solito/link'
 import { memo } from 'react'
 
 export type LinkableAvatarProps = AvatarProps & LinkProps
@@ -14,8 +14,9 @@ export const LinkableAvatar = memo(
     children,
     ...props
   }: { children: React.ReactNode } & LinkProps & AvatarProps) => {
+    const linkProps = useLink({ href, replace, scroll, shallow })
     return (
-      <Link href={href}>
+      <Link {...linkProps}>
         <Avatar {...props}>{children}</Avatar>
       </Link>
     )
