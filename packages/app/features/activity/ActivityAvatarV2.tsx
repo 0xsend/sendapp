@@ -79,32 +79,23 @@ export const ActivityAvatar = memo(
             circular={true}
             {...props}
           >
-            {(() => {
-              switch (true) {
-                case !user.avatar_url:
-                  return Platform.OS === 'android' ? (
-                    <UserImage user={user} />
-                  ) : (
-                    <Avatar.Image src={undefined} />
-                  )
-                case Boolean(to_user?.send_id) && Boolean(from_user?.send_id):
-                  return <Avatar.Image src={user.avatar_url} />
-                case isERC20Transfer || isETHReceive:
-                  return (
-                    <IconCoin
-                      symbol={
-                        allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''
-                      }
-                    />
-                  )
-                default:
-                  return Platform.OS === 'android' && !user?.avatar_url ? (
-                    <UserImage user={user} />
-                  ) : (
-                    <Avatar.Image src={user?.avatar_url ?? undefined} />
-                  )
-              }
-            })()}
+            {!user.avatar_url ? (
+              Platform.OS === 'android' ? (
+                <UserImage user={user} />
+              ) : (
+                <Avatar.Image src={undefined} />
+              )
+            ) : Boolean(to_user?.send_id) && Boolean(from_user?.send_id) ? (
+              <Avatar.Image src={user.avatar_url} />
+            ) : isERC20Transfer || isETHReceive ? (
+              <IconCoin
+                symbol={allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''}
+              />
+            ) : Platform.OS === 'android' && !user?.avatar_url ? (
+              <UserImage user={user} />
+            ) : (
+              <Avatar.Image src={user?.avatar_url ?? undefined} />
+            )}
 
             <Avatar.Fallback jc="center" bc="$olive">
               <Avatar size="$5" {...props}>
