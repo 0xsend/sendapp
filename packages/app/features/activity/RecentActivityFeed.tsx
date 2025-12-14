@@ -6,14 +6,13 @@ import type { ZodError } from 'zod'
 import {
   memo,
   type PropsWithChildren,
-  startTransition,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
-import { H4, LazyMount, LinearGradient, Paragraph, Shimmer, useEvent, View, YStack } from '@my/ui'
+import { H4, LazyMount, Paragraph, Shimmer, useEvent, View, YStack } from '@my/ui'
 import { FlashList } from '@shopify/flash-list'
 import { TokenActivityRow } from 'app/features/home/TokenActivityRowV2'
 import { useTranslation } from 'react-i18next'

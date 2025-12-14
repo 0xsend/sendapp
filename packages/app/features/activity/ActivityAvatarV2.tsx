@@ -1,11 +1,13 @@
 // optimized version of ActivityAvatar for the TokenActivityRowV2.tsx
 import {
   Avatar,
-  LinkableAvatar,
   type LinkableAvatarProps,
   Spinner,
+  styled,
   useThemeName,
   XStack,
+  FastImage,
+  useTheme,
 } from '@my/ui'
 import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
@@ -14,6 +16,10 @@ import { IconUpgrade, IconBadgeCheckSolid2 } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { ContractLabels } from 'app/data/contract-labels'
+import { Link as SolitoLink } from 'solito/link'
+
+import { isAndroid } from '@tamagui/constants'
+
 import {
   counterpart,
   isActivitySwapTransfer,
@@ -34,8 +40,8 @@ import {
   isSendEarnWithdrawEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity'
-import { Platform } from 'react-native'
-import { memo } from 'react'
+import type { ImageStyle, StyleProp } from 'react-native'
+import { memo, useMemo } from 'react'
 
 interface ActivityAvatarProps extends Omit<LinkableAvatarProps, 'children' | 'href'> {
   activity: Activity
@@ -43,6 +49,9 @@ interface ActivityAvatarProps extends Omit<LinkableAvatarProps, 'children' | 'hr
   liquidityPools: ReturnType<typeof useLiquidityPools>['data']
   addressBook: ReturnType<typeof useAddressBook>
 }
+
+const Link = styled(SolitoLink)
+
 export const ActivityAvatar = memo(
   ({ activity, swapRouters, liquidityPools, addressBook, ...props }: ActivityAvatarProps) => {
     const user = counterpart(activity)
@@ -50,7 +59,13 @@ export const ActivityAvatar = memo(
     const isERC20Transfer = isSendAccountTransfersEvent(activity)
     const isETHReceive = isSendAccountReceiveEvent(activity)
     const theme = useThemeName()
+    const themeObj = useTheme()
     const isDark = theme.includes('dark')
+
+    const fastImageStyle = useMemo(
+      () => ({ backgroundColor: themeObj.background.val }),
+      [themeObj.background.val]
+    )
 
     if (isSendPotTicketPurchase(activity) || isSendPotWin(activity)) {
       return (
@@ -72,48 +87,38 @@ export const ActivityAvatar = memo(
           }}
           position={'relative'}
         >
-          <LinkableAvatar
-            size="$5"
-            gap="$2"
-            href={`/profile/${user.send_id}`}
-            circular={true}
-            {...props}
-          >
+          <Link w={52} h={52} gap="$2" href={`/profile/${user.send_id}`} br={1000_000} {...props}>
             {!user.avatar_url ? (
-              Platform.OS === 'android' ? (
-                <UserImage user={user} />
-              ) : (
-                <Avatar.Image src={undefined} />
-              )
+              <UserImage style={fastImageStyle} user={user} />
             ) : Boolean(to_user?.send_id) && Boolean(from_user?.send_id) ? (
-              <Avatar.Image src={user.avatar_url} />
+              <FastImage
+                contentFit="cover"
+                src={user.avatar_url}
+                width={52}
+                height={52}
+                borderRadius={1000_000}
+                style={fastImageStyle}
+              />
             ) : isERC20Transfer || isETHReceive ? (
               <IconCoin
                 symbol={allCoinsDict[data?.coin?.token as keyof typeof allCoinsDict]?.symbol ?? ''}
               />
-            ) : Platform.OS === 'android' && !user?.avatar_url ? (
-              <UserImage user={user} />
+            ) : isAndroid && !user?.avatar_url ? (
+              <UserImage style={fastImageStyle} user={user} />
             ) : (
-              <Avatar.Image src={user?.avatar_url ?? undefined} />
+              <FastImage
+                src={user?.avatar_url ?? undefined}
+                width={52}
+                height={52}
+                borderRadius={1000_000}
+                style={fastImageStyle}
+              />
             )}
-
-            <Avatar.Fallback jc="center" bc="$olive">
-              <Avatar size="$5" {...props}>
-                <UserImage user={user} />
-              </Avatar>
-            </Avatar.Fallback>
-          </LinkableAvatar>
+          </Link>
           {user.is_verified && (
             <XStack zi={100} pos="absolute" bottom={0} right={0} x="$0.5" y="$0.5">
               <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
-              <IconBadgeCheckSolid2
-                size="$1"
-                scale={0.7}
-                color="$neon8"
-                $theme-dark={{ color: '$neon7' }}
-                // @ts-expect-error - checkColor is not typed
-                checkColor={isDark ? '#082B1B' : '#fff'}
-              />
+              <BadgeIcon isDark={isDark} />
             </XStack>
           )}
         </XStack>
@@ -192,7 +197,23 @@ export const ActivityAvatar = memo(
     )
   }
 )
+
 ActivityAvatar.displayName = 'ActivityAvatar'
+
+const BadgeIcon = memo(({ isDark }: { isDark: boolean }) => {
+  return (
+    <IconBadgeCheckSolid2
+      size="$1"
+      scale={0.7}
+      color="$neon8"
+      $theme-dark={{ color: '$neon7' }}
+      // @ts-expect-error - checkColor is not typed
+      checkColor={isDark ? '#082B1B' : '#fff'}
+    />
+  )
+})
+
+BadgeIcon.displayName = 'BadgeIcon'
 
 const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
   const { data: swapRouters } = useSwapRouters()
@@ -241,12 +262,23 @@ const TransferDirectionIndicator = ({ activity }: { activity: Activity }) => {
   )
 }
 
-const UserImage = ({ user }: { user?: Activity['from_user'] | Activity['to_user'] }) => {
-  return (
-    <Avatar.Image
-      src={`https://ui-avatars.com/api/?name=${
-        user?.name ?? user?.main_tag_name ?? user?.send_id
-      }&size=256&format=png&background=86ad7f`}
-    />
-  )
-}
+const UserImage = memo(
+  ({
+    user,
+    style,
+  }: { user?: Activity['from_user'] | Activity['to_user']; style?: StyleProp<ImageStyle> }) => {
+    return (
+      <FastImage
+        src={`https://ui-avatars.com/api/?name=${
+          user?.name ?? user?.main_tag_name ?? user?.send_id
+        }&size=256&format=png&background=86ad7f`}
+        width={52}
+        height={52}
+        borderRadius={1000_000}
+        style={style}
+      />
+    )
+  }
+)
+
+UserImage.displayName = 'UserImage'
