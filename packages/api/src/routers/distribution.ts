@@ -60,6 +60,10 @@ export const distributionRouter = createTRPCRouter({
       debug('Generated merkle tree', tree.root)
 
       // this is what the user will need to submit to claim their tokens
-      return tree.getProof([myShare.index, myShare.address, myShare.amount]) as `0x${string}`[]
+      return tree.getProof([
+        myShare.index,
+        myShare.address,
+        BigInt(myShare.amount),
+      ]) as `0x${string}`[]
     }),
 })
