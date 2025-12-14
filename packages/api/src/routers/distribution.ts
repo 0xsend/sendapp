@@ -53,7 +53,7 @@ export const distributionRouter = createTRPCRouter({
 
       // could save some cycles and save this to the database
       const tree = StandardMerkleTree.of(
-        shares.map(({ index, address, amount }) => [index, address, amount]),
+        shares.map(({ index, address, amount }) => [index, address, BigInt(amount)]),
         ['uint256', 'address', 'uint256']
       )
 
