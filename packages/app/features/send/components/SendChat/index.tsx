@@ -833,8 +833,10 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         assert(!!validatedUserOp, 'Operation expected to fail')
 
         // optimistic activity entry
+        // Note: event_id will be updated with workflowId after transfer call succeeds
+        const optimisticEventId = `optimistic/${Date.now()}/${Math.random()}`
         const optimisticActivity: Activity = {
-          event_id: `optimistic/${Date.now()}/${Math.random()}`,
+          event_id: optimisticEventId,
           event_name: Events.TemporalSendAccountTransfers,
           created_at: new Date(),
           from_user: currentUserProfile
@@ -870,6 +872,9 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                   value: BigInt(amount ?? '0'),
                   note: note || undefined,
                   coin: selectedCoin,
+                  user_op_hash: userOp.sender
+                    ? (`0x${Buffer.from(userOp.sender).toString('hex')}` as `0x${string}`)
+                    : undefined,
                 }
               : {
                   status: 'initialized' as const,
@@ -879,6 +884,9 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                   v: BigInt(amount ?? '0'),
                   note: note || undefined,
                   coin: selectedCoin,
+                  user_op_hash: userOp.sender
+                    ? (`0x${Buffer.from(userOp.sender).toString('hex')}` as `0x${string}`)
+                    : undefined,
                 },
         }
 
@@ -914,6 +922,39 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           workflowId = result.workflowId
 
           if (workflowId) {
+            // Update optimistic entry with real workflowId to prevent duplicate appearance
+            const finalWorkflowId = workflowId // Capture for closure
+            queryClient.setQueryData<InfiniteData<Activity[]>>(['activity_feed'], (old) => {
+              if (!old) return old
+              return {
+                ...old,
+                pages: old.pages.map((page) =>
+                  page.map((activity) =>
+                    activity.event_id === optimisticEventId
+                      ? { ...activity, event_id: finalWorkflowId }
+                      : activity
+                  )
+                ),
+              }
+            })
+
+            queryClient.setQueryData<InfiniteData<Activity[]>>(
+              ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
+              (old) => {
+                if (!old) return old
+                return {
+                  ...old,
+                  pages: old.pages.map((page) =>
+                    page.map((activity) =>
+                      activity.event_id === optimisticEventId
+                        ? { ...activity, event_id: finalWorkflowId }
+                        : activity
+                    )
+                  ),
+                }
+              }
+            )
+
             // Don't await - fire and forget to avoid iOS hanging on cache operations
             void queryClient.invalidateQueries({
               queryKey: ['activity_feed'],
@@ -933,6 +974,28 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             }
           }
         } catch (transferError) {
+          // Remove optimistic entry before resetting queries
+          queryClient.setQueryData<InfiniteData<Activity[]>>(['activity_feed'], (old) => {
+            if (!old) return old
+            return {
+              ...old,
+              pages: old.pages.map((page) => page.filter((a) => a.event_id !== optimisticEventId)),
+            }
+          })
+
+          queryClient.setQueryData<InfiniteData<Activity[]>>(
+            ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
+            (old) => {
+              if (!old) return old
+              return {
+                ...old,
+                pages: old.pages.map((page) =>
+                  page.filter((a) => a.event_id !== optimisticEventId)
+                ),
+              }
+            }
+          )
+
           void queryClient.resetQueries({
             queryKey: ['activity_feed'],
             exact: false,

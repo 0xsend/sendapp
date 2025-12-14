@@ -27,6 +27,7 @@ const BaseTemporalTransfersDataSchema = z.object({
   tx_hash: byteaToHexTxHash.nullable().optional(),
   block_num: decimalStrToBigInt.nullable().optional(),
   note: z.string().optional(),
+  activity_id: z.number().nullable().optional(), // Links to activity table for cleanup
 })
 
 /**
