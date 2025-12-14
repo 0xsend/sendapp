@@ -194,7 +194,8 @@ CREATE TABLE IF NOT EXISTS "temporal"."send_account_transfers" (
     "created_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "updated_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "send_account_transfers_activity_event_id" "text",
-    "send_account_transfers_activity_event_name" "text"
+    "send_account_transfers_activity_event_name" "text",
+    "activity_id" bigint
 );
 ALTER TABLE "temporal"."send_account_transfers" OWNER TO "postgres";
 
@@ -234,6 +235,7 @@ CREATE INDEX "send_account_transfers_workflow_id_updated_at_idx" ON "temporal"."
 CREATE INDEX "temporal_send_account_transfers_activity_event_name_event_id_id" ON "temporal"."send_account_transfers" USING "btree" ("send_account_transfers_activity_event_id", "send_account_transfers_activity_event_name");
 CREATE INDEX "temporal_send_account_transfers_user_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("user_id");
 CREATE UNIQUE INDEX "temporal_send_account_transfers_workflow_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id");
+CREATE INDEX "idx_temporal_send_account_transfers_activity_id" ON "temporal"."send_account_transfers" USING "btree" ("activity_id");
 
 -- Add missing indexes for send_earn_deposits
 CREATE INDEX "idx_temporal_send_earn_deposits_activity_id" ON "temporal"."send_earn_deposits" USING "btree" ("activity_id");
@@ -244,6 +246,10 @@ CREATE INDEX "idx_temporal_send_earn_deposits_status_owner_block_num" ON "tempor
 -- Add foreign key constraint to public.activity
 ALTER TABLE temporal.send_earn_deposits
 ADD CONSTRAINT fk_activity
+FOREIGN KEY (activity_id) REFERENCES public.activity(id) ON DELETE CASCADE;
+
+ALTER TABLE temporal.send_account_transfers
+ADD CONSTRAINT fk_transfer_activity
 FOREIGN KEY (activity_id) REFERENCES public.activity(id) ON DELETE CASCADE;
 
 -- RLS
