@@ -2488,6 +2488,7 @@ export type Database = {
     Tables: {
       send_account_transfers: {
         Row: {
+          activity_id: number | null
           created_at: string
           created_at_block_num: number | null
           data: Json | null
@@ -2500,6 +2501,7 @@ export type Database = {
           workflow_id: string
         }
         Insert: {
+          activity_id?: number | null
           created_at?: string
           created_at_block_num?: number | null
           data?: Json | null
@@ -2512,6 +2514,7 @@ export type Database = {
           workflow_id: string
         }
         Update: {
+          activity_id?: number | null
           created_at?: string
           created_at_block_num?: number | null
           data?: Json | null
