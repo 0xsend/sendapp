@@ -1,14 +1,14 @@
-name: Deploy to production
+name: Deploy to staging
 
 on:
   push:
-    branches: ['SEND-382']
+    branches: ['dev']
 
 jobs:
   fingerprint:
     name: Fingerprint
     type: fingerprint
-    environment: production
+    environment: staging
 
   get_android_build:
     name: Check for existing android build
@@ -16,7 +16,7 @@ jobs:
     type: get-build
     params:
       fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
-      profile: production
+      profile: staging
 
 #  get_ios_build:
 #    name: Check for existing ios build
@@ -24,7 +24,7 @@ jobs:
 #    type: get-build
 #    params:
 #      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
-#      profile: production
+#      profile: staging
 
   build_android:
     name: Build Android
@@ -33,7 +33,7 @@ jobs:
     type: build
     params:
       platform: android
-      profile: production
+      profile: staging
 
 #  build_ios:
 #    name: Build iOS
@@ -42,12 +42,12 @@ jobs:
 #    type: build
 #    params:
 #      platform: ios
-#      profile: production
+#      profile: staging
 
   submit_android_build:
     name: Submit Android Build
     needs: [build_android]
-    type: submit 
+    type: submit
     params:
       build_id: ${{ needs.build_android.outputs.build_id }}
 
@@ -62,7 +62,7 @@ jobs:
     name: Publish Android update
     needs: [get_android_build]
     if: ${{ needs.get_android_build.outputs.build_id }}
-    environment: production
+    environment: staging
     steps:
       - name: Check working directory
         run: |
@@ -197,13 +197,13 @@ jobs:
 
           # Publish update with latest commit message
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          eas update --branch production --platform android --message "$COMMIT_MESSAGE" --non-interactive
+          eas update --channel staging --branch staging --platform android --message "$COMMIT_MESSAGE" --non-interactive
 
 #  publish_ios_update:
 #    name: Publish iOS update
 #    needs: [get_ios_build]
 #    if: ${{ needs.get_ios_build.outputs.build_id }}
-#    environment: production
+#    environment: staging
 #    steps:
 #      - name: Check working directory
 #        run: |
@@ -337,4 +337,4 @@ jobs:
 #          ls -la | head -20
 #
 #          # Publish update with message
-#          eas update --branch production --platform ios --message "Automated update from EAS Workflow" --non-interactive
+#          eas update --branch staging --platform ios --message "Automated update from EAS Workflow" --non-interactive
