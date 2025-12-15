@@ -197,7 +197,7 @@ jobs:
 
           # Publish update with latest commit message
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          eas update --channel staging --branch staging --platform android --message "$COMMIT_MESSAGE" --non-interactive
+          eas update --channel staging --platform android --message "$COMMIT_MESSAGE" --non-interactive
 
 #  publish_ios_update:
 #    name: Publish iOS update
