@@ -25,7 +25,7 @@ module.exports = {
     bundleIdentifier: 'send.app',
     displayName: 'Send',
     associatedDomains: ['webcredentials:send.app'],
-    appleTeamId: '8S6R4SU556',
+    appleTeamId: '325JS7C582',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       LSApplicationCategoryType: 'public.app-category.finance',
