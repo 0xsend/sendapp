@@ -81,7 +81,18 @@ function ActivityBody() {
   }
 
   return (
-    <YStack f={1} pt={Platform.OS === 'web' ? 0 : '$9'}>
+    <YStack
+      als="center"
+      pos="absolute"
+      b={0}
+      mih="100%"
+      w="100%"
+      f={1}
+      pt="$10"
+      $platform-web={{
+        y: '$6',
+      }}
+    >
       {isLoading && (
         <YStack
           key="loading"
