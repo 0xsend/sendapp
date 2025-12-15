@@ -8,7 +8,7 @@ jobs:
   fingerprint:
     name: Fingerprint
     type: fingerprint
-    environment: staging
+    environment: production
 
   get_android_build:
     name: Check for existing android build
@@ -62,7 +62,7 @@ jobs:
     name: Publish Android update
     needs: [get_android_build]
     if: ${{ needs.get_android_build.outputs.build_id }}
-    environment: staging
+    environment: production
     steps:
       - name: Check working directory
         run: |
