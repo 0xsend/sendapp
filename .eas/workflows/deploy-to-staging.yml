@@ -189,7 +189,7 @@ jobs:
     name: Publish iOS update
     needs: [get_ios_build]
     if: ${{ needs.get_ios_build.outputs.build_id }}
-    environment: staging
+    environment: production
     steps:
       - name: Check working directory
         run: |
