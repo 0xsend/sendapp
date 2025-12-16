@@ -1049,7 +1049,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                             fontFamily="$mono"
                             col="$gray12"
                             placeholderTextColor="$gray11"
-                            placeholder="0.000"
+                            placeholder="0"
                             focusStyle={{
                               bbc: themeName.includes('dark') ? '$primary' : '$neon8',
                             }}
@@ -1097,7 +1097,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                             </Paragraph>
                             <Paragraph color="$color12" size={'$5'} fontWeight={'600'}>
                               {!coin?.balance
-                                ? '0.000'
+                                ? '0'
                                 : formatAmount(formatUnits(coin.balance, coin.decimals), 12, 4)}
                             </Paragraph>
 
