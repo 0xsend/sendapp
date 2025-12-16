@@ -194,7 +194,7 @@ function HomeBody(props: XStackProps) {
                 <StablesBalanceCard.Actions />
               </StablesBalanceCard.Footer>
             </StablesBalanceCard>
-            {/*<SavingsBalanceCard w="100%" />*/}
+            <SavingsBalanceCard w="100%" />
             <InvestmentsBalanceCard padded gap="$3" w="100%">
               <InvestmentsBalanceCard.HomeScreenHeader />
               <Card.Footer jc="space-between" ai="center">
