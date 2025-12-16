@@ -15,6 +15,11 @@
       "environment": "production",
       "channel": "preview"
     },
+    "staging": {
+      "distribution": "internal",
+      "environment": "production",
+      "channel": "staging"
+    },
     "production": {
       "environment": "production",
       "autoIncrement": true,
