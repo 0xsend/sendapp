@@ -1,12 +1,24 @@
 {
   "webcredentials": {
-    "apps": ["325JS7C582.send.app"]
+    "apps": [
+      "325JS7C582.send.app",
+      "325JS7C582.send.app.staging",
+      "325JS7C582.send.app.preview"
+    ]
   },
   "applinks": {
     "apps": [],
     "details": [
       {
         "appID": "325JS7C582.send.app",
+        "paths": ["*"]
+      },
+      {
+        "appID": "325JS7C582.send.app.staging",
+        "paths": ["*"]
+      },
+      {
+        "appID": "325JS7C582.send.app.preview",
         "paths": ["*"]
       }
     ]
