@@ -322,5 +322,6 @@ jobs:
           echo "Contents:"
           ls -la | head -20
 
-          # Publish update with message
-          eas update --channel production --platform ios --message "Automated update from EAS Workflow" --non-interactive
+          # Publish update with latest commit message
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          eas update --channel production --platform ios --message "$COMMIT_MESSAGE" --non-interactive
