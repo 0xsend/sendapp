@@ -2359,6 +2359,33 @@ export type Database = {
         Returns: undefined
       }
       user_referrals_count: { Args: never; Returns: number }
+      wrapped_send_score_rank: {
+        Args: never
+        Returns: {
+          rank: number
+        }[]
+      }
+      wrapped_top_counterparties: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          name: string
+          send_id: number
+          tag_name: string
+        }[]
+      }
+      wrapped_total_transfers: {
+        Args: never
+        Returns: {
+          count: number
+        }[]
+      }
+      wrapped_unique_recipients: {
+        Args: never
+        Returns: {
+          count: number
+        }[]
+      }
     }
     Enums: {
       key_type_enum: "ES256"

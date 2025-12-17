@@ -15,10 +15,22 @@
       "environment": "production",
       "channel": "preview"
     },
+    "staging": {
+      "distribution": "internal",
+      "environment": "production",
+      "channel": "staging"
+    },
     "production": {
       "environment": "production",
       "autoIncrement": true,
       "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6748525971"
+      }
     }
   }
 }
