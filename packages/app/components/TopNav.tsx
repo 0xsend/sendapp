@@ -19,6 +19,7 @@ import { Link } from 'solito/link'
 import { useUser } from 'app/utils/useUser'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { useTranslation } from 'react-i18next'
+import { WrappedEntry } from 'app/features/wrapped'
 
 interface TopNavProps {
   header?: string
@@ -147,7 +148,9 @@ export function TopNav({
                   {showLogo ? (
                     <XStack>
                       <Link href="/">
-                        <IconSendLogo size={'$2.5'} color={'$color12'} />
+                        <WrappedEntry>
+                          <IconSendLogo size={'$2.5'} color={'$color12'} />
+                        </WrappedEntry>
                       </Link>
                     </XStack>
                   ) : (

@@ -1,6 +1,7 @@
 import { Paragraph, useTheme, XStack } from '@my/ui'
 import { IconSendLogo } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
+import { WrappedEntry } from 'app/features/wrapped'
 import { Redirect, Stack, Tabs, useFocusEffect } from 'expo-router'
 import AvatarMenuButton from 'app/components/AvatarMenuButton/AvatarMenuButton'
 import { HeaderSlot } from 'apps-expo/components/layout/HeaderSlot'
@@ -22,7 +23,9 @@ const TABS: TabConfig[] = [
     key: 'home/index',
     renderHeader: () => (
       <XStack ai="center" jc="flex-start">
-        <IconSendLogo size={'$2'} color={'$color12'} />
+        <WrappedEntry>
+          <IconSendLogo size={'$2'} color={'$color12'} />
+        </WrappedEntry>
       </XStack>
     ),
     labelKey: 'tabs.home',

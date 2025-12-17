@@ -37,6 +37,7 @@ import { ReferralLink } from '../ReferralLink'
 import { usePathname } from 'app/utils/usePathname'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { WrappedEntry } from 'app/features/wrapped'
 
 type NavigationLink = { icon: ReactElement; text: string; href: string }
 
@@ -84,7 +85,9 @@ function HomeSideBar({ ...props }: YStackProps) {
     <SideBar {...props} ai={'flex-start'} px="$7">
       <YStack width={'100%'}>
         <Link href={'/'}>
-          <IconSendLogo color={'$color12'} size={'$2.5'} />
+          <WrappedEntry>
+            <IconSendLogo color={'$color12'} size={'$2.5'} />
+          </WrappedEntry>
         </Link>
         <YStack gap={'$2.5'} pt={'$12'} width={'100%'}>
           {links.map((link) => (
