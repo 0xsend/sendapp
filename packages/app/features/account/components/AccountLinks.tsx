@@ -1,6 +1,6 @@
 import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { Button, type ColorTokens, type SizeTokens, YGroup, YStack } from '@my/ui'
+import { Button, type ColorTokens, Paragraph, type SizeTokens, YGroup, YStack } from '@my/ui'
 import {
   IconAccount,
   IconDollar,
@@ -19,6 +19,8 @@ import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Platform } from 'react-native'
+import * as Application from 'expo-application'
 import { AccountDeletionFlow } from './AccountDeletionFlow'
 
 const iconProps = {
@@ -168,12 +170,19 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
         </YGroup>
       </YStack>
-      <Button onPress={handleSignOut} {...shadowProps}>
-        <Button.Icon>
-          <IconLogout {...iconProps} $theme-dark={{ color: '$gray12' }} />
-        </Button.Icon>
-        <Button.Text>{t('links.signOut')}</Button.Text>
-      </Button>
+      <YStack gap={'$2'}>
+        <Button onPress={handleSignOut} {...shadowProps}>
+          <Button.Icon>
+            <IconLogout {...iconProps} $theme-dark={{ color: '$gray12' }} />
+          </Button.Icon>
+          <Button.Text>{t('links.signOut')}</Button.Text>
+        </Button>
+        {Platform.OS !== 'web' && (
+          <Paragraph size="$2" color="$color4" textAlign="center">
+            Version {Application.nativeApplicationVersion}
+          </Paragraph>
+        )}
+      </YStack>
       <AccountDeletionFlow open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} />
     </YStack>
   )
