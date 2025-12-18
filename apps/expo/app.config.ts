@@ -24,7 +24,7 @@ module.exports = {
     supportsTablet: true,
     bundleIdentifier: 'send.app',
     displayName: 'Send',
-    associatedDomains: ['webcredentials:send.app'],
+    associatedDomains: ['webcredentials:send.app', 'applinks:send.app'],
     appleTeamId: '325JS7C582',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
