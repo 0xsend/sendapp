@@ -1,21 +1,26 @@
-import { SendConfirmScreen } from 'app/features/send/confirm/screen'
-import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
-import { Stack } from 'expo-router'
-import { useTranslation } from 'react-i18next'
+import { useSendScreenParams } from 'app/routers/params'
+import { Redirect } from 'expo-router'
 
-export default function SendConfirm() {
-  const { t } = useTranslation('navigation')
+/**
+ * Redirect /send/confirm to /send.
+ * The SendChat component now handles confirmation inline.
+ * Modal opens when idType and recipient params are present.
+ */
+export default function SendConfirmRedirect() {
+  const [params] = useSendScreenParams()
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: t('stack.send.previewAndSend'),
-        }}
-      />
-      <ScreenContainer>
-        <SendConfirmScreen />
-      </ScreenContainer>
-    </>
+    <Redirect
+      href={{
+        pathname: '/send',
+        params: {
+          idType: params.idType,
+          recipient: params.recipient,
+          amount: params.amount,
+          sendToken: params.sendToken,
+          note: params.note,
+        },
+      }}
+    />
   )
 }

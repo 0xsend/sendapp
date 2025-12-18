@@ -21,7 +21,6 @@ export default function ProfileSendButton({
           ...sendParams,
           recipient: sendId?.toString() ?? '',
           idType: 'sendid',
-          m: 1,
         })
         onSendChatOpenChange?.(true)
       }}

@@ -13,7 +13,6 @@ export default function ProfileSendButton({ sendId }: { sendId?: number | null }
           ...sendParams,
           recipient: sendId?.toString() ?? '',
           idType: 'sendid',
-          m: 1,
         })
       }}
       borderRadius={'$4'}

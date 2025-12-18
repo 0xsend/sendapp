@@ -49,17 +49,20 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const [sendChatOpen, setSendChatOpen] = useState(false)
 
   useEffect(() => {
-    if (sendParams.recipient && Number(sendParams.m) === 1) {
+    if (sendParams.idType && sendParams.recipient) {
       setSendChatOpen(true)
     }
-  }, [sendParams.recipient, sendParams.m])
+  }, [sendParams.idType, sendParams.recipient])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
     if (!sendChatOpen) {
       setSendParams({
-        ...sendParams,
-        m: undefined,
+        idType: undefined,
+        recipient: undefined,
+        note: undefined,
+        amount: sendParams.amount,
+        sendToken: sendParams.sendToken,
       })
     }
   }, [sendChatOpen])
@@ -296,7 +299,7 @@ const Vibe = ({
   return (
     <VibeButton
       href={{
-        pathname: '/send/confirm',
+        pathname: '/send',
         query: {
           recipient: profile?.main_tag_name ? profile?.main_tag_name : (profile?.sendid ?? ''),
           idType: profile?.main_tag_name ? 'tag' : 'sendid',
