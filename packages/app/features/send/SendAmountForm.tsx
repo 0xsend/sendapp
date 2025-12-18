@@ -129,7 +129,7 @@ export function SendAmountForm() {
     if (!canSubmit) return
 
     router.push({
-      pathname: '/send/confirm',
+      pathname: '/send',
       query: {
         idType: sendParams.idType,
         recipient: sendParams.recipient,

@@ -1,18 +1,22 @@
-import { SendConfirmScreen } from 'app/features/send/confirm/screen'
-import { NextSeo } from 'next-seo'
-import type { NextPageWithLayout } from '../_app'
-import { HomeLayout } from 'app/features/home/layout.web'
-import { SendTopNav } from 'app/features/send/components/SendTopNav'
+import type { GetServerSideProps } from 'next'
 
-export const Page: NextPageWithLayout = () => {
-  return (
-    <>
-      <NextSeo title="Send | Confirm" description="Send" />
-      <SendConfirmScreen />
-    </>
-  )
+/**
+ * Redirect /send/confirm to /send.
+ * The SendChat component now handles confirmation inline.
+ * Modal opens when idType and recipient params are present.
+ */
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // Pass through all query params to /send
+  const queryString = ctx.resolvedUrl.split('?')[1] || ''
+  return {
+    redirect: {
+      destination: `/send${queryString ? `?${queryString}` : ''}`,
+      permanent: true,
+    },
+  }
 }
 
-Page.getLayout = (children) => <HomeLayout TopNav={<SendTopNav />}>{children}</HomeLayout>
-
-export default Page
+export default function SendConfirmRedirect() {
+  // This component won't render due to the redirect
+  return null
+}

@@ -225,7 +225,6 @@ const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
             idType: 'sendid',
             recipient: item?.send_id,
           }),
-      m: 1,
     })
   }
 

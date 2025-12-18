@@ -126,12 +126,20 @@ export const SendChat = memo(
 
     const [transaction, setTransaction] = useState<Activity>()
 
-    const [activeSection, setActiveSection] = useState<Sections>('chat')
-    const bottomSheetRef = useRef<BottomSheet>(null)
-
-    // Capture the hook result BEFORE entering Portal
-    // This creates a stable reference to params that works inside Portal
+    // Capture the hook result BEFORE useState so we can determine initial section
+    // This also creates a stable reference to params that works inside Portal
     const sendScreenParamsResult = useSendScreenParams()
+    const [sendParams] = sendScreenParamsResult
+
+    // Determine initial section: if deep link has valid send params, go directly to enterAmount
+    const hasValidDeepLinkParams = Boolean(
+      sendParams.recipient && sendParams.idType && sendParams.amount && sendParams.sendToken
+    )
+
+    const [activeSection, setActiveSection] = useState<Sections>(() =>
+      hasValidDeepLinkParams ? 'enterAmount' : 'chat'
+    )
+    const bottomSheetRef = useRef<BottomSheet>(null)
 
     useEffect(() => {
       if (open) {
