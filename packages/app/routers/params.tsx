@@ -227,7 +227,6 @@ export type SendScreenParams = {
   amount?: string
   sendToken?: allCoins[number]['token']
   note?: string
-  m?: number
 }
 
 const { useParam: useSendParam, useParams: useSendParams } = createParam<SendScreenParams>()
@@ -320,7 +319,6 @@ const useSendScreenParamsBase = () => {
       amount,
       sendToken,
       note,
-      m: params?.m,
     },
     setEncodedParams,
   ] as const

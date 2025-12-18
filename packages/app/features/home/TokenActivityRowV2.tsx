@@ -74,7 +74,6 @@ export const TokenActivityRow = ({
               ? to_user?.send_id?.toString()
               : from_user?.send_id?.toString(),
           idType: 'sendid',
-          m: 1,
         })
         return
       }

@@ -311,6 +311,7 @@ export type Database = {
           hodler_pool_bips: number
           id: number
           merkle_drop_addr: string | null
+          merkle_tree: Json | null
           name: string
           number: number
           qualification_end: string
@@ -335,6 +336,7 @@ export type Database = {
           hodler_pool_bips: number
           id?: number
           merkle_drop_addr?: string | null
+          merkle_tree?: Json | null
           name: string
           number: number
           qualification_end: string
@@ -359,6 +361,7 @@ export type Database = {
           hodler_pool_bips?: number
           id?: number
           merkle_drop_addr?: string | null
+          merkle_tree?: Json | null
           name?: string
           number?: number
           qualification_end?: string

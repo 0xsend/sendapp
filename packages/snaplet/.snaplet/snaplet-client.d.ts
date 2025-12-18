@@ -150,6 +150,7 @@ type Override = {
       tranche_id?: string;
       earn_min_balance?: string;
       sendpot_ticket_increment?: string;
+      merkle_tree?: string;
       distribution_shares?: string;
       distribution_verification_values?: string;
       distribution_verifications?: string;
@@ -1009,6 +1010,7 @@ export interface Fingerprint {
     trancheId?: FingerprintNumberField;
     earnMinBalance?: FingerprintNumberField;
     sendpotTicketIncrement?: FingerprintNumberField;
+    merkleTree?: FingerprintJsonField;
     distributionShares?: FingerprintRelationField;
     distributionVerificationValues?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;

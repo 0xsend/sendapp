@@ -43,7 +43,7 @@ test('redirect on sign-in', async ({ page, pg }) => {
   }
 })
 
-test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
+test('redirect to send page on sign-in with recipient params', async ({ page, seed, pg }) => {
   const sendtag = generateSendtag()
   const plan = await createUserWithTagsAndAccounts(seed)
   const tag = plan.tags[0]
@@ -59,23 +59,21 @@ test('redirect to send confirm page on sign-in', async ({ page, seed, pg }) => {
 
     // ensure use can log in with passkey
     await page.context().clearCookies()
-    await page.goto(
-      `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
-    )
+    await page.goto(`/send?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`)
     await page.waitForURL(/\//)
     const beforeRedirectUrl = new URL(page.url())
     expect(Object.fromEntries(beforeRedirectUrl.searchParams.entries())).toMatchObject({
-      redirectUri: `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`,
+      redirectUri: `/send?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`,
     })
     // redirect to send after user is logged in
     const signInButton = page.getByRole('button', { name: 'SIGN-IN' })
     await expect(signInButton).toBeVisible()
     await signInButton.click()
-    await page.waitForURL(/send\/confirm/)
+    await page.waitForURL(/send\?/)
     //@todo: find a way to wait for the new url and check query params like above
-    //       Checking the url strimg is not sturdy because it cares about the query params order
+    //       Checking the url string is not sturdy because it cares about the query params order
     await expect(page).toHaveURL(
-      `/send/confirm?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
+      `/send?idType=tag&recipient=${tag?.name}&amount=1&sendToken=${sendCoin.token}`
     )
   } finally {
     await pg.query('DELETE FROM auth.users WHERE email like $1', [`${sendtag}_%`]).catch((e) => {

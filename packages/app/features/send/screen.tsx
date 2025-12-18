@@ -53,7 +53,7 @@ export const SendScreen = () => {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    if (profile?.address && Number(queryParams.m) === 1) {
+    if (profile?.address && queryParams.idType && queryParams.recipient) {
       Keyboard.dismiss()
       startTransition(() => {
         setOpen(true)
@@ -61,17 +61,23 @@ export const SendScreen = () => {
     } else {
       setOpen(false)
     }
-  }, [profile, queryParams.m])
+  }, [profile, queryParams.idType, queryParams.recipient])
 
   const onSendChatOpenChange = useEvent((open: boolean) => {
     setOpen(open)
-    setQueryParams(
-      {
-        ...queryParams,
-        m: open ? 1 : 0,
-      },
-      { webBehavior: 'replace' }
-    )
+    if (!open) {
+      // Clear recipient params when closing modal, keep amount and sendToken
+      setQueryParams(
+        {
+          idType: undefined,
+          recipient: undefined,
+          note: undefined,
+          amount: queryParams.amount,
+          sendToken: queryParams.sendToken,
+        },
+        { webBehavior: 'replace' }
+      )
+    }
   })
 
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)

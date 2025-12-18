@@ -153,6 +153,7 @@ interface Table_public_distributions {
   tranche_id: number;
   earn_min_balance: number;
   sendpot_ticket_increment: number | null;
+  merkle_tree: Json | null;
 }
 interface Table_realtime_extensions {
   id: string;

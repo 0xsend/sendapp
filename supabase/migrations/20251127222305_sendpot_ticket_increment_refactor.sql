@@ -150,7 +150,7 @@ BEGIN
       AND block_time >= curr_distribution_start_epoch
       AND block_time < curr_distribution_end_epoch
       AND block_time > max_jackpot_block_time;
-    
+
     -- Calculate weight: integer division by ticket increment
     recalculated_weight := FLOOR(total_tickets / ticket_increment);
 

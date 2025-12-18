@@ -1995,6 +1995,20 @@
           "maxLength": null
         },
         {
+          "id": "public.distributions.merkle_tree",
+          "name": "merkle_tree",
+          "columnName": "merkle_tree",
+          "type": "jsonb",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "distribution_shares",
           "type": "distribution_shares",
           "isRequired": false,

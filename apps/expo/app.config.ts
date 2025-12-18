@@ -1,11 +1,38 @@
 import * as process from 'node:process'
 
+const appVariant = process.env.APP_VARIANT || 'production'
+
+const getAppConfig = () => {
+  switch (appVariant) {
+    case 'preview':
+      return {
+        displayName: 'Send (Preview)',
+        iosBundleIdentifier: 'send.app.preview',
+        androidPackage: 'app.send.preview',
+      }
+    case 'staging':
+      return {
+        displayName: 'Send (Staging)',
+        iosBundleIdentifier: 'send.app.staging',
+        androidPackage: 'app.send.staging',
+      }
+    default:
+      return {
+        displayName: 'Send',
+        iosBundleIdentifier: 'send.app',
+        androidPackage: 'app.send',
+      }
+  }
+}
+
+const appConfig = getAppConfig()
+
 module.exports = {
-  name: 'Send',
+  name: appConfig.displayName,
   owner: 'send-it',
   slug: 'send',
   scheme: 'send',
-  version: '1.0.0',
+  version: '1.1.0',
   experiments: {
     reactCanary: true,
   },
@@ -22,9 +49,9 @@ module.exports = {
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'send.app',
-    displayName: 'Send',
-    associatedDomains: ['webcredentials:send.app'],
+    bundleIdentifier: appConfig.iosBundleIdentifier,
+    displayName: appConfig.displayName,
+    associatedDomains: ['webcredentials:send.app', 'applinks:send.app'],
     appleTeamId: '325JS7C582',
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
@@ -38,7 +65,7 @@ module.exports = {
       foregroundImage: './assets/icons/android-adaptive-icon.png',
       backgroundColor: '#40FB50',
     },
-    package: 'app.send',
+    package: appConfig.androidPackage,
     permissions: ['android.permission.RECORD_AUDIO'],
     intentFilters: [
       {

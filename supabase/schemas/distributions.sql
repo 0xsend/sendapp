@@ -67,7 +67,8 @@ CREATE TABLE IF NOT EXISTS "public"."distributions" (
     "token_decimals" numeric,
     "tranche_id" integer NOT NULL,
     "earn_min_balance" bigint NOT NULL DEFAULT 0,
-    "sendpot_ticket_increment" integer DEFAULT 10
+    "sendpot_ticket_increment" integer DEFAULT 10,
+    "merkle_tree" jsonb
 );
 
 ALTER TABLE "public"."distributions" OWNER TO "postgres";
@@ -164,7 +165,7 @@ ALTER TABLE ONLY "public"."distribution_shares"
     ADD CONSTRAINT "distribution_shares_distribution_id_fkey" FOREIGN KEY ("distribution_id") REFERENCES "public"."distributions"("id") ON DELETE CASCADE;
 
 ALTER TABLE ONLY "public"."distribution_shares"
-    ADD CONSTRAINT "distribution_shares_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+    ADD CONSTRAINT "distribution_shares_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE NO ACTION NOT VALID;
 
 ALTER TABLE ONLY "public"."distribution_verification_values"
     ADD CONSTRAINT "distribution_verification_values_distribution_id_fkey" FOREIGN KEY ("distribution_id") REFERENCES "public"."distributions"("id") ON DELETE CASCADE;
@@ -1055,7 +1056,7 @@ BEGIN
       AND block_time >= curr_distribution_start_epoch
       AND block_time < curr_distribution_end_epoch
       AND block_time > max_jackpot_block_time;
-    
+
     -- Calculate weight: integer division by ticket increment
     recalculated_weight := FLOOR(total_tickets / ticket_increment);
 
@@ -1324,6 +1325,7 @@ GRANT ALL ON FUNCTION "public"."insert_verification_sendpot_ticket_purchase"() T
 REVOKE ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) FROM authenticated;
 GRANT ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) TO service_role;
+
 
 -- Triggers for profile verified_at sync (functions defined in profiles.sql)
 DROP TRIGGER IF EXISTS "update_profile_verified_at_on_insert" ON "public"."distribution_shares";

@@ -12,6 +12,7 @@ const ELIGIBLE_SEND_IDS: number[] = [
   3409, // vic
   3941, // erick
   117902, // ehsan
+  17, // sunburn
 ]
 
 /**

@@ -41,18 +41,21 @@ export default function ActivityFeed({
     if (!sendChatOpen) {
       setTimeout(() => {
         setSendParams({
-          ...sendParams,
-          m: undefined,
+          idType: undefined,
+          recipient: undefined,
+          note: undefined,
+          amount: sendParams.amount,
+          sendToken: sendParams.sendToken,
         })
       }, 400)
     }
   }, [sendChatOpen])
 
   useEffect(() => {
-    if (sendParams.recipient && Number(sendParams.m) === 1) {
+    if (sendParams.idType && sendParams.recipient) {
       setSendChatOpen(true)
     }
-  }, [sendParams.recipient, sendParams.m])
+  }, [sendParams.idType, sendParams.recipient])
 
   const {
     data,
