@@ -45,7 +45,7 @@ import { formatUnits, isAddress } from 'viem'
 import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
-import { IconBadgeCheckSolid2, IconCoin } from 'app/components/icons'
+import { IconBadgeCheckSolid2, IconCoin, IconAccount } from 'app/components/icons'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { AlertCircle, CheckCheck, Clock4, History, X } from '@tamagui/lucide-icons'
 import { useSendScreenParams } from 'app/routers/params'
@@ -71,6 +71,7 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
+import { useRouter } from 'solito/router'
 
 import debug from 'debug'
 import { signUserOp } from 'app/utils/signUserOp'
@@ -135,9 +136,14 @@ export const SendChat = memo(
     const hasValidDeepLinkParams = Boolean(
       sendParams.recipient && sendParams.idType && sendParams.amount && sendParams.sendToken
     )
+    const externalAddressPrefill = Boolean(
+      sendParams.recipient &&
+        sendParams.idType === 'address' &&
+        isAddress((sendParams.recipient || '') as `0x${string}`)
+    )
 
     const [activeSection, setActiveSection] = useState<Sections>(() =>
-      hasValidDeepLinkParams ? 'enterAmount' : 'chat'
+      hasValidDeepLinkParams || externalAddressPrefill ? 'enterAmount' : 'chat'
     )
     const bottomSheetRef = useRef<BottomSheet>(null)
 
@@ -333,21 +339,20 @@ interface SendChatHeaderProps {
 
 const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...props }) => {
   const themeName = useThemeName()
-
   const isDark = themeName.includes('dark')
 
   const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
-  const href = profile ? `/profile/${profile?.sendid}` : ''
+  const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
+  const href = !isExternalAddress && profile ? `/profile/${profile?.sendid}` : ''
 
-  const tagName =
-    idType === 'address'
-      ? shorten(recipient, 5, 4)
-      : profile?.tag
-        ? `/${profile?.tag}`
-        : `#${profile?.sendid}`
+  const tagName = isExternalAddress
+    ? shorten(recipient, 5, 4)
+    : profile?.tag
+      ? `/${profile?.tag}`
+      : `#${profile?.sendid}`
 
   return (
     <XStack
@@ -361,38 +366,34 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       {...props}
     >
       <XStack>
-        <Link
-          hoverStyle={{
-            opacity: 0.8,
-          }}
-          focusStyle={{
-            opacity: 0.8,
-          }}
-          pressStyle={{
-            scale: 0.95,
-          }}
-          href={href}
-        >
+        {href ? (
+          <Link
+            hoverStyle={{ opacity: 0.8 }}
+            focusStyle={{ opacity: 0.8 }}
+            pressStyle={{ scale: 0.95 }}
+            href={href}
+          >
+            <Avatar circular size="$4.5" elevation="$0.75">
+              {isAndroid && !profile?.avatar_url ? (
+                <IconAccount size={'$4'} color="$olive" />
+              ) : (
+                <>
+                  <Avatar.Image src={profile?.avatar_url ?? ''} />
+                  <Avatar.Fallback jc="center">
+                    <IconAccount size={'$4'} color="$olive" />
+                  </Avatar.Fallback>
+                </>
+              )}
+            </Avatar>
+          </Link>
+        ) : (
           <Avatar circular size="$4.5" elevation="$0.75">
-            {isAndroid && !profile?.avatar_url ? (
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-              />
-            ) : (
-              <>
-                <Avatar.Image src={profile?.avatar_url ?? ''} />
-                <Avatar.Fallback jc="center" bc="$olive">
-                  <Avatar size="$4.5" circular>
-                    <Avatar.Image
-                      src={`https://ui-avatars.com/api/?name=${profile?.name}&size=256&format=png&background=86ad7f`}
-                    />
-                  </Avatar>
-                </Avatar.Fallback>
-              </>
-            )}
+            <Avatar.Fallback jc="center">
+              <IconAccount size={'$4'} color="$olive" />
+            </Avatar.Fallback>
           </Avatar>
-        </Link>
-        {profile?.is_verified && (
+        )}
+        {profile?.is_verified && !isExternalAddress && (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
             <IconBadgeCheckSolid2
@@ -408,7 +409,9 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       </XStack>
       <YStack gap="$1.5">
         <SizableText size="$4" color="$gray12" fow="500">
-          {profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
+          {isExternalAddress
+            ? tagName
+            : profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
         </SizableText>
         <SizableText size="$3" color="$gray10">
           {tagName}
@@ -425,13 +428,8 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
         x={-9}
         y={10}
         boc="$aztec3"
-        hoverStyle={{
-          boc: '$aztec4',
-        }}
-        pressStyle={{
-          boc: '$aztec4',
-          scale: 0.9,
-        }}
+        hoverStyle={{ boc: '$aztec4' }}
+        pressStyle={{ boc: '$aztec4', scale: 0.9 }}
         onPress={onClose}
       >
         <Button.Icon scaleIcon={1.2}>
@@ -573,6 +571,9 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   const themeName = useThemeName()
 
+  const { recipient, idType } = sendParams
+  const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
+
   const { isLoading: isLoadingCoins } = useCoins()
   const form = useForm<z.infer<typeof SendAmountSchema>>({
     resolver: zodResolver(SendAmountSchema),
@@ -582,16 +583,13 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
         sendParams.amount && coin !== undefined
           ? localizeAmount(formatUnits(BigInt(sendParams.amount), coin.decimals))
           : undefined,
-      note: sendParams.note || '',
+      note: isExternalAddress ? '' : sendParams.note || '',
     },
   })
 
   const [present] = usePresence()
   const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
 
-  // copied
-
-  const { recipient, idType } = sendParams
   const { data: profile, isLoading: isProfileLoading } = useProfileLookup(
     idType ?? 'tag',
     recipient ?? ''
@@ -599,6 +597,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
 
   const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
   const [amountInputRef, setAmountInputRef] = useState<InputOG | null>(null)
+
+  const router = useRouter()
 
   const noteValidationError = form.formState.errors.note
 
@@ -612,27 +612,29 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           allCoinsDict[sendToken]?.decimals
         )?.toString()
 
-        const noteValidation = formFields.note.safeParse(note)
-        if (noteValidation.error) {
-          form.setError('note', {
-            message:
-              noteValidation.error.errors[0]?.message ??
-              'Note failed to match validation constraints',
-          })
-        } else {
-          form.clearErrors('note')
+        if (!isExternalAddress) {
+          const noteValidation = formFields.note.safeParse(note)
+          if (noteValidation.error) {
+            form.setError('note', {
+              message:
+                noteValidation.error.errors[0]?.message ??
+                'Note failed to match validation constraints',
+            })
+          } else {
+            form.clearErrors('note')
+          }
         }
         setSendParams(
           {
             ...sendParams,
             amount: sanitizedAmount,
             sendToken,
-            note: note.trim(),
+            note: isExternalAddress ? undefined : note.trim(),
           },
           { webBehavior: 'replace' }
         )
       },
-      [setSendParams, sendParams, form]
+      [setSendParams, sendParams, form, isExternalAddress]
     ),
     300,
     { leading: false },
@@ -923,7 +925,12 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               exact: false,
             })
 
-            setActiveSection('chat')
+            // Navigate to activity page for external addresses
+            if (isExternalAddress) {
+              router.replace({ pathname: '/activity' })
+            } else {
+              setActiveSection('chat')
+            }
           }
         } catch (transferError) {
           void queryClient.resetQueries({
@@ -1153,10 +1160,16 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                       bg: '$gray3',
                     }}
                     placeholderTextColor="$gray11"
-                    disabled={activeSection === 'reviewAndSend'}
-                    pointerEvents={activeSection === 'reviewAndSend' ? 'none' : 'auto'}
-                    editable={activeSection !== 'reviewAndSend'}
-                    placeholder="Add a note..."
+                    disabled={activeSection === 'reviewAndSend' || isExternalAddress}
+                    pointerEvents={
+                      activeSection === 'reviewAndSend' || isExternalAddress ? 'none' : 'auto'
+                    }
+                    editable={activeSection !== 'reviewAndSend' && !isExternalAddress}
+                    placeholder={
+                      isExternalAddress
+                        ? 'Notes not supported for external address'
+                        : 'Add a note...'
+                    }
                     fos="$5"
                     br="$3"
                     multiline
@@ -1463,6 +1476,9 @@ const ChatList = YStack.styleable(() => {
     error: otherUserProfileError,
   } = useProfileLookup(idTypeParam ?? 'tag', recipientParam ?? '')
 
+  const isExternalAddress =
+    idTypeParam === 'address' && isAddress((recipientParam || '') as `0x${string}`)
+
   const {
     data,
     isLoading: isLoadingActivities,
@@ -1472,7 +1488,7 @@ const ChatList = YStack.styleable(() => {
     hasNextPage,
   } = useInterUserActivityFeed({
     pageSize: 5,
-    otherUserId: otherUserProfile?.sendid ?? undefined,
+    otherUserId: isExternalAddress ? undefined : (otherUserProfile?.sendid ?? undefined),
     currentUserId: currentUserProfile?.send_id,
   })
 
@@ -1512,9 +1528,13 @@ const ChatList = YStack.styleable(() => {
       <YStack ai="center" jc="center" f={1} gap="$4">
         <History col="$gray11" size="$6" />
         <YStack jc="center" ai="center" gap="$4">
-          <SizableText size="$8">No transactions yet</SizableText>
+          <SizableText size="$8">
+            {isExternalAddress ? 'History not available' : 'No transactions yet'}
+          </SizableText>
           <SizableText size="$5" col="$gray11">
-            Your next transaction will appear here
+            {isExternalAddress
+              ? 'Enter an amount below to send.'
+              : 'Your next transaction will appear here'}
           </SizableText>
         </YStack>
       </YStack>
