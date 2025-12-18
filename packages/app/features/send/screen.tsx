@@ -24,7 +24,6 @@ import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { startTransition, useDeferredValue, useEffect, useState } from 'react'
-import { SendAmountForm } from './SendAmountForm'
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
@@ -52,8 +51,13 @@ export const SendScreen = () => {
 
   const [open, setOpen] = useState(false)
 
+  // Check if recipient is an external address (not a Send profile)
+  const isExternalAddress = idType === 'address' && isAddress(recipient as Address)
+
   useEffect(() => {
-    if (profile?.address && queryParams.idType && queryParams.recipient) {
+    // Open SendChat for both Send profiles and external addresses
+    const hasValidRecipient = profile?.address || isExternalAddress
+    if (hasValidRecipient && queryParams.idType && queryParams.recipient) {
       Keyboard.dismiss()
       startTransition(() => {
         setOpen(true)
@@ -61,7 +65,7 @@ export const SendScreen = () => {
     } else {
       setOpen(false)
     }
-  }, [profile, queryParams.idType, queryParams.recipient])
+  }, [profile, queryParams.idType, queryParams.recipient, isExternalAddress])
 
   const onSendChatOpenChange = useEvent((open: boolean) => {
     setOpen(open)
@@ -81,10 +85,6 @@ export const SendScreen = () => {
   })
 
   if (errorProfileLookup) throw new Error(errorProfileLookup.message)
-
-  if (idType === 'address' && isAddress(recipient as Address)) {
-    return <SendAmountForm />
-  }
 
   if (profile && !profile.address) return <NoSendAccount profile={profile} />
 
