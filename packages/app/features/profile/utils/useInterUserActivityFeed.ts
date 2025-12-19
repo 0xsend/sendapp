@@ -15,6 +15,11 @@ const MAX_PENDING_TIME = 30_000 // 2 minutes - stop aggressive polling after thi
 /**
  * Infinite query to fetch ERC-20 token activity feed between the current user and another profile.
  *
+ * IMPORTANT: Recipients do not see temporal (pending) transfers due to activity_feed view filtering.
+ * Only senders see temporal transfers. This is intentional UX to avoid showing pending states to recipients.
+ * The backend view filters out temporal activities where the current user is the recipient:
+ * WHERE ((a.from_user_id = auth.uid()) OR ((a.to_user_id = auth.uid()) AND (a.event_name !~~ 'temporal_%')))
+ *
  * @param pageSize - number of items to fetch per page
  * @param refetchInterval - Interval in milliseconds to automatically refetch the data.
  * @param currentUserId - The ID of the current logged in user. If undefined, the query will not be enabled.
@@ -82,11 +87,12 @@ export function useInterUserActivityFeed(params: {
       if (!pages || !pages[0]) return refetchInterval
       const activities = pages.flat()
 
-      // Find pending temporal transfers
+      // Find pending temporal transfers - only poll for truly pending statuses
+      // Once a transfer is 'confirmed', it will soon be replaced by an indexed activity
       const pendingTransfers = activities.filter(
         (a) =>
           a.event_name === Events.TemporalSendAccountTransfers &&
-          !['cancelled', 'failed'].includes(a.data.status)
+          ['initialized', 'submitted', 'sent'].includes(a.data.status)
       )
 
       if (pendingTransfers.length === 0) {
