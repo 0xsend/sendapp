@@ -13,6 +13,7 @@ const {
   decodeTransferUserOpActivity,
   updateTemporalSendAccountTransferActivity,
   getEventFromTransferActivity,
+  verifyTransferIndexedActivity,
 } = proxyActivities<ReturnType<typeof createTransferActivities>>({
   // TODO: make this configurable
   startToCloseTimeout: '1 minute',
@@ -142,6 +143,12 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
     from,
     to,
   })
+  debugLog('Event derived:', { eventName, eventId })
+
+  // Wait for indexer to process the transfer
+  debugLog('Waiting for transfer to be indexed', { eventId })
+  await verifyTransferIndexedActivity({ eventId })
+  debugLog('Transfer indexing verified', { eventId })
 
   await updateTemporalSendAccountTransferActivity({
     workflow_id: workflowId,

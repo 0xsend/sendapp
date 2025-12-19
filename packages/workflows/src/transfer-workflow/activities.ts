@@ -1,7 +1,8 @@
 import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
-import { ApplicationFailure, log } from '@temporalio/activity'
+import { Context as ActivityContext, ApplicationFailure, log, sleep } from '@temporalio/activity'
 import { allCoins } from 'app/data/coins'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import type { GetUserOperationReceiptReturnType, UserOperation } from 'permissionless'
 import type { Address } from 'viem'
 import {
@@ -43,6 +44,7 @@ type TransferActivities = {
     eventName: string
     eventId: string
   }>
+  verifyTransferIndexedActivity: (params: { eventId: string }) => Promise<boolean>
 }
 
 export const createTransferActivities = (
@@ -51,6 +53,81 @@ export const createTransferActivities = (
   bootstrap(env)
 
   return {
+    async verifyTransferIndexedActivity({ eventId }) {
+      const maxAttempts = 10
+      const initialDelayMs = 1000
+      const backoffCoefficient = 2
+
+      log.info('Starting verification for indexed transfer', { eventId })
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        ActivityContext.current().heartbeat(`Attempt ${attempt}/${maxAttempts}`) // Send heartbeat
+
+        try {
+          const supabaseAdmin = createSupabaseAdminClient()
+          const { error, count } = await supabaseAdmin
+            .from('send_account_transfers')
+            .select('*', { count: 'exact', head: true }) // Efficiently check existence
+            .eq('event_id', eventId)
+
+          if (error) {
+            log.error('DB error checking send_account_transfers', { eventId, attempt, error })
+            if (isRetryableDBError(error)) {
+              // Let Temporal handle retry based on policy for retryable DB errors
+              throw ApplicationFailure.retryable(
+                `Retryable DB error on attempt ${attempt}`,
+                error.code,
+                { error }
+              )
+            }
+            // Non-retryable DB error
+            throw ApplicationFailure.nonRetryable(
+              'Non-retryable DB error checking transfer index',
+              error.code,
+              { error }
+            )
+          }
+
+          if (count !== null && count > 0) {
+            log.info('Transfer successfully verified as indexed', { eventId, attempt })
+            return true // Found the record
+          }
+
+          // Record not found yet, log and prepare for next attempt
+          log.info(`Transfer not yet indexed, attempt ${attempt}/${maxAttempts}`, { eventId })
+        } catch (error) {
+          // Catch ApplicationFailures rethrown from DB checks or unexpected errors
+          log.error('Error during transfer verification attempt', { eventId, attempt, error })
+          if (error instanceof ApplicationFailure) {
+            throw error // Re-throw known Temporal failures
+          }
+          // Treat other unexpected errors as non-retryable for this attempt
+          throw ApplicationFailure.nonRetryable(
+            error.message ?? `Unexpected error during verification attempt ${attempt}`,
+            'VERIFICATION_ATTEMPT_FAILED',
+            { error }
+          )
+        }
+
+        // If not the last attempt, wait before retrying
+        if (attempt < maxAttempts) {
+          const delay = initialDelayMs * backoffCoefficient ** (attempt - 1)
+          log.info(`Waiting ${delay}ms before next verification attempt`, { eventId })
+          await sleep(delay) // Use Temporal's sleep for cancellation awareness
+        }
+      }
+
+      // If loop completes without finding the record
+      log.error('Transfer indexing verification timed out after max attempts', {
+        eventId,
+        maxAttempts,
+      })
+      throw ApplicationFailure.nonRetryable(
+        'Transfer indexing verification failed after maximum attempts',
+        'VERIFICATION_TIMEOUT',
+        { eventId, maxAttempts }
+      )
+    },
     async upsertTemporalSendAccountTransferActivity(params) {
       const { workflow_id } = params
       const { data: upsertData, error } = await upsertTemporalSendAccountTransfer({
