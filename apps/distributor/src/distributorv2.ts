@@ -655,11 +655,7 @@ export class DistributorV2Worker {
     // Calculate hodler pool share weights
     const hodlerPoolAvailableAmount = distAmt - fixedPoolAllocatedAmount
 
-    let hodlerShares: {
-      address: Address
-      userId: string
-      amount: bigint
-    }[] = []
+    let hodlerShares: ReturnType<typeof calculateWeights>[string][] = []
 
     if (hodlerPoolAvailableAmount > 0n) {
       const endDate = new Date(distribution.qualification_end)
@@ -719,11 +715,7 @@ export class DistributorV2Worker {
       // Calculate weighted shares
       const weightedShares = calculateWeights(slashedBalances, timeAdjustedAmount, Mode.Sigmoid)
 
-      hodlerShares = slashedBalances.map(({ address, userId }) => ({
-        address,
-        userId,
-        amount: weightedShares[address]?.amount || 0n,
-      }))
+      hodlerShares = Object.values(weightedShares)
 
       log.info(
         {
@@ -778,6 +770,7 @@ export class DistributorV2Worker {
           fixed_pool_amount: fixedPoolAmount.toString(),
           hodler_pool_amount: hodlerPoolAmount.toString(),
           bonus_pool_amount: '0',
+          balance_rank: share.balanceRank,
         } as Tables<'distribution_shares'>
       })
       .filter(Boolean) as Tables<'distribution_shares'>[]
