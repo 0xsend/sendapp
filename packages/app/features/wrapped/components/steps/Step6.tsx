@@ -20,7 +20,7 @@ export function Step6({ onNext }: Step5Props) {
     <YStack gap="$8" ai="center" jc="center">
       <FadeIn delay={500} duration={1000}>
         <Paragraph textAlign="center" size="$8">
-          Your TOP 2025 senders
+          Top 5 /senders
         </Paragraph>
       </FadeIn>
       <YStack gap={'$3'}>

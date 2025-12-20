@@ -39,7 +39,7 @@ export function Step3PeopleCount({ onNext }: Step3PeopleCountProps) {
         </FadeIn>
         <FadeIn delay={2600} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            senders
+            /senders
           </Paragraph>
         </FadeIn>
       </YStack>
