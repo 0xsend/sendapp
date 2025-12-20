@@ -61,7 +61,7 @@ export function CheckCreateScreen() {
     defaultValues: {
       token: usdcAddress[baseMainnet.id],
       amount: '',
-      expiresInDays: 7,
+      expiresInDays: 30,
     },
   })
 
@@ -69,10 +69,12 @@ export function CheckCreateScreen() {
   const amount = form.watch('amount')
 
   const coin = coins.find((c) => c.token === token)
-  const decimals = coin?.decimals ?? allCoinsDict[token]?.decimals ?? 18
+  const coinInfo = allCoinsDict[token]
+  const decimals = coin?.decimals ?? coinInfo?.decimals ?? 18
 
   const parsedAmount = amount ? (sanitizeAmount(amount, decimals) ?? 0n) : 0n
-  const hasInsufficientBalance = coin?.balance !== undefined && parsedAmount > coin.balance
+  const balance = coin?.balance ?? 0n
+  const hasInsufficientBalance = parsedAmount > balance
 
   const canSubmit =
     !isLoadingCoins &&
@@ -204,11 +206,9 @@ export function CheckCreateScreen() {
                   Insufficient balance
                 </Paragraph>
               )}
-              {coin?.balance !== undefined && (
-                <Paragraph color="$color10" size="$3">
-                  Balance: {formatUnits(coin.balance, coin.decimals)} {coin.symbol}
-                </Paragraph>
-              )}
+              <Paragraph color="$color10" size="$3">
+                Balance: {formatUnits(balance, decimals)} {coin?.symbol ?? coinInfo?.symbol ?? ''}
+              </Paragraph>
             </YStack>
 
             <YStack gap="$2">

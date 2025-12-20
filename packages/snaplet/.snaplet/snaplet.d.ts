@@ -608,6 +608,43 @@ interface Table_public_send_accounts {
   deleted_at: string | null;
   main_tag_id: number | null;
 }
+interface Table_public_send_check_claimed {
+  id: number;
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  tx_idx: number | null;
+  ephemeral_address: string | null;
+  sender: string | null;
+  tokens: string | null;
+  amounts: string | null;
+  expires_at: number | null;
+  redeemer: string | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
+interface Table_public_send_check_created {
+  id: number;
+  chain_id: number | null;
+  log_addr: string | null;
+  block_time: number | null;
+  tx_hash: string | null;
+  tx_idx: number | null;
+  ephemeral_address: string | null;
+  sender: string | null;
+  tokens: string | null;
+  amounts: string | null;
+  expires_at: number | null;
+  ig_name: string | null;
+  src_name: string | null;
+  block_num: number | null;
+  log_idx: number | null;
+  abi_idx: number | null;
+}
 interface Table_public_send_earn_create {
   id: number;
   chain_id: number;
@@ -1054,6 +1091,8 @@ interface Schema_public {
   send_account_tags: Table_public_send_account_tags;
   send_account_transfers: Table_public_send_account_transfers;
   send_accounts: Table_public_send_accounts;
+  send_check_claimed: Table_public_send_check_claimed;
+  send_check_created: Table_public_send_check_created;
   send_earn_create: Table_public_send_earn_create;
   send_earn_deposit: Table_public_send_earn_deposit;
   send_earn_new_affiliate: Table_public_send_earn_new_affiliate;

@@ -11,8 +11,8 @@ create table "public"."send_check_claimed" (
     "tx_idx" numeric,
     "ephemeral_address" bytea,
     "sender" bytea,
-    "amount" numeric,
-    "token" bytea,
+    "tokens" bytea,
+    "amounts" bytea,
     "expires_at" numeric,
     "redeemer" bytea,
     "ig_name" text,
@@ -34,8 +34,8 @@ create table "public"."send_check_created" (
     "tx_idx" numeric,
     "ephemeral_address" bytea,
     "sender" bytea,
-    "amount" numeric,
-    "token" bytea,
+    "tokens" bytea,
+    "amounts" bytea,
     "expires_at" numeric,
     "ig_name" text,
     "src_name" text,
@@ -82,7 +82,7 @@ alter table "public"."send_check_created" add constraint "send_check_created_pke
 set check_function_bodies = off;
 
 CREATE OR REPLACE FUNCTION public.get_user_active_checks(user_address bytea)
- RETURNS TABLE(id integer, chain_id numeric, block_time numeric, tx_hash bytea, ephemeral_address bytea, sender bytea, amount numeric, token bytea, expires_at numeric, block_num numeric, is_expired boolean)
+ RETURNS TABLE(id integer, chain_id numeric, block_time numeric, tx_hash bytea, ephemeral_address bytea, sender bytea, tokens bytea, amounts bytea, expires_at numeric, block_num numeric, is_expired boolean)
  LANGUAGE sql
  STABLE
 AS $function$
@@ -93,8 +93,8 @@ SELECT
     c.tx_hash,
     c.ephemeral_address,
     c.sender,
-    c.amount,
-    c.token,
+    c.tokens,
+    c.amounts,
     c.expires_at,
     c.block_num,
     c.is_expired
@@ -105,7 +105,7 @@ $function$
 ;
 
 CREATE OR REPLACE FUNCTION public.get_user_checks_history(user_address bytea)
- RETURNS TABLE(id integer, chain_id numeric, block_time numeric, tx_hash bytea, ephemeral_address bytea, sender bytea, amount numeric, token bytea, expires_at numeric, block_num numeric, is_claimed boolean, claimed_by bytea, claimed_at numeric)
+ RETURNS TABLE(id integer, chain_id numeric, block_time numeric, tx_hash bytea, ephemeral_address bytea, sender bytea, tokens bytea, amounts bytea, expires_at numeric, block_num numeric, is_claimed boolean, claimed_by bytea, claimed_at numeric)
  LANGUAGE sql
  STABLE
 AS $function$
@@ -116,8 +116,8 @@ SELECT
     c.tx_hash,
     c.ephemeral_address,
     c.sender,
-    c.amount,
-    c.token,
+    c.tokens,
+    c.amounts,
     c.expires_at,
     c.block_num,
     (cl.id IS NOT NULL)::boolean AS is_claimed,
@@ -138,8 +138,8 @@ create or replace view "public"."send_checks_active" as  SELECT c.id,
     c.tx_hash,
     c.ephemeral_address,
     c.sender,
-    c.amount,
-    c.token,
+    c.tokens,
+    c.amounts,
     c.expires_at,
     c.block_num,
     (c.expires_at <= EXTRACT(epoch FROM now())) AS is_expired

@@ -1608,18 +1608,15 @@
         "columns": [
           {
             "name": "chain_id",
-            "type": "numeric",
-            "constraints": "PRIMARY KEY"
+            "type": "numeric"
           },
           {
             "name": "block_num",
-            "type": "numeric",
-            "constraints": "PRIMARY KEY"
+            "type": "numeric"
           },
           {
             "name": "log_idx",
-            "type": "numeric",
-            "constraints": "PRIMARY KEY"
+            "type": "numeric"
           },
           {
             "name": "block_time",
@@ -1646,11 +1643,11 @@
             "type": "bytea"
           },
           {
-            "name": "amount",
-            "type": "numeric"
+            "name": "tokens",
+            "type": "bytea"
           },
           {
-            "name": "token",
+            "name": "amounts",
             "type": "bytea"
           },
           {
@@ -1680,14 +1677,14 @@
                 "column": "sender"
               },
               {
-                "name": "amount",
-                "type": "uint256",
-                "column": "amount"
+                "name": "tokens",
+                "type": "address[]",
+                "column": "tokens"
               },
               {
-                "name": "token",
-                "type": "address",
-                "column": "token"
+                "name": "amounts",
+                "type": "uint256[]",
+                "column": "amounts"
               },
               {
                 "name": "expiresAt",
@@ -1747,18 +1744,15 @@
         "columns": [
           {
             "name": "chain_id",
-            "type": "numeric",
-            "constraints": "PRIMARY KEY"
+            "type": "numeric"
           },
           {
             "name": "block_num",
-            "type": "numeric",
-            "constraints": "PRIMARY KEY"
+            "type": "numeric"
           },
           {
             "name": "log_idx",
-            "type": "numeric",
-            "constraints": "PRIMARY KEY"
+            "type": "numeric"
           },
           {
             "name": "block_time",
@@ -1785,11 +1779,11 @@
             "type": "bytea"
           },
           {
-            "name": "amount",
-            "type": "numeric"
+            "name": "tokens",
+            "type": "bytea"
           },
           {
-            "name": "token",
+            "name": "amounts",
             "type": "bytea"
           },
           {
@@ -1823,14 +1817,14 @@
                 "column": "sender"
               },
               {
-                "name": "amount",
-                "type": "uint256",
-                "column": "amount"
+                "name": "tokens",
+                "type": "address[]",
+                "column": "tokens"
               },
               {
-                "name": "token",
-                "type": "address",
-                "column": "token"
+                "name": "amounts",
+                "type": "uint256[]",
+                "column": "amounts"
               },
               {
                 "name": "expiresAt",

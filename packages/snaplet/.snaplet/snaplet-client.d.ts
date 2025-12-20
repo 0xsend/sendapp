@@ -533,6 +533,49 @@ type Override = {
       send_account_tags?: string;
     };
   }
+  send_check_claimed?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      tx_idx?: string;
+      ephemeral_address?: string;
+      sender?: string;
+      tokens?: string;
+      amounts?: string;
+      expires_at?: string;
+      redeemer?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
+  send_check_created?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      chain_id?: string;
+      log_addr?: string;
+      block_time?: string;
+      tx_hash?: string;
+      tx_idx?: string;
+      ephemeral_address?: string;
+      sender?: string;
+      tokens?: string;
+      amounts?: string;
+      expires_at?: string;
+      ig_name?: string;
+      src_name?: string;
+      block_num?: string;
+      log_idx?: string;
+      abi_idx?: string;
+    };
+  }
   send_earn_create?: {
     name?: string;
     fields?: {
@@ -1196,6 +1239,26 @@ export interface Fingerprint {
     mainTag?: FingerprintRelationField;
     sendAccountCredentialsByAccountId?: FingerprintRelationField;
     sendAccountTags?: FingerprintRelationField;
+  }
+  sendCheckClaimeds?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    expiresAt?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
+  }
+  sendCheckCreateds?: {
+    id?: FingerprintNumberField;
+    chainId?: FingerprintNumberField;
+    blockTime?: FingerprintNumberField;
+    txIdx?: FingerprintNumberField;
+    expiresAt?: FingerprintNumberField;
+    blockNum?: FingerprintNumberField;
+    logIdx?: FingerprintNumberField;
+    abiIdx?: FingerprintNumberField;
   }
   sendEarnCreates?: {
     id?: FingerprintNumberField;
