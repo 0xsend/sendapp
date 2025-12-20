@@ -1551,6 +1551,220 @@ exports[`shovel config 1`] = `
         "name": "send_earn_withdraw",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "filter_op": "!contains",
+          "filter_ref": {
+            "column": "tx_hash",
+            "integration": "send_account_transfers",
+          },
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+            "0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4",
+            "0x08E53B71490E00e8dC1c0367f97BA053567a547E",
+            "0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c",
+            "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+            "0x3f14920c99BEB920Afa163031c4e47a3e03B3e4A",
+            "0x45D9C101a3870Ca5024582fd788F4E1e8F7971c3",
+            "0x50dA645f148798F68EF2d7dB7C1CB22A6819bb2C",
+            "0x58D97B57BB95320F9a05dC918Aef65434969c2B2",
+            "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
+            "0x7300B37DfdfAb110d83290A29DfB31B1740219fE",
+            "0x7cEfbe54c37a35dCdaD29b86373ca8353a2F4680",
+            "0x808456652fdb597867f38412077A9182bf77359F",
+            "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "0x8C32bcFC720FEC35443748A96030cE866d0665ff",
+            "0x940181a94A35A4569E4529A3CDfB74e38FD98631",
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "0xA88594D404727625A9437C3f886C7643872296AE",
+            "0xBAa5CC21fd487B8Fcc2F632f3F4E8D37262a0842",
+            "0xBbB542c66a7DD7BA6893C9630B30358D610FF3ee",
+            "0xE0f63A424a4439cBE457D80E4f4b51aD25b2c56C",
+            "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
+            "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+            "0xcbB7C0006F23900c38EB856149F799620fcb8A4a",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "f",
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+          },
+          {
+            "column": "t",
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+          },
+          {
+            "column": "v",
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Transfer",
+        "type": "event",
+      },
+      "name": "send_account_transfers_backfill",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "f",
+            "type": "bytea",
+          },
+          {
+            "name": "t",
+            "type": "bytea",
+          },
+          {
+            "name": "v",
+            "type": "numeric",
+          },
+        ],
+        "name": "shovel_backfill",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "filter_op": "!contains",
+          "filter_ref": {
+            "column": "tx_hash",
+            "integration": "send_token_transfers",
+          },
+          "name": "tx_hash",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0xBbB542c66a7DD7BA6893C9630B30358D610FF3ee",
+            "0xEab49138BA2Ea6dd776220fE26b7b8E446638956",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "column": "f",
+            "indexed": true,
+            "name": "from",
+            "type": "address",
+          },
+          {
+            "column": "t",
+            "indexed": true,
+            "name": "to",
+            "type": "address",
+          },
+          {
+            "column": "v",
+            "indexed": false,
+            "name": "value",
+            "type": "uint256",
+          },
+        ],
+        "name": "Transfer",
+        "type": "event",
+      },
+      "name": "send_token_transfers_backfill",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "f",
+            "type": "bytea",
+          },
+          {
+            "name": "t",
+            "type": "bytea",
+          },
+          {
+            "name": "v",
+            "type": "numeric",
+          },
+        ],
+        "name": "shovel_backfill",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
