@@ -7,7 +7,9 @@ import "account-abstraction/samples/VerifyingPaymaster.sol";
 /// @author @0xBigBoss
 /// @dev This is for deterministic deployments using CREATE2. The owner is passed in as a constructor argument.
 contract SendVerifyingPaymaster is VerifyingPaymaster {
-    constructor(IEntryPoint _entryPoint, address _verifier, address _owner) VerifyingPaymaster(_entryPoint, _verifier) {
+    constructor(IEntryPoint _entryPoint, address _verifier, address _owner)
+        VerifyingPaymaster(_entryPoint, _verifier)
+    {
         transferOwnership(_owner);
     }
 }

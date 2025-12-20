@@ -1,4 +1,36 @@
 {
+  "check": {
+    "button": "Send a Check",
+    "buttonDescription": "Send to anyone, even without an account",
+    "title": "Create Check",
+    "amount": "Amount",
+    "token": "Token",
+    "expiration": "Expires",
+    "expirationPlaceholder": "Select expiration date",
+    "create": "Create Check",
+    "defaultExpiry": "7 days from now",
+    "manage": {
+      "title": "My Checks",
+      "activeTab": "Active",
+      "historyTab": "History",
+      "loading": "Loading checks...",
+      "error": "Failed to load checks",
+      "noActiveChecks": "No active checks. Create one to get started!",
+      "noHistory": "No check history yet.",
+      "expired": "Expired",
+      "expiresAt": "Expires",
+      "createdAt": "Created",
+      "claimed": "Claimed",
+      "pending": "Pending",
+      "revoke": "Revoke",
+      "confirmRevoke": "Confirm",
+      "cancel": "Cancel",
+      "revokeSuccess": "Check revoked successfully",
+      "revokeError": "Failed to revoke check",
+      "showHistory": "Show History",
+      "hideHistory": "Hide History"
+    }
+  },
   "confirm": {
     "button": {
       "send": "发送"

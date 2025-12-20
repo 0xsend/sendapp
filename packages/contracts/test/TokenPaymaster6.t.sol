@@ -519,12 +519,8 @@ contract TokenPaymaster6Test is Test {
 
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256));
         uint256 refundTokens = abi.decode(entries[2].data, (uint256));
-        (
-            uint256 actualTokenCharge,
-            uint256 actualGasCostPaymaster,
-            uint256 actualTokenPriceWithMarkup,
-            uint256 baseFee
-        ) = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
+        (uint256 actualTokenCharge, uint256 actualGasCostPaymaster, uint256 actualTokenPriceWithMarkup, uint256 baseFee)
+        = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
         uint256 actualTokenChargeEvents = preChargeTokens - refundTokens;
         (, bool success, uint256 actualGasCostEntryPoint,) =
             abi.decode(entries[5].data, (uint256, bool, uint256, uint256));
@@ -814,9 +810,8 @@ contract TokenPaymaster6Test is Test {
     }
 
     // should revert in the first postOp run if the pre-charge ended up lower than the final transaction cost but the client has no tokens to cover the overdraft
-    function testShouldRevertInTheFirstPostOpRunIfThePreChargeEndedUpLowerThanTheFinalTransactionCostButTheClientHasNoTokensToCoverTheOverdraft()
-        external
-    {
+    function testShouldRevertInTheFirstPostOpRunIfThePreChargeEndedUpLowerThanTheFinalTransactionCostButTheClientHasNoTokensToCoverTheOverdraft(
+    ) external {
         address alice = makeAddr("alice");
         token.sudoMint(address(account), 0.01 ether);
         token.sudoApprove(address(account), address(paymaster), type(uint256).max);
@@ -871,10 +866,8 @@ contract TokenPaymaster6Test is Test {
             );
             if (
                 keccak256(
-                        abi.encodePacked(
-                            abi.encodeWithSelector(IEntryPoint.PostOpReverted.selector, expectedRevertReason)
-                        )
-                    ) == keccak256(abi.encodePacked(revertReason))
+                    abi.encodePacked(abi.encodeWithSelector(IEntryPoint.PostOpReverted.selector, expectedRevertReason))
+                ) == keccak256(abi.encodePacked(revertReason))
             ) {
                 // test should pass
                 return;
@@ -1013,12 +1006,8 @@ contract TokenPaymaster6Test is Test {
 
         uint256 preChargeTokens = abi.decode(entries[0].data, (uint256));
         uint256 refundTokens = abi.decode(entries[2].data, (uint256));
-        (
-            uint256 actualTokenCharge,
-            uint256 actualGasCostPaymaster,
-            uint256 actualTokenPriceWithMarkup,
-            uint256 baseFee
-        ) = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
+        (uint256 actualTokenCharge, uint256 actualGasCostPaymaster, uint256 actualTokenPriceWithMarkup, uint256 baseFee)
+        = abi.decode(entries[4].data, (uint256, uint256, uint256, uint256));
         uint256 actualTokenChargeEvents = preChargeTokens - refundTokens;
         (, bool success, uint256 actualGasCostEntryPoint,) =
             abi.decode(entries[5].data, (uint256, bool, uint256, uint256));

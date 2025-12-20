@@ -4,6 +4,69 @@
     "enterAmount": "Enter Amount",
     "preview": "Preview and Send"
   },
+  "check": {
+    "button": "Send a Check",
+    "buttonDescription": "Send to anyone, even without an account",
+    "title": "Create Check",
+    "amount": "Amount",
+    "token": "Token",
+    "expiration": "Expires",
+    "expirationPlaceholder": "Select expiration date",
+    "create": "Create Check",
+    "defaultExpiry": "7 days from now",
+    "claim": {
+      "title": "Claim a Check",
+      "codeDescription": "Enter the check code to claim tokens",
+      "codeLabel": "Check Code",
+      "codePlaceholder": "XXXX-XXXX-XXXX-XXXX...",
+      "invalidCode": "Invalid check code",
+      "continue": "Continue",
+      "submit": "Claim Check",
+      "success": "Check claimed successfully!",
+      "error": "Failed to claim check",
+      "successTitle": "Check Claimed!",
+      "successDescription": "The tokens have been added to your account",
+      "addedToAccount": "has been added to your account",
+      "done": "Done",
+      "tryAgain": "Try Again",
+      "verifying": "Verifying check...",
+      "verifyError": "Failed to verify check",
+      "notFound": "Check not found or invalid",
+      "alreadyClaimed": "This check has already been claimed",
+      "expired": "This check has expired",
+      "amount": "Amount",
+      "expiresAt": "Expires",
+      "preview": {
+        "someone": "Someone",
+        "sentYou": "sent you",
+        "expires": "Expires"
+      },
+      "public": {
+        "claimButton": "Sign In to Claim"
+      }
+    },
+    "manage": {
+      "title": "My Checks",
+      "activeTab": "Active",
+      "historyTab": "History",
+      "loading": "Loading checks...",
+      "error": "Failed to load checks",
+      "noActiveChecks": "No active checks. Create one to get started!",
+      "noHistory": "No check history yet.",
+      "expired": "Expired",
+      "expiresAt": "Expires",
+      "createdAt": "Created",
+      "claimed": "Claimed",
+      "pending": "Pending",
+      "revoke": "Revoke",
+      "confirmRevoke": "Confirm",
+      "cancel": "Cancel",
+      "revokeSuccess": "Check revoked successfully",
+      "revokeError": "Failed to revoke check",
+      "showHistory": "Show History",
+      "hideHistory": "Hide History"
+    }
+  },
   "form": {
     "balanceLabel": "Balance:",
     "errors": {

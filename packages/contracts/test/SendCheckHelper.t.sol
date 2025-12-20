@@ -13,6 +13,7 @@ import "../src/SendCheck.sol";
 
 struct SendCheckStub {
     TestERC20 token;
+    TestERC20 token2;
     address sender;
     address receiver;
     uint256 ephemeralPrivKey;
@@ -36,8 +37,9 @@ contract SendCheckHelper is Test {
         address sender1 = vm.addr(0x123);
         address receiver1 = vm.addr(0x321);
         uint256 ephemeralPrivKey1 = 0x1010101010101010101010101010101010101010101010101010101010101010;
-        sendCheckStub =
-            SendCheckStub(new TestERC20(0), sender1, receiver1, ephemeralPrivKey1, vm.addr(ephemeralPrivKey1));
+        sendCheckStub = SendCheckStub(
+            new TestERC20(0), new TestERC20(0), sender1, receiver1, ephemeralPrivKey1, vm.addr(ephemeralPrivKey1)
+        );
     }
 
     /// @notice Creates an ephemeral signature
@@ -65,25 +67,39 @@ contract SendCheckHelper is Test {
         );
     }
 
-    /// @notice Create a /send check
-    /// @param token the token to create the /send check for
+    /// @notice Create a /send check with multiple tokens
+    /// @param tokens the tokens to include in the check
     /// @param sender the sending address of the /send check
     /// @param ephemeralAddress the ephemeral address (derived from the sender's ephemeral keypair)
-    /// @param amount the /send check amount
-    function createSendCheck(IERC20 token, address sender, address ephemeralAddress, uint256 amount) internal {
-        createSendCheck(token, sender, ephemeralAddress, amount, block.timestamp + 1 days);
+    /// @param amounts the amounts for each token
+    function createSendCheck(
+        IERC20[] memory tokens,
+        address sender,
+        address ephemeralAddress,
+        uint256[] memory amounts
+    ) internal {
+        createSendCheck(tokens, sender, ephemeralAddress, amounts, block.timestamp + 1 days);
     }
 
-    /// @notice Create a /send check with a custom expiration
-    /// @param token the token to create the /send check for
+    /// @notice Create a /send check with multiple tokens and custom expiration
+    /// @param tokens the tokens to include in the check
     /// @param sender the sending address of the /send check
     /// @param ephemeralAddress the ephemeral address (derived from the sender's ephemeral keypair)
-    /// @param amount the /send check amount
+    /// @param amounts the amounts for each token
     /// @param expiresAt the expiration timestamp
-    function createSendCheck(IERC20 token, address sender, address ephemeralAddress, uint256 amount, uint256 expiresAt) internal {
+    function createSendCheck(
+        IERC20[] memory tokens,
+        address sender,
+        address ephemeralAddress,
+        uint256[] memory amounts,
+        uint256 expiresAt
+    ) internal {
         vm.startPrank(sender, sender);
-        token.approve(address(sendCheck), amount);
-        sendCheck.createCheck(token, ephemeralAddress, amount, expiresAt);
+        // Approve each token
+        for (uint256 i = 0; i < tokens.length; i++) {
+            tokens[i].approve(address(sendCheck), amounts[i]);
+        }
+        sendCheck.createCheck(tokens, ephemeralAddress, amounts, expiresAt);
         vm.stopPrank();
     }
 
