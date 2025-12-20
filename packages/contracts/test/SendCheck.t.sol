@@ -33,7 +33,9 @@ contract SendCheckTest is SendCheckHelper {
         token.sudoMint(sender, 500);
 
         uint256 expiresAt = block.timestamp + 1 days;
-        createSendCheck(_singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt);
+        createSendCheck(
+            _singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt
+        );
         (address ephemeralAddress, address from, IERC20[] memory tokens, uint256[] memory amounts, uint256 _expiresAt) =
             sendCheck.checks(sendCheckStub.ephemeralAddress);
         assertEq(ephemeralAddress, sendCheckStub.ephemeralAddress);
@@ -100,15 +102,21 @@ contract SendCheckTest is SendCheckHelper {
 
         // sender has insufficient funds
         vm.expectRevert();
-        sendCheck.createCheck(_singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(1000), validExpiry);
+        sendCheck.createCheck(
+            _singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(1000), validExpiry
+        );
 
         // invalid token address
         vm.expectRevert(bytes("Invalid token address"));
-        sendCheck.createCheck(_singleTokenArray(IERC20(address(0))), sendCheckStub.ephemeralAddress, _singleAmountArray(500), validExpiry);
+        sendCheck.createCheck(
+            _singleTokenArray(IERC20(address(0))), sendCheckStub.ephemeralAddress, _singleAmountArray(500), validExpiry
+        );
 
         // invalid amount
         vm.expectRevert(bytes("Invalid amount"));
-        sendCheck.createCheck(_singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(0), validExpiry);
+        sendCheck.createCheck(
+            _singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(0), validExpiry
+        );
 
         // invalid ephemeral address
         vm.expectRevert(bytes("Invalid ephemeral address"));
@@ -116,11 +124,15 @@ contract SendCheckTest is SendCheckHelper {
 
         // invalid expiration (in the past)
         vm.expectRevert(bytes("Invalid expiration"));
-        sendCheck.createCheck(_singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(500), block.timestamp - 1);
+        sendCheck.createCheck(
+            _singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(500), block.timestamp - 1
+        );
 
         // invalid expiration (current timestamp)
         vm.expectRevert(bytes("Invalid expiration"));
-        sendCheck.createCheck(_singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(500), block.timestamp);
+        sendCheck.createCheck(
+            _singleTokenArray(token), sendCheckStub.ephemeralAddress, _singleAmountArray(500), block.timestamp
+        );
 
         // empty tokens array
         IERC20[] memory emptyTokens = new IERC20[](0);
@@ -346,7 +358,9 @@ contract SendCheckTest is SendCheckHelper {
         token.sudoMint(sender, 500);
 
         uint256 expiresAt = block.timestamp + 1 hours;
-        createSendCheck(_singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt);
+        createSendCheck(
+            _singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt
+        );
 
         // warp time past expiration
         vm.warp(expiresAt + 1);
@@ -365,7 +379,9 @@ contract SendCheckTest is SendCheckHelper {
         token.sudoMint(sender, 500);
 
         uint256 expiresAt = block.timestamp + 1 hours;
-        createSendCheck(_singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt);
+        createSendCheck(
+            _singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt
+        );
 
         // warp time to exactly the expiration (should still be claimable)
         vm.warp(expiresAt);
@@ -382,7 +398,9 @@ contract SendCheckTest is SendCheckHelper {
         token.sudoMint(sender, 500);
 
         uint256 expiresAt = block.timestamp + 1 hours;
-        createSendCheck(_singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt);
+        createSendCheck(
+            _singleTokenArray(token), sender, sendCheckStub.ephemeralAddress, _singleAmountArray(500), expiresAt
+        );
         assertEq(token.balanceOf(sender), 0);
         assertEq(token.balanceOf(address(sendCheck)), 500);
 

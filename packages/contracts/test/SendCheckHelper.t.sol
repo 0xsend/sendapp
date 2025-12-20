@@ -72,12 +72,9 @@ contract SendCheckHelper is Test {
     /// @param sender the sending address of the /send check
     /// @param ephemeralAddress the ephemeral address (derived from the sender's ephemeral keypair)
     /// @param amounts the amounts for each token
-    function createSendCheck(
-        IERC20[] memory tokens,
-        address sender,
-        address ephemeralAddress,
-        uint256[] memory amounts
-    ) internal {
+    function createSendCheck(IERC20[] memory tokens, address sender, address ephemeralAddress, uint256[] memory amounts)
+        internal
+    {
         createSendCheck(tokens, sender, ephemeralAddress, amounts, block.timestamp + 1 days);
     }
 
