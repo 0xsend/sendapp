@@ -15,7 +15,7 @@ export function Step4({ onNext }: Step4Props) {
       <YStack gap="$7" ai="center">
         <FadeIn delay={500} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            Do you know
+            We know
           </Paragraph>
         </FadeIn>
         <FadeIn delay={1200} duration={1000}>
@@ -25,23 +25,23 @@ export function Step4({ onNext }: Step4Props) {
         </FadeIn>
         <FadeIn delay={1900} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            was your
+            your favorite
           </Paragraph>
         </FadeIn>
         <FadeIn delay={2600} duration={1000}>
           <Paragraph textAlign="center" size="$11" fontWeight={600} lineHeight={55}>
-            favourite
+            /sender
           </Paragraph>
         </FadeIn>
         <FadeIn delay={3300} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            sender?
+            is
           </Paragraph>
         </FadeIn>
       </YStack>
       <FadeIn delay={4500} duration={1000}>
         <PrimaryButton onPress={onNext}>
-          <PrimaryButton.Text>Continue</PrimaryButton.Text>
+          <PrimaryButton.Text> Care to guess?</PrimaryButton.Text>
         </PrimaryButton>
       </FadeIn>
     </YStack>

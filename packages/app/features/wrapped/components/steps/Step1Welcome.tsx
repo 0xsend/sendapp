@@ -34,12 +34,12 @@ export function Step1Welcome({ onNext }: Step1WelcomeProps) {
         </FadeIn>
         <FadeIn delay={1900} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            have you been
+            How many times did you
           </Paragraph>
         </FadeIn>
         <FadeIn delay={2600} duration={1000}>
           <Paragraph textAlign="center" size="$11" fontWeight={600} lineHeight={55}>
-            sending
+            /send
           </Paragraph>
         </FadeIn>
         <FadeIn delay={3300} duration={1000}>

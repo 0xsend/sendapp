@@ -15,33 +15,28 @@ export function Step2LetsGo({ onNext }: Step2LetsGoProps) {
       <YStack gap="$7" ai="center">
         <FadeIn delay={500} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            Your
+            Your 2025
           </Paragraph>
         </FadeIn>
         <FadeIn delay={1200} duration={1000}>
           <Paragraph textAlign="center" size="$11" fontWeight={600} lineHeight={55}>
-            2025
+            Send
           </Paragraph>
         </FadeIn>
         <FadeIn delay={1900} duration={1000}>
-          <Paragraph textAlign="center" size="$8">
-            /send
+          <Paragraph textAlign="center" size="$11" fontWeight={600} lineHeight={55}>
+            Wrapped
           </Paragraph>
         </FadeIn>
         <FadeIn delay={2600} duration={1000}>
-          <Paragraph textAlign="center" size="$11" fontWeight={600} lineHeight={55}>
-            wrapped
-          </Paragraph>
-        </FadeIn>
-        <FadeIn delay={3300} duration={1000}>
           <Paragraph textAlign="center" size="$8">
-            is ready
+            is here
           </Paragraph>
         </FadeIn>
       </YStack>
-      <FadeIn delay={4500} duration={1000}>
+      <FadeIn delay={3300} duration={1000}>
         <PrimaryButton onPress={onNext}>
-          <PrimaryButton.Text>Let's go</PrimaryButton.Text>
+          <PrimaryButton.Text>Let’s have a look</PrimaryButton.Text>
         </PrimaryButton>
       </FadeIn>
     </YStack>
