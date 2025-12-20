@@ -71,9 +71,19 @@ contract SendCheckHelper is Test {
     /// @param ephemeralAddress the ephemeral address (derived from the sender's ephemeral keypair)
     /// @param amount the /send check amount
     function createSendCheck(IERC20 token, address sender, address ephemeralAddress, uint256 amount) internal {
+        createSendCheck(token, sender, ephemeralAddress, amount, block.timestamp + 1 days);
+    }
+
+    /// @notice Create a /send check with a custom expiration
+    /// @param token the token to create the /send check for
+    /// @param sender the sending address of the /send check
+    /// @param ephemeralAddress the ephemeral address (derived from the sender's ephemeral keypair)
+    /// @param amount the /send check amount
+    /// @param expiresAt the expiration timestamp
+    function createSendCheck(IERC20 token, address sender, address ephemeralAddress, uint256 amount, uint256 expiresAt) internal {
         vm.startPrank(sender, sender);
         token.approve(address(sendCheck), amount);
-        sendCheck.createCheck(token, ephemeralAddress, amount);
+        sendCheck.createCheck(token, ephemeralAddress, amount, expiresAt);
         vm.stopPrank();
     }
 

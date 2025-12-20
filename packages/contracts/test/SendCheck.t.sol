@@ -21,12 +21,14 @@ contract SendCheckTest is SendCheckHelper {
         (TestERC20 token, address sender) = (sendCheckStub.token, sendCheckStub.sender);
         token.sudoMint(sender, 500);
 
-        createSendCheck(sendCheckStub.token, sender, sendCheckStub.ephemeralAddress, 500);
-        (address ephemeralAddress, address from, uint256 amount, IERC20 _token) =
+        uint256 expiresAt = block.timestamp + 1 days;
+        createSendCheck(sendCheckStub.token, sender, sendCheckStub.ephemeralAddress, 500, expiresAt);
+        (address ephemeralAddress, address from, uint256 amount, IERC20 _token, uint256 _expiresAt) =
             sendCheck.checks(sendCheckStub.ephemeralAddress);
         assertEq(ephemeralAddress, sendCheckStub.ephemeralAddress);
         assertEq(from, sender);
         assertEq(amount, 500);
+        assertEq(_expiresAt, expiresAt);
         assertEq(sendCheckStub.token.balanceOf(sender), 0);
         assertEq(sendCheckStub.token.balanceOf(address(sendCheck)), 500);
         assertEq(address(token), address(_token));
@@ -37,22 +39,33 @@ contract SendCheckTest is SendCheckHelper {
         (TestERC20 token, address sender) = (sendCheckStub.token, sendCheckStub.sender);
         token.sudoMint(sender, 500);
         vm.startPrank(sender, sender);
+        token.approve(address(sendCheck), 1000);
+
+        uint256 validExpiry = block.timestamp + 1 days;
 
         // sender has insufficient funds
         vm.expectRevert();
-        sendCheck.createCheck(token, sendCheckStub.ephemeralAddress, 1000);
+        sendCheck.createCheck(token, sendCheckStub.ephemeralAddress, 1000, validExpiry);
 
         // invalid token address
         vm.expectRevert(bytes("Invalid token address"));
-        sendCheck.createCheck(ERC20(address(0)), sendCheckStub.ephemeralAddress, 500);
+        sendCheck.createCheck(ERC20(address(0)), sendCheckStub.ephemeralAddress, 500, validExpiry);
 
         // invalid amount
         vm.expectRevert(bytes("Invalid amount"));
-        sendCheck.createCheck(token, sendCheckStub.ephemeralAddress, 0);
+        sendCheck.createCheck(token, sendCheckStub.ephemeralAddress, 0, validExpiry);
 
         // invalid ephemeral address
         vm.expectRevert(bytes("Invalid ephemeral address"));
-        sendCheck.createCheck(token, address(0), 500);
+        sendCheck.createCheck(token, address(0), 500, validExpiry);
+
+        // invalid expiration (in the past)
+        vm.expectRevert(bytes("Invalid expiration"));
+        sendCheck.createCheck(token, sendCheckStub.ephemeralAddress, 500, block.timestamp - 1);
+
+        // invalid expiration (current timestamp)
+        vm.expectRevert(bytes("Invalid expiration"));
+        sendCheck.createCheck(token, sendCheckStub.ephemeralAddress, 500, block.timestamp);
 
         vm.stopPrank();
 
@@ -156,5 +169,61 @@ contract SendCheckTest is SendCheckHelper {
         // invalid ephemeralAddress
         vm.expectRevert(bytes("Check does not exist"));
         claimSendCheck(sendCheckStub.receiver, vm.addr(0x123), sendCheckStub.ephemeralPrivKey);
+    }
+
+    // /send checks cannot be claimed after expiration
+    function testCannotClaimExpiredCheck() public {
+        (TestERC20 token, address sender) = (sendCheckStub.token, sendCheckStub.sender);
+        token.sudoMint(sender, 500);
+
+        uint256 expiresAt = block.timestamp + 1 hours;
+        createSendCheck(sendCheckStub.token, sender, sendCheckStub.ephemeralAddress, 500, expiresAt);
+
+        // warp time past expiration
+        vm.warp(expiresAt + 1);
+
+        // receiver cannot claim expired check
+        vm.expectRevert(bytes("Check expired"));
+        claimSendCheck(sendCheckStub.receiver, sendCheckStub.ephemeralAddress, sendCheckStub.ephemeralPrivKey);
+
+        // tokens should still be in the contract
+        assertEq(token.balanceOf(address(sendCheck)), 500);
+    }
+
+    // /send checks can be claimed right before expiration
+    function testClaimCheckBeforeExpiration() public {
+        (TestERC20 token, address sender) = (sendCheckStub.token, sendCheckStub.sender);
+        token.sudoMint(sender, 500);
+
+        uint256 expiresAt = block.timestamp + 1 hours;
+        createSendCheck(sendCheckStub.token, sender, sendCheckStub.ephemeralAddress, 500, expiresAt);
+
+        // warp time to exactly the expiration (should still be claimable)
+        vm.warp(expiresAt);
+
+        // receiver can still claim at expiration time
+        claimSendCheck(sendCheckStub.receiver, sendCheckStub.ephemeralAddress, sendCheckStub.ephemeralPrivKey);
+        assertEq(token.balanceOf(sendCheckStub.receiver), 500);
+        assertEq(token.balanceOf(address(sendCheck)), 0);
+    }
+
+    // expired /send checks can still be reclaimed by the sender
+    function testClaimSelfExpiredCheck() public {
+        (TestERC20 token, address sender) = (sendCheckStub.token, sendCheckStub.sender);
+        token.sudoMint(sender, 500);
+
+        uint256 expiresAt = block.timestamp + 1 hours;
+        createSendCheck(sendCheckStub.token, sender, sendCheckStub.ephemeralAddress, 500, expiresAt);
+        assertEq(token.balanceOf(sender), 0);
+        assertEq(token.balanceOf(address(sendCheck)), 500);
+
+        // warp time past expiration
+        vm.warp(expiresAt + 1 days);
+
+        // sender can still reclaim expired check
+        vm.prank(sender, sender);
+        sendCheck.claimCheckSelf(sendCheckStub.ephemeralAddress);
+        assertEq(token.balanceOf(sender), 500);
+        assertEq(token.balanceOf(address(sendCheck)), 0);
     }
 }

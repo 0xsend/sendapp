@@ -11,6 +11,7 @@ struct Check {
     address from;
     uint256 amount;
     IERC20 token;
+    uint256 expiresAt;
 }
 
 contract SendCheck {
@@ -21,14 +22,15 @@ contract SendCheck {
     event CheckCreated(Check check);
     event CheckClaimed(Check check, address redeemer);
 
-    function createCheck(IERC20 token, address ephemeralAddress, uint256 amount) external {
+    function createCheck(IERC20 token, address ephemeralAddress, uint256 amount, uint256 expiresAt) external {
         require(address(token) != address(0), "Invalid token address");
         require(ephemeralAddress != address(0), "Invalid ephemeral address");
         require(amount > 0, "Invalid amount");
+        require(expiresAt > block.timestamp, "Invalid expiration");
         require(checks[ephemeralAddress].ephemeralAddress == address(0), "Check already exists");
 
         checks[ephemeralAddress] =
-            Check({ephemeralAddress: ephemeralAddress, from: msg.sender, amount: amount, token: token});
+            Check({ephemeralAddress: ephemeralAddress, from: msg.sender, amount: amount, token: token, expiresAt: expiresAt});
 
         emit CheckCreated(checks[ephemeralAddress]);
         token.safeTransferFrom(msg.sender, address(this), amount);
@@ -47,6 +49,7 @@ contract SendCheck {
     function claimCheck(address ephemeralAddress, bytes memory _signature) external {
         Check memory check = checks[ephemeralAddress];
         require(check.ephemeralAddress != address(0), "Check does not exist");
+        require(block.timestamp <= check.expiresAt, "Check expired");
 
         bytes32 message = MessageHashUtils.toEthSignedMessageHash(keccak256(abi.encodePacked(msg.sender)));
         address signer = ECDSA.recover(message, _signature);
