@@ -9,7 +9,7 @@ import {DeploySendMerkleDropScript} from "../script/DeploySendMerkleDrop.s.sol";
 
 contract DeploySendMerkleDropTest is Test, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function testItRuns() public {

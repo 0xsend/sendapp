@@ -10,7 +10,7 @@ import {Helper} from "../src/Helper.sol";
 // solhint-disable no-console
 contract DeploySendMerkleDropScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

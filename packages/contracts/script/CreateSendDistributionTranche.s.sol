@@ -8,7 +8,7 @@ import {Helper} from "../src/Helper.sol";
 
 contract CreateSendDistributionTrancheScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

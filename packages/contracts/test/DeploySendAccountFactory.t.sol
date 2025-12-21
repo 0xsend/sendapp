@@ -7,7 +7,7 @@ import {DeploySendAccountFactoryScript} from "../script/DeploySendAccountFactory
 
 contract DeploySendAccountFactoryTest is Test, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function testItRuns() public {
