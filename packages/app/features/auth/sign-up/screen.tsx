@@ -406,12 +406,12 @@ export const SignUpScreen = () => {
 
     try {
       await signInMutateAsync({})
-      redirect(queryParams.redirectUri)
+      redirect()
     } catch (error) {
       setFormState(FormState.Idle)
       toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast, redirect, queryParams.redirectUri])
+  }, [signInMutateAsync, toast, redirect])
 
   return (
     <YStack f={1} jc={'center'} ai={'center'} gap={xxs ? '$3.5' : '$7'} w={'100%'}>

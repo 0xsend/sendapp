@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useAuthScreenParams } from 'app/routers/params'
 import { FadeCard, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { useEffect, useState } from 'react'
 import { useAppReviewSignIn } from './useAppReviewSignIn'
@@ -15,8 +14,6 @@ const AppReviewSignInSchema = z.object({
 
 export const AppReviewLoginScreen = () => {
   const form = useForm<z.infer<typeof AppReviewSignInSchema>>()
-  const [queryParams] = useAuthScreenParams()
-  const { redirectUri } = queryParams
   const [isEmailFocused, setIsEmailFocused] = useState<boolean>(false)
   const [isPasswordFocused, setIsPasswordFocused] = useState<boolean>(false)
   const { redirect } = useAuthRedirect()
@@ -47,7 +44,7 @@ export const AppReviewLoginScreen = () => {
       return
     }
 
-    redirect(redirectUri)
+    redirect()
   }
 
   return (

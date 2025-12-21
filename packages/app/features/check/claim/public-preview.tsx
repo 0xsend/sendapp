@@ -1,10 +1,11 @@
 import { Button, Card, Paragraph, Spinner, XStack, YStack } from '@my/ui'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { CheckPreviewCard, useCheckPreview } from './components/CheckPreviewCard'
 import { useSetReferralCode } from 'app/utils/useReferralCode'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { setAfterLoginRedirect } from 'app/utils/useAfterLoginRedirect'
 
 interface CheckPublicPreviewScreenProps {
   checkCode: string
@@ -33,8 +34,8 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
     }
   }, [previewData?.senderTag, setReferralCode])
 
-  // Loading state (including redirect for logged-in users)
-  if (isLoading || isLoadingAccount || sendAccount) {
+  // Loading state (including redirect for logged-in users, or waiting for router hydration)
+  if (isLoading || isLoadingAccount || sendAccount || !checkCode) {
     return (
       <YStack f={1} gap="$5" w="100%" maxWidth={600} ai="center" jc="center">
         <Spinner size="large" />
@@ -58,20 +59,22 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
     )
   }
 
-  // Build sign-up URL with redirect to claim after auth
-  const redirectUri = encodeURIComponent(`/check/claim/${checkCode}`)
+  const handleRegister = useCallback(() => {
+    setAfterLoginRedirect(`/check/claim/${checkCode}`)
+    router.push('/auth/sign-up')
+  }, [checkCode, router])
+
+  const handleSignIn = useCallback(() => {
+    setAfterLoginRedirect(`/check/claim/${checkCode}`)
+    router.push('/auth/sign-in')
+  }, [checkCode, router])
 
   return (
     <YStack f={1} gap="$4" w="100%" maxWidth={600}>
       <CheckPreviewCard checkCode={checkCode} />
 
       {/* Register Button */}
-      <Button
-        size="$5"
-        onPress={() => router.push(`/auth/sign-up?redirectUri=${redirectUri}`)}
-        bc="$primary"
-        $theme-light={{ bc: '$color12' }}
-      >
+      <Button size="$5" onPress={handleRegister} bc="$primary" $theme-light={{ bc: '$color12' }}>
         <Button.Text color="$color1" fontWeight="600">
           {t('check.claim.public.registerButton')}
         </Button.Text>
@@ -83,7 +86,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
           {t('check.claim.public.alreadyHaveAccount')}
         </Paragraph>
         <Button
-          onPress={() => router.push(`/auth/sign-in?redirectUri=${redirectUri}`)}
+          onPress={handleSignIn}
           transparent
           chromeless
           backgroundColor="transparent"

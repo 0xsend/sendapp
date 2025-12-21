@@ -20,7 +20,7 @@ export const Page: NextPageWithLayout = () => {
 
 const CheckClaimPreviewLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <HomeLayout TopNav={<TopNav header="Claim Check" backFunction="pop" showBackOnDesktop />}>
+    <HomeLayout TopNav={<TopNav header="Claim Check" backFunction="root" showBackOnDesktop />}>
       {children}
     </HomeLayout>
   )

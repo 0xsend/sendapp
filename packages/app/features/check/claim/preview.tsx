@@ -53,8 +53,8 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
     }
   }, [claimCheck, checkCode, webauthnCreds, toast, t])
 
-  // Loading state
-  if (isLoading) {
+  // Loading state (including waiting for router hydration)
+  if (isLoading || !checkCode) {
     return (
       <YStack f={1} gap="$5" w="100%" maxWidth={600} ai="center" jc="center">
         <Spinner size="large" />
@@ -72,7 +72,7 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
             <Paragraph color="$error" size="$5" fontWeight="600">
               {t('check.claim.notFound')}
             </Paragraph>
-            <Button size="$4" variant="outlined" onPress={() => router.push('/check/claim')}>
+            <Button size="$4" variant="outlined" onPress={() => router.push('/check')}>
               <Button.Text>{t('check.claim.tryAgain')}</Button.Text>
             </Button>
           </YStack>

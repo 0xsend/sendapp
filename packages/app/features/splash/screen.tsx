@@ -17,7 +17,6 @@ import {
 import { IconSendLogo } from 'app/components/icons'
 import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel, carouselImagePositions } from 'app/features/auth/components/Carousel'
-import { useAuthScreenParams } from 'app/routers/params'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useState } from 'react'
 import { SolitoImage } from 'solito/image'
@@ -245,8 +244,6 @@ function Hero() {
 }
 
 function AuthButtons() {
-  const [queryParams] = useAuthScreenParams()
-  const { redirectUri } = queryParams
   const toast = useAppToast()
   const signUpLink = useLink({ href: '/auth/sign-up' })
   const [isSigningIn, setIsSigningIn] = useState(false)
@@ -258,7 +255,7 @@ function AuthButtons() {
     setIsSigningIn(true)
     try {
       await signInMutateAsync({})
-      redirect(redirectUri)
+      redirect()
     } catch (error) {
       toast.error(formatErrorMessage(error))
     } finally {
