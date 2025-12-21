@@ -74,9 +74,10 @@ export const BooleanCheckboxField = (
             }}
             ref={field.ref}
             id={id}
-            borderWidth={0}
             backgroundColor={isChecked ? '$primary' : '$background'}
             circular={true}
+            boc="$gray8"
+            bw={1}
             {...checkboxProps}
           >
             <Checkbox.Indicator>
