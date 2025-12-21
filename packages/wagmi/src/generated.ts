@@ -3795,7 +3795,7 @@ export const sendCheckAbi = [
  *
  */
 export const sendCheckAddress = {
-  845337: '0xf44822D5fD589527bDAE515c151f30eF6E17DB9D',
+  845337: '0x274B45D75d71b7F627c00d87757B493E7E1312a7',
 } as const
 
 /**

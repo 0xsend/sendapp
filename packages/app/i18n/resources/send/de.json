@@ -1,53 +1,76 @@
 {
+  "topNav": {
+    "default": "Senden",
+    "enterAmount": "Betrag eingeben",
+    "preview": "Vorschau und Senden"
+  },
   "check": {
-    "button": "Send Check",
-    "buttonDescription": "Send to anyone, even without an account",
-    "title": "Send Check",
-    "amount": "Amount",
-    "token": "Token",
-    "expiration": "Expires",
-    "expirationPlaceholder": "Select expiration date",
-    "create": "Send Check",
-    "defaultExpiry": "7 days from now",
+    "button": "Scheck senden",
+    "amount": "Betrag",
+    "expiration": "Läuft ab",
+    "create": "Scheck senden",
+    "fee": "Gebühren",
+    "info": {
+      "title": "Was ist Send Check?",
+      "description": "Mit Send Check kannst du Krypto an jeden über einen teilbaren Link senden — keine Wallet-Adresse erforderlich.",
+      "howItWorks": "So funktioniert es",
+      "steps": [
+        "Wähle einen Betrag und erstelle einen Scheck",
+        "Teile den Link mit dem Empfänger",
+        "Sie registrieren sich oder melden sich bei Send an, um einzulösen",
+        "Wenn nicht eingelöst, storniere den Scheck um dein Guthaben zurückzubekommen"
+      ],
+      "note": "Teile nur mit deinem vorgesehenen Empfänger — jeder mit dem Link kann das Guthaben einlösen.",
+      "dismiss": "Verstanden"
+    },
     "success": {
       "warningTitle": "Speichern Sie diesen Link bevor Sie gehen",
       "warningDescription": "Wenn der Link verloren geht, stornieren Sie den Scheck, um das Guthaben zurückzuerhalten, und senden Sie einen neuen."
     },
+    "claim": {
+      "submit": "Scheck einlösen",
+      "success": "Scheck erfolgreich eingelöst!",
+      "error": "Scheck einlösen fehlgeschlagen",
+      "successTitle": "Scheck eingelöst!",
+      "addedToAccount": "wurde deinem Konto gutgeschrieben",
+      "done": "Fertig",
+      "tryAgain": "Erneut versuchen",
+      "verifying": "Scheck wird überprüft...",
+      "notFound": "Scheck nicht gefunden oder ungültig",
+      "alreadyClaimed": "Dieser Scheck wurde bereits eingelöst",
+      "expired": "Dieser Scheck ist abgelaufen",
+      "preview": {
+        "someone": "Jemand",
+        "sentYou": "hat dir gesendet",
+        "expires": "Läuft ab"
+      },
+      "public": {
+        "claimButton": "Anmelden zum Einlösen"
+      }
+    },
     "manage": {
-      "title": "My Checks",
-      "activeTab": "Active",
-      "historyTab": "History",
-      "loading": "Loading checks...",
-      "error": "Failed to load checks",
-      "noActiveChecks": "No active checks. Create one to get started!",
-      "noHistory": "No check history yet.",
-      "expired": "Expired",
-      "expiresAt": "Expires",
-      "createdAt": "Created",
-      "claimed": "Claimed",
-      "pending": "Pending",
-      "sentCheck": "Sent Check",
-      "cancelCheck": "Cancel",
-      "confirmCancel": "Confirm",
-      "keepCheck": "Keep",
-      "cancelSuccess": "Check cancelled successfully",
-      "cancelError": "Failed to cancel check",
-      "showHistory": "Show History",
-      "hideHistory": "Hide History"
+      "loading": "Schecks werden geladen...",
+      "error": "Schecks laden fehlgeschlagen",
+      "noActiveChecks": "Keine aktiven Schecks. Erstelle einen um loszulegen!",
+      "expired": "Abgelaufen",
+      "expiresAt": "Läuft ab",
+      "claimed": "Eingelöster Scheck",
+      "canceled": "Stornierter Scheck",
+      "sentCheck": "Gesendeter Scheck",
+      "cancelCheck": "Stornieren",
+      "confirmCancel": "Bestätigen",
+      "keepCheck": "Behalten",
+      "cancelSuccess": "Scheck erfolgreich storniert",
+      "cancelError": "Scheck stornieren fehlgeschlagen",
+      "claimedOn": "Eingelöst",
+      "canceledOn": "Storniert",
+      "expiredUnclaimed": "Abgelaufen - Guthaben zurückholen"
+    },
+    "sections": {
+      "pending": "Ausstehend",
+      "today": "Heute",
+      "yesterday": "Gestern"
     }
-  },
-  "confirm": {
-    "button": {
-      "send": "SENDEN"
-    },
-    "edit": "Bearbeiten",
-    "errors": {
-      "default": "Fehler beim Senden",
-      "insufficientBalance": "Nicht genügend Guthaben",
-      "insufficientGas": "Nicht genügend Gas"
-    },
-    "fees": "Gebühren",
-    "noteTitle": "Ihre Notiz"
   },
   "form": {
     "balanceLabel": "Guthaben:",
@@ -61,32 +84,40 @@
     },
     "submit": "WEITER"
   },
-  "noAccount": {
-    "banner": "/send-Checks folgen in Kürze",
-    "cta": "/send-Check schreiben",
-    "description": "hat kein Send-Konto! Bitten Sie sie, eines zu erstellen oder einen /send-Check zu schreiben.",
-    "title": "Kein Send-Konto",
-    "toast": "Kommt bald"
-  },
-  "recipient": {
+  "confirm": {
     "edit": "Bearbeiten",
-    "label": "AN"
+    "fees": "Gebühren",
+    "noteTitle": "Ihre Notiz",
+    "button": {
+      "send": "SENDEN"
+    },
+    "errors": {
+      "default": "Fehler beim Senden",
+      "insufficientBalance": "Nicht genügend Guthaben",
+      "insufficientGas": "Nicht genügend Gas"
+    }
   },
   "search": {
-    "errorHeading": "Fehler",
     "placeholder": "Suche nach Sende-Tag oder Wallet-Adresse",
+    "errorHeading": "Fehler",
     "unknownError": "Unbekannter Fehler"
   },
   "suggestions": {
-    "birthdays": "Alles Gute zum Geburtstag wünschen",
-    "favorites": "Favorisierte Absender",
     "recent": "Letzte Aktivitäten",
+    "favorites": "Favorisierte Absender",
     "top": "Top-Absender",
+    "birthdays": "Alles Gute zum Geburtstag wünschen",
     "viewMore": "Mehr anzeigen"
   },
-  "topNav": {
-    "default": "Senden",
-    "enterAmount": "Betrag eingeben",
-    "preview": "Vorschau und Senden"
+  "recipient": {
+    "label": "AN",
+    "edit": "Bearbeiten"
+  },
+  "noAccount": {
+    "title": "Kein Send-Konto",
+    "description": "hat kein Send-Konto! Bitten Sie sie, eines zu erstellen oder einen /send-Check zu schreiben.",
+    "cta": "/send-Check schreiben",
+    "toast": "Kommt bald",
+    "banner": "/send-Checks folgen in Kürze"
   }
 }

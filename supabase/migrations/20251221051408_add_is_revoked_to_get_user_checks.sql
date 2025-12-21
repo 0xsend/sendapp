@@ -1,30 +1,11 @@
--- Function to get paginated checks for a sender with claim status
--- Aggregates multiple tokens per check into arrays
--- Active checks (not claimed, not expired) come first, then history by date descending
-CREATE OR REPLACE FUNCTION public.get_user_checks(
-    user_address bytea,
-    page_limit integer DEFAULT 50,
-    page_offset integer DEFAULT 0
-)
-RETURNS TABLE(
-    ephemeral_address bytea,
-    sender bytea,
-    chain_id numeric,
-    block_time numeric,
-    tx_hash bytea,
-    block_num numeric,
-    expires_at numeric,
-    tokens bytea[],
-    amounts numeric[],
-    is_expired boolean,
-    is_claimed boolean,
-    claimed_by bytea,
-    claimed_at numeric,
-    is_active boolean,
-    is_revoked boolean
-)
-LANGUAGE sql
-STABLE
+drop function if exists "public"."get_user_checks"(user_address bytea, page_limit integer, page_offset integer);
+
+set check_function_bodies = off;
+
+CREATE OR REPLACE FUNCTION public.get_user_checks(user_address bytea, page_limit integer DEFAULT 50, page_offset integer DEFAULT 0)
+ RETURNS TABLE(ephemeral_address bytea, sender bytea, chain_id numeric, block_time numeric, tx_hash bytea, block_num numeric, expires_at numeric, tokens bytea[], amounts numeric[], is_expired boolean, is_claimed boolean, claimed_by bytea, claimed_at numeric, is_active boolean, is_revoked boolean)
+ LANGUAGE sql
+ STABLE
 AS $function$
 SELECT
     c.ephemeral_address,
@@ -59,11 +40,7 @@ ORDER BY
     MAX(c.block_time) DESC
 LIMIT page_limit
 OFFSET page_offset;
-$function$;
+$function$
+;
 
-ALTER FUNCTION "public"."get_user_checks"(bytea, integer, integer) OWNER TO "postgres";
 
-REVOKE ALL ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) TO "anon";
-GRANT EXECUTE ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) TO "authenticated";
-GRANT EXECUTE ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) TO "service_role";

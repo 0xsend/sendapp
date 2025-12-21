@@ -2,19 +2,13 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccount } from './send-accounts'
 import { useSendUserOpMutation } from './sendUserOp'
-import { useAccountNonce } from './userop'
+import { useAccountNonce, useUserOp, type SendAccountCall } from './userop'
 import { assert } from './assert'
-import { defaultUserOp } from './userOpConstants'
-import {
-  baseMainnetClient,
-  sendAccountAbi,
-  sendCheckAbi,
-  sendCheckAddress,
-  tokenPaymasterAddress,
-} from '@my/wagmi'
+import { useUSDCFees } from './useUSDCFees'
+import { baseMainnetClient, sendCheckAbi, sendCheckAddress } from '@my/wagmi'
 import { encodeFunctionData, type Hex } from 'viem'
-import type { UserOperation } from 'permissionless'
 import type { Database, PgBytea } from '@my/supabase/database.types'
+import { useMemo, useCallback } from 'react'
 
 const USER_SEND_CHECKS_QUERY_KEY = 'user_send_checks'
 
@@ -79,73 +73,116 @@ export function useUserSendChecks({ pageSize = PAGE_SIZE }: { pageSize?: number 
 useUserSendChecks.queryKey = USER_SEND_CHECKS_QUERY_KEY
 
 export type RevokeCheckArgs = {
-  ephemeralAddress: Hex
   webauthnCreds: { raw_credential_id: PgBytea; name: string }[]
+}
+
+export type UseSendCheckRevokeArgs = {
+  ephemeralAddress?: Hex
+}
+
+/**
+ * Builds the calls for revoking a SendCheck (claimCheckSelf).
+ */
+function buildRevokeCheckCalls({
+  ephemeralAddress,
+  checkAddress,
+}: {
+  ephemeralAddress: Hex
+  checkAddress: Hex
+}): SendAccountCall[] {
+  return [
+    {
+      dest: checkAddress,
+      value: 0n,
+      data: encodeFunctionData({
+        abi: sendCheckAbi,
+        functionName: 'claimCheckSelf',
+        args: [ephemeralAddress],
+      }),
+    },
+  ]
 }
 
 /**
  * Hook for revoking (self-claiming) a check.
  * This allows the sender to reclaim the tokens from an unclaimed check.
+ * Prepares the UserOp upfront to calculate fees, then submits when revokeCheck is called.
  */
-export function useSendCheckRevoke() {
+export function useSendCheckRevoke({ ephemeralAddress }: UseSendCheckRevokeArgs = {}) {
   const { data: sendAccount } = useSendAccount()
-  const { data: nonce } = useAccountNonce({ sender: sendAccount?.address })
+  const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
   const { mutateAsync: sendUserOpAsync, isPending, error } = useSendUserOpMutation()
   const queryClient = useQueryClient()
   const chainId = baseMainnetClient.chain.id
   const checkAddress = getSendCheckAddress(chainId)
 
-  const revokeCheck = async ({
-    ephemeralAddress,
-    webauthnCreds,
-  }: RevokeCheckArgs): Promise<Hex> => {
-    assert(!!sendAccount?.address, 'Send account not loaded')
-    assert(!!checkAddress, 'SendCheck contract not deployed on this chain')
-    assert(nonce !== undefined, 'Account nonce not loaded')
-    assert(webauthnCreds.length > 0, 'No webauthn credentials available')
-
-    // Create call data for claimCheckSelf
-    const callData = encodeFunctionData({
-      abi: sendAccountAbi,
-      functionName: 'execute',
-      args: [
-        checkAddress,
-        0n,
-        encodeFunctionData({
-          abi: sendCheckAbi,
-          functionName: 'claimCheckSelf',
-          args: [ephemeralAddress],
-        }),
-      ],
-    })
-
-    const paymaster = tokenPaymasterAddress[chainId]
-    const userOp: UserOperation<'v0.7'> = {
-      ...defaultUserOp,
-      sender: sendAccount.address,
-      nonce,
-      callData,
-      paymaster,
-      paymasterData: '0x',
-      signature: '0x',
+  // Build calls for fee estimation
+  const calls = useMemo(() => {
+    if (!ephemeralAddress || !checkAddress) {
+      return undefined
     }
 
-    // Submit the user operation
-    const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
+    return buildRevokeCheckCalls({
+      ephemeralAddress,
+      checkAddress,
+    })
+  }, [ephemeralAddress, checkAddress])
 
-    // Invalidate queries to refresh the check lists
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] }),
-      queryClient.invalidateQueries({ queryKey: [USER_SEND_CHECKS_QUERY_KEY] }),
-    ])
+  // Prepare UserOp for fee estimation
+  const {
+    data: userOp,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+    refetch: refetchUserOp,
+  } = useUserOp({ sender, calls })
 
-    return receipt.receipt.transactionHash
-  }
+  // Calculate USDC fees
+  const {
+    data: usdcFees,
+    error: usdcFeesError,
+    isLoading: isLoadingFees,
+    refetch: refetchFees,
+  } = useUSDCFees({ userOp })
+
+  const isPreparing = isLoadingUserOp || isLoadingFees
+  const prepareError = userOpError || usdcFeesError
+
+  const refetchPrepare = useCallback(async () => {
+    await refetchUserOp()
+    await refetchFees()
+  }, [refetchUserOp, refetchFees])
+
+  const revokeCheck = useCallback(
+    async ({ webauthnCreds }: RevokeCheckArgs): Promise<Hex> => {
+      assert(!!sender, 'Send account not loaded')
+      assert(!!checkAddress, 'SendCheck contract not deployed on this chain')
+      assert(!!userOp, 'UserOp not prepared')
+      assert(webauthnCreds.length > 0, 'No webauthn credentials available')
+
+      // Submit the user operation
+      const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
+
+      // Invalidate queries to refresh the check lists
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] }),
+        queryClient.invalidateQueries({ queryKey: [USER_SEND_CHECKS_QUERY_KEY] }),
+      ])
+
+      return receipt.receipt.transactionHash
+    },
+    [sender, checkAddress, userOp, sendUserOpAsync, queryClient]
+  )
 
   return {
     revokeCheck,
     isPending,
     error,
-    isReady: !!sendAccount?.address && !!checkAddress && nonce !== undefined,
+    isPreparing,
+    prepareError,
+    userOp,
+    usdcFees,
+    refetchPrepare,
+    isReady: !!sender && !!checkAddress && !!userOp,
+    checkAddress,
   }
 }

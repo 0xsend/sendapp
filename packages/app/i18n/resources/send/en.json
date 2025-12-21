@@ -6,41 +6,39 @@
   },
   "check": {
     "button": "Send Check",
-    "buttonDescription": "Send to anyone, even without an account",
-    "title": "Send Check",
     "amount": "Amount",
-    "token": "Token",
     "expiration": "Expires",
-    "expirationPlaceholder": "Select expiration date",
     "create": "Send Check",
-    "defaultExpiry": "7 days from now",
     "fee": "Fees",
+    "info": {
+      "title": "What is Send Check?",
+      "description": "Send Check lets you send crypto to anyone using a shareable link — no wallet address needed.",
+      "howItWorks": "How it works",
+      "steps": [
+        "Choose an amount and create a check",
+        "Share the link with the recipient",
+        "They register or sign into Send with the link to claim",
+        "If unclaimed, cancel the check to get your funds back"
+      ],
+      "note": "Only share with your intended recipient — anyone with the link can claim the funds.",
+      "dismiss": "Got it"
+    },
     "success": {
       "warningTitle": "Save this link before leaving",
       "warningDescription": "If the link is lost, cancel the check to recover funds and send a new check."
     },
     "claim": {
-      "title": "Claim a Check",
-      "codeDescription": "Enter the check code to claim tokens",
-      "codeLabel": "Check Code",
-      "codePlaceholder": "XXXX-XXXX-XXXX-XXXX...",
-      "invalidCode": "Invalid check code",
-      "continue": "Continue",
       "submit": "Claim Check",
       "success": "Check claimed successfully!",
       "error": "Failed to claim check",
       "successTitle": "Check Claimed!",
-      "successDescription": "The tokens have been added to your account",
       "addedToAccount": "has been added to your account",
       "done": "Done",
       "tryAgain": "Try Again",
       "verifying": "Verifying check...",
-      "verifyError": "Failed to verify check",
       "notFound": "Check not found or invalid",
       "alreadyClaimed": "This check has already been claimed",
       "expired": "This check has expired",
-      "amount": "Amount",
-      "expiresAt": "Expires",
       "preview": {
         "someone": "Someone",
         "sentYou": "sent you",
@@ -51,26 +49,27 @@
       }
     },
     "manage": {
-      "title": "My Checks",
-      "activeTab": "Active",
-      "historyTab": "History",
       "loading": "Loading checks...",
       "error": "Failed to load checks",
       "noActiveChecks": "No active checks. Create one to get started!",
-      "noHistory": "No check history yet.",
       "expired": "Expired",
       "expiresAt": "Expires",
-      "createdAt": "Created",
-      "claimed": "Claimed",
-      "pending": "Pending",
+      "claimed": "Claimed Check",
+      "canceled": "Canceled Check",
       "sentCheck": "Sent Check",
       "cancelCheck": "Cancel",
       "confirmCancel": "Confirm",
       "keepCheck": "Keep",
       "cancelSuccess": "Check cancelled successfully",
       "cancelError": "Failed to cancel check",
-      "showHistory": "Show History",
-      "hideHistory": "Hide History"
+      "claimedOn": "Claimed",
+      "canceledOn": "Canceled",
+      "expiredUnclaimed": "Expired - Reclaim funds"
+    },
+    "sections": {
+      "pending": "Pending",
+      "today": "Today",
+      "yesterday": "Yesterday"
     }
   },
   "form": {

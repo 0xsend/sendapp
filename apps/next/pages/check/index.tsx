@@ -1,9 +1,8 @@
 import { CheckScreen } from 'app/features/check/screen'
+import { CheckLayout } from 'app/features/check/layout.web'
 import { NextSeo } from 'next-seo'
 import type { NextPageWithLayout } from '../_app'
-import { HomeLayout } from 'app/features/home/layout.web'
 import { TopNav } from 'app/components/TopNav'
-import type { ReactNode } from 'react'
 
 export const Page: NextPageWithLayout = () => {
   return (
@@ -14,14 +13,10 @@ export const Page: NextPageWithLayout = () => {
   )
 }
 
-const CheckLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <HomeLayout TopNav={<TopNav header="My Checks" backFunction="router" showOnGtLg />}>
-      {children}
-    </HomeLayout>
-  )
-}
-
-Page.getLayout = (children) => <CheckLayout>{children}</CheckLayout>
+Page.getLayout = (children) => (
+  <CheckLayout TopNav={<TopNav header="My Checks" backFunction="router" showOnGtLg />}>
+    {children}
+  </CheckLayout>
+)
 
 export default Page

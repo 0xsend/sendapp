@@ -1,53 +1,76 @@
 {
+  "topNav": {
+    "default": "发送",
+    "enterAmount": "输入金额",
+    "preview": "预览并发送"
+  },
   "check": {
-    "button": "Send Check",
-    "buttonDescription": "Send to anyone, even without an account",
-    "title": "Send Check",
-    "amount": "Amount",
-    "token": "Token",
-    "expiration": "Expires",
-    "expirationPlaceholder": "Select expiration date",
-    "create": "Send Check",
-    "defaultExpiry": "7 days from now",
+    "button": "发送支票",
+    "amount": "金额",
+    "expiration": "到期",
+    "create": "发送支票",
+    "fee": "手续费",
+    "info": {
+      "title": "什么是 Send Check？",
+      "description": "Send Check 让你通过可分享的链接向任何人发送加密货币——无需钱包地址。",
+      "howItWorks": "如何运作",
+      "steps": [
+        "选择金额并创建支票",
+        "将链接分享给收款人",
+        "他们通过链接注册或登录 Send 来领取",
+        "如果未被领取，取消支票以收回资金"
+      ],
+      "note": "仅与您的预期收款人分享——任何拥有链接的人都可以领取资金。",
+      "dismiss": "明白了"
+    },
     "success": {
       "warningTitle": "离开前请保存此链接",
       "warningDescription": "如果链接丢失，请取消支票以恢复资金并发送新支票。"
     },
+    "claim": {
+      "submit": "领取支票",
+      "success": "支票领取成功！",
+      "error": "领取支票失败",
+      "successTitle": "支票已领取！",
+      "addedToAccount": "已添加到您的账户",
+      "done": "完成",
+      "tryAgain": "重试",
+      "verifying": "正在验证支票...",
+      "notFound": "支票未找到或无效",
+      "alreadyClaimed": "此支票已被领取",
+      "expired": "此支票已过期",
+      "preview": {
+        "someone": "某人",
+        "sentYou": "向您发送了",
+        "expires": "到期"
+      },
+      "public": {
+        "claimButton": "登录以领取"
+      }
+    },
     "manage": {
-      "title": "My Checks",
-      "activeTab": "Active",
-      "historyTab": "History",
-      "loading": "Loading checks...",
-      "error": "Failed to load checks",
-      "noActiveChecks": "No active checks. Create one to get started!",
-      "noHistory": "No check history yet.",
-      "expired": "Expired",
-      "expiresAt": "Expires",
-      "createdAt": "Created",
-      "claimed": "Claimed",
-      "pending": "Pending",
-      "sentCheck": "Sent Check",
-      "cancelCheck": "Cancel",
-      "confirmCancel": "Confirm",
-      "keepCheck": "Keep",
-      "cancelSuccess": "Check cancelled successfully",
-      "cancelError": "Failed to cancel check",
-      "showHistory": "Show History",
-      "hideHistory": "Hide History"
+      "loading": "正在加载支票...",
+      "error": "加载支票失败",
+      "noActiveChecks": "没有进行中的支票。创建一个开始吧！",
+      "expired": "已过期",
+      "expiresAt": "到期",
+      "claimed": "已领取的支票",
+      "canceled": "已取消的支票",
+      "sentCheck": "已发送的支票",
+      "cancelCheck": "取消",
+      "confirmCancel": "确认",
+      "keepCheck": "保留",
+      "cancelSuccess": "支票取消成功",
+      "cancelError": "取消支票失败",
+      "claimedOn": "领取于",
+      "canceledOn": "取消于",
+      "expiredUnclaimed": "已过期 - 收回资金"
+    },
+    "sections": {
+      "pending": "待处理",
+      "today": "今天",
+      "yesterday": "昨天"
     }
-  },
-  "confirm": {
-    "button": {
-      "send": "发送"
-    },
-    "edit": "编辑",
-    "errors": {
-      "default": "发送错误",
-      "insufficientBalance": "余额不足",
-      "insufficientGas": "Gas 不足"
-    },
-    "fees": "手续费",
-    "noteTitle": "您的备注"
   },
   "form": {
     "balanceLabel": "余额：",
@@ -61,32 +84,40 @@
     },
     "submit": "继续"
   },
-  "noAccount": {
-    "banner": "/send 支票即将推出",
-    "cta": "写 /send 支票",
-    "description": "没有发送帐户！请他们创建一个或写一张 /send 支票。",
-    "title": "没有发送帐户",
-    "toast": "即将推出"
-  },
-  "recipient": {
+  "confirm": {
     "edit": "编辑",
-    "label": "至"
+    "fees": "手续费",
+    "noteTitle": "您的备注",
+    "button": {
+      "send": "发送"
+    },
+    "errors": {
+      "default": "发送错误",
+      "insufficientBalance": "余额不足",
+      "insufficientGas": "Gas 不足"
+    }
   },
   "search": {
-    "errorHeading": "错误",
     "placeholder": "按发送标签或钱包地址搜索",
+    "errorHeading": "错误",
     "unknownError": "未知错误"
   },
   "suggestions": {
-    "birthdays": "祝他们生日快乐",
-    "favorites": "收藏的发送者",
     "recent": "最近活动",
+    "favorites": "收藏的发送者",
     "top": "热门发送者",
+    "birthdays": "祝他们生日快乐",
     "viewMore": "查看更多"
   },
-  "topNav": {
-    "default": "发送",
-    "enterAmount": "输入金额",
-    "preview": "预览并发送"
+  "recipient": {
+    "label": "至",
+    "edit": "编辑"
+  },
+  "noAccount": {
+    "title": "没有发送帐户",
+    "description": "没有发送帐户！请他们创建一个或写一张 /send 支票。",
+    "cta": "写 /send 支票",
+    "toast": "即将推出",
+    "banner": "/send 支票即将推出"
   }
 }

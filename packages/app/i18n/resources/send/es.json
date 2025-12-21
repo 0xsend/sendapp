@@ -1,45 +1,76 @@
 {
-  "check": {
-    "button": "Send Check",
-    "buttonDescription": "Send to anyone, even without an account",
-    "title": "Send Check",
-    "amount": "Amount",
-    "token": "Token",
-    "expiration": "Expires",
-    "expirationPlaceholder": "Select expiration date",
-    "create": "Send Check",
-    "defaultExpiry": "7 days from now",
-    "success": {
-      "warningTitle": "Guarda este enlace antes de salir",
-      "warningDescription": "Si pierdes el enlace, cancela el cheque para recuperar los fondos y envía uno nuevo."
-    },
-    "manage": {
-      "title": "My Checks",
-      "activeTab": "Active",
-      "historyTab": "History",
-      "loading": "Loading checks...",
-      "error": "Failed to load checks",
-      "noActiveChecks": "No active checks. Create one to get started!",
-      "noHistory": "No check history yet.",
-      "expired": "Expired",
-      "expiresAt": "Expires",
-      "createdAt": "Created",
-      "claimed": "Claimed",
-      "pending": "Pending",
-      "sentCheck": "Sent Check",
-      "cancelCheck": "Cancel",
-      "confirmCancel": "Confirm",
-      "keepCheck": "Keep",
-      "cancelSuccess": "Check cancelled successfully",
-      "cancelError": "Failed to cancel check",
-      "showHistory": "Show History",
-      "hideHistory": "Hide History"
-    }
-  },
   "topNav": {
     "default": "Enviar",
     "enterAmount": "Ingresar monto",
     "preview": "Revisar y enviar"
+  },
+  "check": {
+    "button": "Enviar Cheque",
+    "amount": "Monto",
+    "expiration": "Vence",
+    "create": "Enviar Cheque",
+    "fee": "Comisiones",
+    "info": {
+      "title": "¿Qué es Send Check?",
+      "description": "Send Check te permite enviar cripto a cualquiera usando un enlace compartible — sin necesidad de dirección de wallet.",
+      "howItWorks": "Cómo funciona",
+      "steps": [
+        "Elige un monto y crea un cheque",
+        "Comparte el enlace con el destinatario",
+        "Se registran o inician sesión en Send con el enlace para reclamar",
+        "Si no se reclama, cancela el cheque para recuperar tus fondos"
+      ],
+      "note": "Solo comparte con tu destinatario previsto — cualquiera con el enlace puede reclamar los fondos.",
+      "dismiss": "Entendido"
+    },
+    "success": {
+      "warningTitle": "Guarda este enlace antes de salir",
+      "warningDescription": "Si pierdes el enlace, cancela el cheque para recuperar los fondos y envía uno nuevo."
+    },
+    "claim": {
+      "submit": "Reclamar Cheque",
+      "success": "¡Cheque reclamado exitosamente!",
+      "error": "Error al reclamar el cheque",
+      "successTitle": "¡Cheque Reclamado!",
+      "addedToAccount": "ha sido agregado a tu cuenta",
+      "done": "Listo",
+      "tryAgain": "Intentar de nuevo",
+      "verifying": "Verificando cheque...",
+      "notFound": "Cheque no encontrado o inválido",
+      "alreadyClaimed": "Este cheque ya fue reclamado",
+      "expired": "Este cheque ha vencido",
+      "preview": {
+        "someone": "Alguien",
+        "sentYou": "te envió",
+        "expires": "Vence"
+      },
+      "public": {
+        "claimButton": "Iniciar Sesión para Reclamar"
+      }
+    },
+    "manage": {
+      "loading": "Cargando cheques...",
+      "error": "Error al cargar cheques",
+      "noActiveChecks": "No hay cheques activos. ¡Crea uno para comenzar!",
+      "expired": "Vencido",
+      "expiresAt": "Vence",
+      "claimed": "Cheque Reclamado",
+      "canceled": "Cheque Cancelado",
+      "sentCheck": "Cheque Enviado",
+      "cancelCheck": "Cancelar",
+      "confirmCancel": "Confirmar",
+      "keepCheck": "Mantener",
+      "cancelSuccess": "Cheque cancelado exitosamente",
+      "cancelError": "Error al cancelar el cheque",
+      "claimedOn": "Reclamado",
+      "canceledOn": "Cancelado",
+      "expiredUnclaimed": "Vencido - Recuperar fondos"
+    },
+    "sections": {
+      "pending": "Pendiente",
+      "today": "Hoy",
+      "yesterday": "Ayer"
+    }
   },
   "form": {
     "balanceLabel": "Saldo:",

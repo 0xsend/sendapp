@@ -5,15 +5,19 @@ import {
   Input,
   Label,
   Paragraph,
+  Popover,
   PrimaryButton,
   QRCode,
   Separator,
+  Sheet,
   Spinner,
   useAppToast,
+  useMedia,
   XStack,
   YStack,
 } from '@my/ui'
-import { AlertTriangle, Check, Copy } from '@tamagui/lucide-icons'
+import { AlertTriangle, Check, Copy, HelpCircle } from '@tamagui/lucide-icons'
+import { Platform } from 'react-native'
 import { IconCoin, IconSend } from 'app/components/icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
@@ -207,13 +211,27 @@ export function CheckSendScreen() {
     <YStack f={1} gap="$5" w="100%" maxWidth={600}>
       <FormProvider {...form}>
         <FadeCard>
+          <XStack jc="flex-end" position="absolute" top="$4" right="$4" zIndex={1}>
+            <SendCheckInfo />
+          </XStack>
           <YStack gap="$2">
             <Label color="$color10" textTransform="uppercase" fontSize="$3">
               {t('check.amount')}
             </Label>
-            <XStack ai="center" gap="$3">
+            <XStack ai="center" gap="$3" position="relative" mb="$2">
               <AmountInput decimals={decimals} hasError={hasInsufficientBalance} />
               <CoinField showAllCoins />
+              <XStack
+                position="absolute"
+                bottom={-8}
+                left={0}
+                right={0}
+                height={1}
+                backgroundColor={'$darkGrayTextField'}
+                $theme-light={{
+                  backgroundColor: '$silverChalice',
+                }}
+              />
             </XStack>
             {hasInsufficientBalance && (
               <Paragraph color="$error" size="$3">
@@ -327,6 +345,183 @@ function ExpirationSelector() {
         )
       })}
     </XStack>
+  )
+}
+
+function SendCheckInfo() {
+  const [isOpen, setIsOpen] = useState(false)
+  const media = useMedia()
+  const { t } = useTranslation('send')
+  const steps = t('check.info.steps', { returnObjects: true }) as string[]
+
+  // Use sheet for mobile/tablet, popover for desktop
+  const shouldUseSheet = Platform.OS !== 'web' || media.sm || media.md
+
+  if (shouldUseSheet) {
+    return (
+      <>
+        <XStack
+          ai="center"
+          jc="center"
+          w="$2.5"
+          h="$2.5"
+          br="$10"
+          bc="$color3"
+          onPress={() => setIsOpen(true)}
+          pressStyle={{ opacity: 0.7 }}
+          cursor="pointer"
+          hoverStyle={{ bc: '$color4' }}
+        >
+          <HelpCircle size={16} color="$color11" />
+        </XStack>
+
+        <Sheet
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          modal
+          dismissOnSnapToBottom
+          dismissOnOverlayPress
+          native={Platform.OS !== 'web'}
+          snapPoints={['fit']}
+          snapPointsMode="fit"
+        >
+          <Sheet.Frame key="send-check-info-sheet" gap="$4" padding="$4" pb="$6">
+            <YStack gap="$4">
+              <Paragraph fontWeight="600" size="$6">
+                {t('check.info.title')}
+              </Paragraph>
+              <Paragraph size="$4" lineHeight={22} color="$color11">
+                {t('check.info.description')}
+              </Paragraph>
+              <YStack gap="$3" mt="$2">
+                <Paragraph size="$4" fontWeight="600">
+                  {t('check.info.howItWorks')}
+                </Paragraph>
+                {steps.map((step, index) => (
+                  <XStack key={step} gap="$2.5" ai="flex-start">
+                    <XStack
+                      w="$1.5"
+                      h="$1.5"
+                      br="$10"
+                      bc="$primary"
+                      ai="center"
+                      jc="center"
+                      mt="$0.5"
+                    >
+                      <Paragraph size="$2" color="$black" fontWeight="600">
+                        {index + 1}
+                      </Paragraph>
+                    </XStack>
+                    <Paragraph size="$4" color="$color11" f={1}>
+                      {step}
+                    </Paragraph>
+                  </XStack>
+                ))}
+              </YStack>
+              <Paragraph size="$3" color="$color10" fontStyle="italic">
+                {t('check.info.note')}
+              </Paragraph>
+              <XStack justifyContent="flex-end" marginTop="$2">
+                <PrimaryButton onPress={() => setIsOpen(false)}>
+                  <PrimaryButton.Text>{t('check.info.dismiss')}</PrimaryButton.Text>
+                </PrimaryButton>
+              </XStack>
+            </YStack>
+          </Sheet.Frame>
+          <Sheet.Overlay
+            animation="lazy"
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+            backgroundColor="rgba(0,0,0,0.5)"
+          />
+        </Sheet>
+      </>
+    )
+  }
+
+  // Desktop: Show popover with overlay
+  return (
+    <>
+      {isOpen && (
+        <XStack
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          backgroundColor="rgba(0,0,0,0.4)"
+          zIndex={999}
+          onPress={() => setIsOpen(false)}
+          animation="quick"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+        />
+      )}
+      <Popover open={isOpen} onOpenChange={setIsOpen} size="$5" allowFlip placement="bottom-end">
+        <Popover.Trigger asChild>
+          <XStack
+            ai="center"
+            jc="center"
+            w="$2.5"
+            h="$2.5"
+            br="$10"
+            bc="$color3"
+            cursor="pointer"
+            hoverStyle={{ bc: '$color4' }}
+          >
+            <HelpCircle size={16} color="$color11" />
+          </XStack>
+        </Popover.Trigger>
+
+        <Popover.Content
+          borderWidth={1}
+          borderColor="$borderColor"
+          enterStyle={{ y: -10, opacity: 0 }}
+          exitStyle={{ y: -10, opacity: 0 }}
+          elevate
+          animation={[
+            'quick',
+            {
+              opacity: {
+                overshootClamping: true,
+              },
+            },
+          ]}
+          padding="$4"
+          maxWidth={360}
+        >
+          <Popover.Arrow borderWidth={1} borderColor="$borderColor" />
+          <YStack gap="$3">
+            <Paragraph fontWeight="600" size="$5">
+              {t('check.info.title')}
+            </Paragraph>
+            <Paragraph size="$3" lineHeight={20} color="$color11">
+              {t('check.info.description')}
+            </Paragraph>
+            <YStack gap="$2.5" mt="$1">
+              <Paragraph size="$3" fontWeight="600">
+                {t('check.info.howItWorks')}
+              </Paragraph>
+              {steps.map((step, index) => (
+                <XStack key={step} gap="$2" ai="flex-start">
+                  <XStack w="$1" h="$1" br="$10" bc="$primary" ai="center" jc="center" mt="$0.5">
+                    <Paragraph size="$1" color="$black" fontWeight="600">
+                      {index + 1}
+                    </Paragraph>
+                  </XStack>
+                  <Paragraph size="$3" color="$color11" f={1}>
+                    {step}
+                  </Paragraph>
+                </XStack>
+              ))}
+            </YStack>
+            <Paragraph size="$2" color="$color10" fontStyle="italic" mt="$2">
+              {t('check.info.note')}
+            </Paragraph>
+          </YStack>
+        </Popover.Content>
+      </Popover>
+    </>
   )
 }
 

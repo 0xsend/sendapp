@@ -2196,6 +2196,7 @@ export type Database = {
           is_active: boolean
           is_claimed: boolean
           is_expired: boolean
+          is_revoked: boolean
           sender: string
           tokens: string[]
           tx_hash: string
