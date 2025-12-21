@@ -47,7 +47,7 @@ CREATE UNIQUE INDEX "u_send_check_claimed" ON "public"."send_check_claimed" USIN
 
 -- RLS
 ALTER TABLE "public"."send_check_claimed" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "authenticated can read send check claimed" ON "public"."send_check_claimed" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "anon and authenticated can read send check claimed" ON "public"."send_check_claimed" FOR SELECT TO anon, authenticated USING (true);
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_check_claimed" TO "anon";

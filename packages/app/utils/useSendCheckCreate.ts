@@ -92,14 +92,12 @@ function buildSendCheckCalls({
 }
 
 /**
- * Creates a shareable claim URL with the check code.
+ * Creates a shareable public preview URL with the check code.
  * @param checkCode - The base32 encoded check code
  */
 export function createSendCheckClaimUrl(checkCode: string): string {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://send.app'
-  const claimUrl = new URL('/check/claim', baseUrl)
-  claimUrl.searchParams.set('code', checkCode)
-  return claimUrl.toString()
+  return `${baseUrl}/check/public/${checkCode}`
 }
 
 export type SendCheckCreateArgs = {

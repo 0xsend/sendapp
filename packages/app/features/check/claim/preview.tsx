@@ -5,23 +5,22 @@ import { useTranslation } from 'react-i18next'
 import { useState, useCallback, useMemo } from 'react'
 import { useSendCheckClaim } from 'app/utils/useSendCheckClaim'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useSearchParams } from 'solito/navigation'
 import { CheckPreviewCard, useCheckPreview } from './components/CheckPreviewCard'
 import debug from 'debug'
 
 const log = debug('app:features:check:claim:preview')
 
-export function CheckClaimPreviewScreen() {
+interface CheckClaimPreviewScreenProps {
+  checkCode: string
+}
+
+export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenProps) {
   const router = useRouter()
   const { t } = useTranslation('send')
   const toast = useAppToast()
-  const searchParams = useSearchParams()
   const { data: sendAccount } = useSendAccount()
   const { claimCheck, isPending: isSubmitting, isReady } = useSendCheckClaim()
   const [claimed, setClaimed] = useState(false)
-
-  // Get check code from URL params (includes chain)
-  const checkCode = searchParams?.get('code') ?? ''
 
   // Use shared preview hook
   const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)

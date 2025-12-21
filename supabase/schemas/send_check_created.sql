@@ -46,7 +46,7 @@ CREATE UNIQUE INDEX "u_send_check_created" ON "public"."send_check_created" USIN
 
 -- RLS
 ALTER TABLE "public"."send_check_created" ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "authenticated can read send check created" ON "public"."send_check_created" FOR SELECT TO "authenticated" USING (true);
+CREATE POLICY "anon and authenticated can read send check created" ON "public"."send_check_created" FOR SELECT TO anon, authenticated USING (true);
 
 -- Grants
 GRANT ALL ON TABLE "public"."send_check_created" TO "anon";

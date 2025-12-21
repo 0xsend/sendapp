@@ -47,7 +47,9 @@
         "expires": "Läuft ab"
       },
       "public": {
-        "claimButton": "Anmelden zum Einlösen"
+        "registerButton": "Registrieren zum Einlösen",
+        "alreadyHaveAccount": "Bereits ein Konto?",
+        "signIn": "Anmelden"
       }
     },
     "manage": {

@@ -1,9 +1,10 @@
 import {
   baseMainnetClient,
+  entryPointAddress,
   sendAccountAbi,
   sendCheckAbi,
   sendCheckAddress,
-  tokenPaymasterAddress,
+  sendVerifyingPaymasterAddress,
 } from '@my/wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { UserOperation } from 'permissionless'
@@ -18,6 +19,7 @@ import { decodeCheckCode, isValidCheckCodeFormat } from './checkCode'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import type { Database, PgBytea } from '@my/supabase/database.types'
 import { byteaToHex } from './byteaToHex'
+import { api } from 'app/utils/api'
 
 /**
  * Parse a chain string to a numeric chain ID.
@@ -140,12 +142,21 @@ export type SendCheckClaimResult = {
  * Hook for claiming a SendCheck.
  * The claim URL contains the ephemeral private key needed to claim.
  * All tokens in the check are transferred to the claimer.
+ * Gas is sponsored via the Send Verifying Paymaster.
  */
 export function useSendCheckClaim() {
   const { data: sendAccount } = useSendAccount()
   const { data: nonce } = useAccountNonce({ sender: sendAccount?.address })
-  const { mutateAsync: sendUserOpAsync, isPending, error } = useSendUserOpMutation()
+  const {
+    mutateAsync: sendUserOpAsync,
+    isPending: isSending,
+    error: sendError,
+  } = useSendUserOpMutation()
+  const paymasterSignMutation = api.sendAccount.paymasterSign.useMutation()
   const queryClient = useQueryClient()
+
+  const isPending = isSending || paymasterSignMutation.isPending
+  const error = sendError || paymasterSignMutation.error
 
   const claimCheck = async ({
     checkCode,
@@ -157,6 +168,7 @@ export function useSendCheckClaim() {
 
     const chainId = baseMainnetClient.chain.id
     const checkAddress = getSendCheckAddress(chainId)
+    const entryPoint = entryPointAddress[chainId]
 
     assert(!!sendAccount?.address, 'Send account not loaded')
     assert(checkAddress !== null, 'SendCheck contract not deployed on this chain')
@@ -189,19 +201,30 @@ export function useSendCheckClaim() {
       args: [[{ dest: contractAddress, value: 0n, data: innerCallData }]],
     })
 
-    const paymaster = tokenPaymasterAddress[chainId]
-    const userOp: UserOperation<'v0.7'> = {
+    // Build base userOp without paymaster data yet
+    const baseUserOp: UserOperation<'v0.7'> = {
       ...defaultUserOp,
       sender: sendAccount.address,
       nonce,
       callData,
-      paymaster,
-      paymasterData: '0x',
       signature: '0x',
     }
 
-    // Submit the user operation
-    const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
+    // Get paymaster signature from the server (sponsorship)
+    const paymasterResult = await paymasterSignMutation.mutateAsync({
+      userop: baseUserOp,
+      entryPoint,
+    })
+
+    // Update userOp with sponsored paymaster
+    const sponsoredUserOp: UserOperation<'v0.7'> = {
+      ...baseUserOp,
+      paymaster: sendVerifyingPaymasterAddress[chainId],
+      paymasterData: paymasterResult.paymasterData,
+    }
+
+    // Submit the user operation (signing happens inside sendUserOpAsync)
+    const receipt = await sendUserOpAsync({ userOp: sponsoredUserOp, webauthnCreds })
 
     // Invalidate nonce query
     await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })

@@ -47,7 +47,9 @@
         "expires": "Expire"
       },
       "public": {
-        "claimButton": "Se connecter pour réclamer"
+        "registerButton": "S'inscrire pour réclamer",
+        "alreadyHaveAccount": "Déjà un compte ?",
+        "signIn": "Se connecter"
       }
     },
     "manage": {

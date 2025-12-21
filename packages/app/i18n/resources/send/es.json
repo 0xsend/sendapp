@@ -47,7 +47,9 @@
         "expires": "Vence"
       },
       "public": {
-        "claimButton": "Iniciar Sesión para Reclamar"
+        "registerButton": "Registrarse para Reclamar",
+        "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+        "signIn": "Iniciar sesión"
       }
     },
     "manage": {

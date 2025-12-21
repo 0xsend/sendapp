@@ -1,16 +1,18 @@
-import { Avatar, Card, Paragraph, Spinner, XStack, YStack } from '@my/ui'
+import { Avatar, Card, Paragraph, Spinner, XStack, YStack, useThemeName } from '@my/ui'
 import { Gift } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import { useCheckDetails, type TokenAmount } from 'app/utils/useSendCheckClaim'
+import { IconBadgeCheckSolid2 } from 'app/components/icons'
+import { useCheckDetails } from 'app/utils/useSendCheckClaim'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { formatUnits } from 'viem'
-import { allCoinsDict } from 'app/data/coins'
+import { allCoins, type coin } from 'app/data/coins'
+import { formatCoinAmount } from 'app/utils/formatCoinAmount'
+import { IconCoin } from 'app/components/icons/IconCoin'
 
 export interface TokenPreviewData {
   amount: string
-  symbol: string
-  coinIcon?: string
+  symbol: coin['symbol']
+  coin: coin
 }
 
 export interface CheckPreviewData {
@@ -21,6 +23,7 @@ export interface CheckPreviewData {
   isCanceled: boolean
   senderTag?: string
   senderAvatar?: string
+  senderIsVerified?: boolean
 }
 
 interface CheckPreviewCardProps {
@@ -46,19 +49,18 @@ export function useCheckPreview(checkCode: string | null) {
   const previewData = useMemo((): CheckPreviewData | null => {
     if (!checkDetails) return null
 
-    const tokens: TokenPreviewData[] = checkDetails.tokenAmounts.map((ta) => {
-      const coin = allCoinsDict[ta.token.toLowerCase()]
-      const decimals = coin?.decimals ?? 18
-      const symbol = coin?.symbol ?? 'tokens'
-      const formattedAmount = formatUnits(ta.amount, decimals)
-      const coinIcon = coin?.icon
+    const tokens: TokenPreviewData[] = checkDetails.tokenAmounts
+      .map((ta) => {
+        const coin = allCoins.find((c) => c.token.toLowerCase() === ta.token.toLowerCase())
+        if (!coin) return null
 
-      return {
-        amount: formattedAmount,
-        symbol,
-        coinIcon,
-      }
-    })
+        return {
+          amount: formatCoinAmount({ amount: ta.amount, coin }),
+          symbol: coin.symbol,
+          coin,
+        }
+      })
+      .filter((t): t is TokenPreviewData => t !== null)
 
     const expiresAt = new Date(Number(checkDetails.expiresAt) * 1000)
 
@@ -70,6 +72,7 @@ export function useCheckPreview(checkCode: string | null) {
       isCanceled: checkDetails.isCanceled,
       senderTag: senderProfile?.tag,
       senderAvatar: senderProfile?.avatar_url,
+      senderIsVerified: senderProfile?.is_verified ?? false,
     }
   }, [checkDetails, senderProfile])
 
@@ -84,6 +87,8 @@ export function useCheckPreview(checkCode: string | null) {
 
 export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
   const { t } = useTranslation('send')
+  const theme = useThemeName()
+  const isDark = theme.includes('dark')
   const { previewData, isLoading, isLoadingProfile, error, checkDetails } =
     useCheckPreview(checkCode)
 
@@ -121,19 +126,34 @@ export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
             <Spinner size="small" />
           ) : (
             <>
-              {previewData.senderAvatar ? (
-                <Avatar size="$6" circular>
-                  <Avatar.Image src={previewData.senderAvatar} />
-                  <Avatar.Fallback bc="$color5" />
-                </Avatar>
-              ) : (
-                <XStack w="$6" h="$6" br="$10" ai="center" jc="center" bc="$color3">
-                  <Gift size="$2" color="$color10" />
-                </XStack>
-              )}
+              <XStack position="relative">
+                {previewData.senderAvatar ? (
+                  <Avatar size="$6" circular>
+                    <Avatar.Image src={previewData.senderAvatar} />
+                    <Avatar.Fallback bc="$color5" />
+                  </Avatar>
+                ) : (
+                  <XStack w="$6" h="$6" br="$10" ai="center" jc="center" bc="$color3">
+                    <Gift size="$2" color="$color10" />
+                  </XStack>
+                )}
+                {previewData.senderIsVerified && (
+                  <XStack zi={100} pos="absolute" b="-25%" r="-25%">
+                    <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+                    <IconBadgeCheckSolid2
+                      size="$1"
+                      scale={0.7}
+                      color="$neon8"
+                      $theme-dark={{ color: '$neon7' }}
+                      // @ts-expect-error - checkColor is not typed
+                      checkColor={isDark ? '#082B1B' : '#fff'}
+                    />
+                  </XStack>
+                )}
+              </XStack>
               <Paragraph color="$color10" size="$3">
                 {previewData.senderTag
-                  ? `@${previewData.senderTag}`
+                  ? `/${previewData.senderTag}`
                   : t('check.claim.preview.someone')}{' '}
                 {t('check.claim.preview.sentYou')}
               </Paragraph>
@@ -142,16 +162,14 @@ export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
         </YStack>
 
         {/* Token amounts */}
-        <YStack ai="center" gap="$3">
+        <YStack ai="center" gap="$4">
           {previewData.tokens.map((token) => (
-            <YStack key={token.symbol} ai="center" gap="$1">
+            <XStack key={token.symbol} ai="center" gap="$2">
+              <IconCoin symbol={token.symbol} size="$2" />
               <Paragraph color="$color12" fontWeight="700" fontSize="$9">
-                {token.amount}
+                {token.amount} {token.symbol}
               </Paragraph>
-              <Paragraph color="$color10" fontSize="$5" fontWeight="500">
-                {token.symbol}
-              </Paragraph>
-            </YStack>
+            </XStack>
           ))}
         </YStack>
 

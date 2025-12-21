@@ -238,19 +238,19 @@ grant truncate on table "public"."send_check_created" to "service_role";
 
 grant update on table "public"."send_check_created" to "service_role";
 
-create policy "authenticated can read send check claimed"
+create policy "anon and authenticated can read send check claimed"
 on "public"."send_check_claimed"
 as permissive
 for select
-to authenticated
+to anon, authenticated
 using (true);
 
 
-create policy "authenticated can read send check created"
+create policy "anon and authenticated can read send check created"
 on "public"."send_check_created"
 as permissive
 for select
-to authenticated
+to anon, authenticated
 using (true);
 
 

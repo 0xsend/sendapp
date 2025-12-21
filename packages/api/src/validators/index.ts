@@ -1,12 +1,19 @@
 import type { Validator, ValidationResult, ValidatorParams } from './types'
+import { sendCheckClaimValidator } from './sendCheckClaimValidator'
 import { sendEarnValidator } from './sendEarnValidator'
 import { sendTokenUpgradeValidator } from './sendTokenUpgradeValidator'
 import { usdcPaymasterApprovalValidator } from './usdcPaymasterApprovalValidator'
 
-export { sendEarnValidator, sendTokenUpgradeValidator, usdcPaymasterApprovalValidator }
+export {
+  sendCheckClaimValidator,
+  sendEarnValidator,
+  sendTokenUpgradeValidator,
+  usdcPaymasterApprovalValidator,
+}
 export type { Validator, ValidationResult, ValidatorParams }
 
 export const validators: Validator[] = [
+  sendCheckClaimValidator,
   sendEarnValidator,
   sendTokenUpgradeValidator,
   usdcPaymasterApprovalValidator,

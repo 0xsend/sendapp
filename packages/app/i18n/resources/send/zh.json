@@ -47,7 +47,9 @@
         "expires": "到期"
       },
       "public": {
-        "claimButton": "登录以领取"
+        "registerButton": "注册以领取",
+        "alreadyHaveAccount": "已有账户？",
+        "signIn": "登录"
       }
     },
     "manage": {
