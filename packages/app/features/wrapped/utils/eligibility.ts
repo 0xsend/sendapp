@@ -1,32 +1,13 @@
 import type { WrappedData } from '../types'
 
 /**
- * Hardcoded list of Send IDs eligible for Wrapped 2025
- * Add eligible user Send IDs to this array
- */
-const ELIGIBLE_SEND_IDS: number[] = [
-  47446, // dev
-  38282, // milf
-  2, // 3
-  1, // bigboss
-  3409, // vic
-  3941, // erick
-  117902, // ehsan
-  17, // sunburn
-  17787, // stefan
-  7065, // gustas
-  2633, // rit
-  4, // beezy
-]
-
-/**
  * Checks if a user is eligible for Send Wrapped 2025
  * @param sendId - The user's Send ID
  * @returns true if the user is eligible, false otherwise
  */
 export function isEligibleForWrapped(sendId: number | undefined | null): boolean {
   if (!sendId) return false
-  return ELIGIBLE_SEND_IDS.includes(sendId)
+  return true
 }
 
 /**
