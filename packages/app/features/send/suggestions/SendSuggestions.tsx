@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   LinearGradient,
   Paragraph,
@@ -10,6 +9,8 @@ import {
   View,
   XStack,
   YStack,
+  FastImage,
+  isWeb,
 } from '@my/ui'
 import { FlatList, Platform } from 'react-native'
 import { useSendScreenParams } from 'app/routers/params'
@@ -21,7 +22,7 @@ import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
-import { memo, useCallback, useId } from 'react'
+import React, { memo, useCallback, useId, useMemo } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
 
@@ -191,7 +192,6 @@ SuggestionsList.displayName = 'SuggestionsList'
 
 const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
   const [sendParams, setSendParams] = useSendScreenParams()
-  const _sendParams = JSON.parse(JSON.stringify(sendParams)) //JSON makes sure we don't pass undefined values
 
   // Prefer main_tag_name, fallback to first tag in tags array
   const tagToUse = item?.main_tag_name || item?.tags?.[0]
@@ -212,6 +212,7 @@ const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
   const isDark = theme.includes('dark')
 
   const onSelect = () => {
+    const _sendParams = JSON.parse(JSON.stringify(sendParams))
     setSendParams({
       ...sendParams,
       ...(tagToUse
@@ -246,24 +247,7 @@ const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
         }}
         onPress={onSelect}
       >
-        <Avatar circular size="$7" elevation={'$0.75'}>
-          {Platform.OS === 'android' && !avatarUrl ? (
-            <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-            />
-          ) : (
-            <>
-              <Avatar.Image src={avatarUrl} />
-              <Avatar.Fallback jc="center" bc="$olive">
-                <Avatar size="$7" br="$4">
-                  <Avatar.Image
-                    src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
-                  />
-                </Avatar>
-              </Avatar.Fallback>
-            </>
-          )}
-        </Avatar>
+        <Image avatarUrl={avatarUrl} label={label} />
 
         {isVerified && (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$-1" y="$-1">
@@ -301,3 +285,47 @@ const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
     </YStack>
   )
 }
+
+interface ImageProps {
+  avatarUrl: string
+  label: string
+}
+
+const Image = React.memo(({ avatarUrl, label }: ImageProps) => {
+  const themeObj = useTheme()
+  const fastImageStyle = useMemo(
+    () => ({
+      backgroundColor: themeObj.background.val,
+      borderRadius: 1000_000,
+    }),
+    [themeObj.background.val]
+  )
+
+  return (
+    <XStack ov="hidden" br={1000_000} elevation="$0.75">
+      {!avatarUrl ? (
+        <FastImage
+          src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
+          width={74}
+          height={74}
+          style={fastImageStyle}
+        />
+      ) : (
+        <FastImage
+          alt={`${label} avatar`}
+          width={74}
+          height={74}
+          src={avatarUrl}
+          style={fastImageStyle}
+          onError={(e) => {
+            if (isWeb) {
+              e.target.src = `https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`
+            }
+          }}
+        />
+      )}
+    </XStack>
+  )
+})
+
+Image.displayName = 'Image'
