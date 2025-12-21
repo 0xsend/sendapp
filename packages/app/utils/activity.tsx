@@ -305,7 +305,7 @@ export const isSendPotWin = (activity: Activity): boolean => {
  * Get the SendCheck contract address for the current chain.
  */
 const getSendCheckContractAddress = (): `0x${string}` | undefined => {
-  return sendCheckAddress[baseMainnet.id]
+  return sendCheckAddress?.[baseMainnet.id]
 }
 
 /**
