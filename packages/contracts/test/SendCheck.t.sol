@@ -153,30 +153,6 @@ contract SendCheckTest is SendCheckHelper {
         assertEq(token.balanceOf(address(sendCheck)), 0);
     }
 
-    // cannot create check with too many tokens
-    function testCannotCreateCheckTooManyTokens() public {
-        address sender = sendCheckStub.sender;
-        vm.startPrank(sender, sender);
-
-        uint256 validExpiry = block.timestamp + 1 days;
-
-        // Create 6 tokens (exceeds MAX_TOKENS of 5)
-        IERC20[] memory tokens = new IERC20[](6);
-        uint256[] memory amounts = new uint256[](6);
-        for (uint256 i = 0; i < 6; i++) {
-            TestERC20 newToken = new TestERC20(0);
-            newToken.sudoMint(sender, 100);
-            newToken.approve(address(sendCheck), 100);
-            tokens[i] = newToken;
-            amounts[i] = 100;
-        }
-
-        vm.expectRevert(bytes("Too many tokens"));
-        sendCheck.createCheck(tokens, sendCheckStub.ephemeralAddress, amounts, validExpiry);
-
-        vm.stopPrank();
-    }
-
     // cannot create check with duplicate tokens
     function testCannotCreateCheckDuplicateTokens() public {
         (TestERC20 token, address sender) = (sendCheckStub.token, sendCheckStub.sender);

@@ -17,8 +17,6 @@ struct Check {
 contract SendCheck {
     using SafeERC20 for IERC20;
 
-    uint256 public constant MAX_TOKENS = 5;
-
     mapping(address => Check) internal _checks;
 
     event CheckCreated(Check check);
@@ -40,7 +38,6 @@ contract SendCheck {
         uint256 expiresAt
     ) external {
         require(tokens.length > 0, "No tokens provided");
-        require(tokens.length <= MAX_TOKENS, "Too many tokens");
         require(tokens.length == amounts.length, "Array length mismatch");
         require(ephemeralAddress != address(0), "Invalid ephemeral address");
         require(expiresAt > block.timestamp, "Invalid expiration");

@@ -11,8 +11,8 @@ create table "public"."send_check_claimed" (
     "tx_idx" numeric,
     "ephemeral_address" bytea,
     "sender" bytea,
-    "tokens" bytea,
-    "amounts" bytea,
+    "token" bytea,
+    "amount" numeric,
     "expires_at" numeric,
     "redeemer" bytea,
     "ig_name" text,
@@ -34,8 +34,8 @@ create table "public"."send_check_created" (
     "tx_idx" numeric,
     "ephemeral_address" bytea,
     "sender" bytea,
-    "tokens" bytea,
-    "amounts" bytea,
+    "token" bytea,
+    "amount" numeric,
     "expires_at" numeric,
     "ig_name" text,
     "src_name" text,
@@ -81,72 +81,40 @@ alter table "public"."send_check_created" add constraint "send_check_created_pke
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.get_user_active_checks(user_address bytea)
- RETURNS TABLE(id integer, chain_id numeric, block_time numeric, tx_hash bytea, ephemeral_address bytea, sender bytea, tokens bytea, amounts bytea, expires_at numeric, block_num numeric, is_expired boolean)
+CREATE OR REPLACE FUNCTION public.get_user_checks(user_address bytea, page_limit integer DEFAULT 50, page_offset integer DEFAULT 0)
+ RETURNS TABLE(ephemeral_address bytea, sender bytea, chain_id numeric, block_time numeric, tx_hash bytea, block_num numeric, expires_at numeric, tokens bytea[], amounts numeric[], is_expired boolean, is_claimed boolean, claimed_by bytea, claimed_at numeric, is_active boolean)
  LANGUAGE sql
  STABLE
 AS $function$
 SELECT
-    c.id,
-    c.chain_id,
-    c.block_time,
-    c.tx_hash,
     c.ephemeral_address,
     c.sender,
-    c.tokens,
-    c.amounts,
-    c.expires_at,
-    c.block_num,
-    c.is_expired
-FROM "public"."send_checks_active" c
-WHERE c.sender = user_address
-ORDER BY c.block_time DESC;
-$function$
-;
-
-CREATE OR REPLACE FUNCTION public.get_user_checks_history(user_address bytea)
- RETURNS TABLE(id integer, chain_id numeric, block_time numeric, tx_hash bytea, ephemeral_address bytea, sender bytea, tokens bytea, amounts bytea, expires_at numeric, block_num numeric, is_claimed boolean, claimed_by bytea, claimed_at numeric)
- LANGUAGE sql
- STABLE
-AS $function$
-SELECT
-    c.id,
     c.chain_id,
-    c.block_time,
-    c.tx_hash,
-    c.ephemeral_address,
-    c.sender,
-    c.tokens,
-    c.amounts,
-    c.expires_at,
-    c.block_num,
-    (cl.id IS NOT NULL)::boolean AS is_claimed,
-    cl.redeemer AS claimed_by,
-    cl.block_time AS claimed_at
+    MAX(c.block_time) AS block_time,
+    (array_agg(c.tx_hash))[1] AS tx_hash,
+    MAX(c.block_num) AS block_num,
+    MAX(c.expires_at) AS expires_at,
+    array_agg(c.token ORDER BY c.abi_idx) AS tokens,
+    array_agg(c.amount ORDER BY c.abi_idx) AS amounts,
+    (MAX(c.expires_at) <= EXTRACT(EPOCH FROM NOW()))::boolean AS is_expired,
+    bool_or(cl.id IS NOT NULL) AS is_claimed,
+    (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] AS claimed_by,
+    MAX(cl.block_time) AS claimed_at,
+    (NOT bool_or(cl.id IS NOT NULL) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW()))::boolean AS is_active
 FROM "public"."send_check_created" c
 LEFT JOIN "public"."send_check_claimed" cl
     ON c.ephemeral_address = cl.ephemeral_address
     AND c.chain_id = cl.chain_id
+    AND c.abi_idx = cl.abi_idx
 WHERE c.sender = user_address
-ORDER BY c.block_time DESC;
+GROUP BY c.ephemeral_address, c.sender, c.chain_id
+ORDER BY
+    (NOT bool_or(cl.id IS NOT NULL) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW())) DESC,
+    MAX(c.block_time) DESC
+LIMIT page_limit
+OFFSET page_offset;
 $function$
 ;
-
-create or replace view "public"."send_checks_active" as  SELECT c.id,
-    c.chain_id,
-    c.block_time,
-    c.tx_hash,
-    c.ephemeral_address,
-    c.sender,
-    c.tokens,
-    c.amounts,
-    c.expires_at,
-    c.block_num,
-    (c.expires_at <= EXTRACT(epoch FROM now())) AS is_expired
-   FROM (send_check_created c
-     LEFT JOIN send_check_claimed cl ON (((c.ephemeral_address = cl.ephemeral_address) AND (c.chain_id = cl.chain_id))))
-  WHERE (cl.id IS NULL);
-
 
 grant delete on table "public"."send_check_claimed" to "anon";
 
@@ -232,26 +200,20 @@ grant truncate on table "public"."send_check_created" to "service_role";
 
 grant update on table "public"."send_check_created" to "service_role";
 
-create policy "users can see claims for checks they created or claimed"
+create policy "authenticated can read send check claimed"
 on "public"."send_check_claimed"
 as permissive
 for select
-to public
-using (((EXISTS ( SELECT 1
-   FROM send_accounts
-  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND (send_accounts.address_bytes = send_check_claimed.sender)))) OR (EXISTS ( SELECT 1
-   FROM send_accounts
-  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND (send_accounts.address_bytes = send_check_claimed.redeemer))))));
+to authenticated
+using (true);
 
 
-create policy "users can see checks they created"
+create policy "authenticated can read send check created"
 on "public"."send_check_created"
 as permissive
 for select
-to public
-using ((EXISTS ( SELECT 1
-   FROM send_accounts
-  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND (send_accounts.address_bytes = send_check_created.sender)))));
+to authenticated
+using (true);
 
 
 
