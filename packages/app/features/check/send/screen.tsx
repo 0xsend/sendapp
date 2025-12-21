@@ -1,11 +1,11 @@
 import {
   Button,
   Card,
+  Dialog,
   FadeCard,
   Input,
   Label,
   Paragraph,
-  Popover,
   PrimaryButton,
   QRCode,
   Separator,
@@ -429,7 +429,7 @@ function SendCheckInfo() {
             </YStack>
           </Sheet.Frame>
           <Sheet.Overlay
-            animation="lazy"
+            animation="quick"
             enterStyle={{ opacity: 0 }}
             exitStyle={{ opacity: 0 }}
             backgroundColor="rgba(0,0,0,0.5)"
@@ -439,46 +439,36 @@ function SendCheckInfo() {
     )
   }
 
-  // Desktop: Show popover with overlay
+  // Desktop: Show dialog with overlay
   return (
-    <>
-      {isOpen && (
+    <Dialog modal open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Trigger asChild>
         <XStack
-          position="fixed"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          backgroundColor="rgba(0,0,0,0.4)"
-          zIndex={999}
-          onPress={() => setIsOpen(false)}
+          ai="center"
+          jc="center"
+          w="$2.5"
+          h="$2.5"
+          br="$10"
+          bc="$color3"
+          cursor="pointer"
+          hoverStyle={{ bc: '$color4' }}
+        >
+          <HelpCircle size={16} color="$color11" />
+        </XStack>
+      </Dialog.Trigger>
+
+      <Dialog.Portal>
+        <Dialog.Overlay
+          key="overlay"
           animation="quick"
+          opacity={0.5}
           enterStyle={{ opacity: 0 }}
           exitStyle={{ opacity: 0 }}
         />
-      )}
-      <Popover open={isOpen} onOpenChange={setIsOpen} size="$5" allowFlip placement="bottom-end">
-        <Popover.Trigger asChild>
-          <XStack
-            ai="center"
-            jc="center"
-            w="$2.5"
-            h="$2.5"
-            br="$10"
-            bc="$color3"
-            cursor="pointer"
-            hoverStyle={{ bc: '$color4' }}
-          >
-            <HelpCircle size={16} color="$color11" />
-          </XStack>
-        </Popover.Trigger>
-
-        <Popover.Content
-          borderWidth={1}
-          borderColor="$borderColor"
-          enterStyle={{ y: -10, opacity: 0 }}
-          exitStyle={{ y: -10, opacity: 0 }}
+        <Dialog.Content
+          bordered
           elevate
+          key="content"
           animation={[
             'quick',
             {
@@ -487,10 +477,11 @@ function SendCheckInfo() {
               },
             },
           ]}
+          enterStyle={{ y: -10, opacity: 0 }}
+          exitStyle={{ y: -10, opacity: 0 }}
           padding="$4"
           maxWidth={360}
         >
-          <Popover.Arrow borderWidth={1} borderColor="$borderColor" />
           <YStack gap="$3">
             <Paragraph fontWeight="600" size="$5">
               {t('check.info.title')}
@@ -519,9 +510,9 @@ function SendCheckInfo() {
               {t('check.info.note')}
             </Paragraph>
           </YStack>
-        </Popover.Content>
-      </Popover>
-    </>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   )
 }
 

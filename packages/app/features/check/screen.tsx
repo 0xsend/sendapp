@@ -374,7 +374,7 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
   // Title text based on status
   const getTitleText = () => {
     if (check.is_active) return t('check.manage.sentCheck')
-    if (check.is_revoked) return t('check.manage.canceled')
+    if (check.is_canceled) return t('check.manage.canceled')
     if (check.is_claimed) return t('check.manage.claimed')
     return t('check.manage.expired')
   }
@@ -384,7 +384,7 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
     if (check.is_active) {
       return `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`
     }
-    if (check.is_revoked && check.claimed_at) {
+    if (check.is_canceled && check.claimed_at) {
       const canceledDate = new Date(Number(check.claimed_at) * 1000)
       return `${t('check.manage.canceledOn')} ${canceledDate.toLocaleDateString()}`
     }

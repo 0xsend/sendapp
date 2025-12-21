@@ -70,8 +70,8 @@ export function useCheckPreview(checkCode: string | null) {
       isExpired: checkDetails.isExpired,
       isClaimed: checkDetails.isClaimed,
       isCanceled: checkDetails.isCanceled,
-      senderTag: senderProfile?.tag,
-      senderAvatar: senderProfile?.avatar_url,
+      senderTag: senderProfile?.tag ?? undefined,
+      senderAvatar: senderProfile?.avatar_url ?? undefined,
       senderIsVerified: senderProfile?.is_verified ?? false,
     }
   }, [checkDetails, senderProfile])
