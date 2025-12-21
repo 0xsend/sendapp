@@ -3653,13 +3653,6 @@ export const sendAirdropsSafeConfig = {
 export const sendCheckAbi = [
   {
     type: 'function',
-    inputs: [],
-    name: 'MAX_TOKENS',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
     inputs: [{ name: 'ephemeralAddress', internalType: 'address', type: 'address' }],
     name: 'checks',
     outputs: [
@@ -3774,7 +3767,7 @@ export const sendCheckAbi = [
  *
  */
 export const sendCheckAddress = {
-  845337: '0x3e8493A4D9526dACca71959487cb5583c26a39FF',
+  845337: '0xf44822D5fD589527bDAE515c151f30eF6E17DB9D',
 } as const
 
 /**
@@ -11361,17 +11354,6 @@ export const watchSendAccountFactoryAccountCreatedEvent = /*#__PURE__*/ createWa
 export const readSendCheck = /*#__PURE__*/ createReadContract({
   abi: sendCheckAbi,
   address: sendCheckAddress,
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"MAX_TOKENS"`
- *
- *
- */
-export const readSendCheckMaxTokens = /*#__PURE__*/ createReadContract({
-  abi: sendCheckAbi,
-  address: sendCheckAddress,
-  functionName: 'MAX_TOKENS',
 })
 
 /**
@@ -21034,17 +21016,6 @@ export const useWatchSendAccountFactoryAccountCreatedEvent =
 export const useReadSendCheck = /*#__PURE__*/ createUseReadContract({
   abi: sendCheckAbi,
   address: sendCheckAddress,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"MAX_TOKENS"`
- *
- *
- */
-export const useReadSendCheckMaxTokens = /*#__PURE__*/ createUseReadContract({
-  abi: sendCheckAbi,
-  address: sendCheckAddress,
-  functionName: 'MAX_TOKENS',
 })
 
 /**

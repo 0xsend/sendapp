@@ -544,8 +544,8 @@ type Override = {
       tx_idx?: string;
       ephemeral_address?: string;
       sender?: string;
-      tokens?: string;
-      amounts?: string;
+      token?: string;
+      amount?: string;
       expires_at?: string;
       redeemer?: string;
       ig_name?: string;
@@ -566,8 +566,8 @@ type Override = {
       tx_idx?: string;
       ephemeral_address?: string;
       sender?: string;
-      tokens?: string;
-      amounts?: string;
+      token?: string;
+      amount?: string;
       expires_at?: string;
       ig_name?: string;
       src_name?: string;
@@ -1245,6 +1245,7 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
+    amount?: FingerprintNumberField;
     expiresAt?: FingerprintNumberField;
     blockNum?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
@@ -1255,6 +1256,7 @@ export interface Fingerprint {
     chainId?: FingerprintNumberField;
     blockTime?: FingerprintNumberField;
     txIdx?: FingerprintNumberField;
+    amount?: FingerprintNumberField;
     expiresAt?: FingerprintNumberField;
     blockNum?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;

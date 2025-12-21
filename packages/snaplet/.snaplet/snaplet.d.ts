@@ -617,8 +617,8 @@ interface Table_public_send_check_claimed {
   tx_idx: number | null;
   ephemeral_address: string | null;
   sender: string | null;
-  tokens: string | null;
-  amounts: string | null;
+  token: string | null;
+  amount: number | null;
   expires_at: number | null;
   redeemer: string | null;
   ig_name: string | null;
@@ -636,8 +636,8 @@ interface Table_public_send_check_created {
   tx_idx: number | null;
   ephemeral_address: string | null;
   sender: string | null;
-  tokens: string | null;
-  amounts: string | null;
+  token: string | null;
+  amount: number | null;
   expires_at: number | null;
   ig_name: string | null;
   src_name: string | null;

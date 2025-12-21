@@ -9005,9 +9005,9 @@
           "maxLength": null
         },
         {
-          "id": "public.send_check_claimed.tokens",
-          "name": "tokens",
-          "columnName": "tokens",
+          "id": "public.send_check_claimed.token",
+          "name": "token",
+          "columnName": "token",
           "type": "bytea",
           "isRequired": false,
           "kind": "scalar",
@@ -9019,10 +9019,10 @@
           "maxLength": null
         },
         {
-          "id": "public.send_check_claimed.amounts",
-          "name": "amounts",
-          "columnName": "amounts",
-          "type": "bytea",
+          "id": "public.send_check_claimed.amount",
+          "name": "amount",
+          "columnName": "amount",
+          "type": "numeric",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,
@@ -9275,9 +9275,9 @@
           "maxLength": null
         },
         {
-          "id": "public.send_check_created.tokens",
-          "name": "tokens",
-          "columnName": "tokens",
+          "id": "public.send_check_created.token",
+          "name": "token",
+          "columnName": "token",
           "type": "bytea",
           "isRequired": false,
           "kind": "scalar",
@@ -9289,10 +9289,10 @@
           "maxLength": null
         },
         {
-          "id": "public.send_check_created.amounts",
-          "name": "amounts",
-          "columnName": "amounts",
-          "type": "bytea",
+          "id": "public.send_check_created.amount",
+          "name": "amount",
+          "columnName": "amount",
+          "type": "numeric",
           "isRequired": false,
           "kind": "scalar",
           "isList": false,
