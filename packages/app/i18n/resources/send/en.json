@@ -5,15 +5,20 @@
     "preview": "Preview and Send"
   },
   "check": {
-    "button": "Send a Check",
+    "button": "Send Check",
     "buttonDescription": "Send to anyone, even without an account",
-    "title": "Create Check",
+    "title": "Send Check",
     "amount": "Amount",
     "token": "Token",
     "expiration": "Expires",
     "expirationPlaceholder": "Select expiration date",
-    "create": "Create Check",
+    "create": "Send Check",
     "defaultExpiry": "7 days from now",
+    "fee": "Fees",
+    "success": {
+      "warningTitle": "Save this link before leaving",
+      "warningDescription": "If the link is lost, cancel the check to recover funds and send a new check."
+    },
     "claim": {
       "title": "Claim a Check",
       "codeDescription": "Enter the check code to claim tokens",
@@ -58,11 +63,12 @@
       "createdAt": "Created",
       "claimed": "Claimed",
       "pending": "Pending",
-      "revoke": "Revoke",
-      "confirmRevoke": "Confirm",
-      "cancel": "Cancel",
-      "revokeSuccess": "Check revoked successfully",
-      "revokeError": "Failed to revoke check",
+      "sentCheck": "Sent Check",
+      "cancelCheck": "Cancel",
+      "confirmCancel": "Confirm",
+      "keepCheck": "Keep",
+      "cancelSuccess": "Check cancelled successfully",
+      "cancelError": "Failed to cancel check",
       "showHistory": "Show History",
       "hideHistory": "Hide History"
     }

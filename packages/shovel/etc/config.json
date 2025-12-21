@@ -1597,9 +1597,9 @@
         {
           "name": "log_addr",
           "column": "log_addr",
-          "filter_op": "eq",
+          "filter_op": "contains",
           "filter_arg": [
-            "0x11eeF3894EcDCA6cCD5186c8FBB0BD4F6a928403"
+            "0x3e8493A4D9526dACca71959487cb5583c26a39FF"
           ]
         }
       ],
@@ -1643,12 +1643,12 @@
             "type": "bytea"
           },
           {
-            "name": "tokens",
+            "name": "token",
             "type": "bytea"
           },
           {
-            "name": "amounts",
-            "type": "bytea"
+            "name": "amount",
+            "type": "numeric"
           },
           {
             "name": "expires_at",
@@ -1679,12 +1679,12 @@
               {
                 "name": "tokens",
                 "type": "address[]",
-                "column": "tokens"
+                "column": "token"
               },
               {
                 "name": "amounts",
                 "type": "uint256[]",
-                "column": "amounts"
+                "column": "amount"
               },
               {
                 "name": "expiresAt",
@@ -1733,9 +1733,9 @@
         {
           "name": "log_addr",
           "column": "log_addr",
-          "filter_op": "eq",
+          "filter_op": "contains",
           "filter_arg": [
-            "0x11eeF3894EcDCA6cCD5186c8FBB0BD4F6a928403"
+            "0x3e8493A4D9526dACca71959487cb5583c26a39FF"
           ]
         }
       ],
@@ -1779,12 +1779,12 @@
             "type": "bytea"
           },
           {
-            "name": "tokens",
+            "name": "token",
             "type": "bytea"
           },
           {
-            "name": "amounts",
-            "type": "bytea"
+            "name": "amount",
+            "type": "numeric"
           },
           {
             "name": "expires_at",
@@ -1819,12 +1819,12 @@
               {
                 "name": "tokens",
                 "type": "address[]",
-                "column": "tokens"
+                "column": "token"
               },
               {
                 "name": "amounts",
                 "type": "uint256[]",
-                "column": "amounts"
+                "column": "amount"
               },
               {
                 "name": "expiresAt",

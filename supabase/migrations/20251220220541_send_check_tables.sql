@@ -232,20 +232,26 @@ grant truncate on table "public"."send_check_created" to "service_role";
 
 grant update on table "public"."send_check_created" to "service_role";
 
-create policy "authenticated can read send check claimed"
+create policy "users can see claims for checks they created or claimed"
 on "public"."send_check_claimed"
 as permissive
 for select
-to authenticated
-using (true);
+to public
+using (((EXISTS ( SELECT 1
+   FROM send_accounts
+  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND (send_accounts.address_bytes = send_check_claimed.sender)))) OR (EXISTS ( SELECT 1
+   FROM send_accounts
+  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND (send_accounts.address_bytes = send_check_claimed.redeemer))))));
 
 
-create policy "authenticated can read send check created"
+create policy "users can see checks they created"
 on "public"."send_check_created"
 as permissive
 for select
-to authenticated
-using (true);
+to public
+using ((EXISTS ( SELECT 1
+   FROM send_accounts
+  WHERE ((send_accounts.user_id = ( SELECT auth.uid() AS uid)) AND (send_accounts.address_bytes = send_check_created.sender)))));
 
 
 

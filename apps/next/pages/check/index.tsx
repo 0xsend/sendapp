@@ -16,7 +16,9 @@ export const Page: NextPageWithLayout = () => {
 
 const CheckLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <HomeLayout TopNav={<TopNav header="My Checks" backFunction="router" />}>{children}</HomeLayout>
+    <HomeLayout TopNav={<TopNav header="My Checks" backFunction="router" showOnGtLg />}>
+      {children}
+    </HomeLayout>
   )
 }
 

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useSendAccount } from './send-accounts'
 import { useSendUserOpMutation } from './sendUserOp'
@@ -14,50 +14,19 @@ import {
 } from '@my/wagmi'
 import { encodeFunctionData, type Hex } from 'viem'
 import type { UserOperation } from 'permissionless'
-import { z } from 'zod'
+import type { Database, PgBytea } from '@my/supabase/database.types'
 
-const ACTIVE_CHECKS_QUERY_KEY = 'user_active_checks'
-const CHECKS_HISTORY_QUERY_KEY = 'user_checks_history'
+const USER_SEND_CHECKS_QUERY_KEY = 'user_send_checks'
 
-/**
- * Schema for active check data from Supabase
- */
-const ActiveCheckSchema = z.object({
-  id: z.number(),
-  chain_id: z.coerce.number(),
-  block_time: z.coerce.number(),
-  tx_hash: z.string(), // bytea comes as hex string
-  ephemeral_address: z.string(),
-  sender: z.string(),
-  amount: z.coerce.bigint(),
-  token: z.string(),
-  expires_at: z.coerce.number(),
-  block_num: z.coerce.number(),
-  is_expired: z.boolean(),
-})
+// Same page size as activity feed
+const PAGE_SIZE = 50
 
-export type ActiveCheck = z.infer<typeof ActiveCheckSchema>
+type GetUserChecksRow = Database['public']['Functions']['get_user_checks']['Returns'][number]
 
 /**
- * Schema for check history data from Supabase
+ * Check with computed status fields from the RPC function
  */
-const CheckHistorySchema = z.object({
-  id: z.number(),
-  chain_id: z.coerce.number(),
-  block_time: z.coerce.number(),
-  tx_hash: z.string(),
-  ephemeral_address: z.string(),
-  sender: z.string(),
-  amount: z.coerce.bigint(),
-  token: z.string(),
-  expires_at: z.coerce.number(),
-  block_num: z.coerce.number(),
-  is_claimed: z.boolean(),
-  claimed_by: z.string().nullable(),
-  claimed_at: z.coerce.number().nullable(),
-})
-
-export type CheckHistory = z.infer<typeof CheckHistorySchema>
+export type Check = GetUserChecksRow
 
 /**
  * Get the SendCheck contract address for the current chain.
@@ -67,72 +36,51 @@ function getSendCheckAddress(chainId: number): Hex | null {
 }
 
 /**
- * Hook to fetch active (unclaimed) checks for the current user.
+ * Hook to fetch paginated checks for the current user with infinite scroll.
+ * Active checks are returned first, then history, ordered by block_time DESC.
  */
-export function useUserActiveChecks() {
+export function useUserSendChecks({ pageSize = PAGE_SIZE }: { pageSize?: number } = {}) {
   const supabase = useSupabase()
   const { data: sendAccount } = useSendAccount()
   const userAddress = sendAccount?.address
+  const sendAccountId = sendAccount?.id
 
-  return useQuery({
-    queryKey: [ACTIVE_CHECKS_QUERY_KEY, userAddress],
-    enabled: !!userAddress,
-    queryFn: async () => {
+  return useInfiniteQuery({
+    queryKey: [USER_SEND_CHECKS_QUERY_KEY, sendAccountId, userAddress, pageSize],
+    enabled: !!userAddress && !!sendAccountId,
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
       assert(!!userAddress, 'User address is required')
 
       // Convert address to bytea format for Supabase
-      const addressBytes = `\\x${userAddress.slice(2).toLowerCase()}`
+      const addressBytes = `\\x${userAddress.slice(2).toLowerCase()}` as PgBytea
 
-      const { data, error } = await supabase.rpc('get_user_active_checks', {
+      const { data, error } = await supabase.rpc('get_user_checks', {
         user_address: addressBytes,
+        page_limit: pageSize,
+        page_offset: pageParam * pageSize,
       })
 
       if (error) {
-        throw new Error(error.message || 'Failed to fetch active checks')
+        throw new Error(error.message || 'Failed to fetch checks')
       }
 
-      return z.array(ActiveCheckSchema).parse(data ?? [])
+      return (data ?? []) as Check[]
+    },
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+      if (lastPage.length < pageSize) {
+        return undefined
+      }
+      return lastPageParam + 1
     },
   })
 }
 
-useUserActiveChecks.queryKey = ACTIVE_CHECKS_QUERY_KEY
-
-/**
- * Hook to fetch check history (all checks, including claimed) for the current user.
- */
-export function useUserChecksHistory() {
-  const supabase = useSupabase()
-  const { data: sendAccount } = useSendAccount()
-  const userAddress = sendAccount?.address
-
-  return useQuery({
-    queryKey: [CHECKS_HISTORY_QUERY_KEY, userAddress],
-    enabled: !!userAddress,
-    queryFn: async () => {
-      assert(!!userAddress, 'User address is required')
-
-      // Convert address to bytea format for Supabase
-      const addressBytes = `\\x${userAddress.slice(2).toLowerCase()}`
-
-      const { data, error } = await supabase.rpc('get_user_checks_history', {
-        user_address: addressBytes,
-      })
-
-      if (error) {
-        throw new Error(error.message || 'Failed to fetch check history')
-      }
-
-      return z.array(CheckHistorySchema).parse(data ?? [])
-    },
-  })
-}
-
-useUserChecksHistory.queryKey = CHECKS_HISTORY_QUERY_KEY
+useUserSendChecks.queryKey = USER_SEND_CHECKS_QUERY_KEY
 
 export type RevokeCheckArgs = {
   ephemeralAddress: Hex
-  webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
+  webauthnCreds: { raw_credential_id: PgBytea; name: string }[]
 }
 
 /**
@@ -188,8 +136,7 @@ export function useSendCheckRevoke() {
     // Invalidate queries to refresh the check lists
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] }),
-      queryClient.invalidateQueries({ queryKey: [ACTIVE_CHECKS_QUERY_KEY] }),
-      queryClient.invalidateQueries({ queryKey: [CHECKS_HISTORY_QUERY_KEY] }),
+      queryClient.invalidateQueries({ queryKey: [USER_SEND_CHECKS_QUERY_KEY] }),
     ])
 
     return receipt.receipt.transactionHash

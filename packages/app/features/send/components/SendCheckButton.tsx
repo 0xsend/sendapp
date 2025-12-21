@@ -1,5 +1,5 @@
 import { Card, Paragraph, useThemeName, XStack, YStack } from '@my/ui'
-import { Gift } from '@tamagui/lucide-icons'
+import { FileSignature } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
 
@@ -18,7 +18,7 @@ export const SendCheckButton = () => {
       hoverStyle={{ opacity: 0.9, scale: 0.995 }}
       pressStyle={{ scale: 0.98 }}
       animation="100ms"
-      onPress={() => router.push('/check/create')}
+      onPress={() => router.push('/check/send')}
       bc={isDark ? '$color2' : '$gray2'}
       maw={600}
       $sm={{ maw: '100%' }}
@@ -32,7 +32,7 @@ export const SendCheckButton = () => {
           jc="center"
           bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
         >
-          <Gift size="$1.5" color={isDark ? '$primary' : '$color12'} />
+          <FileSignature size="$1.5" color={isDark ? '$primary' : '$color12'} />
         </XStack>
         <YStack f={1} gap="$1">
           <Paragraph size="$5" fontWeight="600" color="$color12">

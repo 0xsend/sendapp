@@ -1,119 +1,62 @@
--- View to get active (unclaimed) checks
--- A check is active if it was created but not claimed
-CREATE OR REPLACE VIEW "public"."send_checks_active" AS
-SELECT
-    c.id,
-    c.chain_id,
-    c.block_time,
-    c.tx_hash,
-    c.ephemeral_address,
-    c.sender,
-    c.tokens,
-    c.amounts,
-    c.expires_at,
-    c.block_num,
-    -- Computed fields
-    (c.expires_at <= EXTRACT(EPOCH FROM NOW()))::boolean AS is_expired
-FROM "public"."send_check_created" c
-LEFT JOIN "public"."send_check_claimed" cl
-    ON c.ephemeral_address = cl.ephemeral_address
-    AND c.chain_id = cl.chain_id
-WHERE cl.id IS NULL;
-
-ALTER VIEW "public"."send_checks_active" OWNER TO "postgres";
-
--- Grant access to the view
-GRANT SELECT ON "public"."send_checks_active" TO "anon";
-GRANT SELECT ON "public"."send_checks_active" TO "authenticated";
-GRANT SELECT ON "public"."send_checks_active" TO "service_role";
-
--- Function to get active checks for a sender address
-CREATE OR REPLACE FUNCTION public.get_user_active_checks(user_address bytea)
-RETURNS TABLE(
-    id integer,
-    chain_id numeric,
-    block_time numeric,
-    tx_hash bytea,
-    ephemeral_address bytea,
-    sender bytea,
-    tokens bytea,
-    amounts bytea,
-    expires_at numeric,
-    block_num numeric,
-    is_expired boolean
+-- Function to get paginated checks for a sender with claim status
+-- Aggregates multiple tokens per check into arrays
+-- Active checks (not claimed, not expired) come first, then history by date descending
+CREATE OR REPLACE FUNCTION public.get_user_checks(
+    user_address bytea,
+    page_limit integer DEFAULT 50,
+    page_offset integer DEFAULT 0
 )
-LANGUAGE sql
-STABLE
-AS $function$
-SELECT
-    c.id,
-    c.chain_id,
-    c.block_time,
-    c.tx_hash,
-    c.ephemeral_address,
-    c.sender,
-    c.tokens,
-    c.amounts,
-    c.expires_at,
-    c.block_num,
-    c.is_expired
-FROM "public"."send_checks_active" c
-WHERE c.sender = user_address
-ORDER BY c.block_time DESC;
-$function$;
-
-ALTER FUNCTION "public"."get_user_active_checks"("user_address" bytea) OWNER TO "postgres";
-
-REVOKE ALL ON FUNCTION "public"."get_user_active_checks"("user_address" bytea) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."get_user_active_checks"("user_address" bytea) TO "anon";
-GRANT ALL ON FUNCTION "public"."get_user_active_checks"("user_address" bytea) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."get_user_active_checks"("user_address" bytea) TO "service_role";
-
--- Function to get all checks created by a sender (including claimed ones)
-CREATE OR REPLACE FUNCTION public.get_user_checks_history(user_address bytea)
 RETURNS TABLE(
-    id integer,
+    ephemeral_address bytea,
+    sender bytea,
     chain_id numeric,
     block_time numeric,
     tx_hash bytea,
-    ephemeral_address bytea,
-    sender bytea,
-    tokens bytea,
-    amounts bytea,
-    expires_at numeric,
     block_num numeric,
+    expires_at numeric,
+    tokens bytea[],
+    amounts numeric[],
+    is_expired boolean,
     is_claimed boolean,
     claimed_by bytea,
-    claimed_at numeric
+    claimed_at numeric,
+    is_active boolean
 )
 LANGUAGE sql
 STABLE
 AS $function$
 SELECT
-    c.id,
-    c.chain_id,
-    c.block_time,
-    c.tx_hash,
     c.ephemeral_address,
     c.sender,
-    c.tokens,
-    c.amounts,
-    c.expires_at,
-    c.block_num,
-    (cl.id IS NOT NULL)::boolean AS is_claimed,
-    cl.redeemer AS claimed_by,
-    cl.block_time AS claimed_at
+    c.chain_id,
+    MAX(c.block_time) AS block_time,
+    (array_agg(c.tx_hash))[1] AS tx_hash,
+    MAX(c.block_num) AS block_num,
+    MAX(c.expires_at) AS expires_at,
+    array_agg(c.token ORDER BY c.abi_idx) AS tokens,
+    array_agg(c.amount ORDER BY c.abi_idx) AS amounts,
+    (MAX(c.expires_at) <= EXTRACT(EPOCH FROM NOW()))::boolean AS is_expired,
+    bool_or(cl.id IS NOT NULL) AS is_claimed,
+    (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] AS claimed_by,
+    MAX(cl.block_time) AS claimed_at,
+    (NOT bool_or(cl.id IS NOT NULL) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW()))::boolean AS is_active
 FROM "public"."send_check_created" c
 LEFT JOIN "public"."send_check_claimed" cl
     ON c.ephemeral_address = cl.ephemeral_address
     AND c.chain_id = cl.chain_id
+    AND c.abi_idx = cl.abi_idx
 WHERE c.sender = user_address
-ORDER BY c.block_time DESC;
+GROUP BY c.ephemeral_address, c.sender, c.chain_id
+ORDER BY
+    (NOT bool_or(cl.id IS NOT NULL) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW())) DESC,
+    MAX(c.block_time) DESC
+LIMIT page_limit
+OFFSET page_offset;
 $function$;
 
-ALTER FUNCTION "public"."get_user_checks_history"("user_address" bytea) OWNER TO "postgres";
+ALTER FUNCTION "public"."get_user_checks"(bytea, integer, integer) OWNER TO "postgres";
 
-REVOKE ALL ON FUNCTION "public"."get_user_checks_history"("user_address" bytea) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."get_user_checks_history"("user_address" bytea) TO "anon";
-GRANT ALL ON FUNCTION "public"."get_user_checks_history"("user_address" bytea) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."get_user_checks_history"("user_address" bytea) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) TO "anon";
+GRANT EXECUTE ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) TO "authenticated";
+GRANT EXECUTE ON FUNCTION "public"."get_user_checks"(bytea, integer, integer) TO "service_role";

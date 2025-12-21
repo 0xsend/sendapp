@@ -1,21 +1,33 @@
-import { Button, Card, FadeCard, H3, Paragraph, Spinner, useAppToast, XStack, YStack } from '@my/ui'
-import { CheckCircle, Clock, Gift, Plus, RotateCcw, XCircle } from '@tamagui/lucide-icons'
+import {
+  Button,
+  FadeCard,
+  Paragraph,
+  PrimaryButton,
+  Shimmer,
+  Spinner,
+  Text,
+  useAppToast,
+  XStack,
+  YStack,
+} from '@my/ui'
+import { ArrowUp, Clock, Plus, XCircle } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import { useSendAccount } from 'app/utils/send-accounts'
-import {
-  useUserActiveChecks,
-  useUserChecksHistory,
-  useSendCheckRevoke,
-  type ActiveCheck,
-  type CheckHistory,
-} from 'app/utils/useSendCheckManagement'
-import { formatUnits, type Hex } from 'viem'
-import { allCoinsDict } from 'app/data/coins'
+import { useUserSendChecks, useSendCheckRevoke, type Check } from 'app/utils/useSendCheck'
+import { formatUnits, checksumAddress } from 'viem'
+import { allCoinsDict, type coin } from 'app/data/coins'
+import { FlashList } from '@shopify/flash-list'
+import { IconCoin } from 'app/components/icons'
+import { byteaToHex } from 'app/utils/byteaToHex'
+import type { PgBytea } from '@my/supabase/database.types'
 import debug from 'debug'
 
 const log = debug('app:features:check')
+
+// Activity-style row height
+const ROW_HEIGHT = 102
 
 export function CheckScreen() {
   const router = useRouter()
@@ -24,49 +36,33 @@ export function CheckScreen() {
   return (
     <YStack f={1} gap="$5" w="100%" maxWidth={600}>
       <FadeCard>
-        <YStack gap="$4">
-          <H3 color="$color12">{t('check.manage.title')}</H3>
-          <ActiveChecksList />
-          <ChecksHistorySection />
-        </YStack>
-        <XStack gap="$3">
-          <Button
-            size="$5"
-            f={1}
-            onPress={() => router.push('/check/claim')}
-            bc="$color3"
-            $theme-light={{ bc: '$gray3' }}
-          >
-            <Button.Icon>
-              <Gift size="$1" color="$color12" />
-            </Button.Icon>
-            <Button.Text color="$color12" fontWeight="600">
-              {t('check.claim.title')}
-            </Button.Text>
-          </Button>
-          <Button
-            size="$5"
-            f={1}
-            onPress={() => router.push('/check/create')}
-            bc="$primary"
-            $theme-light={{ bc: '$color12' }}
-          >
-            <Button.Icon>
-              <Plus size="$1" color="$color1" />
-            </Button.Icon>
-            <Button.Text color="$color1" fontWeight="600">
-              {t('check.button')}
-            </Button.Text>
-          </Button>
-        </XStack>
+        <ChecksList />
+        <PrimaryButton onPress={() => router.push('/check/send')}>
+          <PrimaryButton.Icon>
+            <Plus size={16} color="$black" />
+          </PrimaryButton.Icon>
+          <PrimaryButton.Text>{t('check.button')}</PrimaryButton.Text>
+        </PrimaryButton>
       </FadeCard>
     </YStack>
   )
 }
 
-function ActiveChecksList() {
+function ChecksList() {
   const { t } = useTranslation('send')
-  const { data: checks, isLoading, error } = useUserActiveChecks()
+  const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useUserSendChecks()
+
+  const onEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [hasNextPage, fetchNextPage, isFetchingNextPage])
+
+  const flattenedChecks = useMemo(() => {
+    if (!data?.pages) return []
+    return data.pages.flat()
+  }, [data?.pages])
 
   if (isLoading) {
     return (
@@ -90,7 +86,7 @@ function ActiveChecksList() {
     )
   }
 
-  if (!checks || checks.length === 0) {
+  if (flattenedChecks.length === 0) {
     return (
       <Paragraph color="$color10" size="$3" py="$4">
         {t('check.manage.noActiveChecks')}
@@ -99,15 +95,112 @@ function ActiveChecksList() {
   }
 
   return (
-    <YStack gap="$2">
-      {checks.map((check) => (
-        <ActiveCheckCard key={check.id} check={check} />
-      ))}
+    <YStack f={1} minHeight={200}>
+      <FlashList
+        data={flattenedChecks}
+        estimatedItemSize={ROW_HEIGHT}
+        keyExtractor={(item) => `${item.ephemeral_address}-${item.chain_id}`}
+        renderItem={({ item, index }) => (
+          <CheckCard
+            check={item}
+            isFirst={index === 0}
+            isLast={index === flattenedChecks.length - 1}
+          />
+        )}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
+      />
     </YStack>
   )
 }
 
-function ActiveCheckCard({ check }: { check: ActiveCheck }) {
+/**
+ * Parse tokens and amounts into display items
+ * Note: amounts come from Postgres as strings (numeric type) to preserve precision
+ */
+function useTokenItems(tokens: string[], amounts: (string | number)[]) {
+  return useMemo(() => {
+    const items: { coin: coin | undefined; formatted: string }[] = []
+    for (let i = 0; i < tokens.length; i++) {
+      const rawToken = tokens[i]
+      if (!rawToken) continue
+      const tokenAddress = checksumAddress(byteaToHex(rawToken as PgBytea))
+      const tokenCoin = allCoinsDict[tokenAddress as keyof typeof allCoinsDict]
+      const decimals = tokenCoin?.decimals ?? 18
+      const rawAmount = amounts[i]
+      const amount = rawAmount ? BigInt(rawAmount.toString()) : 0n
+      const formatted = formatUnits(amount, decimals)
+      items.push({ coin: tokenCoin, formatted })
+    }
+    return items
+  }, [tokens, amounts])
+}
+
+/**
+ * Avatar-style icon for the check (shows first token's coin icon with send arrow)
+ */
+function CheckAvatar({ tokens }: { tokens: string[] }) {
+  const firstToken = tokens[0]
+  if (!firstToken) {
+    return (
+      <XStack w={52} h={52} br="$4" bc="$color3" ai="center" jc="center">
+        <Clock size="$2" color="$color10" />
+      </XStack>
+    )
+  }
+  const tokenAddress = checksumAddress(byteaToHex(firstToken as PgBytea))
+  const tokenCoin = allCoinsDict[tokenAddress as keyof typeof allCoinsDict]
+
+  return (
+    <XStack w={52} h={52} ai="center" jc="center" position="relative">
+      {tokenCoin ? (
+        <IconCoin symbol={tokenCoin.symbol} size="$5" />
+      ) : (
+        <XStack w={52} h={52} br="$4" bc="$color3" ai="center" jc="center">
+          <Clock size="$2" color="$color10" />
+        </XStack>
+      )}
+      {/* Arrow indicator like activity feed */}
+      <XStack
+        position="absolute"
+        bottom={0}
+        right={0}
+        x="$0.5"
+        y="$0.5"
+        scale={0.85}
+        bc="$error"
+        borderRadius={999}
+        borderWidth={2}
+        borderColor="$color1"
+      >
+        <ArrowUp size="$1" color="$white" />
+      </XStack>
+    </XStack>
+  )
+}
+
+/**
+ * Format relative time for display
+ */
+function formatRelativeDate(date: Date): string {
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) return 'Today'
+  if (diffDays === 1) return 'Yesterday'
+  if (diffDays < 7) return `${diffDays} days ago`
+  return date.toLocaleDateString()
+}
+
+interface CheckCardProps {
+  check: Check
+  isFirst: boolean
+  isLast: boolean
+}
+
+const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardProps) {
   const { t } = useTranslation('send')
   const toast = useAppToast()
   const { data: sendAccount } = useSendAccount()
@@ -122,14 +215,9 @@ function ActiveCheckCard({ check }: { check: ActiveCheck }) {
     [sendAccount?.send_account_credentials]
   )
 
-  const tokenAddress = check.token.startsWith('\\x') ? `0x${check.token.slice(2)}` : check.token
-  const coin = allCoinsDict[tokenAddress.toLowerCase()]
-  const decimals = coin?.decimals ?? 18
-  const symbol = coin?.symbol ?? 'tokens'
-  const formattedAmount = formatUnits(check.amount, decimals)
-
-  const expiresAt = new Date(check.expires_at * 1000)
-  const isExpired = check.is_expired
+  const tokenItems = useTokenItems(check.tokens ?? [], check.amounts ?? [])
+  const expiresAt = new Date(Number(check.expires_at) * 1000)
+  const createdAt = new Date(Number(check.block_time) * 1000)
 
   const handleRevoke = useCallback(async () => {
     if (!isConfirming) {
@@ -138,15 +226,12 @@ function ActiveCheckCard({ check }: { check: ActiveCheck }) {
     }
 
     try {
-      const ephemeralAddress = check.ephemeral_address.startsWith('\\x')
-        ? (`0x${check.ephemeral_address.slice(2)}` as Hex)
-        : (check.ephemeral_address as Hex)
-
+      const ephemeralAddress = byteaToHex(check.ephemeral_address as PgBytea)
       await revokeCheck({ ephemeralAddress, webauthnCreds })
-      toast.show(t('check.manage.revokeSuccess'))
+      toast.show(t('check.manage.cancelSuccess'))
     } catch (error) {
-      log('Failed to revoke check:', error)
-      toast.error(error instanceof Error ? error.message : t('check.manage.revokeError'))
+      log('Failed to cancel check:', error)
+      toast.error(error instanceof Error ? error.message : t('check.manage.cancelError'))
     } finally {
       setIsConfirming(false)
     }
@@ -156,146 +241,125 @@ function ActiveCheckCard({ check }: { check: ActiveCheck }) {
     setIsConfirming(false)
   }, [])
 
-  return (
-    <Card padded elevation={1} br="$4" p="$3">
-      <XStack jc="space-between" ai="center">
-        <YStack gap="$1">
-          <Paragraph color="$color12" fontWeight="600" fontSize="$4">
-            {formattedAmount} {symbol}
-          </Paragraph>
-          <XStack ai="center" gap="$1">
-            <Clock size="$0.5" color={isExpired ? '$error' : '$color10'} />
-            <Paragraph color={isExpired ? '$error' : '$color10'} fontSize="$2">
-              {isExpired
-                ? t('check.manage.expired')
-                : `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`}
-            </Paragraph>
-          </XStack>
-        </YStack>
+  // Format amount text (e.g., "100 USDC" or "100 USDC + 50 SEND")
+  const amountText = tokenItems
+    .map((item) => `${item.formatted} ${item.coin?.symbol ?? 'tokens'}`)
+    .join(' + ')
 
-        {isConfirming ? (
-          <XStack gap="$2">
-            <Button
-              size="$2"
-              variant="outlined"
-              onPress={handleCancelConfirm}
-              disabled={isRevoking}
-            >
-              <Button.Text fontSize="$2">{t('check.manage.cancel')}</Button.Text>
-            </Button>
-            <Button
-              size="$2"
-              bc="$error"
-              onPress={handleRevoke}
-              disabled={isRevoking || webauthnCreds.length === 0}
-            >
-              {isRevoking ? (
-                <Spinner size="small" color="$color1" />
-              ) : (
-                <Button.Text color="$color1" fontSize="$2">
-                  {t('check.manage.confirmRevoke')}
-                </Button.Text>
-              )}
-            </Button>
-          </XStack>
-        ) : (
-          <Button
-            size="$2"
-            variant="outlined"
-            onPress={handleRevoke}
-            disabled={webauthnCreds.length === 0}
-          >
-            <Button.Icon>
-              <RotateCcw size="$0.75" />
-            </Button.Icon>
-            <Button.Text fontSize="$2">{t('check.manage.revoke')}</Button.Text>
-          </Button>
-        )}
-      </XStack>
-    </Card>
-  )
-}
+  // Title text based on status
+  const getTitleText = () => {
+    if (check.is_active) return t('check.manage.sentCheck')
+    if (check.is_claimed) return t('check.manage.claimed')
+    return t('check.manage.expired')
+  }
 
-function ChecksHistorySection() {
-  const { t } = useTranslation('send')
-  const { data: checks, isLoading, error } = useUserChecksHistory()
-  const [showHistory, setShowHistory] = useState(false)
+  // Date text - show expiration for active, created date for others
+  const getDateText = () => {
+    if (check.is_active) {
+      return `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`
+    }
+    return formatRelativeDate(createdAt)
+  }
 
-  if (isLoading || error || !checks || checks.length === 0) {
-    return null
+  // Border radius based on position
+  const borderRadius = {
+    borderTopLeftRadius: isFirst ? '$4' : 0,
+    borderTopRightRadius: isFirst ? '$4' : 0,
+    borderBottomLeftRadius: isLast ? '$4' : 0,
+    borderBottomRightRadius: isLast ? '$4' : 0,
   }
 
   return (
-    <YStack gap="$2">
-      <Button
-        size="$3"
-        chromeless
-        onPress={() => setShowHistory(!showHistory)}
-        jc="flex-start"
-        px="$0"
-      >
-        <Button.Text color="$color10" fontSize="$3">
-          {showHistory ? t('check.manage.hideHistory') : t('check.manage.showHistory')} (
-          {checks.length})
-        </Button.Text>
-      </Button>
+    <XStack
+      w="100%"
+      h={ROW_HEIGHT}
+      gap="$3.5"
+      p="$3.5"
+      bc="$background"
+      borderWidth={1}
+      borderColor="$color1"
+      ai="flex-start"
+      hoverStyle={{ bc: '$color2' }}
+      cursor="pointer"
+      {...borderRadius}
+    >
+      {/* Avatar */}
+      <CheckAvatar tokens={check.tokens ?? []} />
 
-      {showHistory && (
-        <YStack gap="$2">
-          {checks.map((check) => (
-            <HistoryCheckCard key={check.id} check={check} />
-          ))}
-        </YStack>
-      )}
-    </YStack>
-  )
-}
-
-function HistoryCheckCard({ check }: { check: CheckHistory }) {
-  const { t } = useTranslation('send')
-
-  const tokenAddress = check.token.startsWith('\\x') ? `0x${check.token.slice(2)}` : check.token
-  const coin = allCoinsDict[tokenAddress.toLowerCase()]
-  const decimals = coin?.decimals ?? 18
-  const symbol = coin?.symbol ?? 'tokens'
-  const formattedAmount = formatUnits(check.amount, decimals)
-
-  const createdAt = new Date(check.block_time * 1000)
-
-  return (
-    <Card padded elevation={1} br="$4" p="$3">
-      <XStack jc="space-between" ai="center">
-        <YStack gap="$1">
-          <Paragraph color="$color12" fontWeight="600" fontSize="$4">
-            {formattedAmount} {symbol}
-          </Paragraph>
-          <Paragraph color="$color10" fontSize="$2">
-            {createdAt.toLocaleDateString()}
-          </Paragraph>
-        </YStack>
-        <XStack
-          ai="center"
-          gap="$1"
-          bc={check.is_claimed ? '$green3' : '$color3'}
-          px="$2"
-          py="$1"
-          br="$2"
-        >
-          {check.is_claimed ? (
-            <CheckCircle size="$0.5" color="$green10" />
-          ) : (
-            <Clock size="$0.5" color="$color10" />
-          )}
-          <Paragraph
-            color={check.is_claimed ? '$green10' : '$color10'}
-            fontSize="$2"
-            fontWeight="500"
-          >
-            {check.is_claimed ? t('check.manage.claimed') : t('check.manage.pending')}
-          </Paragraph>
+      {/* Content - matches activity feed layout */}
+      <YStack f={1} gap="$1" overflow="hidden">
+        {/* Title row: event name + amount */}
+        <XStack jc="space-between" gap="$1.5" w="100%">
+          <Text color="$color12" fontSize="$5" fontWeight="500">
+            {getTitleText()}
+          </Text>
+          <Text>&nbsp;</Text>
+          <Text color="$color12" fontSize="$5" fontWeight="500" ta="right">
+            {amountText}
+          </Text>
         </XStack>
-      </XStack>
-    </Card>
+
+        {/* Date row + action */}
+        <XStack jc="space-between" ai="center">
+          <Paragraph color="$color10" size="$3" o={0.6}>
+            {getDateText()}
+          </Paragraph>
+
+          {/* Cancel action for active checks only */}
+          {check.is_active &&
+            (isConfirming ? (
+              <XStack gap="$2">
+                <Button
+                  size="$2"
+                  variant="outlined"
+                  onPress={handleCancelConfirm}
+                  disabled={isRevoking}
+                >
+                  <Button.Text fontSize="$2">{t('check.manage.keepCheck')}</Button.Text>
+                </Button>
+                <Button
+                  size="$2"
+                  bc="$error"
+                  onPress={handleRevoke}
+                  disabled={isRevoking || webauthnCreds.length === 0}
+                >
+                  {isRevoking ? (
+                    <Spinner size="small" color="$color1" />
+                  ) : (
+                    <Button.Text color="$color1" fontSize="$2">
+                      {t('check.manage.confirmCancel')}
+                    </Button.Text>
+                  )}
+                </Button>
+              </XStack>
+            ) : (
+              <Button
+                size="$2"
+                variant="outlined"
+                onPress={handleRevoke}
+                disabled={webauthnCreds.length === 0}
+              >
+                <Button.Icon>
+                  <XCircle size={14} />
+                </Button.Icon>
+                <Button.Text fontSize="$2">{t('check.manage.cancelCheck')}</Button.Text>
+              </Button>
+            ))}
+        </XStack>
+      </YStack>
+    </XStack>
+  )
+})
+
+function ListFooterComponent() {
+  return (
+    <Shimmer
+      br="$4"
+      componentName="Card"
+      $theme-light={{ bg: '$background' }}
+      w="100%"
+      h={ROW_HEIGHT}
+    />
   )
 }
 

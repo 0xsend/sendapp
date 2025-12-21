@@ -1,9 +1,5 @@
 import type { BlockData, Column, Integration, Table } from '@indexsupply/shovel-config'
-
-// TODO: Import from @my/wagmi/generated once deployed to mainnet
-// import { sendCheckAddress } from '@my/wagmi/generated'
-// Local dev address (CREATE2 with salt=0 from anvil deployer)
-const SEND_CHECK_ADDRESS = '0x11eeF3894EcDCA6cCD5186c8FBB0BD4F6a928403'
+import { sendCheckAddress } from '@my/wagmi/generated'
 
 export const sendCheckClaimedTable: Table = {
   name: 'send_check_claimed',
@@ -17,8 +13,8 @@ export const sendCheckClaimedTable: Table = {
     { name: 'log_addr', type: 'bytea' },
     { name: 'ephemeral_address', type: 'bytea' },
     { name: 'sender', type: 'bytea' },
-    { name: 'tokens', type: 'bytea' },
-    { name: 'amounts', type: 'bytea' },
+    { name: 'token', type: 'bytea' },
+    { name: 'amount', type: 'numeric' },
     { name: 'expires_at', type: 'numeric' },
     { name: 'redeemer', type: 'bytea' },
   ] as Column[],
@@ -37,8 +33,8 @@ export const integration: Omit<Integration, 'sources'> = {
     {
       name: 'log_addr',
       column: 'log_addr',
-      filter_op: 'eq',
-      filter_arg: [SEND_CHECK_ADDRESS],
+      filter_op: 'contains',
+      filter_arg: [...new Set(Object.values(sendCheckAddress))].sort() as `0x${string}`[],
     },
   ] as BlockData[],
   table: sendCheckClaimedTable,
@@ -54,8 +50,8 @@ export const integration: Omit<Integration, 'sources'> = {
         components: [
           { name: 'ephemeralAddress', type: 'address', column: 'ephemeral_address' },
           { name: 'from', type: 'address', column: 'sender' },
-          { name: 'tokens', type: 'address[]', column: 'tokens' },
-          { name: 'amounts', type: 'uint256[]', column: 'amounts' },
+          { name: 'tokens', type: 'address[]', column: 'token' },
+          { name: 'amounts', type: 'uint256[]', column: 'amount' },
           { name: 'expiresAt', type: 'uint256', column: 'expires_at' },
         ],
       },

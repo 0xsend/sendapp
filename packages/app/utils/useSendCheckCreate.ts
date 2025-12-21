@@ -1,21 +1,15 @@
-import {
-  baseMainnetClient,
-  sendAccountAbi,
-  sendCheckAbi,
-  sendCheckAddress,
-  tokenPaymasterAddress,
-  baseMainnet,
-} from '@my/wagmi'
-import { useQuery, useMutation, type UseQueryResult, useQueryClient } from '@tanstack/react-query'
-import type { UserOperation } from 'permissionless'
-import { encodeFunctionData, type Hex, isAddress, erc20Abi } from 'viem'
+import { baseMainnetClient, sendCheckAbi, sendCheckAddress } from '@my/wagmi'
+import { useQueryClient } from '@tanstack/react-query'
+import { encodeFunctionData, type Hex, isAddress, erc20Abi, hexToBytes, bytesToHex } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { assert } from './assert'
-import { defaultUserOp } from './userOpConstants'
 import { useSendAccount } from './send-accounts'
-import { useAccountNonce } from './userop'
+import { useAccountNonce, useUserOp, type SendAccountCall } from './userop'
 import { useSendUserOpMutation } from './sendUserOp'
 import { encodeCheckCode } from './checkCode'
+import { useUSDCFees } from './useUSDCFees'
+import { useMemo, useState, useCallback } from 'react'
+import { base64urlnopad } from '@scure/base'
 
 /**
  * Get the SendCheck contract address for the current chain.
@@ -47,112 +41,52 @@ export type TokenAmount = {
   amount: bigint
 }
 
-export type UseGenerateSendCheckUserOpArgs = {
-  sender?: Hex
-  tokenAmounts?: TokenAmount[]
-  expiresAt?: bigint
-  ephemeralAddress?: Hex
-  nonce?: bigint
-}
-
 /**
- * Generates a user operation for creating a SendCheck with multiple tokens.
- * The user operation includes:
- * 1. Approve the SendCheck contract to spend each token
- * 2. Call createCheck on the SendCheck contract with token arrays
+ * Builds the calls for creating a SendCheck with multiple tokens.
+ * Used for both fee estimation and actual transaction submission.
  */
-export function useGenerateSendCheckUserOp({
-  sender,
+function buildSendCheckCalls({
   tokenAmounts,
-  expiresAt,
   ephemeralAddress,
-  nonce,
-}: UseGenerateSendCheckUserOpArgs): UseQueryResult<UserOperation<'v0.7'>> {
-  const chainId = baseMainnetClient.chain.id
-  const checkAddress = getSendCheckAddress(chainId)
+  expiresAt,
+  checkAddress,
+}: {
+  tokenAmounts: TokenAmount[]
+  ephemeralAddress: Hex
+  expiresAt: bigint
+  checkAddress: Hex
+}): SendAccountCall[] {
+  const calls: SendAccountCall[] = []
 
-  return useQuery({
-    queryKey: [
-      'generateSendCheckUserOp',
-      sender,
-      tokenAmounts?.map((ta) => `${ta.token}:${ta.amount}`).join(','),
-      String(expiresAt),
-      ephemeralAddress,
-      String(nonce),
-    ],
-    enabled:
-      !!sender &&
-      !!tokenAmounts &&
-      tokenAmounts.length > 0 &&
-      !!checkAddress &&
-      expiresAt !== undefined &&
-      !!ephemeralAddress &&
-      nonce !== undefined,
-    queryFn: (): UserOperation<'v0.7'> => {
-      assert(!!sender && isAddress(sender), 'Invalid sender address')
-      assert(!!tokenAmounts && tokenAmounts.length > 0, 'No tokens provided')
-      assert(tokenAmounts.length <= 5, 'Too many tokens (max 5)')
-      assert(!!checkAddress && isAddress(checkAddress), 'SendCheck contract not deployed')
-      assert(typeof expiresAt === 'bigint' && expiresAt > 0n, 'Invalid expiration')
-      assert(!!ephemeralAddress && isAddress(ephemeralAddress), 'Invalid ephemeral address')
-      assert(typeof nonce === 'bigint' && nonce >= 0n, 'Invalid nonce')
+  // Add approve calls for each token
+  for (const ta of tokenAmounts) {
+    calls.push({
+      dest: ta.token,
+      value: 0n,
+      data: encodeFunctionData({
+        abi: erc20Abi,
+        functionName: 'approve',
+        args: [checkAddress, ta.amount],
+      }),
+    })
+  }
 
-      // Validate each token
-      for (const ta of tokenAmounts) {
-        assert(!!ta.token && isAddress(ta.token), 'Invalid token address')
-        assert(typeof ta.amount === 'bigint' && ta.amount > 0n, 'Invalid amount')
-      }
+  // Extract tokens and amounts arrays
+  const tokens = tokenAmounts.map((ta) => ta.token)
+  const amounts = tokenAmounts.map((ta) => ta.amount)
 
-      // Build batch calls: approve each token, then createCheck
-      const batchCalls: { dest: Hex; value: bigint; data: Hex }[] = []
-
-      // Add approve calls for each token
-      for (const ta of tokenAmounts) {
-        batchCalls.push({
-          dest: ta.token,
-          value: 0n,
-          data: encodeFunctionData({
-            abi: erc20Abi,
-            functionName: 'approve',
-            args: [checkAddress, ta.amount],
-          }),
-        })
-      }
-
-      // Extract tokens and amounts arrays
-      const tokens = tokenAmounts.map((ta) => ta.token)
-      const amounts = tokenAmounts.map((ta) => ta.amount)
-
-      // Add createCheck call with arrays
-      batchCalls.push({
-        dest: checkAddress,
-        value: 0n,
-        data: encodeFunctionData({
-          abi: sendCheckAbi,
-          functionName: 'createCheck',
-          args: [tokens, ephemeralAddress, amounts, expiresAt],
-        }),
-      })
-
-      const callData = encodeFunctionData({
-        abi: sendAccountAbi,
-        functionName: 'executeBatch',
-        args: [batchCalls],
-      })
-
-      const paymaster = tokenPaymasterAddress[chainId]
-      const userOp: UserOperation<'v0.7'> = {
-        ...defaultUserOp,
-        sender,
-        nonce,
-        callData,
-        paymaster,
-        paymasterData: '0x',
-        signature: '0x',
-      }
-      return userOp
-    },
+  // Add createCheck call with arrays
+  calls.push({
+    dest: checkAddress,
+    value: 0n,
+    data: encodeFunctionData({
+      abi: sendCheckAbi,
+      functionName: 'createCheck',
+      args: [tokens, ephemeralAddress, amounts, expiresAt],
+    }),
   })
+
+  return calls
 }
 
 /**
@@ -166,8 +100,8 @@ export function createSendCheckClaimUrl({
   ephemeralPrivateKey: Hex
   chainId: number
 }): string {
-  // Encode the private key in base64 for URL safety
-  const encodedKey = Buffer.from(ephemeralPrivateKey.slice(2), 'hex').toString('base64url')
+  // Encode the private key in base64url for URL safety
+  const encodedKey = base64urlnopad.encode(hexToBytes(ephemeralPrivateKey))
 
   // Create the claim URL - this should point to a claim page
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://send.app'
@@ -192,8 +126,8 @@ export function decodeSendCheckClaimUrl(url: string): {
 
     if (!encodedKey || !chainIdStr) return null
 
-    const privateKeyBytes = Buffer.from(encodedKey, 'base64url')
-    const ephemeralPrivateKey = `0x${privateKeyBytes.toString('hex')}` as Hex
+    const privateKeyBytes = base64urlnopad.decode(encodedKey)
+    const ephemeralPrivateKey = bytesToHex(privateKeyBytes)
     const chainId = Number.parseInt(chainIdStr, 10)
 
     return { ephemeralPrivateKey, chainId }
@@ -203,8 +137,6 @@ export function decodeSendCheckClaimUrl(url: string): {
 }
 
 export type SendCheckCreateArgs = {
-  tokenAmounts: TokenAmount[]
-  expiresAt: bigint
   webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
 }
 
@@ -215,107 +147,128 @@ export type SendCheckCreateResult = {
   txHash: Hex
 }
 
+export type UseSendCheckCreateArgs = {
+  tokenAmounts?: TokenAmount[]
+  expiresAt?: bigint
+}
+
 /**
  * Hook for creating a SendCheck with multiple tokens.
- * Handles ephemeral keypair generation, user operation creation, signing, and submission.
+ * Prepares the UserOp upfront to calculate fees, then submits when createCheck is called.
  */
-export function useSendCheckCreate() {
+export function useSendCheckCreate({ tokenAmounts, expiresAt }: UseSendCheckCreateArgs = {}) {
   const { data: sendAccount } = useSendAccount()
-  const { data: nonce } = useAccountNonce({ sender: sendAccount?.address })
+  const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
   const { mutateAsync: sendUserOpAsync, isPending, error } = useSendUserOpMutation()
   const queryClient = useQueryClient()
   const chainId = baseMainnetClient.chain.id
   const checkAddress = getSendCheckAddress(chainId)
 
-  const createCheck = async ({
-    tokenAmounts,
-    expiresAt,
-    webauthnCreds,
-  }: SendCheckCreateArgs): Promise<SendCheckCreateResult> => {
-    assert(!!sendAccount?.address, 'Send account not loaded')
-    assert(!!checkAddress, 'SendCheck contract not deployed on this chain')
-    assert(nonce !== undefined, 'Account nonce not loaded')
-    assert(webauthnCreds.length > 0, 'No webauthn credentials available')
-    assert(tokenAmounts.length > 0, 'No tokens provided')
-    assert(tokenAmounts.length <= 5, 'Too many tokens (max 5)')
+  // Generate ephemeral keypair once and keep it stable for fee estimation
+  const [ephemeralKeyPair] = useState<EphemeralKeyPair>(() => generateEphemeralKeyPair())
 
-    // Generate ephemeral keypair for the check
-    const ephemeralKeyPair = generateEphemeralKeyPair()
+  // Build calls for fee estimation
+  const calls = useMemo(() => {
+    if (
+      !tokenAmounts ||
+      tokenAmounts.length === 0 ||
+      !checkAddress ||
+      expiresAt === undefined ||
+      !ephemeralKeyPair
+    ) {
+      return undefined
+    }
 
-    // Build batch calls: approve each token, then createCheck
-    const batchCalls: { dest: Hex; value: bigint; data: Hex }[] = []
-
-    // Add approve calls for each token
+    // Validate inputs
     for (const ta of tokenAmounts) {
-      batchCalls.push({
-        dest: ta.token,
-        value: 0n,
-        data: encodeFunctionData({
-          abi: erc20Abi,
-          functionName: 'approve',
-          args: [checkAddress, ta.amount],
-        }),
+      if (!ta.token || !isAddress(ta.token) || typeof ta.amount !== 'bigint' || ta.amount <= 0n) {
+        return undefined
+      }
+    }
+
+    return buildSendCheckCalls({
+      tokenAmounts,
+      ephemeralAddress: ephemeralKeyPair.address,
+      expiresAt,
+      checkAddress,
+    })
+  }, [tokenAmounts, checkAddress, expiresAt, ephemeralKeyPair])
+
+  // Prepare UserOp for fee estimation
+  const {
+    data: userOp,
+    error: userOpError,
+    isLoading: isLoadingUserOp,
+    refetch: refetchUserOp,
+  } = useUserOp({ sender, calls })
+
+  // Calculate USDC fees
+  const {
+    data: usdcFees,
+    error: usdcFeesError,
+    isLoading: isLoadingFees,
+    refetch: refetchFees,
+  } = useUSDCFees({ userOp })
+
+  const isPreparing = isLoadingUserOp || isLoadingFees
+  const prepareError = userOpError || usdcFeesError
+
+  const refetchPrepare = useCallback(async () => {
+    await refetchUserOp()
+    await refetchFees()
+  }, [refetchUserOp, refetchFees])
+
+  const createCheck = useCallback(
+    async ({ webauthnCreds }: SendCheckCreateArgs): Promise<SendCheckCreateResult> => {
+      assert(!!sender, 'Send account not loaded')
+      assert(!!checkAddress, 'SendCheck contract not deployed on this chain')
+      assert(!!userOp, 'UserOp not prepared')
+      assert(webauthnCreds.length > 0, 'No webauthn credentials available')
+      assert(!!tokenAmounts && tokenAmounts.length > 0, 'No tokens provided')
+      assert(tokenAmounts.length <= 5, 'Too many tokens (max 5)')
+
+      // Submit the user operation
+      const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
+
+      // Invalidate nonce query
+      await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+
+      // Generate claim URL and check code
+      const claimUrl = createSendCheckClaimUrl({
+        ephemeralPrivateKey: ephemeralKeyPair.privateKey,
+        chainId,
       })
-    }
+      const checkCode = encodeCheckCode(ephemeralKeyPair.privateKey)
 
-    // Extract tokens and amounts arrays
-    const tokens = tokenAmounts.map((ta) => ta.token)
-    const amounts = tokenAmounts.map((ta) => ta.amount)
-
-    // Add createCheck call with arrays
-    batchCalls.push({
-      dest: checkAddress,
-      value: 0n,
-      data: encodeFunctionData({
-        abi: sendCheckAbi,
-        functionName: 'createCheck',
-        args: [tokens, ephemeralKeyPair.address, amounts, expiresAt],
-      }),
-    })
-
-    const callData = encodeFunctionData({
-      abi: sendAccountAbi,
-      functionName: 'executeBatch',
-      args: [batchCalls],
-    })
-
-    const paymaster = tokenPaymasterAddress[chainId]
-    const userOp: UserOperation<'v0.7'> = {
-      ...defaultUserOp,
-      sender: sendAccount.address,
-      nonce,
-      callData,
-      paymaster,
-      paymasterData: '0x',
-      signature: '0x',
-    }
-
-    // Submit the user operation
-    const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
-
-    // Invalidate nonce query
-    await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
-
-    // Generate claim URL and check code
-    const claimUrl = createSendCheckClaimUrl({
-      ephemeralPrivateKey: ephemeralKeyPair.privateKey,
-      chainId,
-    })
-    const checkCode = encodeCheckCode(ephemeralKeyPair.privateKey)
-
-    return {
-      claimUrl,
-      checkCode,
+      return {
+        claimUrl,
+        checkCode,
+        ephemeralKeyPair,
+        txHash: receipt.receipt.transactionHash,
+      }
+    },
+    [
+      sender,
+      checkAddress,
+      userOp,
+      tokenAmounts,
+      sendUserOpAsync,
+      queryClient,
       ephemeralKeyPair,
-      txHash: receipt.receipt.transactionHash,
-    }
-  }
+      chainId,
+    ]
+  )
 
   return {
     createCheck,
     isPending,
     error,
-    isReady: !!sendAccount?.address && !!checkAddress && nonce !== undefined,
+    isPreparing,
+    prepareError,
+    userOp,
+    usdcFees,
+    refetchPrepare,
+    isReady: !!sender && !!checkAddress && !!userOp,
     checkAddress,
   }
 }
