@@ -8,7 +8,7 @@ import "../src/SendCheck.sol";
 /// @dev forge script ./script/DeploySendCheck.s.sol:DeploySendCheckScript
 contract DeploySendCheckScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() external returns (SendCheck) {
