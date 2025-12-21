@@ -5,7 +5,7 @@ import { useEffect, useCallback } from 'react'
 import { CheckPreviewCard, useCheckPreview } from './components/CheckPreviewCard'
 import { useSetReferralCode } from 'app/utils/useReferralCode'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { setAfterLoginRedirect } from 'app/utils/useAfterLoginRedirect'
+import { setAfterLoginRedirect } from 'app/utils/afterLoginRedirect'
 
 interface CheckPublicPreviewScreenProps {
   checkCode: string

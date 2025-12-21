@@ -1,6 +1,6 @@
 import { useRouter } from 'solito/router'
 import { useCallback } from 'react'
-import { consumeAfterLoginRedirect } from 'app/utils/useAfterLoginRedirect'
+import { consumeAfterLoginRedirect } from 'app/utils/afterLoginRedirect'
 
 export default function useAuthRedirect() {
   const router = useRouter()
