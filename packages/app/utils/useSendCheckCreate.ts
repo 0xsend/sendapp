@@ -1,6 +1,6 @@
 import { baseMainnetClient, sendCheckAbi, sendCheckAddress } from '@my/wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { encodeFunctionData, type Hex, isAddress, erc20Abi, hexToBytes, bytesToHex } from 'viem'
+import { encodeFunctionData, type Hex, isAddress, erc20Abi } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { assert } from './assert'
 import { useSendAccount } from './send-accounts'
@@ -9,7 +9,7 @@ import { useSendUserOpMutation } from './sendUserOp'
 import { encodeCheckCode } from './checkCode'
 import { useUSDCFees } from './useUSDCFees'
 import { useMemo, useState, useCallback } from 'react'
-import { base64urlnopad } from '@scure/base'
+import type { PgBytea } from '@my/supabase/database.types'
 
 /**
  * Get the SendCheck contract address for the current chain.
@@ -92,54 +92,18 @@ function buildSendCheckCalls({
 }
 
 /**
- * Encodes the ephemeral private key and check details into a shareable URL.
- * The recipient can use this URL to claim the check.
+ * Creates a shareable claim URL with the check code.
+ * @param checkCode - The base32 encoded check code
  */
-export function createSendCheckClaimUrl({
-  ephemeralPrivateKey,
-  chainId,
-}: {
-  ephemeralPrivateKey: Hex
-  chainId: number
-}): string {
-  // Encode the private key in base64url for URL safety
-  const encodedKey = base64urlnopad.encode(hexToBytes(ephemeralPrivateKey))
-
-  // Create the claim URL - this should point to a claim page
+export function createSendCheckClaimUrl(checkCode: string): string {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://send.app'
   const claimUrl = new URL('/check/claim', baseUrl)
-  claimUrl.searchParams.set('k', encodedKey)
-  claimUrl.searchParams.set('c', chainId.toString())
-
+  claimUrl.searchParams.set('code', checkCode)
   return claimUrl.toString()
 }
 
-/**
- * Decodes a claim URL back to the ephemeral private key.
- */
-export function decodeSendCheckClaimUrl(url: string): {
-  ephemeralPrivateKey: Hex
-  chainId: number
-} | null {
-  try {
-    const parsedUrl = new URL(url)
-    const encodedKey = parsedUrl.searchParams.get('k')
-    const chainIdStr = parsedUrl.searchParams.get('c')
-
-    if (!encodedKey || !chainIdStr) return null
-
-    const privateKeyBytes = base64urlnopad.decode(encodedKey)
-    const ephemeralPrivateKey = bytesToHex(privateKeyBytes)
-    const chainId = Number.parseInt(chainIdStr, 10)
-
-    return { ephemeralPrivateKey, chainId }
-  } catch {
-    return null
-  }
-}
-
 export type SendCheckCreateArgs = {
-  webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
+  webauthnCreds: { raw_credential_id: PgBytea; name: string }[]
 }
 
 export type SendCheckCreateResult = {
@@ -235,12 +199,9 @@ export function useSendCheckCreate({ tokenAmounts, expiresAt }: UseSendCheckCrea
       // Invalidate nonce query
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
 
-      // Generate claim URL and check code
-      const claimUrl = createSendCheckClaimUrl({
-        ephemeralPrivateKey: ephemeralKeyPair.privateKey,
-        chainId,
-      })
+      // Generate check code and claim URL
       const checkCode = encodeCheckCode(ephemeralKeyPair.privateKey)
+      const claimUrl = createSendCheckClaimUrl(checkCode)
 
       return {
         claimUrl,
@@ -249,16 +210,7 @@ export function useSendCheckCreate({ tokenAmounts, expiresAt }: UseSendCheckCrea
         txHash: receipt.receipt.transactionHash,
       }
     },
-    [
-      sender,
-      checkAddress,
-      userOp,
-      tokenAmounts,
-      sendUserOpAsync,
-      queryClient,
-      ephemeralKeyPair,
-      chainId,
-    ]
+    [sender, checkAddress, userOp, tokenAmounts, sendUserOpAsync, queryClient, ephemeralKeyPair]
   )
 
   return {

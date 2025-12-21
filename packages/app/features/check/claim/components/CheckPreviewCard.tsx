@@ -2,11 +2,10 @@ import { Avatar, Card, Paragraph, Spinner, XStack, YStack } from '@my/ui'
 import { Gift } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
-import { useCheckDetails, parseCheckCode, type TokenAmount } from 'app/utils/useSendCheckClaim'
+import { useCheckDetails, type TokenAmount } from 'app/utils/useSendCheckClaim'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { formatUnits } from 'viem'
 import { allCoinsDict } from 'app/data/coins'
-import { encodeCheckCode } from 'app/utils/checkCode'
 
 export interface TokenPreviewData {
   amount: string
@@ -19,6 +18,7 @@ export interface CheckPreviewData {
   expiresAt: Date
   isExpired: boolean
   isClaimed: boolean
+  isCanceled: boolean
   senderTag?: string
   senderAvatar?: string
 }
@@ -28,7 +28,7 @@ interface CheckPreviewCardProps {
 }
 
 export function useCheckPreview(checkCode: string | null) {
-  // Fetch check details
+  // Fetch check details (chain is encoded in the checkCode)
   const {
     data: checkDetails,
     isLoading: isLoadingDetails,
@@ -41,12 +41,6 @@ export function useCheckPreview(checkCode: string | null) {
     'address',
     senderAddress
   )
-
-  // Format the check code with dashes for display
-  const formattedCode = useMemo(() => {
-    if (!checkCode) return ''
-    return encodeCheckCode(parseCheckCode(checkCode) ?? ('0x' as `0x${string}`))
-  }, [checkCode])
 
   // Format check details for display
   const previewData = useMemo((): CheckPreviewData | null => {
@@ -73,6 +67,7 @@ export function useCheckPreview(checkCode: string | null) {
       expiresAt,
       isExpired: checkDetails.isExpired,
       isClaimed: checkDetails.isClaimed,
+      isCanceled: checkDetails.isCanceled,
       senderTag: senderProfile?.tag,
       senderAvatar: senderProfile?.avatar_url,
     }
@@ -81,7 +76,6 @@ export function useCheckPreview(checkCode: string | null) {
   return {
     checkDetails,
     previewData,
-    formattedCode,
     isLoading: isLoadingDetails,
     isLoadingProfile,
     error: detailsError,
@@ -167,7 +161,12 @@ export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
         </Paragraph>
 
         {/* Status warnings */}
-        {previewData.isClaimed && (
+        {previewData.isCanceled && (
+          <Paragraph color="$orange10" size="$3" fontWeight="600">
+            {t('check.claim.canceled')}
+          </Paragraph>
+        )}
+        {previewData.isClaimed && !previewData.isCanceled && (
           <Paragraph color="$orange10" size="$3" fontWeight="600">
             {t('check.claim.alreadyClaimed')}
           </Paragraph>

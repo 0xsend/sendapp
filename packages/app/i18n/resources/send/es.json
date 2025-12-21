@@ -6,6 +6,7 @@
   },
   "check": {
     "button": "Enviar Cheque",
+    "buttonDescription": "Enviar a cualquiera mediante un enlace compartible",
     "amount": "Monto",
     "expiration": "Vence",
     "create": "Enviar Cheque",
@@ -38,6 +39,7 @@
       "verifying": "Verificando cheque...",
       "notFound": "Cheque no encontrado o inválido",
       "alreadyClaimed": "Este cheque ya fue reclamado",
+      "canceled": "Este cheque ha sido cancelado",
       "expired": "Este cheque ha vencido",
       "preview": {
         "someone": "Alguien",

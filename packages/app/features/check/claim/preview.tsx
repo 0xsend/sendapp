@@ -20,11 +20,11 @@ export function CheckClaimPreviewScreen() {
   const { claimCheck, isPending: isSubmitting, isReady } = useSendCheckClaim()
   const [claimed, setClaimed] = useState(false)
 
-  // Get check code from URL params
-  const rawCode = searchParams?.get('code') ?? ''
+  // Get check code from URL params (includes chain)
+  const checkCode = searchParams?.get('code') ?? ''
 
   // Use shared preview hook
-  const { checkDetails, previewData, isLoading, error } = useCheckPreview(rawCode || null)
+  const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)
 
   const webauthnCreds = useMemo(
     () =>
@@ -36,7 +36,7 @@ export function CheckClaimPreviewScreen() {
 
   const canSubmit =
     isReady &&
-    rawCode &&
+    checkCode &&
     webauthnCreds.length > 0 &&
     !isSubmitting &&
     checkDetails &&
@@ -45,14 +45,14 @@ export function CheckClaimPreviewScreen() {
 
   const onClaim = useCallback(async () => {
     try {
-      await claimCheck({ checkCode: rawCode, webauthnCreds })
+      await claimCheck({ checkCode, webauthnCreds })
       setClaimed(true)
       toast.show(t('check.claim.success'))
     } catch (err) {
       log('Failed to claim check:', err)
       toast.error(err instanceof Error ? err.message : t('check.claim.error'))
     }
-  }, [claimCheck, rawCode, webauthnCreds, toast, t])
+  }, [claimCheck, checkCode, webauthnCreds, toast, t])
 
   // Loading state
   if (isLoading) {
@@ -128,7 +128,7 @@ export function CheckClaimPreviewScreen() {
   // Preview state
   return (
     <YStack f={1} gap="$5" w="100%" maxWidth={600}>
-      <CheckPreviewCard checkCode={rawCode} />
+      <CheckPreviewCard checkCode={checkCode} />
 
       {/* Claim Button */}
       <Button

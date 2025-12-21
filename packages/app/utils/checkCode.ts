@@ -49,15 +49,7 @@ export function decodeCheckCode(code: string): Hex | null {
     const padded = cleaned + '='.repeat(padLength)
     const bytes = base32.decode(padded)
 
-    // Pad to 32 bytes if needed (shouldn't be necessary with Base32)
-    if (bytes.length < 32) {
-      const paddedBytes = new Uint8Array(32)
-      paddedBytes.set(bytes, 32 - bytes.length)
-      const hexStr = Array.from(paddedBytes)
-        .map((b) => b.toString(16).padStart(2, '0'))
-        .join('')
-      return `0x${hexStr}` as Hex
-    }
+    if (bytes.length !== 32) return null
 
     // Convert to hex
     const hexStr = Array.from(bytes)
@@ -74,7 +66,7 @@ export function decodeCheckCode(code: string): Hex | null {
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
 
 /**
- * Check if a string looks like a valid check code
+ * Check if a string looks like a valid check code format
  */
 export function isValidCheckCodeFormat(code: string): boolean {
   const cleaned = unformat(code).toUpperCase()

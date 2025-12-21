@@ -6,6 +6,7 @@
   },
   "check": {
     "button": "Send Check",
+    "buttonDescription": "Send to anyone via a shareable link",
     "amount": "Amount",
     "expiration": "Expires",
     "create": "Send Check",
@@ -38,6 +39,7 @@
       "verifying": "Verifying check...",
       "notFound": "Check not found or invalid",
       "alreadyClaimed": "This check has already been claimed",
+      "canceled": "This check has been canceled",
       "expired": "This check has expired",
       "preview": {
         "someone": "Someone",

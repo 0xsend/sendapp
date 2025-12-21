@@ -7,7 +7,7 @@ import {
 } from '@my/wagmi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { UserOperation } from 'permissionless'
-import { encodeFunctionData, type Hex, keccak256, encodePacked, zeroAddress } from 'viem'
+import { encodeFunctionData, type Hex, keccak256, encodePacked } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { assert } from './assert'
 import { defaultUserOp } from './userOpConstants'
@@ -15,6 +15,18 @@ import { useSendAccount } from './send-accounts'
 import { useAccountNonce } from './userop'
 import { useSendUserOpMutation } from './sendUserOp'
 import { decodeCheckCode, isValidCheckCodeFormat } from './checkCode'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import type { Database, PgBytea } from '@my/supabase/database.types'
+import { byteaToHex } from './byteaToHex'
+
+/**
+ * Parse a chain string to a numeric chain ID.
+ * Returns the number if parseable, null otherwise.
+ */
+export function parseChainId(chain: string): number | null {
+  const parsed = Number.parseInt(chain, 10)
+  return Number.isNaN(parsed) ? null : parsed
+}
 
 /**
  * Get the SendCheck contract address for the current chain.
@@ -40,6 +52,9 @@ export type TokenAmount = {
   amount: bigint
 }
 
+type GetCheckByEphemeralAddressRow =
+  Database['public']['Functions']['get_check_by_ephemeral_address']['Returns'][number]
+
 export type CheckDetails = {
   ephemeralAddress: Hex
   from: Hex
@@ -47,65 +62,65 @@ export type CheckDetails = {
   expiresAt: bigint
   isExpired: boolean
   isClaimed: boolean
+  isActive: boolean
+  isCanceled: boolean
+  claimedBy: Hex | null
+  claimedAt: bigint | null
 }
 
 /**
- * Hook to fetch check details from the contract using a check code.
- * Returns null if check doesn't exist or has been claimed.
+ * Hook to fetch check details from the indexer database using a check code.
+ * Returns null if check doesn't exist.
+ * @param checkCode - The check code (base32 encoded)
  */
 export function useCheckDetails(checkCode: string | null) {
-  const chainId = baseMainnetClient.chain.id
-  const checkAddress = getSendCheckAddress(chainId)
-
+  const supabase = useSupabase()
   const privateKey = checkCode ? parseCheckCode(checkCode) : null
+  const chainId = baseMainnetClient.chain.id
 
   return useQuery({
-    queryKey: ['checkDetails', checkCode],
-    enabled: !!privateKey && !!checkAddress,
+    queryKey: ['checkDetails', checkCode, chainId, privateKey],
+    enabled: !!privateKey,
     queryFn: async (): Promise<CheckDetails | null> => {
-      if (!privateKey || !checkAddress) return null
+      if (!privateKey) return null
 
       const ephemeralAccount = privateKeyToAccount(privateKey)
 
-      // Read check details from contract
-      // Contract returns: (address ephemeralAddress, address from, CheckAmount[] amounts, uint256 expiresAt)
-      const result = await baseMainnetClient.readContract({
-        address: checkAddress,
-        abi: sendCheckAbi,
-        functionName: 'checks',
-        args: [ephemeralAccount.address],
+      // Convert address to bytea format for Supabase
+      const addressBytes = `\\x${ephemeralAccount.address.slice(2).toLowerCase()}` as PgBytea
+
+      const { data, error } = await supabase.rpc('get_check_by_ephemeral_address', {
+        check_ephemeral_address: addressBytes,
+        check_chain_id: chainId,
       })
 
-      const [ephemeralAddress, from, checkAmounts, expiresAt] = result as [
-        Hex,
-        Hex,
-        readonly { token: Hex; amount: bigint }[],
-        bigint,
-      ]
-
-      // Check if the check exists (from address is not zero)
-      if (from === zeroAddress) {
-        return null
+      if (error) {
+        throw new Error(error.message || 'Failed to fetch check details')
       }
 
-      const now = BigInt(Math.floor(Date.now() / 1000))
-      const isExpired = expiresAt < now
-      // A check is claimed if there are no amounts or all amounts are 0
-      const isClaimed = checkAmounts.length === 0 || checkAmounts.every((a) => a.amount === 0n)
+      // Function returns an array, but should have at most one result
+      const row = (data as GetCheckByEphemeralAddressRow[])?.[0]
+      if (!row) {
+        throw new Error('Check not found')
+      }
 
-      // Map CheckAmount[] to TokenAmount[]
-      const tokenAmounts: TokenAmount[] = checkAmounts.map((ca) => ({
-        token: ca.token,
-        amount: ca.amount,
+      // Parse tokens and amounts arrays into TokenAmount[]
+      const tokenAmounts: TokenAmount[] = row.tokens.map((token, i) => ({
+        token: byteaToHex(token as PgBytea),
+        amount: BigInt(row.amounts[i] ?? 0),
       }))
 
       return {
-        ephemeralAddress,
-        from,
+        ephemeralAddress: byteaToHex(row.ephemeral_address as PgBytea),
+        from: byteaToHex(row.sender as PgBytea),
         tokenAmounts,
-        expiresAt,
-        isExpired,
-        isClaimed,
+        expiresAt: BigInt(row.expires_at),
+        isExpired: row.is_expired,
+        isClaimed: row.is_claimed,
+        isActive: row.is_active,
+        isCanceled: row.is_canceled,
+        claimedBy: row.claimed_by ? byteaToHex(row.claimed_by as PgBytea) : null,
+        claimedAt: row.claimed_at ? BigInt(row.claimed_at) : null,
       }
     },
     staleTime: 10000, // 10 seconds
@@ -114,7 +129,7 @@ export function useCheckDetails(checkCode: string | null) {
 
 export type SendCheckClaimArgs = {
   checkCode: string
-  webauthnCreds: { raw_credential_id: `\\x${string}`; name: string }[]
+  webauthnCreds: { raw_credential_id: PgBytea; name: string }[]
 }
 
 export type SendCheckClaimResult = {
@@ -131,23 +146,27 @@ export function useSendCheckClaim() {
   const { data: nonce } = useAccountNonce({ sender: sendAccount?.address })
   const { mutateAsync: sendUserOpAsync, isPending, error } = useSendUserOpMutation()
   const queryClient = useQueryClient()
-  const chainId = baseMainnetClient.chain.id
-  const checkAddress = getSendCheckAddress(chainId)
 
   const claimCheck = async ({
     checkCode,
     webauthnCreds,
   }: SendCheckClaimArgs): Promise<SendCheckClaimResult> => {
+    // Decode the check code to get the ephemeral private key
+    const privateKey = parseCheckCode(checkCode)
+    assert(!!privateKey, 'Invalid check code')
+
+    const chainId = baseMainnetClient.chain.id
+    const checkAddress = getSendCheckAddress(chainId)
+
     assert(!!sendAccount?.address, 'Send account not loaded')
-    assert(!!checkAddress, 'SendCheck contract not deployed on this chain')
+    assert(checkAddress !== null, 'SendCheck contract not deployed on this chain')
     assert(nonce !== undefined, 'Account nonce not loaded')
     assert(webauthnCreds.length > 0, 'No webauthn credentials available')
 
-    // Decode the check code to get the ephemeral private key
-    const ephemeralPrivateKey = parseCheckCode(checkCode)
-    assert(!!ephemeralPrivateKey, 'Invalid check code')
+    // TypeScript doesn't narrow after assert, so we need to cast
+    const contractAddress = checkAddress as Hex
 
-    const ephemeralAccount = privateKeyToAccount(ephemeralPrivateKey)
+    const ephemeralAccount = privateKeyToAccount(privateKey)
 
     // Sign the claimer's address and chain ID with the ephemeral key
     // The contract expects a signature of keccak256(abi.encodePacked(msg.sender, block.chainid))
@@ -159,18 +178,15 @@ export function useSendCheckClaim() {
     })
 
     // Create call data for claimCheck
+    const innerCallData = encodeFunctionData({
+      abi: sendCheckAbi,
+      functionName: 'claimCheck',
+      args: [ephemeralAccount.address, signature],
+    })
     const callData = encodeFunctionData({
       abi: sendAccountAbi,
-      functionName: 'execute',
-      args: [
-        checkAddress,
-        0n,
-        encodeFunctionData({
-          abi: sendCheckAbi,
-          functionName: 'claimCheck',
-          args: [ephemeralAccount.address, signature],
-        }),
-      ],
+      functionName: 'executeBatch',
+      args: [[{ dest: contractAddress, value: 0n, data: innerCallData }]],
     })
 
     const paymaster = tokenPaymasterAddress[chainId]
@@ -199,7 +215,6 @@ export function useSendCheckClaim() {
     claimCheck,
     isPending,
     error,
-    isReady: !!sendAccount?.address && !!checkAddress && nonce !== undefined,
-    checkAddress,
+    isReady: !!sendAccount?.address && nonce !== undefined,
   }
 }

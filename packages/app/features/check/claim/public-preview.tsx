@@ -6,16 +6,16 @@ import { CheckPreviewCard, useCheckPreview } from './components/CheckPreviewCard
 import { useSetReferralCode } from 'app/utils/useReferralCode'
 
 interface CheckPublicPreviewScreenProps {
-  code: string
+  checkCode: string
 }
 
-export function CheckPublicPreviewScreen({ code }: CheckPublicPreviewScreenProps) {
+export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreenProps) {
   const router = useRouter()
   const { t } = useTranslation('send')
   const { mutate: setReferralCode } = useSetReferralCode()
 
-  // Use shared preview hook
-  const { checkDetails, previewData, isLoading, error } = useCheckPreview(code || null)
+  // Use shared preview hook (chain is encoded in the checkCode)
+  const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)
 
   // Set the sender's sendtag as the referral code when preview loads
   useEffect(() => {
@@ -49,13 +49,12 @@ export function CheckPublicPreviewScreen({ code }: CheckPublicPreviewScreenProps
     )
   }
 
-  // Build sign-up URL with redirect to claim preview after auth
-  const encodedCode = encodeURIComponent(code)
-  const redirectUri = encodeURIComponent(`/check/claim/preview?code=${encodedCode}`)
+  // Build sign-up URL with redirect to claim after auth
+  const redirectUri = encodeURIComponent(`/check/claim?code=${encodeURIComponent(checkCode)}`)
 
   return (
     <YStack f={1} gap="$5" w="100%" maxWidth={600}>
-      <CheckPreviewCard checkCode={code} />
+      <CheckPreviewCard checkCode={checkCode} />
 
       {/* Auth Button */}
       <Button

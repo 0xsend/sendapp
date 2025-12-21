@@ -6,6 +6,7 @@
   },
   "check": {
     "button": "Scheck senden",
+    "buttonDescription": "An jeden über einen teilbaren Link senden",
     "amount": "Betrag",
     "expiration": "Läuft ab",
     "create": "Scheck senden",
@@ -38,6 +39,7 @@
       "verifying": "Scheck wird überprüft...",
       "notFound": "Scheck nicht gefunden oder ungültig",
       "alreadyClaimed": "Dieser Scheck wurde bereits eingelöst",
+      "canceled": "Dieser Scheck wurde storniert",
       "expired": "Dieser Scheck ist abgelaufen",
       "preview": {
         "someone": "Jemand",
