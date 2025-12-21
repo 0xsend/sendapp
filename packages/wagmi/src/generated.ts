@@ -3658,8 +3658,15 @@ export const sendCheckAbi = [
     outputs: [
       { name: '', internalType: 'address', type: 'address' },
       { name: '', internalType: 'address', type: 'address' },
-      { name: '', internalType: 'contract IERC20[]', type: 'address[]' },
-      { name: '', internalType: 'uint256[]', type: 'uint256[]' },
+      {
+        name: '',
+        internalType: 'struct CheckAmount[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
       { name: '', internalType: 'uint256', type: 'uint256' },
     ],
     stateMutability: 'view',
@@ -3684,9 +3691,16 @@ export const sendCheckAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'tokens', internalType: 'contract IERC20[]', type: 'address[]' },
+      {
+        name: 'amounts',
+        internalType: 'struct CheckAmount[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
       { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
-      { name: 'amounts', internalType: 'uint256[]', type: 'uint256[]' },
       { name: 'expiresAt', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'createCheck',
@@ -3704,8 +3718,15 @@ export const sendCheckAbi = [
         components: [
           { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
           { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'tokens', internalType: 'contract IERC20[]', type: 'address[]' },
-          { name: 'amounts', internalType: 'uint256[]', type: 'uint256[]' },
+          {
+            name: 'amounts',
+            internalType: 'struct CheckAmount[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'token', internalType: 'contract IERC20', type: 'address' },
+              { name: 'amount', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
           { name: 'expiresAt', internalType: 'uint256', type: 'uint256' },
         ],
         indexed: false,
@@ -3725,8 +3746,15 @@ export const sendCheckAbi = [
         components: [
           { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
           { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'tokens', internalType: 'contract IERC20[]', type: 'address[]' },
-          { name: 'amounts', internalType: 'uint256[]', type: 'uint256[]' },
+          {
+            name: 'amounts',
+            internalType: 'struct CheckAmount[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'token', internalType: 'contract IERC20', type: 'address' },
+              { name: 'amount', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
           { name: 'expiresAt', internalType: 'uint256', type: 'uint256' },
         ],
         indexed: false,

@@ -68,6 +68,7 @@ export function useCheckDetails(checkCode: string | null) {
       const ephemeralAccount = privateKeyToAccount(privateKey)
 
       // Read check details from contract
+      // Contract returns: (address ephemeralAddress, address from, CheckAmount[] amounts, uint256 expiresAt)
       const result = await baseMainnetClient.readContract({
         address: checkAddress,
         abi: sendCheckAbi,
@@ -75,11 +76,10 @@ export function useCheckDetails(checkCode: string | null) {
         args: [ephemeralAccount.address],
       })
 
-      const [ephemeralAddress, from, tokens, amounts, expiresAt] = result as [
+      const [ephemeralAddress, from, checkAmounts, expiresAt] = result as [
         Hex,
         Hex,
-        readonly Hex[],
-        readonly bigint[],
+        readonly { token: Hex; amount: bigint }[],
         bigint,
       ]
 
@@ -90,13 +90,13 @@ export function useCheckDetails(checkCode: string | null) {
 
       const now = BigInt(Math.floor(Date.now() / 1000))
       const isExpired = expiresAt < now
-      // A check is claimed if there are no tokens or all amounts are 0
-      const isClaimed = tokens.length === 0 || amounts.every((a) => a === 0n)
+      // A check is claimed if there are no amounts or all amounts are 0
+      const isClaimed = checkAmounts.length === 0 || checkAmounts.every((a) => a.amount === 0n)
 
-      // Combine tokens and amounts into TokenAmount array
-      const tokenAmounts: TokenAmount[] = tokens.map((token, i) => ({
-        token,
-        amount: amounts[i] ?? 0n,
+      // Map CheckAmount[] to TokenAmount[]
+      const tokenAmounts: TokenAmount[] = checkAmounts.map((ca) => ({
+        token: ca.token,
+        amount: ca.amount,
       }))
 
       return {
@@ -149,9 +149,11 @@ export function useSendCheckClaim() {
 
     const ephemeralAccount = privateKeyToAccount(ephemeralPrivateKey)
 
-    // Sign the claimer's address with the ephemeral key
-    // The contract expects a signature of keccak256(abi.encodePacked(msg.sender))
-    const messageHash = keccak256(encodePacked(['address'], [sendAccount.address]))
+    // Sign the claimer's address and chain ID with the ephemeral key
+    // The contract expects a signature of keccak256(abi.encodePacked(msg.sender, block.chainid))
+    const messageHash = keccak256(
+      encodePacked(['address', 'uint256'], [sendAccount.address, BigInt(chainId)])
+    )
     const signature = await ephemeralAccount.signMessage({
       message: { raw: messageHash },
     })

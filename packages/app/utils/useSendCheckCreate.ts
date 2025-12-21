@@ -71,18 +71,20 @@ function buildSendCheckCalls({
     })
   }
 
-  // Extract tokens and amounts arrays
-  const tokens = tokenAmounts.map((ta) => ta.token)
-  const amounts = tokenAmounts.map((ta) => ta.amount)
+  // Build CheckAmount[] array for the new contract format
+  const checkAmounts = tokenAmounts.map((ta) => ({
+    token: ta.token,
+    amount: ta.amount,
+  }))
 
-  // Add createCheck call with arrays
+  // Add createCheck call with CheckAmount[] struct array
   calls.push({
     dest: checkAddress,
     value: 0n,
     data: encodeFunctionData({
       abi: sendCheckAbi,
       functionName: 'createCheck',
-      args: [tokens, ephemeralAddress, amounts, expiresAt],
+      args: [checkAmounts, ephemeralAddress, expiresAt],
     }),
   })
 

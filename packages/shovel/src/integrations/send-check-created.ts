@@ -49,8 +49,14 @@ export const integration: Omit<Integration, 'sources'> = {
         components: [
           { name: 'ephemeralAddress', type: 'address', column: 'ephemeral_address' },
           { name: 'from', type: 'address', column: 'sender' },
-          { name: 'tokens', type: 'address[]', column: 'token' },
-          { name: 'amounts', type: 'uint256[]', column: 'amount' },
+          {
+            name: 'amounts',
+            type: 'tuple[]',
+            components: [
+              { name: 'token', type: 'address', column: 'token' },
+              { name: 'amount', type: 'uint256', column: 'amount' },
+            ],
+          },
           { name: 'expiresAt', type: 'uint256', column: 'expires_at' },
         ],
       },

@@ -1677,14 +1677,20 @@
                 "column": "sender"
               },
               {
-                "name": "tokens",
-                "type": "address[]",
-                "column": "token"
-              },
-              {
                 "name": "amounts",
-                "type": "uint256[]",
-                "column": "amount"
+                "type": "tuple[]",
+                "components": [
+                  {
+                    "name": "token",
+                    "type": "address",
+                    "column": "token"
+                  },
+                  {
+                    "name": "amount",
+                    "type": "uint256",
+                    "column": "amount"
+                  }
+                ]
               },
               {
                 "name": "expiresAt",
@@ -1817,14 +1823,20 @@
                 "column": "sender"
               },
               {
-                "name": "tokens",
-                "type": "address[]",
-                "column": "token"
-              },
-              {
                 "name": "amounts",
-                "type": "uint256[]",
-                "column": "amount"
+                "type": "tuple[]",
+                "components": [
+                  {
+                    "name": "token",
+                    "type": "address",
+                    "column": "token"
+                  },
+                  {
+                    "name": "amount",
+                    "type": "uint256",
+                    "column": "amount"
+                  }
+                ]
               },
               {
                 "name": "expiresAt",
