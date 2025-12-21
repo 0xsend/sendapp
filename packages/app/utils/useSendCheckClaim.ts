@@ -201,13 +201,16 @@ export function useSendCheckClaim() {
       args: [[{ dest: contractAddress, value: 0n, data: innerCallData }]],
     })
 
-    // Build base userOp without paymaster data yet
+    // Build base userOp with paymaster address (required for correct hash computation)
+    // The paymaster's getHash includes gas limits from paymasterAndData, so paymaster must be set
+    // before sending to the server for signing
     const baseUserOp: UserOperation<'v0.7'> = {
       ...defaultUserOp,
       sender: sendAccount.address,
       nonce,
       callData,
       signature: '0x',
+      paymaster: sendVerifyingPaymasterAddress[chainId],
     }
 
     // Get paymaster signature from the server (sponsorship)
@@ -216,10 +219,9 @@ export function useSendCheckClaim() {
       entryPoint,
     })
 
-    // Update userOp with sponsored paymaster
+    // Update userOp with paymaster signature data
     const sponsoredUserOp: UserOperation<'v0.7'> = {
       ...baseUserOp,
-      paymaster: sendVerifyingPaymasterAddress[chainId],
       paymasterData: paymasterResult.paymasterData,
     }
 
