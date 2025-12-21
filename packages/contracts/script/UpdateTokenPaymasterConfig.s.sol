@@ -13,7 +13,7 @@ contract UpdateTokenPaymasterConfigScript is Script, Helper {
     uint40 private constant BASE_FEE_DEFAULT = 5e4; // ¢5
 
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

@@ -8,7 +8,7 @@ import {SendTokenV0} from "../src/SendTokenV0.sol";
 
 contract DeployTestnetSendTokenV0Script is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

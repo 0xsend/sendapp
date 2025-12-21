@@ -7,7 +7,7 @@ import {DeploySendVerifierScript} from "../script/DeploySendVerifier.s.sol";
 
 contract DeploySendVerifierTest is Test, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function testItRuns() public {

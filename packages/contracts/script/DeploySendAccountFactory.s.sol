@@ -9,7 +9,7 @@ import "../src/SendAccountFactory.sol";
 
 contract DeploySendAccountFactoryScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

@@ -11,7 +11,7 @@ contract SendVerifyingPaymasterTest is Test, Helper {
     SendVerifyingPaymaster paymaster;
 
     function setUp() public {
-        this.labels();
+        labels();
         address owner = makeAddr("owner");
         address verifier = makeAddr("verifier");
         deal(owner, 2 ether);
