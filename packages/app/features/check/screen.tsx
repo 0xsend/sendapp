@@ -425,9 +425,9 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
       // Sender's perspective
       if (check.is_canceled) return t('check.manage.canceled')
       if (check.is_expired && !check.is_claimed) return t('check.manage.expired')
-      return t('check.manage.sentCheck')
+      return t('check.manage.sent')
     }
-    // Receiver's perspective - always show "Claimed Check"
+    // Receiver's perspective
     return t('check.manage.claimed')
   }
 
