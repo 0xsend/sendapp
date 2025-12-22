@@ -209,6 +209,7 @@ local_resource(
 local_resource(
     "anvil:anvil-add-send-check-fixtures",
     "yarn contracts dev:anvil-add-send-check-fixtures",
+    auto_init = False,
     dir = _prj_root,
     labels = labels,
     resource_deps = _infra_resource_deps + [
@@ -225,7 +226,6 @@ local_resource(
         "anvil:base",
         "anvil:anvil-token-paymaster-deposit",
         "anvil:anvil-deploy-verifying-paymaster-fixtures",
-        "anvil:anvil-add-send-check-fixtures",
     ],
 )
 
