@@ -1,7 +1,9 @@
 import { baseMainnetClient, sendCheckAbi, sendCheckAddress } from '@my/wagmi'
+import { secp256k1 } from '@noble/curves/secp256k1'
 import { useQueryClient } from '@tanstack/react-query'
-import { encodeFunctionData, type Hex, isAddress, erc20Abi } from 'viem'
-import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { getRandomBytes } from 'expo-crypto'
+import { bytesToHex, encodeFunctionData, type Hex, isAddress, erc20Abi } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
 import { assert } from './assert'
 import { useSendAccount } from './send-accounts'
 import { useAccountNonce, useUserOp, type SendAccountCall } from './userop'
@@ -28,7 +30,13 @@ export type EphemeralKeyPair = {
  * The private key should be shared with the recipient to claim the check.
  */
 export function generateEphemeralKeyPair(): EphemeralKeyPair {
-  const privateKey = generatePrivateKey()
+  const privateKeyBytes = getRandomBytes(32)
+  // Validate the key is in the valid range for secp256k1 (1 to n-1).
+  // While the probability of an invalid key is ~2^-128, we validate for correctness.
+  if (!secp256k1.utils.isValidPrivateKey(privateKeyBytes)) {
+    return generateEphemeralKeyPair()
+  }
+  const privateKey = bytesToHex(privateKeyBytes) as Hex
   const account = privateKeyToAccount(privateKey)
   return {
     privateKey,
@@ -96,7 +104,7 @@ function buildSendCheckCalls({
  * @param checkCode - The base32 encoded check code
  */
 export function createSendCheckClaimUrl(checkCode: string): string {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://send.app'
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
   return `${baseUrl}/check/public/${checkCode}`
 }
 

@@ -58,7 +58,7 @@ module.exports = {
       LSApplicationCategoryType: 'public.app-category.finance',
       UIRequiredDeviceCapabilities: [],
     },
-    icon: './assets/icons/ios-icon.icon',
+    icon: './assets/icons/ios-icon.png',
   },
   android: {
     adaptiveIcon: {

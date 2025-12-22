@@ -1,4 +1,13 @@
-import { Button, Card, Paragraph, Spinner, useAppToast, XStack, YStack } from '@my/ui'
+import {
+  Button,
+  Card,
+  Paragraph,
+  PrimaryButton,
+  Spinner,
+  useAppToast,
+  XStack,
+  YStack,
+} from '@my/ui'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useCallback, useState } from 'react'
@@ -87,16 +96,9 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
       {!isNotFound && (
         <>
           {/* Register Button */}
-          <Button
-            size="$5"
-            onPress={handleRegister}
-            bc="$primary"
-            $theme-light={{ bc: '$color12' }}
-          >
-            <Button.Text color="$color1" fontWeight="600">
-              {t('check.claim.public.registerButton')}
-            </Button.Text>
-          </Button>
+          <PrimaryButton onPress={handleRegister}>
+            <PrimaryButton.Text>{t('check.claim.public.registerButton')}</PrimaryButton.Text>
+          </PrimaryButton>
 
           {/* Sign In Link */}
           <XStack w="100%" gap="$2" jc="center" ai="center">
@@ -117,7 +119,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
               height="auto"
               p={0}
             >
-              <Button.Text color="$primary" $theme-light={{ color: '$color12' }}>
+              <Button.Text color="$primary">
                 {isSigningIn ? 'Signing in...' : t('check.claim.public.signIn')}
               </Button.Text>
             </Button>

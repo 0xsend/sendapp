@@ -1,4 +1,13 @@
-import { Button, Card, Paragraph, Spinner, useAppToast, XStack, YStack } from '@my/ui'
+import {
+  Button,
+  Card,
+  Paragraph,
+  PrimaryButton,
+  Spinner,
+  useAppToast,
+  XStack,
+  YStack,
+} from '@my/ui'
 import { Check } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
@@ -79,14 +88,9 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
             <Paragraph color="$color10" size="$4" ta="center">
               {t('check.claim.notFoundMessage')}
             </Paragraph>
-            <Button
-              size="$4"
-              onPress={() => router.push('/check')}
-              bc="$primary"
-              $theme-light={{ bc: '$color12' }}
-            >
-              <Button.Text color="$color1">{t('check.claim.goBack')}</Button.Text>
-            </Button>
+            <PrimaryButton onPress={() => router.push('/check')}>
+              <PrimaryButton.Text>{t('check.claim.goBack')}</PrimaryButton.Text>
+            </PrimaryButton>
           </YStack>
         </Card>
       </YStack>
@@ -99,16 +103,8 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
       <YStack f={1} gap="$5" w="100%" maxWidth={600}>
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
-            <XStack
-              w="$6"
-              h="$6"
-              br="$10"
-              ai="center"
-              jc="center"
-              bc="$primary"
-              $theme-light={{ bc: '$color12' }}
-            >
-              <Check size="$2" color="$color1" />
+            <XStack w="$6" h="$6" br="$10" ai="center" jc="center" bc="$primary">
+              <Check size="$2" color="$black" />
             </XStack>
             <YStack ai="center" gap="$2">
               <Paragraph color="$color12" fontWeight="600" fontSize="$6">
@@ -122,16 +118,9 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
           </YStack>
         </Card>
 
-        <Button
-          size="$5"
-          onPress={() => router.push('/')}
-          bc="$primary"
-          $theme-light={{ bc: '$color12' }}
-        >
-          <Button.Text color="$color1" fontWeight="600">
-            {t('check.claim.done')}
-          </Button.Text>
-        </Button>
+        <PrimaryButton onPress={() => router.push('/')}>
+          <PrimaryButton.Text>{t('check.claim.done')}</PrimaryButton.Text>
+        </PrimaryButton>
       </YStack>
     )
   }
@@ -142,22 +131,13 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
       <CheckPreviewCard checkCode={checkCode} />
 
       {/* Claim Button */}
-      <Button
-        size="$5"
-        disabled={!canSubmit}
-        onPress={onClaim}
-        bc="$primary"
-        $theme-light={{ bc: '$color12' }}
-        disabledStyle={{ opacity: 0.5 }}
-      >
+      <PrimaryButton disabled={!canSubmit} onPress={onClaim} disabledStyle={{ opacity: 0.5 }}>
         {isSubmitting ? (
-          <Spinner color="$color1" />
+          <Spinner color="$black" />
         ) : (
-          <Button.Text color="$color1" fontWeight="600">
-            {t('check.claim.submit')}
-          </Button.Text>
+          <PrimaryButton.Text>{t('check.claim.submit')}</PrimaryButton.Text>
         )}
-      </Button>
+      </PrimaryButton>
     </YStack>
   )
 }
