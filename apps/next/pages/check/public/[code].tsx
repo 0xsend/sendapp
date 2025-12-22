@@ -58,7 +58,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   // Default SEO for invalid/missing checks
   const defaultSeo = buildSeo({
-    title: 'Claim Check | Send',
+    title: 'Send | Claim Check',
     description: 'Someone sent you tokens! Create an account to claim.',
     url: `${siteUrl}/check/public/${code}`,
     type: 'website',
@@ -105,6 +105,19 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
       return { props: { seo: defaultSeo } }
     }
 
+    // Look up sender's profile to get their sendtag
+    let senderTag: string | undefined
+    if (row.sender) {
+      const senderAddress = byteaToHex(row.sender as PgBytea)
+      const { data: senderProfile } = await supabaseAdmin.rpc('profile_lookup', {
+        lookup_type: 'address',
+        identifier: senderAddress,
+      })
+      // profile_lookup returns an array, get the first result's tag
+      const profile = senderProfile?.[0]
+      senderTag = profile?.tag ?? profile?.all_tags?.[0] ?? undefined
+    }
+
     // Parse tokens and amounts
     const tokens = row.tokens.map((t) => byteaToHex(t as PgBytea))
     const amounts = row.amounts.map((a) => BigInt(a ?? 0))
@@ -137,6 +150,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
       amount: primaryAmount,
       symbol: primarySymbol,
       additionalCount: additionalCount > 0 ? additionalCount : undefined,
+      senderTag,
     }
 
     const checkSeoData = generateCheckSeoData(checkData, {

@@ -12,7 +12,7 @@ export const Page: NextPageWithLayout = () => {
 
   return (
     <>
-      <NextSeo title="Claim Check | Send" description="Preview and claim your Send Check" />
+      <NextSeo title="Send | Claim Check" description="Preview and claim your Send Check" />
       <CheckClaimPreviewScreen checkCode={code} />
     </>
   )
