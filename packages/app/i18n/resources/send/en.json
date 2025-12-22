@@ -6,7 +6,7 @@
   },
   "check": {
     "button": "Send Check",
-    "buttonDescription": "Send to anyone via a shareable link",
+    "buttonDescription": "Send to anyone with a shareable link",
     "amount": "Amount",
     "expiration": "Expires",
     "create": "Send Check",

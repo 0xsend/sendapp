@@ -78,6 +78,7 @@
     "sendAccountSigningKey": "Clé de signature de compte Send",
     "sendEarn": "Send Earn",
     "tickets_one": "{{count}} billet",
-    "tickets_other": "{{count}} billets"
+    "tickets_other": "{{count}} billets",
+    "you": "Vous"
   }
 }

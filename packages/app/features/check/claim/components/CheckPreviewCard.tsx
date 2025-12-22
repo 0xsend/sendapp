@@ -118,10 +118,6 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
     )
   }
 
-  // TODO: Remove mock data after testing
-  const mockAvatar = 'https://i.pravatar.cc/150?img=3'
-  const forceVerified = true
-
   return (
     <Card padded elevation={1} br="$5">
       <YStack ai="center" gap="$5" py="$4">
@@ -132,9 +128,9 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
           ) : (
             <>
               <XStack position="relative">
-                {previewData.senderAvatar || mockAvatar ? (
+                {previewData.senderAvatar ? (
                   <Avatar size="$6" circular>
-                    <Avatar.Image src={previewData.senderAvatar || mockAvatar} />
+                    <Avatar.Image src={previewData.senderAvatar} />
                     <Avatar.Fallback bc="$color5" />
                   </Avatar>
                 ) : (
@@ -142,7 +138,7 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
                     <Gift size="$2" color="$color10" />
                   </XStack>
                 )}
-                {(previewData.senderIsVerified || forceVerified) && (
+                {previewData.senderIsVerified && (
                   <XStack zi={100} pos="absolute" bottom={2} right={2}>
                     <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
                     <IconBadgeCheckSolid2

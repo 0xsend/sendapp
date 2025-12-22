@@ -78,6 +78,7 @@
     "sendAccountSigningKey": "Send Account Signing Key",
     "sendEarn": "Send Earn",
     "tickets_one": "{{count}} Ticket",
-    "tickets_other": "{{count}} Tickets"
+    "tickets_other": "{{count}} Tickets",
+    "you": "Du"
   }
 }

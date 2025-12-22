@@ -7,59 +7,10 @@ import {
   type AllowedImageHost,
   type VercelWildcardHost,
 } from 'next-app/config/allowedImageHosts'
+import { loadGoogleFont, safeDecode } from '../../../utils/og'
 
 export const config = {
   runtime: 'edge',
-}
-
-// Simple font cache to avoid re-downloading
-const fontCache = new Map<string, ArrayBuffer>()
-
-async function loadGoogleFont(font: string, weight: number, text: string) {
-  // Include the exact glyph subset in the cache key.
-  // We request DM Sans via Google Fonts with text= (per-request subsetting).
-  // Normalizing to a unique+sorted set prevents reusing a smaller subset from a
-  // previous request, which caused missing bold glyphs in OG images.
-  // Docs: https://developers.google.com/fonts/docs/css2#optimize_your_font_requests
-  const normalizedText = Array.from(new Set(text)).sort().join('')
-  const cacheKey = `${font}-${weight}-${normalizedText}`
-
-  // Check cache first
-  if (fontCache.has(cacheKey)) {
-    return fontCache.get(cacheKey)
-  }
-
-  try {
-    const encodedFamily = encodeURIComponent(font).replace(/%20/g, '+')
-    const url = `https://fonts.googleapis.com/css2?family=${encodedFamily}:wght@${weight}&text=${encodeURIComponent(normalizedText)}&display=swap`
-
-    const cssResponse = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-    })
-
-    if (!cssResponse.ok) {
-      throw new Error(`Failed to fetch CSS: ${cssResponse.status}`)
-    }
-
-    const css = await cssResponse.text()
-    const resource = css.match(/src: url\((.+?)\) format\('(woff2?|opentype|truetype)'\)/)
-
-    if (resource) {
-      const fontResponse = await fetch(resource[1], {
-        headers: { 'User-Agent': 'Mozilla/5.0' },
-      })
-
-      if (fontResponse.ok) {
-        const fontData = await fontResponse.arrayBuffer()
-        fontCache.set(cacheKey, fontData) // Cache the font
-        return fontData
-      }
-    }
-  } catch (error) {
-    console.warn(`Font loading failed for ${font}:${weight}:`, error)
-  }
-
-  throw new Error(`Failed to load font data for ${font}:${weight}`)
 }
 
 interface ProfileData {
@@ -98,17 +49,6 @@ function supabaseRenderUrl(url: string, width?: number, height?: number) {
     return url
   }
   return url
-}
-
-// Safe decode patterned after validateRedirectUrl.ts (decode inside try/catch and fallback)
-// apps/next/utils/validateRedirectUrl.ts
-function safeDecode(input: string | undefined | null): string | undefined {
-  if (!input) return undefined
-  try {
-    return decodeURIComponent(input)
-  } catch {
-    return input || undefined
-  }
 }
 
 // Allowlist remote image hosts (single source of truth)
