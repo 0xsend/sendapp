@@ -68,6 +68,7 @@ export type CheckDetails = {
   isCanceled: boolean
   claimedBy: Hex | null
   claimedAt: bigint | null
+  note: string | null
 }
 
 /**
@@ -128,6 +129,7 @@ export function useCheckDetails(checkCode: string | null) {
         isCanceled: row.is_canceled,
         claimedBy: row.claimed_by ? byteaToHex(row.claimed_by as PgBytea) : null,
         claimedAt: row.claimed_at ? BigInt(row.claimed_at) : null,
+        note: row.note ?? null,
       }
     },
     staleTime: 10000, // 10 seconds
