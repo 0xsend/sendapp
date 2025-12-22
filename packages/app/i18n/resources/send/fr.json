@@ -69,7 +69,11 @@
       "cancelError": "Échec de l'annulation du chèque",
       "claimedOn": "Réclamé",
       "canceledOn": "Annulé",
-      "expiredUnclaimed": "Expiré - Récupérer les fonds"
+      "expiredUnclaimed": "Expiré - Récupérer les fonds",
+      "claimedBy": "Réclamé par",
+      "claimedByUser": "Réclamé par un utilisateur",
+      "from": "De",
+      "fromUser": "D'un utilisateur"
     },
     "sections": {
       "pending": "En attente",

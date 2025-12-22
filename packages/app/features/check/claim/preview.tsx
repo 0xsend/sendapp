@@ -2,7 +2,7 @@ import { Button, Card, Paragraph, Spinner, useAppToast, XStack, YStack } from '@
 import { Check } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useSendCheckClaim } from 'app/utils/useSendCheckClaim'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { CheckPreviewCard, useCheckPreview } from './components/CheckPreviewCard'
@@ -18,9 +18,16 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   const router = useRouter()
   const { t } = useTranslation('send')
   const toast = useAppToast()
-  const { data: sendAccount } = useSendAccount()
+  const { data: sendAccount, isLoading: isLoadingAccount } = useSendAccount()
   const { claimCheck, isPending: isSubmitting, isReady } = useSendCheckClaim()
   const [claimed, setClaimed] = useState(false)
+
+  // Redirect to public page if not logged in
+  useEffect(() => {
+    if (!isLoadingAccount && !sendAccount && checkCode) {
+      router.replace(`/check/public/${checkCode}`)
+    }
+  }, [isLoadingAccount, sendAccount, checkCode, router])
 
   // Use shared preview hook
   const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)
@@ -53,8 +60,8 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
     }
   }, [claimCheck, checkCode, webauthnCreds, toast, t])
 
-  // Loading state (including waiting for router hydration)
-  if (isLoading || !checkCode) {
+  // Loading state (including waiting for auth check, redirect, or router hydration)
+  if (isLoading || isLoadingAccount || !sendAccount || !checkCode) {
     return (
       <YStack f={1} gap="$5" w="100%" maxWidth={600} ai="center" jc="center">
         <Spinner size="large" />

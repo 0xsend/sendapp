@@ -69,7 +69,11 @@
       "cancelError": "Scheck stornieren fehlgeschlagen",
       "claimedOn": "Eingelöst",
       "canceledOn": "Storniert",
-      "expiredUnclaimed": "Abgelaufen - Guthaben zurückholen"
+      "expiredUnclaimed": "Abgelaufen - Guthaben zurückholen",
+      "claimedBy": "Eingelöst von",
+      "claimedByUser": "Von einem Benutzer eingelöst",
+      "from": "Von",
+      "fromUser": "Von einem Benutzer"
     },
     "sections": {
       "pending": "Ausstehend",

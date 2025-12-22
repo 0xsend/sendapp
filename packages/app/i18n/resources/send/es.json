@@ -69,7 +69,11 @@
       "cancelError": "Error al cancelar el cheque",
       "claimedOn": "Reclamado",
       "canceledOn": "Cancelado",
-      "expiredUnclaimed": "Vencido - Recuperar fondos"
+      "expiredUnclaimed": "Vencido - Recuperar fondos",
+      "claimedBy": "Reclamado por",
+      "claimedByUser": "Reclamado por un usuario",
+      "from": "De",
+      "fromUser": "De un usuario"
     },
     "sections": {
       "pending": "Pendiente",

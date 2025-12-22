@@ -2217,6 +2217,7 @@ export type Database = {
           is_canceled: boolean
           is_claimed: boolean
           is_expired: boolean
+          is_sender: boolean
           sender: string
           tokens: string[]
           tx_hash: string

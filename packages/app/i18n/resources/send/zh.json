@@ -69,7 +69,11 @@
       "cancelError": "取消支票失败",
       "claimedOn": "领取于",
       "canceledOn": "取消于",
-      "expiredUnclaimed": "已过期 - 收回资金"
+      "expiredUnclaimed": "已过期 - 收回资金",
+      "claimedBy": "被领取",
+      "claimedByUser": "被用户领取",
+      "from": "来自",
+      "fromUser": "来自一位用户"
     },
     "sections": {
       "pending": "待处理",

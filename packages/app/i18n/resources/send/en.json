@@ -69,7 +69,11 @@
       "cancelError": "Failed to cancel check",
       "claimedOn": "Claimed",
       "canceledOn": "Canceled",
-      "expiredUnclaimed": "Expired - Reclaim funds"
+      "expiredUnclaimed": "Expired - Reclaim funds",
+      "claimedBy": "Claimed by",
+      "claimedByUser": "Claimed by a user",
+      "from": "From",
+      "fromUser": "From a user"
     },
     "sections": {
       "pending": "Pending",

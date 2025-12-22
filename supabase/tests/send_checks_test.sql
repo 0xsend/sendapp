@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(20);
+SELECT plan(25);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -356,6 +356,65 @@ SELECT results_eq(
     $$,
     $$VALUES (2)$$,
     'get_user_checks respects page_offset'
+);
+
+-- ============================================================================
+-- TEST: get_user_checks function - is_sender is true for sender
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT DISTINCT is_sender
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000ABC'::bytea)
+    $$,
+    $$VALUES (true)$$,
+    'get_user_checks returns is_sender=true for all checks when queried by sender'
+);
+
+-- ============================================================================
+-- TEST: get_user_checks function - Receiver sees claimed checks with is_sender=false
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000DEF'::bytea)
+    $$,
+    $$VALUES (1)$$,
+    'get_user_checks returns claimed checks for receiver'
+);
+
+SELECT results_eq(
+    $$
+        SELECT is_sender, is_claimed
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000DEF'::bytea)
+    $$,
+    $$VALUES (false, true)$$,
+    'get_user_checks returns is_sender=false and is_claimed=true for receiver'
+);
+
+-- ============================================================================
+-- TEST: get_user_checks function - Sender still sees claimed check with is_sender=true
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT is_sender, is_claimed, claimed_by
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000ABC'::bytea)
+        WHERE ephemeral_address = '\xCCCC000000000000000000000000000000000003'::bytea
+    $$,
+    $$VALUES (true, true, '\xCCCC000000000000000000000000000000000DEF'::bytea)$$,
+    'get_user_checks returns is_sender=true for sender even when check is claimed by someone else'
+);
+
+-- ============================================================================
+-- TEST: get_user_checks function - Canceled check not shown to sender as receiver
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000ABC'::bytea)
+        WHERE is_sender = false
+    $$,
+    $$VALUES (0)$$,
+    'get_user_checks does not return canceled checks as received (is_sender=false)'
 );
 
 -- ============================================================================

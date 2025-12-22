@@ -1,4 +1,5 @@
 import {
+  Avatar,
   H4,
   Paragraph,
   PrimaryButton,
@@ -25,6 +26,7 @@ import { byteaToHex } from 'app/utils/byteaToHex'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ActivityRowLayout } from 'app/components/ActivityRowLayout'
 import type { PgBytea } from '@my/supabase/database.types'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
 import debug from 'debug'
 
 const log = debug('app:features:check')
@@ -248,38 +250,62 @@ function useTokenItems(tokens: string[], amounts: (string | number)[]) {
 }
 
 /**
- * Avatar-style icon for the check (shows first token's coin icon with arrow indicator)
- * Matches the SendCheckActivityAvatar from ActivityAvatarV2
+ * Avatar-style icon for the check
+ * Shows other party's profile picture if available, otherwise shows token icon
+ * Arrow indicator shows ArrowUp (sent) for sender, ArrowDown (received) for receiver
  */
-function CheckAvatar({ tokens, isClaimed }: { tokens: string[]; isClaimed: boolean }) {
+function CheckAvatar({
+  tokens,
+  isReceiver,
+  avatarUrl,
+}: {
+  tokens: string[]
+  isReceiver: boolean
+  avatarUrl?: string | null
+}) {
   const firstToken = tokens[0]
-  if (!firstToken) {
+  const tokenAddress = firstToken ? checksumAddress(byteaToHex(firstToken as PgBytea)) : null
+  const tokenCoin = tokenAddress ? allCoinsDict[tokenAddress as keyof typeof allCoinsDict] : null
+  const Icon = isReceiver ? ArrowDown : ArrowUp
+
+  // Determine what to show as the main avatar
+  const renderMainAvatar = () => {
+    if (avatarUrl) {
+      return (
+        <Avatar size="$5" circular>
+          <Avatar.Image src={avatarUrl} />
+          <Avatar.Fallback bc="$color3">
+            {tokenCoin ? (
+              <IconCoin symbol={tokenCoin.symbol} size="$5" />
+            ) : (
+              <Clock size="$2" color="$color10" />
+            )}
+          </Avatar.Fallback>
+        </Avatar>
+      )
+    }
+
+    if (tokenCoin) {
+      return <IconCoin symbol={tokenCoin.symbol} size="$5" />
+    }
+
     return (
       <XStack w="$5" h="$5" br="$4" bc="$color3" ai="center" jc="center">
         <Clock size="$2" color="$color10" />
       </XStack>
     )
   }
-  const tokenAddress = checksumAddress(byteaToHex(firstToken as PgBytea))
-  const tokenCoin = allCoinsDict[tokenAddress as keyof typeof allCoinsDict]
-  const Icon = isClaimed ? ArrowDown : ArrowUp
 
   return (
     <XStack w="$5" h="$5" br="$4" ai="center" jc="center" position="relative">
-      {tokenCoin ? (
-        <IconCoin symbol={tokenCoin.symbol} size="$5" />
-      ) : (
-        <XStack w="$5" h="$5" br="$4" bc="$color3" ai="center" jc="center">
-          <Clock size="$2" color="$color10" />
-        </XStack>
-      )}
-      {/* Arrow indicator matching ActivityAvatarV2 */}
+      {renderMainAvatar()}
+      {/* Arrow indicator */}
       <XStack
         position="absolute"
         bottom={0}
         right={0}
         transform="translate(5px, 5px) scale(0.85)"
-        bc={isClaimed ? '$olive' : '$error'}
+        bc={isReceiver ? '$olive' : '$error'}
         borderRadius={999}
         borderWidth={2}
         borderColor="$color1"
@@ -316,6 +342,27 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
   const hoverStyles = useHoverStyles()
   const { data: sendAccount } = useSendAccount()
   const [isConfirming, setIsConfirming] = useState(false)
+
+  // Determine if user is the sender or receiver
+  const isSender = check.is_sender ?? true
+
+  // Look up the other party's profile
+  const otherPartyAddress = useMemo(() => {
+    if (isSender) {
+      // Sender view: look up claimer's profile if check was claimed
+      if (check.is_claimed && !check.is_canceled && check.claimed_by) {
+        return byteaToHex(check.claimed_by as PgBytea)
+      }
+    } else {
+      // Receiver view: look up sender's profile
+      if (check.sender) {
+        return byteaToHex(check.sender as PgBytea)
+      }
+    }
+    return ''
+  }, [isSender, check.is_claimed, check.is_canceled, check.claimed_by, check.sender])
+
+  const { data: otherPartyProfile } = useProfileLookup('address', otherPartyAddress)
 
   // Only prepare revoke for active checks that can be canceled
   const ephemeralAddress = useMemo(
@@ -371,29 +418,57 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
     .map((item) => `${item.formatted} ${item.coin?.symbol ?? 'tokens'}`)
     .join(' + ')
 
-  // Title text based on status
+  // Title text based on status and whether user is sender or receiver
   const getTitleText = () => {
-    if (check.is_active) return t('check.manage.sentCheck')
-    if (check.is_canceled) return t('check.manage.canceled')
-    if (check.is_claimed) return t('check.manage.claimed')
-    return t('check.manage.expired')
+    if (isSender) {
+      // Sender's perspective
+      if (check.is_canceled) return t('check.manage.canceled')
+      if (check.is_expired && !check.is_claimed) return t('check.manage.expired')
+      return t('check.manage.sentCheck')
+    }
+    // Receiver's perspective - always show "Claimed Check"
+    return t('check.manage.claimed')
+  }
+
+  // Subtext showing the other party
+  const getOtherPartyText = () => {
+    if (isSender) {
+      // Sender view: show who claimed it
+      if (!check.is_claimed || check.is_canceled) return null
+      if (otherPartyProfile?.tag) {
+        return `${t('check.manage.claimedBy')} /${otherPartyProfile.tag}`
+      }
+      return t('check.manage.claimedByUser')
+    }
+    // Receiver view: show who sent it
+    if (otherPartyProfile?.tag) {
+      return `${t('check.manage.from')} /${otherPartyProfile.tag}`
+    }
+    return t('check.manage.fromUser')
   }
 
   // Date text based on status
   const getDateText = () => {
-    if (check.is_active) {
-      return `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`
-    }
-    if (check.is_canceled && check.claimed_at) {
-      const canceledDate = new Date(Number(check.claimed_at) * 1000)
-      return `${t('check.manage.canceledOn')} ${canceledDate.toLocaleDateString()}`
-    }
-    if (check.is_claimed && check.claimed_at) {
-      const claimedDate = new Date(Number(check.claimed_at) * 1000)
-      return `${t('check.manage.claimedOn')} ${claimedDate.toLocaleDateString()}`
-    }
-    if (check.is_expired && !check.is_claimed) {
-      return t('check.manage.expiredUnclaimed')
+    if (isSender) {
+      // Sender's view
+      if (check.is_active) {
+        return `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`
+      }
+      if (check.is_canceled && check.claimed_at) {
+        const canceledDate = new Date(Number(check.claimed_at) * 1000)
+        return `${t('check.manage.canceledOn')} ${canceledDate.toLocaleDateString()}`
+      }
+      if (check.is_claimed && check.claimed_at) {
+        const otherPartyText = getOtherPartyText()
+        if (otherPartyText) return otherPartyText
+      }
+      if (check.is_expired && !check.is_claimed) {
+        return t('check.manage.expiredUnclaimed')
+      }
+    } else {
+      // Receiver's view: show who it's from
+      const otherPartyText = getOtherPartyText()
+      if (otherPartyText) return otherPartyText
     }
     return formatRelativeDate(createdAt)
   }
@@ -477,7 +552,13 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
       })}
     >
       <ActivityRowLayout
-        avatar={<CheckAvatar tokens={check.tokens ?? []} isClaimed={check.is_claimed} />}
+        avatar={
+          <CheckAvatar
+            tokens={check.tokens ?? []}
+            isReceiver={!isSender || check.is_canceled}
+            avatarUrl={otherPartyProfile?.avatar_url}
+          />
+        }
         title={getTitleText()}
         amount={amountText}
         date={getDateText()}
