@@ -148,3 +148,72 @@ export const PAGE_DESCRIPTIONS = {
   sendtagCheckout:
     'Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers.',
 } as const
+
+/**
+ * Check SEO data types and helpers
+ */
+export type CheckSeoData = {
+  amount?: string
+  symbol?: string
+  additionalCount?: number
+}
+
+export type CheckSeoOptions = {
+  siteUrl: string
+  route: string
+}
+
+/**
+ * Generates standardized check page title
+ */
+export function generateCheckTitle(check: CheckSeoData): string {
+  if (check.amount && check.symbol) {
+    const additional = check.additionalCount ? ` (+${check.additionalCount} more)` : ''
+    return `Claim ${check.amount} ${check.symbol}${additional} | Send`
+  }
+  return 'Claim Check | Send'
+}
+
+/**
+ * Generates standardized check page description
+ */
+export function generateCheckDescription(check: CheckSeoData): string {
+  if (check.amount && check.symbol) {
+    const additional = check.additionalCount
+      ? ` and ${check.additionalCount} more token${check.additionalCount > 1 ? 's' : ''}`
+      : ''
+    return `Someone sent you ${check.amount} ${check.symbol}${additional}! Create an account to claim.`
+  }
+  return 'Someone sent you tokens! Create an account to claim.'
+}
+
+/**
+ * Gets check OG image URL with dynamic parameters
+ */
+export function getCheckImageUrl(check: CheckSeoData, siteUrl: string): string {
+  const fallbackImage = 'https://ghassets.send.app/2024/04/send-og-image.png'
+
+  if (check.amount && check.symbol) {
+    const searchParams = new URLSearchParams()
+    searchParams.set('amount', check.amount)
+    searchParams.set('symbol', check.symbol)
+    if (check.additionalCount && check.additionalCount > 0) {
+      searchParams.set('additional_count', String(check.additionalCount))
+    }
+    return `${siteUrl}/api/og/check?${searchParams.toString()}`
+  }
+
+  return fallbackImage
+}
+
+/**
+ * Generates complete SEO metadata for check pages
+ */
+export function generateCheckSeoData(check: CheckSeoData, options: CheckSeoOptions) {
+  return {
+    title: generateCheckTitle(check),
+    description: generateCheckDescription(check),
+    canonicalUrl: generateCanonicalUrl(options),
+    imageUrl: getCheckImageUrl(check, options.siteUrl),
+  }
+}
