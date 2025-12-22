@@ -2,6 +2,7 @@ import { ImageResponse } from '@vercel/og'
 import type { NextRequest } from 'next/server'
 import type React from 'react'
 import { z } from 'zod'
+import { formatAmountForDisplay } from 'utils/seoHelpers'
 
 export const config = {
   runtime: 'edge',
@@ -242,7 +243,7 @@ export default async function handler(req: NextRequest) {
         : undefined
 
     const check: CheckData = {
-      amount: safeAmount,
+      amount: safeAmount ? formatAmountForDisplay(safeAmount) : undefined,
       symbol: safeSymbol,
       additionalCount:
         safeAdditionalCount && !Number.isNaN(safeAdditionalCount) ? safeAdditionalCount : undefined,

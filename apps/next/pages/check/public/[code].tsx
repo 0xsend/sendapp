@@ -6,7 +6,7 @@ import type { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import type { Database, PgBytea } from '@my/supabase/database.types'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { buildSeo } from 'utils/seo'
-import { generateCheckSeoData, type CheckSeoData } from 'utils/seoHelpers'
+import { generateCheckSeoData, formatAmountForDisplay, type CheckSeoData } from 'utils/seoHelpers'
 import { base32 } from '@scure/base'
 import { formatUnits } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -69,33 +69,10 @@ function findCoinByToken(tokenAddress: `0x${string}`): coin | undefined {
 
 /**
  * Format coin amount for OG image display.
- * - Shows up to 4 decimal places, trimming trailing zeros
- * - For small numbers (< 1), shows 4 significant figures
  */
 function formatCoinAmountString(amount: bigint, coinData: coin): string {
   const formatted = formatUnits(amount, coinData.decimals)
-  const num = Number.parseFloat(formatted)
-
-  if (num === 0) return '0'
-
-  // For small numbers (< 1), use 4 significant figures
-  if (Math.abs(num) < 1) {
-    // toPrecision gives us significant figures
-    const precise = num.toPrecision(4)
-    // Convert back to number to remove trailing zeros, then to string
-    return Number.parseFloat(precise).toString()
-  }
-
-  // For larger numbers, show up to 4 decimal places
-  // toFixed(4) then parseFloat removes trailing zeros
-  const fixed = num.toFixed(4)
-  const trimmed = Number.parseFloat(fixed)
-
-  // Format with commas for thousands
-  return trimmed.toLocaleString('en-US', {
-    maximumFractionDigits: 4,
-    minimumFractionDigits: 0,
-  })
+  return formatAmountForDisplay(formatted)
 }
 
 type GetCheckRow =

@@ -150,6 +150,32 @@ export const PAGE_DESCRIPTIONS = {
 } as const
 
 /**
+ * Format amount for display in OG images and SEO.
+ * - Shows up to 4 decimal places, trimming trailing zeros
+ * - For small numbers (< 1), shows 4 significant figures
+ */
+export function formatAmountForDisplay(amount: string | number): string {
+  const num = typeof amount === 'string' ? Number.parseFloat(amount) : amount
+
+  if (Number.isNaN(num) || num === 0) return typeof amount === 'string' ? amount : '0'
+
+  // For small numbers (< 1), use 4 significant figures
+  if (Math.abs(num) < 1) {
+    const precise = num.toPrecision(4)
+    return Number.parseFloat(precise).toString()
+  }
+
+  // For larger numbers, show up to 4 decimal places
+  const fixed = num.toFixed(4)
+  const trimmed = Number.parseFloat(fixed)
+
+  return trimmed.toLocaleString('en-US', {
+    maximumFractionDigits: 4,
+    minimumFractionDigits: 0,
+  })
+}
+
+/**
  * Check SEO data types and helpers
  */
 export type CheckSeoData = {
