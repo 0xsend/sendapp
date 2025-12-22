@@ -44,7 +44,7 @@ const log = debug('app:features:check:send')
 const sendCheckSchema = z.object({
   token: z.string().min(1, 'Token required'),
   amount: z.string().min(1, 'Amount required'),
-  expiresInDays: z.number().min(1).max(30).default(7),
+  expiresInDays: z.number().min(1).max(365).default(7),
   note: z
     .string()
     .trim()
@@ -366,6 +366,7 @@ function ExpirationSelector() {
     { label: '7 days', value: 7 },
     { label: '14 days', value: 14 },
     { label: '30 days', value: 30 },
+    { label: '1 year', value: 365 },
   ]
 
   return (
