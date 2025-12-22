@@ -130,7 +130,7 @@ export const PAGE_TITLES = {
   activity: 'Send | Activity',
   leaderboard: 'Send | Leaderboard',
   send: 'Send',
-  notFound: '404 | Send',
+  notFound: 'Send | 404',
   sendtagCheckout: 'Send | Sendtag Checkout',
 } as const
 
@@ -182,6 +182,7 @@ export type CheckSeoData = {
   amount?: string
   symbol?: string
   additionalCount?: number
+  senderTag?: string
 }
 
 export type CheckSeoOptions = {
@@ -195,22 +196,24 @@ export type CheckSeoOptions = {
 export function generateCheckTitle(check: CheckSeoData): string {
   if (check.amount && check.symbol) {
     const additional = check.additionalCount ? ` (+${check.additionalCount} more)` : ''
-    return `Claim ${check.amount} ${check.symbol}${additional} | Send`
+    return `Send | Claim ${check.amount} ${check.symbol}${additional}`
   }
-  return 'Claim Check | Send'
+  return 'Send | Claim Check'
 }
 
 /**
  * Generates standardized check page description
+ * Uses sender's sendtag when available for better SEO
  */
 export function generateCheckDescription(check: CheckSeoData): string {
+  const sender = check.senderTag ? `/${check.senderTag}` : 'Someone'
   if (check.amount && check.symbol) {
     const additional = check.additionalCount
       ? ` and ${check.additionalCount} more token${check.additionalCount > 1 ? 's' : ''}`
       : ''
-    return `Someone sent you ${check.amount} ${check.symbol}${additional}! Create an account to claim.`
+    return `${sender} sent you ${check.amount} ${check.symbol}${additional}! Create an account to claim.`
   }
-  return 'Someone sent you tokens! Create an account to claim.'
+  return `${sender} sent you tokens! Create an account to claim.`
 }
 
 /**
