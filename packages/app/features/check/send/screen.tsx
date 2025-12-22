@@ -290,7 +290,7 @@ export function CheckSendScreen() {
 
           <YStack gap="$2">
             <Label color="$color10" textTransform="uppercase" fontSize="$3">
-              {t('check.note', 'Note (Optional)')}
+              {t('check.note', 'Note')}
             </Label>
             <NoteInput />
           </YStack>
@@ -421,16 +421,12 @@ function NoteInput() {
         }}
       />
       <XStack jc="space-between">
-        {fieldState.error ? (
+        {fieldState.error && (
           <Paragraph color="$error" size="$2">
             {fieldState.error.message}
           </Paragraph>
-        ) : (
-          <Paragraph color="$color8" size="$2">
-            {t('check.noteHint', 'Visible to the recipient')}
-          </Paragraph>
         )}
-        <Paragraph color="$color8" size="$2">
+        <Paragraph color="$color10" size="$2" ml="auto">
           {field.value?.length ?? 0}/{MAX_NOTE_LENGTH}
         </Paragraph>
       </XStack>
