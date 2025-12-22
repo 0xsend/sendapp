@@ -11,6 +11,7 @@ import {
   Separator,
   Sheet,
   Spinner,
+  TextArea,
   useAppToast,
   XStack,
   YStack,
@@ -33,14 +34,24 @@ import { useSendCheckCreate, type TokenAmount } from 'app/utils/useSendCheckCrea
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import * as Clipboard from 'expo-clipboard'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { hexToBytea } from 'app/utils/hexToBytea'
 import debug from 'debug'
 
 const log = debug('app:features:check:send')
+
+const MAX_NOTE_LENGTH = 100
 
 const sendCheckSchema = z.object({
   token: z.string().min(1, 'Token required'),
   amount: z.string().min(1, 'Amount required'),
   expiresInDays: z.number().min(1).max(30).default(7),
+  note: z
+    .string()
+    .trim()
+    .max(MAX_NOTE_LENGTH, `Note cannot exceed ${MAX_NOTE_LENGTH} characters`)
+    .optional()
+    .default(''),
 })
 
 type SendCheckFormValues = z.infer<typeof sendCheckSchema>
@@ -49,6 +60,7 @@ type CheckCreatedState = {
   claimUrl: string
   amount: string
   symbol: string
+  note?: string
 }
 
 export function CheckSendScreen() {
@@ -69,12 +81,15 @@ export function CheckSendScreen() {
     [sendAccount?.send_account_credentials]
   )
 
+  const supabase = useSupabase()
+
   const form = useForm<SendCheckFormValues>({
     resolver: zodResolver(sendCheckSchema),
     defaultValues: {
       token: usdcAddress[baseMainnet.id],
       amount: '',
       expiresInDays: 30,
+      note: '',
     },
   })
 
@@ -136,10 +151,28 @@ export function CheckSendScreen() {
     try {
       const result = await createCheck({ webauthnCreds })
 
+      // Save note if provided (fire and forget - don't block on this)
+      const trimmedNote = values.note?.trim()
+      if (trimmedNote) {
+        supabase
+          .from('send_check_notes')
+          .insert({
+            ephemeral_address: hexToBytea(result.ephemeralKeyPair.address),
+            chain_id: baseMainnet.id,
+            note: trimmedNote,
+          })
+          .then(({ error }) => {
+            if (error) {
+              log('Failed to save check note:', error)
+            }
+          })
+      }
+
       setCheckCreated({
         claimUrl: result.claimUrl,
         amount: values.amount,
         symbol: coin?.symbol ?? coinInfo?.symbol ?? 'tokens',
+        note: trimmedNote,
       })
     } catch (error) {
       log('Failed to create check:', error)
@@ -172,6 +205,14 @@ export function CheckSendScreen() {
               {checkCreated.amount} {checkCreated.symbol}
             </Paragraph>
           </XStack>
+
+          {checkCreated.note && (
+            <Card bc="$color2" br="$4" p="$3" w="100%">
+              <Paragraph color="$color11" size="$3" fontStyle="italic">
+                "{checkCreated.note}"
+              </Paragraph>
+            </Card>
+          )}
 
           <YStack ai="center" py="$2">
             <QRCode
@@ -246,6 +287,13 @@ export function CheckSendScreen() {
               {t('check.expiration')}
             </Label>
             <ExpirationSelector />
+          </YStack>
+
+          <YStack gap="$2">
+            <Label color="$color10" textTransform="uppercase" fontSize="$3">
+              {t('check.note', 'Note (Optional)')}
+            </Label>
+            <NoteInput />
           </YStack>
 
           <Separator />
@@ -343,6 +391,49 @@ function ExpirationSelector() {
         )
       })}
     </XStack>
+  )
+}
+
+function NoteInput() {
+  const { field, fieldState } = useController({ name: 'note' })
+  const { t } = useTranslation('send')
+
+  return (
+    <YStack gap="$1">
+      <TextArea
+        value={field.value}
+        onChangeText={field.onChange}
+        onBlur={field.onBlur}
+        placeholder={t('check.notePlaceholder', 'Add a message for the recipient...')}
+        placeholderTextColor="$color4"
+        fontSize="$4"
+        color="$color12"
+        bc="$color2"
+        bw={1}
+        boc={fieldState.error ? '$error' : '$color4'}
+        br="$4"
+        p="$3"
+        minHeight={80}
+        maxLength={MAX_NOTE_LENGTH}
+        focusStyle={{
+          boc: '$color12',
+        }}
+      />
+      <XStack jc="space-between">
+        {fieldState.error ? (
+          <Paragraph color="$error" size="$2">
+            {fieldState.error.message}
+          </Paragraph>
+        ) : (
+          <Paragraph color="$color8" size="$2">
+            {t('check.noteHint', 'Visible to the recipient')}
+          </Paragraph>
+        )}
+        <Paragraph color="$color8" size="$2">
+          {field.value?.length ?? 0}/{MAX_NOTE_LENGTH}
+        </Paragraph>
+      </XStack>
+    </YStack>
   )
 }
 

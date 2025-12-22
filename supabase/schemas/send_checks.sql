@@ -22,7 +22,8 @@ RETURNS TABLE(
     claimed_at numeric,
     is_active boolean,
     is_canceled boolean,
-    is_sender boolean
+    is_sender boolean,
+    note text
 )
 LANGUAGE sql
 STABLE
@@ -82,18 +83,39 @@ received_checks AS (
         AND c.sender != user_address
     GROUP BY c.ephemeral_address, c.sender, c.chain_id
 )
-SELECT * FROM (
+SELECT
+    combined.ephemeral_address,
+    combined.sender,
+    combined.chain_id,
+    combined.block_time,
+    combined.tx_hash,
+    combined.block_num,
+    combined.expires_at,
+    combined.tokens,
+    combined.amounts,
+    combined.is_expired,
+    combined.is_claimed,
+    combined.claimed_by,
+    combined.claimed_at,
+    combined.is_active,
+    combined.is_canceled,
+    combined.is_sender,
+    n.note
+FROM (
     SELECT * FROM sent_checks
     UNION ALL
     SELECT * FROM received_checks
 ) combined
+LEFT JOIN "public"."send_check_notes" n
+    ON combined.ephemeral_address = n.ephemeral_address
+    AND combined.chain_id = n.chain_id
 ORDER BY
     -- Active checks first (only sent checks can be active)
-    is_active DESC,
+    combined.is_active DESC,
     -- Expired but unclaimed checks second (need action from sender to reclaim)
-    (NOT is_claimed AND is_expired) DESC,
+    (NOT combined.is_claimed AND combined.is_expired) DESC,
     -- Then by block_time descending
-    block_time DESC
+    combined.block_time DESC
 LIMIT page_limit
 OFFSET page_offset;
 $function$;
@@ -126,7 +148,8 @@ RETURNS TABLE(
     claimed_by bytea,
     claimed_at numeric,
     is_active boolean,
-    is_canceled boolean
+    is_canceled boolean,
+    note text
 )
 LANGUAGE sql
 STABLE
@@ -146,12 +169,16 @@ SELECT
     (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] AS claimed_by,
     MAX(cl.block_time) AS claimed_at,
     (NOT bool_or(cl.id IS NOT NULL) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW()))::boolean AS is_active,
-    (bool_or(cl.id IS NOT NULL) AND (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] = c.sender)::boolean AS is_canceled
+    (bool_or(cl.id IS NOT NULL) AND (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] = c.sender)::boolean AS is_canceled,
+    MAX(n.note) AS note
 FROM "public"."send_check_created" c
 LEFT JOIN "public"."send_check_claimed" cl
     ON c.ephemeral_address = cl.ephemeral_address
     AND c.chain_id = cl.chain_id
     AND c.abi_idx = cl.abi_idx
+LEFT JOIN "public"."send_check_notes" n
+    ON c.ephemeral_address = n.ephemeral_address
+    AND c.chain_id = n.chain_id
 WHERE c.ephemeral_address = check_ephemeral_address
     AND c.chain_id = check_chain_id
 GROUP BY c.ephemeral_address, c.sender, c.chain_id;
