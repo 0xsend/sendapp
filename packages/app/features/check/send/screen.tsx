@@ -11,7 +11,6 @@ import {
   Separator,
   Sheet,
   Spinner,
-  TextArea,
   useAppToast,
   XStack,
   YStack,
@@ -36,11 +35,10 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import * as Clipboard from 'expo-clipboard'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { hexToBytea } from 'app/utils/hexToBytea'
+import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
 import debug from 'debug'
 
 const log = debug('app:features:check:send')
-
-const MAX_NOTE_LENGTH = 100
 
 const sendCheckSchema = z.object({
   token: z.string().min(1, 'Token required'),
@@ -400,7 +398,7 @@ function NoteInput() {
 
   return (
     <YStack gap="$1">
-      <TextArea
+      <Input
         value={field.value}
         onChangeText={field.onChange}
         onBlur={field.onBlur}
@@ -413,7 +411,8 @@ function NoteInput() {
         boc={fieldState.error ? '$error' : '$color4'}
         br="$4"
         p="$3"
-        minHeight={80}
+        multiline
+        numberOfLines={4}
         maxLength={MAX_NOTE_LENGTH}
         focusStyle={{
           boc: '$color12',
