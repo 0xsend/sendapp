@@ -6,7 +6,7 @@
   },
   "check": {
     "button": "Envoyer un Chèque",
-    "buttonDescription": "Envoyer à n'importe qui via un lien partageable",
+    "buttonDescription": "Envoyer à n'importe qui avec un lien partageable",
     "amount": "Montant",
     "expiration": "Expire",
     "create": "Envoyer un Chèque",

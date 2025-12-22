@@ -6,7 +6,7 @@
   },
   "check": {
     "button": "发送支票",
-    "buttonDescription": "通过可分享的链接发送给任何人",
+    "buttonDescription": "用可分享的链接发送给任何人",
     "amount": "金额",
     "expiration": "到期",
     "create": "发送支票",

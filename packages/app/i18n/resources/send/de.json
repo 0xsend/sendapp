@@ -6,7 +6,7 @@
   },
   "check": {
     "button": "Scheck senden",
-    "buttonDescription": "An jeden über einen teilbaren Link senden",
+    "buttonDescription": "An jeden mit einem teilbaren Link senden",
     "amount": "Betrag",
     "expiration": "Läuft ab",
     "create": "Scheck senden",

@@ -78,6 +78,7 @@
     "sendAccountSigningKey": "Send 帐户签名密钥",
     "sendEarn": "Send Earn",
     "tickets_one": "{{count}} 张票",
-    "tickets_other": "{{count}} 张票"
+    "tickets_other": "{{count}} 张票",
+    "you": "你"
   }
 }
