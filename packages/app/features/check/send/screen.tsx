@@ -404,13 +404,12 @@ function NoteInput() {
         value={field.value}
         onChangeText={field.onChange}
         onBlur={field.onBlur}
-        placeholder={t('check.notePlaceholder', 'Add a message for the recipient...')}
+        placeholder={t('check.notePlaceholder', 'Add an optional note...')}
         placeholderTextColor="$color4"
         fontSize="$4"
-        color="$color12"
-        bc="$color2"
+        bc="$color1"
         bw={1}
-        boc={fieldState.error ? '$error' : '$color4'}
+        boc={fieldState.error ? '$error' : '$color1'}
         br="$4"
         p="$3"
         rows={3}
