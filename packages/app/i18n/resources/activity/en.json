@@ -70,7 +70,8 @@
     "tickets_one": "{{count}} ticket",
     "tickets_other": "{{count}} tickets",
     "sendEarn": "Send Earn",
-    "sendAccountSigningKey": "Send Account Signing Key"
+    "sendAccountSigningKey": "Send Account Signing Key",
+    "you": "You"
   },
   "status": {
     "sending": "Sending...",
