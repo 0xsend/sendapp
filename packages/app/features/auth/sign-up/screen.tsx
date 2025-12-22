@@ -463,7 +463,7 @@ export const SignUpScreen = () => {
                   focusStyle: {
                     outlineWidth: 0,
                   },
-                  placeholderTextColor: '$color4',
+                  placeholderTextColor: '$gray9',
                   fontSize: '$5',
                   onFocus: () => setIsInputFocused(true),
                   onBlur: () => setIsInputFocused(false),
