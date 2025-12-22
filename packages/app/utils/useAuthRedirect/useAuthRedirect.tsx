@@ -1,12 +1,15 @@
 import { useRouter } from 'solito/router'
 import { useCallback } from 'react'
+import { consumeAfterLoginRedirect } from 'app/utils/afterLoginRedirect'
 
 export default function useAuthRedirect() {
   const router = useRouter()
 
   const redirect = useCallback(
     (redirectUrl?: string) => {
-      router.replace(redirectUrl || '/')
+      // Check localStorage for stored redirect (e.g., from check claim flow)
+      const storedRedirect = consumeAfterLoginRedirect()
+      router.replace(storedRedirect || redirectUrl || '/')
     },
     [router]
   )

@@ -1,14 +1,17 @@
 import { useRouter } from 'expo-router'
 import { useCallback } from 'react'
+import { consumeAfterLoginRedirect } from 'app/utils/afterLoginRedirect'
 
 export default function useAuthRedirect() {
   const router = useRouter()
 
   const redirect = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (redirectUrl?: string) => {
       router.dismissAll()
-      router.replace('/(tabs)/home')
+      // Check for stored redirect (e.g., from check claim flow)
+      const storedRedirect = consumeAfterLoginRedirect()
+      const target = storedRedirect || redirectUrl || '/(tabs)/home'
+      router.replace(target as never)
     },
     [router]
   )

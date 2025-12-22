@@ -1,5 +1,6 @@
 import {
   baseMainnet,
+  sendCheckAddress,
   sendtagCheckoutAddress,
   sendTokenV0Address,
   sendTokenV0LockboxAddress,
@@ -301,6 +302,46 @@ export const isSendPotWin = (activity: Activity): boolean => {
 }
 
 /**
+ * Get the SendCheck contract address for the current chain.
+ */
+const getSendCheckContractAddress = (): `0x${string}` | undefined => {
+  return sendCheckAddress?.[baseMainnet.id]
+}
+
+/**
+ * Checks if the activity represents creating/funding a Send Check.
+ * This is when tokens are transferred TO the SendCheck contract.
+ * @param activity - The activity to check.
+ * @returns `true` if the activity is a transfer to the SendCheck contract, otherwise `false`.
+ */
+export const isSendCheckCreate = (activity: Activity): boolean => {
+  const checkAddress = getSendCheckContractAddress()
+  if (!checkAddress) return false
+  return isSendAccountTransfersEvent(activity) && isAddressEqual(activity.data.t, checkAddress)
+}
+
+/**
+ * Checks if the activity represents claiming a Send Check.
+ * This is when tokens are transferred FROM the SendCheck contract to the user.
+ * @param activity - The activity to check.
+ * @returns `true` if the activity is a transfer from the SendCheck contract, otherwise `false`.
+ */
+export const isSendCheckClaim = (activity: Activity): boolean => {
+  const checkAddress = getSendCheckContractAddress()
+  if (!checkAddress) return false
+  return isSendAccountTransfersEvent(activity) && isAddressEqual(activity.data.f, checkAddress)
+}
+
+/**
+ * Checks if the activity is a Send Check related transfer (create or claim).
+ * @param activity - The activity to check.
+ * @returns `true` if the activity involves the SendCheck contract, otherwise `false`.
+ */
+export const isSendCheckTransfer = (activity: Activity): boolean => {
+  return isSendCheckCreate(activity) || isSendCheckClaim(activity)
+}
+
+/**
  * Checks if a given activity is a swap transfer.
  * A swap transfer can either be a swap buy transfer or a swap sell transfer.
  *
@@ -355,6 +396,10 @@ export function eventNameFromActivity({
       return translate('events.sendpot.ticketPurchase', 'Bought')
     case isSendPotWin(activity):
       return translate('events.sendpot.win', 'Sendpot Win')
+    case isSendCheckCreate(activity):
+      return translate('events.sendCheck.create', 'Sent Check')
+    case isSendCheckClaim(activity):
+      return translate('events.sendCheck.claim', 'Claimed Check')
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
         ? translate('events.temporal.depositFailed', 'Deposit Failed')
@@ -478,6 +523,10 @@ export function phraseFromActivity({
       return translate('phrases.sendpot.win', 'won')
     case isSendPotTicketPurchase(activity):
       return translate('phrases.sendpot.ticketPurchase', 'bought')
+    case isSendCheckCreate(activity):
+      return translate('phrases.sendCheck.create', 'Created a Send Check')
+    case isSendCheckClaim(activity):
+      return translate('phrases.sendCheck.claim', 'Claimed a Send Check')
     case isTemporalSendEarnDepositEvent(activity):
       return activity.data.status === 'failed'
         ? translate('phrases.sendEarn.depositFailed', 'Failed to deposit to Send Earn')
@@ -603,6 +652,10 @@ export function subtextFromActivity({
     return translate('subtext.tickets', defaultLabel, {
       count: ticketCount,
     })
+  }
+
+  if (isSendCheckTransfer(activity)) {
+    return 'Send Check'
   }
 
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {

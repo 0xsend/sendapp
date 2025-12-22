@@ -41,6 +41,11 @@ interface TopNavProps {
    */
   showOnGtLg?: boolean
   hideRightActions?: boolean
+  /**
+   * Show back button on desktop (gtLg) for subroutes
+   * @default false
+   */
+  showBackOnDesktop?: boolean
 }
 
 export function TopNav({
@@ -51,6 +56,7 @@ export function TopNav({
   backFunction = 'root',
   showOnGtLg = false,
   hideRightActions = false,
+  showBackOnDesktop = false,
 }: TopNavProps) {
   const [queryParams] = useRootScreenParams()
   const path = usePathname()
@@ -109,7 +115,22 @@ export function TopNav({
         {(() => {
           switch (true) {
             case media.gtLg && isSubRoute:
-              return (
+              return showBackOnDesktop ? (
+                <XStack ai="center" f={1}>
+                  <Button onPress={handleBack}>
+                    <ButtonOg.Icon>
+                      <IconArrowLeft
+                        size={'$1.5'}
+                        color={'$primary'}
+                        $theme-light={{ color: '$color12' }}
+                      />
+                    </ButtonOg.Icon>
+                  </Button>
+                  <H2 fontWeight={'500'} col="$color12" lineHeight={32} als={'center'}>
+                    {header}
+                  </H2>
+                </XStack>
+              ) : (
                 <H2 fontWeight={'500'} col="$color12" lineHeight={32} als={'center'}>
                   {header}
                 </H2>

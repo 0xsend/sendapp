@@ -23,6 +23,9 @@ import { isAndroid } from '@tamagui/constants'
 import {
   counterpart,
   isActivitySwapTransfer,
+  isSendCheckClaim,
+  isSendCheckCreate,
+  isSendCheckTransfer,
   isSendPotTicketPurchase,
   isSendPotWin,
   isSwapBuyTransfer,
@@ -73,6 +76,10 @@ export const ActivityAvatar = memo(
           <IconSendPotTicket color={'$color2'} />
         </XStack>
       )
+    }
+
+    if (isSendCheckTransfer(activity)) {
+      return <SendCheckActivityAvatar activity={activity} />
     }
 
     if (isActivitySwapTransfer(activity, swapRouters, liquidityPools)) {
@@ -234,6 +241,29 @@ const TradeActivityAvatar = ({ activity }: { activity: Activity }) => {
         borderColor={'$color1'}
       >
         <Icon size={'$1'} />
+      </XStack>
+    </XStack>
+  )
+}
+
+const SendCheckActivityAvatar = ({ activity }: { activity: Activity }) => {
+  const isClaim = isSendCheckClaim(activity)
+  const Icon = isClaim ? ArrowDown : ArrowUp
+
+  return (
+    <XStack w="$5" h={'$5'} br="$4" ai={'center'} jc={'center'} position={'relative'}>
+      <IconCoin symbol={activity.data?.coin?.symbol ?? ''} size={'$5'} />
+      <XStack
+        position={'absolute'}
+        bottom={0}
+        right={0}
+        transform={'translate(5px, 5px) scale(0.85)'}
+        bc={isClaim ? '$olive' : '$error'}
+        borderRadius={999}
+        borderWidth={2}
+        borderColor={'$color1'}
+      >
+        <Icon size={'$1'} color={'$white'} />
       </XStack>
     </XStack>
   )

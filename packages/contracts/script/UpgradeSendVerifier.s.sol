@@ -11,7 +11,7 @@ import {SendVerifier, SendVerifierProxy} from "../src/SendVerifier.sol";
  */
 contract UpgradeSendVerifierScript is Script, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function run() public {

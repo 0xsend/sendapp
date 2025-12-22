@@ -4,6 +4,83 @@
     "enterAmount": "Enter Amount",
     "preview": "Preview and Send"
   },
+  "check": {
+    "button": "Send Check",
+    "buttonDescription": "Send to anyone via a shareable link",
+    "amount": "Amount",
+    "expiration": "Expires",
+    "create": "Send Check",
+    "fee": "Fees",
+    "info": {
+      "title": "What is Send Check?",
+      "description": "Send Check lets you send crypto to anyone using a shareable link — no wallet address needed.",
+      "howItWorks": "How it works",
+      "steps": [
+        "Choose an amount and create a check",
+        "Share the link with the recipient",
+        "They register or sign into Send with the link to claim",
+        "If unclaimed, cancel the check to get your funds back"
+      ],
+      "note": "Only share with your intended recipient — anyone with the link can claim the funds.",
+      "dismiss": "Got it"
+    },
+    "success": {
+      "warningTitle": "Save this link before leaving",
+      "warningDescription": "If the link is lost, cancel the check to recover funds and send a new check."
+    },
+    "claim": {
+      "submit": "Claim Check",
+      "success": "Check claimed successfully!",
+      "error": "Failed to claim check",
+      "successTitle": "Check Claimed!",
+      "addedToAccount": "has been added to your account",
+      "done": "Done",
+      "tryAgain": "Try Again",
+      "goBack": "Go Back",
+      "verifying": "Verifying check...",
+      "alreadyClaimed": "This check has already been claimed",
+      "canceled": "This check has been canceled",
+      "expired": "This check has expired",
+      "preview": {
+        "someone": "Someone",
+        "sentYou": "sent you",
+        "expires": "Expires"
+      },
+      "public": {
+        "registerButton": "Register to Claim",
+        "alreadyHaveAccount": "Already have an account?",
+        "signIn": "Sign in"
+      },
+      "notFoundMessage": "This check link is no longer valid. Please ask the sender for a new link."
+    },
+    "manage": {
+      "loading": "Loading checks...",
+      "error": "Failed to load checks",
+      "noActiveChecks": "No active checks. Create one to get started!",
+      "expired": "Expired",
+      "expiresAt": "Expires",
+      "claimed": "Claimed Check",
+      "canceled": "Canceled Check",
+      "sentCheck": "Sent Check",
+      "cancelCheck": "Cancel",
+      "confirmCancel": "Confirm",
+      "keepCheck": "Keep",
+      "cancelSuccess": "Check cancelled successfully",
+      "cancelError": "Failed to cancel check",
+      "claimedOn": "Claimed",
+      "canceledOn": "Canceled",
+      "expiredUnclaimed": "Expired - Reclaim funds",
+      "claimedBy": "Claimed by",
+      "claimedByUser": "Claimed by a user",
+      "from": "From",
+      "fromUser": "From a user"
+    },
+    "sections": {
+      "pending": "Pending",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    }
+  },
   "form": {
     "balanceLabel": "Balance:",
     "errors": {

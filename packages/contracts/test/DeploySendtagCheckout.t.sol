@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DeploySendtagCheckoutTest is Test, Helper {
     function setUp() public {
-        this.labels();
+        labels();
     }
 
     function testItRuns() public {

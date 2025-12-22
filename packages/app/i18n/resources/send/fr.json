@@ -1,55 +1,132 @@
 {
-  "confirm": {
-    "button": {
-      "send": "ENVOYER"
-    },
-    "edit": "modifier",
-    "errors": {
-      "default": "Erreur lors de l’envoi",
-      "insufficientBalance": "Solde insuffisant",
-      "insufficientGas": "Gaz insuffisant"
-    },
-    "fees": "Frais",
-    "noteTitle": "Votre note"
-  },
-  "form": {
-    "balanceLabel": "Solde :",
-    "errors": {
-      "insufficientFunds": "Fonds insuffisants",
-      "minimum": "Minimum : {{amount}} {{symbol}}",
-      "noteValidationFallback": "La note n’a pas pu correspondre aux contraintes de validation"
-    },
-    "note": {
-      "maxCharacters": "Max. : {{count}} caractères"
-    },
-    "submit": "CONTINUER"
-  },
-  "noAccount": {
-    "banner": "Chèques /send bientôt disponibles",
-    "cta": "Écrire un chèque /send",
-    "description": "n’a pas de compte d’envoi ! Demandez-lui d’en créer un ou d’écrire un chèque /send.",
-    "title": "Aucun compte d’envoi",
-    "toast": "Bientôt disponible"
-  },
-  "recipient": {
-    "edit": "modifier",
-    "label": "À"
-  },
-  "search": {
-    "errorHeading": "Erreur",
-    "placeholder": "Rechercher par balise d’envoi ou adresse de portefeuille",
-    "unknownError": "Erreur inconnue"
-  },
-  "suggestions": {
-    "birthdays": "Souhaitez-leur un joyeux anniversaire",
-    "favorites": "Expéditeurs favoris",
-    "recent": "Activité récente",
-    "top": "Meilleurs expéditeurs",
-    "viewMore": "Voir plus"
-  },
   "topNav": {
     "default": "Envoyer",
     "enterAmount": "Saisir le montant",
     "preview": "Aperçu et envoi"
+  },
+  "check": {
+    "button": "Envoyer un Chèque",
+    "buttonDescription": "Envoyer à n'importe qui via un lien partageable",
+    "amount": "Montant",
+    "expiration": "Expire",
+    "create": "Envoyer un Chèque",
+    "fee": "Frais",
+    "info": {
+      "title": "Qu'est-ce que Send Check ?",
+      "description": "Send Check vous permet d'envoyer des cryptos à n'importe qui via un lien partageable — sans adresse de portefeuille requise.",
+      "howItWorks": "Comment ça marche",
+      "steps": [
+        "Choisissez un montant et créez un chèque",
+        "Partagez le lien avec le destinataire",
+        "Ils s'inscrivent ou se connectent à Send avec le lien pour réclamer",
+        "Si non réclamé, annulez le chèque pour récupérer vos fonds"
+      ],
+      "note": "Ne partagez qu'avec votre destinataire prévu — toute personne ayant le lien peut réclamer les fonds.",
+      "dismiss": "Compris"
+    },
+    "success": {
+      "warningTitle": "Enregistrez ce lien avant de partir",
+      "warningDescription": "Si le lien est perdu, annulez le chèque pour récupérer les fonds et envoyez-en un nouveau."
+    },
+    "claim": {
+      "submit": "Réclamer le Chèque",
+      "success": "Chèque réclamé avec succès !",
+      "error": "Échec de la réclamation du chèque",
+      "successTitle": "Chèque Réclamé !",
+      "addedToAccount": "a été ajouté à votre compte",
+      "done": "Terminé",
+      "tryAgain": "Réessayer",
+      "goBack": "Retour",
+      "verifying": "Vérification du chèque...",
+      "alreadyClaimed": "Ce chèque a déjà été réclamé",
+      "canceled": "Ce chèque a été annulé",
+      "expired": "Ce chèque a expiré",
+      "preview": {
+        "someone": "Quelqu'un",
+        "sentYou": "vous a envoyé",
+        "expires": "Expire"
+      },
+      "public": {
+        "registerButton": "S'inscrire pour réclamer",
+        "alreadyHaveAccount": "Déjà un compte ?",
+        "signIn": "Se connecter"
+      },
+      "notFoundMessage": "Ce lien de chèque n'est plus valide. Veuillez demander un nouveau lien à l'expéditeur."
+    },
+    "manage": {
+      "loading": "Chargement des chèques...",
+      "error": "Échec du chargement des chèques",
+      "noActiveChecks": "Aucun chèque actif. Créez-en un pour commencer !",
+      "expired": "Expiré",
+      "expiresAt": "Expire",
+      "claimed": "Chèque Réclamé",
+      "canceled": "Chèque Annulé",
+      "sentCheck": "Chèque Envoyé",
+      "cancelCheck": "Annuler",
+      "confirmCancel": "Confirmer",
+      "keepCheck": "Garder",
+      "cancelSuccess": "Chèque annulé avec succès",
+      "cancelError": "Échec de l'annulation du chèque",
+      "claimedOn": "Réclamé",
+      "canceledOn": "Annulé",
+      "expiredUnclaimed": "Expiré - Récupérer les fonds",
+      "claimedBy": "Réclamé par",
+      "claimedByUser": "Réclamé par un utilisateur",
+      "from": "De",
+      "fromUser": "D'un utilisateur"
+    },
+    "sections": {
+      "pending": "En attente",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier"
+    }
+  },
+  "form": {
+    "balanceLabel": "Solde :",
+    "errors": {
+      "insufficientFunds": "Fonds insuffisants",
+      "minimum": "Minimum : {{amount}} {{symbol}}",
+      "noteValidationFallback": "La note n'a pas pu correspondre aux contraintes de validation"
+    },
+    "note": {
+      "maxCharacters": "Max. : {{count}} caractères"
+    },
+    "submit": "CONTINUER"
+  },
+  "confirm": {
+    "edit": "modifier",
+    "fees": "Frais",
+    "noteTitle": "Votre note",
+    "button": {
+      "send": "ENVOYER"
+    },
+    "errors": {
+      "default": "Erreur lors de l'envoi",
+      "insufficientBalance": "Solde insuffisant",
+      "insufficientGas": "Gaz insuffisant"
+    }
+  },
+  "search": {
+    "placeholder": "Rechercher par balise d'envoi ou adresse de portefeuille",
+    "errorHeading": "Erreur",
+    "unknownError": "Erreur inconnue"
+  },
+  "suggestions": {
+    "recent": "Activité récente",
+    "favorites": "Expéditeurs favoris",
+    "top": "Meilleurs expéditeurs",
+    "birthdays": "Souhaitez-leur un joyeux anniversaire",
+    "viewMore": "Voir plus"
+  },
+  "recipient": {
+    "label": "À",
+    "edit": "modifier"
+  },
+  "noAccount": {
+    "title": "Aucun compte d'envoi",
+    "description": "n'a pas de compte d'envoi ! Demandez-lui d'en créer un ou d'écrire un chèque /send.",
+    "cta": "Écrire un chèque /send",
+    "toast": "Bientôt disponible",
+    "banner": "Chèques /send bientôt disponibles"
   }
 }

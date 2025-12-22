@@ -1551,6 +1551,300 @@ exports[`shovel config 1`] = `
         "name": "send_earn_withdraw",
       },
     },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x274B45D75d71b7F627c00d87757B493E7E1312a7",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "components": [
+              {
+                "column": "ephemeral_address",
+                "name": "ephemeralAddress",
+                "type": "address",
+              },
+              {
+                "column": "sender",
+                "name": "from",
+                "type": "address",
+              },
+              {
+                "components": [
+                  {
+                    "column": "token",
+                    "name": "token",
+                    "type": "address",
+                  },
+                  {
+                    "column": "amount",
+                    "name": "amount",
+                    "type": "uint256",
+                  },
+                ],
+                "name": "amounts",
+                "type": "tuple[]",
+              },
+              {
+                "column": "expires_at",
+                "name": "expiresAt",
+                "type": "uint256",
+              },
+            ],
+            "indexed": false,
+            "name": "check",
+            "type": "tuple",
+          },
+        ],
+        "name": "CheckCreated",
+        "type": "event",
+      },
+      "name": "send_check_created",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "ephemeral_address",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "token",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+          {
+            "name": "expires_at",
+            "type": "numeric",
+          },
+        ],
+        "name": "send_check_created",
+      },
+    },
+    {
+      "block": [
+        {
+          "column": "chain_id",
+          "name": "chain_id",
+        },
+        {
+          "column": "block_num",
+          "name": "block_num",
+        },
+        {
+          "column": "block_time",
+          "name": "block_time",
+        },
+        {
+          "column": "tx_hash",
+          "name": "tx_hash",
+        },
+        {
+          "column": "tx_idx",
+          "name": "tx_idx",
+        },
+        {
+          "column": "log_idx",
+          "name": "log_idx",
+        },
+        {
+          "column": "log_addr",
+          "filter_arg": [
+            "0x274B45D75d71b7F627c00d87757B493E7E1312a7",
+          ],
+          "filter_op": "contains",
+          "name": "log_addr",
+        },
+      ],
+      "enabled": true,
+      "event": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "components": [
+              {
+                "column": "ephemeral_address",
+                "name": "ephemeralAddress",
+                "type": "address",
+              },
+              {
+                "column": "sender",
+                "name": "from",
+                "type": "address",
+              },
+              {
+                "components": [
+                  {
+                    "column": "token",
+                    "name": "token",
+                    "type": "address",
+                  },
+                  {
+                    "column": "amount",
+                    "name": "amount",
+                    "type": "uint256",
+                  },
+                ],
+                "name": "amounts",
+                "type": "tuple[]",
+              },
+              {
+                "column": "expires_at",
+                "name": "expiresAt",
+                "type": "uint256",
+              },
+            ],
+            "indexed": false,
+            "name": "check",
+            "type": "tuple",
+          },
+          {
+            "column": "redeemer",
+            "indexed": false,
+            "name": "redeemer",
+            "type": "address",
+          },
+        ],
+        "name": "CheckClaimed",
+        "type": "event",
+      },
+      "name": "send_check_claimed",
+      "sources": [
+        {
+          "name": "base_logs",
+          "start": "$BASE_BLOCK_START",
+        },
+      ],
+      "table": {
+        "columns": [
+          {
+            "name": "chain_id",
+            "type": "numeric",
+          },
+          {
+            "name": "block_num",
+            "type": "numeric",
+          },
+          {
+            "name": "log_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "block_time",
+            "type": "numeric",
+          },
+          {
+            "name": "tx_hash",
+            "type": "bytea",
+          },
+          {
+            "name": "tx_idx",
+            "type": "numeric",
+          },
+          {
+            "name": "log_addr",
+            "type": "bytea",
+          },
+          {
+            "name": "ephemeral_address",
+            "type": "bytea",
+          },
+          {
+            "name": "sender",
+            "type": "bytea",
+          },
+          {
+            "name": "token",
+            "type": "bytea",
+          },
+          {
+            "name": "amount",
+            "type": "numeric",
+          },
+          {
+            "name": "expires_at",
+            "type": "numeric",
+          },
+          {
+            "name": "redeemer",
+            "type": "bytea",
+          },
+        ],
+        "name": "send_check_claimed",
+      },
+    },
   ],
   "pg_url": "$DATABASE_URL",
   "sources": [
