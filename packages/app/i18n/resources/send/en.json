@@ -36,8 +36,8 @@
       "addedToAccount": "has been added to your account",
       "done": "Done",
       "tryAgain": "Try Again",
+      "goBack": "Go Back",
       "verifying": "Verifying check...",
-      "notFound": "Check not found or invalid",
       "alreadyClaimed": "This check has already been claimed",
       "canceled": "This check has been canceled",
       "expired": "This check has expired",
@@ -50,7 +50,8 @@
         "registerButton": "Register to Claim",
         "alreadyHaveAccount": "Already have an account?",
         "signIn": "Sign in"
-      }
+      },
+      "notFoundMessage": "This check link is no longer valid. Please ask the sender for a new link."
     },
     "manage": {
       "loading": "Loading checks...",

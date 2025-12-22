@@ -106,6 +106,11 @@ export function useCheckDetails(checkCode: string | null) {
         throw new Error('Check not found')
       }
 
+      // Treat claimed or canceled checks as not found
+      if (row.is_claimed || row.is_canceled) {
+        throw new Error('Check not found')
+      }
+
       // Parse tokens and amounts arrays into TokenAmount[]
       const tokenAmounts: TokenAmount[] = row.tokens.map((token, i) => ({
         token: byteaToHex(token as PgBytea),

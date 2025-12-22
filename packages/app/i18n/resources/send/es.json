@@ -36,8 +36,8 @@
       "addedToAccount": "ha sido agregado a tu cuenta",
       "done": "Listo",
       "tryAgain": "Intentar de nuevo",
+      "goBack": "Volver",
       "verifying": "Verificando cheque...",
-      "notFound": "Cheque no encontrado o inválido",
       "alreadyClaimed": "Este cheque ya fue reclamado",
       "canceled": "Este cheque ha sido cancelado",
       "expired": "Este cheque ha vencido",
@@ -50,7 +50,8 @@
         "registerButton": "Registrarse para Reclamar",
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
         "signIn": "Iniciar sesión"
-      }
+      },
+      "notFoundMessage": "Este enlace de cheque ya no es válido. Por favor, pide al remitente un nuevo enlace."
     },
     "manage": {
       "loading": "Cargando cheques...",

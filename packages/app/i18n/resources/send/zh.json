@@ -36,8 +36,8 @@
       "addedToAccount": "已添加到您的账户",
       "done": "完成",
       "tryAgain": "重试",
+      "goBack": "返回",
       "verifying": "正在验证支票...",
-      "notFound": "支票未找到或无效",
       "alreadyClaimed": "此支票已被领取",
       "canceled": "此支票已被取消",
       "expired": "此支票已过期",
@@ -50,7 +50,8 @@
         "registerButton": "注册以领取",
         "alreadyHaveAccount": "已有账户？",
         "signIn": "登录"
-      }
+      },
+      "notFoundMessage": "此支票链接已失效。请联系发送者获取新链接。"
     },
     "manage": {
       "loading": "正在加载支票...",

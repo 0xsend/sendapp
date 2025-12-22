@@ -109,8 +109,8 @@ export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
     return (
       <Card padded elevation={1} br="$5">
         <YStack ai="center" gap="$4" py="$4">
-          <Paragraph color="$error" size="$5" fontWeight="600">
-            {t('check.claim.notFound')}
+          <Paragraph color="$color10" size="$4" ta="center">
+            {t('check.claim.notFoundMessage')}
           </Paragraph>
         </YStack>
       </Card>

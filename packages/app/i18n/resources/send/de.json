@@ -36,8 +36,8 @@
       "addedToAccount": "wurde deinem Konto gutgeschrieben",
       "done": "Fertig",
       "tryAgain": "Erneut versuchen",
+      "goBack": "Zurück",
       "verifying": "Scheck wird überprüft...",
-      "notFound": "Scheck nicht gefunden oder ungültig",
       "alreadyClaimed": "Dieser Scheck wurde bereits eingelöst",
       "canceled": "Dieser Scheck wurde storniert",
       "expired": "Dieser Scheck ist abgelaufen",
@@ -50,7 +50,8 @@
         "registerButton": "Registrieren zum Einlösen",
         "alreadyHaveAccount": "Bereits ein Konto?",
         "signIn": "Anmelden"
-      }
+      },
+      "notFoundMessage": "Dieser Scheck-Link ist nicht mehr gültig. Bitte den Absender um einen neuen Link."
     },
     "manage": {
       "loading": "Schecks werden geladen...",

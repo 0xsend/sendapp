@@ -36,8 +36,8 @@
       "addedToAccount": "a été ajouté à votre compte",
       "done": "Terminé",
       "tryAgain": "Réessayer",
+      "goBack": "Retour",
       "verifying": "Vérification du chèque...",
-      "notFound": "Chèque non trouvé ou invalide",
       "alreadyClaimed": "Ce chèque a déjà été réclamé",
       "canceled": "Ce chèque a été annulé",
       "expired": "Ce chèque a expiré",
@@ -50,7 +50,8 @@
         "registerButton": "S'inscrire pour réclamer",
         "alreadyHaveAccount": "Déjà un compte ?",
         "signIn": "Se connecter"
-      }
+      },
+      "notFoundMessage": "Ce lien de chèque n'est plus valide. Veuillez demander un nouveau lien à l'expéditeur."
     },
     "manage": {
       "loading": "Chargement des chèques...",

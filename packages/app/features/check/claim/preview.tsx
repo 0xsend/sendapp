@@ -69,11 +69,16 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
       <YStack f={1} gap="$5" w="100%" maxWidth={600}>
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
-            <Paragraph color="$error" size="$5" fontWeight="600">
-              {t('check.claim.notFound')}
+            <Paragraph color="$color10" size="$4" ta="center">
+              {t('check.claim.notFoundMessage')}
             </Paragraph>
-            <Button size="$4" variant="outlined" onPress={() => router.push('/check')}>
-              <Button.Text>{t('check.claim.tryAgain')}</Button.Text>
+            <Button
+              size="$4"
+              onPress={() => router.push('/check')}
+              bc="$primary"
+              $theme-light={{ bc: '$color12' }}
+            >
+              <Button.Text color="$color1">{t('check.claim.goBack')}</Button.Text>
             </Button>
           </YStack>
         </Card>
