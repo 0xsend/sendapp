@@ -70,7 +70,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
   // Loading state (including redirect for logged-in users, or waiting for router hydration)
   if (isLoading || isLoadingAccount || sendAccount || !checkCode) {
     return (
-      <YStack f={1} gap="$5" w="100%" maxWidth={600} ai="center" jc="center">
+      <YStack gap="$5" w="100%" maxWidth={600} ai="center" jc="center" py="$10">
         <Spinner size="large" />
         <Paragraph color="$color10">{t('check.claim.verifying')}</Paragraph>
       </YStack>
@@ -80,7 +80,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
   const isNotFound = error || !checkDetails
 
   return (
-    <YStack f={1} gap="$4" w="100%" maxWidth={600}>
+    <YStack gap="$4" w="100%" maxWidth={600}>
       {isNotFound ? (
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
@@ -90,11 +90,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
           </YStack>
         </Card>
       ) : (
-        <CheckPreviewCard checkCode={checkCode} />
-      )}
-
-      {!isNotFound && (
-        <>
+        <CheckPreviewCard checkCode={checkCode}>
           {/* Register Button */}
           <PrimaryButton onPress={handleRegister}>
             <PrimaryButton.Text>{t('check.claim.public.registerButton')}</PrimaryButton.Text>
@@ -124,7 +120,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
               </Button.Text>
             </Button>
           </XStack>
-        </>
+        </CheckPreviewCard>
       )}
     </YStack>
   )

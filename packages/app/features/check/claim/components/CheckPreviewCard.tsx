@@ -28,6 +28,7 @@ export interface CheckPreviewData {
 
 interface CheckPreviewCardProps {
   checkCode: string
+  children?: React.ReactNode
 }
 
 export function useCheckPreview(checkCode: string | null) {
@@ -85,7 +86,7 @@ export function useCheckPreview(checkCode: string | null) {
   }
 }
 
-export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
+export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps) {
   const { t } = useTranslation('send')
   const theme = useThemeName()
   const isDark = theme.includes('dark')
@@ -166,7 +167,7 @@ export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
           {previewData.tokens.map((token) => (
             <XStack key={token.symbol} ai="center" gap="$2">
               <IconCoin symbol={token.symbol} size="$2" />
-              <Paragraph color="$color12" fontWeight="700" fontSize="$9">
+              <Paragraph color="$color12" fontWeight="700" fontSize="$9" lineHeight="$9">
                 {token.amount} {token.symbol}
               </Paragraph>
             </XStack>
@@ -194,6 +195,8 @@ export function CheckPreviewCard({ checkCode }: CheckPreviewCardProps) {
             {t('check.claim.expired')}
           </Paragraph>
         )}
+
+        {children}
       </YStack>
     </Card>
   )

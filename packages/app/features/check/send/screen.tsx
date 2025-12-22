@@ -150,7 +150,7 @@ export function CheckSendScreen() {
   // Success state after creating a check
   if (checkCreated) {
     return (
-      <YStack f={1} gap="$5" w="100%" maxWidth={600}>
+      <YStack gap="$5" w="100%" maxWidth={600}>
         <FadeCard>
           <Card bc="$yellow2" br="$4" p="$3" w="100%">
             <XStack gap="$2" ai="flex-start">
@@ -168,7 +168,7 @@ export function CheckSendScreen() {
 
           <XStack ai="center" gap="$3">
             <IconCoin symbol={checkCreated.symbol} size="$3" />
-            <Paragraph color="$color12" fontWeight="600" fontSize="$8">
+            <Paragraph color="$color12" fontWeight="600" fontSize="$8" lineHeight="$8">
               {checkCreated.amount} {checkCreated.symbol}
             </Paragraph>
           </XStack>
@@ -206,7 +206,7 @@ export function CheckSendScreen() {
 
   // Create check form
   return (
-    <YStack f={1} gap="$5" w="100%" maxWidth={600}>
+    <YStack gap="$5" w="100%" maxWidth={600}>
       <FormProvider {...form}>
         <FadeCard>
           <XStack jc="flex-end" position="absolute" top="$4" right="$4" zIndex={1}>

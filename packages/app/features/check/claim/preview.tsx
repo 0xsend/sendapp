@@ -72,35 +72,17 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   // Loading state (including waiting for auth check, redirect, or router hydration)
   if (isLoading || isLoadingAccount || !sendAccount || !checkCode) {
     return (
-      <YStack f={1} gap="$5" w="100%" maxWidth={600} ai="center" jc="center">
+      <YStack gap="$5" w="100%" maxWidth={600} ai="center" jc="center" py="$10">
         <Spinner size="large" />
         <Paragraph color="$color10">{t('check.claim.verifying')}</Paragraph>
       </YStack>
     )
   }
 
-  // Error state
-  if (error || !checkDetails) {
-    return (
-      <YStack f={1} gap="$5" w="100%" maxWidth={600}>
-        <Card padded elevation={1} br="$5">
-          <YStack ai="center" gap="$4" py="$4">
-            <Paragraph color="$color10" size="$4" ta="center">
-              {t('check.claim.notFoundMessage')}
-            </Paragraph>
-            <PrimaryButton onPress={() => router.push('/check')}>
-              <PrimaryButton.Text>{t('check.claim.goBack')}</PrimaryButton.Text>
-            </PrimaryButton>
-          </YStack>
-        </Card>
-      </YStack>
-    )
-  }
-
-  // Success state after claiming
+  // Success state after claiming (check before error since claimed checks throw "not found")
   if (claimed) {
     return (
-      <YStack f={1} gap="$5" w="100%" maxWidth={600}>
+      <YStack gap="$5" w="100%" maxWidth={600}>
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
             <XStack w="$6" h="$6" br="$10" ai="center" jc="center" bc="$primary">
@@ -115,29 +97,46 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
                 {t('check.claim.addedToAccount')}
               </Paragraph>
             </YStack>
+
+            <PrimaryButton onPress={() => router.push('/')}>
+              <PrimaryButton.Text>{t('check.claim.done')}</PrimaryButton.Text>
+            </PrimaryButton>
           </YStack>
         </Card>
+      </YStack>
+    )
+  }
 
-        <PrimaryButton onPress={() => router.push('/')}>
-          <PrimaryButton.Text>{t('check.claim.done')}</PrimaryButton.Text>
-        </PrimaryButton>
+  // Error state
+  if (error || !checkDetails) {
+    return (
+      <YStack gap="$5" w="100%" maxWidth={600}>
+        <Card padded elevation={1} br="$5">
+          <YStack ai="center" gap="$4" py="$4">
+            <Paragraph color="$color10" size="$4" ta="center">
+              {t('check.claim.notFoundMessage')}
+            </Paragraph>
+            <PrimaryButton onPress={() => router.push('/check')}>
+              <PrimaryButton.Text>{t('check.claim.goBack')}</PrimaryButton.Text>
+            </PrimaryButton>
+          </YStack>
+        </Card>
       </YStack>
     )
   }
 
   // Preview state
   return (
-    <YStack f={1} gap="$5" w="100%" maxWidth={600}>
-      <CheckPreviewCard checkCode={checkCode} />
-
-      {/* Claim Button */}
-      <PrimaryButton disabled={!canSubmit} onPress={onClaim} disabledStyle={{ opacity: 0.5 }}>
-        {isSubmitting ? (
-          <Spinner color="$black" />
-        ) : (
-          <PrimaryButton.Text>{t('check.claim.submit')}</PrimaryButton.Text>
-        )}
-      </PrimaryButton>
+    <YStack gap="$5" w="100%" maxWidth={600}>
+      <CheckPreviewCard checkCode={checkCode}>
+        <PrimaryButton disabled={!canSubmit} onPress={onClaim} disabledStyle={{ opacity: 0.5 }}>
+          {isSubmitting ? (
+            <Spinner color="$black" />
+          ) : (
+            <PrimaryButton.Text>{t('check.claim.submit')}</PrimaryButton.Text>
+          )}
+        </PrimaryButton>
+      </CheckPreviewCard>
     </YStack>
   )
 }
