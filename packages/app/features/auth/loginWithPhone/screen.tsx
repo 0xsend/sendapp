@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
+import { useAuthScreenParams } from 'app/routers/params'
 import { Button, FadeCard, LinkableButton, Paragraph, SubmitButton, XStack, YStack } from '@my/ui'
 import { useEffect, useState } from 'react'
 import { api } from 'app/utils/api'
@@ -17,6 +18,8 @@ const SignInWithPhoneSchema = z.object({
 export const LoginWithPhoneScreen = () => {
   const form = useForm<z.infer<typeof SignInWithPhoneSchema>>()
   const router = useRouter()
+  const [queryParams] = useAuthScreenParams()
+  const { redirectUri } = queryParams
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const { redirect } = useAuthRedirect()
 
@@ -50,7 +53,7 @@ export const LoginWithPhoneScreen = () => {
       return
     }
 
-    redirect()
+    redirect(redirectUri)
   }
 
   return (
