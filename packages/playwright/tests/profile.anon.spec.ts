@@ -58,7 +58,7 @@ test('anon user cannot visit private profile', async ({ page, seed, pg }) => {
   await visitProfile({ page, tag: tag.name })
   await expect(async () => {
     const title = await page.title()
-    expect(title).toBe('404 | Send')
+    expect(title).toBe('Send | 404')
   }).toPass()
   await expect(page.getByRole('heading', { name: 'Not found.' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Need to sign in?' })).toBeVisible()

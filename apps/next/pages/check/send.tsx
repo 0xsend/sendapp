@@ -9,7 +9,7 @@ export const Page: NextPageWithLayout = () => {
   return (
     <>
       <NextSeo
-        title="Send Check | Send"
+        title="Send | Send Check"
         description="Send tokens to anyone, even without a Send account"
       />
       <CheckSendScreen />

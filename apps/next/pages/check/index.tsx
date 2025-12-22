@@ -7,7 +7,7 @@ import { TopNav } from 'app/components/TopNav'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <NextSeo title="My Checks | Send" description="View and manage your Send Checks" />
+      <NextSeo title="Send | My Checks" description="View and manage your Send Checks" />
       <CheckScreen />
     </>
   )
