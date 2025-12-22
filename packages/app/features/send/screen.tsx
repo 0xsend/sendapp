@@ -109,7 +109,7 @@ export const SendScreen = () => {
         <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
         </YStack>
-        {!search && Platform.OS === 'web' && <SendCheckButton />}
+        {!search && <SendCheckButton />}
         {!search && <SendSuggestions />}
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />
