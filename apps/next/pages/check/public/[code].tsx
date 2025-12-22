@@ -7,11 +7,12 @@ import type { Database, PgBytea } from '@my/supabase/database.types'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { buildSeo } from 'utils/seo'
 import { generateCheckSeoData, formatAmountForDisplay, type CheckSeoData } from 'utils/seoHelpers'
-import { base32 } from '@scure/base'
 import { formatUnits } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { allCoinsDict, type coin } from 'app/data/coins'
 import { baseMainnetClient } from '@my/wagmi'
+import { parseCheckCode } from 'app/utils/useSendCheckClaim'
+import { byteaToHex } from 'app/utils/byteaToHex'
 
 interface PageProps {
   seo: ReturnType<typeof buildSeo>
@@ -22,36 +23,6 @@ export const Page: NextPageWithLayout<PageProps> = () => {
   const code = (router.query.code as string) ?? ''
 
   return <CheckPublicPreviewScreen checkCode={code} />
-}
-
-/**
- * Parse check code and return the private key as hex.
- */
-function parseCheckCode(code: string): `0x${string}` | null {
-  try {
-    const cleaned = code.replace(/[-\s]/g, '').toUpperCase()
-    const padLength = (8 - (cleaned.length % 8)) % 8
-    const padded = cleaned + '='.repeat(padLength)
-    const bytes = base32.decode(padded)
-
-    if (bytes.length !== 32) return null
-
-    const hexStr = Array.from(bytes)
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
-
-    return `0x${hexStr}` as `0x${string}`
-  } catch {
-    return null
-  }
-}
-
-/**
- * Convert bytea to hex address
- */
-function byteaToHex(bytea: PgBytea): `0x${string}` {
-  const hex = bytea.slice(2) // Remove \x prefix
-  return `0x${hex}` as `0x${string}`
 }
 
 /**
