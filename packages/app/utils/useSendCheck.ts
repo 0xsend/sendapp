@@ -43,6 +43,7 @@ export function useUserSendChecks({ pageSize = PAGE_SIZE }: { pageSize?: number 
     queryKey: [USER_SEND_CHECKS_QUERY_KEY, sendAccountId, userAddress, pageSize],
     enabled: !!userAddress && !!sendAccountId,
     initialPageParam: 0,
+    refetchInterval: 15_000,
     queryFn: async ({ pageParam }) => {
       assert(!!userAddress, 'User address is required')
 
