@@ -11,6 +11,7 @@ import {
   Separator,
   Sheet,
   Spinner,
+  TextArea,
   useAppToast,
   XStack,
   YStack,
@@ -398,7 +399,7 @@ function NoteInput() {
 
   return (
     <YStack gap="$1">
-      <Input
+      <TextArea
         value={field.value}
         onChangeText={field.onChange}
         onBlur={field.onBlur}
@@ -411,9 +412,9 @@ function NoteInput() {
         boc={fieldState.error ? '$error' : '$color4'}
         br="$4"
         p="$3"
-        multiline
-        numberOfLines={4}
+        rows={3}
         maxLength={MAX_NOTE_LENGTH}
+        textAlignVertical="top"
         focusStyle={{
           boc: '$color12',
         }}
