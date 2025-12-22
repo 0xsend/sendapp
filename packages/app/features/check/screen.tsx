@@ -497,15 +497,17 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
           )}
         </XStack>
         <XStack gap="$3" ai="center">
-          <Text
-            fontSize="$3"
-            color="$color10"
-            cursor="pointer"
-            onPress={handleCancelConfirm}
-            hoverStyle={{ opacity: 0.7 }}
-          >
-            {t('check.manage.keepCheck')}
-          </Text>
+          {!isRevoking && (
+            <Text
+              fontSize="$3"
+              color="$color10"
+              cursor="pointer"
+              onPress={handleCancelConfirm}
+              hoverStyle={{ opacity: 0.7 }}
+            >
+              {t('check.manage.keepCheck')}
+            </Text>
+          )}
           {isRevoking ? (
             <Spinner size="small" color="$error" />
           ) : totalFee !== undefined ? (

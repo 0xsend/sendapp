@@ -53,7 +53,7 @@ alter sequence "public"."send_check_created_id_seq" owned by "public"."send_chec
 
 CREATE INDEX idx_send_check_claimed_block_num ON public.send_check_claimed USING btree (block_num);
 
-CREATE INDEX idx_send_check_claimed_ephemeral_address ON public.send_check_claimed USING btree (ephemeral_address);
+CREATE INDEX idx_send_check_claimed_ephemeral_chain_abi ON public.send_check_claimed USING btree (ephemeral_address, chain_id, abi_idx);
 
 CREATE INDEX idx_send_check_claimed_redeemer ON public.send_check_claimed USING btree (redeemer);
 
@@ -61,7 +61,7 @@ CREATE INDEX idx_send_check_claimed_sender ON public.send_check_claimed USING bt
 
 CREATE INDEX idx_send_check_created_block_num ON public.send_check_created USING btree (block_num);
 
-CREATE INDEX idx_send_check_created_ephemeral_address ON public.send_check_created USING btree (ephemeral_address);
+CREATE INDEX idx_send_check_created_ephemeral_chain_abi ON public.send_check_created USING btree (ephemeral_address, chain_id, abi_idx);
 
 CREATE INDEX idx_send_check_created_expires_at ON public.send_check_created USING btree (expires_at);
 

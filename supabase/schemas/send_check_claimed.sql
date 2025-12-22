@@ -42,7 +42,9 @@ ALTER TABLE ONLY "public"."send_check_claimed"
 CREATE INDEX "idx_send_check_claimed_block_num" ON "public"."send_check_claimed" USING "btree" ("block_num");
 CREATE INDEX "idx_send_check_claimed_sender" ON "public"."send_check_claimed" USING "btree" ("sender");
 CREATE INDEX "idx_send_check_claimed_redeemer" ON "public"."send_check_claimed" USING "btree" ("redeemer");
-CREATE INDEX "idx_send_check_claimed_ephemeral_address" ON "public"."send_check_claimed" USING "btree" ("ephemeral_address");
+-- Composite index for JOIN conditions from send_check_created table
+-- Replaces single-column ephemeral_address index (leading column covers that case)
+CREATE INDEX "idx_send_check_claimed_ephemeral_chain_abi" ON "public"."send_check_claimed" USING "btree" ("ephemeral_address", "chain_id", "abi_idx");
 CREATE UNIQUE INDEX "u_send_check_claimed" ON "public"."send_check_claimed" USING "btree" ("ig_name", "src_name", "block_num", "tx_idx", "log_idx", "abi_idx");
 
 -- RLS
