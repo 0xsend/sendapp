@@ -3647,16 +3647,28 @@ export const sendAirdropsSafeConfig = {
 // SendCheck
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ */
 export const sendCheckAbi = [
   {
     type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    inputs: [{ name: 'ephemeralAddress', internalType: 'address', type: 'address' }],
     name: 'checks',
     outputs: [
-      { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
-      { name: 'from', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+      { name: '', internalType: 'address', type: 'address' },
+      { name: '', internalType: 'address', type: 'address' },
+      {
+        name: '',
+        internalType: 'struct CheckAmount[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
+      { name: '', internalType: 'uint256', type: 'uint256' },
     ],
     stateMutability: 'view',
   },
@@ -3680,9 +3692,17 @@ export const sendCheckAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token', internalType: 'contract IERC20', type: 'address' },
+      {
+        name: 'amounts',
+        internalType: 'struct CheckAmount[]',
+        type: 'tuple[]',
+        components: [
+          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+        ],
+      },
       { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'expiresAt', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'createCheck',
     outputs: [],
@@ -3699,8 +3719,16 @@ export const sendCheckAbi = [
         components: [
           { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
           { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
-          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+          {
+            name: 'amounts',
+            internalType: 'struct CheckAmount[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'token', internalType: 'contract IERC20', type: 'address' },
+              { name: 'amount', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          { name: 'expiresAt', internalType: 'uint256', type: 'uint256' },
         ],
         indexed: false,
       },
@@ -3719,8 +3747,16 @@ export const sendCheckAbi = [
         components: [
           { name: 'ephemeralAddress', internalType: 'address', type: 'address' },
           { name: 'from', internalType: 'address', type: 'address' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
-          { name: 'token', internalType: 'contract IERC20', type: 'address' },
+          {
+            name: 'amounts',
+            internalType: 'struct CheckAmount[]',
+            type: 'tuple[]',
+            components: [
+              { name: 'token', internalType: 'contract IERC20', type: 'address' },
+              { name: 'amount', internalType: 'uint256', type: 'uint256' },
+            ],
+          },
+          { name: 'expiresAt', internalType: 'uint256', type: 'uint256' },
         ],
         indexed: false,
       },
@@ -3755,6 +3791,22 @@ export const sendCheckAbi = [
     name: 'SafeERC20FailedOperation',
   },
 ] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ */
+export const sendCheckAddress = {
+  8453: '0x274B45D75d71b7F627c00d87757B493E7E1312a7',
+  84532: '0x274B45D75d71b7F627c00d87757B493E7E1312a7',
+  845337: '0x274B45D75d71b7F627c00d87757B493E7E1312a7',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ */
+export const sendCheckConfig = { address: sendCheckAddress, abi: sendCheckAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SendEarn
@@ -11329,93 +11381,153 @@ export const watchSendAccountFactoryAccountCreatedEvent = /*#__PURE__*/ createWa
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const readSendCheck = /*#__PURE__*/ createReadContract({ abi: sendCheckAbi })
+export const readSendCheck = /*#__PURE__*/ createReadContract({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"checks"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const readSendCheckChecks = /*#__PURE__*/ createReadContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'checks',
 })
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const writeSendCheck = /*#__PURE__*/ createWriteContract({ abi: sendCheckAbi })
+export const writeSendCheck = /*#__PURE__*/ createWriteContract({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const writeSendCheckClaimCheck = /*#__PURE__*/ createWriteContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheck',
 })
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const writeSendCheckClaimCheckSelf = /*#__PURE__*/ createWriteContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheckSelf',
 })
 
 /**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const writeSendCheckCreateCheck = /*#__PURE__*/ createWriteContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'createCheck',
 })
 
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const prepareWriteSendCheck = /*#__PURE__*/ createSimulateContract({ abi: sendCheckAbi })
+export const prepareWriteSendCheck = /*#__PURE__*/ createSimulateContract({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const prepareWriteSendCheckClaimCheck = /*#__PURE__*/ createSimulateContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheck',
 })
 
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const prepareWriteSendCheckClaimCheckSelf = /*#__PURE__*/ createSimulateContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheckSelf',
 })
 
 /**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const prepareWriteSendCheckCreateCheck = /*#__PURE__*/ createSimulateContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'createCheck',
 })
 
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const watchSendCheckEvent = /*#__PURE__*/ createWatchContractEvent({ abi: sendCheckAbi })
+export const watchSendCheckEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckClaimed"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const watchSendCheckCheckClaimedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   eventName: 'CheckClaimed',
 })
 
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckCreated"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const watchSendCheckCheckCreatedEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   eventName: 'CheckCreated',
 })
 
@@ -20944,95 +21056,153 @@ export const useWatchSendAccountFactoryAccountCreatedEvent =
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const useReadSendCheck = /*#__PURE__*/ createUseReadContract({ abi: sendCheckAbi })
+export const useReadSendCheck = /*#__PURE__*/ createUseReadContract({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"checks"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useReadSendCheckChecks = /*#__PURE__*/ createUseReadContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'checks',
 })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const useWriteSendCheck = /*#__PURE__*/ createUseWriteContract({ abi: sendCheckAbi })
+export const useWriteSendCheck = /*#__PURE__*/ createUseWriteContract({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useWriteSendCheckClaimCheck = /*#__PURE__*/ createUseWriteContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheck',
 })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useWriteSendCheckClaimCheckSelf = /*#__PURE__*/ createUseWriteContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheckSelf',
 })
 
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useWriteSendCheckCreateCheck = /*#__PURE__*/ createUseWriteContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'createCheck',
 })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
-export const useSimulateSendCheck = /*#__PURE__*/ createUseSimulateContract({ abi: sendCheckAbi })
+export const useSimulateSendCheck = /*#__PURE__*/ createUseSimulateContract({
+  abi: sendCheckAbi,
+  address: sendCheckAddress,
+})
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useSimulateSendCheckClaimCheck = /*#__PURE__*/ createUseSimulateContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheck',
 })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"claimCheckSelf"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useSimulateSendCheckClaimCheckSelf = /*#__PURE__*/ createUseSimulateContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'claimCheckSelf',
 })
 
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link sendCheckAbi}__ and `functionName` set to `"createCheck"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useSimulateSendCheckCreateCheck = /*#__PURE__*/ createUseSimulateContract({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   functionName: 'createCheck',
 })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useWatchSendCheckEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
 })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckClaimed"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useWatchSendCheckCheckClaimedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   eventName: 'CheckClaimed',
 })
 
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link sendCheckAbi}__ and `eventName` set to `"CheckCreated"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x274b45d75d71b7f627c00d87757b493e7e1312a7)
  */
 export const useWatchSendCheckCheckCreatedEvent = /*#__PURE__*/ createUseWatchContractEvent({
   abi: sendCheckAbi,
+  address: sendCheckAddress,
   eventName: 'CheckCreated',
 })
 

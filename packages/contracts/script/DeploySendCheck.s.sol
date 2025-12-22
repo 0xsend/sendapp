@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.20;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console2} from "forge-std/Script.sol";
 import {Helper} from "../src/Helper.sol";
 import "../src/SendCheck.sol";
 
@@ -13,8 +13,10 @@ contract DeploySendCheckScript is Script, Helper {
 
     function run() external returns (SendCheck) {
         vm.startBroadcast();
-        SendCheck sendCheck = new SendCheck();
+        SendCheck sendCheck = new SendCheck{salt: 0}();
 
+        /* solhint-disable no-console */
+        console2.log("SendCheck address:", address(sendCheck));
         vm.stopBroadcast();
         return sendCheck;
     }

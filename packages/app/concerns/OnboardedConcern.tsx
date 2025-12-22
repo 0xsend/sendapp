@@ -20,7 +20,14 @@ export function OnboardedConcern({ children }: { children: React.ReactNode }) {
       return
     }
 
-    if (!sendAccount.data && pathname !== '/auth/onboarding' && pathname !== '/auth/sign-up') {
+    // Allow public check preview pages to be accessed without authentication
+    const isPublicRoute = pathname.startsWith('/check/public/')
+    if (
+      !sendAccount.data &&
+      pathname !== '/auth/onboarding' &&
+      pathname !== '/auth/sign-up' &&
+      !isPublicRoute
+    ) {
       router.push('/auth/onboarding')
       return
     }

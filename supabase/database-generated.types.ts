@@ -960,6 +960,123 @@ export type Database = {
           },
         ]
       }
+      send_check_claimed: {
+        Row: {
+          abi_idx: number | null
+          amount: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ephemeral_address: string | null
+          expires_at: number | null
+          id: number
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          redeemer: string | null
+          sender: string | null
+          src_name: string | null
+          token: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          amount?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ephemeral_address?: string | null
+          expires_at?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          redeemer?: string | null
+          sender?: string | null
+          src_name?: string | null
+          token?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          amount?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ephemeral_address?: string | null
+          expires_at?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          redeemer?: string | null
+          sender?: string | null
+          src_name?: string | null
+          token?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
+      send_check_created: {
+        Row: {
+          abi_idx: number | null
+          amount: number | null
+          block_num: number | null
+          block_time: number | null
+          chain_id: number | null
+          ephemeral_address: string | null
+          expires_at: number | null
+          id: number
+          ig_name: string | null
+          log_addr: string | null
+          log_idx: number | null
+          sender: string | null
+          src_name: string | null
+          token: string | null
+          tx_hash: string | null
+          tx_idx: number | null
+        }
+        Insert: {
+          abi_idx?: number | null
+          amount?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ephemeral_address?: string | null
+          expires_at?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          sender?: string | null
+          src_name?: string | null
+          token?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Update: {
+          abi_idx?: number | null
+          amount?: number | null
+          block_num?: number | null
+          block_time?: number | null
+          chain_id?: number | null
+          ephemeral_address?: string | null
+          expires_at?: number | null
+          id?: number
+          ig_name?: string | null
+          log_addr?: string | null
+          log_idx?: number | null
+          sender?: string | null
+          src_name?: string | null
+          token?: string | null
+          tx_hash?: string | null
+          tx_idx?: number | null
+        }
+        Relationships: []
+      }
       send_earn_create: {
         Row: {
           abi_idx: number
@@ -2031,6 +2148,26 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_check_by_ephemeral_address: {
+        Args: { check_chain_id: number; check_ephemeral_address: string }
+        Returns: {
+          amounts: number[]
+          block_num: number
+          block_time: number
+          chain_id: number
+          claimed_at: number
+          claimed_by: string
+          ephemeral_address: string
+          expires_at: number
+          is_active: boolean
+          is_canceled: boolean
+          is_claimed: boolean
+          is_expired: boolean
+          sender: string
+          tokens: string[]
+          tx_hash: string
+        }[]
+      }
       get_fee_bps_at_block: {
         Args: { target_block_num: number }
         Returns: number
@@ -2059,6 +2196,31 @@ export type Database = {
           send_ceiling: number
           unique_sends: number
           user_id: string
+        }[]
+      }
+      get_user_checks: {
+        Args: {
+          page_limit?: number
+          page_offset?: number
+          user_address: string
+        }
+        Returns: {
+          amounts: number[]
+          block_num: number
+          block_time: number
+          chain_id: number
+          claimed_at: number
+          claimed_by: string
+          ephemeral_address: string
+          expires_at: number
+          is_active: boolean
+          is_canceled: boolean
+          is_claimed: boolean
+          is_expired: boolean
+          is_sender: boolean
+          sender: string
+          tokens: string[]
+          tx_hash: string
         }[]
       }
       get_user_jackpot_summary: {

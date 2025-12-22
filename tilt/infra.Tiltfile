@@ -207,6 +207,18 @@ local_resource(
 )
 
 local_resource(
+    "anvil:anvil-add-send-check-fixtures",
+    "yarn contracts dev:anvil-add-send-check-fixtures",
+    auto_init = False,
+    dir = _prj_root,
+    labels = labels,
+    resource_deps = _infra_resource_deps + [
+        "anvil:base",
+        "contracts:build",
+    ],
+)
+
+local_resource(
     "anvil:fixtures",
     "echo 🥳",
     labels = labels,

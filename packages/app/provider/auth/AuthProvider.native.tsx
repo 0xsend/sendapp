@@ -70,19 +70,24 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
 }
 
 export function useProtectedRoute(user: User | null) {
-  const segments = useSegments()
+  // Cast needed because expo-router infers strict tuple types from route structure
+  const segments = useSegments() as string[]
   const firstSegment = segments[0]
+  const secondSegment = segments[1]
   useEffect(() => {
     if (!firstSegment) return
     if (firstSegment === '_sitemap') return
     if (firstSegment === '+not-found') return
 
     const inAuthGroup = firstSegment === '(auth)'
+    // Allow public check preview routes without authentication
+    const isPublicCheckRoute = firstSegment === 'check' && secondSegment === 'public'
 
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
       !user &&
-      !inAuthGroup
+      !inAuthGroup &&
+      !isPublicCheckRoute
     ) {
       // Redirect to the splash page.
       replaceRoute('/')
@@ -94,7 +99,7 @@ export function useProtectedRoute(user: User | null) {
     //   replaceRoute('/')
     //   console.log('redirecting to / away from auth group', firstSegment)
     // }
-  }, [user, firstSegment])
+  }, [user, firstSegment, secondSegment])
 }
 
 /**

@@ -82,6 +82,11 @@
     "trade": {
       "root": "Trade",
       "summary": "Trade summary"
+    },
+    "check": {
+      "root": "My Checks",
+      "send": "Send Check",
+      "claim": "Claim Check"
     }
   }
 }
