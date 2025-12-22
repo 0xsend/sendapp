@@ -167,7 +167,7 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
           {previewData.tokens.map((token) => (
             <XStack key={token.symbol} ai="center" gap="$2">
               <IconCoin symbol={token.symbol} size="$2" />
-              <Paragraph color="$color12" fontWeight="700" fontSize="$9" lineHeight="$9">
+              <Paragraph color="$color12" fontWeight="700" fontSize="$9" lineHeight={42}>
                 {token.amount} {token.symbol}
               </Paragraph>
             </XStack>
