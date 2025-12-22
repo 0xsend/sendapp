@@ -309,6 +309,7 @@ function CheckAvatar({
         borderRadius={999}
         borderWidth={2}
         borderColor="$color1"
+        zi={10}
       >
         <Icon size="$1" color="$white" />
       </XStack>
@@ -454,9 +455,8 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
       if (check.is_active) {
         return `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`
       }
-      if (check.is_canceled && check.claimed_at) {
-        const canceledDate = new Date(Number(check.claimed_at) * 1000)
-        return `${t('check.manage.canceledOn')} ${canceledDate.toLocaleDateString()}`
+      if (check.is_canceled) {
+        return t('check.manage.canceled')
       }
       if (check.is_claimed && check.claimed_at) {
         const otherPartyText = getOtherPartyText()
