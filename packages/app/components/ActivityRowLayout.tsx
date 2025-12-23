@@ -52,25 +52,28 @@ export const ActivityRowLayout = memo(function ActivityRowLayout({
               {amount}
             </Text>
           </XStack>
-          {subtext && (
-            <Paragraph
-              color="$color10"
-              size="$4"
-              maxWidth="100%"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              numberOfLines={2}
-              lineHeight={18}
-            >
-              {subtext}
-            </Paragraph>
+          {(subtext || actions) && (
+            <XStack jc="space-between" ai="flex-start" gap="$2">
+              <Paragraph
+                color="$color10"
+                size="$4"
+                maxWidth="100%"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                numberOfLines={2}
+                lineHeight={18}
+                f={1}
+              >
+                {subtext}
+              </Paragraph>
+              {actions}
+            </XStack>
           )}
-          <XStack jc="space-between" ai="center">
+          {date && (
             <Paragraph color="$color10" size="$3" flexShrink={0} display="flex" opacity={0.6}>
               {date}
             </Paragraph>
-            {actions}
-          </XStack>
+          )}
         </YStack>
       </XStack>
     </XStack>

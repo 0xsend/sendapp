@@ -196,14 +196,6 @@ grant truncate on table "public"."send_check_notes" to "service_role";
 
 grant update on table "public"."send_check_notes" to "service_role";
 
-create policy "anyone can read send check notes"
-on "public"."send_check_notes"
-as permissive
-for select
-to anon, authenticated
-using (true);
-
-
 create policy "sender can insert send check notes"
 on "public"."send_check_notes"
 as permissive
@@ -213,6 +205,20 @@ with check ((EXISTS ( SELECT 1
    FROM (send_check_created c
      JOIN send_accounts sa ON ((sa.address = (('0x'::text || encode(c.sender, 'hex'::text)))::citext)))
   WHERE ((c.ephemeral_address = send_check_notes.ephemeral_address) AND (c.chain_id = send_check_notes.chain_id) AND (sa.user_id = auth.uid())))));
+
+
+create policy "sender or receiver can read send check notes"
+on "public"."send_check_notes"
+as permissive
+for select
+to authenticated
+using (((EXISTS ( SELECT 1
+   FROM (send_check_created c
+     JOIN send_accounts sa ON ((sa.address = (('0x'::text || encode(c.sender, 'hex'::text)))::citext)))
+  WHERE ((c.ephemeral_address = send_check_notes.ephemeral_address) AND (c.chain_id = send_check_notes.chain_id) AND (sa.user_id = auth.uid())))) OR (EXISTS ( SELECT 1
+   FROM (send_check_claimed cl
+     JOIN send_accounts sa ON ((sa.address = (('0x'::text || encode(cl.redeemer, 'hex'::text)))::citext)))
+  WHERE ((cl.ephemeral_address = send_check_notes.ephemeral_address) AND (cl.chain_id = send_check_notes.chain_id) AND (sa.user_id = auth.uid()))))));
 
 
 

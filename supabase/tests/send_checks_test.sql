@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(36);
+SELECT plan(39);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -532,7 +532,31 @@ SELECT results_eq(
 );
 
 -- ============================================================================
--- TEST: RLS - Authenticated users can read send_check_notes
+-- TEST: RLS - Setup send_accounts for sender and receiver users
+-- ============================================================================
+SELECT tests.clear_authentication();
+SELECT set_config('role', 'service_role', TRUE);
+
+-- Create send_account for sender_user linked to the test sender address
+INSERT INTO send_accounts(user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('sender_user'),
+    '0xCCCC000000000000000000000000000000000ABC',
+    8453,
+    '\x00'
+);
+
+-- Create send_account for redeemer_user linked to the test redeemer address
+INSERT INTO send_accounts(user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('redeemer_user'),
+    '0xCCCC000000000000000000000000000000000DEF',
+    8453,
+    '\x00'
+);
+
+-- ============================================================================
+-- TEST: RLS - Sender can read their own notes
 -- ============================================================================
 SELECT tests.authenticate_as('sender_user');
 
@@ -545,24 +569,54 @@ SELECT results_eq(
         )
     $$,
     $$VALUES (2)$$,
-    'Authenticated users can read send_check_notes'
+    'Sender can read notes for their own checks'
+);
+
+-- ============================================================================
+-- TEST: RLS - Receiver can read notes for claimed checks
+-- ============================================================================
+SELECT tests.authenticate_as('redeemer_user');
+
+-- Redeemer claimed check 3, so they should be able to read its note
+SELECT results_eq(
+    $$
+        SELECT note FROM send_check_notes
+        WHERE ephemeral_address = '\xCCCC000000000000000000000000000000000003'::bytea
+    $$,
+    $$VALUES ('Thanks for lunch!'::text)$$,
+    'Receiver can read note for claimed check'
+);
+
+-- ============================================================================
+-- TEST: RLS - Receiver cannot read notes for unclaimed checks
+-- ============================================================================
+-- Redeemer should NOT be able to read note for check 1 (not claimed by them)
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer FROM send_check_notes
+        WHERE ephemeral_address = '\xCCCC000000000000000000000000000000000001'::bytea
+    $$,
+    $$VALUES (0)$$,
+    'Receiver cannot read notes for checks they have not claimed'
+);
+
+-- ============================================================================
+-- TEST: RLS - Unrelated user cannot read any notes
+-- ============================================================================
+SELECT tests.create_supabase_user('unrelated_user');
+SELECT tests.authenticate_as('unrelated_user');
+
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer FROM send_check_notes
+    $$,
+    $$VALUES (0)$$,
+    'Unrelated user cannot read any notes'
 );
 
 -- ============================================================================
 -- TEST: RLS - Sender can insert note for their own check
 -- ============================================================================
--- First, create a send_account for the sender_user linked to our test sender address
-SELECT tests.clear_authentication();
-SELECT set_config('role', 'service_role', TRUE);
-
-INSERT INTO send_accounts(user_id, address, chain_id, init_code)
-VALUES (
-    tests.get_supabase_uid('sender_user'),
-    '0xCCCC000000000000000000000000000000000ABC',
-    8453,
-    '\x00'
-);
-
 SELECT tests.authenticate_as('sender_user');
 
 -- Sender should be able to insert a note for check 2 (expired unclaimed - no note yet)
