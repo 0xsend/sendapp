@@ -6,7 +6,11 @@
   },
   "check": {
     "button": "Envoyer un Chèque",
-    "buttonDescription": "Envoyer à n'importe qui avec un lien partageable",
+    "buttonShort": "Envoyer",
+    "buttonDescription": "Envoyer à n'importe qui avec un lien",
+    "manageButton": "Gérer les Chèques",
+    "manageButtonShort": "Gérer",
+    "manageButtonDescription": "Voir & annuler les chèques",
     "amount": "Montant",
     "expiration": "Expire",
     "create": "Envoyer un Chèque",
@@ -36,7 +40,7 @@
       "addedToAccount": "a été ajouté à votre compte",
       "done": "Terminé",
       "tryAgain": "Réessayer",
-      "goBack": "Retour",
+      "goBack": "Gérer les Chèques",
       "verifying": "Vérification du chèque...",
       "alreadyClaimed": "Ce chèque a déjà été réclamé",
       "canceled": "Ce chèque a été annulé",
@@ -51,7 +55,7 @@
         "alreadyHaveAccount": "Déjà un compte ?",
         "signIn": "Se connecter"
       },
-      "notFoundMessage": "Ce lien de chèque n'est plus valide. Veuillez demander un nouveau lien à l'expéditeur."
+      "notFoundMessage": "Ce chèque est invalide, expiré ou déjà réclamé."
     },
     "manage": {
       "loading": "Chargement des chèques...",

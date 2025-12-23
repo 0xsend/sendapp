@@ -181,23 +181,22 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
           )}
           <Separator px="$4" />
           <YStack gap={'$2'}>
-            <XStack jc={'space-between'} ai={'center'}>
+            <XStack jc={'space-between'} ai={'center'} gap={'$2'}>
               <Paragraph
                 size={'$5'}
                 color={'$silverChalice'}
                 $theme-light={{
                   color: '$darkGrayTextField',
                 }}
+                width={'50%'}
               >
                 {activityPhrase
-                  ? t('details.phraseOn', { phrase: activityPhrase })
+                  ? t('details.phraseOn', {
+                      phrase: activityPhrase,
+                    })
                   : t('details.dateOnly')}{' '}
               </Paragraph>
-              <Paragraph
-                size={'$5'}
-                // @ts-expect-error end value for text-align is valid value, left is not working properly in this case
-                ta={'end'}
-              >
+              <Paragraph size={'$5'} textAlign={'right'} width={'50%'}>
                 {date}
               </Paragraph>
             </XStack>

@@ -1077,6 +1077,27 @@ export type Database = {
         }
         Relationships: []
       }
+      send_check_notes: {
+        Row: {
+          chain_id: number
+          created_at: string
+          ephemeral_address: string
+          note: string
+        }
+        Insert: {
+          chain_id: number
+          created_at?: string
+          ephemeral_address: string
+          note: string
+        }
+        Update: {
+          chain_id?: number
+          created_at?: string
+          ephemeral_address?: string
+          note?: string
+        }
+        Relationships: []
+      }
       send_earn_create: {
         Row: {
           abi_idx: number
@@ -2163,6 +2184,7 @@ export type Database = {
           is_canceled: boolean
           is_claimed: boolean
           is_expired: boolean
+          note: string
           sender: string
           tokens: string[]
           tx_hash: string
@@ -2218,6 +2240,7 @@ export type Database = {
           is_claimed: boolean
           is_expired: boolean
           is_sender: boolean
+          note: string
           sender: string
           tokens: string[]
           tx_hash: string

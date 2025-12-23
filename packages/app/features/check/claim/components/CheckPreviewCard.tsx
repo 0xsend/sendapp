@@ -24,6 +24,7 @@ export interface CheckPreviewData {
   senderTag?: string
   senderAvatar?: string
   senderIsVerified?: boolean
+  note?: string
 }
 
 interface CheckPreviewCardProps {
@@ -74,6 +75,7 @@ export function useCheckPreview(checkCode: string | null) {
       senderTag: senderProfile?.tag ?? undefined,
       senderAvatar: senderProfile?.avatar_url ?? undefined,
       senderIsVerified: senderProfile?.is_verified ?? false,
+      note: checkDetails.note ?? undefined,
     }
   }, [checkDetails, senderProfile])
 
@@ -167,12 +169,19 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
           {previewData.tokens.map((token) => (
             <XStack key={token.symbol} ai="center" gap="$2">
               <IconCoin symbol={token.symbol} size="$2" />
-              <Paragraph color="$color12" fontWeight="700" fontSize="$9" lineHeight="$9">
+              <Paragraph color="$color12" fontWeight="700" fontSize="$9" lineHeight={42}>
                 {token.amount} {token.symbol}
               </Paragraph>
             </XStack>
           ))}
         </YStack>
+
+        {/* Note from sender */}
+        {previewData.note && (
+          <Paragraph color="$color11" size="$4" fontStyle="italic" ta="center">
+            "{previewData.note}"
+          </Paragraph>
+        )}
 
         {/* Expiration */}
         <Paragraph color="$color10" size="$3">

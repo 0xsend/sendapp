@@ -38,7 +38,8 @@ import {
   YStack,
 } from '@my/ui'
 
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import type BottomSheet from '@gorhom/bottom-sheet'
+import { SendModalContainer, ReviewSendAmountBox, NoteInput } from '../shared'
 
 import { formatUnits, isAddress } from 'viem'
 
@@ -175,7 +176,7 @@ export const SendChat = memo(
     return (
       <>
         <Portal zIndex={10}>
-          <Container bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
+          <SendModalContainer bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
             <SendChatContext.Provider
               activeSection={activeSection}
               setActiveSection={setActiveSection}
@@ -237,7 +238,7 @@ export const SendChat = memo(
                 )}
               </AnimatePresence>
             </SendChatContext.Provider>
-          </Container>
+          </SendModalContainer>
           <AnimatePresence>
             {open && (
               <View
@@ -266,72 +267,6 @@ export const SendChat = memo(
 )
 
 SendChat.displayName = 'SendChat'
-
-interface ContainerProps {
-  children: React.ReactNode
-  open: boolean
-  setOpen: (open: boolean) => void
-  bottomSheetRef: React.RefObject<BottomSheet>
-}
-
-const Container = ({ children, open, setOpen, bottomSheetRef }: ContainerProps) => {
-  const { lg } = useMedia()
-  const { bottom, top } = useSafeAreaInsets()
-
-  const [render, setRender] = useState(false)
-
-  useEffect(() => {
-    if (open) {
-      setRender(true)
-    }
-  }, [open])
-
-  if (lg && render) {
-    return (
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={['95%']}
-        style={{ backgroundColor: 'transparent' }}
-        enableDynamicSizing={false}
-        enablePanDownToClose
-        detached
-        onClose={() => {
-          setOpen(false)
-        }}
-        animationConfigs={{
-          damping: 35,
-          stiffness: 400,
-        }}
-        handleComponent={null}
-        backgroundStyle={{
-          backgroundColor: 'transparent',
-        }}
-        bottomInset={bottom || 10}
-        topInset={top}
-        keyboardBehavior="interactive"
-      >
-        <BottomSheetView
-          style={{
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            flex: 1,
-            height: '100%',
-          }}
-        >
-          {children}
-        </BottomSheetView>
-      </BottomSheet>
-    )
-  }
-
-  if (!lg) {
-    return (
-      <View p="$8" jc="center" ai="flex-end" pos="absolute" inset={0} zi={1000}>
-        {children}
-      </View>
-    )
-  }
-}
 
 interface SendChatHeaderProps {
   onClose: () => void
@@ -595,7 +530,6 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
     recipient ?? ''
   )
 
-  const [isNoteInputFocused, setIsNoteInputFocused] = useState<boolean>(false)
   const [amountInputRef, setAmountInputRef] = useState<InputOG | null>(null)
 
   const router = useRouter()
@@ -1146,63 +1080,13 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               opacity: 0,
             }}
           >
-            <Controller
-              name="note"
+            <NoteInput
               control={form.control}
-              render={({ field: { value, onChange, onBlur, ...rest } }) => (
-                <YStack>
-                  <Input
-                    {...rest}
-                    bg="$aztec5"
-                    numberOfLines={4}
-                    ai="flex-start"
-                    $theme-light={{
-                      bg: '$gray3',
-                    }}
-                    placeholderTextColor="$gray11"
-                    disabled={activeSection === 'reviewAndSend' || isExternalAddress}
-                    pointerEvents={
-                      activeSection === 'reviewAndSend' || isExternalAddress ? 'none' : 'auto'
-                    }
-                    editable={activeSection !== 'reviewAndSend' && !isExternalAddress}
-                    placeholder={
-                      isExternalAddress
-                        ? 'Notes not supported for external address'
-                        : 'Add a note...'
-                    }
-                    fos="$5"
-                    br="$3"
-                    multiline
-                    value={value}
-                    onFocus={() => {
-                      setIsNoteInputFocused(true)
-                    }}
-                    onBlur={() => {
-                      onBlur()
-                      setIsNoteInputFocused(false)
-                    }}
-                    onChangeText={onChange}
-                  />
-
-                  <Paragraph
-                    color={noteValidationError ? '$error' : '$lightGrayTextField'}
-                    $theme-light={{ color: '$darkGrayTextField' }}
-                    pos="absolute"
-                    b={0}
-                    y="120%"
-                  >
-                    {isNoteInputFocused || noteValidationError ? (
-                      <>
-                        {noteValidationError
-                          ? noteValidationError.message
-                          : `Max: ${MAX_NOTE_LENGTH} characters`}
-                      </>
-                    ) : (
-                      ''
-                    )}
-                  </Paragraph>
-                </YStack>
-              )}
+              error={noteValidationError}
+              disabled={activeSection === 'reviewAndSend' || isExternalAddress}
+              placeholder={
+                isExternalAddress ? 'Notes not supported for external address' : 'Add a note...'
+              }
             />
           </View>
         </YStack>
@@ -1316,91 +1200,6 @@ function useValidateTransferUserOp() {
     },
   })
 }
-
-interface ReviewSendAmountBoxProps {
-  localizedAmount: string
-  selectedCoin: CoinWithBalance | undefined
-  amountInUSD: number
-  isPricesLoading: boolean
-  isFeesLoading: boolean
-  usdcFees:
-    | {
-        gasFees: bigint
-        baseFee: bigint
-        decimals: number
-      }
-    | undefined
-  usdcFeesError: Error | null
-}
-
-const ReviewSendAmountBox = YStack.styleable<ReviewSendAmountBoxProps>((props) => {
-  const {
-    localizedAmount,
-    selectedCoin,
-    amountInUSD,
-    isPricesLoading,
-    isFeesLoading,
-    usdcFees,
-    usdcFeesError,
-    ...rest
-  } = props
-  return (
-    <YStack key="review-send-amount-box" gap="$3" jc="center" {...rest}>
-      <YStack gap="$4">
-        <XStack gap="$2" ai="center">
-          <IconCoin
-            symbol={selectedCoin?.symbol ?? 'USDC'}
-            size={localizedAmount.length > 10 ? '$1.5' : '$2.5'}
-          />
-          <SizableText size="$6" fow="500">
-            {selectedCoin?.symbol}
-          </SizableText>
-        </XStack>
-        <XStack ai={'center'} gap={'$2'} bbw={1} bbc="$gray8">
-          <Text
-            fontWeight={'700'}
-            fontFamily="$mono"
-            fontSize={localizedAmount?.length > 12 ? 32 : 40}
-            lh={55}
-            pb="$2"
-          >
-            {localizedAmount}
-          </Text>
-          {isPricesLoading ? (
-            <Spinner size="small" color={'$color12'} />
-          ) : (
-            <SizableText color={'$color10'} fontSize={'$3'} fontFamily={'$mono'} mt={-1}>
-              (
-              {amountInUSD.toLocaleString('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                maximumFractionDigits: 2,
-              })}
-              )
-            </SizableText>
-          )}
-        </XStack>
-      </YStack>
-      <YStack gap="$3">
-        <XStack ai={'center'} jc={'space-between'} gap={'$4'}>
-          <SizableText col="$gray11" size="$5">
-            Fees
-          </SizableText>
-          {isFeesLoading && <Spinner size="small" color={'$color11'} />}
-          {usdcFees && (
-            <SizableText size="$5" col="$gray12">
-              {formatAmount(formatUnits(usdcFees.baseFee + usdcFees.gasFees, usdcFees.decimals))}{' '}
-              USDC
-            </SizableText>
-          )}
-          {usdcFeesError && (
-            <SizableText col="$error">{usdcFeesError?.message?.split('.').at(0)}</SizableText>
-          )}
-        </XStack>
-      </YStack>
-    </YStack>
-  )
-})
 
 type ListItem = { type: 'activity'; activity: Activity } | { type: 'dateHeader'; date: Date }
 

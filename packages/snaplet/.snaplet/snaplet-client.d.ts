@@ -576,6 +576,15 @@ type Override = {
       abi_idx?: string;
     };
   }
+  send_check_notes?: {
+    name?: string;
+    fields?: {
+      ephemeral_address?: string;
+      chain_id?: string;
+      note?: string;
+      created_at?: string;
+    };
+  }
   send_earn_create?: {
     name?: string;
     fields?: {
@@ -1261,6 +1270,10 @@ export interface Fingerprint {
     blockNum?: FingerprintNumberField;
     logIdx?: FingerprintNumberField;
     abiIdx?: FingerprintNumberField;
+  }
+  sendCheckNotes?: {
+    chainId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
   }
   sendEarnCreates?: {
     id?: FingerprintNumberField;

@@ -645,6 +645,12 @@ interface Table_public_send_check_created {
   log_idx: number | null;
   abi_idx: number | null;
 }
+interface Table_public_send_check_notes {
+  ephemeral_address: string;
+  chain_id: number;
+  note: string;
+  created_at: string;
+}
 interface Table_public_send_earn_create {
   id: number;
   chain_id: number;
@@ -1093,6 +1099,7 @@ interface Schema_public {
   send_accounts: Table_public_send_accounts;
   send_check_claimed: Table_public_send_check_claimed;
   send_check_created: Table_public_send_check_created;
+  send_check_notes: Table_public_send_check_notes;
   send_earn_create: Table_public_send_earn_create;
   send_earn_deposit: Table_public_send_earn_deposit;
   send_earn_new_affiliate: Table_public_send_earn_new_affiliate;

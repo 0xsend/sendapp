@@ -152,14 +152,14 @@ export function CheckSendScreen() {
     return (
       <YStack gap="$5" w="100%" maxWidth={600}>
         <FadeCard>
-          <Card bc="$yellow2" br="$4" p="$3" w="100%">
-            <XStack gap="$2" ai="flex-start">
-              <AlertTriangle size="$1" color="$yellow10" flexShrink={0} mt="$0.5" />
+          <Card bc="$yellow3" br="$4" p="$3" w="100%">
+            <XStack gap="$2" ai="center">
+              <AlertTriangle size="$1" color="$yellow11" flexShrink={0} mt="$0.5" />
               <YStack gap="$1" f={1}>
                 <Paragraph color="$yellow11" size="$3" fontWeight="600">
                   {t('check.success.warningTitle')}
                 </Paragraph>
-                <Paragraph color="$yellow10" size="$2">
+                <Paragraph color="$yellow11" size="$2">
                   {t('check.success.warningDescription')}
                 </Paragraph>
               </YStack>
@@ -236,7 +236,7 @@ export function CheckSendScreen() {
                 Insufficient balance
               </Paragraph>
             )}
-            <Paragraph color="$color10" size="$3">
+            <Paragraph color="$color10" size="$3" lineHeight={15}>
               Balance: {formatUnits(balance, decimals)} {coin?.symbol ?? coinInfo?.symbol ?? ''}
             </Paragraph>
           </YStack>
@@ -307,6 +307,7 @@ function AmountInput({ decimals, hasError }: { decimals: number; hasError: boole
       bc="transparent"
       focusStyle={{ outlineWidth: 0 }}
       borderColor={hasError ? '$error' : 'transparent'}
+      $platform-android={{ fontSize: '$7' }}
     />
   )
 }
