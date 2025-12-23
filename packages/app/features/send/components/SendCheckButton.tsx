@@ -1,4 +1,4 @@
-import { Card, Paragraph, useThemeName, XStack, YStack } from '@my/ui'
+import { Card, Paragraph, XStack, YStack } from '@my/ui'
 import { FileSignature, ListChecks } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'solito/router'
@@ -9,7 +9,6 @@ interface SendCheckButtonProps {
 
 export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
   const { t } = useTranslation('send')
-  const isDark = useThemeName()?.startsWith('dark')
   const router = useRouter()
 
   return (
@@ -24,7 +23,8 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
         pressStyle={{ scale: 0.98 }}
         animation="100ms"
         onPress={onPress}
-        bc={isDark ? '$color2' : '$gray2'}
+        bc="$aztec4"
+        $theme-light={{ bc: '$white' }}
         f={1}
         fb={0}
       >
@@ -35,9 +35,10 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
             br="$4"
             ai="center"
             jc="center"
-            bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+            bc="$aztec6"
+            $theme-light={{ bc: '$gray3' }}
           >
-            <FileSignature size="$1.5" color={isDark ? '$primary' : '$color12'} />
+            <FileSignature size="$1.5" color="$neon9" />
           </XStack>
           <YStack f={1} gap="$1" miw={0}>
             <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
@@ -60,7 +61,8 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
         pressStyle={{ scale: 0.98 }}
         animation="100ms"
         onPress={() => router.push('/check')}
-        bc={isDark ? '$color2' : '$gray2'}
+        bc="$aztec4"
+        $theme-light={{ bc: '$white' }}
         f={1}
         fb={0}
       >
@@ -71,9 +73,10 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
             br="$4"
             ai="center"
             jc="center"
-            bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+            bc="$aztec6"
+            $theme-light={{ bc: '$gray3' }}
           >
-            <ListChecks size="$1.5" color={isDark ? '$primary' : '$color12'} />
+            <ListChecks size="$1.5" color="$neon9" />
           </XStack>
           <YStack f={1} gap="$1" miw={0}>
             <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
