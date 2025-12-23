@@ -565,7 +565,7 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
         title={getTitleText()}
         amount={amountText}
         subtext={getSubtext()}
-        date={getNoteText()}
+        subtext2={getNoteText()}
         actions={cancelActions}
         hoverStyle={hoverStyles}
       />

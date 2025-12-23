@@ -9,7 +9,7 @@ interface ActivityRowLayoutProps {
   title: string
   amount: ReactNode
   subtext?: string | null
-  date: ReactNode
+  subtext2?: ReactNode
   actions?: ReactNode
   onPress?: () => void
   hoverStyle?: ReturnType<typeof useHoverStyles>
@@ -20,7 +20,7 @@ export const ActivityRowLayout = memo(function ActivityRowLayout({
   title,
   amount,
   subtext,
-  date,
+  subtext2,
   actions,
   onPress,
   hoverStyle,
@@ -69,9 +69,9 @@ export const ActivityRowLayout = memo(function ActivityRowLayout({
               {actions}
             </XStack>
           )}
-          {date && (
+          {subtext2 && (
             <Paragraph color="$color10" size="$3" flexShrink={0} display="flex" opacity={0.6}>
-              {date}
+              {subtext2}
             </Paragraph>
           )}
         </YStack>
