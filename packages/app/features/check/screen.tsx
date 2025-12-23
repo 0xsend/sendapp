@@ -2,7 +2,6 @@ import {
   Avatar,
   H4,
   Paragraph,
-  PrimaryButton,
   Shimmer,
   Spinner,
   Text,
@@ -11,8 +10,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { ArrowDown, ArrowUp, Clock, Plus, XCircle } from '@tamagui/lucide-icons'
-import { useRouter } from 'solito/router'
+import { ArrowDown, ArrowUp, Clock, XCircle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useState, useCallback, useMemo, memo } from 'react'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -35,9 +33,6 @@ const log = debug('app:features:check')
 const ROW_HEIGHT = 122
 
 export function CheckScreen() {
-  const router = useRouter()
-  const { t } = useTranslation('send')
-
   return (
     <YStack
       f={1}
@@ -48,15 +43,7 @@ export function CheckScreen() {
       gap="$6"
       $gtLg={{ pt: 0, gap: '$7' }}
     >
-      <YStack f={1}>
-        <ChecksList />
-      </YStack>
-      <PrimaryButton onPress={() => router.push('/check/send')}>
-        <PrimaryButton.Icon>
-          <Plus size={16} color="$black" />
-        </PrimaryButton.Icon>
-        <PrimaryButton.Text>{t('check.button')}</PrimaryButton.Text>
-      </PrimaryButton>
+      <ChecksList />
     </YStack>
   )
 }

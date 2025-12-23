@@ -415,15 +415,7 @@ const SendCheckContent = ({
         // Save note if provided (fire and forget)
         const trimmedNote = values.note?.trim()
         if (trimmedNote) {
-          ;(
-            supabase as unknown as {
-              from: (table: string) => {
-                insert: (data: Record<string, unknown>) => {
-                  then: (cb: (result: { error: Error | null }) => void) => void
-                }
-              }
-            }
-          )
+          supabase
             .from('send_check_notes')
             .insert({
               ephemeral_address: hexToBytea(result.ephemeralKeyPair.address),
