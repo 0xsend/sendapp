@@ -178,6 +178,18 @@ type ListItem =
   | (Activity & { sectionIndex: number })
   | { type: 'header'; title: string; sectionIndex: number }
 
+type ComputedValues = {
+  amount: ReactNode
+  date: ReactNode
+  eventName: string
+  subtext: string | null
+  isUserTransfer: boolean
+}
+
+type ComputedListItem =
+  | (Activity & { sectionIndex: number; computed: ComputedValues })
+  | { type: 'header'; title: string; sectionIndex: number }
+
 interface MyListProps {
   data: ListItem[]
   stickyIndices?: number[]
@@ -189,15 +201,15 @@ interface MyListProps {
   hasNextPage: boolean
 }
 
-const getItemType = (item: ListItem) => {
+const getItemType = (item: ComputedListItem) => {
   return 'type' in item && item.type === 'header' ? 'header' : 'activity'
 }
 
-const keyExtractor = (item: ListItem, index: number): string => {
+const keyExtractor = (item: ComputedListItem, index: number): string => {
   if ('type' in item && item.type === 'header') {
     return `header-${item.sectionIndex}-${item.title}-${index}`
   }
-  const activity = item as Activity & { sectionIndex: number }
+  const activity = item as Activity & { sectionIndex: number; computed: ComputedValues }
   return activity.event_id
 }
 import { useSwapRouters } from 'app/utils/useSwapRouters'
@@ -243,23 +255,18 @@ const MyList = memo(
 
     const hoverStyles = useHoverStyles()
 
-    const activityComputedValues = useMemo(() => {
-      const computed = new Map<
-        string,
-        {
-          amount: ReactNode
-          date: ReactNode
-          eventName: string
-          subtext: string | null
-          isUserTransfer: boolean
-        }
-      >()
-
+    const computedData = useMemo(() => {
       const translator = (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
         t(key, { defaultValue, ...options })
 
+      const result: ComputedListItem[] = []
+      let currentHeader: { type: 'header'; title: string; sectionIndex: number } | null = null
+
       for (const item of data) {
-        if ('type' in item && item.type === 'header') continue
+        if ('type' in item && item.type === 'header') {
+          currentHeader = item
+          continue
+        }
 
         const activity = item as Activity & { sectionIndex: number }
 
@@ -357,16 +364,26 @@ const MyList = memo(
           date = CommentsTime(new Date(activity.created_at), locale)
         }
 
-        computed.set(activity.event_id, {
+        const computed: ComputedValues = {
           amount,
           date,
           eventName,
           subtext,
           isUserTransfer,
+        }
+
+        if (currentHeader) {
+          result.push(currentHeader)
+          currentHeader = null
+        }
+
+        result.push({
+          ...activity,
+          computed,
         })
       }
 
-      return computed
+      return result
     }, [data, swapRouters, liquidityPools, addressBook.data, t, locale])
 
     const sectionDataMap = useMemo(() => {
@@ -374,7 +391,7 @@ const MyList = memo(
       let currentSectionIndex = -1
       let firstIndexInSection = -1
 
-      data.forEach((item, index) => {
+      computedData.forEach((item, index) => {
         if ('type' in item && item.type === 'header') {
           if (currentSectionIndex >= 0) {
             const prevSection = map.get(currentSectionIndex)
@@ -391,14 +408,14 @@ const MyList = memo(
       if (currentSectionIndex >= 0) {
         const lastSection = map.get(currentSectionIndex)
         if (lastSection) {
-          lastSection.lastIndex = data.length - 1
+          lastSection.lastIndex = computedData.length - 1
         }
       }
 
       return map
-    }, [data])
+    }, [computedData])
 
-    const renderItem = useEvent(({ item, index }: { item: ListItem; index: number }) => {
+    const renderItem = useEvent(({ item, index }: { item: ComputedListItem; index: number }) => {
       if ('type' in item && item.type === 'header') {
         return <RowLabel>{item.title}</RowLabel>
       }
@@ -408,12 +425,8 @@ const MyList = memo(
       const isFirst = sectionInfo?.firstIndex === index
       const isLast = sectionInfo?.lastIndex === index
 
-      const activity = item as Activity
-      const computed = activityComputedValues.get(activity.event_id)
-
-      if (!computed) {
-        return null
-      }
+      const activity = item as Activity & { computed: ComputedValues }
+      const { computed } = activity
 
       return (
         <YStack
@@ -452,7 +465,7 @@ const MyList = memo(
     return (
       <View className="hide-scroll" display="contents">
         <FlashList
-          data={data}
+          data={computedData}
           style={styles.flashListStyle}
           testID={'RecentActivity'}
           keyExtractor={keyExtractor}
