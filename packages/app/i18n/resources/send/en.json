@@ -6,7 +6,11 @@
   },
   "check": {
     "button": "Send Check",
-    "buttonDescription": "Send to anyone with a shareable link",
+    "buttonShort": "Send",
+    "buttonDescription": "Send to anyone with a link",
+    "manageButton": "Manage Checks",
+    "manageButtonShort": "Manage",
+    "manageButtonDescription": "View & cancel checks",
     "amount": "Amount",
     "expiration": "Expires",
     "create": "Send Check",
@@ -36,7 +40,7 @@
       "addedToAccount": "has been added to your account",
       "done": "Done",
       "tryAgain": "Try Again",
-      "goBack": "Go Back",
+      "goBack": "Manage Checks",
       "verifying": "Verifying check...",
       "alreadyClaimed": "This check has already been claimed",
       "canceled": "This check has been canceled",
@@ -51,7 +55,7 @@
         "alreadyHaveAccount": "Already have an account?",
         "signIn": "Sign in"
       },
-      "notFoundMessage": "This check link is no longer valid. Please ask the sender for a new link."
+      "notFoundMessage": "This check is either invalid, expired, or already claimed."
     },
     "manage": {
       "loading": "Loading checks...",

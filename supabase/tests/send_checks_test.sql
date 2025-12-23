@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(25);
+SELECT plan(39);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -28,6 +28,14 @@ SELECT has_column('public', 'send_check_created', 'expires_at', 'has expires_at 
 -- ============================================================================
 SELECT has_table('public', 'send_check_claimed', 'send_check_claimed table exists');
 SELECT has_column('public', 'send_check_claimed', 'redeemer', 'has redeemer column');
+
+-- ============================================================================
+-- TEST: Table structure for send_check_notes
+-- ============================================================================
+SELECT has_table('public', 'send_check_notes', 'send_check_notes table exists');
+SELECT has_column('public', 'send_check_notes', 'ephemeral_address', 'has ephemeral_address column');
+SELECT has_column('public', 'send_check_notes', 'chain_id', 'has chain_id column');
+SELECT has_column('public', 'send_check_notes', 'note', 'has note column');
 
 -- ============================================================================
 -- TEST: Insert test data for send_check_created
@@ -177,6 +185,26 @@ VALUES (
     '\xCCCC000000000000000000000000000000000ABC', -- redeemer = sender (canceled)
     'send_checks_test', 'send_checks_test',
     100005, 0, 0);
+
+-- ============================================================================
+-- TEST: Insert test notes for send_check_notes
+-- ============================================================================
+
+-- Note for active check (Check 1)
+INSERT INTO send_check_notes(ephemeral_address, chain_id, note)
+VALUES (
+    '\xCCCC000000000000000000000000000000000001',
+    8453,
+    'Happy Birthday!'
+);
+
+-- Note for claimed check (Check 3)
+INSERT INTO send_check_notes(ephemeral_address, chain_id, note)
+VALUES (
+    '\xCCCC000000000000000000000000000000000003',
+    8453,
+    'Thanks for lunch!'
+);
 
 -- ============================================================================
 -- TEST: get_check_by_ephemeral_address function - Active check
@@ -443,6 +471,183 @@ SELECT results_eq(
     $$,
     $$VALUES (3)$$,
     'Authenticated users can read send_check_claimed test records'
+);
+
+-- ============================================================================
+-- TEST: get_check_by_ephemeral_address function - Returns note for check with note
+-- ============================================================================
+SELECT tests.clear_authentication();
+SELECT set_config('role', 'service_role', TRUE);
+
+SELECT results_eq(
+    $$
+        SELECT note
+        FROM get_check_by_ephemeral_address(
+            '\xCCCC000000000000000000000000000000000001'::bytea,
+            8453::numeric
+        )
+    $$,
+    $$VALUES ('Happy Birthday!'::text)$$,
+    'get_check_by_ephemeral_address returns note for check with note'
+);
+
+-- ============================================================================
+-- TEST: get_check_by_ephemeral_address function - Returns NULL note for check without note
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT note
+        FROM get_check_by_ephemeral_address(
+            '\xCCCC000000000000000000000000000000000002'::bytea,
+            8453::numeric
+        )
+    $$,
+    $$VALUES (NULL::text)$$,
+    'get_check_by_ephemeral_address returns NULL note for check without note'
+);
+
+-- ============================================================================
+-- TEST: get_user_checks function - Returns note for sender's check
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT note
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000ABC'::bytea)
+        WHERE ephemeral_address = '\xCCCC000000000000000000000000000000000001'::bytea
+    $$,
+    $$VALUES ('Happy Birthday!'::text)$$,
+    'get_user_checks returns note for sender check with note'
+);
+
+-- ============================================================================
+-- TEST: get_user_checks function - Returns note for receiver's claimed check
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT note
+        FROM get_user_checks('\xCCCC000000000000000000000000000000000DEF'::bytea)
+    $$,
+    $$VALUES ('Thanks for lunch!'::text)$$,
+    'get_user_checks returns note for receiver on claimed check'
+);
+
+-- ============================================================================
+-- TEST: RLS - Setup send_accounts for sender and receiver users
+-- ============================================================================
+SELECT tests.clear_authentication();
+SELECT set_config('role', 'service_role', TRUE);
+
+-- Create send_account for sender_user linked to the test sender address
+INSERT INTO send_accounts(user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('sender_user'),
+    '0xCCCC000000000000000000000000000000000ABC',
+    8453,
+    '\x00'
+);
+
+-- Create send_account for redeemer_user linked to the test redeemer address
+INSERT INTO send_accounts(user_id, address, chain_id, init_code)
+VALUES (
+    tests.get_supabase_uid('redeemer_user'),
+    '0xCCCC000000000000000000000000000000000DEF',
+    8453,
+    '\x00'
+);
+
+-- ============================================================================
+-- TEST: RLS - Sender can read their own notes
+-- ============================================================================
+SELECT tests.authenticate_as('sender_user');
+
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer FROM send_check_notes
+        WHERE ephemeral_address IN (
+            '\xCCCC000000000000000000000000000000000001'::bytea,
+            '\xCCCC000000000000000000000000000000000003'::bytea
+        )
+    $$,
+    $$VALUES (2)$$,
+    'Sender can read notes for their own checks'
+);
+
+-- ============================================================================
+-- TEST: RLS - Receiver can read notes for claimed checks
+-- ============================================================================
+SELECT tests.authenticate_as('redeemer_user');
+
+-- Redeemer claimed check 3, so they should be able to read its note
+SELECT results_eq(
+    $$
+        SELECT note FROM send_check_notes
+        WHERE ephemeral_address = '\xCCCC000000000000000000000000000000000003'::bytea
+    $$,
+    $$VALUES ('Thanks for lunch!'::text)$$,
+    'Receiver can read note for claimed check'
+);
+
+-- ============================================================================
+-- TEST: RLS - Receiver cannot read notes for unclaimed checks
+-- ============================================================================
+-- Redeemer should NOT be able to read note for check 1 (not claimed by them)
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer FROM send_check_notes
+        WHERE ephemeral_address = '\xCCCC000000000000000000000000000000000001'::bytea
+    $$,
+    $$VALUES (0)$$,
+    'Receiver cannot read notes for checks they have not claimed'
+);
+
+-- ============================================================================
+-- TEST: RLS - Unrelated user cannot read any notes
+-- ============================================================================
+SELECT tests.create_supabase_user('unrelated_user');
+SELECT tests.authenticate_as('unrelated_user');
+
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer FROM send_check_notes
+    $$,
+    $$VALUES (0)$$,
+    'Unrelated user cannot read any notes'
+);
+
+-- ============================================================================
+-- TEST: RLS - Sender can insert note for their own check
+-- ============================================================================
+SELECT tests.authenticate_as('sender_user');
+
+-- Sender should be able to insert a note for check 2 (expired unclaimed - no note yet)
+SELECT lives_ok(
+    $$
+        INSERT INTO send_check_notes(ephemeral_address, chain_id, note)
+        VALUES (
+            '\xCCCC000000000000000000000000000000000002',
+            8453,
+            'Test note from sender'
+        )
+    $$,
+    'Sender can insert note for their own check'
+);
+
+-- ============================================================================
+-- TEST: RLS - Non-sender cannot insert note for someone else's check
+-- ============================================================================
+SELECT tests.authenticate_as('redeemer_user');
+
+SELECT throws_ok(
+    $$
+        INSERT INTO send_check_notes(ephemeral_address, chain_id, note)
+        VALUES (
+            '\xCCCC000000000000000000000000000000000004',
+            8453,
+            'Unauthorized note'
+        )
+    $$,
+    'new row violates row-level security policy for table "send_check_notes"',
+    'Non-sender cannot insert note for someone else check'
 );
 
 SELECT finish();

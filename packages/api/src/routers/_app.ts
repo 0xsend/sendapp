@@ -7,6 +7,7 @@ import { distributionRouter } from './distribution'
 import { erc7677PaymasterRouter } from './erc7677Paymaster'
 import { secretShopRouter } from './secretShop'
 import { sendAccountRouter } from './sendAccount'
+import { sendCheckRouter } from './sendCheck'
 import { sendEarnRouter } from './sendEarn'
 import { swapRouter } from './swap/router'
 import { tagRouter } from './tag/router'
@@ -27,6 +28,7 @@ type AppRouterType = ReturnType<
     erc7677Paymaster: typeof erc7677PaymasterRouter
     secretShop: typeof secretShopRouter
     sendAccount: typeof sendAccountRouter
+    sendCheck: typeof sendCheckRouter
     sendEarn: typeof sendEarnRouter
     temporal: typeof temporalRouter
     swap: typeof swapRouter
@@ -44,6 +46,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   erc7677Paymaster: erc7677PaymasterRouter,
   secretShop: secretShopRouter,
   sendAccount: sendAccountRouter,
+  sendCheck: sendCheckRouter,
   sendEarn: sendEarnRouter,
   temporal: temporalRouter,
   swap: swapRouter,

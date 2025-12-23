@@ -218,13 +218,16 @@ export function generateCheckDescription(check: CheckSeoData): string {
 
 /**
  * Gets check OG image URL with dynamic parameters
+ * Note: We strip commas from amount since formatAmountForDisplay adds them,
+ * but commas break URL parsing (parseFloat stops at comma)
  */
 export function getCheckImageUrl(check: CheckSeoData, siteUrl: string): string {
   const fallbackImage = 'https://ghassets.send.app/2024/04/send-og-image.png'
 
   if (check.amount && check.symbol) {
     const searchParams = new URLSearchParams()
-    searchParams.set('amount', check.amount)
+    // Remove commas from amount - they break URL parsing
+    searchParams.set('amount', check.amount.replace(/,/g, ''))
     searchParams.set('symbol', check.symbol)
     if (check.additionalCount && check.additionalCount > 0) {
       searchParams.set('additional_count', String(check.additionalCount))

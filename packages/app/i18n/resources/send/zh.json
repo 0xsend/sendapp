@@ -6,7 +6,11 @@
   },
   "check": {
     "button": "发送支票",
-    "buttonDescription": "用可分享的链接发送给任何人",
+    "buttonShort": "发送",
+    "buttonDescription": "通过链接发送给任何人",
+    "manageButton": "管理支票",
+    "manageButtonShort": "管理",
+    "manageButtonDescription": "查看&取消支票",
     "amount": "金额",
     "expiration": "到期",
     "create": "发送支票",
@@ -36,7 +40,7 @@
       "addedToAccount": "已添加到您的账户",
       "done": "完成",
       "tryAgain": "重试",
-      "goBack": "返回",
+      "goBack": "管理支票",
       "verifying": "正在验证支票...",
       "alreadyClaimed": "此支票已被领取",
       "canceled": "此支票已被取消",
@@ -51,7 +55,7 @@
         "alreadyHaveAccount": "已有账户？",
         "signIn": "登录"
       },
-      "notFoundMessage": "此支票链接已失效。请联系发送者获取新链接。"
+      "notFoundMessage": "此支票无效、已过期或已被领取。"
     },
     "manage": {
       "loading": "正在加载支票...",
