@@ -6,7 +6,9 @@
   },
   "check": {
     "button": "Enviar Cheque",
-    "buttonDescription": "Enviar a cualquiera mediante un enlace compartible",
+    "buttonDescription": "Enviar a cualquiera con un enlace",
+    "manageButton": "Gestionar Cheques",
+    "manageButtonDescription": "Ver y cancelar cheques",
     "amount": "Monto",
     "expiration": "Vence",
     "create": "Enviar Cheque",

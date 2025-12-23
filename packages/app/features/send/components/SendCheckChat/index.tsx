@@ -4,14 +4,12 @@ import {
   AnimatePresence,
   Button,
   Card,
-  Dialog,
   Input as InputOG,
   GorhomSheetInput,
   Paragraph,
   Portal,
   PrimaryButton,
   QRCode,
-  Sheet,
   Shimmer,
   SizableText,
   Spinner,
@@ -20,7 +18,6 @@ import {
   useMedia,
   usePresence,
   useThemeName,
-  useWindowDimensions,
   View,
   type ViewProps,
   XStack,
@@ -32,7 +29,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Check, Copy, FileSignature, HelpCircle, X } from '@tamagui/lucide-icons'
-import { isAndroid, isWeb } from '@tamagui/constants'
+import { isWeb } from '@tamagui/constants'
 import * as Clipboard from 'expo-clipboard'
 
 import { allCoinsDict } from 'app/data/coins'
@@ -88,7 +85,6 @@ interface SendCheckChatProps {
 
 export const SendCheckChat = memo(
   ({ open: openProp, onOpenChange: onOpenChangeProp }: SendCheckChatProps) => {
-    const { height } = useWindowDimensions()
     const { gtLg } = useMedia()
 
     const [open, setOpen] = useControllableState({
@@ -99,6 +95,7 @@ export const SendCheckChat = memo(
 
     const [activeSection, setActiveSection] = useState<Sections>('enterAmount')
     const [checkCreated, setCheckCreated] = useState<CheckCreatedState | null>(null)
+    const [showInfo, setShowInfo] = useState(false)
     const bottomSheetRef = useRef<BottomSheet>(null)
 
     useEffect(() => {
@@ -172,14 +169,38 @@ export const SendCheckChat = memo(
                       f={1}
                       bg="$color1"
                     >
-                      <SendCheckHeader onClose={handleClose} zi={2} />
-                      <SendCheckContent
-                        activeSection={activeSection}
-                        setActiveSection={setActiveSection}
-                        checkCreated={checkCreated}
-                        setCheckCreated={setCheckCreated}
+                      <SendCheckHeader
                         onClose={handleClose}
+                        onInfoPress={() => setShowInfo(true)}
+                        zi={2}
                       />
+                      <View f={1} ov="hidden">
+                        <AnimatePresence exitBeforeEnter>
+                          {showInfo ? (
+                            <SendCheckInfoCard
+                              key="info-card"
+                              onContinue={() => setShowInfo(false)}
+                            />
+                          ) : (
+                            <YStack
+                              key="main-card"
+                              f={1}
+                              animation="medium"
+                              opacity={1}
+                              enterStyle={{ opacity: 0 }}
+                              exitStyle={{ opacity: 0 }}
+                            >
+                              <SendCheckContent
+                                activeSection={activeSection}
+                                setActiveSection={setActiveSection}
+                                checkCreated={checkCreated}
+                                setCheckCreated={setCheckCreated}
+                                onClose={handleClose}
+                              />
+                            </YStack>
+                          )}
+                        </AnimatePresence>
+                      </View>
                     </YStack>
                   </YStack>
                 </View>
@@ -212,53 +233,69 @@ SendCheckChat.displayName = 'SendCheckChat'
 
 interface SendCheckHeaderProps {
   onClose: () => void
+  onInfoPress: () => void
 }
 
-const SendCheckHeader = XStack.styleable<SendCheckHeaderProps>(({ onClose, ...props }) => {
-  const { t } = useTranslation('send')
+const SendCheckHeader = XStack.styleable<SendCheckHeaderProps>(
+  ({ onClose, onInfoPress, ...props }) => {
+    const { t } = useTranslation('send')
 
-  return (
-    <XStack
-      gap="$3"
-      ai="center"
-      p="$4"
-      bg="$aztec1"
-      bbw={1}
-      bbc="$gray3"
-      $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
-      {...props}
-    >
-      <XStack ai="center" jc="center" w="$4.5" h="$4.5" br="$10" bg="$primary">
-        <FileSignature size={24} color="$black" />
+    return (
+      <XStack
+        gap="$3"
+        ai="center"
+        p="$4"
+        bg="$aztec1"
+        bbw={1}
+        bbc="$gray3"
+        $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
+        {...props}
+      >
+        <XStack ai="center" jc="center" w="$4.5" h="$4.5" br="$10" bg="$primary">
+          <FileSignature size={24} color="$black" />
+        </XStack>
+        <YStack gap="$1.5" f={1}>
+          <SizableText size="$4" color="$gray12" fow="500">
+            {t('check.title', 'Send Check')}
+          </SizableText>
+          <SizableText size="$3" color="$gray10">
+            {t('check.subtitle', 'Create a shareable link')}
+          </SizableText>
+        </YStack>
+        <XStack ai="center" gap="$2" pos="absolute" r={0} t={0} x={-9} y={10}>
+          <Button
+            size="$3"
+            circular
+            animation="100ms"
+            animateOnly={['transform']}
+            boc="$aztec3"
+            hoverStyle={{ boc: '$aztec4' }}
+            pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+            onPress={onInfoPress}
+          >
+            <Button.Icon scaleIcon={1.2}>
+              <HelpCircle size={16} />
+            </Button.Icon>
+          </Button>
+          <Button
+            size="$3"
+            circular
+            animation="100ms"
+            animateOnly={['transform']}
+            boc="$aztec3"
+            hoverStyle={{ boc: '$aztec4' }}
+            pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+            onPress={onClose}
+          >
+            <Button.Icon scaleIcon={1.2}>
+              <X />
+            </Button.Icon>
+          </Button>
+        </XStack>
       </XStack>
-      <YStack gap="$1.5" f={1}>
-        <SizableText size="$4" color="$gray12" fow="500">
-          {t('check.title', 'Send Check')}
-        </SizableText>
-        <SizableText size="$3" color="$gray10">
-          {t('check.subtitle', 'Create a shareable link')}
-        </SizableText>
-      </YStack>
-      <XStack ai="center" gap="$2" pos="absolute" r={0} t={0} x={-9} y={10}>
-        <SendCheckInfo />
-        <Button
-          size="$3"
-          circular
-          animation="100ms"
-          animateOnly={['transform']}
-          boc="$aztec3"
-          hoverStyle={{ boc: '$aztec4' }}
-          pressStyle={{ boc: '$aztec4', scale: 0.9 }}
-          onPress={onClose}
-        >
-          <Button.Icon scaleIcon={1.2}>
-            <X />
-          </Button.Icon>
-        </Button>
-      </XStack>
-    </XStack>
-  )
-})
+    )
+  }
+)
 
 interface SendCheckContentProps {
   activeSection: Sections
@@ -838,110 +875,72 @@ const SuccessSection = ({
   )
 }
 
-function SendCheckInfo() {
-  const [isOpen, setIsOpen] = useState(false)
+interface SendCheckInfoCardProps {
+  onContinue: () => void
+}
+
+const SendCheckInfoCard = ({ onContinue }: SendCheckInfoCardProps) => {
   const { t } = useTranslation('send')
   const steps = t('check.info.steps', { returnObjects: true }) as string[]
 
-  const dialogContent = (
-    <YStack gap="$3">
-      <Paragraph fontWeight="600" size="$5">
-        {t('check.info.title')}
-      </Paragraph>
-      <Paragraph size="$3" lineHeight={20} color="$color11">
-        {t('check.info.description')}
-      </Paragraph>
-      <YStack gap="$2.5" mt="$1">
-        <Paragraph size="$3" fontWeight="600">
-          {t('check.info.howItWorks')}
-        </Paragraph>
-        {steps.map((step, index) => (
-          <XStack key={step} gap="$2" ai="flex-start">
-            <XStack w="$1" h="$1" br="$10" bc="$primary" ai="center" jc="center" mt="$0.5">
-              <Paragraph size="$1" color="$black" fontWeight="600">
-                {index + 1}
-              </Paragraph>
-            </XStack>
-            <Paragraph size="$3" color="$color11" f={1}>
-              {step}
+  return (
+    <YStack
+      f={1}
+      animation="medium"
+      animateOnly={['transform', 'opacity']}
+      y={0}
+      opacity={1}
+      enterStyle={{ y: 300, opacity: 0 }}
+      exitStyle={{ y: 300, opacity: 0 }}
+    >
+      <YStack f={1} p="$4" gap="$4" jc="space-between">
+        <YStack gap="$3">
+          <XStack gap="$2" ai="center">
+            <HelpCircle size={20} color="$primary" />
+            <Paragraph fontWeight="600" size="$5" color="$gray12">
+              {t('check.info.title', 'What is Send Check?')}
             </Paragraph>
           </XStack>
-        ))}
-      </YStack>
-      <Paragraph size="$2" color="$color10" fontStyle="italic" mt="$2">
-        {t('check.info.note')}
-      </Paragraph>
-    </YStack>
-  )
+          <Paragraph size="$3" lineHeight={20} color="$color11">
+            {t('check.info.description')}
+          </Paragraph>
+          <YStack gap="$2.5" mt="$1">
+            <Paragraph size="$3" fontWeight="600">
+              {t('check.info.howItWorks')}
+            </Paragraph>
+            {Array.isArray(steps) &&
+              steps.map((step, index) => (
+                <XStack key={step} gap="$2" ai="flex-start">
+                  <XStack w="$1" h="$1" br="$10" bc="$primary" ai="center" jc="center" mt="$0.5">
+                    <Paragraph size="$1" color="$black" fontWeight="600">
+                      {index + 1}
+                    </Paragraph>
+                  </XStack>
+                  <Paragraph size="$3" color="$color11" f={1}>
+                    {step}
+                  </Paragraph>
+                </XStack>
+              ))}
+          </YStack>
+          <Paragraph size="$2" color="$color10" fontStyle="italic" mt="$2">
+            {t('check.info.note')}
+          </Paragraph>
+        </YStack>
 
-  return (
-    <Dialog modal open={isOpen} onOpenChange={setIsOpen}>
-      <Dialog.Trigger asChild>
         <Button
-          size="$3"
-          circular
-          animation="100ms"
-          animateOnly={['transform']}
-          boc="$aztec3"
-          hoverStyle={{ boc: '$aztec4' }}
-          pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+          bg="$neon7"
+          br="$4"
+          bw={0}
+          hoverStyle={{ bg: '$neon6' }}
+          pressStyle={{ bg: '$neon7', scale: 0.98 }}
+          onPress={onContinue}
         >
-          <Button.Icon scaleIcon={1.2}>
-            <HelpCircle size={16} />
-          </Button.Icon>
+          <Button.Text fos="$5" col="$gray1" $theme-light={{ col: '$gray12' }}>
+            {t('check.info.dismiss', 'Got it')}
+          </Button.Text>
         </Button>
-      </Dialog.Trigger>
-
-      <Dialog.Portal>
-        <Dialog.Overlay
-          key="overlay"
-          animation="quick"
-          opacity={0.5}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-        <Dialog.Content
-          bordered
-          elevate
-          key="content"
-          animation={[
-            'quick',
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ y: -10, opacity: 0 }}
-          exitStyle={{ y: -10, opacity: 0 }}
-          padding="$4"
-          maxWidth={360}
-        >
-          {dialogContent}
-        </Dialog.Content>
-      </Dialog.Portal>
-
-      <Dialog.Adapt platform="native">
-        <Dialog.Sheet
-          modal
-          dismissOnSnapToBottom
-          dismissOnOverlayPress
-          native
-          snapPoints={['fit']}
-          snapPointsMode="fit"
-        >
-          <Dialog.Sheet.Frame key="send-check-info-sheet" gap="$3" padding="$4">
-            <Dialog.Adapt.Contents />
-          </Dialog.Sheet.Frame>
-          <Sheet.Overlay
-            animation="quick"
-            opacity={0.5}
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
-          />
-        </Dialog.Sheet>
-      </Dialog.Adapt>
-    </Dialog>
+      </YStack>
+    </YStack>
   )
 }
 

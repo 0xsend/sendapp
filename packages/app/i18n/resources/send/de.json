@@ -6,7 +6,9 @@
   },
   "check": {
     "button": "Scheck senden",
-    "buttonDescription": "An jeden über einen teilbaren Link senden",
+    "buttonDescription": "An jeden mit einem Link senden",
+    "manageButton": "Schecks verwalten",
+    "manageButtonDescription": "Schecks anzeigen und stornieren",
     "amount": "Betrag",
     "expiration": "Läuft ab",
     "create": "Scheck senden",

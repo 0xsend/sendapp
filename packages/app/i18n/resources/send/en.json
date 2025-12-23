@@ -6,7 +6,9 @@
   },
   "check": {
     "button": "Send Check",
-    "buttonDescription": "Send to anyone via a shareable link",
+    "buttonDescription": "Send to anyone with a link",
+    "manageButton": "Manage Checks",
+    "manageButtonDescription": "View and cancel checks",
     "amount": "Amount",
     "expiration": "Expires",
     "create": "Send Check",
