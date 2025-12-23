@@ -216,19 +216,20 @@ function SectionHeader({ title }: { title: string }) {
 
 /**
  * Parse tokens and amounts into display items
- * Note: amounts come from Postgres as strings (numeric type) to preserve precision
+ * Note: pass amounts directly to BigInt, not via toString() which produces
+ * scientific notation for large numbers like 1e21
  */
-function useTokenItems(tokens: string[], amounts: (string | number)[]) {
+function useTokenItems(tokens: string[], amounts: number[]) {
   return useMemo(() => {
     const items: { coin: coin | undefined; formatted: string }[] = []
     for (let i = 0; i < tokens.length; i++) {
       const rawToken = tokens[i]
-      if (!rawToken) continue
+      const rawAmount = amounts[i]
+      if (!rawToken || rawAmount === undefined) continue
       const tokenAddress = checksumAddress(byteaToHex(rawToken as PgBytea))
       const tokenCoin = allCoinsDict[tokenAddress as keyof typeof allCoinsDict]
       const decimals = tokenCoin?.decimals ?? 18
-      const rawAmount = amounts[i]
-      const amount = rawAmount ? BigInt(rawAmount.toString()) : 0n
+      const amount = BigInt(rawAmount)
       const formatted = formatUnits(amount, decimals)
       items.push({ coin: tokenCoin, formatted })
     }
