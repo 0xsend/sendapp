@@ -130,7 +130,7 @@ export const PAGE_TITLES = {
   activity: 'Send | Activity',
   leaderboard: 'Send | Leaderboard',
   send: 'Send',
-  notFound: '404 | Send',
+  notFound: 'Send | 404',
   sendtagCheckout: 'Send | Sendtag Checkout',
 } as const
 
@@ -148,3 +148,101 @@ export const PAGE_DESCRIPTIONS = {
   sendtagCheckout:
     'Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers.',
 } as const
+
+/**
+ * Format amount for display in OG images and SEO.
+ * - Shows up to 4 decimal places, trimming trailing zeros
+ * - For small numbers (< 1), shows 4 significant figures
+ */
+export function formatAmountForDisplay(amount: string | number): string {
+  const num = typeof amount === 'string' ? Number.parseFloat(amount) : amount
+
+  if (Number.isNaN(num) || num === 0) return typeof amount === 'string' ? amount : '0'
+
+  // For small numbers (< 1), use 4 significant figures
+  if (Math.abs(num) < 1) {
+    const precise = num.toPrecision(4)
+    return Number.parseFloat(precise).toString()
+  }
+
+  // For larger numbers, show up to 4 decimal places
+  const fixed = num.toFixed(4)
+  const trimmed = Number.parseFloat(fixed)
+
+  return trimmed.toLocaleString('en-US', {
+    maximumFractionDigits: 4,
+    minimumFractionDigits: 0,
+  })
+}
+
+/**
+ * Check SEO data types and helpers
+ */
+export type CheckSeoData = {
+  amount?: string
+  symbol?: string
+  additionalCount?: number
+  senderTag?: string
+}
+
+export type CheckSeoOptions = {
+  siteUrl: string
+  route: string
+}
+
+/**
+ * Generates standardized check page title
+ */
+export function generateCheckTitle(check: CheckSeoData): string {
+  if (check.amount && check.symbol) {
+    const additional = check.additionalCount ? ` (+${check.additionalCount} more)` : ''
+    return `Send | Claim ${check.amount} ${check.symbol}${additional}`
+  }
+  return 'Send | Claim Check'
+}
+
+/**
+ * Generates standardized check page description
+ * Uses sender's sendtag when available for better SEO
+ */
+export function generateCheckDescription(check: CheckSeoData): string {
+  const sender = check.senderTag ? `/${check.senderTag}` : 'Someone'
+  if (check.amount && check.symbol) {
+    const additional = check.additionalCount
+      ? ` and ${check.additionalCount} more token${check.additionalCount > 1 ? 's' : ''}`
+      : ''
+    return `${sender} sent you ${check.amount} ${check.symbol}${additional}! Create an account to claim.`
+  }
+  return `${sender} sent you tokens! Create an account to claim.`
+}
+
+/**
+ * Gets check OG image URL with dynamic parameters
+ */
+export function getCheckImageUrl(check: CheckSeoData, siteUrl: string): string {
+  const fallbackImage = 'https://ghassets.send.app/2024/04/send-og-image.png'
+
+  if (check.amount && check.symbol) {
+    const searchParams = new URLSearchParams()
+    searchParams.set('amount', check.amount)
+    searchParams.set('symbol', check.symbol)
+    if (check.additionalCount && check.additionalCount > 0) {
+      searchParams.set('additional_count', String(check.additionalCount))
+    }
+    return `${siteUrl}/api/og/check?${searchParams.toString()}`
+  }
+
+  return fallbackImage
+}
+
+/**
+ * Generates complete SEO metadata for check pages
+ */
+export function generateCheckSeoData(check: CheckSeoData, options: CheckSeoOptions) {
+  return {
+    title: generateCheckTitle(check),
+    description: generateCheckDescription(check),
+    canonicalUrl: generateCanonicalUrl(options),
+    imageUrl: getCheckImageUrl(check, options.siteUrl),
+  }
+}

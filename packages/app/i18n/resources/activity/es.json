@@ -70,7 +70,8 @@
     "tickets_one": "{{count}} boleto",
     "tickets_other": "{{count}} boletos",
     "sendEarn": "Send Earn",
-    "sendAccountSigningKey": "Clave de firma de cuenta de Send"
+    "sendAccountSigningKey": "Clave de firma de cuenta de Send",
+    "you": "Tú"
   },
   "status": {
     "sending": "Enviando...",

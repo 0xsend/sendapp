@@ -296,6 +296,7 @@ function CheckAvatar({
         borderRadius={999}
         borderWidth={2}
         borderColor="$color1"
+        zi={10}
       >
         <Icon size="$1" color="$white" />
       </XStack>
@@ -411,9 +412,9 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
       // Sender's perspective
       if (check.is_canceled) return t('check.manage.canceled')
       if (check.is_expired && !check.is_claimed) return t('check.manage.expired')
-      return t('check.manage.sentCheck')
+      return t('check.manage.sent')
     }
-    // Receiver's perspective - always show "Claimed Check"
+    // Receiver's perspective
     return t('check.manage.claimed')
   }
 
@@ -441,9 +442,8 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
       if (check.is_active) {
         return `${t('check.manage.expiresAt')} ${expiresAt.toLocaleDateString()}`
       }
-      if (check.is_canceled && check.claimed_at) {
-        const canceledDate = new Date(Number(check.claimed_at) * 1000)
-        return `${t('check.manage.canceledOn')} ${canceledDate.toLocaleDateString()}`
+      if (check.is_canceled) {
+        return t('check.manage.canceled')
       }
       if (check.is_claimed && check.claimed_at) {
         const otherPartyText = getOtherPartyText()

@@ -655,7 +655,7 @@ export function subtextFromActivity({
   }
 
   if (isSendCheckTransfer(activity)) {
-    return 'Send Check'
+    return translate('subtext.you', 'You')
   }
 
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
