@@ -51,9 +51,11 @@ contract SendAccountFactory {
         }
 
         ret = SendAccount(
-            payable(new ERC1967Proxy{salt: bytes32(salt)}(
+            payable(
+                new ERC1967Proxy{salt: bytes32(salt)}(
                     address(accountImplementation), abi.encodeCall(SendAccount.initialize, (keySlot, key, initCalls))
-                ))
+                )
+            )
         );
 
         emit AccountCreated(address(ret));
