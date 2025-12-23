@@ -204,6 +204,23 @@ import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import { CommentsTime } from 'app/utils/dateHelper'
+import { Spinner } from '@my/ui'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import {
+  isSendEarnEvent,
+  isSendEarnDepositEvent,
+  isTemporalSendEarnDepositEvent,
+} from 'app/utils/zod/activity'
+import { isSendAccountTransfersEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { isSendAccountReceiveEvent } from 'app/utils/zod/activity/SendAccountReceiveEventSchema'
+import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
+import { ContractLabels } from 'app/data/contract-labels'
+import type { ReactNode } from 'react'
 
 const MyList = memo(
   ({
@@ -216,17 +233,141 @@ const MyList = memo(
     onEndReached,
     hasNextPage,
   }: MyListProps) => {
-    // for TokenActivityRowV2
-
     const { profile } = useUser()
 
     const { data: swapRouters } = useSwapRouters()
     const { data: liquidityPools } = useLiquidityPools()
     const addressBook = useAddressBook()
-
-    //
+    const { t, i18n } = useTranslation('activity')
+    const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
 
     const hoverStyles = useHoverStyles()
+
+    const activityComputedValues = useMemo(() => {
+      const computed = new Map<
+        string,
+        {
+          amount: ReactNode
+          date: ReactNode
+          eventName: string
+          subtext: string | null
+          isUserTransfer: boolean
+        }
+      >()
+
+      const translator = (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
+        t(key, { defaultValue, ...options })
+
+      for (const item of data) {
+        if ('type' in item && item.type === 'header') continue
+
+        const activity = item as Activity & { sectionIndex: number }
+
+        const isERC20Transfer = isSendAccountTransfersEvent(activity)
+        const isETHReceive = isSendAccountReceiveEvent(activity)
+        const isTemporalTransfer =
+          isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+        const isUserTransfer =
+          (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
+          Boolean(activity.to_user?.send_id) &&
+          Boolean(activity.from_user?.send_id)
+
+        let eventName: string
+        if (
+          isSendEarnDepositEvent(activity) &&
+          addressBook.data?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
+        ) {
+          eventName = translator('events.rewards', 'Rewards')
+        } else if (
+          isERC20Transfer &&
+          addressBook.data?.[activity.data.t] === ContractLabels.SendEarn
+        ) {
+          eventName = translator('events.deposit', 'Deposit')
+        } else if (
+          isERC20Transfer &&
+          addressBook.data?.[activity.data.f] === ContractLabels.SendEarn
+        ) {
+          eventName = translator('events.withdraw', 'Withdraw')
+        } else {
+          eventName = eventNameFromActivity({
+            activity,
+            swapRouters: swapRouters || [],
+            liquidityPools: liquidityPools || [],
+            t: translator,
+          })
+        }
+
+        let subtext: string | null
+        const sendEarnLabel = translator('subtext.sendEarn', 'Send Earn')
+        if (isTemporalSendEarnDepositEvent(activity)) {
+          if (activity.data.status === 'failed') {
+            subtext = activity.data.error_message || sendEarnLabel
+          } else {
+            subtext = sendEarnLabel
+          }
+        } else if (isSendEarnEvent(activity)) {
+          subtext = sendEarnLabel
+        } else if (isERC20Transfer) {
+          if (addressBook.data?.[activity.data.t] === ContractLabels.SendEarn) {
+            subtext = sendEarnLabel
+          } else if (addressBook.data?.[activity.data.f] === ContractLabels.SendEarn) {
+            subtext = sendEarnLabel
+          } else {
+            subtext = subtextFromActivity({
+              activity,
+              swapRouters: swapRouters || [],
+              liquidityPools: liquidityPools || [],
+              t: translator,
+            })
+          }
+        } else {
+          subtext = subtextFromActivity({
+            activity,
+            swapRouters: swapRouters || [],
+            liquidityPools: liquidityPools || [],
+            t: translator,
+          })
+        }
+
+        let amount: ReactNode
+        if (isSendEarnEvent(activity)) {
+          amount = <SendEarnAmount activity={activity} />
+        } else {
+          amount = amountFromActivity(activity, swapRouters || [], liquidityPools || [])
+        }
+
+        let date: ReactNode
+        const isTemporalTransferForDate =
+          isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+        if (isTemporalTransferForDate) {
+          switch (activity.data.status) {
+            case 'failed':
+              date = translator('status.failed', 'Failed')
+              break
+            case 'cancelled':
+              date = translator('status.cancelled', 'Cancelled')
+              break
+            case 'confirmed':
+              date = CommentsTime(new Date(activity.created_at), locale)
+              break
+            default:
+              date = <Spinner size="small" color={'$color11'} />
+          }
+        } else {
+          date = CommentsTime(new Date(activity.created_at), locale)
+        }
+
+        computed.set(activity.event_id, {
+          amount,
+          date,
+          eventName,
+          subtext,
+          isUserTransfer,
+        })
+      }
+
+      return computed
+    }, [data, swapRouters, liquidityPools, addressBook.data, t, locale])
 
     const sectionDataMap = useMemo(() => {
       const map = new Map<number, { firstIndex: number; lastIndex: number }>()
@@ -267,6 +408,13 @@ const MyList = memo(
       const isFirst = sectionInfo?.firstIndex === index
       const isLast = sectionInfo?.lastIndex === index
 
+      const activity = item as Activity
+      const computed = activityComputedValues.get(activity.event_id)
+
+      if (!computed) {
+        return null
+      }
+
       return (
         <YStack
           bc="$color1"
@@ -286,11 +434,16 @@ const MyList = memo(
             swapRouters={swapRouters}
             liquidityPools={liquidityPools}
             profile={profile}
-            activity={item as Activity}
+            activity={activity}
             onPress={onActivityPress}
             sendParamsRef={sendParamsRef}
             addressBook={addressBook}
             hoverStyle={hoverStyles}
+            computedAmount={computed.amount}
+            computedDate={computed.date}
+            computedEventName={computed.eventName}
+            computedSubtext={computed.subtext}
+            computedIsUserTransfer={computed.isUserTransfer}
           />
         </YStack>
       )
