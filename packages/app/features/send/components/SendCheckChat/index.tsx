@@ -39,7 +39,12 @@ import { formFields } from 'app/utils/SchemaForm'
 import { CoinField } from '../SendChat/CoinField'
 import { useCoin, useCoins } from 'app/provider/coins'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useSendCheckCreate, type TokenAmount } from 'app/utils/useSendCheckCreate'
+import {
+  useSendCheckCreate,
+  type TokenAmount,
+  createSendCheckClaimUrl,
+} from 'app/utils/useSendCheckCreate'
+import { encodeCheckCode } from 'app/utils/checkCode'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { hexToBytea } from 'app/utils/hexToBytea'
@@ -96,7 +101,20 @@ export const SendCheckChat = memo(
     const [activeSection, setActiveSection] = useState<Sections>('enterAmount')
     const [checkCreated, setCheckCreated] = useState<CheckCreatedState | null>(null)
     const [showInfo, setShowInfo] = useState(false)
+    const [hasCopiedLink, setHasCopiedLink] = useState(false)
     const bottomSheetRef = useRef<BottomSheet>(null)
+
+    const canClose = activeSection !== 'success' || hasCopiedLink
+
+    const form = useForm<SendCheckFormValues>({
+      resolver: zodResolver(SendCheckSchema),
+      defaultValues: {
+        token: usdcAddress[baseMainnet.id],
+        amount: '',
+        expiresInDays: 30,
+        note: '',
+      },
+    })
 
     useEffect(() => {
       if (open) {
@@ -107,14 +125,17 @@ export const SendCheckChat = memo(
     }, [open])
 
     const handleClose = useCallback(() => {
+      if (!canClose) return
       setOpen(false)
       bottomSheetRef.current?.close()
       // Reset state after close
       setTimeout(() => {
         setActiveSection('enterAmount')
         setCheckCreated(null)
+        setHasCopiedLink(false)
+        form.reset()
       }, 300)
-    }, [setOpen])
+    }, [setOpen, form, canClose])
 
     const animateOnMount = gtLg
       ? ({
@@ -171,7 +192,8 @@ export const SendCheckChat = memo(
                     >
                       <SendCheckHeader
                         onClose={handleClose}
-                        onInfoPress={() => setShowInfo(true)}
+                        onInfoPress={() => setShowInfo((prev) => !prev)}
+                        canClose={canClose}
                         zi={2}
                       />
                       <View f={1} ov="hidden">
@@ -191,11 +213,14 @@ export const SendCheckChat = memo(
                               exitStyle={{ opacity: 0 }}
                             >
                               <SendCheckContent
+                                form={form}
                                 activeSection={activeSection}
                                 setActiveSection={setActiveSection}
                                 checkCreated={checkCreated}
                                 setCheckCreated={setCheckCreated}
                                 onClose={handleClose}
+                                hasCopiedLink={hasCopiedLink}
+                                setHasCopiedLink={setHasCopiedLink}
                               />
                             </YStack>
                           )}
@@ -211,8 +236,8 @@ export const SendCheckChat = memo(
             {open && (
               <View
                 pe="auto"
-                cursor="pointer"
-                onPress={handleClose}
+                cursor={canClose ? 'pointer' : 'default'}
+                onPress={canClose ? handleClose : undefined}
                 animation="200ms"
                 enterStyle={{ opacity: 0 }}
                 exitStyle={{ opacity: 0 }}
@@ -234,10 +259,11 @@ SendCheckChat.displayName = 'SendCheckChat'
 interface SendCheckHeaderProps {
   onClose: () => void
   onInfoPress: () => void
+  canClose: boolean
 }
 
 const SendCheckHeader = XStack.styleable<SendCheckHeaderProps>(
-  ({ onClose, onInfoPress, ...props }) => {
+  ({ onClose, onInfoPress, canClose, ...props }) => {
     const { t } = useTranslation('send')
 
     return (
@@ -277,20 +303,22 @@ const SendCheckHeader = XStack.styleable<SendCheckHeaderProps>(
               <HelpCircle size={16} />
             </Button.Icon>
           </Button>
-          <Button
-            size="$3"
-            circular
-            animation="100ms"
-            animateOnly={['transform']}
-            boc="$aztec3"
-            hoverStyle={{ boc: '$aztec4' }}
-            pressStyle={{ boc: '$aztec4', scale: 0.9 }}
-            onPress={onClose}
-          >
-            <Button.Icon scaleIcon={1.2}>
-              <X />
-            </Button.Icon>
-          </Button>
+          {canClose && (
+            <Button
+              size="$3"
+              circular
+              animation="100ms"
+              animateOnly={['transform']}
+              boc="$aztec3"
+              hoverStyle={{ boc: '$aztec4' }}
+              pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+              onPress={onClose}
+            >
+              <Button.Icon scaleIcon={1.2}>
+                <X />
+              </Button.Icon>
+            </Button>
+          )}
         </XStack>
       </XStack>
     )
@@ -298,19 +326,25 @@ const SendCheckHeader = XStack.styleable<SendCheckHeaderProps>(
 )
 
 interface SendCheckContentProps {
+  form: ReturnType<typeof useForm<SendCheckFormValues>>
   activeSection: Sections
   setActiveSection: React.Dispatch<React.SetStateAction<Sections>>
   checkCreated: CheckCreatedState | null
   setCheckCreated: React.Dispatch<React.SetStateAction<CheckCreatedState | null>>
   onClose: () => void
+  hasCopiedLink: boolean
+  setHasCopiedLink: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const SendCheckContent = ({
+  form,
   activeSection,
   setActiveSection,
   checkCreated,
   setCheckCreated,
   onClose,
+  hasCopiedLink,
+  setHasCopiedLink,
 }: SendCheckContentProps) => {
   const { t } = useTranslation('send')
   const toast = useAppToast()
@@ -329,16 +363,6 @@ const SendCheckContent = ({
         ?.map((c) => c.webauthn_credentials as NonNullable<typeof c.webauthn_credentials>) ?? [],
     [sendAccount?.send_account_credentials]
   )
-
-  const form = useForm<SendCheckFormValues>({
-    resolver: zodResolver(SendCheckSchema),
-    defaultValues: {
-      token: usdcAddress[baseMainnet.id],
-      amount: '',
-      expiresInDays: 30,
-      note: '',
-    },
-  })
 
   const token = form.watch('token')
   const amount = form.watch('amount')
@@ -368,19 +392,20 @@ const SendCheckContent = ({
     isReady,
     checkAddress,
     usdcFees,
+    ephemeralKeyPair,
+    prepareError,
   } = useSendCheckCreate({ tokenAmounts, expiresAt })
 
-  const totalFee = usdcFees ? usdcFees.baseFee + usdcFees.gasFees : undefined
-
-  const canSubmit =
+  // Basic validation for proceeding to review
+  const canProceedToReview =
     !isLoadingCoins &&
-    !isSubmitting &&
-    !isPreparing &&
     parsedAmount > 0n &&
     !hasInsufficientBalance &&
-    isReady &&
     webauthnCreds.length > 0 &&
     !!checkAddress
+
+  // Full validation for creating check (includes fee estimation)
+  const canCreateCheck = canProceedToReview && !isSubmitting && !isPreparing && isReady
 
   const price = prices?.[token] ?? 0
   const amountInUSD = price * Number(formatUnits(parsedAmount, decimals))
@@ -390,7 +415,6 @@ const SendCheckContent = ({
   const [present] = usePresence()
   const [loadingSend, setLoadingSend] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
-  const [hasCopiedLink, setHasCopiedLink] = useState(false)
 
   const copyLinkToClipboard = useCallback(async () => {
     if (!checkCreated?.claimUrl) return
@@ -399,14 +423,40 @@ const SendCheckContent = ({
     setHasCopiedLink(true)
     toast.show(t('check.linkCopied', 'Link copied!'))
     setTimeout(() => setCopiedLink(false), 2000)
-  }, [checkCreated?.claimUrl, toast, t])
+  }, [checkCreated?.claimUrl, toast, t, setHasCopiedLink])
+
+  // Helper function to poll for check creation via Supabase
+  const pollForCheckCreation = useCallback(
+    async (ephemeralAddress: Hex): Promise<boolean> => {
+      const POLL_INTERVAL_MS = 2000
+      const MAX_POLL_TIME_MS = 15000
+      const startTime = Date.now()
+
+      while (Date.now() - startTime < MAX_POLL_TIME_MS) {
+        try {
+          const { data, error } = await supabase.rpc('get_check_by_ephemeral_address', {
+            check_ephemeral_address: hexToBytea(ephemeralAddress),
+            check_chain_id: baseMainnet.id,
+          })
+          if (!error && data && data.length > 0) {
+            return true
+          }
+        } catch (pollError) {
+          log('Poll error:', pollError)
+        }
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS))
+      }
+      return false
+    },
+    [supabase]
+  )
 
   async function onSubmit() {
     if (activeSection === 'enterAmount') {
-      if (!canSubmit) return
+      if (!canProceedToReview) return
       setActiveSection('reviewAndSend')
     } else if (activeSection === 'reviewAndSend') {
-      if (!canSubmit) return
+      if (!canCreateCheck) return
       try {
         setLoadingSend(true)
         const values = form.getValues()
@@ -437,16 +487,58 @@ const SendCheckContent = ({
         })
         setActiveSection('success')
       } catch (error) {
-        log('Failed to create check:', error)
-        toast.error(error instanceof Error ? error.message : 'Failed to create check')
-      } finally {
-        setLoadingSend(false)
+        log('Failed to create check, polling for confirmation:', error)
+
+        // The transaction might still go through even if we got an error
+        // Poll for the check in Supabase before showing the error
+        const checkExists = await pollForCheckCreation(ephemeralKeyPair.address)
+
+        if (checkExists) {
+          // Check was created despite the error, treat as success
+          log('Check found in Supabase despite error')
+          const values = form.getValues()
+          const trimmedNote = values.note?.trim()
+
+          // Save note if provided (fire and forget)
+          if (trimmedNote) {
+            supabase
+              .from('send_check_notes')
+              .insert({
+                ephemeral_address: hexToBytea(ephemeralKeyPair.address),
+                chain_id: baseMainnet.id,
+                note: trimmedNote,
+              })
+              .then(({ error: noteError }) => {
+                if (noteError) {
+                  log('Failed to save check note:', noteError)
+                }
+              })
+          }
+
+          const checkCode = encodeCheckCode(ephemeralKeyPair.privateKey)
+          const claimUrl = createSendCheckClaimUrl(checkCode)
+
+          setCheckCreated({
+            claimUrl,
+            amount: values.amount,
+            symbol: coin?.symbol ?? coinInfo?.symbol ?? 'tokens',
+            note: trimmedNote,
+          })
+          setActiveSection('success')
+          setLoadingSend(false)
+        } else {
+          // Check not found on-chain after polling, show the error
+          toast.error(error instanceof Error ? error.message : 'Failed to create check')
+          setLoadingSend(false)
+        }
+        return
       }
+      setLoadingSend(false)
     }
   }
 
   const isSendButtonDisabled =
-    loadingSend || (activeSection === 'enterAmount' ? !canSubmit : !canSubmit)
+    loadingSend || (activeSection === 'enterAmount' ? !canProceedToReview : !canCreateCheck)
 
   if (activeSection === 'success' && checkCreated) {
     return (
@@ -509,7 +601,7 @@ const SendCheckContent = ({
                     isPricesLoading={isPricesLoading}
                     isFeesLoading={isPreparing}
                     usdcFees={usdcFees}
-                    usdcFeesError={null}
+                    usdcFeesError={prepareError}
                   >
                     {form.watch('note') && (
                       <ReviewSendDetailsRow
@@ -807,14 +899,14 @@ const SuccessSection = ({
 
   return (
     <YStack gap="$4" p="$4" f={1}>
-      <Card bc="$yellow2" br="$4" p="$3" w="100%">
+      <Card bg="$aztec4" $theme-light={{ bg: '$gray2' }} br="$4" p="$3" w="100%">
         <XStack gap="$2" ai="flex-start">
           <AlertTriangle size="$1" color="$yellow10" flexShrink={0} mt="$0.5" />
           <YStack gap="$1" f={1}>
-            <Paragraph color="$yellow11" size="$3" fontWeight="600">
+            <Paragraph color="$gray12" size="$3" fontWeight="600">
               {t('check.success.warningTitle', 'Keep this link safe')}
             </Paragraph>
-            <Paragraph color="$yellow10" size="$2">
+            <Paragraph color="$gray10" size="$2">
               {t(
                 'check.success.warningDescription',
                 'Anyone with this link can claim these funds. Only share with the intended recipient.'
@@ -832,11 +924,9 @@ const SuccessSection = ({
       </XStack>
 
       {checkCreated.note && (
-        <Card bc="$color2" br="$4" p="$3" w="100%">
-          <Paragraph color="$color11" size="$3" fontStyle="italic">
-            "{checkCreated.note}"
-          </Paragraph>
-        </Card>
+        <Paragraph color="$color11" size="$3" fontStyle="italic" ta="center">
+          "{checkCreated.note}"
+        </Paragraph>
       )}
 
       <YStack ai="center" py="$2">
@@ -886,13 +976,7 @@ const SendCheckInfoCard = ({ onContinue }: SendCheckInfoCardProps) => {
       exitStyle={{ y: 300, opacity: 0 }}
     >
       <YStack f={1} p="$4" gap="$4" jc="space-between">
-        <YStack gap="$3">
-          <XStack gap="$2" ai="center">
-            <HelpCircle size={20} color="$primary" />
-            <Paragraph fontWeight="600" size="$5" color="$gray12">
-              {t('check.info.title', 'What is Send Check?')}
-            </Paragraph>
-          </XStack>
+        <YStack gap="$3" p="$4" br="$4" bg="$aztec4" $theme-light={{ bg: '$gray2' }}>
           <Paragraph size="$3" lineHeight={20} color="$color11">
             {t('check.info.description')}
           </Paragraph>
@@ -902,13 +986,21 @@ const SendCheckInfoCard = ({ onContinue }: SendCheckInfoCardProps) => {
             </Paragraph>
             {Array.isArray(steps) &&
               steps.map((step, index) => (
-                <XStack key={step} gap="$2" ai="flex-start">
-                  <XStack w="$1" h="$1" br="$10" bc="$primary" ai="center" jc="center" mt="$0.5">
+                <XStack key={step} gap="$2.5" ai="flex-start">
+                  <XStack
+                    w={20}
+                    h={20}
+                    br="$10"
+                    bc="$primary"
+                    ai="center"
+                    jc="center"
+                    flexShrink={0}
+                  >
                     <Paragraph size="$1" color="$black" fontWeight="600">
                       {index + 1}
                     </Paragraph>
                   </XStack>
-                  <Paragraph size="$3" color="$color11" f={1}>
+                  <Paragraph size="$3" color="$color11" f={1} pt={2}>
                     {step}
                   </Paragraph>
                 </XStack>

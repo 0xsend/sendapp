@@ -1,4 +1,4 @@
-import { Card, Paragraph, XStack, YStack } from '@my/ui'
+import { Card, Paragraph, useMedia, XStack, YStack } from '@my/ui'
 import { FileSignature, ListChecks } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'solito/router'
@@ -10,6 +10,10 @@ interface SendCheckButtonProps {
 export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
   const { t } = useTranslation('send')
   const router = useRouter()
+  const { xs } = useMedia()
+
+  const sendButtonText = xs ? t('check.buttonShort') : t('check.button')
+  const manageButtonText = xs ? t('check.manageButtonShort') : t('check.manageButton')
 
   return (
     <XStack gap="$3" maw={600} $sm={{ maw: '100%' }}>
@@ -41,10 +45,12 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
             <FileSignature size="$1.5" color="$neon9" />
           </XStack>
           <YStack f={1} gap="$1" miw={0}>
-            <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
-              {t('check.button')}
-            </Paragraph>
-            <Paragraph size="$3" color="$color10" numberOfLines={2}>
+            {!xs && (
+              <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
+                {t('check.button')}
+              </Paragraph>
+            )}
+            <Paragraph size={xs ? '$4' : '$3'} color="$color10">
               {t('check.buttonDescription')}
             </Paragraph>
           </YStack>
@@ -79,11 +85,13 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
             <ListChecks size="$1.5" color="$neon9" />
           </XStack>
           <YStack f={1} gap="$1" miw={0}>
-            <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
-              {t('check.manageButton', 'Manage Checks')}
-            </Paragraph>
-            <Paragraph size="$3" color="$color10" numberOfLines={2}>
-              {t('check.manageButtonDescription', 'View and cancel checks')}
+            {!xs && (
+              <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
+                {t('check.manageButton')}
+              </Paragraph>
+            )}
+            <Paragraph size={xs ? '$4' : '$3'} color="$color10">
+              {t('check.manageButtonDescription')}
             </Paragraph>
           </YStack>
         </XStack>

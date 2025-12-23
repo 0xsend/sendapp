@@ -178,11 +178,9 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
 
         {/* Note from sender */}
         {previewData.note && (
-          <Card bc="$color2" br="$4" p="$3" w="100%">
-            <Paragraph color="$color11" size="$4" fontStyle="italic" ta="center">
-              "{previewData.note}"
-            </Paragraph>
-          </Card>
+          <Paragraph color="$color11" size="$4" fontStyle="italic" ta="center">
+            "{previewData.note}"
+          </Paragraph>
         )}
 
         {/* Expiration */}

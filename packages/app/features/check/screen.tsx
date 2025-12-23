@@ -435,8 +435,8 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
     return t('check.manage.fromUser')
   }
 
-  // Date text based on status
-  const getDateText = () => {
+  // Subtext showing the other party (From/Claimed by)
+  const getSubtext = () => {
     if (isSender) {
       // Sender's view
       if (check.is_active) {
@@ -446,18 +446,32 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
         return t('check.manage.canceled')
       }
       if (check.is_claimed && check.claimed_at) {
-        const otherPartyText = getOtherPartyText()
-        if (otherPartyText) return otherPartyText
+        return getOtherPartyText()
       }
       if (check.is_expired && !check.is_claimed) {
         return t('check.manage.expiredUnclaimed')
       }
     } else {
       // Receiver's view: show who it's from
-      const otherPartyText = getOtherPartyText()
-      if (otherPartyText) return otherPartyText
+      return getOtherPartyText()
     }
     return formatRelativeDate(createdAt)
+  }
+
+  // Note text for claimed checks (shown below From/Claimed by)
+  const getNoteText = () => {
+    if (!check.note) return null
+    // Don't show note for active or canceled checks
+    if (check.is_active || check.is_canceled) return null
+    // Show note for claimed checks (both sender and receiver view)
+    if (check.is_claimed) {
+      return (
+        <Text fontStyle="italic" color="$color10">
+          {`"${check.note}"`}
+        </Text>
+      )
+    }
+    return null
   }
 
   // Calculate total fee for display
@@ -550,7 +564,8 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
         }
         title={getTitleText()}
         amount={amountText}
-        date={getDateText()}
+        subtext={getSubtext()}
+        date={getNoteText()}
         actions={cancelActions}
         hoverStyle={hoverStyles}
       />

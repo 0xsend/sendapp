@@ -36,6 +36,10 @@ interface TopNavProps {
    */
   backFunction?: 'root' | 'pop' | 'router' | 'home'
   /**
+   * Custom back href - overrides backFunction when provided
+   */
+  backHref?: string
+  /**
    * Show header even on greater than large screens
    * @default false
    */
@@ -54,6 +58,7 @@ export function TopNav({
   showLogo = false,
   noSubroute = false,
   backFunction = 'root',
+  backHref,
   showOnGtLg = false,
   hideRightActions = false,
   showBackOnDesktop = false,
@@ -67,6 +72,12 @@ export function TopNav({
   const { t } = useTranslation('navigation')
 
   const handleBack = () => {
+    // Use custom backHref if provided
+    if (backHref) {
+      push(backHref)
+      return
+    }
+
     // pop to the base path if subroute. e.g. /account/settings/edit-profile -> /account
     // else, go to home page
     if (backFunction === 'router') {
@@ -100,7 +111,8 @@ export function TopNav({
     path.includes('/sendpot') ||
     path.includes('/feed') ||
     path.includes('/rewards') ||
-    path.includes('/canton-wallet')
+    path.includes('/canton-wallet') ||
+    path.includes('/check')
 
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
