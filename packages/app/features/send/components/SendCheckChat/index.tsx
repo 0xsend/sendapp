@@ -207,7 +207,7 @@ export const SendCheckChat = memo(
                             <YStack
                               key="main-card"
                               f={1}
-                              animation="medium"
+                              animation="200ms"
                               opacity={1}
                               enterStyle={{ opacity: 0 }}
                               exitStyle={{ opacity: 0 }}
@@ -968,7 +968,7 @@ const SendCheckInfoCard = ({ onContinue }: SendCheckInfoCardProps) => {
   return (
     <YStack
       f={1}
-      animation="medium"
+      animation="200ms"
       animateOnly={['transform', 'opacity']}
       y={0}
       opacity={1}
