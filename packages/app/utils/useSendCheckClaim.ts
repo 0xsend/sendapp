@@ -20,8 +20,8 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import type { Database, PgBytea } from '@my/supabase/database.types'
 import { byteaToHex } from './byteaToHex'
 import { api } from 'app/utils/api'
-import { CHECK_NOTE_ACCESS_MESSAGE } from '@my/api/src/routers/sendCheck'
 import debug from 'debug'
+import { CHECK_NOTE_ACCESS_MESSAGE } from './sendCheckConstants'
 
 const logger = debug('app:utils:useSendCheckClaim')
 

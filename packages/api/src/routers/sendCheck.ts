@@ -4,14 +4,9 @@ import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { createTRPCRouter, publicProcedure } from '../trpc'
 import { z } from 'zod'
 import { verifyMessage, type Hex } from 'viem'
+import { CHECK_NOTE_ACCESS_MESSAGE } from 'app/utils/sendCheckConstants'
 
 const logger = debug('api:routers:sendCheck')
-
-/**
- * The message that must be signed to prove ownership of the ephemeral key.
- * This is a constant to prevent replay attacks with other messages.
- */
-export const CHECK_NOTE_ACCESS_MESSAGE = 'Send Check Note Access'
 
 export const GetCheckNoteRequestSchema = z.object({
   ephemeralAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid address format'),
