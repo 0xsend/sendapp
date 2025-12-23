@@ -51,7 +51,7 @@
         "alreadyHaveAccount": "Déjà un compte ?",
         "signIn": "Se connecter"
       },
-      "notFoundMessage": "Ce lien de chèque n'est plus valide. Veuillez demander un nouveau lien à l'expéditeur."
+      "notFoundMessage": "Ce chèque est invalide, expiré ou déjà réclamé."
     },
     "manage": {
       "loading": "Chargement des chèques...",

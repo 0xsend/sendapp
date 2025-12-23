@@ -51,7 +51,7 @@
         "alreadyHaveAccount": "Already have an account?",
         "signIn": "Sign in"
       },
-      "notFoundMessage": "This check link is no longer valid. Please ask the sender for a new link."
+      "notFoundMessage": "This check is either invalid, expired, or already claimed."
     },
     "manage": {
       "loading": "Loading checks...",

@@ -51,7 +51,7 @@
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
         "signIn": "Iniciar sesión"
       },
-      "notFoundMessage": "Este enlace de cheque ya no es válido. Por favor, pide al remitente un nuevo enlace."
+      "notFoundMessage": "Este cheque es inválido, ha vencido o ya fue reclamado."
     },
     "manage": {
       "loading": "Cargando cheques...",

@@ -153,7 +153,15 @@ export function CheckSendScreen() {
       // Save note if provided (fire and forget - don't block on this)
       const trimmedNote = values.note?.trim()
       if (trimmedNote) {
-        supabase
+        ;(
+          supabase as unknown as {
+            from: (table: string) => {
+              insert: (data: Record<string, unknown>) => {
+                then: (cb: (result: { error: Error | null }) => void) => void
+              }
+            }
+          }
+        )
           .from('send_check_notes')
           .insert({
             ephemeral_address: hexToBytea(result.ephemeralKeyPair.address),

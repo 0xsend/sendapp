@@ -1,11 +1,13 @@
 import { Card, Paragraph, useThemeName, XStack, YStack } from '@my/ui'
 import { FileSignature } from '@tamagui/lucide-icons'
-import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
 
-export const SendCheckButton = () => {
+interface SendCheckButtonProps {
+  onPress: () => void
+}
+
+export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
   const { t } = useTranslation('send')
-  const router = useRouter()
   const isDark = useThemeName()?.startsWith('dark')
 
   return (
@@ -18,7 +20,7 @@ export const SendCheckButton = () => {
       hoverStyle={{ opacity: 0.9, scale: 0.995 }}
       pressStyle={{ scale: 0.98 }}
       animation="100ms"
-      onPress={() => router.push('/check/send')}
+      onPress={onPress}
       bc={isDark ? '$color2' : '$gray2'}
       maw={600}
       $sm={{ maw: '100%' }}

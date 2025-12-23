@@ -55,7 +55,9 @@ export type TokenAmount = {
 }
 
 type GetCheckByEphemeralAddressRow =
-  Database['public']['Functions']['get_check_by_ephemeral_address']['Returns'][number]
+  Database['public']['Functions']['get_check_by_ephemeral_address']['Returns'][number] & {
+    note?: string | null
+  }
 
 export type CheckDetails = {
   ephemeralAddress: Hex
