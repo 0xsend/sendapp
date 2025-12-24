@@ -39,7 +39,7 @@
       "root": "Explore Canton Wallet"
     },
     "deposit": {
-      "root": "Deposit",
+      "root": "Savings",
       "applePay": "Apple Pay",
       "debitCard": "Debit Card",
       "onBase": "Deposit on Base",
@@ -48,7 +48,7 @@
     "earn": {
       "root": "Savings",
       "details": "Details",
-      "deposit": "Deposit",
+      "savings": "Savings",
       "withdraw": "Withdraw Savings",
       "balance": "Balance",
       "rewards": "Rewards Balance"
@@ -87,6 +87,9 @@
       "root": "My Checks",
       "send": "Send Check",
       "claim": "Claim Check"
+    },
+    "savings": {
+      "root": "Savings"
     }
   }
 }

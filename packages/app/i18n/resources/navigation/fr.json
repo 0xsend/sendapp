@@ -29,12 +29,12 @@
       "applePay": "Apple Pay",
       "debitCard": "Carte de débit",
       "onBase": "Déposer sur Base",
-      "root": "Déposer",
+      "root": "Épargne",
       "success": "Succès"
     },
     "earn": {
       "balance": "Solde",
-      "deposit": "Déposer",
+      "savings": "Épargne",
       "details": "Détails",
       "rewards": "Solde des récompenses",
       "root": "Épargne",
@@ -69,6 +69,9 @@
     "trade": {
       "root": "Trade",
       "summary": "Résumé du trade"
+    },
+    "savings": {
+      "root": "Épargne"
     }
   },
   "tabs": {

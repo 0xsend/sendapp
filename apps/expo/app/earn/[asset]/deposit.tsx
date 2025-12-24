@@ -11,7 +11,7 @@ export default function DepositAssetSavingsScreen() {
     <>
       <Stack.Screen
         options={{
-          title: t('stack.earn.deposit'),
+          title: t('stack.earn.savings'),
         }}
       />
       <ScreenContainer>
