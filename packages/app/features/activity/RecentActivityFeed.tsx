@@ -319,7 +319,7 @@ const MyList = memo(
           renderItem={renderItem}
           contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
-          onScroll={(e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>, 50)}
+          onScroll={(e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)}
           onContentSizeChange={onContentSizeChangeHandler}
           scrollEventThrottle={16}
         />
