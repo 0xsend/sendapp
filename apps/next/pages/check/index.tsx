@@ -14,7 +14,7 @@ export const Page: NextPageWithLayout = () => {
 }
 
 Page.getLayout = (children) => (
-  <CheckLayout TopNav={<TopNav header="My Checks" backFunction="router" showOnGtLg />}>
+  <CheckLayout TopNav={<TopNav header="My Checks" backHref="/send" showOnGtLg showBackOnDesktop />}>
     {children}
   </CheckLayout>
 )

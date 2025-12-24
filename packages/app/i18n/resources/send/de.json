@@ -6,7 +6,11 @@
   },
   "check": {
     "button": "Scheck senden",
-    "buttonDescription": "An jeden mit einem teilbaren Link senden",
+    "buttonShort": "Senden",
+    "buttonDescription": "An jeden mit einem Link senden",
+    "manageButton": "Schecks verwalten",
+    "manageButtonShort": "Verwalten",
+    "manageButtonDescription": "Schecks anzeigen & stornieren",
     "amount": "Betrag",
     "expiration": "Läuft ab",
     "create": "Scheck senden",
@@ -36,7 +40,7 @@
       "addedToAccount": "wurde deinem Konto gutgeschrieben",
       "done": "Fertig",
       "tryAgain": "Erneut versuchen",
-      "goBack": "Zurück",
+      "goBack": "Schecks verwalten",
       "verifying": "Scheck wird überprüft...",
       "alreadyClaimed": "Dieser Scheck wurde bereits eingelöst",
       "canceled": "Dieser Scheck wurde storniert",
@@ -51,7 +55,7 @@
         "alreadyHaveAccount": "Bereits ein Konto?",
         "signIn": "Anmelden"
       },
-      "notFoundMessage": "Dieser Scheck-Link ist nicht mehr gültig. Bitte den Absender um einen neuen Link."
+      "notFoundMessage": "Dieser Scheck ist entweder ungültig, abgelaufen oder bereits eingelöst."
     },
     "manage": {
       "loading": "Schecks werden geladen...",

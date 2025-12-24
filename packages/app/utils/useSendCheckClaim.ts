@@ -20,6 +20,10 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import type { Database, PgBytea } from '@my/supabase/database.types'
 import { byteaToHex } from './byteaToHex'
 import { api } from 'app/utils/api'
+import debug from 'debug'
+import { CHECK_NOTE_ACCESS_MESSAGE } from './sendCheckConstants'
+
+const logger = debug('app:utils:useSendCheckClaim')
 
 /**
  * Parse a chain string to a numeric chain ID.
@@ -55,7 +59,9 @@ export type TokenAmount = {
 }
 
 type GetCheckByEphemeralAddressRow =
-  Database['public']['Functions']['get_check_by_ephemeral_address']['Returns'][number]
+  Database['public']['Functions']['get_check_by_ephemeral_address']['Returns'][number] & {
+    note?: string | null
+  }
 
 export type CheckDetails = {
   ephemeralAddress: Hex
@@ -68,6 +74,7 @@ export type CheckDetails = {
   isCanceled: boolean
   claimedBy: Hex | null
   claimedAt: bigint | null
+  note: string | null
 }
 
 /**
@@ -79,6 +86,7 @@ export function useCheckDetails(checkCode: string | null) {
   const supabase = useSupabase()
   const privateKey = checkCode ? parseCheckCode(checkCode) : null
   const chainId = baseMainnetClient.chain.id
+  const trpcUtils = api.useUtils()
 
   return useQuery({
     queryKey: ['checkDetails', checkCode, chainId, privateKey],
@@ -117,6 +125,23 @@ export function useCheckDetails(checkCode: string | null) {
         amount: BigInt(row.amounts[i] ?? 0),
       }))
 
+      // Fetch the note by signing with the ephemeral key to prove ownership
+      let note: string | null = null
+      try {
+        const signature = await ephemeralAccount.signMessage({
+          message: CHECK_NOTE_ACCESS_MESSAGE,
+        })
+        const noteResult = await trpcUtils.sendCheck.getCheckNote.fetch({
+          ephemeralAddress: ephemeralAccount.address,
+          chainId,
+          signature,
+        })
+        note = noteResult.note
+      } catch (e) {
+        // Note fetch failed - continue without note
+        logger('Failed to fetch check note:', e)
+      }
+
       return {
         ephemeralAddress: byteaToHex(row.ephemeral_address as PgBytea),
         from: byteaToHex(row.sender as PgBytea),
@@ -128,6 +153,7 @@ export function useCheckDetails(checkCode: string | null) {
         isCanceled: row.is_canceled,
         claimedBy: row.claimed_by ? byteaToHex(row.claimed_by as PgBytea) : null,
         claimedAt: row.claimed_at ? BigInt(row.claimed_at) : null,
+        note,
       }
     },
     staleTime: 10000, // 10 seconds

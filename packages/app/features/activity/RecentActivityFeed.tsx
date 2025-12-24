@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
 import { useSendScreenParams } from 'app/routers/params'
 import { useUser } from 'app/utils/useUser'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -28,6 +30,8 @@ export default function ActivityFeed({
   onActivityPress: (activity: Activity) => void
 }) {
   const { t, i18n } = useTranslation('activity')
+  const { onScroll: onScrollHandler, onContentSizeChange: onContentSizeChangeHandler } =
+    useScrollDirection()
 
   const [sendChatOpen, setSendChatOpen] = useState(false)
   const sendParamsAndSet = useSendScreenParams()
@@ -166,6 +170,8 @@ export default function ActivityFeed({
         sendParamsRef={sendParamsRef}
         onEndReached={onEndReached}
         hasNextPage={hasNextPage}
+        onScrollHandler={onScrollHandler}
+        onContentSizeChangeHandler={onContentSizeChangeHandler}
       />
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
@@ -199,6 +205,8 @@ interface MyListProps {
   sendParamsRef: React.RefObject<ReturnType<typeof useSendScreenParams>>
   onEndReached: () => void
   hasNextPage: boolean
+  onScrollHandler: (e: NativeSyntheticEvent<NativeScrollEvent>, threshold?: number) => void
+  onContentSizeChangeHandler?: (w: number, h: number) => void
 }
 
 const getItemType = (item: ComputedListItem) => {
@@ -244,6 +252,8 @@ const MyList = memo(
     sendParamsRef,
     onEndReached,
     hasNextPage,
+    onScrollHandler,
+    onContentSizeChangeHandler,
   }: MyListProps) => {
     const { profile } = useUser()
 
@@ -475,6 +485,9 @@ const MyList = memo(
           renderItem={renderItem}
           contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
+          onScroll={(e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)}
+          onContentSizeChange={onContentSizeChangeHandler}
+          scrollEventThrottle={16}
         />
       </View>
     )

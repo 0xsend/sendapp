@@ -122,13 +122,19 @@ export type SendCheckCreateResult = {
 export type UseSendCheckCreateArgs = {
   tokenAmounts?: TokenAmount[]
   expiresAt?: bigint
+  /** When false, fee estimation is disabled. Default: true */
+  enabled?: boolean
 }
 
 /**
  * Hook for creating a SendCheck with multiple tokens.
  * Prepares the UserOp upfront to calculate fees, then submits when createCheck is called.
  */
-export function useSendCheckCreate({ tokenAmounts, expiresAt }: UseSendCheckCreateArgs = {}) {
+export function useSendCheckCreate({
+  tokenAmounts,
+  expiresAt,
+  enabled = true,
+}: UseSendCheckCreateArgs = {}) {
   const { data: sendAccount } = useSendAccount()
   const sender = useMemo(() => sendAccount?.address, [sendAccount?.address])
   const { mutateAsync: sendUserOpAsync, isPending, error } = useSendUserOpMutation()
@@ -166,13 +172,13 @@ export function useSendCheckCreate({ tokenAmounts, expiresAt }: UseSendCheckCrea
     })
   }, [tokenAmounts, checkAddress, expiresAt, ephemeralKeyPair])
 
-  // Prepare UserOp for fee estimation
+  // Prepare UserOp for fee estimation (only when enabled)
   const {
     data: userOp,
     error: userOpError,
     isLoading: isLoadingUserOp,
     refetch: refetchUserOp,
-  } = useUserOp({ sender, calls })
+  } = useUserOp({ sender, calls: enabled ? calls : undefined })
 
   // Calculate USDC fees
   const {
@@ -230,5 +236,6 @@ export function useSendCheckCreate({ tokenAmounts, expiresAt }: UseSendCheckCrea
     refetchPrepare,
     isReady: !!sender && !!checkAddress && !!userOp,
     checkAddress,
+    ephemeralKeyPair,
   }
 }

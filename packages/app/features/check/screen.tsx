@@ -2,7 +2,6 @@ import {
   Avatar,
   H4,
   Paragraph,
-  PrimaryButton,
   Shimmer,
   Spinner,
   Text,
@@ -11,8 +10,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { ArrowDown, ArrowUp, Clock, Plus, XCircle } from '@tamagui/lucide-icons'
-import { useRouter } from 'solito/router'
+import { ArrowDown, ArrowUp, Clock, XCircle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useState, useCallback, useMemo, memo } from 'react'
 import { useSendAccount } from 'app/utils/send-accounts'
@@ -35,9 +33,6 @@ const log = debug('app:features:check')
 const ROW_HEIGHT = 122
 
 export function CheckScreen() {
-  const router = useRouter()
-  const { t } = useTranslation('send')
-
   return (
     <YStack
       f={1}
@@ -48,15 +43,7 @@ export function CheckScreen() {
       gap="$6"
       $gtLg={{ pt: 0, gap: '$7' }}
     >
-      <YStack f={1}>
-        <ChecksList />
-      </YStack>
-      <PrimaryButton onPress={() => router.push('/check/send')}>
-        <PrimaryButton.Icon>
-          <Plus size={16} color="$black" />
-        </PrimaryButton.Icon>
-        <PrimaryButton.Text>{t('check.button')}</PrimaryButton.Text>
-      </PrimaryButton>
+      <ChecksList />
     </YStack>
   )
 }
@@ -229,19 +216,20 @@ function SectionHeader({ title }: { title: string }) {
 
 /**
  * Parse tokens and amounts into display items
- * Note: amounts come from Postgres as strings (numeric type) to preserve precision
+ * Note: pass amounts directly to BigInt, not via toString() which produces
+ * scientific notation for large numbers like 1e21
  */
-function useTokenItems(tokens: string[], amounts: (string | number)[]) {
+function useTokenItems(tokens: string[], amounts: number[]) {
   return useMemo(() => {
     const items: { coin: coin | undefined; formatted: string }[] = []
     for (let i = 0; i < tokens.length; i++) {
       const rawToken = tokens[i]
-      if (!rawToken) continue
+      const rawAmount = amounts[i]
+      if (!rawToken || rawAmount === undefined) continue
       const tokenAddress = checksumAddress(byteaToHex(rawToken as PgBytea))
       const tokenCoin = allCoinsDict[tokenAddress as keyof typeof allCoinsDict]
       const decimals = tokenCoin?.decimals ?? 18
-      const rawAmount = amounts[i]
-      const amount = rawAmount ? BigInt(rawAmount.toString()) : 0n
+      const amount = BigInt(rawAmount)
       const formatted = formatUnits(amount, decimals)
       items.push({ coin: tokenCoin, formatted })
     }
@@ -448,8 +436,8 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
     return t('check.manage.fromUser')
   }
 
-  // Date text based on status
-  const getDateText = () => {
+  // Subtext showing the other party (From/Claimed by)
+  const getSubtext = () => {
     if (isSender) {
       // Sender's view
       if (check.is_active) {
@@ -459,18 +447,32 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
         return t('check.manage.canceled')
       }
       if (check.is_claimed && check.claimed_at) {
-        const otherPartyText = getOtherPartyText()
-        if (otherPartyText) return otherPartyText
+        return getOtherPartyText()
       }
       if (check.is_expired && !check.is_claimed) {
         return t('check.manage.expiredUnclaimed')
       }
     } else {
       // Receiver's view: show who it's from
-      const otherPartyText = getOtherPartyText()
-      if (otherPartyText) return otherPartyText
+      return getOtherPartyText()
     }
     return formatRelativeDate(createdAt)
+  }
+
+  // Note text for claimed checks (shown below From/Claimed by)
+  const getNoteText = () => {
+    if (!check.note) return null
+    // Don't show note for active or canceled checks
+    if (check.is_active || check.is_canceled) return null
+    // Show note for claimed checks (both sender and receiver view)
+    if (check.is_claimed) {
+      return (
+        <Text fontStyle="italic" color="$color10">
+          {`"${check.note}"`}
+        </Text>
+      )
+    }
+    return null
   }
 
   // Calculate total fee for display
@@ -563,7 +565,8 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
         }
         title={getTitleText()}
         amount={amountText}
-        date={getDateText()}
+        subtext={getSubtext()}
+        subtext2={getNoteText()}
         actions={cancelActions}
         hoverStyle={hoverStyles}
       />

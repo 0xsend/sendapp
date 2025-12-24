@@ -9409,6 +9409,79 @@
         }
       ]
     },
+    "send_check_notes": {
+      "id": "public.send_check_notes",
+      "schemaName": "public",
+      "tableName": "send_check_notes",
+      "fields": [
+        {
+          "id": "public.send_check_notes.ephemeral_address",
+          "name": "ephemeral_address",
+          "columnName": "ephemeral_address",
+          "type": "bytea",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.send_check_notes.chain_id",
+          "name": "chain_id",
+          "columnName": "chain_id",
+          "type": "numeric",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.send_check_notes.note",
+          "name": "note",
+          "columnName": "note",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.send_check_notes.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "send_check_notes_pkey",
+          "fields": [
+            "chain_id",
+            "ephemeral_address"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "send_earn_create": {
       "id": "public.send_earn_create",
       "schemaName": "public",
