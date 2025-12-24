@@ -12,7 +12,7 @@ import type { ReactNode } from 'react'
 
 export const Page: NextPageWithLayout = () => {
   const { t } = useTranslation('navigation')
-  const title = t('stack.earn.deposit')
+  const title = t('stack.earn.savings')
 
   return (
     <>
@@ -34,7 +34,7 @@ function EarnDepositLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation('navigation')
 
   return (
-    <HomeLayout TopNav={<TopNav header={t('stack.earn.deposit')} backFunction="router" />}>
+    <HomeLayout TopNav={<TopNav header={t('stack.earn.savings')} backFunction="router" />}>
       {children}
     </HomeLayout>
   )
