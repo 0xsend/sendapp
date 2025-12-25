@@ -16,9 +16,11 @@ export interface TokenPreviewData {
 }
 
 export interface CheckPreviewData {
+  from: string
   tokens: TokenPreviewData[]
   expiresAt: Date
   isExpired: boolean
+  isClaimed: boolean
   senderTag?: string
   senderAvatar?: string
   senderIsVerified?: boolean
@@ -66,9 +68,11 @@ export function useCheckPreview(checkCode: string | null) {
     const expiresAt = new Date(Number(checkDetails.expiresAt) * 1000)
 
     return {
+      from: checkDetails.from,
       tokens,
       expiresAt,
       isExpired: checkDetails.isExpired,
+      isClaimed: checkDetails.isClaimed,
       senderTag: senderProfile?.tag ?? undefined,
       senderAvatar: senderProfile?.avatar_url ?? undefined,
       senderIsVerified: senderProfile?.is_verified ?? false,
@@ -77,7 +81,6 @@ export function useCheckPreview(checkCode: string | null) {
   }, [checkDetails, senderProfile])
 
   return {
-    checkDetails,
     previewData,
     isLoading: isLoadingDetails,
     isLoadingProfile,

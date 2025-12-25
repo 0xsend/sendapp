@@ -39,18 +39,18 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   }, [isLoadingAccount, sendAccount, checkCode, router])
 
   // Use shared preview hook
-  const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)
+  const { previewData, isLoading, error } = useCheckPreview(checkCode || null)
 
   // Redirect to my checks page if the user is the sender of this check
   useEffect(() => {
     if (
-      checkDetails?.from &&
+      previewData?.from &&
       sendAccount?.address &&
-      checkDetails.from.toLowerCase() === sendAccount.address.toLowerCase()
+      previewData.from.toLowerCase() === sendAccount.address.toLowerCase()
     ) {
       router.replace('/check')
     }
-  }, [checkDetails?.from, sendAccount?.address, router])
+  }, [previewData?.from, sendAccount?.address, router])
 
   const webauthnCreds = useMemo(
     () =>
@@ -65,9 +65,9 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
     checkCode &&
     webauthnCreds.length > 0 &&
     !isSubmitting &&
-    checkDetails &&
-    !checkDetails.isExpired &&
-    !checkDetails.isClaimed
+    previewData &&
+    !previewData.isExpired &&
+    !previewData.isClaimed
 
   const onClaim = useCallback(async () => {
     try {
@@ -119,7 +119,7 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   }
 
   // Error state
-  if (error || !checkDetails || !previewData) {
+  if (error || !previewData) {
     return (
       <YStack gap="$5" w="100%" maxWidth={600}>
         <Card padded elevation={1} br="$5">

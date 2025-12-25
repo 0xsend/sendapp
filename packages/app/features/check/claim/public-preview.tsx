@@ -34,7 +34,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
   const [isSigningIn, setIsSigningIn] = useState(false)
 
   // Use shared preview hook (chain is encoded in the checkCode)
-  const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)
+  const { previewData, isLoading, error } = useCheckPreview(checkCode || null)
 
   // Redirect logged-in users to claim page
   useEffect(() => {
@@ -78,7 +78,7 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
     )
   }
 
-  const isNotFound = error || !checkDetails || !previewData
+  const isNotFound = error || !previewData
 
   return (
     <YStack gap="$4" w="100%" maxWidth={600}>
