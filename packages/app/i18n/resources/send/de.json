@@ -55,7 +55,8 @@
         "alreadyHaveAccount": "Bereits ein Konto?",
         "signIn": "Anmelden"
       },
-      "notFoundMessage": "Dieser Scheck ist entweder ungültig, abgelaufen oder bereits eingelöst."
+      "notFoundMessage": "Dieser Scheck ist entweder ungültig, abgelaufen oder bereits eingelöst.",
+      "duplicateInvalid": "Dieser Scheck ist aufgrund eines doppelten Links ungültig. Bitte fragen Sie den Absender nach einem neuen Scheck."
     },
     "manage": {
       "loading": "Schecks werden geladen...",
@@ -77,7 +78,8 @@
       "claimedBy": "Eingelöst von",
       "claimedByUser": "Von einem Benutzer eingelöst",
       "from": "Von",
-      "fromUser": "Von einem Benutzer"
+      "fromUser": "Von einem Benutzer",
+      "duplicateWarning": "Dieser Scheck ist ein Duplikat. Stornieren Sie ihn und erstellen Sie einen neuen."
     },
     "sections": {
       "pending": "Ausstehend",

@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(52);
+SELECT plan(55);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -743,20 +743,20 @@ SELECT results_eq(
 );
 
 -- ============================================================================
--- TEST: Scenario 1 - First check shows as claimed, second as active
+-- TEST: Scenario 1 - First check shows as claimed, second as active (duplicate)
 -- ============================================================================
 SELECT results_eq(
     $$
-        SELECT is_claimed, is_active, amounts[1]
+        SELECT is_claimed, is_active, amounts[1], is_potential_duplicate
         FROM get_user_checks('\xDDDD000000000000000000000000000000000ABC'::bytea)
         WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E001'::bytea
         ORDER BY block_num ASC
     $$,
     $$VALUES
-        (true, false, 1000000::numeric),  -- Check A: claimed
-        (false, true, 2000000::numeric)   -- Check B: active
+        (true, false, 1000000::numeric, false),   -- Check A: claimed, original (not duplicate)
+        (false, true, 2000000::numeric, true)     -- Check B: active, is duplicate
     $$,
-    'Reuse Scenario 1: First check is claimed, second check is active'
+    'Reuse Scenario 1: First check is claimed (not duplicate), second is active (duplicate)'
 );
 
 -- ============================================================================
@@ -783,18 +783,18 @@ SELECT results_eq(
 );
 
 -- ============================================================================
--- TEST: Scenario 1 - get_check_by_ephemeral_address returns the newer check (Check B)
+-- TEST: Scenario 1 - get_check_by_ephemeral_address returns the newer check (Check B) as duplicate
 -- ============================================================================
 SELECT results_eq(
     $$
-        SELECT amounts[1], is_claimed, is_active
+        SELECT amounts[1], is_claimed, is_active, is_potential_duplicate
         FROM get_check_by_ephemeral_address(
             '\xDDDD00000000000000000000000000000000E001'::bytea,
             8453::numeric
         )
     $$,
-    $$VALUES (2000000::numeric, false, true)$$,
-    'Reuse Scenario 1: get_check_by_ephemeral_address returns the newer unclaimed check'
+    $$VALUES (2000000::numeric, false, true, true)$$,
+    'Reuse Scenario 1: get_check_by_ephemeral_address returns the newer check marked as duplicate'
 );
 
 -- ============================================================================
@@ -1073,6 +1073,96 @@ SELECT results_eq(
         (6000000::numeric)   -- Check F
     $$,
     'Reuse Scenario 3: Receiver sees correct amounts for both claimed checks'
+);
+
+-- ============================================================================
+-- SCENARIO 4: Same ephemeral address, NEITHER check claimed (both active)
+-- Check G: Created at block 200300, still active
+-- Check H: Created at block 200310 (same ephemeral), still active
+-- Both should show, with Check H marked as duplicate
+-- ============================================================================
+
+-- Check G creation (first check, still active)
+INSERT INTO send_check_created(
+    chain_id, log_addr, block_time, tx_hash, tx_idx,
+    ephemeral_address, sender, token, amount, expires_at,
+    ig_name, src_name, block_num, log_idx, abi_idx)
+VALUES (
+    8453,
+    '\xDDDD567890123456789012345678901234567890',
+    EXTRACT(EPOCH FROM NOW() - interval '30 minutes'),
+    '\xDDDDD11111111111111111111111111111111111111111111111111111111111',
+    0,
+    '\xDDDD00000000000000000000000000000000E004', -- Same ephemeral for G and H
+    '\xDDDD000000000000000000000000000000000ABC',
+    '\x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    7000000, -- 7 USDC
+    EXTRACT(EPOCH FROM NOW() + interval '1 day'),
+    'send_checks_reuse_test', 'send_checks_reuse_test',
+    200300, 0, 0);
+
+-- Check H creation (second check, also still active - this is the problematic duplicate)
+INSERT INTO send_check_created(
+    chain_id, log_addr, block_time, tx_hash, tx_idx,
+    ephemeral_address, sender, token, amount, expires_at,
+    ig_name, src_name, block_num, log_idx, abi_idx)
+VALUES (
+    8453,
+    '\xDDDD567890123456789012345678901234567890',
+    EXTRACT(EPOCH FROM NOW() - interval '20 minutes'),
+    '\xDDDDD22222222222222222222222222222222222222222222222222222222222',
+    0,
+    '\xDDDD00000000000000000000000000000000E004', -- Same ephemeral as Check G
+    '\xDDDD000000000000000000000000000000000ABC',
+    '\x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    8000000, -- 8 USDC
+    EXTRACT(EPOCH FROM NOW() + interval '2 days'),
+    'send_checks_reuse_test', 'send_checks_reuse_test',
+    200310, 0, 0);
+
+-- ============================================================================
+-- TEST: Scenario 4 - Sender sees both active checks as separate entries
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer
+        FROM get_user_checks('\xDDDD000000000000000000000000000000000ABC'::bytea)
+        WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E004'::bytea
+    $$,
+    $$VALUES (2)$$,
+    'Reuse Scenario 4: Sender sees both active checks with same ephemeral as separate entries'
+);
+
+-- ============================================================================
+-- TEST: Scenario 4 - First check is NOT duplicate, second check IS duplicate
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT is_active, amounts[1], is_potential_duplicate
+        FROM get_user_checks('\xDDDD000000000000000000000000000000000ABC'::bytea)
+        WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E004'::bytea
+        ORDER BY block_num ASC
+    $$,
+    $$VALUES
+        (true, 7000000::numeric, false),   -- Check G: active, original (not duplicate)
+        (true, 8000000::numeric, true)     -- Check H: active, is duplicate
+    $$,
+    'Reuse Scenario 4: Both active, first is original, second is duplicate'
+);
+
+-- ============================================================================
+-- TEST: Scenario 4 - get_check_by_ephemeral_address returns the newer check as duplicate
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT amounts[1], is_active, is_potential_duplicate
+        FROM get_check_by_ephemeral_address(
+            '\xDDDD00000000000000000000000000000000E004'::bytea,
+            8453::numeric
+        )
+    $$,
+    $$VALUES (8000000::numeric, true, true)$$,
+    'Reuse Scenario 4: get_check_by_ephemeral_address returns the newer active check marked as duplicate'
 );
 
 SELECT finish();

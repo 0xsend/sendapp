@@ -75,6 +75,7 @@ export type CheckDetails = {
   claimedBy: Hex | null
   claimedAt: bigint | null
   note: string | null
+  isPotentialDuplicate: boolean
 }
 
 /**
@@ -114,9 +115,14 @@ export function useCheckDetails(checkCode: string | null) {
         throw new Error('Check not found')
       }
 
-      // Treat claimed or canceled checks as not found
+      // Treat claimed, canceled, or potential duplicate checks as not found
       if (row.is_claimed || row.is_canceled) {
         throw new Error('Check not found')
+      }
+
+      // Potential duplicates are invalid - user should ask sender for a new check
+      if (row.is_potential_duplicate) {
+        throw new Error('Check is a duplicate and cannot be claimed')
       }
 
       // Parse tokens and amounts arrays into TokenAmount[]
@@ -154,6 +160,7 @@ export function useCheckDetails(checkCode: string | null) {
         claimedBy: row.claimed_by ? byteaToHex(row.claimed_by as PgBytea) : null,
         claimedAt: row.claimed_at ? BigInt(row.claimed_at) : null,
         note,
+        isPotentialDuplicate: row.is_potential_duplicate,
       }
     },
     staleTime: 10000, // 10 seconds
