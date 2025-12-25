@@ -405,7 +405,7 @@ const SendCheckContent = ({
     webauthnCreds.length > 0 &&
     !!checkAddress
 
-  // Full validation for creating check (includes fee estimation)
+  // Full validation for creating check (requires userOp to be prepared)
   const canCreateCheck = canProceedToReview && !isSubmitting && !isPreparing && isReady
 
   const price = prices?.[token] ?? 0
@@ -551,7 +551,7 @@ const SendCheckContent = ({
     }
   }
 
-  const hasRetryableError = activeSection === 'reviewAndSend' && !!prepareError
+  const hasRetryableError = activeSection === 'reviewAndSend' && !!prepareError && !isPreparing
   const isSendButtonDisabled =
     loadingSend ||
     (activeSection === 'enterAmount' ? !canProceedToReview : !canCreateCheck && !hasRetryableError)
@@ -686,12 +686,10 @@ const SendCheckContent = ({
             bg: '$neon7',
             scale: 0.98,
           }}
-          onPress={async () => {
+          onPress={() => {
             if (hasRetryableError) {
-              const success = await refetchPrepare()
-              if (success) {
-                form.handleSubmit(onSubmit)()
-              }
+              // Just trigger refetch, don't submit - user will click again once ready
+              refetchPrepare()
             } else {
               form.handleSubmit(onSubmit)()
             }
@@ -701,7 +699,7 @@ const SendCheckContent = ({
           o={isSendButtonDisabled ? 0.5 : 1}
         >
           <AnimatePresence>
-            {loadingSend ? (
+            {loadingSend || (activeSection === 'reviewAndSend' && isPreparing) ? (
               <View
                 animation="responsive"
                 animateOnly={['opacity', 'transform']}

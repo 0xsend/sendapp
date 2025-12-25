@@ -206,13 +206,10 @@ export function useSendCheckCreate({
       assert(webauthnCreds.length > 0, 'No webauthn credentials available')
       assert(!!tokenAmounts && tokenAmounts.length > 0, 'No tokens provided')
       assert(tokenAmounts.length <= 5, 'Too many tokens (max 5)')
-
-      // Always fetch fresh userOp to get latest nonce (handles retry after error)
-      const { data: freshUserOp } = await refetchUserOp()
-      assert(!!freshUserOp, 'Failed to prepare UserOp')
+      assert(!!userOp, 'UserOp not prepared')
 
       // Submit the user operation
-      const receipt = await sendUserOpAsync({ userOp: freshUserOp, webauthnCreds })
+      const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
 
       // Invalidate nonce query
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
@@ -228,15 +225,7 @@ export function useSendCheckCreate({
         txHash: receipt.receipt.transactionHash,
       }
     },
-    [
-      sender,
-      checkAddress,
-      tokenAmounts,
-      sendUserOpAsync,
-      queryClient,
-      ephemeralKeyPair,
-      refetchUserOp,
-    ]
+    [sender, checkAddress, tokenAmounts, userOp, sendUserOpAsync, queryClient, ephemeralKeyPair]
   )
 
   return {

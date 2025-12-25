@@ -1,5 +1,5 @@
 import { Avatar, Card, Paragraph, Spinner, XStack, YStack, useThemeName } from '@my/ui'
-import { Gift } from '@tamagui/lucide-icons'
+import { Gift, AlertTriangle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
@@ -16,11 +16,11 @@ export interface TokenPreviewData {
 }
 
 export interface CheckPreviewData {
+  from: string
   tokens: TokenPreviewData[]
   expiresAt: Date
   isExpired: boolean
   isClaimed: boolean
-  isCanceled: boolean
   senderTag?: string
   senderAvatar?: string
   senderIsVerified?: boolean
@@ -28,7 +28,8 @@ export interface CheckPreviewData {
 }
 
 interface CheckPreviewCardProps {
-  checkCode: string
+  previewData: CheckPreviewData
+  isLoadingProfile?: boolean
   children?: React.ReactNode
 }
 
@@ -67,11 +68,11 @@ export function useCheckPreview(checkCode: string | null) {
     const expiresAt = new Date(Number(checkDetails.expiresAt) * 1000)
 
     return {
+      from: checkDetails.from,
       tokens,
       expiresAt,
       isExpired: checkDetails.isExpired,
       isClaimed: checkDetails.isClaimed,
-      isCanceled: checkDetails.isCanceled,
       senderTag: senderProfile?.tag ?? undefined,
       senderAvatar: senderProfile?.avatar_url ?? undefined,
       senderIsVerified: senderProfile?.is_verified ?? false,
@@ -80,7 +81,6 @@ export function useCheckPreview(checkCode: string | null) {
   }, [checkDetails, senderProfile])
 
   return {
-    checkDetails,
     previewData,
     isLoading: isLoadingDetails,
     isLoadingProfile,
@@ -88,37 +88,14 @@ export function useCheckPreview(checkCode: string | null) {
   }
 }
 
-export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps) {
+export function CheckPreviewCard({
+  previewData,
+  isLoadingProfile = false,
+  children,
+}: CheckPreviewCardProps) {
   const { t } = useTranslation('send')
   const theme = useThemeName()
   const isDark = theme.includes('dark')
-  const { previewData, isLoading, isLoadingProfile, error, checkDetails } =
-    useCheckPreview(checkCode)
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <Card padded elevation={1} br="$5">
-        <YStack ai="center" gap="$4" py="$6">
-          <Spinner size="large" />
-          <Paragraph color="$color10">{t('check.claim.verifying')}</Paragraph>
-        </YStack>
-      </Card>
-    )
-  }
-
-  // Error state
-  if (error || !checkDetails || !previewData) {
-    return (
-      <Card padded elevation={1} br="$5">
-        <YStack ai="center" gap="$4" py="$4">
-          <Paragraph color="$color10" size="$4" ta="center">
-            {t('check.claim.notFoundMessage')}
-          </Paragraph>
-        </YStack>
-      </Card>
-    )
-  }
 
   return (
     <Card padded elevation={1} br="$5">
@@ -188,21 +165,14 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
           {t('check.claim.preview.expires')} {previewData.expiresAt.toLocaleDateString()}
         </Paragraph>
 
-        {/* Status warnings */}
-        {previewData.isCanceled && (
-          <Paragraph color="$orange10" size="$3" fontWeight="600">
-            {t('check.claim.canceled')}
-          </Paragraph>
-        )}
-        {previewData.isClaimed && !previewData.isCanceled && (
-          <Paragraph color="$orange10" size="$3" fontWeight="600">
-            {t('check.claim.alreadyClaimed')}
-          </Paragraph>
-        )}
-        {previewData.isExpired && !previewData.isClaimed && (
-          <Paragraph color="$error" size="$3" fontWeight="600">
-            {t('check.claim.expired')}
-          </Paragraph>
+        {/* Status warning for expired checks */}
+        {previewData.isExpired && (
+          <XStack ai="center" gap="$2">
+            <AlertTriangle size={16} color="$error" />
+            <Paragraph color="$error" size="$3" fontWeight="600">
+              {t('check.claim.expired')}
+            </Paragraph>
+          </XStack>
         )}
 
         {children}
