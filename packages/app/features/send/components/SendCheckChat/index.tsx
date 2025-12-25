@@ -350,7 +350,7 @@ const SendCheckContent = ({
   const toast = useAppToast()
   const supabase = useSupabase()
 
-  const { coins, isLoading: isLoadingCoins } = useCoins()
+  const { isLoading: isLoadingCoins } = useCoins()
   const { data: sendAccount } = useSendAccount()
   const {
     query: { data: prices, isLoading: isPricesLoading },
@@ -394,6 +394,7 @@ const SendCheckContent = ({
     usdcFees,
     ephemeralKeyPair,
     prepareError,
+    refetchPrepare,
   } = useSendCheckCreate({ tokenAmounts, expiresAt })
 
   // Basic validation for proceeding to review
@@ -487,7 +488,20 @@ const SendCheckContent = ({
         })
         setActiveSection('success')
       } catch (error) {
-        log('Failed to create check, polling for confirmation:', error)
+        log('Failed to create check:', error)
+
+        // Check if this is a user cancellation (WebAuthn cancelled)
+        const isCancellation =
+          error instanceof Error &&
+          (error.name === 'NotAllowedError' ||
+            error.message.toLowerCase().includes('cancel') ||
+            error.message.toLowerCase().includes('aborted'))
+
+        if (isCancellation) {
+          // User cancelled, no need to poll - just reset state
+          setLoadingSend(false)
+          return
+        }
 
         // The transaction might still go through even if we got an error
         // Poll for the check in Supabase before showing the error
@@ -537,8 +551,10 @@ const SendCheckContent = ({
     }
   }
 
+  const hasRetryableError = activeSection === 'reviewAndSend' && !!prepareError
   const isSendButtonDisabled =
-    loadingSend || (activeSection === 'enterAmount' ? !canProceedToReview : !canCreateCheck)
+    loadingSend ||
+    (activeSection === 'enterAmount' ? !canProceedToReview : !canCreateCheck && !hasRetryableError)
 
   if (activeSection === 'success' && checkCreated) {
     return (
@@ -670,8 +686,15 @@ const SendCheckContent = ({
             bg: '$neon7',
             scale: 0.98,
           }}
-          onPress={() => {
-            form.handleSubmit(onSubmit)()
+          onPress={async () => {
+            if (hasRetryableError) {
+              const success = await refetchPrepare()
+              if (success) {
+                form.handleSubmit(onSubmit)()
+              }
+            } else {
+              form.handleSubmit(onSubmit)()
+            }
           }}
           ov="hidden"
           disabled={isSendButtonDisabled}
@@ -711,9 +734,11 @@ const SendCheckContent = ({
                   y: 40,
                 }}
               >
-                {activeSection === 'reviewAndSend'
-                  ? t('check.create', 'Create Check')
-                  : t('check.reviewAndSend', 'Review and Send')}
+                {hasRetryableError
+                  ? t('check.tryAgain', 'Try again')
+                  : activeSection === 'reviewAndSend'
+                    ? t('check.create', 'Create Check')
+                    : t('check.reviewAndSend', 'Review and Send')}
               </Button.Text>
             )}
           </AnimatePresence>
