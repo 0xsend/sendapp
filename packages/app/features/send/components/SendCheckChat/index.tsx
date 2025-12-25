@@ -350,7 +350,7 @@ const SendCheckContent = ({
   const toast = useAppToast()
   const supabase = useSupabase()
 
-  const { coins, isLoading: isLoadingCoins } = useCoins()
+  const { isLoading: isLoadingCoins } = useCoins()
   const { data: sendAccount } = useSendAccount()
   const {
     query: { data: prices, isLoading: isPricesLoading },
@@ -673,9 +673,12 @@ const SendCheckContent = ({
             bg: '$neon7',
             scale: 0.98,
           }}
-          onPress={() => {
+          onPress={async () => {
             if (hasRetryableError) {
-              refetchPrepare()
+              const success = await refetchPrepare()
+              if (success) {
+                form.handleSubmit(onSubmit)()
+              }
             } else {
               form.handleSubmit(onSubmit)()
             }

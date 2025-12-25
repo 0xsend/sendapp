@@ -192,10 +192,11 @@ export function useSendCheckCreate({
   const prepareError = userOpError || usdcFeesError
 
   // Refetch helper - only use when there's an error to retry
-  const refetchPrepare = useCallback(async () => {
-    if (!prepareError) return
-    await refetchUserOp()
-    await refetchUsdcFees()
+  // Returns true if refetch was successful
+  const refetchPrepare = useCallback(async (): Promise<boolean> => {
+    if (!prepareError) return true
+    const [userOpResult, feesResult] = await Promise.all([refetchUserOp(), refetchUsdcFees()])
+    return !userOpResult.error && !feesResult.error
   }, [prepareError, refetchUserOp, refetchUsdcFees])
 
   const createCheck = useCallback(
