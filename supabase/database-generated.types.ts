@@ -2184,6 +2184,7 @@ export type Database = {
           is_canceled: boolean
           is_claimed: boolean
           is_expired: boolean
+          is_potential_duplicate: boolean
           note: string
           sender: string
           tokens: string[]
@@ -2239,6 +2240,7 @@ export type Database = {
           is_canceled: boolean
           is_claimed: boolean
           is_expired: boolean
+          is_potential_duplicate: boolean
           is_sender: boolean
           note: string
           sender: string

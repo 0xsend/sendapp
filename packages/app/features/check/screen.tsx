@@ -138,7 +138,8 @@ function ChecksList() {
       return `header-${item.sectionIndex}-${item.title}`
     }
     const check = item as Check & { sectionIndex: number }
-    return `${check.ephemeral_address}-${check.chain_id}`
+    // Include tx_hash to handle edge case where ephemeral_address was reused
+    return `${check.ephemeral_address}-${check.chain_id}-${check.tx_hash}`
   }, [])
 
   const renderItem = useCallback(
@@ -460,7 +461,16 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
   }
 
   // Note text for claimed checks (shown below From/Claimed by)
+  // Also shows warning for potential duplicates
   const getNoteText = () => {
+    // Show warning for potential duplicates (takes priority over regular note)
+    if (check.is_potential_duplicate) {
+      return (
+        <Text fontStyle="italic" color="$error">
+          {t('check.manage.duplicateWarning')}
+        </Text>
+      )
+    }
     if (!check.note) return null
     // Don't show note for active or canceled checks
     if (check.is_active || check.is_canceled) return null

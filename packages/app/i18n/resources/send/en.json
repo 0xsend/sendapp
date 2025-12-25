@@ -55,7 +55,8 @@
         "alreadyHaveAccount": "Already have an account?",
         "signIn": "Sign in"
       },
-      "notFoundMessage": "This check is either invalid, expired, or already claimed."
+      "notFoundMessage": "This check is either invalid, expired, or already claimed.",
+      "duplicateInvalid": "This check is invalid due to a duplicate link. Please ask the sender for a new check."
     },
     "manage": {
       "loading": "Loading checks...",
@@ -77,7 +78,8 @@
       "claimedBy": "Claimed by",
       "claimedByUser": "Claimed by a user",
       "from": "From",
-      "fromUser": "From a user"
+      "fromUser": "From a user",
+      "duplicateWarning": "This check is a duplicate. Cancel it and reissue a new one."
     },
     "sections": {
       "pending": "Pending",
