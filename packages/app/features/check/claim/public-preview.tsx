@@ -8,6 +8,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
+import { AlertTriangle } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useCallback, useState } from 'react'
@@ -77,20 +78,23 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
     )
   }
 
-  const isNotFound = error || !checkDetails
+  const isNotFound = error || !checkDetails || !previewData
 
   return (
     <YStack gap="$4" w="100%" maxWidth={600}>
       {isNotFound ? (
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
-            <Paragraph color="$color10" size="$4" ta="center">
-              {t('check.claim.notFoundMessage')}
-            </Paragraph>
+            <XStack ai="center" gap="$2">
+              <AlertTriangle size={18} color="$yellow10" />
+              <Paragraph color="$color10" size="$4" ta="center">
+                {t('check.claim.notFoundMessage')}
+              </Paragraph>
+            </XStack>
           </YStack>
         </Card>
       ) : (
-        <CheckPreviewCard checkCode={checkCode}>
+        <CheckPreviewCard previewData={previewData}>
           {/* Register Button */}
           <PrimaryButton onPress={handleRegister}>
             <PrimaryButton.Text>{t('check.claim.public.registerButton')}</PrimaryButton.Text>

@@ -1,5 +1,5 @@
 import { Avatar, Card, Paragraph, Spinner, XStack, YStack, useThemeName } from '@my/ui'
-import { AlertTriangle, Gift } from '@tamagui/lucide-icons'
+import { Gift, AlertTriangle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
@@ -26,7 +26,8 @@ export interface CheckPreviewData {
 }
 
 interface CheckPreviewCardProps {
-  checkCode: string
+  previewData: CheckPreviewData
+  isLoadingProfile?: boolean
   children?: React.ReactNode
 }
 
@@ -84,40 +85,14 @@ export function useCheckPreview(checkCode: string | null) {
   }
 }
 
-export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps) {
+export function CheckPreviewCard({
+  previewData,
+  isLoadingProfile = false,
+  children,
+}: CheckPreviewCardProps) {
   const { t } = useTranslation('send')
   const theme = useThemeName()
   const isDark = theme.includes('dark')
-  const { previewData, isLoading, isLoadingProfile, error, checkDetails } =
-    useCheckPreview(checkCode)
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <Card padded elevation={1} br="$5">
-        <YStack ai="center" gap="$4" py="$6">
-          <Spinner size="large" />
-          <Paragraph color="$color10">{t('check.claim.verifying')}</Paragraph>
-        </YStack>
-      </Card>
-    )
-  }
-
-  // Error state
-  if (error || !checkDetails || !previewData) {
-    return (
-      <Card padded elevation={1} br="$5">
-        <YStack ai="center" gap="$4" py="$4">
-          <XStack ai="center" gap="$2">
-            <AlertTriangle size={18} color="$color10" />
-            <Paragraph color="$color10" size="$4" ta="center">
-              {t('check.claim.notFoundMessage')}
-            </Paragraph>
-          </XStack>
-        </YStack>
-      </Card>
-    )
-  }
 
   return (
     <Card padded elevation={1} br="$5">

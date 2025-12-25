@@ -8,7 +8,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { Check } from '@tamagui/lucide-icons'
+import { AlertTriangle, Check } from '@tamagui/lucide-icons'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
 import { useState, useCallback, useMemo, useEffect } from 'react'
@@ -40,6 +40,17 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
 
   // Use shared preview hook
   const { checkDetails, previewData, isLoading, error } = useCheckPreview(checkCode || null)
+
+  // Redirect to my checks page if the user is the sender of this check
+  useEffect(() => {
+    if (
+      checkDetails?.from &&
+      sendAccount?.address &&
+      checkDetails.from.toLowerCase() === sendAccount.address.toLowerCase()
+    ) {
+      router.replace('/check')
+    }
+  }, [checkDetails?.from, sendAccount?.address, router])
 
   const webauthnCreds = useMemo(
     () =>
@@ -108,14 +119,17 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   }
 
   // Error state
-  if (error || !checkDetails) {
+  if (error || !checkDetails || !previewData) {
     return (
       <YStack gap="$5" w="100%" maxWidth={600}>
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
-            <Paragraph color="$color10" size="$4" ta="center">
-              {t('check.claim.notFoundMessage')}
-            </Paragraph>
+            <XStack ai="center" gap="$2">
+              <AlertTriangle size={18} color="$yellow10" />
+              <Paragraph color="$color10" size="$4" ta="center">
+                {t('check.claim.notFoundMessage')}
+              </Paragraph>
+            </XStack>
             <PrimaryButton onPress={() => router.push('/check')}>
               <PrimaryButton.Text>{t('check.claim.goBack')}</PrimaryButton.Text>
             </PrimaryButton>
@@ -128,7 +142,7 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   // Preview state
   return (
     <YStack gap="$5" w="100%" maxWidth={600}>
-      <CheckPreviewCard checkCode={checkCode}>
+      <CheckPreviewCard previewData={previewData}>
         <PrimaryButton disabled={!canSubmit} onPress={onClaim} disabledStyle={{ opacity: 0.5 }}>
           {isSubmitting ? (
             <Spinner color="$black" />
