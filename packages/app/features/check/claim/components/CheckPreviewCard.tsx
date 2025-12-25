@@ -1,5 +1,5 @@
 import { Avatar, Card, Paragraph, Spinner, XStack, YStack, useThemeName } from '@my/ui'
-import { Gift } from '@tamagui/lucide-icons'
+import { AlertTriangle, Gift } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
@@ -19,8 +19,6 @@ export interface CheckPreviewData {
   tokens: TokenPreviewData[]
   expiresAt: Date
   isExpired: boolean
-  isClaimed: boolean
-  isCanceled: boolean
   senderTag?: string
   senderAvatar?: string
   senderIsVerified?: boolean
@@ -70,8 +68,6 @@ export function useCheckPreview(checkCode: string | null) {
       tokens,
       expiresAt,
       isExpired: checkDetails.isExpired,
-      isClaimed: checkDetails.isClaimed,
-      isCanceled: checkDetails.isCanceled,
       senderTag: senderProfile?.tag ?? undefined,
       senderAvatar: senderProfile?.avatar_url ?? undefined,
       senderIsVerified: senderProfile?.is_verified ?? false,
@@ -112,9 +108,12 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
     return (
       <Card padded elevation={1} br="$5">
         <YStack ai="center" gap="$4" py="$4">
-          <Paragraph color="$color10" size="$4" ta="center">
-            {t('check.claim.notFoundMessage')}
-          </Paragraph>
+          <XStack ai="center" gap="$2">
+            <AlertTriangle size={18} color="$color10" />
+            <Paragraph color="$color10" size="$4" ta="center">
+              {t('check.claim.notFoundMessage')}
+            </Paragraph>
+          </XStack>
         </YStack>
       </Card>
     )
@@ -188,21 +187,14 @@ export function CheckPreviewCard({ checkCode, children }: CheckPreviewCardProps)
           {t('check.claim.preview.expires')} {previewData.expiresAt.toLocaleDateString()}
         </Paragraph>
 
-        {/* Status warnings */}
-        {previewData.isCanceled && (
-          <Paragraph color="$orange10" size="$3" fontWeight="600">
-            {t('check.claim.canceled')}
-          </Paragraph>
-        )}
-        {previewData.isClaimed && !previewData.isCanceled && (
-          <Paragraph color="$orange10" size="$3" fontWeight="600">
-            {t('check.claim.alreadyClaimed')}
-          </Paragraph>
-        )}
-        {previewData.isExpired && !previewData.isClaimed && (
-          <Paragraph color="$error" size="$3" fontWeight="600">
-            {t('check.claim.expired')}
-          </Paragraph>
+        {/* Status warning for expired checks */}
+        {previewData.isExpired && (
+          <XStack ai="center" gap="$2">
+            <AlertTriangle size={16} color="$error" />
+            <Paragraph color="$error" size="$3" fontWeight="600">
+              {t('check.claim.expired')}
+            </Paragraph>
+          </XStack>
         )}
 
         {children}
