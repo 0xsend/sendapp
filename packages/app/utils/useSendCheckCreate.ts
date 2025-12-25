@@ -181,32 +181,25 @@ export function useSendCheckCreate({
   } = useUserOp({ sender, calls: enabled ? calls : undefined })
 
   // Calculate USDC fees
-  const {
-    data: usdcFees,
-    error: usdcFeesError,
-    isLoading: isLoadingFees,
-    refetch: refetchFees,
-  } = useUSDCFees({ userOp })
+  const { data: usdcFees, error: usdcFeesError, isLoading: isLoadingFees } = useUSDCFees({ userOp })
 
   const isPreparing = isLoadingUserOp || isLoadingFees
   const prepareError = userOpError || usdcFeesError
-
-  const refetchPrepare = useCallback(async () => {
-    await refetchUserOp()
-    await refetchFees()
-  }, [refetchUserOp, refetchFees])
 
   const createCheck = useCallback(
     async ({ webauthnCreds }: SendCheckCreateArgs): Promise<SendCheckCreateResult> => {
       assert(!!sender, 'Send account not loaded')
       assert(!!checkAddress, 'SendCheck contract not deployed on this chain')
-      assert(!!userOp, 'UserOp not prepared')
       assert(webauthnCreds.length > 0, 'No webauthn credentials available')
       assert(!!tokenAmounts && tokenAmounts.length > 0, 'No tokens provided')
       assert(tokenAmounts.length <= 5, 'Too many tokens (max 5)')
 
+      // Always fetch fresh userOp to get latest nonce (handles retry after error)
+      const { data: freshUserOp } = await refetchUserOp()
+      assert(!!freshUserOp, 'Failed to prepare UserOp')
+
       // Submit the user operation
-      const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
+      const receipt = await sendUserOpAsync({ userOp: freshUserOp, webauthnCreds })
 
       // Invalidate nonce query
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
@@ -222,7 +215,15 @@ export function useSendCheckCreate({
         txHash: receipt.receipt.transactionHash,
       }
     },
-    [sender, checkAddress, userOp, tokenAmounts, sendUserOpAsync, queryClient, ephemeralKeyPair]
+    [
+      sender,
+      checkAddress,
+      tokenAmounts,
+      sendUserOpAsync,
+      queryClient,
+      ephemeralKeyPair,
+      refetchUserOp,
+    ]
   )
 
   return {
@@ -233,7 +234,6 @@ export function useSendCheckCreate({
     prepareError,
     userOp,
     usdcFees,
-    refetchPrepare,
     isReady: !!sender && !!checkAddress && !!userOp,
     checkAddress,
     ephemeralKeyPair,
