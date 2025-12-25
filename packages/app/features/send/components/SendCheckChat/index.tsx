@@ -488,7 +488,20 @@ const SendCheckContent = ({
         })
         setActiveSection('success')
       } catch (error) {
-        log('Failed to create check, polling for confirmation:', error)
+        log('Failed to create check:', error)
+
+        // Check if this is a user cancellation (WebAuthn cancelled)
+        const isCancellation =
+          error instanceof Error &&
+          (error.name === 'NotAllowedError' ||
+            error.message.toLowerCase().includes('cancel') ||
+            error.message.toLowerCase().includes('aborted'))
+
+        if (isCancellation) {
+          // User cancelled, no need to poll - just reset state
+          setLoadingSend(false)
+          return
+        }
 
         // The transaction might still go through even if we got an error
         // Poll for the check in Supabase before showing the error
