@@ -25,7 +25,8 @@ RETURNS TABLE(
     is_active boolean,
     is_canceled boolean,
     is_sender boolean,
-    note text
+    note text,
+    is_potential_duplicate boolean
 )
 LANGUAGE sql
 STABLE
@@ -113,14 +114,22 @@ WITH sent_checks AS (
                 AND c2.block_num < cl.block_num
             )
         ))[1] = c.sender)::boolean AS is_canceled,
-        true AS is_sender
+        true AS is_sender,
+        -- Check if this is a duplicate (not the first check with this ephemeral_address)
+        -- Only subsequent checks are considered duplicates, not the original
+        (EXISTS (
+            SELECT 1 FROM send_check_created c2
+            WHERE c2.ephemeral_address = c.ephemeral_address
+            AND c2.chain_id = c.chain_id
+            AND c2.block_num < c.block_num
+        )) AS is_potential_duplicate
     FROM "public"."send_check_created" c
     LEFT JOIN "public"."send_check_claimed" cl
         ON c.ephemeral_address = cl.ephemeral_address
         AND c.chain_id = cl.chain_id
         AND c.abi_idx = cl.abi_idx
     WHERE c.sender = user_address
-    GROUP BY c.ephemeral_address, c.sender, c.chain_id, c.tx_hash
+    GROUP BY c.ephemeral_address, c.sender, c.chain_id, c.tx_hash, c.block_num
 ),
 received_checks AS (
     -- Checks claimed by the user (where they are not the sender)
@@ -141,7 +150,15 @@ received_checks AS (
         MAX(cl.block_time) AS claimed_at,
         false AS is_active,
         false AS is_canceled,
-        false AS is_sender
+        false AS is_sender,
+        -- Check if this is a duplicate (not the first check with this ephemeral_address)
+        -- Only subsequent checks are considered duplicates, not the original
+        (EXISTS (
+            SELECT 1 FROM send_check_created c2
+            WHERE c2.ephemeral_address = c.ephemeral_address
+            AND c2.chain_id = c.chain_id
+            AND c2.block_num < c.block_num
+        )) AS is_potential_duplicate
     FROM "public"."send_check_created" c
     INNER JOIN "public"."send_check_claimed" cl
         ON c.ephemeral_address = cl.ephemeral_address
@@ -159,7 +176,7 @@ received_checks AS (
         )
     WHERE cl.redeemer = user_address
         AND c.sender != user_address
-    GROUP BY c.ephemeral_address, c.sender, c.chain_id, cl.tx_hash
+    GROUP BY c.ephemeral_address, c.sender, c.chain_id, cl.tx_hash, c.block_num
 )
 SELECT
     combined.ephemeral_address,
@@ -178,7 +195,8 @@ SELECT
     combined.is_active,
     combined.is_canceled,
     combined.is_sender,
-    n.note
+    n.note,
+    combined.is_potential_duplicate
 FROM (
     SELECT * FROM sent_checks
     UNION ALL
@@ -229,7 +247,8 @@ RETURNS TABLE(
     claimed_at numeric,
     is_active boolean,
     is_canceled boolean,
-    note text
+    note text,
+    is_potential_duplicate boolean
 )
 LANGUAGE sql
 STABLE
@@ -321,7 +340,15 @@ SELECT
             AND c2.block_num < cl.block_num
         )
     ))[1] = c.sender)::boolean AS is_canceled,
-    MAX(n.note) AS note
+    MAX(n.note) AS note,
+    -- Check if this is a duplicate (not the first check with this ephemeral_address)
+    -- Only subsequent checks are considered duplicates, not the original
+    (EXISTS (
+        SELECT 1 FROM send_check_created c2
+        WHERE c2.ephemeral_address = c.ephemeral_address
+        AND c2.chain_id = c.chain_id
+        AND c2.block_num < lc.block_num
+    )) AS is_potential_duplicate
 FROM "public"."send_check_created" c
 INNER JOIN latest_check lc
     ON c.tx_hash = lc.tx_hash
@@ -334,7 +361,7 @@ LEFT JOIN "public"."send_check_notes" n
     AND c.chain_id = n.chain_id
 WHERE c.ephemeral_address = check_ephemeral_address
     AND c.chain_id = check_chain_id
-GROUP BY c.ephemeral_address, c.sender, c.chain_id, c.tx_hash;
+GROUP BY c.ephemeral_address, c.sender, c.chain_id, c.tx_hash, lc.block_num;
 $function$;
 
 ALTER FUNCTION "public"."get_check_by_ephemeral_address"(bytea, numeric) OWNER TO "postgres";

@@ -55,7 +55,8 @@
         "alreadyHaveAccount": "¿Ya tienes una cuenta?",
         "signIn": "Iniciar sesión"
       },
-      "notFoundMessage": "Este cheque es inválido, ha vencido o ya fue reclamado."
+      "notFoundMessage": "Este cheque es inválido, ha vencido o ya fue reclamado.",
+      "duplicateInvalid": "Este cheque es inválido debido a un enlace duplicado. Por favor, solicite al remitente un nuevo cheque."
     },
     "manage": {
       "loading": "Cargando cheques...",
@@ -77,7 +78,8 @@
       "claimedBy": "Reclamado por",
       "claimedByUser": "Reclamado por un usuario",
       "from": "De",
-      "fromUser": "De un usuario"
+      "fromUser": "De un usuario",
+      "duplicateWarning": "Este cheque es un duplicado. Cancélelo y emita uno nuevo."
     },
     "sections": {
       "pending": "Pendiente",

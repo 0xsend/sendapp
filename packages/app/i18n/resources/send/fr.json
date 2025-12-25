@@ -55,7 +55,8 @@
         "alreadyHaveAccount": "Déjà un compte ?",
         "signIn": "Se connecter"
       },
-      "notFoundMessage": "Ce chèque est invalide, expiré ou déjà réclamé."
+      "notFoundMessage": "Ce chèque est invalide, expiré ou déjà réclamé.",
+      "duplicateInvalid": "Ce chèque est invalide en raison d'un lien en double. Veuillez demander un nouveau chèque à l'expéditeur."
     },
     "manage": {
       "loading": "Chargement des chèques...",
@@ -77,7 +78,8 @@
       "claimedBy": "Réclamé par",
       "claimedByUser": "Réclamé par un utilisateur",
       "from": "De",
-      "fromUser": "D'un utilisateur"
+      "fromUser": "D'un utilisateur",
+      "duplicateWarning": "Ce chèque est un doublon. Annulez-le et émettez-en un nouveau."
     },
     "sections": {
       "pending": "En attente",

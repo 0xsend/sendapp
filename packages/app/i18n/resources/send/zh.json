@@ -55,7 +55,8 @@
         "alreadyHaveAccount": "已有账户？",
         "signIn": "登录"
       },
-      "notFoundMessage": "此支票无效、已过期或已被领取。"
+      "notFoundMessage": "此支票无效、已过期或已被领取。",
+      "duplicateInvalid": "此支票因链接重复而无效。请向发送者索取新支票。"
     },
     "manage": {
       "loading": "正在加载支票...",
@@ -77,7 +78,8 @@
       "claimedBy": "被领取",
       "claimedByUser": "被用户领取",
       "from": "来自",
-      "fromUser": "来自一位用户"
+      "fromUser": "来自一位用户",
+      "duplicateWarning": "此支票是重复的。请取消并重新发送一个新支票。"
     },
     "sections": {
       "pending": "待处理",
