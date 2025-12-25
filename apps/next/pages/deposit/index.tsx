@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 
 export const Page: NextPageWithLayout = () => {
   const { t } = useTranslation('navigation')
-  const depositTitle = t('stack.deposit.root')
+  const depositTitle = t('stack.savings.root')
 
   return (
     <>
@@ -22,7 +22,7 @@ function DepositLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation('navigation')
 
   return (
-    <HomeLayout TopNav={<TopNav header={t('stack.deposit.root')} backFunction="home" />}>
+    <HomeLayout TopNav={<TopNav header={t('stack.savings.root')} backFunction="home" />}>
       {children}
     </HomeLayout>
   )

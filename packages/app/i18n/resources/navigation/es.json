@@ -39,7 +39,7 @@
       "root": "Explorar Canton Wallet"
     },
     "deposit": {
-      "root": "Depositar",
+      "root": "Ahorros",
       "applePay": "Apple Pay",
       "debitCard": "Tarjeta de débito",
       "onBase": "Depositar en Base",
@@ -48,7 +48,7 @@
     "earn": {
       "root": "Ahorros",
       "details": "Detalles",
-      "deposit": "Depositar",
+      "savings": "Ahorros",
       "withdraw": "Retirar ahorros",
       "balance": "Saldo",
       "rewards": "Saldo de recompensas"
@@ -82,6 +82,9 @@
     "trade": {
       "root": "Operar",
       "summary": "Resumen de la operación"
+    },
+    "savings": {
+      "root": "Ahorros"
     }
   }
 }

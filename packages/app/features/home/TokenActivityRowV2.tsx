@@ -1,24 +1,10 @@
 // optimized version of TokenActivityRow for the RecentActivityFeed.tsx
 import { Text, XStack, YStack } from '@my/ui'
 import { Paragraph, useEvent } from 'tamagui'
-import {
-  useDateFromActivity,
-  useEventNameFromActivity,
-  useSubtextFromActivity,
-} from 'app/utils/activity'
-import { useAmountFromActivity } from 'app/utils/activity-hooks'
-import {
-  type Activity,
-  isSendAccountReceiveEvent,
-  isSendAccountTransfersEvent,
-} from 'app/utils/zod/activity'
+import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatarV2'
 
 import type { useUser } from 'app/utils/useUser'
-import {
-  isTemporalEthTransfersEvent,
-  isTemporalTokenTransfersEvent,
-} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import type { ReactNode } from 'react'
 import { memo } from 'react'
 import type { useSendScreenParams } from 'app/routers/params'
@@ -36,6 +22,11 @@ interface TokenActivityRowV2Props {
   liquidityPools: ReturnType<typeof useLiquidityPools>['data']
   addressBook: ReturnType<typeof useAddressBook>
   hoverStyle: ReturnType<typeof useHoverStyles>
+  computedAmount: ReactNode
+  computedDate: ReactNode
+  computedEventName: string
+  computedSubtext: string | null
+  computedIsUserTransfer: boolean
 }
 
 export const TokenActivityRow = ({
@@ -47,26 +38,19 @@ export const TokenActivityRow = ({
   liquidityPools,
   addressBook,
   hoverStyle,
+  computedAmount,
+  computedDate,
+  computedEventName,
+  computedSubtext,
+  computedIsUserTransfer,
 }: TokenActivityRowV2Props) => {
   const { from_user, to_user } = activity
-  const amount = useAmountFromActivity(activity, swapRouters, liquidityPools)
-  const date = useDateFromActivity({ activity })
-  const eventName = useEventNameFromActivity({ activity, swapRouters, liquidityPools })
-  const subtext = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
-  const isERC20Transfer = isSendAccountTransfersEvent(activity)
-  const isETHReceive = isSendAccountReceiveEvent(activity)
-  const isTemporalTransfer =
-    isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
-  const isUserTransfer =
-    (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
-    Boolean(to_user?.send_id) &&
-    Boolean(from_user?.send_id)
 
   const [sendParams, setSendParams] = sendParamsRef.current ?? []
 
   const handlePress = useEvent(() => {
     if (onPress) {
-      if (isUserTransfer) {
+      if (computedIsUserTransfer) {
         setSendParams?.({
           ...sendParams,
           recipient:
@@ -83,11 +67,11 @@ export const TokenActivityRow = ({
 
   return (
     <TokenActivityRowContent
-      amount={amount}
-      date={date}
-      eventName={eventName}
-      subtext={subtext}
-      isUserTransfer={isUserTransfer}
+      amount={computedAmount}
+      date={computedDate}
+      eventName={computedEventName}
+      subtext={computedSubtext}
+      isUserTransfer={computedIsUserTransfer}
       activity={activity}
       onPress={onPress ? handlePress : undefined}
       swapRouters={swapRouters}

@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
 import { useSendScreenParams } from 'app/routers/params'
 import { useUser } from 'app/utils/useUser'
+import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -28,6 +30,8 @@ export default function ActivityFeed({
   onActivityPress: (activity: Activity) => void
 }) {
   const { t, i18n } = useTranslation('activity')
+  const { onScroll: onScrollHandler, onContentSizeChange: onContentSizeChangeHandler } =
+    useScrollDirection()
 
   const [sendChatOpen, setSendChatOpen] = useState(false)
   const sendParamsAndSet = useSendScreenParams()
@@ -166,6 +170,8 @@ export default function ActivityFeed({
         sendParamsRef={sendParamsRef}
         onEndReached={onEndReached}
         hasNextPage={hasNextPage}
+        onScrollHandler={onScrollHandler}
+        onContentSizeChangeHandler={onContentSizeChangeHandler}
       />
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
@@ -178,6 +184,18 @@ type ListItem =
   | (Activity & { sectionIndex: number })
   | { type: 'header'; title: string; sectionIndex: number }
 
+type ComputedValues = {
+  amount: ReactNode
+  date: ReactNode
+  eventName: string
+  subtext: string | null
+  isUserTransfer: boolean
+}
+
+type ComputedListItem =
+  | (Activity & { sectionIndex: number; computed: ComputedValues })
+  | { type: 'header'; title: string; sectionIndex: number }
+
 interface MyListProps {
   data: ListItem[]
   stickyIndices?: number[]
@@ -187,23 +205,42 @@ interface MyListProps {
   sendParamsRef: React.RefObject<ReturnType<typeof useSendScreenParams>>
   onEndReached: () => void
   hasNextPage: boolean
+  onScrollHandler: (e: NativeSyntheticEvent<NativeScrollEvent>, threshold?: number) => void
+  onContentSizeChangeHandler?: (w: number, h: number) => void
 }
 
-const getItemType = (item: ListItem) => {
+const getItemType = (item: ComputedListItem) => {
   return 'type' in item && item.type === 'header' ? 'header' : 'activity'
 }
 
-const keyExtractor = (item: ListItem, index: number): string => {
+const keyExtractor = (item: ComputedListItem, index: number): string => {
   if ('type' in item && item.type === 'header') {
     return `header-${item.sectionIndex}-${item.title}-${index}`
   }
-  const activity = item as Activity & { sectionIndex: number }
+  const activity = item as Activity & { sectionIndex: number; computed: ComputedValues }
   return activity.event_id
 }
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import { CommentsTime } from 'app/utils/dateHelper'
+import { Spinner } from '@my/ui'
+import {
+  isTemporalEthTransfersEvent,
+  isTemporalTokenTransfersEvent,
+} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
+import {
+  isSendEarnEvent,
+  isSendEarnDepositEvent,
+  isTemporalSendEarnDepositEvent,
+} from 'app/utils/zod/activity'
+import { isSendAccountTransfersEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
+import { isSendAccountReceiveEvent } from 'app/utils/zod/activity/SendAccountReceiveEventSchema'
+import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
+import { ContractLabels } from 'app/data/contract-labels'
+import type { ReactNode } from 'react'
 
 const MyList = memo(
   ({
@@ -215,25 +252,156 @@ const MyList = memo(
     sendParamsRef,
     onEndReached,
     hasNextPage,
+    onScrollHandler,
+    onContentSizeChangeHandler,
   }: MyListProps) => {
-    // for TokenActivityRowV2
-
     const { profile } = useUser()
 
     const { data: swapRouters } = useSwapRouters()
     const { data: liquidityPools } = useLiquidityPools()
     const addressBook = useAddressBook()
-
-    //
+    const { t, i18n } = useTranslation('activity')
+    const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
 
     const hoverStyles = useHoverStyles()
+
+    const computedData = useMemo(() => {
+      const translator = (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
+        t(key, { defaultValue, ...options })
+
+      const result: ComputedListItem[] = []
+      let currentHeader: { type: 'header'; title: string; sectionIndex: number } | null = null
+
+      for (const item of data) {
+        if ('type' in item && item.type === 'header') {
+          currentHeader = item
+          continue
+        }
+
+        const activity = item as Activity & { sectionIndex: number }
+
+        const isERC20Transfer = isSendAccountTransfersEvent(activity)
+        const isETHReceive = isSendAccountReceiveEvent(activity)
+        const isTemporalTransfer =
+          isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+        const isUserTransfer =
+          (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
+          Boolean(activity.to_user?.send_id) &&
+          Boolean(activity.from_user?.send_id)
+
+        let eventName: string
+        if (
+          isSendEarnDepositEvent(activity) &&
+          addressBook.data?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
+        ) {
+          eventName = translator('events.rewards', 'Rewards')
+        } else if (
+          isERC20Transfer &&
+          addressBook.data?.[activity.data.t] === ContractLabels.SendEarn
+        ) {
+          eventName = translator('events.deposit', 'Deposit')
+        } else if (
+          isERC20Transfer &&
+          addressBook.data?.[activity.data.f] === ContractLabels.SendEarn
+        ) {
+          eventName = translator('events.withdraw', 'Withdraw')
+        } else {
+          eventName = eventNameFromActivity({
+            activity,
+            swapRouters: swapRouters || [],
+            liquidityPools: liquidityPools || [],
+            t: translator,
+          })
+        }
+
+        let subtext: string | null
+        const sendEarnLabel = translator('subtext.sendEarn', 'Send Earn')
+        if (isTemporalSendEarnDepositEvent(activity)) {
+          if (activity.data.status === 'failed') {
+            subtext = activity.data.error_message || sendEarnLabel
+          } else {
+            subtext = sendEarnLabel
+          }
+        } else if (isSendEarnEvent(activity)) {
+          subtext = sendEarnLabel
+        } else if (isERC20Transfer) {
+          if (addressBook.data?.[activity.data.t] === ContractLabels.SendEarn) {
+            subtext = sendEarnLabel
+          } else if (addressBook.data?.[activity.data.f] === ContractLabels.SendEarn) {
+            subtext = sendEarnLabel
+          } else {
+            subtext = subtextFromActivity({
+              activity,
+              swapRouters: swapRouters || [],
+              liquidityPools: liquidityPools || [],
+              t: translator,
+            })
+          }
+        } else {
+          subtext = subtextFromActivity({
+            activity,
+            swapRouters: swapRouters || [],
+            liquidityPools: liquidityPools || [],
+            t: translator,
+          })
+        }
+
+        let amount: ReactNode
+        if (isSendEarnEvent(activity)) {
+          amount = <SendEarnAmount activity={activity} />
+        } else {
+          amount = amountFromActivity(activity, swapRouters || [], liquidityPools || [])
+        }
+
+        let date: ReactNode
+        const isTemporalTransferForDate =
+          isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
+        if (isTemporalTransferForDate) {
+          switch (activity.data.status) {
+            case 'failed':
+              date = translator('status.failed', 'Failed')
+              break
+            case 'cancelled':
+              date = translator('status.cancelled', 'Cancelled')
+              break
+            case 'confirmed':
+              date = CommentsTime(new Date(activity.created_at), locale)
+              break
+            default:
+              date = <Spinner size="small" color={'$color11'} />
+          }
+        } else {
+          date = CommentsTime(new Date(activity.created_at), locale)
+        }
+
+        const computed: ComputedValues = {
+          amount,
+          date,
+          eventName,
+          subtext,
+          isUserTransfer,
+        }
+
+        if (currentHeader) {
+          result.push(currentHeader)
+          currentHeader = null
+        }
+
+        result.push({
+          ...activity,
+          computed,
+        })
+      }
+
+      return result
+    }, [data, swapRouters, liquidityPools, addressBook.data, t, locale])
 
     const sectionDataMap = useMemo(() => {
       const map = new Map<number, { firstIndex: number; lastIndex: number }>()
       let currentSectionIndex = -1
       let firstIndexInSection = -1
 
-      data.forEach((item, index) => {
+      computedData.forEach((item, index) => {
         if ('type' in item && item.type === 'header') {
           if (currentSectionIndex >= 0) {
             const prevSection = map.get(currentSectionIndex)
@@ -250,14 +418,14 @@ const MyList = memo(
       if (currentSectionIndex >= 0) {
         const lastSection = map.get(currentSectionIndex)
         if (lastSection) {
-          lastSection.lastIndex = data.length - 1
+          lastSection.lastIndex = computedData.length - 1
         }
       }
 
       return map
-    }, [data])
+    }, [computedData])
 
-    const renderItem = useEvent(({ item, index }: { item: ListItem; index: number }) => {
+    const renderItem = useEvent(({ item, index }: { item: ComputedListItem; index: number }) => {
       if ('type' in item && item.type === 'header') {
         return <RowLabel>{item.title}</RowLabel>
       }
@@ -266,6 +434,9 @@ const MyList = memo(
 
       const isFirst = sectionInfo?.firstIndex === index
       const isLast = sectionInfo?.lastIndex === index
+
+      const activity = item as Activity & { computed: ComputedValues }
+      const { computed } = activity
 
       return (
         <YStack
@@ -286,11 +457,16 @@ const MyList = memo(
             swapRouters={swapRouters}
             liquidityPools={liquidityPools}
             profile={profile}
-            activity={item as Activity}
+            activity={activity}
             onPress={onActivityPress}
             sendParamsRef={sendParamsRef}
             addressBook={addressBook}
             hoverStyle={hoverStyles}
+            computedAmount={computed.amount}
+            computedDate={computed.date}
+            computedEventName={computed.eventName}
+            computedSubtext={computed.subtext}
+            computedIsUserTransfer={computed.isUserTransfer}
           />
         </YStack>
       )
@@ -299,7 +475,7 @@ const MyList = memo(
     return (
       <View className="hide-scroll" display="contents">
         <FlashList
-          data={data}
+          data={computedData}
           style={styles.flashListStyle}
           testID={'RecentActivity'}
           keyExtractor={keyExtractor}
@@ -309,6 +485,9 @@ const MyList = memo(
           renderItem={renderItem}
           contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
+          onScroll={(e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)}
+          onContentSizeChange={onContentSizeChangeHandler}
+          scrollEventThrottle={16}
         />
       </View>
     )

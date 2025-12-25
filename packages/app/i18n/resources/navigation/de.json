@@ -29,12 +29,12 @@
       "applePay": "Apple Pay",
       "debitCard": "Debitkarte",
       "onBase": "Auf Base einzahlen",
-      "root": "Einzahlen",
+      "root": "Sparen",
       "success": "Erfolgreich"
     },
     "earn": {
       "balance": "Guthaben",
-      "deposit": "Einzahlen",
+      "savings": "Sparen",
       "details": "Details",
       "rewards": "Prämienguthaben",
       "root": "Sparen",
@@ -69,6 +69,9 @@
     "trade": {
       "root": "Handeln",
       "summary": "Handelszusammenfassung"
+    },
+    "savings": {
+      "root": "Sparen"
     }
   },
   "tabs": {
