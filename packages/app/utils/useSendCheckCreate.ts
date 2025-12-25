@@ -129,6 +129,8 @@ export type UseSendCheckCreateArgs = {
 /**
  * Hook for creating a SendCheck with multiple tokens.
  * Prepares the UserOp upfront to calculate fees, then submits when createCheck is called.
+ * The ephemeral keypair is regenerated after each createCheck attempt (success or fail)
+ * to prevent keypair reuse across multiple check creations.
  */
 export function useSendCheckCreate({
   tokenAmounts,
@@ -142,10 +144,12 @@ export function useSendCheckCreate({
   const chainId = baseMainnetClient.chain.id
   const checkAddress = getSendCheckAddress(chainId)
 
-  // Generate ephemeral keypair once and keep it stable for fee estimation
-  const [ephemeralKeyPair] = useState<EphemeralKeyPair>(() => generateEphemeralKeyPair())
+  // Generate ephemeral keypair - regenerated after each createCheck attempt
+  const [ephemeralKeyPair, setEphemeralKeyPair] = useState<EphemeralKeyPair>(() =>
+    generateEphemeralKeyPair()
+  )
 
-  // Build calls for fee estimation
+  // Build calls for the UserOp
   const calls = useMemo(() => {
     if (
       !tokenAmounts ||
@@ -208,21 +212,30 @@ export function useSendCheckCreate({
       assert(tokenAmounts.length <= 5, 'Too many tokens (max 5)')
       assert(!!userOp, 'UserOp not prepared')
 
-      // Submit the user operation
-      const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
+      // Capture the current keypair before we reset it
+      const currentKeyPair = ephemeralKeyPair
 
-      // Invalidate nonce query
-      await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
+      try {
+        // Submit the user operation
+        const receipt = await sendUserOpAsync({ userOp, webauthnCreds })
 
-      // Generate check code and claim URL
-      const checkCode = encodeCheckCode(ephemeralKeyPair.privateKey)
-      const claimUrl = createSendCheckClaimUrl(checkCode)
+        // Invalidate nonce query
+        await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
 
-      return {
-        claimUrl,
-        checkCode,
-        ephemeralKeyPair,
-        txHash: receipt.receipt.transactionHash,
+        // Generate check code and claim URL
+        const checkCode = encodeCheckCode(currentKeyPair.privateKey)
+        const claimUrl = createSendCheckClaimUrl(checkCode)
+
+        return {
+          claimUrl,
+          checkCode,
+          ephemeralKeyPair: currentKeyPair,
+          txHash: receipt.receipt.transactionHash,
+        }
+      } finally {
+        // Always regenerate the keypair after each attempt (success or fail)
+        // This ensures the next check creation uses a fresh keypair
+        setEphemeralKeyPair(generateEphemeralKeyPair())
       }
     },
     [sender, checkAddress, tokenAmounts, userOp, sendUserOpAsync, queryClient, ephemeralKeyPair]
