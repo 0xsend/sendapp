@@ -394,6 +394,7 @@ const SendCheckContent = ({
     usdcFees,
     ephemeralKeyPair,
     prepareError,
+    refetchPrepare,
   } = useSendCheckCreate({ tokenAmounts, expiresAt })
 
   // Basic validation for proceeding to review
@@ -537,8 +538,10 @@ const SendCheckContent = ({
     }
   }
 
+  const hasRetryableError = activeSection === 'reviewAndSend' && !!prepareError
   const isSendButtonDisabled =
-    loadingSend || (activeSection === 'enterAmount' ? !canProceedToReview : !canCreateCheck)
+    loadingSend ||
+    (activeSection === 'enterAmount' ? !canProceedToReview : !canCreateCheck && !hasRetryableError)
 
   if (activeSection === 'success' && checkCreated) {
     return (
@@ -671,7 +674,11 @@ const SendCheckContent = ({
             scale: 0.98,
           }}
           onPress={() => {
-            form.handleSubmit(onSubmit)()
+            if (hasRetryableError) {
+              refetchPrepare()
+            } else {
+              form.handleSubmit(onSubmit)()
+            }
           }}
           ov="hidden"
           disabled={isSendButtonDisabled}
@@ -711,9 +718,11 @@ const SendCheckContent = ({
                   y: 40,
                 }}
               >
-                {activeSection === 'reviewAndSend'
-                  ? t('check.create', 'Create Check')
-                  : t('check.reviewAndSend', 'Review and Send')}
+                {hasRetryableError
+                  ? t('check.tryAgain', 'Try again')
+                  : activeSection === 'reviewAndSend'
+                    ? t('check.create', 'Create Check')
+                    : t('check.reviewAndSend', 'Review and Send')}
               </Button.Text>
             )}
           </AnimatePresence>

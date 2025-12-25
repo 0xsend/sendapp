@@ -181,10 +181,22 @@ export function useSendCheckCreate({
   } = useUserOp({ sender, calls: enabled ? calls : undefined })
 
   // Calculate USDC fees
-  const { data: usdcFees, error: usdcFeesError, isLoading: isLoadingFees } = useUSDCFees({ userOp })
+  const {
+    data: usdcFees,
+    error: usdcFeesError,
+    isLoading: isLoadingFees,
+    refetch: refetchUsdcFees,
+  } = useUSDCFees({ userOp })
 
   const isPreparing = isLoadingUserOp || isLoadingFees
   const prepareError = userOpError || usdcFeesError
+
+  // Refetch helper - only use when there's an error to retry
+  const refetchPrepare = useCallback(async () => {
+    if (!prepareError) return
+    await refetchUserOp()
+    await refetchUsdcFees()
+  }, [prepareError, refetchUserOp, refetchUsdcFees])
 
   const createCheck = useCallback(
     async ({ webauthnCreds }: SendCheckCreateArgs): Promise<SendCheckCreateResult> => {
@@ -232,6 +244,7 @@ export function useSendCheckCreate({
     error,
     isPreparing,
     prepareError,
+    refetchPrepare,
     userOp,
     usdcFees,
     isReady: !!sender && !!checkAddress && !!userOp,
