@@ -85,9 +85,9 @@ export function CheckPublicPreviewScreen({ checkCode }: CheckPublicPreviewScreen
       {isNotFound ? (
         <Card padded elevation={1} br="$5">
           <YStack ai="center" gap="$4" py="$4">
-            <XStack ai="center" gap="$2">
-              <AlertTriangle size={18} color="$yellow10" />
-              <Paragraph color="$color10" size="$4" ta="center">
+            <XStack ai="flex-start" gap="$2">
+              <AlertTriangle size={18} color="$yellow10" mt="$0.5" />
+              <Paragraph color="$color10" size="$4">
                 {t('check.claim.notFoundMessage')}
               </Paragraph>
             </XStack>
