@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(55);
+SELECT plan(59);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -1163,6 +1163,150 @@ SELECT results_eq(
     $$,
     $$VALUES (8000000::numeric, true, true)$$,
     'Reuse Scenario 4: get_check_by_ephemeral_address returns the newer active check marked as duplicate'
+);
+
+-- ============================================================================
+-- SCENARIO 5: First check claimed by receiver, second check (duplicate) canceled by sender
+-- This tests the bug where multiple claims for the same ephemeral address cause
+-- row multiplication in the LEFT JOIN, resulting in duplicated tokens/amounts.
+-- Check I: Created at block 200400, claimed by Receiver at block 200410
+-- Check J: Created at block 200420 (same ephemeral), canceled by Sender at block 200430
+-- ============================================================================
+
+-- Check I creation (first check)
+INSERT INTO send_check_created(
+    chain_id, log_addr, block_time, tx_hash, tx_idx,
+    ephemeral_address, sender, token, amount, expires_at,
+    ig_name, src_name, block_num, log_idx, abi_idx)
+VALUES (
+    8453,
+    '\xDDDD567890123456789012345678901234567890',
+    EXTRACT(EPOCH FROM NOW() - interval '5 hours'),
+    '\xDDDDE11111111111111111111111111111111111111111111111111111111111',
+    0,
+    '\xDDDD00000000000000000000000000000000E005', -- Same ephemeral for I and J
+    '\xDDDD000000000000000000000000000000000ABC',
+    '\x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    9000000, -- 9 USDC
+    EXTRACT(EPOCH FROM NOW() + interval '1 day'),
+    'send_checks_reuse_test', 'send_checks_reuse_test',
+    200400, 0, 0);
+
+-- Check I claimed by Receiver 1
+INSERT INTO send_check_claimed(
+    chain_id, log_addr, block_time, tx_hash, tx_idx,
+    ephemeral_address, sender, token, amount, expires_at, redeemer,
+    ig_name, src_name, block_num, log_idx, abi_idx)
+VALUES (
+    8453,
+    '\xDDDD567890123456789012345678901234567890',
+    EXTRACT(EPOCH FROM NOW() - interval '4 hours 50 minutes'),
+    '\xDDDDE22222222222222222222222222222222222222222222222222222222222',
+    0,
+    '\xDDDD00000000000000000000000000000000E005',
+    '\xDDDD000000000000000000000000000000000ABC',
+    '\x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    9000000,
+    EXTRACT(EPOCH FROM NOW() + interval '1 day'),
+    '\xDDDD000000000000000000000000000000000DEF', -- Receiver 1 claims
+    'send_checks_reuse_test', 'send_checks_reuse_test',
+    200410, 0, 0);
+
+-- Check J creation (duplicate, after Check I was claimed)
+INSERT INTO send_check_created(
+    chain_id, log_addr, block_time, tx_hash, tx_idx,
+    ephemeral_address, sender, token, amount, expires_at,
+    ig_name, src_name, block_num, log_idx, abi_idx)
+VALUES (
+    8453,
+    '\xDDDD567890123456789012345678901234567890',
+    EXTRACT(EPOCH FROM NOW() - interval '4 hours 40 minutes'),
+    '\xDDDDE33333333333333333333333333333333333333333333333333333333333',
+    0,
+    '\xDDDD00000000000000000000000000000000E005', -- Same ephemeral as Check I
+    '\xDDDD000000000000000000000000000000000ABC',
+    '\x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    10000000, -- 10 USDC (different amount)
+    EXTRACT(EPOCH FROM NOW() + interval '2 days'),
+    'send_checks_reuse_test', 'send_checks_reuse_test',
+    200420, 0, 0);
+
+-- Check J canceled by Sender (redeemer = sender)
+INSERT INTO send_check_claimed(
+    chain_id, log_addr, block_time, tx_hash, tx_idx,
+    ephemeral_address, sender, token, amount, expires_at, redeemer,
+    ig_name, src_name, block_num, log_idx, abi_idx)
+VALUES (
+    8453,
+    '\xDDDD567890123456789012345678901234567890',
+    EXTRACT(EPOCH FROM NOW() - interval '4 hours 30 minutes'),
+    '\xDDDDE44444444444444444444444444444444444444444444444444444444444',
+    0,
+    '\xDDDD00000000000000000000000000000000E005',
+    '\xDDDD000000000000000000000000000000000ABC',
+    '\x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    10000000,
+    EXTRACT(EPOCH FROM NOW() + interval '2 days'),
+    '\xDDDD000000000000000000000000000000000ABC', -- Sender cancels (redeemer = sender)
+    'send_checks_reuse_test', 'send_checks_reuse_test',
+    200430, 0, 0);
+
+-- ============================================================================
+-- TEST: Scenario 5 - Sender sees both checks with correct single token each
+-- This is the key test - if there's row multiplication bug, array_length would be > 1
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT array_length(tokens, 1), array_length(amounts, 1)
+        FROM get_user_checks('\xDDDD000000000000000000000000000000000ABC'::bytea)
+        WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E005'::bytea
+        ORDER BY block_num ASC
+    $$,
+    $$VALUES
+        (1, 1),  -- Check I: should have exactly 1 token
+        (1, 1)   -- Check J: should have exactly 1 token
+    $$,
+    'Reuse Scenario 5: Each check should have exactly 1 token (no row multiplication)'
+);
+
+-- ============================================================================
+-- TEST: Scenario 5 - Sender sees correct amounts for each check
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT amounts[1], is_claimed, is_canceled
+        FROM get_user_checks('\xDDDD000000000000000000000000000000000ABC'::bytea)
+        WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E005'::bytea
+        ORDER BY block_num ASC
+    $$,
+    $$VALUES
+        (9000000::numeric, true, false),   -- Check I: claimed by receiver
+        (10000000::numeric, true, true)    -- Check J: canceled by sender
+    $$,
+    'Reuse Scenario 5: Sender sees correct amounts - Check I claimed, Check J canceled'
+);
+
+-- ============================================================================
+-- TEST: Scenario 5 - Receiver only sees Check I (the one they claimed)
+-- ============================================================================
+SELECT results_eq(
+    $$
+        SELECT COUNT(*)::integer
+        FROM get_user_checks('\xDDDD000000000000000000000000000000000DEF'::bytea)
+        WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E005'::bytea
+    $$,
+    $$VALUES (1)$$,
+    'Reuse Scenario 5: Receiver only sees Check I (the one they claimed)'
+);
+
+SELECT results_eq(
+    $$
+        SELECT array_length(tokens, 1), amounts[1]
+        FROM get_user_checks('\xDDDD000000000000000000000000000000000DEF'::bytea)
+        WHERE ephemeral_address = '\xDDDD00000000000000000000000000000000E005'::bytea
+    $$,
+    $$VALUES (1, 9000000::numeric)$$,
+    'Reuse Scenario 5: Receiver sees Check I with exactly 1 token and correct amount'
 );
 
 SELECT finish();
