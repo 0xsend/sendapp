@@ -289,6 +289,122 @@ if (!dryRun) {
       console.log(`  Configured distribution ${distNumber}`)
     }
 
+    // Set up test data for distribution 51 (current month) to test SEND amount calculations
+    console.log('Setting up test distribution verifications and shares for Alice...')
+
+    // Find Alice from the seeded users (first user with phone '17777777777')
+    const aliceUser = seededUsers.users.find((u) => u.phone === '17777777777')
+    const aliceSendAccount = aliceUser
+      ? seededUsers.send_accounts.find((sa) => sa.user_id === aliceUser.id)
+      : null
+
+    if (aliceUser && aliceSendAccount) {
+      const aliceUserId = aliceUser.id
+      const aliceAddress = aliceSendAccount.address
+
+      // Get distribution 51 (current month) and distribution 50 (previous month)
+      const dist51Result = await client.query(`
+        SELECT id FROM distributions WHERE number = 51 LIMIT 1
+      `)
+      const dist50Result = await client.query(`
+        SELECT id FROM distributions WHERE number = 50 LIMIT 1
+      `)
+
+      if (dist51Result.rows.length > 0) {
+        const dist51Id = dist51Result.rows[0].id
+        const dist50Id = dist50Result.rows.length > 0 ? dist50Result.rows[0].id : null
+
+        // Insert distribution verifications for Alice in distribution 51
+        // These weights will be used by the fixed pool calculations
+        // First check if they already exist to avoid duplicates
+        const existingVerifications = await client.query(
+          `SELECT type FROM distribution_verifications WHERE distribution_id = $1 AND user_id = $2`,
+          [dist51Id, aliceUserId]
+        )
+
+        if (existingVerifications.rows.length === 0) {
+          await client.query(
+            `
+            INSERT INTO distribution_verifications (distribution_id, user_id, type, weight)
+            VALUES 
+              ($1, $2, 'send_ceiling', 50000000000000000000),  -- 50 SEND sent (for slash calculation)
+              ($1, $2, 'send_ten', 3),                         -- sent $10 three times
+              ($1, $2, 'send_streak', 7),                      -- 7 day streak
+              ($1, $2, 'tag_registration', 1),                 -- has sendtag
+              ($1, $2, 'tag_referral', 2)                      -- 2 referrals (creates multiplier)
+          `,
+            [dist51Id, aliceUserId]
+          )
+        }
+
+        // Insert distribution shares for Alice in distribution 51
+        // These show the calculated amounts after all verifications
+        const existingShare = await client.query(
+          `SELECT id FROM distribution_shares WHERE distribution_id = $1 AND user_id = $2`,
+          [dist51Id, aliceUserId]
+        )
+
+        if (existingShare.rows.length === 0) {
+          await client.query(
+            `
+            INSERT INTO distribution_shares (
+              distribution_id, 
+              user_id, 
+              address, 
+              amount, 
+              hodler_pool_amount, 
+              fixed_pool_amount, 
+              bonus_pool_amount,
+              balance_rank,
+              "index"
+            )
+            VALUES ($1, $2, $3, 1500000000000000000000, 0, 1500000000000000000000, 0, 42, 0)
+          `,
+            [dist51Id, aliceUserId, aliceAddress]
+          )
+        }
+
+        console.log('  Created distribution verifications for Alice in distribution 51')
+        console.log('    - send_ceiling: 50 SEND (for slash calculation)')
+        console.log('    - send_ten: weight 3')
+        console.log('    - send_streak: weight 7')
+        console.log('    - tag_registration: weight 1')
+        console.log('    - tag_referral: weight 2 (will create multiplier)')
+
+        // If distribution 50 exists, create a previous distribution share for slash calculation
+        if (dist50Id) {
+          const existingShare50 = await client.query(
+            `SELECT id FROM distribution_shares WHERE distribution_id = $1 AND user_id = $2`,
+            [dist50Id, aliceUserId]
+          )
+
+          if (existingShare50.rows.length === 0) {
+            await client.query(
+              `
+              INSERT INTO distribution_shares (
+                distribution_id, 
+                user_id, 
+                address, 
+                amount, 
+                hodler_pool_amount, 
+                fixed_pool_amount, 
+                bonus_pool_amount,
+                balance_rank,
+                "index"
+              )
+              VALUES ($1, $2, $3, 1000000000000000000000, 0, 1000000000000000000000, 0, 35, 0)
+            `,
+              [dist50Id, aliceUserId, aliceAddress]
+            )
+          }
+
+          console.log(
+            '  Created previous distribution share for Alice in distribution 50 (for slash calculation)'
+          )
+        }
+      }
+    }
+
     // First, update tags with their user_id using the send_account_tags relationship
     // Since tags are created with send_account_tags relationships, we can use this to set the user_id
     const tagUpdateResult = await client.query(`

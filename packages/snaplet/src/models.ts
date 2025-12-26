@@ -174,6 +174,12 @@ export const models: SeedClientOptions['models'] = {
       },
       snapshot_block_num: null,
       sendpot_ticket_increment: 10,
+      verified_count: 0, // Count of users with distribution_shares
+    },
+  },
+  distribution_shares: {
+    data: {
+      balance_rank: null, // Optional rank position within distribution cohort
     },
   },
   send_token_transfers: {
