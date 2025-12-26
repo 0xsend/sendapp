@@ -46,74 +46,12 @@ WITH sent_checks AS (
         array_agg(c.token ORDER BY c.abi_idx) AS tokens,
         array_agg(c.amount ORDER BY c.abi_idx) AS amounts,
         (MAX(c.expires_at) <= EXTRACT(EPOCH FROM NOW()))::boolean AS is_expired,
-        -- A claim applies to this check only if:
-        -- 1. It matches ephemeral_address, chain_id, abi_idx
-        -- 2. The claim happened AFTER this check was created
-        -- 3. No other check with same ephemeral_address was created between this check and the claim
-        bool_or(
-            cl.id IS NOT NULL
-            AND cl.block_num > c.block_num
-            AND NOT EXISTS (
-                SELECT 1 FROM send_check_created c2
-                WHERE c2.ephemeral_address = c.ephemeral_address
-                AND c2.chain_id = c.chain_id
-                AND c2.block_num > c.block_num
-                AND c2.block_num < cl.block_num
-            )
-        ) AS is_claimed,
-        (array_agg(cl.redeemer) FILTER (
-            WHERE cl.redeemer IS NOT NULL
-            AND cl.block_num > c.block_num
-            AND NOT EXISTS (
-                SELECT 1 FROM send_check_created c2
-                WHERE c2.ephemeral_address = c.ephemeral_address
-                AND c2.chain_id = c.chain_id
-                AND c2.block_num > c.block_num
-                AND c2.block_num < cl.block_num
-            )
-        ))[1] AS claimed_by,
-        MAX(cl.block_time) FILTER (
-            WHERE cl.block_num > c.block_num
-            AND NOT EXISTS (
-                SELECT 1 FROM send_check_created c2
-                WHERE c2.ephemeral_address = c.ephemeral_address
-                AND c2.chain_id = c.chain_id
-                AND c2.block_num > c.block_num
-                AND c2.block_num < cl.block_num
-            )
-        ) AS claimed_at,
-        (NOT bool_or(
-            cl.id IS NOT NULL
-            AND cl.block_num > c.block_num
-            AND NOT EXISTS (
-                SELECT 1 FROM send_check_created c2
-                WHERE c2.ephemeral_address = c.ephemeral_address
-                AND c2.chain_id = c.chain_id
-                AND c2.block_num > c.block_num
-                AND c2.block_num < cl.block_num
-            )
-        ) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW()))::boolean AS is_active,
-        (bool_or(
-            cl.id IS NOT NULL
-            AND cl.block_num > c.block_num
-            AND NOT EXISTS (
-                SELECT 1 FROM send_check_created c2
-                WHERE c2.ephemeral_address = c.ephemeral_address
-                AND c2.chain_id = c.chain_id
-                AND c2.block_num > c.block_num
-                AND c2.block_num < cl.block_num
-            )
-        ) AND (array_agg(cl.redeemer) FILTER (
-            WHERE cl.redeemer IS NOT NULL
-            AND cl.block_num > c.block_num
-            AND NOT EXISTS (
-                SELECT 1 FROM send_check_created c2
-                WHERE c2.ephemeral_address = c.ephemeral_address
-                AND c2.chain_id = c.chain_id
-                AND c2.block_num > c.block_num
-                AND c2.block_num < cl.block_num
-            )
-        ))[1] = c.sender)::boolean AS is_canceled,
+        -- A claim applies to this check only if it joined (JOIN conditions handle the filtering)
+        bool_or(cl.id IS NOT NULL) AS is_claimed,
+        (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] AS claimed_by,
+        MAX(cl.block_time) AS claimed_at,
+        (NOT bool_or(cl.id IS NOT NULL) AND MAX(c.expires_at) > EXTRACT(EPOCH FROM NOW()))::boolean AS is_active,
+        (bool_or(cl.id IS NOT NULL) AND (array_agg(cl.redeemer) FILTER (WHERE cl.redeemer IS NOT NULL))[1] = c.sender)::boolean AS is_canceled,
         true AS is_sender,
         -- Check if this is a duplicate (not the first check with this ephemeral_address)
         -- Only subsequent checks are considered duplicates, not the original
@@ -128,6 +66,17 @@ WITH sent_checks AS (
         ON c.ephemeral_address = cl.ephemeral_address
         AND c.chain_id = cl.chain_id
         AND c.abi_idx = cl.abi_idx
+        -- Only join claims that are valid for THIS check:
+        -- 1. Claim must be after this check was created
+        AND cl.block_num > c.block_num
+        -- 2. No other check was created between this check and the claim
+        AND NOT EXISTS (
+            SELECT 1 FROM send_check_created c2
+            WHERE c2.ephemeral_address = c.ephemeral_address
+            AND c2.chain_id = c.chain_id
+            AND c2.block_num > c.block_num
+            AND c2.block_num < cl.block_num
+        )
     WHERE c.sender = user_address
     GROUP BY c.ephemeral_address, c.sender, c.chain_id, c.tx_hash, c.block_num
 ),
