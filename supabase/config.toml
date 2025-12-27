@@ -4,14 +4,15 @@ project_id = "send"
 
 [api]
 enabled = true
-port = 54321
+# Port configurable via SUPABASE_API_PORT env var (default: 54321)
+port = "env(SUPABASE_API_PORT)"
 schemas = ["public", "storage", "graphql_public", "temporal"]
 extra_search_path = ["public", "extensions", "temporal"]
 max_rows = 100
 
 [db]
-# Port to use for the local database URL.
-port = 54322
+# Port configurable via SUPABASE_DB_PORT env var (default: 54322)
+port = "env(SUPABASE_DB_PORT)"
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
 major_version = 15
@@ -82,16 +83,16 @@ schema_paths = [
 ]
 
 [studio]
-# Port to use for Supabase Studio.
-port = 54323
+# Port configurable via SUPABASE_STUDIO_PORT env var (default: 54323)
+port = "env(SUPABASE_STUDIO_PORT)"
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
 [inbucket]
-# Port to use for the email testing server web interface.
-port = 54324
-smtp_port = 54325
-pop3_port = 54326
+# Ports configurable via SUPABASE_INBUCKET_* env vars
+port = "env(SUPABASE_INBUCKET_PORT)"
+smtp_port = "env(SUPABASE_INBUCKET_SMTP_PORT)"
+pop3_port = "env(SUPABASE_INBUCKET_POP3_PORT)"
 
 [storage]
 # The maximum file size allowed (e.g. "5MB", "500KB").
@@ -99,8 +100,8 @@ file_size_limit = "50MiB"
 
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
-# in emails.
-site_url = "http://localhost:3000"
+# in emails. Configurable via SUPABASE_AUTH_SITE_URL env var.
+site_url = "env(SUPABASE_AUTH_SITE_URL)"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = ["https://localhost:3000"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one

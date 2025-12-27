@@ -19,6 +19,39 @@ supabase_exclude = [
     "vector",
 ] + (["studio"] if CI else [])
 
+# Port configuration - use env vars from .localnet.env or defaults
+_supabase_api_port = os.getenv("SUPABASE_API_PORT", "54321")
+_supabase_db_port = os.getenv("SUPABASE_DB_PORT", "54322")
+_supabase_studio_port = os.getenv("SUPABASE_STUDIO_PORT", "54323")
+_supabase_inbucket_port = os.getenv("SUPABASE_INBUCKET_PORT", "54324")
+_supabase_inbucket_smtp_port = os.getenv("SUPABASE_INBUCKET_SMTP_PORT", "54325")
+_supabase_inbucket_pop3_port = os.getenv("SUPABASE_INBUCKET_POP3_PORT", "54326")
+_nextjs_port = os.getenv("NEXTJS_PORT", "3000")
+_anvil_mainnet_port = os.getenv("ANVIL_MAINNET_PORT", "8545")
+_anvil_base_port = os.getenv("ANVIL_BASE_PORT", "8546")
+_bundler_port = os.getenv("BUNDLER_PORT", "3030")
+_shovel_port = os.getenv("SHOVEL_PORT", "8383")
+_otterscan_mainnet_port = os.getenv("OTTERSCAN_MAINNET_PORT", "5100")
+_otterscan_base_port = os.getenv("OTTERSCAN_BASE_PORT", "5101")
+_temporal_port = os.getenv("TEMPORAL_PORT", "7233")
+_temporal_ui_port = os.getenv("TEMPORAL_UI_PORT", "8233")
+
+# Set Supabase env vars with defaults if not already set (for developers not using gen-env)
+if not os.getenv("SUPABASE_API_PORT"):
+    os.putenv("SUPABASE_API_PORT", _supabase_api_port)
+if not os.getenv("SUPABASE_DB_PORT"):
+    os.putenv("SUPABASE_DB_PORT", _supabase_db_port)
+if not os.getenv("SUPABASE_STUDIO_PORT"):
+    os.putenv("SUPABASE_STUDIO_PORT", _supabase_studio_port)
+if not os.getenv("SUPABASE_INBUCKET_PORT"):
+    os.putenv("SUPABASE_INBUCKET_PORT", _supabase_inbucket_port)
+if not os.getenv("SUPABASE_INBUCKET_SMTP_PORT"):
+    os.putenv("SUPABASE_INBUCKET_SMTP_PORT", _supabase_inbucket_smtp_port)
+if not os.getenv("SUPABASE_INBUCKET_POP3_PORT"):
+    os.putenv("SUPABASE_INBUCKET_POP3_PORT", _supabase_inbucket_pop3_port)
+if not os.getenv("SUPABASE_AUTH_SITE_URL"):
+    os.putenv("SUPABASE_AUTH_SITE_URL", "http://localhost:" + _nextjs_port)
+
 local_resource(
     "supabase",
     [
@@ -29,7 +62,7 @@ local_resource(
     ] + supabase_exclude,
     allow_parallel = True,
     labels = labels,
-    links = [link("http://localhost:54323/", "Supabase Studio")],
+    links = [link("http://localhost:" + _supabase_studio_port + "/", "Supabase Studio")],
     resource_deps = _infra_resource_deps,
     serve_cmd = "while true; do docker logs -f -n 1 supabase_db_send; sleep 1; done",
     serve_dir = _prj_root,
@@ -101,7 +134,7 @@ local_resource(
             command = [
                 "cast",
                 "bn",
-                "--rpc-url=127.0.0.1:8545",
+                "--rpc-url=127.0.0.1:" + _anvil_mainnet_port,
             ],
         ),
         initial_delay_secs = 1,
@@ -112,7 +145,7 @@ local_resource(
     serve_cmd = [cmd for cmd in [
         "anvil",
         "--host=0.0.0.0",
-        "--port=8545",
+        "--port=" + _anvil_mainnet_port,
         "--chain-id=" + os.getenv("NEXT_PUBLIC_MAINNET_CHAIN_ID", "1337"),
         "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
         "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
@@ -128,25 +161,28 @@ local_resource(
     allow_parallel = True,
     auto_init = False,
     labels = labels,
-    links = [link("http://localhost:5100/", "Otterscan Mainnet")],
+    links = [link("http://localhost:" + _otterscan_mainnet_port + "/", "Otterscan Mainnet")],
     readiness_probe = probe(
         http_get = http_get_action(
             path = "/",
-            port = 5100,
+            port = int(_otterscan_mainnet_port),
         ),
         period_secs = 15,
         timeout_secs = 5,
     ),
     resource_deps = ["anvil:mainnet"],
     serve_cmd = """
-    docker ps -a | grep otterscan-mainnet | awk '{print $1}' | xargs -r docker rm -f
+    docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
         --name otterscan-mainnet \
-        -p 5100:80 \
+        -p {otterscan_port}:80 \
         --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:8545" \
+        --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
         otterscan/otterscan:v2.3.0
-    """,
+    """.format(
+        otterscan_port = _otterscan_mainnet_port,
+        anvil_port = _anvil_mainnet_port,
+    ),
     serve_dir = _prj_root,
 )
 
@@ -159,7 +195,7 @@ local_resource(
             command = [
                 "cast",
                 "bn",
-                "--rpc-url=127.0.0.1:8546",
+                "--rpc-url=127.0.0.1:" + _anvil_base_port,
             ],
         ),
         initial_delay_secs = 1,
@@ -167,7 +203,7 @@ local_resource(
         timeout_secs = 5,
     ),
     resource_deps = _infra_resource_deps + ["supabase"],
-    serve_cmd = "yarn contracts dev:anvil-base-node",
+    serve_cmd = "ANVIL_BASE_PORT=" + _anvil_base_port + " yarn contracts dev:anvil-base-node",
     serve_dir = _prj_root,
 )
 
@@ -236,7 +272,7 @@ local_resource(
     readiness_probe = probe(
         http_get = http_get_action(
             path = "/",
-            port = 3030,
+            port = int(_bundler_port),
         ),
     ),
     resource_deps = [
@@ -247,7 +283,7 @@ local_resource(
     docker run --rm \
         --name aa-bundler \
         --add-host=host.docker.internal:host-gateway \
-        -p 0.0.0.0:3030:3030 \
+        -p 0.0.0.0:{bundler_port}:{bundler_port} \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./apps/aabundler/etc:/app/etc/aabundler \
         -e "DEBUG={bundler_debug}" \
@@ -255,15 +291,17 @@ local_resource(
         -m 500m \
         --pull always \
         docker.io/0xbigboss/bundler:latest \
-        --port 3030 \
+        --port {bundler_port} \
         --config /app/etc/aabundler/aabundler.config.json \
         --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        --network http://host.docker.internal:8546 \
+        --network http://host.docker.internal:{anvil_port} \
         --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
 """.format(
         bundler_debug = os.getenv("BUNDLER_DEBUG", "aa.rpc"),
+        bundler_port = _bundler_port,
+        anvil_port = _anvil_base_port,
     ),
     serve_dir = _prj_root,
 )
@@ -272,18 +310,18 @@ local_resource(
     "shovel",
     allow_parallel = True,
     labels = labels,
-    links = ["http://localhost:8383/"],
+    links = ["http://localhost:" + _shovel_port + "/"],
     readiness_probe = probe(
         http_get = http_get_action(
             path = "/diag",
-            port = 8383,
+            port = int(_shovel_port),
         ),
     ),
     resource_deps = _infra_resource_deps + [
         "anvil:base",
         "shovel:generate-config",
     ],
-    serve_cmd = "yarn run shovel:tilt",
+    serve_cmd = "SHOVEL_PORT=" + _shovel_port + " yarn run shovel:tilt",
     serve_dir = os.path.join(
         config.main_dir,
         "packages/shovel",
@@ -319,11 +357,11 @@ local_resource(
     allow_parallel = True,
     auto_init = not CI,
     labels = labels,
-    links = [link("http://localhost:5101/", "Otterscan Base")],
+    links = [link("http://localhost:" + _otterscan_base_port + "/", "Otterscan Base")],
     readiness_probe = probe(
         http_get = http_get_action(
             path = "/",
-            port = 5101,
+            port = int(_otterscan_base_port),
         ),
         period_secs = 15,
         timeout_secs = 5,
@@ -332,14 +370,17 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep otterscan-base | awk '{print $1}' | xargs -r docker rm -f
+    docker ps -a | grep otterscan-base | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
         --name otterscan-base \
-        -p 5101:80 \
+        -p {otterscan_port}:80 \
         --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:8546" \
+        --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
         otterscan/otterscan:v2.3.0
-    """,
+    """.format(
+        otterscan_port = _otterscan_base_port,
+        anvil_port = _anvil_base_port,
+    ),
     serve_dir = _prj_root,
 )
 
@@ -347,9 +388,9 @@ local_resource(
     name = "temporal",
     allow_parallel = True,
     labels = labels,
-    links = [link("http://localhost:8233", "Temporal Web UI")],
+    links = [link("http://localhost:" + _temporal_ui_port, "Temporal Web UI")],
     resource_deps = [],
-    serve_cmd = "temporal server start-dev --db-filename ./var/temporal.db",
+    serve_cmd = "temporal server start-dev --db-filename ./var/temporal.db --port " + _temporal_port + " --ui-port " + _temporal_ui_port,
     serve_dir = _prj_root,
 )
 

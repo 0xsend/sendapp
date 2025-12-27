@@ -30,10 +30,11 @@ $.verbose = true
  */
 
 const AIRDROP_MULTISIG_SAFE = '0xD3DCFf1823714a4399AD2927A3800686D4CEB53A'
+const RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || 'http://127.0.0.1:8546'
 
 void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))
-  await $`cast rpc --rpc-url http://localhost:8546 evm_setAutomine true`
+  await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine true`
 
   console.log(chalk.blue('Update all chain ids to use local...'))
   console.log(chalk.blue('base mainnet -> base local'))
@@ -101,35 +102,33 @@ void (async function main() {
   $.env.SEND_MERKLE_DROP_ADDRESS = merkleDropAddress
 
   console.log(chalk.blue('Sending 10 ether to the airdrop multisig...'))
-  await $`cast send --rpc-url http://localhost:8546 \
+  await $`cast send --rpc-url ${RPC_URL} \
               --unlocked \
               --from 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
               ${AIRDROP_MULTISIG_SAFE} \
               --value 10ether`
 
   console.log(chalk.blue('Impersonating the airdrop multisig...'))
-  await $`cast rpc --rpc-url http://localhost:8546 \
+  await $`cast rpc --rpc-url ${RPC_URL} \
       anvil_impersonateAccount \
       ${AIRDROP_MULTISIG_SAFE}`
 
   console.log(chalk.blue('Adding a tranche to the airdrop...'))
   await $`forge script ./script/CreateSendDistributionTranche.s.sol:CreateSendDistributionTrancheScript \
                 -vvvv \
-                --fork-url http://localhost:8546 \
+                --fork-url ${RPC_URL} \
                 --unlocked \
                 --sender ${AIRDROP_MULTISIG_SAFE} \
                 --broadcast`
 
   console.log(chalk.blue('Stop impersonating the airdrop multisig...'))
-  await $`cast rpc --rpc-url http://localhost:8546 anvil_stopImpersonatingAccount ${AIRDROP_MULTISIG_SAFE}`
+  await $`cast rpc --rpc-url ${RPC_URL} anvil_stopImpersonatingAccount ${AIRDROP_MULTISIG_SAFE}`
 
   console.log(chalk.blue('Disable auto-mining...'))
-  await $`cast rpc --rpc-url http://localhost:8546 evm_setAutomine false`
+  await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine false`
 
   console.log(chalk.blue(`Re-enable interval mining... ${$.env.ANVIL_BLOCK_TIME ?? '2'}`))
-  await $`cast rpc --rpc-url http://localhost:8546 evm_setIntervalMining ${
-    $.env.ANVIL_BLOCK_TIME ?? '2'
-  }` // mimics Tiltfile default
+  await $`cast rpc --rpc-url ${RPC_URL} evm_setIntervalMining ${$.env.ANVIL_BLOCK_TIME ?? '2'}` // mimics Tiltfile default
 
   console.log(chalk.green('Done!'))
 })()

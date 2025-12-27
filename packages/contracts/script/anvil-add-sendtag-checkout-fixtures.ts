@@ -29,7 +29,7 @@ $.verbose = true
  * This script is used to deploy the DeploySendtagCheckout
  */
 
-const RPC_URL = 'http://127.0.0.1:8546'
+const RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || 'http://127.0.0.1:8546'
 void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))
   await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine true`

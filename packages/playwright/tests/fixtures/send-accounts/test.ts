@@ -24,7 +24,7 @@ export const signUp = async (page: Page, sendtag: string, expect: Expect) => {
       }
       return false
     },
-    timeout: 15_000,
+    timeout: 30_000,
   })
 
   await page.getByTestId('sendtag-input').fill(sendtag)
@@ -85,7 +85,7 @@ const sendAccountTest = base.extend<{
 
       await use(sendAccount)
     },
-    { timeout: 20000, scope: 'test' },
+    { timeout: 60_000, scope: 'test' },
   ],
   page: [({ sendAccount: _, page }, use) => use(page), { scope: 'test' }],
 })

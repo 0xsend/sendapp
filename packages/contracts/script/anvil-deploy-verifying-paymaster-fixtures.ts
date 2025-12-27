@@ -5,7 +5,7 @@ $.verbose = true
  * This script is used to deploy the SendVerifier and SendAccountFactory contracts
  */
 
-const RPC_URL = 'http://127.0.0.1:8546'
+const RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || 'http://127.0.0.1:8546'
 
 $.env.VERIFIER = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8'
 $.env.OWNER = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
