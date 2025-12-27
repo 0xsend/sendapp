@@ -261,6 +261,7 @@ function generateEnvContent(workspaceName: string, ports: PortConfig): string {
     '',
     '# AA Bundler',
     `NEXT_PUBLIC_BUNDLER_RPC_URL=http://localhost:${ports.BUNDLER_PORT}/rpc`,
+    `ERC7677_BUNDLER_RPC_URL=http://localhost:${ports.BUNDLER_PORT}/rpc`,
     `BUNDLER_PORT=${ports.BUNDLER_PORT}`,
     '',
     '# Shovel (indexer)',
