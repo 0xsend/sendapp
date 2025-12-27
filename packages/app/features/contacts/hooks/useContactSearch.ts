@@ -5,10 +5,10 @@ import type { ContactFilter, ContactSearchParams, ContactSource, ContactView } f
 
 /**
  * Build query key for contact search queries.
- * Includes query string and filter for proper cache invalidation.
+ * Includes query string, filter, and pageSize for proper cache invalidation.
  */
-export function contactSearchQueryKey(query: string, filter: ContactFilter) {
-  return [CONTACTS_QUERY_KEY, 'search', { query, filter }] as const
+export function contactSearchQueryKey(query: string, filter: ContactFilter, pageSize: number) {
+  return [CONTACTS_QUERY_KEY, 'search', { query, filter, pageSize }] as const
 }
 
 interface UseContactSearchOptions {
@@ -45,7 +45,7 @@ export function useContactSearch({
   const supabase = useSupabase()
 
   return useInfiniteQuery({
-    queryKey: contactSearchQueryKey(query, filter),
+    queryKey: contactSearchQueryKey(query, filter, pageSize),
     initialPageParam: 0,
 
     queryFn: async ({ pageParam, signal }) => {
