@@ -10,8 +10,10 @@ $.env.ANVIL_BASE_BLOCK_TIME ||= '2'
 $.env.ANVIL_BASE_EXTRA_ARGS ||= '--silent'
 $.env.NEXT_PUBLIC_BASE_CHAIN_ID ||= '845337'
 $.env.ANVIL_BASE_PORT ||= '8546'
+$.env.SUPABASE_PROJECT_ID ||= 'send'
 
 const ANVIL_BASE_PORT = $.env.ANVIL_BASE_PORT
+const SUPABASE_NETWORK = `supabase_network_${$.env.SUPABASE_PROJECT_ID}`
 
 console.log(chalk.blue('Running anvil base node'), {
   ANVIL_BASE_FORK_URL: $.env.ANVIL_BASE_FORK_URL,
@@ -35,7 +37,7 @@ await $`docker rm -f sendapp-anvil-base`
 await $`docker run --rm \
           -d \
           --platform=linux/amd64 \
-          --network=supabase_network_send \
+          --network=${SUPABASE_NETWORK} \
           -p=0.0.0.0:${ANVIL_BASE_PORT}:${ANVIL_BASE_PORT} \
           --name=sendapp-anvil-base \
           ghcr.io/foundry-rs/foundry:stable "anvil \
