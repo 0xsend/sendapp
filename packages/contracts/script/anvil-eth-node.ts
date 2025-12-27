@@ -9,7 +9,7 @@ if (!$.env.ANVIL_MAINNET_FORK_URL) {
 $.env.ANVIL_MAINNET_BLOCK_TIME ||= '2'
 $.env.ANVIL_MAINNET_EXTRA_ARGS ||= '--silent'
 $.env.NEXT_PUBLIC_MAINNET_CHAIN_ID ||= '1337'
-$.env.SUPABASE_PROJECT_ID ||= 'send'
+$.env.SUPABASE_PROJECT_ID ||= 'sendapp'
 
 const SUPABASE_NETWORK = `supabase_network_${$.env.SUPABASE_PROJECT_ID}`
 
