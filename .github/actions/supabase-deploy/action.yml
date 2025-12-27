@@ -38,7 +38,7 @@ runs:
         SUPABASE_INBUCKET_SMTP_PORT: "54325"
         SUPABASE_INBUCKET_POP3_PORT: "54326"
         SUPABASE_AUTH_SITE_URL: "http://localhost:3000"
-        SUPABASE_PROJECT_ID: "sendapp"
+        SUPABASE_PROJECT_ID: ${{ inputs.supabase-project-id }}
     - shell: bash
       run: supabase db push
       env:
@@ -52,4 +52,4 @@ runs:
         SUPABASE_INBUCKET_SMTP_PORT: "54325"
         SUPABASE_INBUCKET_POP3_PORT: "54326"
         SUPABASE_AUTH_SITE_URL: "http://localhost:3000"
-        SUPABASE_PROJECT_ID: "sendapp"
+        SUPABASE_PROJECT_ID: ${{ inputs.supabase-project-id }}
