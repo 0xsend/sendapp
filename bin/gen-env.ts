@@ -229,6 +229,7 @@ function generateEnvContent(workspaceName: string, ports: PortConfig): string {
     '',
     '# Workspace identification',
     `WORKSPACE_NAME=${workspaceName}`,
+    `SUPABASE_PROJECT_ID=${workspaceName}`,
     '',
     '# Tilt (dev UI)',
     `TILT_HOST=${tiltHost}`,
@@ -419,9 +420,9 @@ async function main() {
 
   console.log(chalk.cyan('Next steps:'))
   console.log('  1. Reload direnv: direnv allow')
-  console.log(`  2. Start Tilt:    tilt up --host ${workspaceName}.localhost --port $TILT_PORT`)
+  console.log('  2. Start Tilt:    tilt up')
   console.log('')
-  console.log(chalk.gray('Note: .localnet.env is loaded automatically via .envrc'))
+  console.log(chalk.gray('Tilt reads TILT_HOST and TILT_PORT from .localnet.env automatically'))
 }
 
 main().catch((err) => {

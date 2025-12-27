@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 
-load("./common.Tiltfile", "CI", "ws_container")
+load("./common.Tiltfile", "CI", "WORKSPACE_NAME", "ws_container")
 load("ext://uibutton", "cmd_button", "location")
 
 _prj_root = os.path.join(
@@ -64,7 +64,7 @@ local_resource(
     labels = labels,
     links = [link("http://localhost:" + _supabase_studio_port + "/", "Supabase Studio")],
     resource_deps = _infra_resource_deps,
-    serve_cmd = "while true; do docker logs -f -n 1 supabase_db_send; sleep 1; done",
+    serve_cmd = "while true; do docker logs -f -n 1 supabase_db_" + WORKSPACE_NAME + "; sleep 1; done",
     serve_dir = _prj_root,
 )
 
