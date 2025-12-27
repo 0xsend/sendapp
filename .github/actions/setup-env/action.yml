@@ -53,24 +53,23 @@ runs:
       uses: foundry-rs/foundry-toolchain@v1
       with:
         version: stable
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # - name: Mount node_modules Sticky Disk
-    #   if: ${{ inputs.yarn-install == 'true' }}
-    #   uses: useblacksmith/stickydisk@v1
-    #   continue-on-error: true
-    #   with:
-    #     key: ${{ github.repository }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-    #     path: ./node_modules
-    # - name: Clean Sticky Disk Metadata
-    #   if: ${{ inputs.yarn-install == 'true' }}
-    #   shell: bash
-    #   run: |
-    #     # Remove ext4 lost+found directory that causes Yarn permission errors
-    #     # This directory is created automatically by ext4 filesystem but not needed
-    #     if [ -d "./node_modules/lost+found" ]; then
-    #       echo "Removing lost+found directory from Sticky Disk mount"
-    #       sudo rm -rf ./node_modules/lost+found
-    #     fi
+    - name: Mount node_modules Sticky Disk
+      if: ${{ inputs.yarn-install == 'true' }}
+      uses: useblacksmith/stickydisk@v1
+      continue-on-error: true
+      with:
+        key: ${{ github.repository }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+        path: ./node_modules
+    - name: Clean Sticky Disk Metadata
+      if: ${{ inputs.yarn-install == 'true' }}
+      shell: bash
+      run: |
+        # Remove ext4 lost+found directory that causes Yarn permission errors
+        # This directory is created automatically by ext4 filesystem but not needed
+        if [ -d "./node_modules/lost+found" ]; then
+          echo "Removing lost+found directory from Sticky Disk mount"
+          sudo rm -rf ./node_modules/lost+found
+        fi
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash

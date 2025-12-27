@@ -40,9 +40,7 @@ concurrency:
 jobs:
   schema-drift-check:
     name: Check Schema Drift
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     steps:
@@ -77,9 +75,7 @@ jobs:
 
   deploy:
     needs: [schema-drift-check]
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     steps:
