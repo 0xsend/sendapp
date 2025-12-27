@@ -4,6 +4,7 @@
     "secretShop": "Geheimer Shop"
   },
   "stack": {
+    "contacts": "Kontakte",
     "account": {
       "language": "Sprache",
       "linkInBio": "Link in Bio",

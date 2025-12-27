@@ -17,6 +17,7 @@
     }
   },
   "stack": {
+    "contacts": "Contactos",
     "account": {
       "root": "Cuenta",
       "profile": "Perfil",

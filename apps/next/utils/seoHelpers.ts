@@ -128,6 +128,7 @@ export const PAGE_TITLES = {
   home: 'Send',
   account: 'Send | Account',
   activity: 'Send | Activity',
+  contacts: 'Send | Contacts',
   leaderboard: 'Send | Leaderboard',
   send: 'Send',
   notFound: 'Send | 404',
@@ -142,6 +143,7 @@ export const PAGE_DESCRIPTIONS = {
   account:
     'Sendtags simplify transactions by replacing long wallet addresses with memorable identifiers.',
   activity: 'View your transaction history and account activity.',
+  contacts: 'Manage your contacts and send money to friends.',
   leaderboard: 'See top users and community activity on Send.',
   send: 'Send money to anyone, anywhere, instantly.',
   notFound: 'Not found. Send, Instant Payments.',
