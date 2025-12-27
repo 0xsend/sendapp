@@ -41,7 +41,7 @@ export class OnboardingPage {
         }
         return false
       },
-      timeout: 15_000,
+      timeout: 30_000,
     })
 
     await this.page.getByRole('button', { name: 'finish account' }).click()

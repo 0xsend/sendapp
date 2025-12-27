@@ -101,12 +101,14 @@ local_resource(
         "yarn run distributor start" if CI else "yarn run distributor dev",
 )
 
+_temporal_ui_port = os.getenv("TEMPORAL_UI_PORT", "8233")
+
 local_resource(
     "workers",
     allow_parallel = True,
     labels = labels,
     links = [
-        link("http://localhost:8233", "Temporal Web UI"),
+        link("http://localhost:" + _temporal_ui_port, "Temporal Web UI"),
     ],
     resource_deps = [
         "yarn:install",
