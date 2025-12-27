@@ -280,6 +280,16 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
+    # Wait for Anvil to be ready before starting bundler
+    echo "Waiting for Anvil at host.docker.internal:{anvil_port}..."
+    until curl -sf -X POST -H "Content-Type: application/json" \
+        --data '{{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}}' \
+        http://host.docker.internal:{anvil_port} > /dev/null 2>&1; do
+        echo "Anvil not ready, retrying in 2s..."
+        sleep 2
+    done
+    echo "Anvil is ready!"
+
     docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
         --name {container_name} \
@@ -323,7 +333,22 @@ local_resource(
         "anvil:base",
         "shovel:generate-config",
     ],
-    serve_cmd = "SHOVEL_PORT=" + _shovel_port + " yarn run shovel:tilt",
+    serve_cmd = """
+    # Wait for Anvil to be ready before starting shovel
+    echo "Waiting for Anvil at localhost:{anvil_port}..."
+    until curl -sf -X POST -H "Content-Type: application/json" \
+        --data '{{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}}' \
+        http://localhost:{anvil_port} > /dev/null 2>&1; do
+        echo "Anvil not ready, retrying in 2s..."
+        sleep 2
+    done
+    echo "Anvil is ready!"
+
+    SHOVEL_PORT={shovel_port} yarn run shovel:tilt
+    """.format(
+        anvil_port = _anvil_base_port,
+        shovel_port = _shovel_port,
+    ),
     serve_dir = os.path.join(
         config.main_dir,
         "packages/shovel",

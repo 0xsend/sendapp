@@ -12,6 +12,8 @@ const ANVIL_BASE_PORT = $.env.ANVIL_BASE_PORT || '8546'
 const SUPABASE_DB_PORT = $.env.SUPABASE_DB_PORT || '54322'
 const SHOVEL_PORT = $.env.SHOVEL_PORT || '8383'
 const BASE_RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || `http://127.0.0.1:${ANVIL_BASE_PORT}`
+const WORKSPACE_NAME = $.env.WORKSPACE_NAME || 'sendapp'
+const CONTAINER_NAME = `${WORKSPACE_NAME}-shovel`
 
 /**
  * This script is used to start the shovel container for local development.
@@ -21,7 +23,7 @@ const BASE_RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || `http://127.0.0.1:${ANVIL
  * SHOVEL_MIGRATE=1 - Enables migration mode, which tells shovel to create the database and run migrations. Useful for adding new integrations.
  */
 
-await $`docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f || true`
+await $`docker rm -f ${CONTAINER_NAME} || true`
 
 const blockNumberProc =
   await $`cast rpc --rpc-url ${BASE_RPC_URL} eth_blockNumber | jq -r . | cast to-dec`
@@ -39,7 +41,7 @@ const dockerArgs = [
   'run',
   '--rm',
   '--name',
-  'shovel',
+  CONTAINER_NAME,
   '--add-host=host.docker.internal:host-gateway',
   '-p',
   `${SHOVEL_PORT}:80`,

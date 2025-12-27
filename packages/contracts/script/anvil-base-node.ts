@@ -13,7 +13,9 @@ $.env.ANVIL_BASE_PORT ||= '8546'
 $.env.SUPABASE_PROJECT_ID ||= 'sendapp'
 
 const ANVIL_BASE_PORT = $.env.ANVIL_BASE_PORT
-const SUPABASE_NETWORK = `supabase_network_${$.env.SUPABASE_PROJECT_ID}`
+const SUPABASE_PROJECT_ID = $.env.SUPABASE_PROJECT_ID
+const SUPABASE_NETWORK = `supabase_network_${SUPABASE_PROJECT_ID}`
+const CONTAINER_NAME = `${SUPABASE_PROJECT_ID}-anvil-base`
 
 console.log(chalk.blue('Running anvil base node'), {
   ANVIL_BASE_FORK_URL: $.env.ANVIL_BASE_FORK_URL,
@@ -31,15 +33,17 @@ const blockHeight = await $`cast bn --rpc-url $ANVIL_BASE_FORK_URL`.then(
   (r) => BigInt(r.stdout.trim()) - 30n
 )
 
-await $`docker rm -f sendapp-anvil-base`
+await $`docker rm -f ${CONTAINER_NAME}`
 
 // Start docker container in the background
 await $`docker run --rm \
           -d \
           --platform=linux/amd64 \
+          -m 2g \
+          --memory-swap 2g \
           --network=${SUPABASE_NETWORK} \
           -p=0.0.0.0:${ANVIL_BASE_PORT}:${ANVIL_BASE_PORT} \
-          --name=sendapp-anvil-base \
+          --name=${CONTAINER_NAME} \
           ghcr.io/foundry-rs/foundry:stable "anvil \
             --host=0.0.0.0 \
             --port=${ANVIL_BASE_PORT} \
@@ -177,4 +181,4 @@ console.log(chalk.green('Remote state prefetching complete!'))
 
 // Now attach to the container logs to see output
 console.log(chalk.blue('Attaching to container logs...'))
-await $`docker logs -f sendapp-anvil-base`
+await $`docker logs -f ${CONTAINER_NAME}`
