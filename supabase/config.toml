@@ -1,6 +1,7 @@
-# A string used to distinguish different Supabase projects on the same host. Defaults to the working
-# directory name when running `supabase init`.
-project_id = "send"
+# A string used to distinguish different Supabase projects on the same host.
+# Uses SUPABASE_PROJECT_ID env var for multi-worktree isolation.
+# gen-env.ts sets this to WORKSPACE_NAME (e.g., "bb-dev").
+project_id = "env(SUPABASE_PROJECT_ID)"
 
 [api]
 enabled = true

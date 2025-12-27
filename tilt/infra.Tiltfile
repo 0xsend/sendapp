@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 
-load("./common.Tiltfile", "CI")
+load("./common.Tiltfile", "CI", "WORKSPACE_NAME", "ws_container")
 load("ext://uibutton", "cmd_button", "location")
 
 _prj_root = os.path.join(
@@ -64,7 +64,7 @@ local_resource(
     labels = labels,
     links = [link("http://localhost:" + _supabase_studio_port + "/", "Supabase Studio")],
     resource_deps = _infra_resource_deps,
-    serve_cmd = "while true; do docker logs -f -n 1 supabase_db_send; sleep 1; done",
+    serve_cmd = "while true; do docker logs -f -n 1 supabase_db_" + WORKSPACE_NAME + "; sleep 1; done",
     serve_dir = _prj_root,
 )
 
@@ -172,14 +172,15 @@ local_resource(
     ),
     resource_deps = ["anvil:mainnet"],
     serve_cmd = """
-    docker ps -a | grep otterscan-mainnet | awk '{{print $1}}' | xargs -r docker rm -f
+    docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
-        --name otterscan-mainnet \
+        --name {container_name} \
         -p {otterscan_port}:80 \
         --add-host=host.docker.internal:host-gateway \
         --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
         otterscan/otterscan:v2.3.0
     """.format(
+        container_name = ws_container("otterscan-mainnet"),
         otterscan_port = _otterscan_mainnet_port,
         anvil_port = _anvil_mainnet_port,
     ),
@@ -279,9 +280,9 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep aa-bundler | awk '{{print $1}}' | xargs -r docker rm -f
+    docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
-        --name aa-bundler \
+        --name {container_name} \
         --add-host=host.docker.internal:host-gateway \
         -p 0.0.0.0:{bundler_port}:{bundler_port} \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
@@ -299,6 +300,7 @@ local_resource(
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
 """.format(
+        container_name = ws_container("aa-bundler"),
         bundler_debug = os.getenv("BUNDLER_DEBUG", "aa.rpc"),
         bundler_port = _bundler_port,
         anvil_port = _anvil_base_port,
@@ -370,14 +372,15 @@ local_resource(
         "anvil:base",
     ],
     serve_cmd = """
-    docker ps -a | grep otterscan-base | awk '{{print $1}}' | xargs -r docker rm -f
+    docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
-        --name otterscan-base \
+        --name {container_name} \
         -p {otterscan_port}:80 \
         --add-host=host.docker.internal:host-gateway \
         --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
         otterscan/otterscan:v2.3.0
     """.format(
+        container_name = ws_container("otterscan-base"),
         otterscan_port = _otterscan_base_port,
         anvil_port = _anvil_base_port,
     ),

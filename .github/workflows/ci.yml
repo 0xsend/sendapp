@@ -112,6 +112,7 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       FOUNDRY_BASE_SEPOLIA_RPC_URL: ${{ secrets.CI_FOUNDRY_BASE_SEPOLIA_RPC_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
+      SUPABASE_PROJECT_ID: sendapp
 
     steps:
       - name: Add hosts to /etc/hosts
@@ -159,6 +160,7 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       FOUNDRY_BASE_SEPOLIA_RPC_URL: ${{ secrets.CI_FOUNDRY_BASE_SEPOLIA_RPC_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
+      SUPABASE_PROJECT_ID: sendapp
 
     steps:
       - name: Add hosts to /etc/hosts
@@ -220,6 +222,7 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
       NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.image-tag }}
+      SUPABASE_PROJECT_ID: sendapp
 
     # for writing PR comments
     permissions:
