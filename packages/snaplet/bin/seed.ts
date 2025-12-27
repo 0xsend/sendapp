@@ -13,9 +13,11 @@ import {
   createNewTokenDistribution,
   createOldTokenDistribution,
   createTransferInDistribution,
+  generateContactNetworkData,
   leaderboardReferralsAllTimes,
   models,
   userOnboarded,
+  DEFAULT_CONTACT_NETWORK_CONFIG,
 } from '../src'
 import { select } from '../src/select'
 import { pravatar } from '../src/utils'
@@ -536,6 +538,149 @@ if (!dryRun) {
 
       console.log('Seeded sendpot data: 3 jackpot runs and ticket purchases')
     }
+
+    // Seed contact network
+    console.log('Seeding contact network...')
+    const userIds = seededUsers.users.map((u) => ({ id: u.id }))
+    // Use fixed baseTime for deterministic seed output
+    // 2024-01-15T12:00:00.000Z - a fixed point in time for reproducible timestamps
+    const SEED_BASE_TIME = 1705320000000
+    const { contacts, labels, labelAssignments } = generateContactNetworkData(userIds, {
+      ...DEFAULT_CONTACT_NETWORK_CONFIG,
+      baseTime: SEED_BASE_TIME,
+    })
+
+    // Seed labels first
+    if (labels.length > 0) {
+      await seed.contact_labels(labels)
+      console.log(`Seeded ${labels.length} contact labels`)
+    }
+
+    // Seed contacts - split by type due to Snaplet FK handling issues
+    if (contacts.length > 0) {
+      // External contacts work with Snaplet
+      const externalContacts = contacts.filter((c) => c.external_address != null)
+      // Send-user contacts require raw SQL due to Snaplet FK relationship handling
+      const sendUserContacts = contacts.filter((c) => c.contact_user_id != null)
+
+      if (externalContacts.length > 0) {
+        await seed.contacts(externalContacts)
+      }
+
+      // Insert Send-user contacts via raw SQL
+      for (const contact of sendUserContacts) {
+        await client.query(
+          `INSERT INTO contacts (owner_id, contact_user_id, custom_name, notes, is_favorite, source, last_interacted_at, archived_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            contact.owner_id,
+            contact.contact_user_id,
+            contact.custom_name ?? null,
+            contact.notes ?? null,
+            contact.is_favorite ?? false,
+            contact.source ?? 'manual',
+            contact.last_interacted_at ?? null,
+            contact.archived_at ?? null,
+          ]
+        )
+      }
+
+      console.log(
+        `Seeded ${contacts.length} contacts (${sendUserContacts.length} Send-user via SQL, ${externalContacts.length} external via Snaplet)`
+      )
+    }
+
+    // Seed label assignments via raw SQL (need actual IDs from seeded records)
+    if (labelAssignments.length > 0) {
+      // Get the seeded contacts with unique identifiers for key-based lookup
+      const contactsResult = await client.query(`
+        SELECT id, owner_id, contact_user_id,
+               normalized_external_address, chain_id
+        FROM contacts
+      `)
+
+      // Get the seeded labels
+      const labelsResult = await client.query(`
+        SELECT id, owner_id, name FROM contact_labels
+      `)
+
+      // Build key-based lookup for contacts
+      // Key format: "owner_id:user:contact_user_id" or "owner_id:ext:normalized_address:chain_id"
+      const contactIdByKey = new Map<string, number>()
+      for (const row of contactsResult.rows) {
+        let key: string
+        if (row.contact_user_id) {
+          key = `${row.owner_id}:user:${row.contact_user_id}`
+        } else {
+          key = `${row.owner_id}:ext:${row.normalized_external_address}:${row.chain_id}`
+        }
+        contactIdByKey.set(key, row.id)
+      }
+
+      // Build key-based lookup for labels: "owner_id:name"
+      const labelIdByKey = new Map<string, number>()
+      for (const row of labelsResult.rows) {
+        const key = `${row.owner_id}:${row.name}`
+        labelIdByKey.set(key, row.id)
+      }
+
+      // Insert label assignments using key-based lookup
+      let assignmentsInserted = 0
+      for (const assignment of labelAssignments) {
+        const contact = contacts[assignment.contactIndex]
+        const label = labels[assignment.labelIndex]
+        if (!contact || !label) continue
+
+        // Build contact key matching the database lookup
+        let contactKey: string
+        if (contact.contact_user_id) {
+          contactKey = `${contact.owner_id}:user:${contact.contact_user_id}`
+        } else {
+          // Normalize external address the same way the database does:
+          // Only EVM addresses (eip155:*) are lowercased; Solana/Canton are case-sensitive
+          const chainId = contact.chain_id as string
+          const addr = contact.external_address as string
+          const normalizedAddr = chainId?.startsWith('eip155:') ? addr.toLowerCase() : addr
+          contactKey = `${contact.owner_id}:ext:${normalizedAddr}:${chainId}`
+        }
+
+        const labelKey = `${label.owner_id}:${label.name}`
+
+        const contactId = contactIdByKey.get(contactKey)
+        const labelId = labelIdByKey.get(labelKey)
+        if (contactId === undefined || labelId === undefined) continue
+
+        try {
+          await client.query(
+            'INSERT INTO contact_label_assignments (contact_id, label_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            [contactId, labelId]
+          )
+          assignmentsInserted++
+        } catch {
+          // Ignore duplicate assignment errors
+        }
+      }
+      console.log(`Seeded ${assignmentsInserted} contact label assignments`)
+    }
+
+    // Log contact network summary
+    const contactStats = await client.query(`
+      SELECT
+        COUNT(*) as total,
+        COUNT(*) FILTER (WHERE source = 'manual') as manual,
+        COUNT(*) FILTER (WHERE source = 'activity') as activity,
+        COUNT(*) FILTER (WHERE source = 'referral') as referral,
+        COUNT(*) FILTER (WHERE source = 'external') as external,
+        COUNT(*) FILTER (WHERE is_favorite = true) as favorites,
+        COUNT(*) FILTER (WHERE archived_at IS NOT NULL) as archived
+      FROM contacts
+    `)
+    const stats = contactStats.rows[0]
+    console.log('Contact network summary:')
+    console.log(
+      `  Total: ${stats.total} (manual: ${stats.manual}, activity: ${stats.activity}, referral: ${stats.referral}, external: ${stats.external})`
+    )
+    console.log(`  Favorites: ${stats.favorites}, Archived: ${stats.archived}`)
 
     // Refresh the send_scores_history materialized view
     console.log('Refreshing send_scores_history materialized view...')
