@@ -21,7 +21,7 @@ import {
   IconX,
 } from 'app/components/icons'
 import { AvatarProfile } from 'app/features/profile/AvatarProfile'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { CONTACTS_CUSTOM_NAME_MAX, CONTACTS_NOTES_MAX } from '../constants'
@@ -89,6 +89,17 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
 
   // Archive confirmation state
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
+
+  // Sync form state when a different contact is selected.
+  // Intentionally only depends on contact_id - we reset when switching contacts,
+  // not when the same contact's fields update (which would cause edit conflicts).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional - reset only on contact switch
+  useEffect(() => {
+    setCustomName(contact.custom_name ?? '')
+    setNotes(contact.notes ?? '')
+    setIsEditing(false)
+    setShowArchiveConfirm(false)
+  }, [contact.contact_id])
 
   // Fetch all labels to display assigned ones
   const { data: allLabels } = useContactLabels()
