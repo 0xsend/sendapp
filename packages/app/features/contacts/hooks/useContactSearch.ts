@@ -58,6 +58,9 @@ export function useContactSearch({
 
       // Add filter parameters based on filter type
       switch (filter.type) {
+        case 'all':
+          // No additional filters needed
+          break
         case 'favorites':
           params.p_favorites_only = true
           break
@@ -67,9 +70,10 @@ export function useContactSearch({
         case 'source':
           params.p_source_filter = [filter.source as ContactSource]
           break
-        default:
-          // No additional filters needed for 'all'
-          break
+        default: {
+          const _exhaustive: never = filter
+          throw new Error(`unhandled filter type: ${JSON.stringify(_exhaustive)}`)
+        }
       }
 
       const { data, error } = await supabase.rpc('contact_search', params).abortSignal(signal)

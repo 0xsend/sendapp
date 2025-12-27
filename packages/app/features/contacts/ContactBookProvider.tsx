@@ -1,6 +1,6 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { useDebounce } from '@my/ui'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { CONTACTS_SEARCH_DEBOUNCE_MS } from './constants'
 import { useContacts } from './hooks/useContacts'
 import type {
@@ -29,15 +29,6 @@ interface ContactBookContextValueExtended extends ContactBookContextValue {
 
 const ContactBookContext = createContext<ContactBookContextValueExtended | null>(null)
 
-interface SearchRequest {
-  id: number
-  query: string
-  abortController: AbortController
-}
-
-// Module-level request tracking for cancellation
-let currentSearchRequest: SearchRequest | null = null
-
 interface ContactBookProviderProps {
   children: React.ReactNode
   /** Initial filter to apply */
@@ -47,8 +38,8 @@ interface ContactBookProviderProps {
 /**
  * Provider for contact book functionality.
  *
- * Manages search state, debouncing, and request cancellation.
- * Follows the pattern from TagSearchProvider.
+ * Manages search state and debouncing. Request cancellation is handled
+ * automatically by React Query when the query key changes.
  *
  * @example
  * ```tsx
@@ -71,28 +62,9 @@ export function ContactBookProvider({
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [filter, setFilter] = useState<ContactFilter>(initialFilter)
 
-  // Track the latest request ID to ignore stale responses
-  const latestRequestIdRef = useRef<number | null>(null)
-
   // Debounced search handler
   const handleDebouncedSearch = useDebounce(
     (query: string) => {
-      const requestId = Date.now()
-      latestRequestIdRef.current = requestId
-
-      // Cancel any pending request
-      if (currentSearchRequest && currentSearchRequest.id !== requestId) {
-        currentSearchRequest.abortController.abort()
-      }
-
-      // Create a new abort controller for this request
-      const abortController = new AbortController()
-      currentSearchRequest = {
-        id: requestId,
-        query,
-        abortController,
-      }
-
       setDebouncedQuery(query)
     },
     CONTACTS_SEARCH_DEBOUNCE_MS,
@@ -100,14 +72,9 @@ export function ContactBookProvider({
     []
   )
 
-  // Cancel pending searches when query is cleared
+  // Cancel pending debounce when query is cleared
   useEffect(() => {
     if (inputQuery.length === 0) {
-      latestRequestIdRef.current = null
-      if (currentSearchRequest) {
-        currentSearchRequest.abortController.abort()
-        currentSearchRequest = null
-      }
       handleDebouncedSearch.cancel()
       setDebouncedQuery('')
     } else {
@@ -132,11 +99,6 @@ export function ContactBookProvider({
     setInputQuery('')
     setDebouncedQuery('')
     setFilter({ type: 'all' })
-    latestRequestIdRef.current = null
-    if (currentSearchRequest) {
-      currentSearchRequest.abortController.abort()
-      currentSearchRequest = null
-    }
     handleDebouncedSearch.cancel()
   }, [handleDebouncedSearch])
 

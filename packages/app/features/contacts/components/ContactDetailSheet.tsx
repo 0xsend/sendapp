@@ -21,7 +21,7 @@ import {
   IconX,
 } from 'app/components/icons'
 import { AvatarProfile } from 'app/features/profile/AvatarProfile'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { CONTACTS_CUSTOM_NAME_MAX, CONTACTS_NOTES_MAX } from '../constants'
@@ -82,24 +82,34 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
   const toast = useAppToast()
   const router = useRouter()
 
-  // Edit mode state
-  const [isEditing, setIsEditing] = useState(false)
-  const [customName, setCustomName] = useState(contact.custom_name ?? '')
-  const [notes, setNotes] = useState(contact.notes ?? '')
+  // Edit mode state - initialized when entering edit mode to avoid stale data
+  const [editState, setEditState] = useState<{
+    customName: string
+    notes: string
+  } | null>(null)
+
+  const isEditing = editState !== null
 
   // Archive confirmation state
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
 
-  // Sync form state when a different contact is selected.
-  // Intentionally only depends on contact_id - we reset when switching contacts,
-  // not when the same contact's fields update (which would cause edit conflicts).
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional - reset only on contact switch
-  useEffect(() => {
-    setCustomName(contact.custom_name ?? '')
-    setNotes(contact.notes ?? '')
-    setIsEditing(false)
-    setShowArchiveConfirm(false)
-  }, [contact.contact_id])
+  // Enter edit mode: initialize form with current contact values
+  const startEditing = useCallback(() => {
+    setEditState({
+      customName: contact.custom_name ?? '',
+      notes: contact.notes ?? '',
+    })
+  }, [contact.custom_name, contact.notes])
+
+  // Exit edit mode
+  const stopEditing = useCallback(() => {
+    setEditState(null)
+  }, [])
+
+  // Update form field while editing
+  const updateEditField = useCallback((field: 'customName' | 'notes', value: string) => {
+    setEditState((prev) => (prev ? { ...prev, [field]: value } : null))
+  }, [])
 
   // Fetch all labels to display assigned ones
   const { data: allLabels } = useContactLabels()
@@ -146,12 +156,12 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
 
   // Handle save edits
   const handleSaveEdits = useCallback(() => {
-    if (contact.contact_id === null) return
+    if (contact.contact_id === null || editState === null) return
 
     const updates: { custom_name?: string | null; notes?: string | null } = {}
 
-    const trimmedName = customName.trim()
-    const trimmedNotes = notes.trim()
+    const trimmedName = editState.customName.trim()
+    const trimmedNotes = editState.notes.trim()
 
     // Only update if values changed
     // Use null to clear values (empty string means clear)
@@ -163,7 +173,7 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
     }
 
     if (Object.keys(updates).length === 0) {
-      setIsEditing(false)
+      stopEditing()
       return
     }
 
@@ -172,7 +182,7 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
       {
         onSuccess: () => {
           toast.show('Contact updated')
-          setIsEditing(false)
+          stopEditing()
           onUpdate?.()
         },
         onError: (error) => {
@@ -184,19 +194,17 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
     contact.contact_id,
     contact.custom_name,
     contact.notes,
-    customName,
-    notes,
+    editState,
+    stopEditing,
     updateContact,
     toast,
     onUpdate,
   ])
 
-  // Handle cancel edits
+  // Handle cancel edits - just exit edit mode, next edit will reinitialize
   const handleCancelEdits = useCallback(() => {
-    setCustomName(contact.custom_name ?? '')
-    setNotes(contact.notes ?? '')
-    setIsEditing(false)
-  }, [contact.custom_name, contact.notes])
+    stopEditing()
+  }, [stopEditing])
 
   // Handle archive/unarchive
   const handleArchiveToggle = useCallback(() => {
@@ -329,10 +337,10 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
         )}
 
         <YStack flex={1} gap="$1">
-          {isEditing ? (
+          {isEditing && editState ? (
             <Input
-              value={customName}
-              onChangeText={setCustomName}
+              value={editState.customName}
+              onChangeText={(v) => updateEditField('customName', v)}
               placeholder="Display name"
               maxLength={CONTACTS_CUSTOM_NAME_MAX}
               size="$4"
@@ -391,10 +399,10 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
         <Text fontWeight="600" color="$color11">
           Notes
         </Text>
-        {isEditing ? (
+        {isEditing && editState ? (
           <TextArea
-            value={notes}
-            onChangeText={setNotes}
+            value={editState.notes}
+            onChangeText={(v) => updateEditField('notes', v)}
             placeholder="Add notes about this contact..."
             maxLength={CONTACTS_NOTES_MAX}
             minHeight={80}
@@ -432,7 +440,7 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
           </Button>
         </XStack>
       ) : (
-        <Button onPress={() => setIsEditing(true)}>
+        <Button onPress={startEditing}>
           <Button.Text>Edit Contact</Button.Text>
         </Button>
       )}

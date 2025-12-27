@@ -31,6 +31,7 @@ const SUPPORTED_CHAINS = [
   { value: 'eip155:8453', name: 'Base' },
   { value: 'eip155:1', name: 'Ethereum' },
   { value: 'solana:mainnet', name: 'Solana' },
+  { value: 'canton:global', name: 'Canton' },
 ] as const
 
 type SupportedChainId = (typeof SUPPORTED_CHAINS)[number]['value']
@@ -120,6 +121,10 @@ export const AddContactForm = memo(function AddContactForm({
     if (chainId === 'solana:mainnet') {
       // Basic Solana address validation (base58, 32-44 chars)
       return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(externalAddress)
+    }
+    if (chainId === 'canton:global') {
+      // Canton party ID format: partyName::64+hex (e.g., alice::abc123...)
+      return /^[a-zA-Z0-9-]+::[0-9a-fA-F]{64,}$/.test(externalAddress)
     }
     return false
   }, [externalAddress, chainId])
@@ -419,7 +424,13 @@ export const AddContactForm = memo(function AddContactForm({
             </Text>
             <Input
               size="$4"
-              placeholder={chainId.startsWith('eip155:') ? '0x...' : 'Enter Solana address'}
+              placeholder={
+                chainId.startsWith('eip155:')
+                  ? '0x...'
+                  : chainId === 'canton:global'
+                    ? 'partyName::hexIdentifier'
+                    : 'Enter Solana address'
+              }
               value={externalAddress}
               onChangeText={setExternalAddress}
               autoCapitalize="none"

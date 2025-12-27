@@ -25,6 +25,7 @@ const SOURCE_FILTERS: { source: ContactSource; label: string }[] = [
   { source: 'activity', label: 'Activity' },
   { source: 'manual', label: 'Manual' },
   { source: 'referral', label: 'Referral' },
+  { source: 'external', label: 'External' },
 ]
 
 /**

@@ -29,7 +29,7 @@ interface LabelSelectorProps extends YStackProps {
  * Features:
  * - Lists all available labels with selection state
  * - Allows creating new labels inline
- * - Uses optimistic updates for smooth UX
+ * - Visual feedback during mutations (opacity change)
  *
  * @example
  * ```tsx
