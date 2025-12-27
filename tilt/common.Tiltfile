@@ -18,6 +18,17 @@ CI = bool(os.getenv(
     config.tilt_subcommand == "ci",
 ))
 
+# Workspace name for resource prefixing (avoids collisions between worktrees)
+# Falls back to "sendapp" if WORKSPACE_NAME not set (for backwards compatibility)
+WORKSPACE_NAME = os.getenv("WORKSPACE_NAME", "sendapp")
+
+def ws_container(name):
+    """Prefix a container name with the workspace name to avoid collisions.
+
+    Example: ws_container("aa-bundler") -> "bb-dev-aa-bundler" (if WORKSPACE_NAME=bb-dev)
+    """
+    return WORKSPACE_NAME + "-" + name
+
 run_id = str(local(
     "echo $RANDOM | shasum | head -c 10",
     echo_off = True,
