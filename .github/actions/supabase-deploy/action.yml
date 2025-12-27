@@ -30,8 +30,26 @@ runs:
       env:
         SUPABASE_ACCESS_TOKEN: ${{ inputs.supabase-access-token }}
         SUPABASE_DB_PASSWORD: ${{ inputs.supabase-db-password }}
+        # Default ports for CI (config.toml uses env() syntax)
+        SUPABASE_API_PORT: "54321"
+        SUPABASE_DB_PORT: "54322"
+        SUPABASE_STUDIO_PORT: "54323"
+        SUPABASE_INBUCKET_PORT: "54324"
+        SUPABASE_INBUCKET_SMTP_PORT: "54325"
+        SUPABASE_INBUCKET_POP3_PORT: "54326"
+        SUPABASE_AUTH_SITE_URL: "http://localhost:3000"
+        SUPABASE_PROJECT_ID: ${{ inputs.supabase-project-id }}
     - shell: bash
       run: supabase db push
       env:
         SUPABASE_ACCESS_TOKEN: ${{ inputs.supabase-access-token }}
         SUPABASE_DB_PASSWORD: ${{ inputs.supabase-db-password }}
+        # Default ports for CI (config.toml uses env() syntax)
+        SUPABASE_API_PORT: "54321"
+        SUPABASE_DB_PORT: "54322"
+        SUPABASE_STUDIO_PORT: "54323"
+        SUPABASE_INBUCKET_PORT: "54324"
+        SUPABASE_INBUCKET_SMTP_PORT: "54325"
+        SUPABASE_INBUCKET_POP3_PORT: "54326"
+        SUPABASE_AUTH_SITE_URL: "http://localhost:3000"
+        SUPABASE_PROJECT_ID: ${{ inputs.supabase-project-id }}

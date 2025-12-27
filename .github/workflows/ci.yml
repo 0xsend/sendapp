@@ -17,9 +17,7 @@ jobs:
     name: Build Next.js Docker Image
     # Only build images for PRs and manual triggers, not for pushes to main/dev (handled by deploy workflows)
     if: false
-    runs-on: ubuntu-latest
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     outputs:
@@ -49,9 +47,8 @@ jobs:
           cat .env.local | grep -v '^#' | grep -v '^$' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-      # - name: Setup Blacksmith Builder
-      #   uses: useblacksmith/setup-docker-builder@v1
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@v1
 
       - name: Generate unique image tag
         id: image-tag
@@ -59,9 +56,7 @@ jobs:
 
       - name: Build Docker image
         id: build
-        # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-        # uses: useblacksmith/build-push-action@v2
-        uses: docker/build-push-action@v5
+        uses: useblacksmith/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
@@ -90,9 +85,7 @@ jobs:
 
   supabase-schema-drift-check:
     name: Supabase Schema Drift Check
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     steps:
@@ -102,9 +95,7 @@ jobs:
 
   unit-tests:
     name: Unit Tests
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: read
     env:
@@ -112,6 +103,7 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       FOUNDRY_BASE_SEPOLIA_RPC_URL: ${{ secrets.CI_FOUNDRY_BASE_SEPOLIA_RPC_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
+      SUPABASE_PROJECT_ID: sendapp
 
     steps:
       - name: Add hosts to /etc/hosts
@@ -149,9 +141,7 @@ jobs:
 
   lint:
     name: Lint
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-8vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-8vcpu-ubuntu-2404
     permissions:
       contents: read
     env:
@@ -159,6 +149,7 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       FOUNDRY_BASE_SEPOLIA_RPC_URL: ${{ secrets.CI_FOUNDRY_BASE_SEPOLIA_RPC_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
+      SUPABASE_PROJECT_ID: sendapp
 
     steps:
       - name: Add hosts to /etc/hosts
@@ -207,9 +198,7 @@ jobs:
     needs: [build_next_image]
     # Only run playwright tests when we build the image (PRs and manual triggers)
     if: false
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
       # Don't stop all shards if one fails
       fail-fast: false
@@ -220,6 +209,7 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
       NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.image-tag }}
+      SUPABASE_PROJECT_ID: sendapp
 
     # for writing PR comments
     permissions:
@@ -388,9 +378,7 @@ jobs:
 
   playwright-merge-reports:
     name: Playwright Merge Reports
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     if: false
     needs: [playwright-tests]
     # for writing PR comments
@@ -452,9 +440,7 @@ jobs:
   vercel-deploy-preview:
     # **always** skip if on dev and main since it will be deployed with another workflow
     if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main'  }}
-    # BLACKSMITH DISABLED: https://status.blacksmith.sh/cmihj50z202ma129natooke3e
-    # runs-on: blacksmith-4vcpu-ubuntu-2404
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
 
     permissions:
       contents: read

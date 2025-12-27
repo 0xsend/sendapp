@@ -9,12 +9,18 @@ if (!$.env.ANVIL_BASE_FORK_URL) {
 $.env.ANVIL_BASE_BLOCK_TIME ||= '2'
 $.env.ANVIL_BASE_EXTRA_ARGS ||= '--silent'
 $.env.NEXT_PUBLIC_BASE_CHAIN_ID ||= '845337'
+$.env.ANVIL_BASE_PORT ||= '8546'
+$.env.SUPABASE_PROJECT_ID ||= 'sendapp'
+
+const ANVIL_BASE_PORT = $.env.ANVIL_BASE_PORT
+const SUPABASE_NETWORK = `supabase_network_${$.env.SUPABASE_PROJECT_ID}`
 
 console.log(chalk.blue('Running anvil base node'), {
   ANVIL_BASE_FORK_URL: $.env.ANVIL_BASE_FORK_URL,
   ANVIL_BASE_BLOCK_TIME: $.env.ANVIL_BASE_BLOCK_TIME,
   ANVIL_BASE_EXTRA_ARGS: $.env.ANVIL_BASE_EXTRA_ARGS,
   NEXT_PUBLIC_BASE_CHAIN_ID: $.env.NEXT_PUBLIC_BASE_CHAIN_ID,
+  ANVIL_BASE_PORT: ANVIL_BASE_PORT,
 })
 
 const baseBaseFee = await $`cast base-fee --rpc-url $ANVIL_BASE_FORK_URL`
@@ -31,12 +37,12 @@ await $`docker rm -f sendapp-anvil-base`
 await $`docker run --rm \
           -d \
           --platform=linux/amd64 \
-          --network=supabase_network_send \
-          -p=0.0.0.0:8546:8546 \
+          --network=${SUPABASE_NETWORK} \
+          -p=0.0.0.0:${ANVIL_BASE_PORT}:${ANVIL_BASE_PORT} \
           --name=sendapp-anvil-base \
           ghcr.io/foundry-rs/foundry:stable "anvil \
             --host=0.0.0.0 \
-            --port=8546 \
+            --port=${ANVIL_BASE_PORT} \
             --chain-id=$NEXT_PUBLIC_BASE_CHAIN_ID \
             --fork-url=$ANVIL_BASE_FORK_URL \
             --block-time=$ANVIL_BASE_BLOCK_TIME  \
@@ -50,9 +56,10 @@ await $`docker run --rm \
 console.log(chalk.yellow('Waiting for RPC node to be ready...'))
 let retries = 0
 const maxRetries = 30
+const LOCAL_RPC_URL = `http://127.0.0.1:${ANVIL_BASE_PORT}`
 while (retries < maxRetries) {
   try {
-    await $`cast bn --rpc-url http://127.0.0.1:8546`
+    await $`cast bn --rpc-url ${LOCAL_RPC_URL}`
     console.log(chalk.green('RPC node is ready!'))
     break
   } catch (error) {
@@ -99,7 +106,7 @@ const importantContracts = [
 ]
 
 // Use the local anvil instance for prefetching (not the remote fork URL)
-const LOCAL_RPC_URL = 'http://127.0.0.1:8546'
+// LOCAL_RPC_URL is defined above
 
 // Prefetch code and basic calls for each contract
 for (const contract of importantContracts) {

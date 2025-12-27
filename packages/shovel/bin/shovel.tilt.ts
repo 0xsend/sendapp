@@ -7,6 +7,12 @@ $.verbose = !process.env.SHOVEL_QUIET
 
 $.env.SHOVEL_VERSION ||= 'af07'
 
+// Port configuration - use env vars from .localnet.env or defaults
+const ANVIL_BASE_PORT = $.env.ANVIL_BASE_PORT || '8546'
+const SUPABASE_DB_PORT = $.env.SUPABASE_DB_PORT || '54322'
+const SHOVEL_PORT = $.env.SHOVEL_PORT || '8383'
+const BASE_RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || `http://127.0.0.1:${ANVIL_BASE_PORT}`
+
 /**
  * This script is used to start the shovel container for local development.
  * It is not intended to be used in production.
@@ -18,16 +24,17 @@ $.env.SHOVEL_VERSION ||= 'af07'
 await $`docker ps -a | grep shovel | awk '{{print $1}}' | xargs -r docker rm -f || true`
 
 const blockNumberProc =
-  await $`cast rpc --rpc-url http://127.0.0.1:8546 eth_blockNumber | jq -r . | cast to-dec`
+  await $`cast rpc --rpc-url ${BASE_RPC_URL} eth_blockNumber | jq -r . | cast to-dec`
 const blockNumber = blockNumberProc.stdout.trim()
 
-const chainIdProc = await $`cast chain-id --rpc-url http://127.0.0.1:8546`
+const chainIdProc = await $`cast chain-id --rpc-url ${BASE_RPC_URL}`
 const chainId = chainIdProc.stdout.trim()
 
 if (!$.env.SHOVEL_SKIP_EMPTY) {
   await import('./empty-shovel.dev.ts')
 }
 
+const dockerRpcUrl = `http://host.docker.internal:${ANVIL_BASE_PORT}`
 const dockerArgs = [
   'run',
   '--rm',
@@ -35,21 +42,21 @@ const dockerArgs = [
   'shovel',
   '--add-host=host.docker.internal:host-gateway',
   '-p',
-  '8383:80',
+  `${SHOVEL_PORT}:80`,
   '--memory=300m',
   '--cpus=1',
   '--env',
-  'DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres',
+  `DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:${SUPABASE_DB_PORT}/postgres`,
   '--env',
   'BASE_NAME=base',
   '--env',
-  'BASE_RPC_URL_PRIMARY=http://host.docker.internal:8546',
+  `BASE_RPC_URL_PRIMARY=${dockerRpcUrl}`,
   '--env',
-  'BASE_RPC_URL_BACKUP1=http://host.docker.internal:8546',
+  `BASE_RPC_URL_BACKUP1=${dockerRpcUrl}`,
   '--env',
-  'BASE_RPC_URL_BACKUP2=http://host.docker.internal:8546',
+  `BASE_RPC_URL_BACKUP2=${dockerRpcUrl}`,
   '--env',
-  'BASE_RPC_URL_BACKUP3=http://host.docker.internal:8546',
+  `BASE_RPC_URL_BACKUP3=${dockerRpcUrl}`,
   '--env',
   `BASE_CHAIN_ID=${chainId}`,
   '--env',

@@ -31,7 +31,8 @@ else:
 for dotfile in [
     ".env",
     ".env.development",
-    ".env.local",  # last one wins
+    ".env.local",
+    ".localnet.env",  # last one wins - contains dynamic ports
 ]:
     if os.path.exists(dotfile):
         print(color.green("Loading environment from " + dotfile))

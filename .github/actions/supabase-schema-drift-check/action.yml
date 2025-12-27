@@ -8,6 +8,15 @@ runs:
         version: 2.53.6
     - name: Start Supabase Local Instance
       shell: bash
+      env:
+        # Default ports for CI (matches supabase defaults)
+        SUPABASE_API_PORT: "54321"
+        SUPABASE_DB_PORT: "54322"
+        SUPABASE_STUDIO_PORT: "54323"
+        SUPABASE_INBUCKET_PORT: "54324"
+        SUPABASE_INBUCKET_SMTP_PORT: "54325"
+        SUPABASE_INBUCKET_POP3_PORT: "54326"
+        SUPABASE_AUTH_SITE_URL: "http://localhost:3000"
       run: |
         # Start Supabase local instance
         supabase start --ignore-health-check
@@ -36,6 +45,14 @@ runs:
       working-directory: ./supabase
       env:
         PGSSLMODE: disable
+        # Default ports for CI (matches supabase defaults)
+        SUPABASE_API_PORT: "54321"
+        SUPABASE_DB_PORT: "54322"
+        SUPABASE_STUDIO_PORT: "54323"
+        SUPABASE_INBUCKET_PORT: "54324"
+        SUPABASE_INBUCKET_SMTP_PORT: "54325"
+        SUPABASE_INBUCKET_POP3_PORT: "54326"
+        SUPABASE_AUTH_SITE_URL: "http://localhost:3000"
       run: supabase db diff -f changes
     - name: Ensure Declarative Schema is Up to Date
       shell: bash

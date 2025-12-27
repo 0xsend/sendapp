@@ -9,6 +9,9 @@ if (!$.env.ANVIL_MAINNET_FORK_URL) {
 $.env.ANVIL_MAINNET_BLOCK_TIME ||= '2'
 $.env.ANVIL_MAINNET_EXTRA_ARGS ||= '--silent'
 $.env.NEXT_PUBLIC_MAINNET_CHAIN_ID ||= '1337'
+$.env.SUPABASE_PROJECT_ID ||= 'sendapp'
+
+const SUPABASE_NETWORK = `supabase_network_${$.env.SUPABASE_PROJECT_ID}`
 
 const baseBaseFee = await $`cast base-fee --rpc-url $ANVIL_MAINNET_FORK_URL`
 const baseGasPrice = await $`cast gas-price --rpc-url $ANVIL_MAINNET_FORK_URL`
@@ -22,7 +25,7 @@ await $`docker rm -f sendapp-anvil-ethmainnet || true`
 
 await $`docker run --rm \
           --platform=linux/amd64 \
-          --network=supabase_network_send \
+          --network=${SUPABASE_NETWORK} \
           -p=0.0.0.0:8546:8546 \
           --name=sendapp-anvil-ethmainnet \
           ghcr.io/foundry-rs/foundry "anvil \

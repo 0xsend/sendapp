@@ -5,14 +5,14 @@ $.verbose = true
  * This script is used to deploy the SendVerifier and SendAccountFactory contracts
  */
 
-const RPC_URL = 'http://127.0.0.1:8546'
+const RPC_URL = $.env.NEXT_PUBLIC_BASE_RPC_URL || 'http://127.0.0.1:8546'
 const baseSendMVPDeployer = '0x436454a68bef94901014e2af90f86e7355a029f3'
 void (async function main() {
   console.log(chalk.blue('Enable auto-mining...'))
   await $`cast rpc --rpc-url ${RPC_URL} evm_setAutomine true`
 
   console.log(chalk.blue('Impersonating the airdrop multisig...'))
-  await $`cast rpc --rpc-url http://localhost:8546 \
+  await $`cast rpc --rpc-url ${RPC_URL} \
     anvil_impersonateAccount \
     ${baseSendMVPDeployer}`
 

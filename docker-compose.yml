@@ -36,7 +36,7 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     networks:
-      - supabase_network_send
+      - supabase_network_${SUPABASE_PROJECT_ID:-sendapp}
 
   # Distributor
   distributor:
@@ -56,8 +56,8 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     networks:
-      - supabase_network_send
+      - supabase_network_${SUPABASE_PROJECT_ID:-sendapp}
 
 networks:
-  supabase_network_send:
+  supabase_network_${SUPABASE_PROJECT_ID:-sendapp}:
     external: true
