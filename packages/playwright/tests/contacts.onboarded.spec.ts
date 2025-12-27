@@ -125,8 +125,9 @@ test.describe('Add Contact', () => {
     const targetProfile = targetPlan.profile
     assert(!!targetTag?.name, 'target tag not found')
     assert(!!targetProfile?.name, 'target profile name not found')
+    const targetName = targetProfile.name
 
-    log(`target user created: ${targetProfile.name}, tag: ${targetTag.name}`)
+    log(`target user created: ${targetName}, tag: ${targetTag.name}`)
 
     await page.goto('/contacts')
 
@@ -151,7 +152,7 @@ test.describe('Add Contact', () => {
 
     // Wait for profile preview to load
     await expect(async () => {
-      const previewName = page.getByText(targetProfile.name)
+      const previewName = page.getByText(targetName)
       await expect(previewName).toBeVisible({ timeout: 3_000 })
     }).toPass({ timeout: 10_000 })
 
