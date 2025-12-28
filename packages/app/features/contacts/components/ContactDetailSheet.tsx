@@ -368,6 +368,7 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
 
         {/* Favorite button */}
         <Button
+          testID="favoriteButton"
           size="$4"
           circular
           chromeless

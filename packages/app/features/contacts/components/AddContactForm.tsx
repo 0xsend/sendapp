@@ -376,6 +376,7 @@ export const AddContactForm = memo(function AddContactForm({
 
           {/* Add button */}
           <Button
+            testID="addContactSubmitButton"
             size="$4"
             theme="active"
             onPress={handleAddSendUser}
@@ -474,6 +475,7 @@ export const AddContactForm = memo(function AddContactForm({
 
           {/* Add button */}
           <Button
+            testID="addExternalContactSubmitButton"
             size="$4"
             theme="active"
             onPress={handleAddExternalContact}

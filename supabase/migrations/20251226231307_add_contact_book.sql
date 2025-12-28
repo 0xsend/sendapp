@@ -209,10 +209,45 @@ BEGIN
         RAISE EXCEPTION 'Authentication required';
     END IF;
 
-    -- Look up the target user using profile_lookup
-    SELECT (pl).id INTO target_user_id
-    FROM profile_lookup(p_lookup_type, p_identifier) pl
-    LIMIT 1;
+    IF p_identifier IS NULL OR p_identifier = '' THEN
+        RAISE EXCEPTION 'identifier cannot be null or empty';
+    END IF;
+
+    -- Look up the target user directly based on lookup type
+    -- Note: profile_lookup returns id only for current user, so we query directly
+    CASE p_lookup_type
+        WHEN 'tag' THEN
+            -- Look up by sendtag name
+            SELECT t.user_id INTO target_user_id
+            FROM tags t
+            WHERE t.name = p_identifier::citext
+              AND t.status = 'confirmed'
+            LIMIT 1;
+        WHEN 'sendid' THEN
+            -- Look up by send_id (numeric)
+            -- Guard against non-numeric input
+            IF p_identifier !~ '^\d+$' THEN
+                RAISE EXCEPTION 'Invalid send_id format: %', p_identifier;
+            END IF;
+            SELECT p.id INTO target_user_id
+            FROM profiles p
+            WHERE p.send_id = p_identifier::integer
+            LIMIT 1;
+        WHEN 'address' THEN
+            -- Look up by send account address
+            SELECT sa.user_id INTO target_user_id
+            FROM send_accounts sa
+            WHERE lower(sa.address) = lower(p_identifier)
+            LIMIT 1;
+        WHEN 'refcode' THEN
+            -- Look up by referral code
+            SELECT p.id INTO target_user_id
+            FROM profiles p
+            WHERE p.referral_code = p_identifier
+            LIMIT 1;
+        ELSE
+            RAISE EXCEPTION 'Unsupported lookup type: %', p_lookup_type;
+    END CASE;
 
     IF target_user_id IS NULL THEN
         RAISE EXCEPTION 'User not found for identifier: %', p_identifier;

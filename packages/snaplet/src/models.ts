@@ -54,6 +54,8 @@ export const models: SeedClientOptions['models'] = {
   },
   tags: {
     data: {
+      // Use high ID range to avoid conflicts with app-generated tags
+      id: (ctx) => copycat.int(ctx.seed, { min: 1_000_000, max: 9_999_999 }),
       name: (ctx) => {
         // Generate a valid tag name (alphanumeric + underscore, max 20 chars)
         // Use nano timestamp + random suffix to ensure uniqueness
@@ -88,6 +90,8 @@ export const models: SeedClientOptions['models'] = {
   },
   send_account_tags: {
     data: {
+      // Use high ID range to avoid conflicts with app-generated send_account_tags
+      id: (ctx) => copycat.int(ctx.seed, { min: 1_000_000, max: 9_999_999 }),
       tag_id: (ctx) => {
         // Get the first (and only) tag for this user
         const tags = ctx.store.tags

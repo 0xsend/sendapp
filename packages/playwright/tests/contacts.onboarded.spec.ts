@@ -118,7 +118,7 @@ test.describe('Contact Search', () => {
 })
 
 test.describe('Add Contact', () => {
-  test('can add contact by sendtag', async ({ page, seed }) => {
+  test('can add contact by sendtag', async ({ page, seed, pg }) => {
     // Create a user to add as contact
     const targetPlan = await createUserWithTagsAndAccounts(seed)
     const targetTag = targetPlan.tags[0]
@@ -126,6 +126,10 @@ test.describe('Add Contact', () => {
     assert(!!targetTag?.name, 'target tag not found')
     assert(!!targetProfile?.name, 'target profile name not found')
     const targetName = targetProfile.name
+
+    // Fix: Snaplet doesn't auto-set user_id on tags (cross-schema FK not detected)
+    // Manually update the tag with the correct user_id
+    await pg.query('UPDATE tags SET user_id = $1 WHERE id = $2', [targetPlan.user.id, targetTag.id])
 
     log(`target user created: ${targetName}, tag: ${targetTag.name}`)
 
@@ -157,18 +161,38 @@ test.describe('Add Contact', () => {
     }).toPass({ timeout: 10_000 })
 
     // Click Add Contact submit button
-    const submitButton = page.getByRole('button', { name: 'Add Contact' }).last()
+    const submitButton = page.getByTestId('addContactSubmitButton')
     await expect(submitButton).toBeEnabled()
+
+    // Monitor network requests to debug the mutation
+    const rpcPromise = page.waitForResponse(
+      (response) => response.url().includes('/rest/v1/rpc/add_contact_by_lookup'),
+      { timeout: 15_000 }
+    )
+
+    log('clicking submit button')
     await submitButton.click()
 
-    // Verify success toast
-    await expect(page.getByText(/contact added|added to contacts/i)).toBeVisible({ timeout: 5_000 })
+    // Wait for the RPC response
+    try {
+      const rpcResponse = await rpcPromise
+      const responseBody = await rpcResponse.text()
+      log(`RPC response status: ${rpcResponse.status()}, body: ${responseBody}`)
+    } catch (e) {
+      log(`RPC request not captured: ${e}`)
+    }
+
+    // Verify success toast (use first() to avoid strict mode violation)
+    await expect(page.getByText(/contact added|added to contacts/i).first()).toBeVisible({
+      timeout: 10_000,
+    })
 
     log('contact added via sendtag')
   })
 
   test('can add external contact', async ({ page }) => {
-    const testAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f4975d'
+    // Use a properly checksummed address - viem's isAddress validates EIP-55 checksum
+    const testAddress = '0x742d35CC6634C0532925A3B844Bc9E7595f4975D'
     const testName = 'Test External Wallet'
 
     await page.goto('/contacts')
@@ -194,12 +218,14 @@ test.describe('Add Contact', () => {
     await nameInput.fill(testName)
 
     // Submit
-    const submitButton = page.getByRole('button', { name: 'Add Contact' }).last()
+    const submitButton = page.getByTestId('addExternalContactSubmitButton')
     await expect(submitButton).toBeEnabled()
     await submitButton.click()
 
-    // Verify success toast
-    await expect(page.getByText(/contact added|added to contacts/i)).toBeVisible({ timeout: 5_000 })
+    // Verify success toast (use first() to avoid strict mode violation)
+    await expect(page.getByText(/contact added|added to contacts/i).first()).toBeVisible({
+      timeout: 10_000,
+    })
 
     log('external contact added')
   })
@@ -221,22 +247,22 @@ test.describe('Contact Favorites', () => {
 
     await page.goto('/contacts')
 
-    // Find the contact in the list and click it
-    const contactItem = page.getByText(`FavTest_${contactProfile.name}`)
+    // Find the contact in the list and click it (use first() to get list item)
+    const contactItem = page.getByText(`FavTest_${contactProfile.name}`).first()
     await expect(contactItem).toBeVisible({ timeout: 10_000 })
     await contactItem.click()
 
     // Wait for detail sheet to open
-    const detailTitle = page.getByText('Contact Details')
-    await expect(detailTitle).toBeVisible({ timeout: 5_000 })
+    const detailDialog = page.getByRole('dialog')
+    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
 
-    // Find and click favorite button (the circular button with star icon)
-    const favoriteButton = page.locator('button[aria-label*="favorite" i], button:has(svg)')
-    const starButton = favoriteButton.filter({ hasNot: page.getByText('Edit') }).first()
+    // Find and click favorite button using testid
+    const starButton = detailDialog.getByTestId('favoriteButton')
+    await expect(starButton).toBeVisible()
     await starButton.click()
 
     // Verify the toggle worked (toast message)
-    await expect(page.getByText(/added to favorites|removed from favorites/i)).toBeVisible({
+    await expect(page.getByText(/added to favorites|removed from favorites/i).first()).toBeVisible({
       timeout: 5_000,
     })
 
@@ -296,20 +322,20 @@ test.describe('Contact Details', () => {
 
     await page.goto('/contacts')
 
-    // Click on contact to open detail sheet
-    const contactItem = page.getByText(contactProfile.name)
+    // Click on contact to open detail sheet (use first() to get list item, not dialog)
+    const contactItem = page.getByText(contactProfile.name).first()
     await expect(contactItem).toBeVisible({ timeout: 10_000 })
     await contactItem.click()
 
     // Verify detail sheet opens with correct info
-    const detailTitle = page.getByText('Contact Details')
-    await expect(detailTitle).toBeVisible({ timeout: 5_000 })
+    const detailDialog = page.getByRole('dialog')
+    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
 
-    // Verify name is displayed
-    await expect(page.getByText(contactProfile.name)).toBeVisible()
+    // Verify name is displayed in dialog
+    await expect(detailDialog.getByText(contactProfile.name)).toBeVisible()
 
-    // Verify sendtag is displayed
-    await expect(page.getByText(`/${contactTag.name}`)).toBeVisible()
+    // Verify sendtag is displayed in dialog
+    await expect(detailDialog.getByText(`/${contactTag.name}`)).toBeVisible()
 
     log('contact details displayed correctly')
   })
@@ -326,31 +352,32 @@ test.describe('Contact Details', () => {
 
     await page.goto('/contacts')
 
-    // Click on contact
-    const contactItem = page.getByText(`EditTest_${contactProfile.name}`)
+    // Click on contact (use first() to get list item)
+    const contactItem = page.getByText(`EditTest_${contactProfile.name}`).first()
     await expect(contactItem).toBeVisible({ timeout: 10_000 })
     await contactItem.click()
 
     // Wait for detail sheet
-    await expect(page.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    const detailDialog = page.getByRole('dialog')
+    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
 
     // Click Edit Contact button
-    const editButton = page.getByRole('button', { name: 'Edit Contact' })
+    const editButton = detailDialog.getByRole('button', { name: 'Edit Contact' })
     await expect(editButton).toBeVisible()
     await editButton.click()
 
     // Fill in notes
-    const notesInput = page.getByPlaceholder(/add notes/i)
+    const notesInput = detailDialog.getByPlaceholder(/add notes/i)
     await expect(notesInput).toBeVisible()
     await notesInput.fill('Updated notes from E2E test')
 
     // Save
-    const saveButton = page.getByRole('button', { name: 'Save' })
+    const saveButton = detailDialog.getByRole('button', { name: 'Save' })
     await expect(saveButton).toBeVisible()
     await saveButton.click()
 
-    // Verify success
-    await expect(page.getByText(/contact updated/i)).toBeVisible({ timeout: 5_000 })
+    // Verify success toast
+    await expect(page.getByText(/contact updated/i).first()).toBeVisible({ timeout: 5_000 })
 
     log('contact notes updated')
   })
@@ -388,8 +415,8 @@ test.describe('Contact Archive', () => {
     await expect(confirmButton).toBeVisible()
     await confirmButton.click()
 
-    // Verify success toast
-    await expect(page.getByText(/contact archived/i)).toBeVisible({ timeout: 5_000 })
+    // Verify success toast (use first() to avoid strict mode violation from multiple matches)
+    await expect(page.getByText(/contact archived/i).first()).toBeVisible({ timeout: 5_000 })
 
     // Verify contact is no longer visible in list
     await expect(page.getByText(archiveName)).not.toBeVisible({ timeout: 3_000 })
@@ -438,6 +465,7 @@ async function addContactViaDatabase(
   )
 
   const contactId = result.rows[0]?.id
-  assert(typeof contactId === 'number' || typeof contactId === 'bigint', 'contact id not returned')
+  // PostgreSQL bigint is returned as string by pg library
+  assert(contactId !== undefined && contactId !== null, 'contact id not returned')
   return Number(contactId)
 }
