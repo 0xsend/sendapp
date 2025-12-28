@@ -25,8 +25,11 @@ export class SendPage {
     this.expect = expect
     // The amount input in SendChat uses placeholder "0" - use getByRole for more reliable matching
     this.amountInput = page.locator('input[placeholder="0"]')
-    // Click the chat input area to enter the amount section (text or textbox)
-    this.enterAmountTrigger = page.getByText('Type amount, add a note...')
+    // The clickable wrapper is a View with tabindex="0" containing the Input
+    // Target the focusable parent, not the Input which has pointerEvents: none
+    this.enterAmountTrigger = page.locator('[tabindex="0"]').filter({
+      has: page.locator('input[placeholder*="Type amount"]'),
+    })
     // Review button transitions to reviewAndSend section
     this.reviewButton = page.getByRole('button', { name: 'Review and Send' })
     // Alias for backward compatibility with tests using continueButton
@@ -53,13 +56,10 @@ export class SendPage {
         await this.expect(this.amountInput).toBeVisible()
         return
       }
-      // Click the chat input area to transition to enterAmount
-      // The input has pointerEvents: none, but clicking triggers the parent's onPress
-      // Use dispatchEvent for more reliable event triggering in Tamagui/RNW components
+
+      // Click the focusable View wrapper to trigger onPress -> setActiveSection('enterAmount')
       if (await this.enterAmountTrigger.isVisible()) {
-        await this.enterAmountTrigger.dispatchEvent('click')
-        // Wait for animation to complete
-        await this.page.waitForTimeout(800)
+        await this.enterAmountTrigger.click()
       }
       // Wait for amount input to be visible (indicates we're in enterAmount section)
       await this.expect(this.amountInput).toBeVisible()
