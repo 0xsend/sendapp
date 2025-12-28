@@ -2,20 +2,42 @@
 import 'zx/globals'
 
 /**
- * Deletes all docker containers and volumes matching the name "supabase".
- * This is useful for resetting the local development environment.
+ * Deletes docker containers and volumes for the current workspace's Supabase instance.
+ * Uses SUPABASE_PROJECT_ID or WORKSPACE_NAME to filter resources, preventing
+ * accidental deletion of other workspaces' Supabase containers.
  */
 $.verbose = true
 
+const projectId = process.env.SUPABASE_PROJECT_ID || process.env.WORKSPACE_NAME
+if (!projectId) {
+  console.log(
+    chalk.yellow(
+      'Warning: SUPABASE_PROJECT_ID and WORKSPACE_NAME not set. Falling back to global supabase pattern.'
+    )
+  )
+}
+
 await $`bunx supabase stop --no-backup`
 
-const containers = (await $`docker ps -a --format '{{.Names}}'`).stdout
+const allContainers = (await $`docker ps -a --format '{{.Names}}'`).stdout
   .split('\n')
-  .filter((c) => c.match(/supabase/i))
+  .filter(Boolean)
+const allVolumes = (await $`docker volume ls --format '{{.Name}}'`).stdout
+  .split('\n')
+  .filter(Boolean)
 
-const volumes = (await $`docker volume ls --format '{{.Name}}'`).stdout
-  .split('\n')
-  .filter((c) => c.match(/supabase/i))
+let containers: string[]
+let volumes: string[]
+
+if (projectId) {
+  const pattern = new RegExp(`supabase.*${projectId}`, 'i')
+  containers = allContainers.filter((c) => pattern.test(c))
+  volumes = allVolumes.filter((v) => pattern.test(v))
+  console.log(chalk.blue(`Filtering supabase resources for workspace: ${projectId}`))
+} else {
+  containers = allContainers.filter((c) => /supabase/i.test(c))
+  volumes = allVolumes.filter((v) => /supabase/i.test(v))
+}
 
 console.log(`Deleting supabase containers and volumes:\n${[...containers, ...volumes].join('\n')}`)
 
