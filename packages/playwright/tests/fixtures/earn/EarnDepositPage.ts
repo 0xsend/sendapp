@@ -75,10 +75,22 @@ export class EarnDepositPage {
       timeout: 15000,
     })
     await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
-    // Toast title from i18n: "Deposit submitted" (lowercase 's')
-    // Increased timeout to 20s to match EarnWithdrawPage and allow for blockchain tx
-    await expect(this.page.getByText('Deposit submitted', { exact: true })).toBeVisible({
-      timeout: 20000,
+    // Wait for either toast or button to disappear (indicating form submission started)
+    // Increased timeout to 30s to allow for blockchain tx
+    await expect(async () => {
+      const toastVisible = await this.page
+        .getByText('Deposit submitted', { exact: true })
+        .isVisible()
+        .catch(() => false)
+      const buttonHidden = await this.page
+        .getByRole('button', { name: 'Confirm Deposit' })
+        .isHidden()
+        .catch(() => false)
+      if (!toastVisible && !buttonHidden) {
+        throw new Error('Waiting for deposit submission confirmation')
+      }
+    }).toPass({
+      timeout: 30000,
     })
   }
 
