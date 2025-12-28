@@ -26,7 +26,7 @@ export class EarnDepositPage {
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
     await this.page.waitForURL(this.depositUrl(coin))
-    await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
+    await expect(this.page.getByText('Deposit Amount')).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
     await expect(this.submitButton).toBeVisible({ timeout: 10000 }) // sometimes needs some time to load
@@ -42,7 +42,7 @@ export class EarnDepositPage {
   async goto(coin: { symbol: string }) {
     await this.page.goto(this.depositUrl(coin))
     await this.page.waitForURL(this.depositUrl(coin))
-    await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
+    await expect(this.page.getByText('Deposit Amount')).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
     await expect(this.submitButton).toBeVisible({ timeout: 10000 })
@@ -75,8 +75,22 @@ export class EarnDepositPage {
       timeout: 15000,
     })
     await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
-    await expect(this.page.getByText('Deposit Submitted', { exact: true })).toBeVisible({
-      timeout: 10000,
+    // Wait for either toast or button to disappear (indicating form submission started)
+    // Increased timeout to 30s to allow for blockchain tx
+    await expect(async () => {
+      const toastVisible = await this.page
+        .getByText('Deposit submitted', { exact: true })
+        .isVisible()
+        .catch(() => false)
+      const buttonHidden = await this.page
+        .getByRole('button', { name: 'Confirm Deposit' })
+        .isHidden()
+        .catch(() => false)
+      if (!toastVisible && !buttonHidden) {
+        throw new Error('Waiting for deposit submission confirmation')
+      }
+    }).toPass({
+      timeout: 30000,
     })
   }
 

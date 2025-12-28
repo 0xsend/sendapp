@@ -56,7 +56,7 @@ test('can visit token detail page', async ({ context, page }) => {
     .soft(history.getByText(shorten('0x93F2FA7A16a7365e3895b0F6E6Ac7a832d6c761a', 5, 4)))
     .toBeVisible()
 
-  expect(page.getByTestId('TokenActivityFeed')).toBeVisible()
+  await expect(page.getByTestId('TokenActivityFeed')).toBeVisible()
   // expect(await page.getByTestId('TokenActivityFeed').textContent()).toMatchSnapshot(
   //   'token-details-history.txt'
   // )
