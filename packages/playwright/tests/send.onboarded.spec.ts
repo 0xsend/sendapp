@@ -106,7 +106,7 @@ for (const token of [...coins, ethCoin]) {
       await expect(async () => {
         // fill search input
         const searchInput = page.getByRole('search', { name: 'query' })
-        expect(searchInput).toBeVisible()
+        await expect(searchInput).toBeVisible()
         await searchInput.fill(query)
         await expect(searchInput).toHaveValue(query)
       }).toPass({

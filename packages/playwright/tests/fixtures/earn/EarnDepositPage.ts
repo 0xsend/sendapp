@@ -26,7 +26,7 @@ export class EarnDepositPage {
     await expect(this.startEarningButton).toBeVisible()
     await this.startEarningButton.click()
     await this.page.waitForURL(this.depositUrl(coin))
-    await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
+    await expect(this.page.getByText('Deposit Amount')).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
     await expect(this.submitButton).toBeVisible({ timeout: 10000 }) // sometimes needs some time to load
@@ -42,7 +42,7 @@ export class EarnDepositPage {
   async goto(coin: { symbol: string }) {
     await this.page.goto(this.depositUrl(coin))
     await this.page.waitForURL(this.depositUrl(coin))
-    await expect(this.page.getByText('Start Earning', { exact: true })).toBeVisible()
+    await expect(this.page.getByText('Deposit Amount')).toBeVisible()
     await expect(this.amountInput).toBeVisible()
     await expect(this.termsCheckbox).toBeVisible()
     await expect(this.submitButton).toBeVisible({ timeout: 10000 })
