@@ -10,12 +10,14 @@ $.env.ANVIL_BASE_BLOCK_TIME ||= '2'
 $.env.ANVIL_BASE_EXTRA_ARGS ||= '--silent'
 $.env.NEXT_PUBLIC_BASE_CHAIN_ID ||= '845337'
 $.env.ANVIL_BASE_PORT ||= '8546'
-$.env.SUPABASE_PROJECT_ID ||= 'sendapp'
+$.env.WORKSPACE_NAME ||= $.env.SUPABASE_PROJECT_ID || 'sendapp'
+$.env.SUPABASE_PROJECT_ID ||= $.env.WORKSPACE_NAME
 
 const ANVIL_BASE_PORT = $.env.ANVIL_BASE_PORT
+const WORKSPACE_NAME = $.env.WORKSPACE_NAME
 const SUPABASE_PROJECT_ID = $.env.SUPABASE_PROJECT_ID
 const SUPABASE_NETWORK = `supabase_network_${SUPABASE_PROJECT_ID}`
-const CONTAINER_NAME = `${SUPABASE_PROJECT_ID}-anvil-base`
+const CONTAINER_NAME = `${WORKSPACE_NAME}-anvil-base`
 
 console.log(chalk.blue('Running anvil base node'), {
   ANVIL_BASE_FORK_URL: $.env.ANVIL_BASE_FORK_URL,
