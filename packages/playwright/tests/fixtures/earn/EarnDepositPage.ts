@@ -75,8 +75,10 @@ export class EarnDepositPage {
       timeout: 15000,
     })
     await this.page.getByRole('button', { name: 'Confirm Deposit' }).click()
-    await expect(this.page.getByText('Deposit Submitted', { exact: true })).toBeVisible({
-      timeout: 10000,
+    // Toast title from i18n: "Deposit submitted" (lowercase 's')
+    // Increased timeout to 20s to match EarnWithdrawPage and allow for blockchain tx
+    await expect(this.page.getByText('Deposit submitted', { exact: true })).toBeVisible({
+      timeout: 20000,
     })
   }
 

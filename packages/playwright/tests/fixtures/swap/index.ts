@@ -151,9 +151,11 @@ export class SwapFormPage {
   }
 
   async reviewSwap() {
+    // Wait for review button to be enabled (route must be loaded and validated)
     await expect(async () => {
+      await expect(this.reviewButton).toBeEnabled()
       await this.reviewButton.click()
-    }).toPass({ timeout: 1_000 })
+    }).toPass({ timeout: 10_000 })
   }
 
   async fillSwapForm({

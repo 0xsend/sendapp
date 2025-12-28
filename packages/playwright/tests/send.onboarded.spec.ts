@@ -104,8 +104,8 @@ for (const token of [...coins, ethCoin]) {
       await sendLink.click()
 
       await expect(async () => {
-        // fill search input
-        const searchInput = page.getByRole('search', { name: 'query' })
+        // fill search input - use placeholder instead of role name (accessible name != form field name)
+        const searchInput = page.getByPlaceholder('Search')
         await expect(searchInput).toBeVisible()
         await searchInput.fill(query)
         await expect(searchInput).toHaveValue(query)
@@ -345,9 +345,9 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
   await sendLink.click()
 
   await expect(async () => {
-    // fill search input
-    const searchInput = page.getByRole('search', { name: 'query' })
-    expect(searchInput).toBeVisible()
+    // fill search input - use placeholder instead of role name (accessible name != form field name)
+    const searchInput = page.getByPlaceholder('Search')
+    await expect(searchInput).toBeVisible()
     await searchInput.fill(tag.name)
     await expect(searchInput).toHaveValue(tag.name)
   }).toPass({
