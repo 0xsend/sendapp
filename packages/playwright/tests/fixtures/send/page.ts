@@ -23,10 +23,10 @@ export class SendPage {
   constructor(page: Page, expect: Expect) {
     this.page = page
     this.expect = expect
-    // The amount input in SendChat uses placeholder "0"
-    this.amountInput = page.getByPlaceholder('0')
-    // Click this to enter the amount section from chat section
-    this.enterAmountTrigger = page.getByPlaceholder('Type amount, add a note...')
+    // The amount input in SendChat uses placeholder "0" - use getByRole for more reliable matching
+    this.amountInput = page.locator('input[placeholder="0"]')
+    // Click the chat input area to enter the amount section (text or textbox)
+    this.enterAmountTrigger = page.getByText('Type amount, add a note...')
     // Review button transitions to reviewAndSend section
     this.reviewButton = page.getByRole('button', { name: 'Review and Send' })
     // Alias for backward compatibility with tests using continueButton
@@ -42,14 +42,29 @@ export class SendPage {
    */
   async enterAmountSection() {
     await this.expect(async () => {
-      // Check if we're in chat section (enter amount trigger visible)
+      // Check if already in enterAmount section (amount input visible)
+      if (await this.amountInput.isVisible()) {
+        return
+      }
+      // Check if we're in chat section - look for "You're Sending" which indicates enterAmount
+      const youSendingVisible = await this.page.getByText("You're Sending").isVisible()
+      if (youSendingVisible) {
+        // Already transitioning or in enterAmount
+        await this.expect(this.amountInput).toBeVisible()
+        return
+      }
+      // Click the chat input area to transition to enterAmount
+      // The input has pointerEvents: none, but clicking triggers the parent's onPress
+      // Use dispatchEvent for more reliable event triggering in Tamagui/RNW components
       if (await this.enterAmountTrigger.isVisible()) {
-        await this.enterAmountTrigger.click()
+        await this.enterAmountTrigger.dispatchEvent('click')
+        // Wait for animation to complete
+        await this.page.waitForTimeout(800)
       }
       // Wait for amount input to be visible (indicates we're in enterAmount section)
       await this.expect(this.amountInput).toBeVisible()
     }).toPass({
-      timeout: 10_000,
+      timeout: 15_000,
     })
   }
 

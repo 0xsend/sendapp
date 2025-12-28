@@ -363,8 +363,8 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
     timeout: 5000,
   })
 
-  // Wait for the form to be visible
-  await expect(page.getByTestId('SendFormContainer')).toHaveText(new RegExp(profile.name))
+  // Wait for the recipient info to be visible (SendFormContainer may be hidden on smaller viewports)
+  await expect(page.getByText(profile.name)).toBeVisible()
 
   await page.reload() // ensure balance is updated
 
