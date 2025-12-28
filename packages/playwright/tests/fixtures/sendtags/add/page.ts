@@ -36,33 +36,19 @@ export class AddSendtagsPage {
   }
 
   async submitTagName() {
-    await expect(async () => {
-      const request = this.page.waitForRequest(
-        (request) => {
-          if (request.url().includes('/api/trpc/tag.create') && request.method() === 'POST') {
-            log('submitTagName request', request.url(), request.method(), request.postDataJSON())
-            return true
-          }
-          return false
-        },
-        { timeout: 5_000 }
-      )
-      const response = this.page.waitForEvent('response', {
-        predicate: async (response) => {
-          if (response.url().includes('/api/trpc/tag.create')) {
-            log('submitTagName response', response.url(), response.status(), await response.text())
-            return true
-          }
-          return false
-        },
-        timeout: 5_000,
-      })
-      await this.submitTagButton.click()
-      await request
-      await response
-    }).toPass({
-      timeout: 20_000,
-    })
+    // Set up response listener before clicking
+    const responsePromise = this.page.waitForResponse(
+      (response) => response.url().includes('/api/trpc/tag.create') && response.status() === 200,
+      { timeout: 30_000 }
+    )
+
+    // Click the button
+    await this.submitTagButton.click()
+
+    // Wait for the API response
+    const response = await responsePromise
+    const json = await response.json()
+    log('submitTagName response', response.url(), response.status(), JSON.stringify(json))
   }
 
   async addPendingTag(tag: string) {

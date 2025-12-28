@@ -8,47 +8,63 @@ export class OnboardingPage {
   ) {}
 
   async completeOnboarding(expect: Expect) {
-    await this.page.goto('/')
-    expect(this.page).toHaveURL('/auth/onboarding') // no send accounts redirects to onboarding page
+    // Navigate to home and wait for network to settle
+    await this.page.goto('/', { waitUntil: 'networkidle' })
+
+    // Check if we're already on onboarding (auto-redirect happened)
+    if (this.page.url().includes('/auth/onboarding')) {
+      this.log?.('already on onboarding page')
+    } else {
+      // Wait for the fallback UI to appear - the "Go To Onboarding" button
+      const goToOnboardingBtn = this.page.getByRole('button', { name: 'Go To Onboarding' })
+      this.log?.('waiting for Go To Onboarding button')
+      await goToOnboardingBtn.waitFor({ state: 'visible', timeout: 15_000 })
+      this.log?.('clicking Go To Onboarding button')
+      await goToOnboardingBtn.click()
+      await this.page.waitForURL('/auth/onboarding')
+    }
+
+    this.log?.('on onboarding page')
 
     const sendtag = generateSendtag()
     await this.page.getByTestId('sendtag-input').fill(sendtag)
 
-    const request = this.page.waitForRequest((request) => {
-      if (request.url().includes('/api/trpc/sendAccount.create') && request.method() === 'POST') {
-        this.log?.(
-          'sendAccount.create request',
-          request.url(),
-          request.method(),
-          request.postDataJSON()
-        )
-        return true
-      }
-      return false
-    })
-    const response = this.page.waitForEvent('response', {
-      predicate: async (response) => {
-        if (response.url().includes('/api/trpc/sendAccount.create')) {
-          const json = await response.json()
-          expect(json.data?.[0]?.error).toBeFalsy()
-          this.log?.(
-            'sendAccount.create response',
-            response.url(),
-            response.status(),
-            JSON.stringify(json)
-          )
-          return true
-        }
-        return false
-      },
-      timeout: 30_000,
-    })
+    // Set up listeners for both API calls before clicking
+    const createAccountResponse = this.page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/trpc/sendAccount.create') && response.status() === 200,
+      { timeout: 30_000 }
+    )
 
+    const registerSendtagResponse = this.page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/trpc/tag.registerFirstSendtag') && response.status() === 200,
+      { timeout: 30_000 }
+    )
+
+    // Click the submit button
+    this.log?.('clicking finish account button')
     await this.page.getByRole('button', { name: 'finish account' }).click()
-    await request
-    await response
-    await this.page.getByRole('button', { name: 'finish account' }).waitFor({ state: 'detached' })
 
-    await this.page.waitForURL('/')
+    // Wait for both API calls to complete
+    this.log?.('waiting for sendAccount.create response')
+    const createResponse = await createAccountResponse
+    const createJson = await createResponse.json()
+    this.log?.('sendAccount.create response', createResponse.status(), JSON.stringify(createJson))
+    expect(createJson[0]?.error).toBeFalsy()
+
+    this.log?.('waiting for registerFirstSendtag response')
+    const registerResponse = await registerSendtagResponse
+    const registerJson = await registerResponse.json()
+    this.log?.(
+      'registerFirstSendtag response',
+      registerResponse.status(),
+      JSON.stringify(registerJson)
+    )
+    expect(registerJson[0]?.error).toBeFalsy()
+
+    // After both APIs complete, the page should redirect
+    this.log?.('waiting for navigation back to home')
+    await this.page.waitForURL('/', { timeout: 10_000 })
   }
 }

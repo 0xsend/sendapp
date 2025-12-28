@@ -43,7 +43,7 @@ const backupAccountTest = async ({
   assert(!!cred, 'cred not found')
 
   expect(cred).toBeTruthy()
-  expect(page.getByTestId(`passkey-${cred.display_name}`)).toBeVisible()
+  await expect(page.getByTestId(`passkey-${cred.display_name}`)).toBeVisible()
 
   await page.getByRole('link', { name: 'add a passkey' }).click()
   await page.waitForURL('/account/backup/create')
