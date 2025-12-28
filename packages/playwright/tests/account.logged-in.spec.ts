@@ -9,7 +9,7 @@ test.beforeEach(async ({ page, user: { user } }) => {
   await page.goto('/')
   await page.waitForURL('/')
   const accountLink = page.getByRole('link', { name: 'Account' })
-  expect(accountLink).toBeVisible()
+  await expect(accountLink).toBeVisible()
   await accountLink.click()
   await page.waitForURL('/account')
 })
