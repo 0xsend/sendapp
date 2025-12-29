@@ -683,14 +683,12 @@ export class DistributorV2Worker {
           if (sendCeilingData && sendCeilingData.weight > 0n) {
             const previousReward =
               previousSharesByUserId[userId] || BigInt(distribution.hodler_min_balance)
-            const scaledPreviousReward =
-              (previousReward * PERC_DENOM) / BigInt(sendSlash.scaling_divisor)
-
-            const scaledWeight = sendCeilingData.weight * PERC_DENOM
-            const cappedWeight =
-              scaledWeight > scaledPreviousReward ? scaledPreviousReward : scaledWeight
-
-            slashPercentage = (cappedWeight * PERC_DENOM) / scaledPreviousReward
+            // Use helper function for consistent slash calculation
+            slashPercentage = calculateSlashPercentage(
+              sendCeilingData.weight,
+              previousReward,
+              sendSlash.scaling_divisor
+            )
           }
 
           const slashedBalance = (balance * slashPercentage) / PERC_DENOM

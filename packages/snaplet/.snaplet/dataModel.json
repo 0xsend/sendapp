@@ -264,6 +264,20 @@
           "hasDefaultValue": false
         },
         {
+          "name": "temporal_send_account_transfers",
+          "type": "temporal_send_account_transfers",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "temporal_send_account_transfersToactivity",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "send_earn_deposits",
           "type": "send_earn_deposits",
           "isRequired": false,
@@ -8656,6 +8670,38 @@
           "hasDefaultValue": false,
           "isId": false,
           "maxLength": null
+        },
+        {
+          "id": "temporal.send_account_transfers.activity_id",
+          "name": "activity_id",
+          "columnName": "activity_id",
+          "type": "int8",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "activity",
+          "type": "activity",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "temporal_send_account_transfersToactivity",
+          "relationFromFields": [
+            "activity_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
         }
       ],
       "uniqueConstraints": [

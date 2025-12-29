@@ -598,6 +598,7 @@ interface Table_temporal_send_account_transfers {
   updated_at: string;
   send_account_transfers_activity_event_id: string | null;
   send_account_transfers_activity_event_name: string | null;
+  activity_id: number | null;
 }
 interface Table_public_send_accounts {
   id: string;
@@ -1191,10 +1192,11 @@ interface Tables_relationships {
        activity_to_user_id_fkey: "auth.users";
     };
     children: {
+       fk_transfer_activity: "temporal.send_account_transfers";
        fk_activity: "temporal.send_earn_deposits";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "temporal.send_earn_deposits" | {};
+    childDestinationsTables: "temporal.send_account_transfers" | "temporal.send_earn_deposits" | {};
     
   };
   "public.affiliate_stats": {
@@ -1601,6 +1603,17 @@ interface Tables_relationships {
 
     };
     parentDestinationsTables: "public.send_accounts" | "public.tags" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "temporal.send_account_transfers": {
+    parent: {
+       fk_transfer_activity: "public.activity";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.activity" | {};
     childDestinationsTables:  | {};
     
   };

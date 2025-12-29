@@ -29,7 +29,6 @@ import { DistributionSelect } from '../components/DistributionSelect'
 import { useRewardsScreenParams } from 'app/routers/params'
 import { isEqualCalendarDate } from 'app/utils/dateHelper'
 import { toNiceError } from 'app/utils/toNiceError'
-import { min } from 'app/utils/bigint'
 import { dynamic } from 'app/utils/dynamic'
 import type { Json } from '@my/supabase/database.types'
 import { sendCoin, usdcCoin } from 'app/data/coins'
@@ -39,7 +38,216 @@ import { Platform } from 'react-native'
 import { Check } from '@tamagui/lucide-icons'
 import { Link } from 'solito/link'
 import { useTranslation } from 'react-i18next'
-import { calculateSlashPercentage, PERC_DENOM } from 'apps/distributor/src/fixed-pool-calculation'
+import {
+  calculateSlashPercentage,
+  calculateAllMultipliers,
+  calculatePreviousReward,
+  calculateTaskAmount,
+  PERC_DENOM,
+} from 'app/utils/fixed-pool-calculation'
+import { formatRewardAmount } from 'app/utils/rewards-breakdown'
+import type { VerificationType } from '@my/supabase/database.types'
+import { CARD_BORDER_RADIUS, NEUTRAL_MULTIPLIER, DISTRIBUTION_11_MULTIPLIER } from './constants'
+
+/**
+ * Check if distribution has send_ceiling verification (required for calculations).
+ */
+function hasSendCeilingVerification(distribution: UseDistributionsResultData[number]): boolean {
+  return distribution.distribution_verification_values.some((vv) => vv.type === 'send_ceiling')
+}
+
+/**
+ * Build verification value map from distribution verification values.
+ * Pattern from: fixed-pool-calculation.ts - reusable helper for verification configs
+ */
+function buildVerificationValueMap(distribution: UseDistributionsResultData[number]) {
+  return new Map(
+    distribution.distribution_verification_values.map((vv) => [
+      vv.type,
+      {
+        fixedValue: BigInt(vv.fixed_value ?? 0),
+        multiplier_min: vv.multiplier_min,
+        multiplier_max: vv.multiplier_max,
+        multiplier_step: vv.multiplier_step,
+      },
+    ])
+  )
+}
+
+/**
+ * Get verification data by type - shared helper to reduce duplication.
+ * Pattern from: screen.tsx lines 95-102, 164-168 - extracted common lookup
+ */
+function getVerificationData(
+  verificationValueMap: Map<
+    VerificationType,
+    { fixedValue: bigint; multiplier_min: number; multiplier_max: number; multiplier_step: number }
+  >,
+  verifications: NonNullable<DistributionsVerificationsQuery['data']>,
+  verificationType: VerificationType
+): {
+  vvData: {
+    fixedValue: bigint
+    multiplier_min: number
+    multiplier_max: number
+    multiplier_step: number
+  }
+  verification: { weight: bigint }
+  weight: bigint
+} | null {
+  const vvData = verificationValueMap.get(verificationType)
+  if (!vvData || vvData.fixedValue === 0n) return null
+
+  const verification = verifications.verification_values.find((v) => v.type === verificationType)
+  if (!verification) return null
+
+  const weight = BigInt(verification.weight ?? 0n)
+  if (weight === 0n) return null
+
+  return { vvData, verification, weight }
+}
+
+/**
+ * Calculate SEND amount for a specific task using helpers from fixed-pool-calculation.ts
+ */
+function calculateTaskSendAmount(
+  distribution: UseDistributionsResultData[number],
+  verifications: NonNullable<DistributionsVerificationsQuery['data']>,
+  verificationType: VerificationType,
+  previousDistribution?: UseDistributionsResultData[number]
+): bigint | null {
+  // Only calculate if send_ceiling exists
+  if (!hasSendCeilingVerification(distribution)) return null
+
+  const sendSlash = distribution.send_slash?.[0]
+  if (!sendSlash) return null
+
+  // Build verification value map using helper
+  const verificationValueMap = buildVerificationValueMap(distribution)
+
+  // Get task data using shared helper
+  const verificationData = getVerificationData(
+    verificationValueMap,
+    verifications,
+    verificationType
+  )
+  if (!verificationData) return null
+
+  const { vvData, weight } = verificationData
+
+  // Calculate base amount for this task
+  const taskBaseAmount = vvData.fixedValue * weight
+
+  // Calculate all multipliers using helper
+  const allMultipliers = calculateAllMultipliers(
+    verifications.verification_values.map((v) => ({
+      type: v.type,
+      weight: v.weight,
+    })),
+    verificationValueMap
+  )
+
+  // Get send ceiling and previous reward
+  const sendCeilingData = verifications.verification_values.find((v) => v.type === 'send_ceiling')
+  if (!sendCeilingData) return null
+
+  const previousReward = calculatePreviousReward(
+    previousDistribution?.distribution_shares,
+    verifications.distributionNumber,
+    BigInt(distribution.hodler_min_balance)
+  )
+
+  // Calculate final amount using helper
+  return calculateTaskAmount(
+    taskBaseAmount,
+    allMultipliers,
+    sendCeilingData.weight,
+    previousReward,
+    sendSlash.scaling_divisor
+  )
+}
+
+/**
+ * Calculate multiplier impact - additional SEND earned from a specific multiplier.
+ * Pattern from: fixed-pool-calculation.ts - calculate difference between WITH and WITHOUT multiplier
+ */
+function calculateMultiplierImpact(
+  distribution: UseDistributionsResultData[number],
+  verifications: NonNullable<DistributionsVerificationsQuery['data']>,
+  verificationType: VerificationType,
+  previousDistribution?: UseDistributionsResultData[number]
+): bigint | null {
+  // Only calculate if send_ceiling exists
+  if (!hasSendCeilingVerification(distribution)) return null
+
+  const multiplierData = verifications.multipliers.find((m) => m.type === verificationType)
+  const multiplierValue = multiplierData?.value ?? NEUTRAL_MULTIPLIER
+
+  if (multiplierValue <= NEUTRAL_MULTIPLIER) return null
+
+  const sendSlash = distribution.send_slash?.[0]
+  if (!sendSlash) return null
+
+  // Build verification value map using helper
+  const verificationValueMap = buildVerificationValueMap(distribution)
+
+  // Get task data using shared helper
+  const verificationData = getVerificationData(
+    verificationValueMap,
+    verifications,
+    verificationType
+  )
+  if (!verificationData) return null
+
+  const { vvData, weight } = verificationData
+
+  // Calculate base amount for this task
+  const taskBaseAmount = vvData.fixedValue * weight
+
+  // Calculate all multipliers
+  const allMultipliers = calculateAllMultipliers(
+    verifications.verification_values.map((v) => ({
+      type: v.type,
+      weight: v.weight,
+    })),
+    verificationValueMap
+  )
+
+  // Get send ceiling and previous reward
+  const sendCeilingData = verifications.verification_values.find((v) => v.type === 'send_ceiling')
+  if (!sendCeilingData) return null
+
+  const previousReward = calculatePreviousReward(
+    previousDistribution?.distribution_shares,
+    verifications.distributionNumber,
+    BigInt(distribution.hodler_min_balance)
+  )
+
+  // Calculate amount WITH this multiplier (all multipliers)
+  const amountWithMultiplier = calculateTaskAmount(
+    taskBaseAmount,
+    allMultipliers,
+    sendCeilingData.weight,
+    previousReward,
+    sendSlash.scaling_divisor
+  )
+
+  // Calculate amount WITHOUT this specific multiplier
+  // Create a copy of multipliers with this one set to neutral
+  const multipliersWithoutThis = { ...allMultipliers }
+  multipliersWithoutThis[verificationType] = { value: NEUTRAL_MULTIPLIER }
+
+  const amountWithoutMultiplier = calculateTaskAmount(
+    taskBaseAmount,
+    multipliersWithoutThis,
+    sendCeilingData.weight,
+    previousReward,
+    sendSlash.scaling_divisor
+  )
+
+  // Impact is the difference
+  return amountWithMultiplier - amountWithoutMultiplier
+}
 
 //@todo get this from the db
 const verificationTypeTitleKey = {
@@ -161,10 +369,12 @@ export function ActivityRewardsScreen() {
                   />
                   <TaskCards
                     distribution={distributions[selectedDistributionIndex]}
+                    previousDistribution={distributions[selectedDistributionIndex + 1]}
                     verificationsQuery={verificationsQuery}
                   />
                   <MultiplierCards
                     distribution={distributions[selectedDistributionIndex]}
+                    previousDistribution={distributions[selectedDistributionIndex + 1]}
                     verificationsQuery={verificationsQuery}
                   />
                   <ProgressCard
@@ -276,7 +486,7 @@ const DistributionRequirementsCard = ({
 
   if (verificationsQuery.isLoading || isLoadingSendAccount) {
     return (
-      <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+      <FadeCard br={CARD_BORDER_RADIUS} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
         <Stack ai="center" jc="center" p="$4">
           <Spinner color="$color12" size="large" />
         </Stack>
@@ -287,7 +497,7 @@ const DistributionRequirementsCard = ({
   if (snapshotBalanceError) throw snapshotBalanceError
 
   return (
-    <FadeCard br={12} p="$4" gap="$4" $gtMd={{ gap: '$6', p: '$6' }}>
+    <FadeCard br={CARD_BORDER_RADIUS} p="$4" gap="$4" $gtMd={{ gap: '$6', p: '$6' }}>
       <Stack ai="center" jc="space-between" gap="$5" $gtXs={{ flexDirection: 'row' }}>
         <YStack>
           <Label fontSize={'$5'} col={'$color10'} miw={120}>
@@ -388,9 +598,11 @@ const DistributionRequirementsCard = ({
 
 const TaskCards = ({
   distribution,
+  previousDistribution,
   verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
+  previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { t } = useTranslation('rewards')
@@ -402,7 +614,7 @@ const TaskCards = ({
         <H3 fontWeight={'600'} color={'$color12'}>
           {t('activity.sections.tasks')}
         </H3>
-        <Card br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+        <Card br={CARD_BORDER_RADIUS} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
             <Spinner color="$color12" size="large" />
           </Stack>
@@ -441,6 +653,9 @@ const TaskCards = ({
               key={verification.type}
               verification={verification}
               isQualificationOver={isQualificationOver}
+              distribution={distribution}
+              previousDistribution={previousDistribution}
+              verifications={verifications}
               url={getTaskHref(verification.type)}
             >
               <H3 fontWeight={'600'} color={'$color12'}>
@@ -460,11 +675,17 @@ const TaskCards = ({
 const TaskCard = ({
   verification,
   isQualificationOver,
+  distribution,
+  previousDistribution,
+  verifications,
   children,
   url,
 }: PropsWithChildren<CardProps> & {
   verification: NonNullable<DistributionsVerificationsQuery['data']>['verification_values'][number]
   isQualificationOver: boolean
+  distribution: UseDistributionsResultData[number]
+  previousDistribution?: UseDistributionsResultData[number]
+  verifications: NonNullable<DistributionsVerificationsQuery['data']> | null
   url?: string | null
 }) => {
   const { t } = useTranslation('rewards')
@@ -571,6 +792,12 @@ const TaskCard = ({
     'sendpot_ticket_purchase',
   ].includes(type)
 
+  // Calculate SEND amount for this task (only when qualification is over)
+  const sendAmount =
+    isQualificationOver && verifications
+      ? calculateTaskSendAmount(distribution, verifications, type, previousDistribution)
+      : null
+
   const cardContent = (
     <>
       <XStack ai={'center'} jc="space-between">
@@ -590,11 +817,23 @@ const TaskCard = ({
         ) : null}
       </XStack>
       {children}
+      {sendAmount !== null && sendAmount > 0n ? (
+        <Paragraph color="$color11" fontSize="$3" mt="$2">
+          +{formatRewardAmount(sendAmount, distribution.token_decimals ?? 18)} SEND
+        </Paragraph>
+      ) : null}
     </>
   )
 
   return (
-    <Card br={12} gap="$4" p="$6" jc={'space-between'} $gtSm={{ maw: 331 }} w={'100%'}>
+    <Card
+      br={CARD_BORDER_RADIUS}
+      gap="$4"
+      p="$6"
+      jc={'space-between'}
+      $gtSm={{ maw: 331 }}
+      w={'100%'}
+    >
       {url ? <Link href={url}>{cardContent}</Link> : cardContent}
     </Card>
   )
@@ -602,9 +841,11 @@ const TaskCard = ({
 
 const MultiplierCards = ({
   distribution,
+  previousDistribution,
   verificationsQuery,
 }: {
   distribution: UseDistributionsResultData[number]
+  previousDistribution?: UseDistributionsResultData[number]
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { t } = useTranslation('rewards')
@@ -615,7 +856,7 @@ const MultiplierCards = ({
         <H3 fontWeight={'600'} color={'$color12'}>
           {t('activity.sections.multipliers')}
         </H3>
-        <FadeCard br={12} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
+        <FadeCard br={CARD_BORDER_RADIUS} $gtMd={{ gap: '$4', p: '$7' }} p="$5">
           <Stack ai="center" jc="center" p="$4">
             <Spinner color="$color12" size="large" />
           </Stack>
@@ -648,7 +889,14 @@ const MultiplierCards = ({
       </H3>
       <Stack gap="$5" $gtXs={{ fd: 'row' }} $platform-web={{ flexWrap: 'wrap' }}>
         {activeMultipliers.map(({ type: verificationType, value }) => (
-          <MultiplierCard key={verificationType}>
+          <MultiplierCard
+            key={verificationType}
+            distribution={distribution}
+            previousDistribution={previousDistribution}
+            verifications={verifications}
+            verificationType={verificationType}
+            isQualificationOver={isQualificationOver}
+          >
             <XStack ai="center" gap="$2" jc="center">
               <IconAccount size={'$2'} color={'$color10'} />
               <H3 fontWeight={'500'} color={'$color10'}>
@@ -682,19 +930,50 @@ const MultiplierCards = ({
   )
 }
 
-const MultiplierCard = ({ children }: PropsWithChildren<CardProps>) => {
+const MultiplierCard = ({
+  children,
+  distribution,
+  previousDistribution,
+  verifications,
+  verificationType,
+  isQualificationOver,
+}: PropsWithChildren<CardProps> & {
+  distribution: UseDistributionsResultData[number]
+  previousDistribution?: UseDistributionsResultData[number]
+  verifications: NonNullable<DistributionsVerificationsQuery['data']> | null
+  verificationType: VerificationType
+  isQualificationOver: boolean
+}) => {
+  // Calculate multiplier impact (only when qualification is over)
+  const multiplierImpact =
+    isQualificationOver && verifications
+      ? calculateMultiplierImpact(
+          distribution,
+          verifications,
+          verificationType,
+          previousDistribution
+        )
+      : null
+
   return (
     <FadeCard br={'$6'} p="$6" jc={'center'} ai={'center'} mih={112}>
-      <XStack
-        ai="center"
-        w={'100%'}
-        jc="space-between"
-        $gtXs={{ gap: '$7' }}
-        gap={'$5'}
-        flexWrap="wrap"
-      >
-        {children}
-      </XStack>
+      <YStack w={'100%'} gap="$3">
+        <XStack
+          ai="center"
+          w={'100%'}
+          jc="space-between"
+          $gtXs={{ gap: '$7' }}
+          gap={'$5'}
+          flexWrap="wrap"
+        >
+          {children}
+        </XStack>
+        {multiplierImpact !== null && multiplierImpact > 0n ? (
+          <Paragraph color="$color11" fontSize="$3" ta="center" mt="$1">
+            +{formatRewardAmount(multiplierImpact, distribution.token_decimals ?? 18)} SEND
+          </Paragraph>
+        ) : null}
+      </YStack>
     </FadeCard>
   )
 }
@@ -719,7 +998,7 @@ const ProgressCard = ({
 
   if (verificationsQuery.isLoading) {
     return (
-      <FadeCard br={12} $gtMd={{ gap: '$4' }} p="$6">
+      <FadeCard br={CARD_BORDER_RADIUS} $gtMd={{ gap: '$4' }} p="$6">
         <Stack ai="center" jc="center" p="$4">
           <Spinner color="$color12" size="large" />
         </Stack>
@@ -750,7 +1029,7 @@ const ProgressCard = ({
       (acc, curr) =>
         acc +
         (verifications.distributionNumber === 11
-          ? BigInt(curr.amount) * BigInt(1e16)
+          ? BigInt(curr.amount) * BigInt(DISTRIBUTION_11_MULTIPLIER)
           : BigInt(curr.amount)),
       0n
     ) || BigInt(distribution.hodler_min_balance)
