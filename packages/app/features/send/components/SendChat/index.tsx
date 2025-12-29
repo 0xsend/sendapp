@@ -1083,7 +1083,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             <NoteInput
               control={form.control}
               error={noteValidationError}
-              disabled={activeSection === 'reviewAndSend' || isExternalAddress}
+              disabled={isExternalAddress}
               placeholder={
                 isExternalAddress ? 'Notes not supported for external address' : 'Add a note...'
               }
