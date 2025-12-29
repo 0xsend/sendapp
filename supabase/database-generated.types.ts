@@ -141,7 +141,6 @@ export type Database = {
         Row: {
           address: string
           amount: number
-          balance_rank: number | null
           bonus_pool_amount: number
           created_at: string
           distribution_id: number
@@ -155,7 +154,6 @@ export type Database = {
         Insert: {
           address: string
           amount: number
-          balance_rank?: number | null
           bonus_pool_amount: number
           created_at?: string
           distribution_id: number
@@ -169,7 +167,6 @@ export type Database = {
         Update: {
           address?: string
           amount?: number
-          balance_rank?: number | null
           bonus_pool_amount?: number
           created_at?: string
           distribution_id?: number
@@ -325,7 +322,6 @@ export type Database = {
           token_decimals: number | null
           tranche_id: number
           updated_at: string
-          verified_count: number
         }
         Insert: {
           amount: number
@@ -351,7 +347,6 @@ export type Database = {
           token_decimals?: number | null
           tranche_id: number
           updated_at?: string
-          verified_count?: number
         }
         Update: {
           amount?: number
@@ -377,7 +372,6 @@ export type Database = {
           token_decimals?: number | null
           tranche_id?: number
           updated_at?: string
-          verified_count?: number
         }
         Relationships: []
       }
@@ -459,7 +453,6 @@ export type Database = {
           distribution_shares: {
             address: string
             amount: number
-            balance_rank: number | null
             bonus_pool_amount: number
             created_at: string
             distribution_id: number
@@ -2130,7 +2123,6 @@ export type Database = {
         Returns: {
           address: string
           amount: number
-          balance_rank: number | null
           bonus_pool_amount: number
           created_at: string
           distribution_id: number

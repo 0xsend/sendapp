@@ -1,4 +1,5 @@
 import type { Database } from '@my/supabase/database.types'
+import { DISTRIBUTION_11_MULTIPLIER } from 'app/features/rewards/activity/constants'
 
 // PERC_DENOM constant - matches distributor weights.ts
 // From: apps/distributor/src/weights.ts line 35
@@ -7,13 +8,6 @@ export const PERC_DENOM = 1000000000000000000n
 export type VerificationType = Database['public']['Enums']['verification_type']
 
 export type MultiplierConfig = {
-  min: number
-  max: number
-  step: number
-}
-
-export type Multiplier = {
-  value?: number
   min: number
   max: number
   step: number
@@ -214,7 +208,10 @@ export function calculatePreviousReward(
 
   return previousShares.reduce(
     (acc, curr) =>
-      acc + (distributionNumber === 11 ? BigInt(curr.amount) * BigInt(1e16) : BigInt(curr.amount)),
+      acc +
+      (distributionNumber === 11
+        ? BigInt(curr.amount) * BigInt(DISTRIBUTION_11_MULTIPLIER)
+        : BigInt(curr.amount)),
     0n
   )
 }

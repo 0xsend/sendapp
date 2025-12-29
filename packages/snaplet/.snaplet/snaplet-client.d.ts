@@ -90,7 +90,6 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       index?: string;
-      balance_rank?: string;
       users?: string;
       distributions?: string;
     };
@@ -151,7 +150,6 @@ type Override = {
       tranche_id?: string;
       earn_min_balance?: string;
       sendpot_ticket_increment?: string;
-      verified_count?: string;
       merkle_tree?: string;
       distribution_shares?: string;
       distribution_verification_values?: string;
@@ -1020,7 +1018,6 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     index?: FingerprintNumberField;
-    balanceRank?: FingerprintNumberField;
     user?: FingerprintRelationField;
     distribution?: FingerprintRelationField;
   }
@@ -1065,7 +1062,6 @@ export interface Fingerprint {
     trancheId?: FingerprintNumberField;
     earnMinBalance?: FingerprintNumberField;
     sendpotTicketIncrement?: FingerprintNumberField;
-    verifiedCount?: FingerprintNumberField;
     merkleTree?: FingerprintJsonField;
     distributionShares?: FingerprintRelationField;
     distributionVerificationValues?: FingerprintRelationField;
