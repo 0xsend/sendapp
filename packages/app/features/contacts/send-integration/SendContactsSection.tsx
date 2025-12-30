@@ -5,34 +5,36 @@
  */
 
 import {
+  Avatar,
   Button,
-  FastImage,
   LinearGradient,
   Paragraph,
   Text,
-  useTheme,
   useThemeName,
   View,
   XStack,
   YStack,
 } from '@my/ui'
-import { IconBadgeCheckSolid2 } from 'app/components/icons'
+import { getContactDisplayName } from '../utils/getContactDisplayName'
+import { IconAccount, IconBadgeCheckSolid2 } from 'app/components/icons'
 import { useSendScreenParams } from 'app/routers/params'
-import { shorten } from 'app/utils/strings'
 import { memo, useCallback, useMemo } from 'react'
 import { FlatList, Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
-import { type SendContactItem, useFavoriteContacts, useRecentContacts } from './useFavoriteContacts'
+import { type SendContactItem, useSendPageContacts } from './useFavoriteContacts'
 
 /**
- * SendContactsSection displays recent and favorite contacts for quick selection in the Send flow.
+ * SendContactsSection displays contacts for quick selection in the Send flow.
  *
  * Features:
- * - Horizontal scrolling list of recent contacts
- * - Horizontal scrolling list of favorite contacts
+ * - Single horizontal scrolling row of contacts
+ * - Sorted by last transaction time (most recent first)
+ * - Contacts without transactions sorted by creation date at the end
+ * - Limited to 15 contacts maximum
  * - Supports both Send users and external addresses
  * - "View All" link to contacts page
+ * - Constrained to app's max-width pattern
  *
  * @example
  * ```tsx
@@ -40,26 +42,14 @@ import { type SendContactItem, useFavoriteContacts, useRecentContacts } from './
  * ```
  */
 export const SendContactsSection = memo(function SendContactsSection() {
-  const {
-    data: favoriteContacts,
-    isLoading: isLoadingFavorites,
-    error: favoritesError,
-  } = useFavoriteContacts()
-  const {
-    data: recentContacts,
-    isLoading: isLoadingRecent,
-    error: recentError,
-  } = useRecentContacts()
+  const { data: contacts, isLoading, error } = useSendPageContacts()
   const router = useRouter()
   const { t } = useTranslation('send')
 
-  const hasFavorites = favoriteContacts && favoriteContacts.length > 0
-  const hasRecent = recentContacts && recentContacts.length > 0
-  const isLoading = isLoadingFavorites || isLoadingRecent
-  const error = favoritesError || recentError
+  const hasContacts = contacts && contacts.length > 0
 
   // Don't render if loading or no contacts (but show if there's an error)
-  if (isLoading || (!hasFavorites && !hasRecent && !error)) {
+  if (isLoading || (!hasContacts && !error)) {
     return null
   }
 
@@ -103,88 +93,65 @@ export const SendContactsSection = memo(function SendContactsSection() {
           {error.message?.split('.')[0] ?? 'Error loading contacts'}
         </Paragraph>
       ) : (
-        <YStack gap="$4">
-          {/* Favorites section */}
-          {hasFavorites && (
-            <ContactsList
-              title={t('suggestions.favorites', { defaultValue: 'Favorites' })}
-              contacts={favoriteContacts}
-            />
-          )}
-
-          {/* Recent contacts section */}
-          {hasRecent && (
-            <ContactsList
-              title={t('suggestions.recent', { defaultValue: 'Recent' })}
-              contacts={recentContacts}
-            />
-          )}
-        </YStack>
+        <ContactsRow contacts={contacts ?? []} />
       )}
     </YStack>
   )
 })
 
 /**
- * Horizontal scrolling list of contacts.
+ * Single horizontal scrolling row of contacts.
  */
-const ContactsList = memo(function ContactsList({
-  title,
+const ContactsRow = memo(function ContactsRow({
   contacts,
 }: {
-  title: string
   contacts: SendContactItem[]
 }) {
   return (
-    <YStack gap="$2">
-      <Text fontSize="$3" color="$color11" fontWeight="500">
-        {title}
-      </Text>
-      <View
-        animation={[
-          '200ms',
-          {
-            opacity: { delay: 50 },
-            transform: { delay: 50 },
-          },
-        ]}
-        enterStyle={{ opacity: 0, y: 10 }}
-        exitStyle={{ opacity: 0, y: 10 }}
-        mx={-24}
-        pos="relative"
-      >
-        <FlatList
-          horizontal
-          bounces
-          data={contacts}
-          renderItem={({ item }) => <ContactSuggestion contact={item} />}
-          keyExtractor={(item) => String(item.contact_id)}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingRight: 24,
-            paddingHorizontal: 24,
-            paddingVertical: 8,
-          }}
-          $platform-native={{
-            overflow: 'visible',
-          }}
-        />
-        <LinearGradient
-          display="none"
-          $sm={{ display: 'flex' }}
-          pointerEvents="none"
-          colors={['rgba(255, 255, 255, 0)', '$aztec1']}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
-          width="$4"
-          height="100%"
-          zi={100}
-          pos="absolute"
-          top={0}
-          right={0}
-        />
-      </View>
-    </YStack>
+    <View
+      animation={[
+        '200ms',
+        {
+          opacity: { delay: 50 },
+          transform: { delay: 50 },
+        },
+      ]}
+      enterStyle={{ opacity: 0, y: 10 }}
+      exitStyle={{ opacity: 0, y: 10 }}
+      mx={-24}
+      pos="relative"
+    >
+      <FlatList
+        horizontal
+        bounces
+        data={contacts}
+        renderItem={({ item }) => <ContactSuggestion contact={item} />}
+        keyExtractor={(item) => String(item.contact_id)}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingRight: 24,
+          paddingHorizontal: 24,
+          paddingVertical: 8,
+        }}
+        $platform-native={{
+          overflow: 'visible',
+        }}
+      />
+      <LinearGradient
+        display="none"
+        $sm={{ display: 'flex' }}
+        pointerEvents="none"
+        colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        width="$4"
+        height="100%"
+        zi={100}
+        pos="absolute"
+        top={0}
+        right={0}
+      />
+    </View>
   )
 })
 
@@ -198,14 +165,17 @@ const ContactSuggestion = memo(function ContactSuggestion({
   const themeName = useThemeName()
   const isDark = themeName.includes('dark')
 
-  // Display label
+  // Display label using the shared utility
+  // Note: contact.name is already (custom_name ?? profile_name) from the hook
   const label = useMemo(() => {
-    if (contact.main_tag_name) return `/${contact.main_tag_name}`
-    if (contact.name) return contact.name
-    if (contact.send_id) return `#${contact.send_id}`
-    if (contact.external_address) return shorten(contact.external_address, 4, 4)
-    return '??'
-  }, [contact])
+    return getContactDisplayName({
+      custom_name: null, // Don't pass since contact.name already has the priority
+      profile_name: contact.name,
+      main_tag_name: contact.main_tag_name,
+      external_address: contact.external_address,
+      send_id: contact.send_id,
+    })
+  }, [contact.name, contact.main_tag_name, contact.external_address, contact.send_id])
 
   const onSelect = useCallback(() => {
     const _sendParams = { ...sendParams }
@@ -286,6 +256,7 @@ const ContactSuggestion = memo(function ContactSuggestion({
 
 /**
  * Contact avatar image.
+ * Uses IconAccount fallback matching profile page styling.
  */
 const ContactImage = memo(function ContactImage({
   avatarUrl,
@@ -294,32 +265,32 @@ const ContactImage = memo(function ContactImage({
   avatarUrl: string | null
   label: string
 }) {
-  const themeObj = useTheme()
-  const fastImageStyle = useMemo(
-    () => ({
-      backgroundColor: themeObj.background.val,
-      borderRadius: 1000_000,
-    }),
-    [themeObj.background.val]
-  )
+  const themeName = useThemeName()
+  const isDark = themeName.includes('dark')
 
-  const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(label)}&size=256&format=png&background=86ad7f`
+  // Android-specific fallback handling
+  if (Platform.OS === 'android' && !avatarUrl) {
+    return (
+      <XStack
+        w={74}
+        h={74}
+        jc="center"
+        ai="center"
+        br={1000_000}
+        bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+      >
+        <IconAccount color="$color12" size="100%" />
+      </XStack>
+    )
+  }
 
   return (
-    <XStack ov="hidden" br={1000_000} elevation="$0.75">
-      <FastImage
-        alt={`${label} avatar`}
-        width={74}
-        height={74}
-        src={avatarUrl ?? fallbackUrl}
-        style={fastImageStyle}
-        onError={(e: { target: { src: string } }) => {
-          if (Platform.OS === 'web') {
-            e.target.src = fallbackUrl
-          }
-        }}
-      />
-    </XStack>
+    <Avatar size={74} br={1000_000} bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}>
+      <Avatar.Image src={avatarUrl ?? undefined} alt={`${label} avatar`} />
+      <Avatar.Fallback f={1} jc="center" ai="center">
+        <IconAccount color="$color12" size="100%" />
+      </Avatar.Fallback>
+    </Avatar>
   )
 })
 

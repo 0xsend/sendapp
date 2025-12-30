@@ -19,6 +19,7 @@ import { FlatList, Platform } from 'react-native'
 import { CONTACTS_SEARCH_DEBOUNCE_MS } from '../constants'
 import { useContactSearch } from '../hooks/useContactSearch'
 import type { ContactView } from '../types'
+import { getContactDisplayName } from '../utils/getContactDisplayName'
 
 /**
  * Props for ContactPickerSheet component.
@@ -276,20 +277,6 @@ interface ContactPickerItemProps {
 }
 
 /**
- * Determines the display name for a contact.
- */
-function getDisplayName(contact: ContactView): string {
-  if (contact.custom_name) return contact.custom_name
-  if (contact.profile_name) return contact.profile_name
-  if (contact.main_tag_name) return `/${contact.main_tag_name}`
-  if (contact.external_address) {
-    const addr = contact.external_address
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-  }
-  return 'Unknown Contact'
-}
-
-/**
  * Determines the subtitle for a contact.
  */
 function getSubtitle(contact: ContactView): string | null {
@@ -310,7 +297,7 @@ const ContactPickerItem = memo(function ContactPickerItem({
   contact,
   onPress,
 }: ContactPickerItemProps) {
-  const displayName = getDisplayName(contact)
+  const displayName = getContactDisplayName(contact)
   const subtitle = getSubtitle(contact)
 
   const handlePress = useCallback(() => {

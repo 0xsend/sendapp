@@ -1,7 +1,16 @@
-import { Button, Input, Paragraph, Spinner, XStack, YStack, type YStackProps } from '@my/ui'
+import {
+  Button,
+  Input,
+  Paragraph,
+  Spinner,
+  useAppToast,
+  XStack,
+  YStack,
+  type YStackProps,
+} from '@my/ui'
 import { IconPlus } from 'app/components/icons'
 import { memo, useCallback, useMemo, useState } from 'react'
-import { CONTACTS_LABEL_NAME_MAX } from '../constants'
+import { CONTACTS_LABEL_NAME_MAX, CONTACTS_MAX_LABELS_PER_CONTACT } from '../constants'
 import {
   useAssignContactLabel,
   useContactLabels,
@@ -46,6 +55,8 @@ export const LabelSelector = memo(function LabelSelector({
   onLabelsChange,
   ...rest
 }: LabelSelectorProps) {
+  const toast = useAppToast()
+
   // Fetch all labels
   const { data: labels, isLoading: isLoadingLabels } = useContactLabels()
 
@@ -61,18 +72,47 @@ export const LabelSelector = memo(function LabelSelector({
   // Convert assigned label IDs to a Set for fast lookup
   const assignedSet = useMemo(() => new Set(assignedLabelIds), [assignedLabelIds])
 
+  // Check if we're at the max label limit
+  const isAtMaxLabels = assignedLabelIds.length >= CONTACTS_MAX_LABELS_PER_CONTACT
+
   // Handle toggling a label assignment
   const handleLabelPress = useCallback(
     (label: ContactLabel) => {
       const isAssigned = assignedSet.has(label.id)
 
       if (isAssigned) {
-        unassignLabel({ contactId, labelId: label.id }, { onSuccess: onLabelsChange })
+        unassignLabel(
+          { contactId, labelId: label.id },
+          {
+            onSuccess: onLabelsChange,
+            onError: (error) => {
+              toast.error(error.message ?? 'Failed to remove label')
+            },
+          }
+        )
       } else {
-        assignLabel({ contactId, labelId: label.id }, { onSuccess: onLabelsChange })
+        // Client-side guard: prevent adding more than max labels
+        if (isAtMaxLabels) {
+          toast.error(`Maximum of ${CONTACTS_MAX_LABELS_PER_CONTACT} labels allowed per contact`)
+          return
+        }
+
+        assignLabel(
+          { contactId, labelId: label.id },
+          {
+            onSuccess: onLabelsChange,
+            onError: (error) => {
+              // Handle database trigger error message
+              const message = error.message?.includes('Maximum of')
+                ? `Maximum of ${CONTACTS_MAX_LABELS_PER_CONTACT} labels allowed per contact`
+                : (error.message ?? 'Failed to add label')
+              toast.error(message)
+            },
+          }
+        )
       }
     },
-    [contactId, assignedSet, assignLabel, unassignLabel, onLabelsChange]
+    [contactId, assignedSet, assignLabel, unassignLabel, onLabelsChange, toast, isAtMaxLabels]
   )
 
   // Handle creating a new label
@@ -88,12 +128,29 @@ export const LabelSelector = memo(function LabelSelector({
         onSuccess: (newLabel) => {
           setNewLabelName('')
           setShowNewLabelInput(false)
-          // Optionally assign the new label immediately
-          assignLabel({ contactId, labelId: newLabel.id }, { onSuccess: onLabelsChange })
+
+          // Only assign the new label if we're not at the max
+          if (!isAtMaxLabels) {
+            assignLabel(
+              { contactId, labelId: newLabel.id },
+              {
+                onSuccess: onLabelsChange,
+                onError: (error) => {
+                  const message = error.message?.includes('Maximum of')
+                    ? `Maximum of ${CONTACTS_MAX_LABELS_PER_CONTACT} labels allowed per contact`
+                    : (error.message ?? 'Failed to add label')
+                  toast.error(message)
+                },
+              }
+            )
+          }
+        },
+        onError: (error) => {
+          toast.error(error.message ?? 'Failed to create label')
         },
       }
     )
-  }, [newLabelName, createLabel, assignLabel, contactId, onLabelsChange])
+  }, [newLabelName, createLabel, assignLabel, contactId, onLabelsChange, toast, isAtMaxLabels])
 
   // Handle canceling new label creation
   const handleCancelCreate = useCallback(() => {
@@ -139,11 +196,15 @@ export const LabelSelector = memo(function LabelSelector({
             flex={1}
             size="$3"
             placeholder="Label name"
+            placeholderTextColor="$color10"
             value={newLabelName}
             onChangeText={setNewLabelName}
             maxLength={CONTACTS_LABEL_NAME_MAX}
             autoFocus
             onSubmitEditing={handleCreateLabel}
+            color="$color12"
+            backgroundColor="$color3"
+            borderColor="$color6"
           />
           <Button
             size="$3"

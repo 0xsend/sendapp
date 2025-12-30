@@ -6,6 +6,7 @@ import { shorten } from 'app/utils/strings'
 import { IconAccount, IconStar, IconBadgeCheckSolid2, IconBase } from 'app/components/icons'
 import { useThemeName } from 'tamagui'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { getContactDisplayName } from '../utils/getContactDisplayName'
 
 /**
  * Props for ContactListItem component.
@@ -19,19 +20,6 @@ export interface ContactListItemProps {
   isFirst?: boolean
   /** Whether this is the last item (for styling) */
   isLast?: boolean
-}
-
-/**
- * Determines the display name for a contact.
- *
- * Priority: custom_name > profile_name > main_tag_name > truncated external_address
- */
-function getDisplayName(contact: ContactView): string {
-  if (contact.custom_name) return contact.custom_name
-  if (contact.profile_name) return contact.profile_name
-  if (contact.main_tag_name) return `/${contact.main_tag_name}`
-  if (contact.external_address) return shorten(contact.external_address, 6, 4)
-  return 'Unknown Contact'
 }
 
 /**
@@ -82,7 +70,7 @@ export const ContactListItem = memo(function ContactListItem({
   const isDark = themeName?.includes('dark')
   const hoverStyles = useHoverStyles()
 
-  const displayName = getDisplayName(contact)
+  const displayName = getContactDisplayName(contact)
   const subtitle = getSubtitle(contact)
   const isExternalContact = Boolean(contact.external_address)
 
