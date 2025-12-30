@@ -7,6 +7,7 @@ import {
   BooleanSwitchField,
   CoinField,
   CountryCodeField,
+  EvmAddressField,
   NumberField,
   OTPField,
   SelectField,
@@ -65,7 +66,7 @@ export const formFields = {
 
 const mapping = [
   [formFields.text, TextField] as const,
-  [formFields.evmAddress, TextField] as const,
+  [formFields.evmAddress, EvmAddressField] as const,
   [formFields.textarea, TextAreaField] as const,
   [formFields.number, NumberField] as const,
   [formFields.boolean, BooleanField] as const,
