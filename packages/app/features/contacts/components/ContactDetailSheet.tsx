@@ -1,34 +1,20 @@
-import {
-  Button,
-  Dialog,
-  H4,
-  Input,
-  Paragraph,
-  Sheet,
-  Spinner,
-  Text,
-  TextArea,
-  VisuallyHidden,
-  XStack,
-  YStack,
-  useAppToast,
-} from '@my/ui'
-import { IconAccount, IconStar, IconStarOutline, IconTrash, IconX } from 'app/components/icons'
-import { AvatarProfile } from 'app/features/profile/AvatarProfile'
+import { Dialog, Sheet, useAppToast, VisuallyHidden, YStack } from '@my/ui'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
-import { CONTACTS_CUSTOM_NAME_MAX, CONTACTS_NOTES_MAX } from '../constants'
-import {
-  useArchiveContact,
-  useToggleContactFavorite,
-  useUnarchiveContact,
-  useUpdateContact,
-} from '../hooks/useContactMutation'
 import { useContactLabels } from '../hooks/useContactLabels'
+import { useToggleContactFavorite, useUpdateContact } from '../hooks/useContactMutation'
+import { useContactArchive } from '../hooks/useContactArchive'
+import { useContactEditState } from '../hooks/useContactEditState'
 import type { ContactView } from '../types'
-import { LabelChip } from './LabelChip'
-import { LabelSelector } from './LabelSelector'
+import { getContactDisplayName } from '../utils/getContactDisplayName'
+import { ContactDetailProvider, type ContactDetailContextValue } from './ContactDetailContext'
+import { ContactDetailHeader } from './ContactDetailHeader'
+import { ContactDetailAvatar } from './ContactDetailAvatar'
+import { ContactDetailLabels } from './ContactDetailLabels'
+import { ContactDetailNotes } from './ContactDetailNotes'
+import { ContactDetailActions } from './ContactDetailActions'
+import { ContactArchiveSection } from './ContactArchiveSection'
 
 /**
  * Props for the ContactDetailSheet component.
@@ -42,10 +28,15 @@ interface ContactDetailSheetProps {
   onOpenChange: (open: boolean) => void
   /** Callback when the contact is updated (for refreshing data) */
   onUpdate?: () => void
+  /** Hide View Profile and Send buttons (useful when opened from profile page) */
+  hideNavButtons?: boolean
 }
 
 /**
  * Bottom sheet for viewing and editing a contact.
+ *
+ * Uses React Context to share state with child components, eliminating prop drilling.
+ * Child components access shared state via useContactDetail() hook.
  *
  * Features:
  * - Display contact info: avatar, name, tags, address, notes
@@ -56,54 +47,31 @@ interface ContactDetailSheetProps {
  * - Send money button (links to send flow)
  *
  * Uses Dialog on web and Sheet on native for platform-appropriate UX.
- *
- * @example
- * ```tsx
- * <ContactDetailSheet
- *   contact={selectedContact}
- *   open={isOpen}
- *   onOpenChange={setIsOpen}
- *   onUpdate={refetchContacts}
- * />
- * ```
  */
 export const ContactDetailSheet = memo(function ContactDetailSheet({
   contact,
   open,
   onOpenChange,
   onUpdate,
+  hideNavButtons = false,
 }: ContactDetailSheetProps) {
   const toast = useAppToast()
   const router = useRouter()
 
-  // Edit mode state - initialized when entering edit mode to avoid stale data
-  const [editState, setEditState] = useState<{
-    customName: string
-    notes: string
-  } | null>(null)
+  // Edit state hook
+  const { editState, isEditing, startEditing, stopEditing, updateEditField } =
+    useContactEditState(contact)
 
-  const isEditing = editState !== null
-
-  // Archive confirmation state
-  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
-
-  // Enter edit mode: initialize form with current contact values
-  const startEditing = useCallback(() => {
-    setEditState({
-      customName: contact.custom_name ?? '',
-      notes: contact.notes ?? '',
-    })
-  }, [contact.custom_name, contact.notes])
-
-  // Exit edit mode
-  const stopEditing = useCallback(() => {
-    setEditState(null)
-  }, [])
-
-  // Update form field while editing
-  const updateEditField = useCallback((field: 'customName' | 'notes', value: string) => {
-    setEditState((prev) => (prev ? { ...prev, [field]: value } : null))
-  }, [])
+  // Archive hook
+  const {
+    showArchiveConfirm,
+    showConfirm,
+    hideConfirm,
+    handleArchiveToggle,
+    isArchiving,
+    isUnarchiving,
+    isArchived,
+  } = useContactArchive(contact, onOpenChange, onUpdate)
 
   // Fetch all labels to display assigned ones
   const { data: allLabels } = useContactLabels()
@@ -111,40 +79,42 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
   // Mutations
   const { mutate: toggleFavorite, isPending: isTogglingFavorite } = useToggleContactFavorite()
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact()
-  const { mutate: archiveContact, isPending: isArchiving } = useArchiveContact()
-  const { mutate: unarchiveContact, isPending: isUnarchiving } = useUnarchiveContact()
 
   // Local favorite state for optimistic updates
   const [localIsFavorite, setLocalIsFavorite] = useState(contact.is_favorite ?? false)
 
-  // Sync local state when contact prop changes (e.g., after parent refetch)
-  // Only sync on contact.is_favorite changes, not on isTogglingFavorite changes
-  // to avoid reverting optimistic updates before the refetch completes
+  // Sync local state when contact prop changes
   useEffect(() => {
     setLocalIsFavorite(contact.is_favorite ?? false)
   }, [contact.is_favorite])
 
   // Derived state
-  const isArchived = Boolean(contact.archived_at)
   const isMutating = isTogglingFavorite || isUpdating || isArchiving || isUnarchiving
 
-  // Display name priority: custom_name > profile name > main_tag_name > address
-  const displayName = useMemo(() => {
-    if (contact.custom_name) return contact.custom_name
-    if (contact.profile_name) return contact.profile_name
-    if (contact.main_tag_name) return `/${contact.main_tag_name}`
-    if (contact.external_address) {
-      const addr = contact.external_address
-      return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-    }
-    return 'Unknown Contact'
-  }, [contact])
+  // Display name using the shared utility
+  const displayName = useMemo(() => getContactDisplayName(contact), [contact])
+
+  // Only show View Profile for Send users (those with a send_id)
+  const canViewProfile = Boolean(contact.send_id)
+
+  // Check if external contact is on an EVM chain
+  const isEvmExternalContact = useMemo(() => {
+    if (!contact.external_address || !contact.chain_id) return false
+    return String(contact.chain_id).startsWith('eip155:')
+  }, [contact.external_address, contact.chain_id])
+
+  // Determine if Send Money should be available
+  const canSendMoney = Boolean(contact.main_tag_name || contact.send_id || isEvmExternalContact)
+
+  // Close handler
+  const close = useCallback(() => {
+    onOpenChange(false)
+  }, [onOpenChange])
 
   // Handle favorite toggle
   const handleToggleFavorite = useCallback(() => {
     if (contact.contact_id === null) return
 
-    // Optimistically update local state
     const newFavoriteState = !localIsFavorite
     setLocalIsFavorite(newFavoriteState)
 
@@ -156,7 +126,6 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
           onUpdate?.()
         },
         onError: (error) => {
-          // Revert on error
           setLocalIsFavorite(!newFavoriteState)
           toast.error(error.message)
         },
@@ -173,8 +142,6 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
     const trimmedName = editState.customName.trim()
     const trimmedNotes = editState.notes.trim()
 
-    // Only update if values changed
-    // Use null to clear values (empty string means clear)
     if (trimmedName !== (contact.custom_name ?? '')) {
       updates.custom_name = trimmedName === '' ? null : trimmedName
     }
@@ -211,71 +178,15 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
     onUpdate,
   ])
 
-  // Handle cancel edits - just exit edit mode, next edit will reinitialize
+  // Handle cancel edits
   const handleCancelEdits = useCallback(() => {
     stopEditing()
   }, [stopEditing])
-
-  // Handle archive/unarchive
-  const handleArchiveToggle = useCallback(() => {
-    if (contact.contact_id === null) return
-
-    if (isArchived) {
-      unarchiveContact(
-        { contactId: contact.contact_id },
-        {
-          onSuccess: () => {
-            toast.show('Contact restored')
-            setShowArchiveConfirm(false)
-            onUpdate?.()
-          },
-          onError: (error) => {
-            toast.error(error.message)
-          },
-        }
-      )
-    } else {
-      archiveContact(
-        { contactId: contact.contact_id },
-        {
-          onSuccess: () => {
-            toast.show('Contact archived')
-            setShowArchiveConfirm(false)
-            onOpenChange(false)
-            onUpdate?.()
-          },
-          onError: (error) => {
-            toast.error(error.message)
-          },
-        }
-      )
-    }
-  }, [
-    contact.contact_id,
-    isArchived,
-    archiveContact,
-    unarchiveContact,
-    toast,
-    onOpenChange,
-    onUpdate,
-  ])
-
-  // Check if external contact is on an EVM chain (send flow only supports EVM)
-  const isEvmExternalContact = useMemo(() => {
-    if (!contact.external_address || !contact.chain_id) return false
-    // CAIP-2 format: eip155:chainId
-    return String(contact.chain_id).startsWith('eip155:')
-  }, [contact.external_address, contact.chain_id])
-
-  // Determine if Send Money should be available
-  const canSendMoney = Boolean(contact.main_tag_name || contact.send_id || isEvmExternalContact)
 
   // Handle send money
   const handleSendMoney = useCallback(() => {
     onOpenChange(false)
 
-    // Navigate to send flow with recipient info
-    // Send flow requires both idType and recipient params
     if (contact.main_tag_name) {
       router.push(`/send?idType=tag&recipient=${encodeURIComponent(contact.main_tag_name)}`)
     } else if (contact.send_id) {
@@ -292,11 +203,18 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
     onOpenChange,
   ])
 
+  // Handle view profile
+  const handleViewProfile = useCallback(() => {
+    if (!contact.send_id) return
+    onOpenChange(false)
+    router.push(`/profile/${contact.send_id}`)
+  }, [contact.send_id, onOpenChange, router])
+
   // Build profile object for AvatarProfile
   const profileForAvatar = useMemo(
     () => ({
-      name: contact.profile_name,
-      avatar_url: contact.avatar_url,
+      name: contact.profile_name ?? null,
+      avatar_url: contact.avatar_url ?? null,
       is_verified: contact.is_verified ?? false,
     }),
     [contact.profile_name, contact.avatar_url, contact.is_verified]
@@ -314,200 +232,90 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
     return allLabels.filter((label) => labelSet.has(label.id))
   }, [allLabels, contact.label_ids])
 
-  // Sheet content
+  // Build context value
+  const contextValue: ContactDetailContextValue = useMemo(
+    () => ({
+      contact,
+      displayName,
+      open,
+      close,
+      onUpdate,
+      hideNavButtons,
+      editState,
+      isEditing,
+      startEditing,
+      stopEditing,
+      updateEditField,
+      localIsFavorite,
+      handleToggleFavorite,
+      isMutating,
+      isTogglingFavorite,
+      isUpdating,
+      isArchived,
+      isArchiving,
+      isUnarchiving,
+      showArchiveConfirm,
+      showConfirm,
+      hideConfirm,
+      handleArchiveToggle,
+      canViewProfile,
+      canSendMoney,
+      handleViewProfile,
+      handleSendMoney,
+      handleSaveEdits,
+      handleCancelEdits,
+      assignedLabelIds,
+      assignedLabels,
+      profileForAvatar,
+    }),
+    [
+      contact,
+      displayName,
+      open,
+      close,
+      onUpdate,
+      hideNavButtons,
+      editState,
+      isEditing,
+      startEditing,
+      stopEditing,
+      updateEditField,
+      localIsFavorite,
+      handleToggleFavorite,
+      isMutating,
+      isTogglingFavorite,
+      isUpdating,
+      isArchived,
+      isArchiving,
+      isUnarchiving,
+      showArchiveConfirm,
+      showConfirm,
+      hideConfirm,
+      handleArchiveToggle,
+      canViewProfile,
+      canSendMoney,
+      handleViewProfile,
+      handleSendMoney,
+      handleSaveEdits,
+      handleCancelEdits,
+      assignedLabelIds,
+      assignedLabels,
+      profileForAvatar,
+    ]
+  )
+
+  // Sheet content using composed components
   const sheetContent = (
-    <YStack gap="$4" padding="$4" pb="$6">
-      {/* Header with close button */}
-      <XStack justifyContent="space-between" alignItems="center">
-        <H4>Contact Details</H4>
-        <Button
-          size="$3"
-          circular
-          chromeless
-          onPress={() => onOpenChange(false)}
-          icon={<IconX size={20} color="$color12" />}
-        />
-      </XStack>
-
-      {/* Avatar and name */}
-      <XStack gap="$4" alignItems="center">
-        {contact.avatar_url || contact.profile_name ? (
-          <AvatarProfile profile={profileForAvatar} size="$7" />
-        ) : (
-          <XStack
-            width="$7"
-            height="$7"
-            backgroundColor="$color4"
-            borderRadius="$4"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <IconAccount size="$5" color="$color11" />
-          </XStack>
-        )}
-
-        <YStack flex={1} gap="$1">
-          {isEditing && editState ? (
-            <Input
-              value={editState.customName}
-              onChangeText={(v) => updateEditField('customName', v)}
-              placeholder="Display name"
-              maxLength={CONTACTS_CUSTOM_NAME_MAX}
-              size="$4"
-            />
-          ) : (
-            <Text fontSize="$6" fontWeight="600" numberOfLines={1}>
-              {displayName}
-            </Text>
-          )}
-
-          {/* Sendtags - only show if displayName is not already showing the tag */}
-          {contact.tags &&
-            contact.tags.length > 0 &&
-            !isEditing &&
-            !displayName.startsWith('/') && (
-              <Text fontSize="$3" color="$color10">
-                /{contact.tags.join(', /')}
-              </Text>
-            )}
-
-          {/* External address */}
-          {contact.external_address && (
-            <Text fontSize="$2" color="$color10" fontFamily="$mono">
-              {contact.external_address}
-            </Text>
-          )}
-        </YStack>
-
-        {/* Favorite button */}
-        <Button
-          testID="favoriteButton"
-          size="$4"
-          circular
-          chromeless
-          onPress={handleToggleFavorite}
-          disabled={isMutating}
-          aria-pressed={localIsFavorite}
-          icon={
-            isTogglingFavorite ? (
-              <Spinner size="small" />
-            ) : localIsFavorite ? (
-              <IconStar size={24} color="$yellow10" />
-            ) : (
-              <IconStarOutline size={24} color="$color10" />
-            )
-          }
-        />
-      </XStack>
-
-      {/* Labels display (when not editing) */}
-      {!isEditing && assignedLabels.length > 0 && (
-        <XStack flexWrap="wrap" gap="$2">
-          {assignedLabels.map((label) => (
-            <LabelChip key={label.id} label={label} />
-          ))}
-        </XStack>
-      )}
-
-      {/* Notes */}
-      <YStack gap="$2">
-        <Text fontWeight="600" color="$color11">
-          Notes
-        </Text>
-        {isEditing && editState ? (
-          <TextArea
-            value={editState.notes}
-            onChangeText={(v) => updateEditField('notes', v)}
-            placeholder="Add notes about this contact..."
-            maxLength={CONTACTS_NOTES_MAX}
-            minHeight={80}
-          />
-        ) : (
-          <Paragraph color={contact.notes ? '$color12' : '$color10'}>
-            {contact.notes || 'No notes'}
-          </Paragraph>
-        )}
+    <ContactDetailProvider value={contextValue}>
+      <YStack gap="$4" padding="$4" pb="$6">
+        <ContactDetailHeader />
+        <ContactDetailAvatar />
+        <ContactDetailLabels />
+        <ContactDetailNotes />
+        <ContactDetailActions />
+        <ContactArchiveSection />
       </YStack>
-
-      {/* Label selector (in edit mode) */}
-      {isEditing && contact.contact_id !== null && (
-        <LabelSelector
-          contactId={contact.contact_id}
-          assignedLabelIds={assignedLabelIds}
-          onLabelsChange={onUpdate}
-        />
-      )}
-
-      {/* Edit/Save buttons */}
-      {isEditing ? (
-        <XStack gap="$3">
-          <Button flex={1} onPress={handleCancelEdits} disabled={isUpdating}>
-            <Button.Text>Cancel</Button.Text>
-          </Button>
-          <Button
-            flex={1}
-            theme="active"
-            onPress={handleSaveEdits}
-            disabled={isUpdating}
-            icon={isUpdating ? <Spinner size="small" /> : undefined}
-          >
-            <Button.Text>Save</Button.Text>
-          </Button>
-        </XStack>
-      ) : (
-        <Button onPress={startEditing}>
-          <Button.Text>Edit Contact</Button.Text>
-        </Button>
-      )}
-
-      {/* Send button - only for Send users or EVM external contacts */}
-      {canSendMoney && (
-        <Button theme="green" onPress={handleSendMoney}>
-          <Button.Text>Send</Button.Text>
-        </Button>
-      )}
-
-      {/* Archive/Restore section */}
-      {!isEditing && (
-        <YStack gap="$2" paddingTop="$4" borderTopWidth={1} borderTopColor="$color4">
-          {showArchiveConfirm ? (
-            <YStack gap="$3">
-              <Paragraph color="$color11" textAlign="center">
-                {isArchived
-                  ? 'Restore this contact to your active list?'
-                  : 'Archive this contact? You can restore it later.'}
-              </Paragraph>
-              <XStack gap="$3">
-                <Button flex={1} onPress={() => setShowArchiveConfirm(false)} disabled={isMutating}>
-                  <Button.Text>Cancel</Button.Text>
-                </Button>
-                <Button
-                  flex={1}
-                  backgroundColor={isArchived ? '$green9' : '$red9'}
-                  onPress={handleArchiveToggle}
-                  disabled={isMutating}
-                  icon={isMutating ? <Spinner size="small" color="$white" /> : undefined}
-                  hoverStyle={{ backgroundColor: isArchived ? '$green10' : '$red10' }}
-                >
-                  <Button.Text color="$white">{isArchived ? 'Restore' : 'Archive'}</Button.Text>
-                </Button>
-              </XStack>
-            </YStack>
-          ) : (
-            <Button
-              testID={isArchived ? 'unarchiveContactButton' : 'archiveContactButton'}
-              chromeless
-              onPress={() => setShowArchiveConfirm(true)}
-              icon={<IconTrash size={18} color={isArchived ? '$green10' : '$red10'} />}
-            >
-              <Button.Text color={isArchived ? '$green10' : '$red10'}>
-                {isArchived ? 'Restore Contact' : 'Archive Contact'}
-              </Button.Text>
-            </Button>
-          )}
-        </YStack>
-      )}
-    </YStack>
+    </ContactDetailProvider>
   )
 
   // Web version using Dialog
