@@ -265,30 +265,20 @@ const ContactImage = memo(function ContactImage({
   avatarUrl: string | null
   label: string
 }) {
-  const themeName = useThemeName()
-  const isDark = themeName.includes('dark')
-
   // Android-specific fallback handling
   if (Platform.OS === 'android' && !avatarUrl) {
     return (
-      <XStack
-        w={74}
-        h={74}
-        jc="center"
-        ai="center"
-        br={1000_000}
-        bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-      >
-        <IconAccount color="$color12" size="100%" />
+      <XStack w={74} h={74} jc="center" ai="center" br="$4">
+        <IconAccount color="$olive" size="$6" />
       </XStack>
     )
   }
 
   return (
-    <Avatar size={74} br={1000_000} bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}>
+    <Avatar size={74} br="$4">
       <Avatar.Image src={avatarUrl ?? undefined} alt={`${label} avatar`} />
       <Avatar.Fallback f={1} jc="center" ai="center">
-        <IconAccount color="$color12" size="100%" />
+        <IconAccount color="$olive" size="$6" />
       </Avatar.Fallback>
     </Avatar>
   )
