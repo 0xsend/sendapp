@@ -434,6 +434,13 @@ type Override = {
       name?: string;
     };
   }
+  seed_files?: {
+    name?: string;
+    fields?: {
+      path?: string;
+      hash?: string;
+    };
+  }
   send_account_created?: {
     name?: string;
     fields?: {
@@ -1239,6 +1246,9 @@ export interface Fingerprint {
     insertedAt?: FingerprintDateField;
   }
   supabaseMigrationsSchemaMigrations?: {
+
+  }
+  seedFiles?: {
 
   }
   sendAccountCreateds?: {
