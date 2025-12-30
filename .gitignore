@@ -74,7 +74,7 @@ var/**
 
 /memory-bank
 
-**/.claude/
+**/.claude/settings.local.json
 .direnv
 
 tilt_config.json
