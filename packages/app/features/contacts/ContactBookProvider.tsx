@@ -1,6 +1,6 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { useDebounce } from '@my/ui'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { CONTACTS_SEARCH_DEBOUNCE_MS } from './constants'
 import { useContacts } from './hooks/useContacts'
 import type {
@@ -53,6 +53,20 @@ interface ContactBookProviderProps {
  * }
  * ```
  */
+/**
+ * Serializes a ContactFilter for comparison purposes.
+ */
+function serializeFilter(filter: ContactFilter): string {
+  switch (filter.type) {
+    case 'label':
+      return `label:${filter.labelId}`
+    case 'source':
+      return `source:${filter.source}`
+    default:
+      return filter.type
+  }
+}
+
 export function ContactBookProvider({
   children,
   initialFilter = { type: 'all' },
@@ -61,6 +75,17 @@ export function ContactBookProvider({
   const [inputQuery, setInputQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [filter, setFilter] = useState<ContactFilter>(initialFilter)
+
+  // Sync filter when initialFilter changes (e.g., URL param changes)
+  // Use a ref to track the previous initialFilter to detect actual changes
+  const prevInitialFilterKey = useRef(serializeFilter(initialFilter))
+  useEffect(() => {
+    const newKey = serializeFilter(initialFilter)
+    if (prevInitialFilterKey.current !== newKey) {
+      prevInitialFilterKey.current = newKey
+      setFilter(initialFilter)
+    }
+  }, [initialFilter])
 
   // Debounced search handler
   const handleDebouncedSearch = useDebounce(

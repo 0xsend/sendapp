@@ -17,5 +17,8 @@ export const CONTACTS_CUSTOM_NAME_MAX = 80
 /** Maximum length for contact notes */
 export const CONTACTS_NOTES_MAX = 500
 
+/** Maximum number of labels that can be assigned to a single contact */
+export const CONTACTS_MAX_LABELS_PER_CONTACT = 3
+
 /** Query key prefix for all contacts queries */
 export const CONTACTS_QUERY_KEY = 'contacts' as const

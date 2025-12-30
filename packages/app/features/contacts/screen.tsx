@@ -1,6 +1,7 @@
 import { ActionButton, H4, Paragraph, YStack } from '@my/ui'
 import { IconPlus } from 'app/components/icons'
-import { useState } from 'react'
+import { useContactsScreenParams } from 'app/routers/params'
+import { useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import { ContactBookProvider, useContactBook } from './ContactBookProvider'
 import { AddContactForm } from './components/AddContactForm'
@@ -8,16 +9,30 @@ import { ContactDetailSheet } from './components/ContactDetailSheet'
 import { ContactFilters } from './components/ContactFilters'
 import { ContactList } from './components/ContactList'
 import { ContactSearchBar } from './components/ContactSearchBar'
-import type { ContactView } from './types'
+import type { ContactFilter, ContactView } from './types'
 
 /**
  * Contact book screen.
  *
  * Provides the ContactBookProvider and renders the contact book UI.
+ * Supports filtering by label via URL query parameter: /contacts?label={labelId}
  */
 export function ContactsScreen() {
+  const [{ label }] = useContactsScreenParams()
+
+  // Parse label param into initial filter
+  const initialFilter = useMemo<ContactFilter>(() => {
+    if (label) {
+      const labelId = Number.parseInt(label, 10)
+      if (!Number.isNaN(labelId)) {
+        return { type: 'label', labelId }
+      }
+    }
+    return { type: 'all' }
+  }, [label])
+
   return (
-    <ContactBookProvider>
+    <ContactBookProvider initialFilter={initialFilter}>
       <YStack
         f={1}
         width="100%"
