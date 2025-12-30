@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Platform } from 'react-native'
-import { Avatar, Text, XStack, YStack, type XStackProps } from '@my/ui'
+import { Avatar, Card, Text, XStack, YStack, type CardProps } from '@my/ui'
 import type { ContactView } from '../types'
 import { shorten } from 'app/utils/strings'
 import { IconAccount, IconStar, IconBadgeCheckSolid2, IconBase } from 'app/components/icons'
@@ -90,7 +90,7 @@ export const ContactListItem = memo(function ContactListItem({
     onPress?.(contact)
   }
 
-  const borderRadiusStyle: XStackProps = {
+  const borderRadiusStyle: CardProps = {
     borderTopLeftRadius: isFirst ? '$4' : 0,
     borderTopRightRadius: isFirst ? '$4' : 0,
     borderBottomLeftRadius: isLast ? '$4' : 0,
@@ -98,20 +98,20 @@ export const ContactListItem = memo(function ContactListItem({
   }
 
   return (
-    <XStack
+    <Card
       width="100%"
       height={72}
+      elevation="$0.75"
       ai="center"
       jc="space-between"
       gap="$3"
       px="$3.5"
       py="$2.5"
       bc="$color1"
-      borderWidth={1}
-      borderColor="$color1"
       cursor="pointer"
       hoverStyle={hoverStyles}
       onPress={handlePress}
+      flexDirection="row"
       {...borderRadiusStyle}
     >
       <XStack gap="$3" f={1} ai="center">
@@ -139,7 +139,7 @@ export const ContactListItem = memo(function ContactListItem({
             </Text>
 
             {/* Favorite indicator */}
-            {contact.is_favorite && <IconStar size="$0.75" color="$yellow10" />}
+            {contact.is_favorite && <IconStar size="$1" color="$yellow10" />}
           </XStack>
 
           {subtitle && (
@@ -149,7 +149,7 @@ export const ContactListItem = memo(function ContactListItem({
           )}
         </YStack>
       </XStack>
-    </XStack>
+    </Card>
   )
 })
 

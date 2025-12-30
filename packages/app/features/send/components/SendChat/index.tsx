@@ -342,7 +342,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
           </XStack>
         )}
       </XStack>
-      <YStack gap="$1.5">
+      <YStack gap="$1.5" f={1}>
         <SizableText size="$4" color="$gray12" fow="500">
           {isExternalAddress
             ? tagName

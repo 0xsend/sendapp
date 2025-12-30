@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import {
   Card,
   type CardProps,
@@ -15,6 +15,9 @@ import { useContactBook } from '../ContactBookProvider'
 import type { ContactView } from '../types'
 import { ContactListItem } from './ContactListItem'
 import { SearchX } from '@tamagui/lucide-icons'
+
+/** Minimum time to show skeleton before transitioning to content (prevents flashing) */
+const SKELETON_MIN_DISPLAY_MS = 150
 
 /**
  * Props for ContactList component.
@@ -53,6 +56,34 @@ export const ContactList = memo(function ContactList({
 
   const { contacts, isLoading, isFetchingNextPage, hasNextPage, error, fetchNextPage, query } =
     useContactBook()
+
+  // Skeleton display state with minimum display time to prevent flashing
+  // Track when skeleton becomes visible (not when loading starts) for accurate timing
+  const [showSkeleton, setShowSkeleton] = useState(isLoading)
+  const skeletonVisibleSinceRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (isLoading && !showSkeleton) {
+      // Loading started - show skeleton after a tiny delay (prevents flash for instant loads)
+      const timer = setTimeout(() => {
+        skeletonVisibleSinceRef.current = Date.now()
+        setShowSkeleton(true)
+      }, 50)
+      return () => clearTimeout(timer)
+    }
+
+    if (!isLoading && showSkeleton) {
+      // Loading finished - ensure minimum display time from when skeleton became visible
+      const visibleSince = skeletonVisibleSinceRef.current ?? Date.now()
+      const elapsed = Date.now() - visibleSince
+      const remaining = Math.max(0, SKELETON_MIN_DISPLAY_MS - elapsed)
+      const timer = setTimeout(() => {
+        setShowSkeleton(false)
+        skeletonVisibleSinceRef.current = null
+      }, remaining)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, showSkeleton])
 
   const layoutSizeAdjustment = media.gtLg ? 32 : 14
 
@@ -119,8 +150,8 @@ export const ContactList = memo(function ContactList({
     )
   }
 
-  // Loading state
-  if (isLoading) {
+  // Loading state - use showSkeleton to prevent flashing
+  if (showSkeleton) {
     return (
       <Card {...cardProps} f={1}>
         <ContactListSkeleton />
@@ -128,8 +159,8 @@ export const ContactList = memo(function ContactList({
     )
   }
 
-  // Empty state
-  if (contacts.length === 0) {
+  // Empty state - suppress while loading to avoid flash during skeleton delay
+  if (contacts.length === 0 && !isLoading) {
     return (
       <Card {...cardProps} f={1}>
         <ContactListEmpty hasQuery={Boolean(query)} query={query} />

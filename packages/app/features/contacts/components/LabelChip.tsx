@@ -65,6 +65,7 @@ export const LabelChip = memo(function LabelChip({
 
   return (
     <XStack
+      testID={`labelChip-${label.id}`}
       backgroundColor={label.color ? undefined : selected ? '$color8' : '$color4'}
       style={containerStyle}
       borderRadius="$10"
@@ -74,6 +75,7 @@ export const LabelChip = memo(function LabelChip({
       gap="$1.5"
       pressStyle={onPress ? { opacity: 0.8, scale: 0.98 } : undefined}
       cursor={onPress ? 'pointer' : undefined}
+      role={onPress ? 'button' : undefined}
       onPress={onPress ? handlePress : undefined}
       {...rest}
     >

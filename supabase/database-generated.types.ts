@@ -2155,6 +2155,7 @@ export type Database = {
           p_custom_name?: string
           p_identifier: string
           p_is_favorite?: boolean
+          p_label_ids?: number[]
           p_lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
           p_notes?: string
         }
@@ -2228,6 +2229,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      contact_by_send_id: {
+        Args: { p_send_id: number }
+        Returns: Database["public"]["CompositeTypes"]["contact_search_result"]
+        SetofOptions: {
+          from: "*"
+          to: "contact_search_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       contact_favorites: {
         Args: { p_page_number?: number; p_page_size?: number }
         Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
@@ -2241,10 +2252,12 @@ export type Database = {
       contact_search: {
         Args: {
           p_favorites_only?: boolean
+          p_include_archived?: boolean
           p_label_ids?: number[]
           p_limit_val?: number
           p_offset_val?: number
           p_query?: string
+          p_sort_by_recency_only?: boolean
           p_source_filter?: Database["public"]["Enums"]["contact_source_enum"][]
         }
         Returns: Database["public"]["CompositeTypes"]["contact_search_result"][]

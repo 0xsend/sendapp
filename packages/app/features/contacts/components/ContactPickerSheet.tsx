@@ -9,6 +9,7 @@ import {
   Spinner,
   Text,
   useDebounce,
+  VisuallyHidden,
   XStack,
   YStack,
 } from '@my/ui'
@@ -239,6 +240,9 @@ export const ContactPickerSheet = memo(function ContactPickerSheet({
             height={600}
             overflow="hidden"
           >
+            <VisuallyHidden>
+              <Dialog.Title>Select Contact</Dialog.Title>
+            </VisuallyHidden>
             {sheetContent}
           </Dialog.Content>
         </Dialog.Portal>

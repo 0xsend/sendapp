@@ -274,12 +274,14 @@ ALTER FUNCTION "public"."toggle_contact_favorite"("p_contact_id" bigint) OWNER T
 -- Add contact for a Send user by lookup (client-facing)
 -- Note: This function confirms user existence via success/error, similar to profile_lookup.
 -- Rate limiting should be implemented at the API gateway level if abuse is a concern.
+-- If the contact was previously archived, this function will unarchive it and update the details.
 CREATE OR REPLACE FUNCTION "public"."add_contact_by_lookup"(
     p_lookup_type lookup_type_enum,
     p_identifier text,
     p_custom_name text DEFAULT NULL,
     p_notes text DEFAULT NULL,
-    p_is_favorite boolean DEFAULT false
+    p_is_favorite boolean DEFAULT NULL,
+    p_label_ids bigint[] DEFAULT NULL
 )
     RETURNS bigint
     LANGUAGE plpgsql
@@ -289,7 +291,10 @@ AS $$
 DECLARE
     target_user_id uuid;
     new_contact_id bigint;
+    existing_contact_id bigint;
+    existing_archived boolean;
     current_uid uuid;
+    v_label_id bigint;
 BEGIN
     current_uid := (SELECT auth.uid());
     IF current_uid IS NULL THEN
@@ -344,25 +349,59 @@ BEGIN
         RAISE EXCEPTION 'Cannot add yourself as a contact';
     END IF;
 
-    -- Check for existing contact
-    IF EXISTS (
-        SELECT 1 FROM contacts
-        WHERE owner_id = current_uid
-          AND contact_user_id = target_user_id
-          AND archived_at IS NULL
-    ) THEN
-        RAISE EXCEPTION 'Contact already exists';
+    -- Check for existing contact (both archived and active)
+    SELECT id, (archived_at IS NOT NULL)
+    INTO existing_contact_id, existing_archived
+    FROM contacts
+    WHERE owner_id = current_uid
+      AND contact_user_id = target_user_id
+    LIMIT 1;
+
+    IF existing_contact_id IS NOT NULL THEN
+        IF existing_archived THEN
+            -- Unarchive the existing contact and update details
+            -- Note: Only update is_favorite if explicitly provided (not NULL)
+            -- to preserve the original favorite status when re-adding
+            UPDATE contacts
+            SET archived_at = NULL,
+                custom_name = COALESCE(p_custom_name, custom_name),
+                notes = COALESCE(p_notes, notes),
+                is_favorite = CASE WHEN p_is_favorite IS NOT NULL THEN p_is_favorite ELSE is_favorite END,
+                updated_at = now()
+            WHERE id = existing_contact_id;
+            new_contact_id := existing_contact_id;
+        ELSE
+            RAISE EXCEPTION 'Contact already exists';
+        END IF;
+    ELSE
+        -- Insert new contact
+        INSERT INTO contacts (owner_id, contact_user_id, custom_name, notes, is_favorite, source)
+        VALUES (current_uid, target_user_id, p_custom_name, p_notes, COALESCE(p_is_favorite, false), 'manual')
+        RETURNING id INTO new_contact_id;
     END IF;
 
-    -- Insert the contact
-    INSERT INTO contacts (owner_id, contact_user_id, custom_name, notes, is_favorite, source)
-    VALUES (current_uid, target_user_id, p_custom_name, p_notes, COALESCE(p_is_favorite, false), 'manual')
-    RETURNING id INTO new_contact_id;
+    -- Assign labels if provided
+    IF p_label_ids IS NOT NULL AND array_length(p_label_ids, 1) > 0 THEN
+        -- First remove existing label assignments for this contact
+        DELETE FROM contact_label_assignments WHERE contact_id = new_contact_id;
+
+        -- Then add the new labels (only if they belong to the current user)
+        FOREACH v_label_id IN ARRAY p_label_ids
+        LOOP
+            INSERT INTO contact_label_assignments (contact_id, label_id)
+            SELECT new_contact_id, v_label_id
+            WHERE EXISTS (
+                SELECT 1 FROM contact_labels cl
+                WHERE cl.id = v_label_id AND cl.owner_id = current_uid
+            )
+            ON CONFLICT (contact_id, label_id) DO NOTHING;
+        END LOOP;
+    END IF;
 
     RETURN new_contact_id;
 END;
 $$;
-ALTER FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean) OWNER TO "postgres";
+ALTER FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean, "p_label_ids" bigint[]) OWNER TO "postgres";
 
 -- Add contact for a Send user (internal use - service_role only)
 CREATE OR REPLACE FUNCTION "public"."add_contact"(
@@ -463,7 +502,9 @@ CREATE OR REPLACE FUNCTION "public"."contact_search"(
     p_offset_val integer DEFAULT 0,
     p_favorites_only boolean DEFAULT false,
     p_label_ids bigint[] DEFAULT NULL,
-    p_source_filter contact_source_enum[] DEFAULT NULL
+    p_source_filter contact_source_enum[] DEFAULT NULL,
+    p_include_archived boolean DEFAULT false,
+    p_sort_by_recency_only boolean DEFAULT false
 )
     RETURNS SETOF contact_search_result
     LANGUAGE plpgsql
@@ -487,73 +528,140 @@ BEGIN
         p_offset_val := 0;
     END IF;
 
-    RETURN QUERY
-    SELECT
-        c.id::bigint AS contact_id,
-        c.owner_id,
-        c.custom_name,
-        c.notes,
-        c.is_favorite,
-        c.source,
-        c.last_interacted_at,
-        c.created_at,
-        c.updated_at,
-        c.archived_at,
-        c.external_address,
-        c.chain_id,
-        p.name::text AS profile_name,
-        p.avatar_url::text,
-        p.send_id,
-        sa.main_tag_id,
-        mt.name::text AS main_tag_name,
-        (SELECT array_agg(t.name::text)
-         FROM tags t
-         JOIN send_account_tags sat ON sat.tag_id = t.id
-         JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
-         WHERE sa2.user_id = c.contact_user_id AND t.status = 'confirmed') AS tags,
-        (p.verified_at IS NOT NULL) AS is_verified,
-        (SELECT array_agg(cla.label_id)
-         FROM contact_label_assignments cla
-         WHERE cla.contact_id = c.id) AS label_ids
-    FROM contacts c
-    LEFT JOIN profiles p ON p.id = c.contact_user_id
-    LEFT JOIN send_accounts sa ON sa.user_id = c.contact_user_id
-    LEFT JOIN tags mt ON mt.id = sa.main_tag_id
-    WHERE c.owner_id = current_uid
-      AND c.archived_at IS NULL
-      -- Favorites filter
-      AND (NOT p_favorites_only OR c.is_favorite = true)
-      -- Source filter
-      AND (p_source_filter IS NULL OR c.source = ANY(p_source_filter))
-      -- Label filter: contact must have at least one of the specified labels
-      AND (p_label_ids IS NULL OR EXISTS (
-          SELECT 1 FROM contact_label_assignments cla
-          WHERE cla.contact_id = c.id AND cla.label_id = ANY(p_label_ids)
-      ))
-      -- Text search filter
-      AND (p_query IS NULL OR p_query = '' OR (
-          c.custom_name ILIKE '%' || p_query || '%'
-          OR c.notes ILIKE '%' || p_query || '%'
-          OR c.external_address ILIKE '%' || p_query || '%'
-          OR p.name ILIKE '%' || p_query || '%'
-          OR EXISTS (
-              SELECT 1 FROM tags t
-              JOIN send_account_tags sat ON sat.tag_id = t.id
-              JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
-              WHERE sa2.user_id = c.contact_user_id
-                AND t.status = 'confirmed'
-                AND t.name::text ILIKE '%' || p_query || '%'
+    -- Return with different ordering based on p_sort_by_recency_only flag
+    IF p_sort_by_recency_only THEN
+        -- Sort purely by last_interacted_at (for Send page)
+        RETURN QUERY
+        SELECT
+            c.id::bigint AS contact_id,
+            c.owner_id,
+            c.custom_name,
+            c.notes,
+            c.is_favorite,
+            c.source,
+            c.last_interacted_at,
+            c.created_at,
+            c.updated_at,
+            c.archived_at,
+            c.external_address,
+            c.chain_id,
+            p.name::text AS profile_name,
+            p.avatar_url::text,
+            p.send_id,
+            sa.main_tag_id,
+            mt.name::text AS main_tag_name,
+            (SELECT array_agg(t.name::text)
+             FROM tags t
+             JOIN send_account_tags sat ON sat.tag_id = t.id
+             JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
+             WHERE sa2.user_id = c.contact_user_id AND t.status = 'confirmed') AS tags,
+            (p.verified_at IS NOT NULL) AS is_verified,
+            (SELECT array_agg(cla.label_id)
+             FROM contact_label_assignments cla
+             WHERE cla.contact_id = c.id) AS label_ids
+        FROM contacts c
+        LEFT JOIN profiles p ON p.id = c.contact_user_id
+        LEFT JOIN send_accounts sa ON sa.user_id = c.contact_user_id
+        LEFT JOIN tags mt ON mt.id = sa.main_tag_id
+        WHERE c.owner_id = current_uid
+          AND (
+              (p_include_archived AND c.archived_at IS NOT NULL)
+              OR (NOT p_include_archived AND c.archived_at IS NULL)
           )
-      ))
-    ORDER BY
-        c.is_favorite DESC,
-        c.last_interacted_at DESC NULLS LAST,
-        c.created_at DESC
-    LIMIT p_limit_val
-    OFFSET p_offset_val;
+          AND (NOT p_favorites_only OR c.is_favorite = true)
+          AND (p_source_filter IS NULL OR c.source = ANY(p_source_filter))
+          AND (p_label_ids IS NULL OR EXISTS (
+              SELECT 1 FROM contact_label_assignments cla
+              WHERE cla.contact_id = c.id AND cla.label_id = ANY(p_label_ids)
+          ))
+          AND (p_query IS NULL OR p_query = '' OR (
+              c.custom_name ILIKE '%' || p_query || '%'
+              OR c.notes ILIKE '%' || p_query || '%'
+              OR c.external_address ILIKE '%' || p_query || '%'
+              OR p.name ILIKE '%' || p_query || '%'
+              OR EXISTS (
+                  SELECT 1 FROM tags t
+                  JOIN send_account_tags sat ON sat.tag_id = t.id
+                  JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
+                  WHERE sa2.user_id = c.contact_user_id
+                    AND t.status = 'confirmed'
+                    AND t.name::text ILIKE '%' || p_query || '%'
+              )
+          ))
+        ORDER BY
+            c.last_interacted_at DESC NULLS LAST,
+            c.created_at DESC
+        LIMIT p_limit_val
+        OFFSET p_offset_val;
+    ELSE
+        -- Default ordering: favorites first, then by recency
+        RETURN QUERY
+        SELECT
+            c.id::bigint AS contact_id,
+            c.owner_id,
+            c.custom_name,
+            c.notes,
+            c.is_favorite,
+            c.source,
+            c.last_interacted_at,
+            c.created_at,
+            c.updated_at,
+            c.archived_at,
+            c.external_address,
+            c.chain_id,
+            p.name::text AS profile_name,
+            p.avatar_url::text,
+            p.send_id,
+            sa.main_tag_id,
+            mt.name::text AS main_tag_name,
+            (SELECT array_agg(t.name::text)
+             FROM tags t
+             JOIN send_account_tags sat ON sat.tag_id = t.id
+             JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
+             WHERE sa2.user_id = c.contact_user_id AND t.status = 'confirmed') AS tags,
+            (p.verified_at IS NOT NULL) AS is_verified,
+            (SELECT array_agg(cla.label_id)
+             FROM contact_label_assignments cla
+             WHERE cla.contact_id = c.id) AS label_ids
+        FROM contacts c
+        LEFT JOIN profiles p ON p.id = c.contact_user_id
+        LEFT JOIN send_accounts sa ON sa.user_id = c.contact_user_id
+        LEFT JOIN tags mt ON mt.id = sa.main_tag_id
+        WHERE c.owner_id = current_uid
+          AND (
+              (p_include_archived AND c.archived_at IS NOT NULL)
+              OR (NOT p_include_archived AND c.archived_at IS NULL)
+          )
+          AND (NOT p_favorites_only OR c.is_favorite = true)
+          AND (p_source_filter IS NULL OR c.source = ANY(p_source_filter))
+          AND (p_label_ids IS NULL OR EXISTS (
+              SELECT 1 FROM contact_label_assignments cla
+              WHERE cla.contact_id = c.id AND cla.label_id = ANY(p_label_ids)
+          ))
+          AND (p_query IS NULL OR p_query = '' OR (
+              c.custom_name ILIKE '%' || p_query || '%'
+              OR c.notes ILIKE '%' || p_query || '%'
+              OR c.external_address ILIKE '%' || p_query || '%'
+              OR p.name ILIKE '%' || p_query || '%'
+              OR EXISTS (
+                  SELECT 1 FROM tags t
+                  JOIN send_account_tags sat ON sat.tag_id = t.id
+                  JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
+                  WHERE sa2.user_id = c.contact_user_id
+                    AND t.status = 'confirmed'
+                    AND t.name::text ILIKE '%' || p_query || '%'
+              )
+          ))
+        ORDER BY
+            c.is_favorite DESC,
+            c.last_interacted_at DESC NULLS LAST,
+            c.created_at DESC
+        LIMIT p_limit_val
+        OFFSET p_offset_val;
+    END IF;
 END;
 $$;
-ALTER FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[]) OWNER TO "postgres";
+ALTER FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[], "p_include_archived" boolean, "p_sort_by_recency_only" boolean) OWNER TO "postgres";
 
 -- Sync contacts from activity (backfill from transfer history)
 CREATE OR REPLACE FUNCTION "public"."sync_contacts_from_activity"()
@@ -724,6 +832,83 @@ END;
 $$;
 ALTER FUNCTION "public"."contact_favorites"("p_page_number" integer, "p_page_size" integer) OWNER TO "postgres";
 
+-- Get a contact by the recipient's send_id (returns null if not a contact)
+CREATE OR REPLACE FUNCTION "public"."contact_by_send_id"(
+    p_send_id integer
+)
+    RETURNS contact_search_result
+    LANGUAGE plpgsql
+    STABLE
+    SECURITY DEFINER
+    SET search_path TO 'public'
+AS $$
+DECLARE
+    current_uid uuid;
+    result contact_search_result;
+BEGIN
+    current_uid := (SELECT auth.uid());
+    IF current_uid IS NULL THEN
+        RAISE EXCEPTION 'Authentication required';
+    END IF;
+
+    SELECT
+        c.id::bigint,
+        c.owner_id,
+        c.custom_name,
+        c.notes,
+        c.is_favorite,
+        c.source,
+        c.last_interacted_at,
+        c.created_at,
+        c.updated_at,
+        c.archived_at,
+        c.external_address,
+        c.chain_id,
+        p.name::text,
+        p.avatar_url::text,
+        p.send_id,
+        sa.main_tag_id,
+        mt.name::text,
+        (SELECT array_agg(t.name::text)
+         FROM tags t
+         JOIN send_account_tags sat ON sat.tag_id = t.id
+         JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
+         WHERE sa2.user_id = c.contact_user_id AND t.status = 'confirmed'),
+        (p.verified_at IS NOT NULL),
+        (SELECT array_agg(cla.label_id)
+         FROM contact_label_assignments cla
+         WHERE cla.contact_id = c.id)
+    INTO result
+    FROM contacts c
+    JOIN profiles p ON p.id = c.contact_user_id
+    LEFT JOIN send_accounts sa ON sa.user_id = c.contact_user_id
+    LEFT JOIN tags mt ON mt.id = sa.main_tag_id
+    WHERE c.owner_id = current_uid
+      AND p.send_id = p_send_id
+      AND c.archived_at IS NULL
+    LIMIT 1;
+
+    RETURN result;
+END;
+$$;
+ALTER FUNCTION "public"."contact_by_send_id"("p_send_id" integer) OWNER TO "postgres";
+
+-- Enforce maximum of 3 labels per contact
+CREATE OR REPLACE FUNCTION "public"."check_contact_label_limit"()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'public'
+AS $$
+BEGIN
+    IF (SELECT COUNT(*) FROM contact_label_assignments WHERE contact_id = NEW.contact_id) >= 3 THEN
+        RAISE EXCEPTION 'Maximum of 3 labels allowed per contact';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+ALTER FUNCTION "public"."check_contact_label_limit"() OWNER TO "postgres";
+
 -- Triggers
 
 -- Updated_at trigger for contacts
@@ -749,6 +934,12 @@ CREATE TRIGGER "contacts_update_last_interacted"
     AFTER INSERT ON "public"."activity"
     FOR EACH ROW
     EXECUTE FUNCTION "public"."update_contact_last_interacted"();
+
+-- Enforce max 3 labels per contact
+CREATE TRIGGER "contact_label_assignments_enforce_limit"
+    BEFORE INSERT ON "public"."contact_label_assignments"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."check_contact_label_limit"();
 
 -- RLS
 ALTER TABLE "public"."contacts" ENABLE ROW LEVEL SECURITY;
@@ -861,9 +1052,9 @@ REVOKE ALL ON FUNCTION "public"."toggle_contact_favorite"("p_contact_id" bigint)
 GRANT ALL ON FUNCTION "public"."toggle_contact_favorite"("p_contact_id" bigint) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."toggle_contact_favorite"("p_contact_id" bigint) TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean, "p_label_ids" bigint[]) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean, "p_label_ids" bigint[]) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."add_contact_by_lookup"("p_lookup_type" "public"."lookup_type_enum", "p_identifier" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean, "p_label_ids" bigint[]) TO "service_role";
 
 -- add_contact is service_role only (internal function)
 REVOKE ALL ON FUNCTION "public"."add_contact"("p_owner_id" uuid, "p_contact_user_id" uuid, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean, "p_source" "public"."contact_source_enum") FROM PUBLIC;
@@ -873,9 +1064,9 @@ REVOKE ALL ON FUNCTION "public"."add_external_contact"("p_external_address" text
 GRANT ALL ON FUNCTION "public"."add_external_contact"("p_external_address" text, "p_chain_id" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."add_external_contact"("p_external_address" text, "p_chain_id" text, "p_custom_name" text, "p_notes" text, "p_is_favorite" boolean) TO "service_role";
 
-REVOKE ALL ON FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[]) FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[]) TO "authenticated";
-GRANT ALL ON FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[]) TO "service_role";
+REVOKE ALL ON FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[], "p_include_archived" boolean, "p_sort_by_recency_only" boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[], "p_include_archived" boolean, "p_sort_by_recency_only" boolean) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."contact_search"("p_query" text, "p_limit_val" integer, "p_offset_val" integer, "p_favorites_only" boolean, "p_label_ids" bigint[], "p_source_filter" "public"."contact_source_enum"[], "p_include_archived" boolean, "p_sort_by_recency_only" boolean) TO "service_role";
 
 REVOKE ALL ON FUNCTION "public"."sync_contacts_from_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."sync_contacts_from_activity"() TO "authenticated";
@@ -888,3 +1079,11 @@ GRANT ALL ON FUNCTION "public"."sync_contacts_from_referrals"() TO "service_role
 REVOKE ALL ON FUNCTION "public"."contact_favorites"("p_page_number" integer, "p_page_size" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."contact_favorites"("p_page_number" integer, "p_page_size" integer) TO "authenticated";
 GRANT ALL ON FUNCTION "public"."contact_favorites"("p_page_number" integer, "p_page_size" integer) TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."contact_by_send_id"("p_send_id" integer) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."contact_by_send_id"("p_send_id" integer) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."contact_by_send_id"("p_send_id" integer) TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."check_contact_label_limit"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."check_contact_label_limit"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."check_contact_label_limit"() TO "service_role";

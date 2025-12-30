@@ -29,6 +29,7 @@ import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
+import { SendContactsSection } from 'app/features/contacts/send-integration'
 import { SendCheckButton } from './components/SendCheckButton'
 import { Keyboard, Platform } from 'react-native'
 import { SendChat } from './components/SendChat'
@@ -112,6 +113,7 @@ export const SendScreen = () => {
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
         </YStack>
         {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
+        {!search && <SendContactsSection />}
         {!search && <SendSuggestions />}
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />

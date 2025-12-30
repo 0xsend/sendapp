@@ -22,6 +22,7 @@ export type LookupType = Database['public']['Enums']['lookup_type_enum']
 export type ContactFilter =
   | { type: 'all' }
   | { type: 'favorites' }
+  | { type: 'archived' }
   | { type: 'label'; labelId: number }
   | { type: 'source'; source: ContactSource }
 

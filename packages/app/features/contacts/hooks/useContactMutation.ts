@@ -50,6 +50,7 @@ export function useAddContactByLookup() {
       customName?: string
       notes?: string
       isFavorite?: boolean
+      labelIds?: number[]
     }): Promise<number> {
       const rpcParams: AddContactByLookupParams = {
         p_identifier: params.identifier,
@@ -57,6 +58,7 @@ export function useAddContactByLookup() {
         p_custom_name: params.customName,
         p_notes: params.notes,
         p_is_favorite: params.isFavorite,
+        p_label_ids: params.labelIds,
       }
 
       const { data, error } = await supabase.rpc('add_contact_by_lookup', rpcParams)

@@ -1,6 +1,6 @@
 // External libs & UI
-import { ChevronRight, Upload } from '@tamagui/lucide-icons'
-import { type PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { ChevronRight, Upload, UserPlus } from '@tamagui/lucide-icons'
+import { type PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
 import {
   Anchor,
   Avatar,
@@ -18,10 +18,17 @@ import {
   XStack,
   YStack,
   LazyMount,
+  useAppToast,
 } from '@my/ui'
 
 // Internal
 import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
+import {
+  useAddContactByLookup,
+  useToggleContactFavorite,
+} from 'app/features/contacts/hooks/useContactMutation'
+import { IconStar, IconStarOutline } from 'app/components/icons'
 import { useProfileScreenParams, useSendScreenParams } from 'app/routers/params'
 import { IconAccount, IconLinkInBio, IconBadgeCheckSolid } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
@@ -44,6 +51,7 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const media = useMedia()
+  const toast = useAppToast()
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const [sendParams, setSendParams] = useSendScreenParams()
   const [sendChatOpen, setSendChatOpen] = useState(false)
@@ -75,6 +83,57 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     isLoading: isLoadingProfile,
     error,
   } = useProfileLookup('sendid', otherUserId?.toString() || '')
+
+  // Contact state
+  const { data: existingContact, refetch: refetchContact } = useContactBySendId(otherUserId)
+  const isContact = !!existingContact
+  const isFavorite = existingContact?.is_favorite ?? false
+
+  // Contact mutations
+  const { mutate: addContact, isPending: isAddingContact } = useAddContactByLookup()
+  const { mutate: toggleFavorite, isPending: isTogglingFavorite } = useToggleContactFavorite()
+
+  // Handle add contact button
+  const handleAddContact = useCallback(() => {
+    if (!otherUserProfile?.sendid) return
+
+    const identifier = otherUserProfile.main_tag_name ?? otherUserProfile.sendid?.toString() ?? ''
+    const lookupType = otherUserProfile.main_tag_name ? 'tag' : 'sendid'
+
+    addContact(
+      {
+        identifier,
+        lookupType: lookupType as 'tag' | 'sendid',
+      },
+      {
+        onSuccess: () => {
+          toast.show('Contact added')
+          refetchContact()
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      }
+    )
+  }, [otherUserProfile, addContact, toast, refetchContact])
+
+  // Handle favorite button
+  const handleToggleFavorite = useCallback(() => {
+    if (!existingContact?.contact_id) return
+
+    toggleFavorite(
+      { contactId: existingContact.contact_id },
+      {
+        onSuccess: () => {
+          toast.show(isFavorite ? 'Removed from favorites' : 'Added to favorites')
+          refetchContact()
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      }
+    )
+  }, [existingContact, isFavorite, toggleFavorite, toast, refetchContact])
 
   const imagePlaceholder = useRef(
     `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
@@ -229,6 +288,44 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
             </Paragraph>
             <XStack w="100%" gap="$4">
               <ProfileSendButton sendId={otherUserProfile?.sendid} />
+              {/* Add contact / favorite button */}
+              {isContact ? (
+                <Button
+                  testID="profileToggleFavoriteButton"
+                  aspectRatio={1}
+                  p={0}
+                  br="$4"
+                  bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                  onPress={handleToggleFavorite}
+                  disabled={isTogglingFavorite}
+                  icon={
+                    isTogglingFavorite ? (
+                      <Spinner size="small" />
+                    ) : isFavorite ? (
+                      <IconStar size="$1" color="$yellow10" />
+                    ) : (
+                      <IconStarOutline size="$1" color="$color12" />
+                    )
+                  }
+                />
+              ) : (
+                <Button
+                  testID="profileAddContactButton"
+                  aspectRatio={1}
+                  p={0}
+                  br="$4"
+                  bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                  onPress={handleAddContact}
+                  disabled={isAddingContact}
+                  icon={
+                    isAddingContact ? (
+                      <Spinner size="small" />
+                    ) : (
+                      <UserPlus size="$1" color="$color12" />
+                    )
+                  }
+                />
+              )}
               <Button
                 aspectRatio={1}
                 p={0}

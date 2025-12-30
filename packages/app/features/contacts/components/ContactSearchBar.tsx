@@ -79,7 +79,7 @@ export const ContactSearchBar = memo(function ContactSearchBar({
           pl="$8"
           fontSize={17}
           lineHeight={20}
-          {...(Platform.OS === 'web' ? { py: '$3.5' } : {})}
+          {...(Platform.OS === 'web' ? { py: '$5' } : {})}
           focusStyle={{
             outlineWidth: 2,
             outlineColor: borderColor,

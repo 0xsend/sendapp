@@ -64,6 +64,9 @@ export function useContactSearch({
         case 'favorites':
           params.p_favorites_only = true
           break
+        case 'archived':
+          params.p_include_archived = true
+          break
         case 'label':
           params.p_label_ids = [filter.labelId]
           break

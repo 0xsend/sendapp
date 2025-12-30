@@ -33,7 +33,7 @@ interface UseVersionUpdaterProps {
   intervalTimeInSeconds?: number
   /**
    * Whether to enable version checking.
-   * Defaults to true. Set to false to disable in development or testing.
+   * Defaults to false in development (NODE_ENV=development), true otherwise.
    */
   enabled?: boolean
 }
@@ -51,7 +51,9 @@ interface UseVersionUpdaterProps {
  * @returns Query result with version information
  */
 export function useVersionUpdater(props: UseVersionUpdaterProps = {}) {
-  const { intervalTimeInSeconds, enabled = true } = props
+  // Disable in development by default - git hash changes on every commit
+  const isDev = process.env.NODE_ENV === 'development'
+  const { intervalTimeInSeconds, enabled = !isDev } = props
 
   const interval = VERSION_UPDATER_REFETCH_INTERVAL_SECONDS
     ? Number(VERSION_UPDATER_REFETCH_INTERVAL_SECONDS)

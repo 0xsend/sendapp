@@ -1,4 +1,4 @@
-import { Button, H4, Paragraph, YStack } from '@my/ui'
+import { ActionButton, H4, Paragraph, YStack } from '@my/ui'
 import { IconPlus } from 'app/components/icons'
 import { useState } from 'react'
 import { Platform } from 'react-native'
@@ -76,15 +76,13 @@ function ContactsBody() {
       {/* Filters and Add button row */}
       <ContactFilters
         rightElement={
-          <Button
+          <ActionButton
             testID="addContactButton"
-            size="$3"
-            theme="active"
             onPress={() => setShowAddForm(true)}
-            icon={<IconPlus size={16} color="$color12" />}
+            icon={<IconPlus size={16} color="$black" />}
           >
-            <Button.Text>Add</Button.Text>
-          </Button>
+            <ActionButton.Text>Add</ActionButton.Text>
+          </ActionButton>
         }
       />
 

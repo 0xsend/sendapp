@@ -2,7 +2,7 @@
 -- Tests tables, functions, constraints, RLS, and labels
 
 BEGIN;
-SELECT plan(38);
+SELECT plan(39);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -452,6 +452,54 @@ SELECT lives_ok(
     'add_contact function (service_role) creates contact'
 );
 SET ROLE postgres;
+
+-- ============================================================================
+-- Test 39: add_contact_by_lookup preserves favorite status on re-add
+-- ============================================================================
+
+-- This tests the bug fix where re-adding an archived favorite contact
+-- would reset is_favorite to false because p_is_favorite defaulted to false.
+-- The fix changed the default to NULL so existing favorite status is preserved.
+
+-- Create a new user for this isolated test
+SELECT tests.create_supabase_user('fav_preserve_user');
+SELECT tests.authenticate_as('fav_preserve_user');
+
+-- Create send account and tag for the new user
+INSERT INTO send_accounts (user_id, address, chain_id, init_code)
+VALUES (tests.get_supabase_uid('fav_preserve_user'), '0x5555555555555555555555555555555555555555', 8453, '\\x00');
+SELECT create_tag('fav_preserve_tag', (SELECT id FROM send_accounts WHERE user_id = tests.get_supabase_uid('fav_preserve_user')));
+
+-- Confirm the tag and set profile (service role needed)
+SELECT tests.authenticate_as_service_role();
+UPDATE tags SET status = 'confirmed' WHERE name = 'fav_preserve_tag';
+UPDATE profiles SET name = 'Fav Preserve User', is_public = TRUE
+WHERE id = tests.get_supabase_uid('fav_preserve_user');
+SET ROLE postgres;
+
+-- Authenticate as contact_owner to add fav_preserve_user as contact
+SELECT tests.authenticate_as('contact_owner');
+
+-- Step 1: Add as favorite contact (p_is_favorite = TRUE)
+SELECT add_contact_by_lookup('tag'::lookup_type_enum, 'fav_preserve_tag', NULL, NULL, TRUE);
+
+-- Step 2: Archive the contact
+UPDATE contacts SET archived_at = NOW()
+WHERE owner_id = tests.get_supabase_uid('contact_owner')
+  AND contact_user_id = tests.get_supabase_uid('fav_preserve_user');
+
+-- Step 3: Re-add WITHOUT specifying is_favorite (NULL)
+-- This should preserve the existing is_favorite = TRUE
+SELECT add_contact_by_lookup('tag'::lookup_type_enum, 'fav_preserve_tag', NULL, NULL, NULL);
+
+-- Verify: contact should still be favorite and unarchived
+SELECT ok(
+    (SELECT is_favorite FROM contacts
+     WHERE owner_id = tests.get_supabase_uid('contact_owner')
+       AND contact_user_id = tests.get_supabase_uid('fav_preserve_user')
+       AND archived_at IS NULL) = TRUE,
+    'add_contact_by_lookup preserves favorite status when re-adding archived contact'
+);
 
 SELECT finish();
 ROLLBACK;

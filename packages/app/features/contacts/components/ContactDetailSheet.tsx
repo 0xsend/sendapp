@@ -8,20 +8,14 @@ import {
   Spinner,
   Text,
   TextArea,
+  VisuallyHidden,
   XStack,
   YStack,
   useAppToast,
 } from '@my/ui'
-import {
-  IconAccount,
-  IconSend,
-  IconStar,
-  IconStarOutline,
-  IconTrash,
-  IconX,
-} from 'app/components/icons'
+import { IconAccount, IconStar, IconStarOutline, IconTrash, IconX } from 'app/components/icons'
 import { AvatarProfile } from 'app/features/profile/AvatarProfile'
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { CONTACTS_CUSTOM_NAME_MAX, CONTACTS_NOTES_MAX } from '../constants'
@@ -120,6 +114,16 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
   const { mutate: archiveContact, isPending: isArchiving } = useArchiveContact()
   const { mutate: unarchiveContact, isPending: isUnarchiving } = useUnarchiveContact()
 
+  // Local favorite state for optimistic updates
+  const [localIsFavorite, setLocalIsFavorite] = useState(contact.is_favorite ?? false)
+
+  // Sync local state when contact prop changes (e.g., after parent refetch)
+  // Only sync on contact.is_favorite changes, not on isTogglingFavorite changes
+  // to avoid reverting optimistic updates before the refetch completes
+  useEffect(() => {
+    setLocalIsFavorite(contact.is_favorite ?? false)
+  }, [contact.is_favorite])
+
   // Derived state
   const isArchived = Boolean(contact.archived_at)
   const isMutating = isTogglingFavorite || isUpdating || isArchiving || isUnarchiving
@@ -140,19 +144,25 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
   const handleToggleFavorite = useCallback(() => {
     if (contact.contact_id === null) return
 
+    // Optimistically update local state
+    const newFavoriteState = !localIsFavorite
+    setLocalIsFavorite(newFavoriteState)
+
     toggleFavorite(
       { contactId: contact.contact_id },
       {
         onSuccess: () => {
-          toast.show(contact.is_favorite ? 'Removed from favorites' : 'Added to favorites')
+          toast.show(newFavoriteState ? 'Added to favorites' : 'Removed from favorites')
           onUpdate?.()
         },
         onError: (error) => {
+          // Revert on error
+          setLocalIsFavorite(!newFavoriteState)
           toast.error(error.message)
         },
       }
     )
-  }, [contact.contact_id, contact.is_favorite, toggleFavorite, toast, onUpdate])
+  }, [contact.contact_id, localIsFavorite, toggleFavorite, toast, onUpdate])
 
   // Handle save edits
   const handleSaveEdits = useCallback(() => {
@@ -351,12 +361,15 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
             </Text>
           )}
 
-          {/* Sendtags */}
-          {contact.tags && contact.tags.length > 0 && !isEditing && (
-            <Text fontSize="$3" color="$color10">
-              /{contact.tags.join(', /')}
-            </Text>
-          )}
+          {/* Sendtags - only show if displayName is not already showing the tag */}
+          {contact.tags &&
+            contact.tags.length > 0 &&
+            !isEditing &&
+            !displayName.startsWith('/') && (
+              <Text fontSize="$3" color="$color10">
+                /{contact.tags.join(', /')}
+              </Text>
+            )}
 
           {/* External address */}
           {contact.external_address && (
@@ -374,10 +387,11 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
           chromeless
           onPress={handleToggleFavorite}
           disabled={isMutating}
+          aria-pressed={localIsFavorite}
           icon={
             isTogglingFavorite ? (
               <Spinner size="small" />
-            ) : contact.is_favorite ? (
+            ) : localIsFavorite ? (
               <IconStar size={24} color="$yellow10" />
             ) : (
               <IconStarOutline size={24} color="$color10" />
@@ -446,14 +460,10 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
         </Button>
       )}
 
-      {/* Send money button - only for Send users or EVM external contacts */}
+      {/* Send button - only for Send users or EVM external contacts */}
       {canSendMoney && (
-        <Button
-          theme="green"
-          onPress={handleSendMoney}
-          icon={<IconSend size={20} color="$color12" />}
-        >
-          <Button.Text>Send Money</Button.Text>
+        <Button theme="green" onPress={handleSendMoney}>
+          <Button.Text>Send</Button.Text>
         </Button>
       )}
 
@@ -485,6 +495,7 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
             </YStack>
           ) : (
             <Button
+              testID={isArchived ? 'unarchiveContactButton' : 'archiveContactButton'}
               chromeless
               onPress={() => setShowArchiveConfirm(true)}
               icon={<IconTrash size={18} color={isArchived ? '$green10' : '$red10'} />}
@@ -530,6 +541,9 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
             maxWidth={500}
             overflow="hidden"
           >
+            <VisuallyHidden>
+              <Dialog.Title>Contact Details</Dialog.Title>
+            </VisuallyHidden>
             {sheetContent}
           </Dialog.Content>
         </Dialog.Portal>
