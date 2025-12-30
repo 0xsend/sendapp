@@ -2,7 +2,7 @@
 -- Tests tables, functions, constraints, RLS, and labels
 
 BEGIN;
-SELECT plan(39);
+SELECT plan(42);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -435,8 +435,30 @@ SELECT ok(
     'contact_search with label filter returns labeled contacts'
 );
 
+-- Test 38: Users can create up to 3 labels (2nd label)
+SELECT lives_ok(
+    $$ INSERT INTO contact_labels (owner_id, name, color)
+       VALUES (tests.get_supabase_uid('contact_owner'), 'Personal', '#00FF00') $$,
+    'Users can create a second label'
+);
+
+-- Test 39: Users can create up to 3 labels (3rd label)
+SELECT lives_ok(
+    $$ INSERT INTO contact_labels (owner_id, name, color)
+       VALUES (tests.get_supabase_uid('contact_owner'), 'Family', '#0000FF') $$,
+    'Users can create a third label'
+);
+
+-- Test 40: Users cannot create more than 3 labels
+SELECT throws_ok(
+    $$ INSERT INTO contact_labels (owner_id, name, color)
+       VALUES (tests.get_supabase_uid('contact_owner'), 'FourthLabel', '#FFFF00') $$,
+    'Maximum of 3 labels allowed per user',
+    'check_contact_labels_total_limit prevents more than 3 labels per user'
+);
+
 -- ============================================================================
--- Test 38: add_contact function (service_role only) upserts correctly
+-- Test 41: add_contact function (service_role only) upserts correctly
 -- ============================================================================
 
 SET ROLE service_role;
@@ -454,7 +476,7 @@ SELECT lives_ok(
 SET ROLE postgres;
 
 -- ============================================================================
--- Test 39: add_contact_by_lookup preserves favorite status on re-add
+-- Test 42: add_contact_by_lookup preserves favorite status on re-add
 -- ============================================================================
 
 -- This tests the bug fix where re-adding an archived favorite contact

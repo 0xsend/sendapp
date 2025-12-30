@@ -1,11 +1,13 @@
 import { memo, useCallback, useState, type ReactNode } from 'react'
-import { Platform } from 'react-native'
+import { Platform, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native'
 import {
   Button,
   ButtonText,
+  LinearGradient,
   Paragraph,
   ScrollView,
   Tooltip,
+  View,
   XStack,
   type XStackProps,
 } from '@my/ui'
@@ -66,6 +68,8 @@ export const ContactFilters = memo(function ContactFilters({
   const { filter, setFilter } = useContactBook()
   const { data: labels } = useContactLabels()
   const [showLabelManager, setShowLabelManager] = useState(false)
+  const [showLeftGradient, setShowLeftGradient] = useState(false)
+  const [showRightGradient, setShowRightGradient] = useState(true)
 
   const handleFilterChange = useCallback(
     (newFilter: ContactFilter) => {
@@ -74,65 +78,128 @@ export const ContactFilters = memo(function ContactFilters({
     [setFilter]
   )
 
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent
+    const scrollX = contentOffset.x
+    const maxScrollX = contentSize.width - layoutMeasurement.width
+
+    // Show left gradient when scrolled past threshold
+    setShowLeftGradient(scrollX > 10)
+    // Show right gradient when not scrolled to end
+    setShowRightGradient(scrollX < maxScrollX - 10)
+  }, [])
+
   return (
     <XStack gap="$3" alignItems="center" justifyContent="space-between">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          gap: 8,
-          paddingHorizontal: Platform.OS === 'web' ? 0 : 16,
-        }}
-        style={{ overflow: 'visible', flex: 1 }}
-      >
-        <XStack gap="$2" {...containerProps}>
-          {/* All filter */}
-          <FilterChip
-            label="All"
-            isActive={filter.type === 'all'}
-            onPress={() => handleFilterChange({ type: 'all' })}
+      <View flex={1} minWidth={0} position="relative">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{
+            gap: 8,
+            paddingHorizontal: Platform.OS === 'web' ? 0 : 16,
+          }}
+          style={{ flex: 1, minWidth: 0 }}
+        >
+          <XStack gap="$2" {...containerProps}>
+            {/* Active label first (if a label is selected) */}
+            {showLabels &&
+              filter.type === 'label' &&
+              labels
+                ?.filter((label) => label.id === filter.labelId)
+                .map((label) => (
+                  <LabelFilterChip
+                    key={`label-${label.id}`}
+                    label={label}
+                    isActive={true}
+                    onPress={() => handleFilterChange({ type: 'label', labelId: label.id })}
+                  />
+                ))}
+
+            {/* All filter */}
+            <FilterChip
+              label="All"
+              isActive={filter.type === 'all'}
+              onPress={() => handleFilterChange({ type: 'all' })}
+            />
+
+            {/* Favorites filter */}
+            <FilterChip
+              label="Favorites"
+              isActive={filter.type === 'favorites'}
+              onPress={() => handleFilterChange({ type: 'favorites' })}
+            />
+
+            {/* Label filters (excluding active label which is shown first) */}
+            {showLabels &&
+              labels
+                ?.filter((label) => !(filter.type === 'label' && filter.labelId === label.id))
+                .map((label) => (
+                  <LabelFilterChip
+                    key={`label-${label.id}`}
+                    label={label}
+                    isActive={false}
+                    onPress={() => handleFilterChange({ type: 'label', labelId: label.id })}
+                  />
+                ))}
+
+            {/* Archived filter - at the end before manage button */}
+            <FilterChip
+              label="Archived"
+              isActive={filter.type === 'archived'}
+              onPress={() => handleFilterChange({ type: 'archived' })}
+            />
+
+            {/* Add label button */}
+            {showLabels && <AddLabelButton onPress={() => setShowLabelManager(true)} />}
+
+            {/* Source filters */}
+            {showSources &&
+              SOURCE_FILTERS.map(({ source, label }) => (
+                <FilterChip
+                  key={`source-${source}`}
+                  label={label}
+                  isActive={filter.type === 'source' && filter.source === source}
+                  onPress={() => handleFilterChange({ type: 'source', source })}
+                />
+              ))}
+          </XStack>
+        </ScrollView>
+
+        {/* Left fade gradient - shows when scrolled */}
+        {showLeftGradient && (
+          <LinearGradient
+            pointerEvents="none"
+            colors={['$background', 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            width="$4"
+            height="100%"
+            position="absolute"
+            top={0}
+            left={0}
+            zIndex={10}
           />
+        )}
 
-          {/* Favorites filter */}
-          <FilterChip
-            label="Favorites"
-            isActive={filter.type === 'favorites'}
-            onPress={() => handleFilterChange({ type: 'favorites' })}
+        {/* Right fade gradient - shows when more content available */}
+        {showRightGradient && (
+          <LinearGradient
+            pointerEvents="none"
+            colors={['transparent', '$background']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            width="$4"
+            height="100%"
+            position="absolute"
+            top={0}
+            right={0}
+            zIndex={10}
           />
-
-          {/* Archived filter */}
-          <FilterChip
-            label="Archived"
-            isActive={filter.type === 'archived'}
-            onPress={() => handleFilterChange({ type: 'archived' })}
-          />
-
-          {/* Label filters */}
-          {showLabels &&
-            labels?.map((label) => (
-              <LabelFilterChip
-                key={`label-${label.id}`}
-                label={label}
-                isActive={filter.type === 'label' && filter.labelId === label.id}
-                onPress={() => handleFilterChange({ type: 'label', labelId: label.id })}
-              />
-            ))}
-
-          {/* Add label button */}
-          {showLabels && <AddLabelButton onPress={() => setShowLabelManager(true)} />}
-
-          {/* Source filters */}
-          {showSources &&
-            SOURCE_FILTERS.map(({ source, label }) => (
-              <FilterChip
-                key={`source-${source}`}
-                label={label}
-                isActive={filter.type === 'source' && filter.source === source}
-                onPress={() => handleFilterChange({ type: 'source', source })}
-              />
-            ))}
-        </XStack>
-      </ScrollView>
+        )}
+      </View>
 
       {rightElement}
 

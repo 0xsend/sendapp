@@ -33,7 +33,7 @@ import { LabelChip } from 'app/features/contacts/components/LabelChip'
 import { ContactDetailSheet } from 'app/features/contacts/components/ContactDetailSheet'
 import { getProfileDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
 import type { ContactView } from 'app/features/contacts/types'
-import { IconStar, IconStarOutline } from 'app/components/icons'
+import { IconHeart, IconHeartOutline } from 'app/components/icons'
 import { useProfileScreenParams, useSendScreenParams } from 'app/routers/params'
 import { IconAccount, IconLinkInBio, IconBadgeCheckSolid } from 'app/components/icons'
 import { ShareOtherProfileDialog } from './components/ShareOtherProfileDialog'
@@ -356,9 +356,9 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                       isTogglingFavorite ? (
                         <Spinner size="small" />
                       ) : isFavorite ? (
-                        <IconStar size="$1" color="$yellow10" />
+                        <IconHeart size="$1" color="$red9" />
                       ) : (
-                        <IconStarOutline size="$1" color="$color12" />
+                        <IconHeartOutline size="$1" color="$color12" />
                       )
                     }
                   />

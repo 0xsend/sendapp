@@ -35,6 +35,8 @@ export interface SendContactItem {
   avatar_url: string | null
   /** Whether verified */
   is_verified: boolean
+  /** Whether this contact is a favorite */
+  is_favorite: boolean
   /** External address (if external contact) */
   external_address: string | null
   /** Chain ID for external contacts */
@@ -89,6 +91,7 @@ export function useFavoriteContacts() {
           name: contact.custom_name ?? contact.profile_name,
           avatar_url: contact.avatar_url,
           is_verified: contact.is_verified ?? false,
+          is_favorite: contact.is_favorite ?? false,
           external_address: contact.external_address,
           chain_id: contact.chain_id,
         }))
@@ -153,6 +156,7 @@ export function useRecentContacts() {
           name: contact.custom_name ?? contact.profile_name,
           avatar_url: contact.avatar_url,
           is_verified: contact.is_verified ?? false,
+          is_favorite: contact.is_favorite ?? false,
           external_address: contact.external_address,
           chain_id: contact.chain_id,
         }))
@@ -225,6 +229,7 @@ export function useSendPageContacts() {
           name: contact.custom_name ?? contact.profile_name,
           avatar_url: contact.avatar_url,
           is_verified: contact.is_verified ?? false,
+          is_favorite: contact.is_favorite ?? false,
           external_address: contact.external_address,
           chain_id: contact.chain_id,
         }))

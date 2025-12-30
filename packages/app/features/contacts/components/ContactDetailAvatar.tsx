@@ -1,5 +1,5 @@
 import { Button, Input, Spinner, Text, XStack, YStack } from '@my/ui'
-import { IconAccount, IconStar, IconStarOutline } from 'app/components/icons'
+import { IconAccount, IconHeart, IconHeartOutline } from 'app/components/icons'
 import { AvatarProfile } from 'app/features/profile/AvatarProfile'
 import { memo } from 'react'
 import { CONTACTS_CUSTOM_NAME_MAX } from '../constants'
@@ -86,9 +86,9 @@ export const ContactDetailAvatar = memo(function ContactDetailAvatar() {
           isTogglingFavorite ? (
             <Spinner size="small" />
           ) : localIsFavorite ? (
-            <IconStar size={24} color="$yellow10" />
+            <IconHeart size={24} color="$red9" />
           ) : (
-            <IconStarOutline size={24} color="$color10" />
+            <IconHeartOutline size={24} color="$color10" />
           )
         }
       />

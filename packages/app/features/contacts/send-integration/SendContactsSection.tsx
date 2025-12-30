@@ -16,7 +16,7 @@ import {
   YStack,
 } from '@my/ui'
 import { getContactDisplayName } from '../utils/getContactDisplayName'
-import { IconAccount, IconBadgeCheckSolid2 } from 'app/components/icons'
+import { IconAccount, IconBadgeCheckSolid2, IconHeart } from 'app/components/icons'
 import { useSendScreenParams } from 'app/routers/params'
 import { memo, useCallback, useMemo } from 'react'
 import { FlatList, Platform } from 'react-native'
@@ -217,7 +217,12 @@ const ContactSuggestion = memo(function ContactSuggestion({
       >
         <ContactImage avatarUrl={contact.avatar_url} label={label} />
 
-        {contact.is_verified && (
+        {/* Badge priority: favorite > verified > none */}
+        {contact.is_favorite ? (
+          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$-1" y="$-1">
+            <IconHeart size="$1" color="$red9" />
+          </XStack>
+        ) : contact.is_verified ? (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$-1" y="$-1">
             <XStack
               pos="absolute"
@@ -237,7 +242,7 @@ const ContactSuggestion = memo(function ContactSuggestion({
               checkColor={isDark ? '#082B1B' : '#fff'}
             />
           </XStack>
-        )}
+        ) : null}
       </View>
       <Text
         w={74}

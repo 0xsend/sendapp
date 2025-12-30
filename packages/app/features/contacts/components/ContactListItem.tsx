@@ -3,7 +3,7 @@ import { Platform } from 'react-native'
 import { Avatar, Card, Text, XStack, YStack, type CardProps } from '@my/ui'
 import type { ContactView } from '../types'
 import { shorten } from 'app/utils/strings'
-import { IconAccount, IconStar, IconBadgeCheckSolid2, IconBase } from 'app/components/icons'
+import { IconAccount, IconHeart, IconBadgeCheckSolid2, IconBase } from 'app/components/icons'
 import { useThemeName } from 'tamagui'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { getContactDisplayName } from '../utils/getContactDisplayName'
@@ -48,7 +48,7 @@ function getSubtitle(contact: ContactView): string | null {
  * Features:
  * - Avatar with fallback to IconAccount
  * - Display name with priority: custom_name > profile_name > main_tag_name > truncated_address
- * - Favorite star indicator
+ * - Favorite heart indicator
  * - Verified badge for verified users
  * - Chain badge for external contacts (Base chain)
  *
@@ -127,7 +127,7 @@ export const ContactListItem = memo(function ContactListItem({
             </Text>
 
             {/* Favorite indicator */}
-            {contact.is_favorite && <IconStar size="$1" color="$yellow10" />}
+            {contact.is_favorite && <IconHeart size="$1" color="$red9" />}
           </XStack>
 
           {subtitle && (

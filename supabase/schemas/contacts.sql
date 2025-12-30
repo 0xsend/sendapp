@@ -909,6 +909,22 @@ END;
 $$;
 ALTER FUNCTION "public"."check_contact_label_limit"() OWNER TO "postgres";
 
+-- Enforce maximum of 3 labels per user (total labels a user can create)
+CREATE OR REPLACE FUNCTION "public"."check_contact_labels_total_limit"()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO 'public'
+AS $$
+BEGIN
+    IF (SELECT COUNT(*) FROM contact_labels WHERE owner_id = NEW.owner_id) >= 3 THEN
+        RAISE EXCEPTION 'Maximum of 3 labels allowed per user';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+ALTER FUNCTION "public"."check_contact_labels_total_limit"() OWNER TO "postgres";
+
 -- Triggers
 
 -- Updated_at trigger for contacts
@@ -940,6 +956,12 @@ CREATE TRIGGER "contact_label_assignments_enforce_limit"
     BEFORE INSERT ON "public"."contact_label_assignments"
     FOR EACH ROW
     EXECUTE FUNCTION "public"."check_contact_label_limit"();
+
+-- Enforce max 3 labels per user (total labels a user can create)
+CREATE TRIGGER "contact_labels_enforce_total_limit"
+    BEFORE INSERT ON "public"."contact_labels"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."check_contact_labels_total_limit"();
 
 -- RLS
 ALTER TABLE "public"."contacts" ENABLE ROW LEVEL SECURITY;
@@ -1087,3 +1109,7 @@ GRANT ALL ON FUNCTION "public"."contact_by_send_id"("p_send_id" integer) TO "ser
 REVOKE ALL ON FUNCTION "public"."check_contact_label_limit"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."check_contact_label_limit"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."check_contact_label_limit"() TO "service_role";
+
+REVOKE ALL ON FUNCTION "public"."check_contact_labels_total_limit"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."check_contact_labels_total_limit"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."check_contact_labels_total_limit"() TO "service_role";

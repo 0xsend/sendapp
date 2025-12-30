@@ -48,7 +48,7 @@ import { formatUnits, isAddress } from 'viem'
 import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
-import { IconBadgeCheckSolid2, IconCoin, IconAccount } from 'app/components/icons'
+import { IconBadgeCheckSolid2, IconCoin, IconAccount, IconHeart } from 'app/components/icons'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { AlertCircle, CheckCheck, Clock4, History, X } from '@tamagui/lucide-icons'
 import { useSendScreenParams } from 'app/routers/params'
@@ -349,7 +349,12 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
             </Avatar.Fallback>
           </Avatar>
         )}
-        {profile?.is_verified && !isExternalAddress && (
+        {/* Badge priority: favorite > verified > none */}
+        {!isExternalAddress && contact?.is_favorite ? (
+          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
+            <IconHeart size="$1" color="$red9" elevation={"$2"} />
+          </XStack>
+        ) : profile?.is_verified && !isExternalAddress ? (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
             <IconBadgeCheckSolid2
@@ -361,7 +366,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
               checkColor={isDark ? '#082B1B' : '#fff'}
             />
           </XStack>
-        )}
+        ) : null}
       </XStack>
       <YStack gap="$1.5" f={1}>
         <SizableText size="$4" color="$gray12" fow="500">
