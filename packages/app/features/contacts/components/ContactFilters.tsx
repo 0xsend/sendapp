@@ -1,6 +1,14 @@
 import { memo, useCallback, useState, type ReactNode } from 'react'
 import { Platform } from 'react-native'
-import { Button, ButtonText, ScrollView, XStack, type XStackProps } from '@my/ui'
+import {
+  Button,
+  ButtonText,
+  Paragraph,
+  ScrollView,
+  Tooltip,
+  XStack,
+  type XStackProps,
+} from '@my/ui'
 import { useThemeName } from 'tamagui'
 import { IconPlus } from 'app/components/icons'
 import { useContactBook } from '../ContactBookProvider'
@@ -250,28 +258,46 @@ interface AddLabelButtonProps {
  */
 const AddLabelButton = memo(function AddLabelButton({ onPress }: AddLabelButtonProps) {
   return (
-    <Button
-      testID="filterChip-add-label"
-      size="$3"
-      br="$10"
-      px="$3"
-      py="$2"
-      bc="$color3"
-      borderWidth={1}
-      borderColor="$color6"
-      borderStyle="dashed"
-      pressStyle={{
-        bc: '$color4',
-        scale: 0.98,
-      }}
-      hoverStyle={{
-        bc: '$color4',
-      }}
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel="Add new label"
-      icon={<IconPlus size={14} color="$color11" />}
-    />
+    <Tooltip placement="bottom" delay={300}>
+      <Tooltip.Trigger>
+        <Button
+          testID="filterChip-add-label"
+          size="$3"
+          br="$10"
+          px="$3"
+          py="$2"
+          bc="$color3"
+          borderWidth={1}
+          borderColor="$color6"
+          borderStyle="dashed"
+          pressStyle={{
+            bc: '$color4',
+            scale: 0.98,
+          }}
+          hoverStyle={{
+            bc: '$color4',
+          }}
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel="Manage labels"
+          icon={<IconPlus size={14} color="$color11" />}
+        />
+      </Tooltip.Trigger>
+      <Tooltip.Content
+        enterStyle={{ y: -5, opacity: 0 }}
+        exitStyle={{ y: -5, opacity: 0 }}
+        animation="quick"
+        bg="$color2"
+        borderWidth={1}
+        borderColor="$color6"
+        px="$2"
+        py="$1.5"
+      >
+        <Paragraph size="$2" color="$color11">
+          Manage Labels
+        </Paragraph>
+      </Tooltip.Content>
+    </Tooltip>
   )
 })
 
