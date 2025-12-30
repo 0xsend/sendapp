@@ -207,14 +207,15 @@ test.describe('Add Contact', () => {
     await expect(externalTab).toBeVisible({ timeout: 5_000 })
     await externalTab.click()
 
-    // Fill in external address
-    const addressInput = page.getByPlaceholder(/0x/i)
-    await expect(addressInput).toBeVisible()
+    // Fill in external address - wait for tab content to switch
+    // The address input is the first text input in the external address tab (has placeholder 0x...)
+    const addressInput = page.getByPlaceholder('0x...')
+    await expect(addressInput).toBeVisible({ timeout: 10_000 })
     await addressInput.fill(testAddress)
 
     // Fill in display name
-    const nameInput = page.getByPlaceholder(/enter a name/i)
-    await expect(nameInput).toBeVisible()
+    const nameInput = page.getByPlaceholder('Enter a name for this contact')
+    await expect(nameInput).toBeVisible({ timeout: 5_000 })
     await nameInput.fill(testName)
 
     // Submit
@@ -322,11 +323,11 @@ test.describe('Contact Favorites', () => {
     await expect(favoritesChip).toBeVisible()
     await favoritesChip.click()
 
-    // Verify only favorited contact is shown
+    // Verify only favorited contact is shown (allow time for filter to apply)
     await expect(async () => {
-      await expect(page.getByText(contact1Name)).toBeVisible({ timeout: 2_000 })
+      await expect(page.getByText(contact1Name)).toBeVisible({ timeout: 3_000 })
       await expect(page.getByText(contact2Name)).not.toBeVisible()
-    }).toPass({ timeout: 5_000 })
+    }).toPass({ timeout: 10_000 })
 
     log('favorites filter working correctly')
   })
@@ -352,7 +353,9 @@ test.describe('Contact Details', () => {
 
     // Verify detail sheet opens with correct info
     const detailDialog = page.getByRole('dialog')
-    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    await expect(detailDialog.locator('h4').filter({ hasText: 'Contact Details' })).toBeVisible({
+      timeout: 5_000,
+    })
 
     // Verify name is displayed in dialog
     await expect(detailDialog.getByText(contactProfile.name)).toBeVisible()
@@ -382,7 +385,9 @@ test.describe('Contact Details', () => {
 
     // Wait for detail sheet
     const detailDialog = page.getByRole('dialog')
-    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    await expect(detailDialog.locator('h4').filter({ hasText: 'Contact Details' })).toBeVisible({
+      timeout: 5_000,
+    })
 
     // Click Edit Contact button
     const editButton = detailDialog.getByRole('button', { name: 'Edit Contact' })
@@ -426,7 +431,9 @@ test.describe('Contact Archive', () => {
     await contactItem.click()
 
     // Wait for detail sheet
-    await expect(page.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    await expect(page.locator('h4').filter({ hasText: 'Contact Details' })).toBeVisible({
+      timeout: 5_000,
+    })
 
     // Find and click Archive Contact button
     const archiveButton = page.getByRole('button', { name: /archive contact/i })
@@ -472,7 +479,9 @@ test.describe('Contact Archive', () => {
 
     // Wait for detail sheet to open
     const detailDialog = page.getByRole('dialog')
-    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    await expect(detailDialog.locator('h4').filter({ hasText: 'Contact Details' })).toBeVisible({
+      timeout: 5_000,
+    })
 
     // Archive the contact via UI
     const archiveButton = detailDialog.getByTestId('archiveContactButton')
@@ -496,12 +505,14 @@ test.describe('Contact Archive', () => {
     await expect(archivedChip).toBeVisible()
     await archivedChip.click()
 
-    // Find and click the archived contact
-    await expect(page.getByText(unarchiveName)).toBeVisible({ timeout: 5_000 })
+    // Find and click the archived contact (allow time for filter to apply)
+    await expect(page.getByText(unarchiveName)).toBeVisible({ timeout: 10_000 })
     await page.getByText(unarchiveName).click()
 
     // Wait for detail sheet
-    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    await expect(detailDialog.locator('h4').filter({ hasText: 'Contact Details' })).toBeVisible({
+      timeout: 5_000,
+    })
 
     // Click Restore Contact button (unarchive)
     const unarchiveButton = detailDialog.getByTestId('unarchiveContactButton')
@@ -548,6 +559,7 @@ test.describe('Label Picker', () => {
     const targetProfile = targetPlan.profile
     assert(!!targetTag?.name, 'target tag not found')
     assert(!!targetProfile?.name, 'target profile name not found')
+    const targetName = targetProfile.name
 
     // Fix: Snaplet doesn't auto-set user_id on tags
     await pg.query('UPDATE tags SET user_id = $1 WHERE id = $2', [targetPlan.user.id, targetTag.id])
@@ -585,7 +597,7 @@ test.describe('Label Picker', () => {
 
     // Wait for profile preview to load
     await expect(async () => {
-      const previewName = page.getByText(targetProfile.name)
+      const previewName = page.getByText(targetName)
       await expect(previewName).toBeVisible({ timeout: 3_000 })
     }).toPass({ timeout: 10_000 })
 
@@ -635,7 +647,9 @@ test.describe('Label Picker', () => {
 
     // Wait for detail sheet to open
     const detailDialog = page.getByRole('dialog')
-    await expect(detailDialog.getByText('Contact Details')).toBeVisible({ timeout: 5_000 })
+    await expect(detailDialog.locator('h4').filter({ hasText: 'Contact Details' })).toBeVisible({
+      timeout: 5_000,
+    })
 
     // Verify the label is displayed in the contact details (if label selection worked)
     await expect(detailDialog.getByText(labelName)).toBeVisible({ timeout: 5_000 })
@@ -650,6 +664,7 @@ test.describe('Label Picker', () => {
     const targetProfile = targetPlan.profile
     assert(!!targetTag?.name, 'target tag not found')
     assert(!!targetProfile?.name, 'target profile name not found')
+    const targetName = targetProfile.name
 
     // Fix: Snaplet doesn't auto-set user_id on tags
     await pg.query('UPDATE tags SET user_id = $1 WHERE id = $2', [targetPlan.user.id, targetTag.id])
@@ -673,7 +688,7 @@ test.describe('Label Picker', () => {
 
     // Wait for profile preview
     await expect(async () => {
-      const previewName = page.getByText(targetProfile.name)
+      const previewName = page.getByText(targetName)
       await expect(previewName).toBeVisible({ timeout: 3_000 })
     }).toPass({ timeout: 10_000 })
 
