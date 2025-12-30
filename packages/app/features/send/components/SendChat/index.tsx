@@ -8,6 +8,8 @@ import {
   useState,
   memo,
 } from 'react'
+import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
+import { getContactDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
 import {
   AnimatePresence,
   Avatar,
@@ -280,6 +282,9 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
+  // Look up contact to get custom_name if it exists
+  const { data: contact } = useContactBySendId(profile?.sendid ?? undefined)
+
   const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
   const href = !isExternalAddress && profile ? `/profile/${profile?.sendid}` : ''
 
@@ -288,6 +293,22 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
     : profile?.tag
       ? `/${profile?.tag}`
       : `#${profile?.sendid}`
+
+  // Display name priority: custom_name > profile_name > sendtag > send_id > address
+  const displayName = useMemo(() => {
+    if (isExternalAddress) return tagName
+    if (contact) {
+      return getContactDisplayName({
+        custom_name: contact.custom_name,
+        profile_name: contact.profile_name,
+        main_tag_name: contact.main_tag_name,
+        send_id: contact.send_id,
+        external_address: null,
+      })
+    }
+    // No contact - use profile name or tag
+    return profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'
+  }, [contact, profile, tagName, isExternalAddress])
 
   return (
     <XStack
@@ -344,9 +365,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
       </XStack>
       <YStack gap="$1.5" f={1}>
         <SizableText size="$4" color="$gray12" fow="500">
-          {isExternalAddress
-            ? tagName
-            : profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
+          {displayName}
         </SizableText>
         <SizableText size="$3" color="$gray10">
           {tagName}

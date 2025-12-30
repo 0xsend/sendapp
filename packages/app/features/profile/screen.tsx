@@ -1,6 +1,6 @@
 // External libs & UI
-import { ChevronRight, Upload, UserPlus } from '@tamagui/lucide-icons'
-import { type PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import { ChevronRight, Pencil, Upload, UserPlus } from '@tamagui/lucide-icons'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Anchor,
   Avatar,
@@ -28,6 +28,11 @@ import {
   useAddContactByLookup,
   useToggleContactFavorite,
 } from 'app/features/contacts/hooks/useContactMutation'
+import { useContactLabels } from 'app/features/contacts/hooks/useContactLabels'
+import { LabelChip } from 'app/features/contacts/components/LabelChip'
+import { ContactDetailSheet } from 'app/features/contacts/components/ContactDetailSheet'
+import { getProfileDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
+import type { ContactView } from 'app/features/contacts/types'
 import { IconStar, IconStarOutline } from 'app/components/icons'
 import { useProfileScreenParams, useSendScreenParams } from 'app/routers/params'
 import { IconAccount, IconLinkInBio, IconBadgeCheckSolid } from 'app/components/icons'
@@ -77,6 +82,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
 
   const otherUserId = propSendid || Number(paramSendid)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [contactSheetOpen, setContactSheetOpen] = useState(false)
   const isDark = useThemeName()?.startsWith('dark')
   const {
     data: otherUserProfile,
@@ -88,6 +94,30 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const { data: existingContact, refetch: refetchContact } = useContactBySendId(otherUserId)
   const isContact = !!existingContact
   const isFavorite = existingContact?.is_favorite ?? false
+
+  // Fetch all labels for displaying contact labels
+  const { data: allLabels } = useContactLabels()
+
+  // Get the labels assigned to this contact
+  const contactLabels = useMemo(() => {
+    if (!allLabels || !existingContact?.label_ids) return []
+    const labelSet = new Set(existingContact.label_ids)
+    return allLabels.filter((label) => labelSet.has(label.id))
+  }, [allLabels, existingContact?.label_ids])
+
+  // Display name with nickname support
+  // Merge contact data with fresh profile lookup data for fallback
+  // Priority: custom_name > profile_name > main_tag_name > send_id
+  const displayNameParts = useMemo(() => {
+    if (!existingContact) return null
+    return getProfileDisplayName({
+      custom_name: existingContact.custom_name,
+      // Use contact data first, fall back to fresh profile lookup data
+      profile_name: existingContact.profile_name ?? otherUserProfile?.name ?? null,
+      main_tag_name: existingContact.main_tag_name ?? otherUserProfile?.main_tag_name ?? null,
+      send_id: existingContact.send_id ?? otherUserProfile?.sendid ?? null,
+    })
+  }, [existingContact, otherUserProfile])
 
   // Contact mutations
   const { mutate: addContact, isPending: isAddingContact } = useAddContactByLookup()
@@ -239,10 +269,24 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                 </Avatar>
               )}
               <YStack px="$4" gap="$3" jc="space-around" f={1} als="center">
-                <XStack ai="center" gap="$2">
-                  <H3 lineHeight={32} color="$color12" testID="profileName">
-                    {otherUserProfile?.name ?? '---'}
-                  </H3>
+                <XStack ai="center" gap="$2" flexWrap="wrap">
+                  {/* Show nickname (Profile Name) format when contact has custom_name */}
+                  {displayNameParts?.primary ? (
+                    <>
+                      <H3 lineHeight={32} color="$color12" testID="profileName">
+                        {displayNameParts.primary}
+                      </H3>
+                      {displayNameParts.secondary && (
+                        <Text fontSize="$5" color="$color10">
+                          ({displayNameParts.secondary})
+                        </Text>
+                      )}
+                    </>
+                  ) : (
+                    <H3 lineHeight={32} color="$color12" testID="profileName">
+                      {otherUserProfile?.name ?? '---'}
+                    </H3>
+                  )}
                   {otherUserProfile?.is_verified ? (
                     <IconBadgeCheckSolid
                       size={'$1.5'}
@@ -283,31 +327,51 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
               })}
             </XStack>
 
+            {/* Contact labels - show below sendtags, above Send button */}
+            {isContact && contactLabels.length > 0 && (
+              <XStack gap="$2" flexWrap="wrap" w="100%">
+                {contactLabels.map((label) => (
+                  <LabelChip key={label.id} label={label} />
+                ))}
+              </XStack>
+            )}
+
             <Paragraph color="$color12" fontSize="$4" fontWeight="400">
               {otherUserProfile?.about}
             </Paragraph>
             <XStack w="100%" gap="$4">
               <ProfileSendButton sendId={otherUserProfile?.sendid} />
-              {/* Add contact / favorite button */}
+              {/* Add contact / favorite / edit buttons */}
               {isContact ? (
-                <Button
-                  testID="profileToggleFavoriteButton"
-                  aspectRatio={1}
-                  p={0}
-                  br="$4"
-                  bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-                  onPress={handleToggleFavorite}
-                  disabled={isTogglingFavorite}
-                  icon={
-                    isTogglingFavorite ? (
-                      <Spinner size="small" />
-                    ) : isFavorite ? (
-                      <IconStar size="$1" color="$yellow10" />
-                    ) : (
-                      <IconStarOutline size="$1" color="$color12" />
-                    )
-                  }
-                />
+                <>
+                  <Button
+                    testID="profileToggleFavoriteButton"
+                    aspectRatio={1}
+                    p={0}
+                    br="$4"
+                    bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                    onPress={handleToggleFavorite}
+                    disabled={isTogglingFavorite}
+                    icon={
+                      isTogglingFavorite ? (
+                        <Spinner size="small" />
+                      ) : isFavorite ? (
+                        <IconStar size="$1" color="$yellow10" />
+                      ) : (
+                        <IconStarOutline size="$1" color="$color12" />
+                      )
+                    }
+                  />
+                  <Button
+                    testID="profileEditContactButton"
+                    aspectRatio={1}
+                    p={0}
+                    br="$4"
+                    bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                    onPress={() => setContactSheetOpen(true)}
+                    icon={<Pencil size="$1" color="$color12" />}
+                  />
+                </>
               ) : (
                 <Button
                   testID="profileAddContactButton"
@@ -375,6 +439,17 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
       <LazyMount when={sendChatOpen}>
         <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
       </LazyMount>
+      {existingContact && (
+        <LazyMount when={contactSheetOpen}>
+          <ContactDetailSheet
+            contact={existingContact as ContactView}
+            open={contactSheetOpen}
+            onOpenChange={setContactSheetOpen}
+            onUpdate={refetchContact}
+            hideNavButtons
+          />
+        </LazyMount>
+      )}
     </YStack>
   )
 }
