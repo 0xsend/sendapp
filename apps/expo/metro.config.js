@@ -26,8 +26,10 @@ for (const envFile of envFiles) {
       if (key && valueParts.length > 0) {
         let value = valueParts.join('=').trim()
         // Remove surrounding quotes if present
-        if ((value.startsWith("'") && value.endsWith("'")) ||
-            (value.startsWith('"') && value.endsWith('"'))) {
+        if (
+          (value.startsWith("'") && value.endsWith("'")) ||
+          (value.startsWith('"') && value.endsWith('"'))
+        ) {
           value = value.slice(1, -1)
         }
         // Only include NEXT_PUBLIC_ and EXPO_PUBLIC_ variables for client-side
