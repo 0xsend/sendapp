@@ -35,6 +35,7 @@ COPY apps/workers/package.json apps/workers/package.json
 COPY package.json package.json
 COPY packages/api/package.json packages/api/package.json
 COPY packages/app/package.json packages/app/package.json
+COPY packages/bridge/package.json packages/bridge/package.json
 COPY packages/contracts/package.json packages/contracts/package.json
 COPY packages/eslint-config-custom/package.json packages/eslint-config-custom/package.json
 COPY packages/playwright/package.json packages/playwright/package.json

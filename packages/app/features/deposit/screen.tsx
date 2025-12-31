@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { YStack } from '@my/ui'
 import { DepositOptionButton } from './components/DepositOptionButton'
-import { IconApple, IconDebitCard, IconWallet } from 'app/components/icons'
+import { IconApple, IconDebitCard, IconWallet, IconDollar } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
 
 export function DepositScreen() {
@@ -14,6 +14,12 @@ export function DepositScreen() {
         href: '/deposit/crypto',
         title: t('options.crypto.title'),
         description: t('options.crypto.description'),
+      },
+      {
+        Icon: IconDollar,
+        href: '/deposit/bank-transfer',
+        title: t('options.bankTransfer.title', 'Bank Transfer'),
+        description: t('options.bankTransfer.description', 'Deposit via ACH or wire transfer'),
       },
       {
         Icon: IconApple,
