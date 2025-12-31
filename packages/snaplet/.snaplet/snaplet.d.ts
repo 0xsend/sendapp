@@ -18,6 +18,8 @@ type Enum_public_contact_source_enum = 'activity' | 'external' | 'manual' | 'ref
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_link_in_bio_domain_names = 'Discord' | 'Facebook' | 'GitHub' | 'Instagram' | 'OnlyFans' | 'Snapchat' | 'Telegram' | 'TikTok' | 'Twitch' | 'WhatsApp' | 'X' | 'YouTube';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
+type Enum_public_notification_type = 'account_activity' | 'system' | 'tag_confirmed' | 'transfer_received' | 'transfer_sent';
+type Enum_public_push_token_platform = 'expo' | 'web';
 type Enum_public_tag_status = 'available' | 'confirmed' | 'pending';
 type Enum_public_temporal_status = 'confirmed' | 'failed' | 'initialized' | 'sent' | 'submitted';
 type Enum_public_verification_type = 'create_passkey' | 'send_ceiling' | 'send_one_hundred' | 'send_streak' | 'send_ten' | 'sendpot_ticket_purchase' | 'tag_referral' | 'tag_registration' | 'total_tag_referrals';
@@ -428,6 +430,18 @@ interface Table_supabase_functions_migrations {
   version: string;
   inserted_at: string;
 }
+interface Table_public_notifications {
+  id: number;
+  user_id: string;
+  type: Enum_public_notification_type;
+  title: string;
+  body: string;
+  data: Json | null;
+  read: boolean;
+  created_at: string;
+  delivered_at: string | null;
+  read_at: string | null;
+}
 interface Table_auth_oauth_authorizations {
   id: string;
   authorization_id: string;
@@ -511,6 +525,20 @@ interface Table_public_profiles {
   verified_at: string | null;
   sync_referrals_to_contacts: boolean;
   is_business: boolean;
+}
+interface Table_public_push_tokens {
+  id: number;
+  user_id: string;
+  platform: Enum_public_push_token_platform;
+  token: string | null;
+  endpoint: string | null;
+  p256dh: string | null;
+  auth: string | null;
+  created_at: string;
+  updated_at: string;
+  device_id: string | null;
+  is_active: boolean;
+  last_used_at: string | null;
 }
 interface Table_public_receipts {
   hash: string | null;
@@ -1210,7 +1238,9 @@ interface Schema_public {
   distributions: Table_public_distributions;
   link_in_bio: Table_public_link_in_bio;
   liquidity_pools: Table_public_liquidity_pools;
+  notifications: Table_public_notifications;
   profiles: Table_public_profiles;
+  push_tokens: Table_public_push_tokens;
   receipts: Table_public_receipts;
   referrals: Table_public_referrals;
   send_account_created: Table_public_send_account_created;
@@ -1633,6 +1663,17 @@ interface Tables_relationships {
     childDestinationsTables: "auth.mfa_challenges" | {};
     
   };
+  "public.notifications": {
+    parent: {
+       notifications_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
+    
+  };
   "auth.oauth_authorizations": {
     parent: {
        oauth_authorizations_client_id_fkey: "auth.oauth_clients";
@@ -1714,6 +1755,17 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables: "public.affiliate_stats" | "public.referrals" | {};
+    
+  };
+  "public.push_tokens": {
+    parent: {
+       push_tokens_user_id_fkey: "auth.users";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables:  | {};
     
   };
   "public.receipts": {
@@ -1950,14 +2002,16 @@ interface Tables_relationships {
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
        link_in_bio_user_id_fkey: "public.link_in_bio";
+       notifications_user_id_fkey: "public.notifications";
        profiles_id_fkey: "public.profiles";
+       push_tokens_user_id_fkey: "public.push_tokens";
        receipts_user_id_fkey: "public.receipts";
        send_accounts_user_id_fkey: "public.send_accounts";
        tags_user_id_fkey: "public.tags";
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.bridge_customers" | "public.canton_party_verifications" | "public.chain_addresses" | "public.contact_labels" | "public.contacts" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.bridge_customers" | "public.canton_party_verifications" | "public.chain_addresses" | "public.contact_labels" | "public.contacts" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.notifications" | "public.profiles" | "public.push_tokens" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {
