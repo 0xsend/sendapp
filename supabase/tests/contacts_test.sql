@@ -2,7 +2,7 @@
 -- Tests tables, functions, constraints, RLS, and labels
 
 BEGIN;
-SELECT plan(42);
+SELECT plan(43);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -395,7 +395,7 @@ SELECT throws_ok(
 );
 
 -- ============================================================================
--- Test 34-37: Label management tests
+-- Test 34-38: Label management tests
 -- ============================================================================
 
 -- Test 34: Users can create labels
@@ -406,7 +406,16 @@ SELECT lives_ok(
     'Users can create contact labels'
 );
 
--- Test 35: Label name uniqueness per owner
+-- Test 35: Label color format constraint (hex only)
+SELECT throws_ok(
+    $$ INSERT INTO contact_labels (owner_id, name, color)
+       VALUES (tests.get_supabase_uid('contact_owner'), 'BadColor', 'red') $$,
+    '23514',
+    NULL,
+    'contact_labels color must be hex format'
+);
+
+-- Test 36: Label name uniqueness per owner
 SELECT throws_ok(
     $$ INSERT INTO contact_labels (owner_id, name)
        VALUES (tests.get_supabase_uid('contact_owner'), 'Work') $$,
@@ -415,7 +424,7 @@ SELECT throws_ok(
     'Label names must be unique per owner'
 );
 
--- Test 36: Users can assign labels to contacts
+-- Test 37: Users can assign labels to contacts
 SELECT lives_ok(
     $$ INSERT INTO contact_label_assignments (contact_id, label_id)
        VALUES (
@@ -425,7 +434,7 @@ SELECT lives_ok(
     'Users can assign labels to their contacts'
 );
 
--- Test 37: contact_search with label filter
+-- Test 38: contact_search with label filter
 SELECT ok(
     (SELECT COUNT(*) FROM contact_search(
         NULL, 50, 0, FALSE,
@@ -435,21 +444,21 @@ SELECT ok(
     'contact_search with label filter returns labeled contacts'
 );
 
--- Test 38: Users can create up to 3 labels (2nd label)
+-- Test 39: Users can create up to 3 labels (2nd label)
 SELECT lives_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'Personal', '#00FF00') $$,
     'Users can create a second label'
 );
 
--- Test 39: Users can create up to 3 labels (3rd label)
+-- Test 40: Users can create up to 3 labels (3rd label)
 SELECT lives_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'Family', '#0000FF') $$,
     'Users can create a third label'
 );
 
--- Test 40: Users cannot create more than 3 labels
+-- Test 41: Users cannot create more than 3 labels
 SELECT throws_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'FourthLabel', '#FFFF00') $$,
@@ -458,7 +467,7 @@ SELECT throws_ok(
 );
 
 -- ============================================================================
--- Test 41: add_contact function (service_role only) upserts correctly
+-- Test 42: add_contact function (service_role only) upserts correctly
 -- ============================================================================
 
 SET ROLE service_role;
@@ -476,7 +485,7 @@ SELECT lives_ok(
 SET ROLE postgres;
 
 -- ============================================================================
--- Test 42: add_contact_by_lookup preserves favorite status on re-add
+-- Test 43: add_contact_by_lookup preserves favorite status on re-add
 -- ============================================================================
 
 -- This tests the bug fix where re-adding an archived favorite contact

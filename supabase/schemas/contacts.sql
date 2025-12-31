@@ -99,7 +99,8 @@ CREATE TABLE IF NOT EXISTS "public"."contact_labels" (
     "color" text,
     "created_at" timestamp with time zone DEFAULT now() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT "contact_labels_name_length" CHECK (length(name::text) >= 1 AND length(name::text) <= 32)
+    CONSTRAINT "contact_labels_name_length" CHECK (length(name::text) >= 1 AND length(name::text) <= 32),
+    CONSTRAINT "color_format" CHECK (color IS NULL OR color ~ '^#[0-9a-fA-F]{6}$')
 );
 ALTER TABLE "public"."contact_labels" OWNER TO "postgres";
 
@@ -514,11 +515,14 @@ CREATE OR REPLACE FUNCTION "public"."contact_search"(
 AS $$
 DECLARE
     current_uid uuid;
+    escaped_query text;
 BEGIN
     current_uid := (SELECT auth.uid());
     IF current_uid IS NULL THEN
         RAISE EXCEPTION 'Authentication required';
     END IF;
+
+    escaped_query := regexp_replace(p_query, '([%_\\])', '\\\1', 'g');
 
     -- Validate and cap limits
     IF p_limit_val IS NULL OR p_limit_val <= 0 OR p_limit_val > 100 THEN
@@ -575,17 +579,17 @@ BEGIN
               WHERE cla.contact_id = c.id AND cla.label_id = ANY(p_label_ids)
           ))
           AND (p_query IS NULL OR p_query = '' OR (
-              c.custom_name ILIKE '%' || p_query || '%'
-              OR c.notes ILIKE '%' || p_query || '%'
-              OR c.external_address ILIKE '%' || p_query || '%'
-              OR p.name ILIKE '%' || p_query || '%'
+              c.custom_name ILIKE '%' || escaped_query || '%'
+              OR c.notes ILIKE '%' || escaped_query || '%'
+              OR c.external_address ILIKE '%' || escaped_query || '%'
+              OR p.name ILIKE '%' || escaped_query || '%'
               OR EXISTS (
                   SELECT 1 FROM tags t
                   JOIN send_account_tags sat ON sat.tag_id = t.id
                   JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
                   WHERE sa2.user_id = c.contact_user_id
                     AND t.status = 'confirmed'
-                    AND t.name::text ILIKE '%' || p_query || '%'
+                    AND t.name::text ILIKE '%' || escaped_query || '%'
               )
           ))
         ORDER BY
@@ -639,17 +643,17 @@ BEGIN
               WHERE cla.contact_id = c.id AND cla.label_id = ANY(p_label_ids)
           ))
           AND (p_query IS NULL OR p_query = '' OR (
-              c.custom_name ILIKE '%' || p_query || '%'
-              OR c.notes ILIKE '%' || p_query || '%'
-              OR c.external_address ILIKE '%' || p_query || '%'
-              OR p.name ILIKE '%' || p_query || '%'
+              c.custom_name ILIKE '%' || escaped_query || '%'
+              OR c.notes ILIKE '%' || escaped_query || '%'
+              OR c.external_address ILIKE '%' || escaped_query || '%'
+              OR p.name ILIKE '%' || escaped_query || '%'
               OR EXISTS (
                   SELECT 1 FROM tags t
                   JOIN send_account_tags sat ON sat.tag_id = t.id
                   JOIN send_accounts sa2 ON sa2.id = sat.send_account_id
                   WHERE sa2.user_id = c.contact_user_id
                     AND t.status = 'confirmed'
-                    AND t.name::text ILIKE '%' || p_query || '%'
+                    AND t.name::text ILIKE '%' || escaped_query || '%'
               )
           ))
         ORDER BY
