@@ -839,6 +839,15 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           }
         )
 
+        // Navigate immediately after optimistic update for better UX
+        if (isExternalAddress) {
+          router.replace({ pathname: '/activity' })
+        } else {
+          setActiveSection('chat')
+        }
+
+        // Fire and forget: let the transfer workflow complete in the background
+        // The temporal workflow will consolidate with the optimistic activity
         let workflowId: string | undefined
         try {
           const result = await transfer({
@@ -858,15 +867,9 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               queryKey: ['inter_user_activity_feed', profile?.sendid, currentUserProfile?.send_id],
               exact: false,
             })
-
-            // Navigate to activity page for external addresses
-            if (isExternalAddress) {
-              router.replace({ pathname: '/activity' })
-            } else {
-              setActiveSection('chat')
-            }
           }
         } catch (transferError) {
+          // Rollback optimistic updates on workflow failure
           void queryClient.resetQueries({
             queryKey: ['activity_feed'],
             exact: false,
