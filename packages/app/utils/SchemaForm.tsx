@@ -7,6 +7,7 @@ import {
   BooleanSwitchField,
   CoinField,
   CountryCodeField,
+  EvmAddressField,
   NumberField,
   OTPField,
   SelectField,
@@ -18,10 +19,12 @@ import {
 import type { ComponentProps } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
+import { address } from 'app/utils/zod'
 import type { YStackProps } from 'tamagui'
 
 export const formFields = {
   text: z.string(),
+  evmAddress: createUniqueFieldSchema(address, 'evm_address'),
   textarea: createUniqueFieldSchema(z.string(), 'textarea'),
   /**
    * input that takes number
@@ -63,6 +66,7 @@ export const formFields = {
 
 const mapping = [
   [formFields.text, TextField] as const,
+  [formFields.evmAddress, EvmAddressField] as const,
   [formFields.textarea, TextAreaField] as const,
   [formFields.number, NumberField] as const,
   [formFields.boolean, BooleanField] as const,

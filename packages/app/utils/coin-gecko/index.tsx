@@ -47,6 +47,7 @@ export const MarketDataSchema = z
         percentage: z.number(),
       })
       .nullable(),
+    last_updated: z.string(),
   })
   .array()
 

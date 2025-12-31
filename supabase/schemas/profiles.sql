@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "birthday" "date",
     "banner_url" "text",
     "verified_at" timestamp with time zone DEFAULT NULL,
+    "sync_referrals_to_contacts" boolean DEFAULT true NOT NULL,
     CONSTRAINT "profiles_about_update" CHECK (("length"("about") < 255)),
     CONSTRAINT "profiles_name_update" CHECK (("length"("name") < 63)),
     CONSTRAINT "profiles_x_username_update" CHECK (("length"("x_username") <= 64))

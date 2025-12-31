@@ -8,6 +8,8 @@ import {
   useState,
   memo,
 } from 'react'
+import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
+import { getContactDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
 import {
   AnimatePresence,
   Avatar,
@@ -46,7 +48,7 @@ import { formatUnits, isAddress } from 'viem'
 import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
-import { IconBadgeCheckSolid2, IconCoin, IconAccount } from 'app/components/icons'
+import { IconBadgeCheckSolid2, IconCoin, IconAccount, IconHeart } from 'app/components/icons'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { AlertCircle, CheckCheck, Clock4, History, X } from '@tamagui/lucide-icons'
 import { useSendScreenParams } from 'app/routers/params'
@@ -280,6 +282,9 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
   const [{ recipient, idType }] = useSendScreenParams()
   const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
+  // Look up contact to get custom_name if it exists
+  const { data: contact } = useContactBySendId(profile?.sendid ?? undefined)
+
   const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
   const href = !isExternalAddress && profile ? `/profile/${profile?.sendid}` : ''
 
@@ -288,6 +293,22 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
     : profile?.tag
       ? `/${profile?.tag}`
       : `#${profile?.sendid}`
+
+  // Display name priority: custom_name > profile_name > sendtag > send_id > address
+  const displayName = useMemo(() => {
+    if (isExternalAddress) return tagName
+    if (contact) {
+      return getContactDisplayName({
+        custom_name: contact.custom_name,
+        profile_name: contact.profile_name,
+        main_tag_name: contact.main_tag_name,
+        send_id: contact.send_id,
+        external_address: null,
+      })
+    }
+    // No contact - use profile name or tag
+    return profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'
+  }, [contact, profile, tagName, isExternalAddress])
 
   return (
     <XStack
@@ -328,7 +349,12 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
             </Avatar.Fallback>
           </Avatar>
         )}
-        {profile?.is_verified && !isExternalAddress && (
+        {/* Badge priority: favorite > verified > none */}
+        {!isExternalAddress && contact?.is_favorite ? (
+          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
+            <IconHeart size="$1" color="$red9" />
+          </XStack>
+        ) : profile?.is_verified && !isExternalAddress ? (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
             <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
             <IconBadgeCheckSolid2
@@ -340,13 +366,11 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
               checkColor={isDark ? '#082B1B' : '#fff'}
             />
           </XStack>
-        )}
+        ) : null}
       </XStack>
-      <YStack gap="$1.5">
+      <YStack gap="$1.5" f={1}>
         <SizableText size="$4" color="$gray12" fow="500">
-          {isExternalAddress
-            ? tagName
-            : profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'}
+          {displayName}
         </SizableText>
         <SizableText size="$3" color="$gray10">
           {tagName}
@@ -1083,7 +1107,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
             <NoteInput
               control={form.control}
               error={noteValidationError}
-              disabled={activeSection === 'reviewAndSend' || isExternalAddress}
+              disabled={isExternalAddress}
               placeholder={
                 isExternalAddress ? 'Notes not supported for external address' : 'Add a note...'
               }

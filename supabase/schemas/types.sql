@@ -83,3 +83,38 @@ CREATE TYPE "temporal"."transfer_status" AS ENUM (
     'cancelled'
 );
 ALTER TYPE "temporal"."transfer_status" OWNER TO "postgres";
+
+-- Contact source enum for tracking how a contact was added
+CREATE TYPE "public"."contact_source_enum" AS ENUM (
+    'activity',
+    'manual',
+    'external',
+    'referral'
+);
+ALTER TYPE "public"."contact_source_enum" OWNER TO "postgres";
+
+-- Composite type for contact search results
+-- Omits contact_user_id for privacy (prevents lookup of user IDs)
+CREATE TYPE "public"."contact_search_result" AS (
+    "contact_id" bigint,
+    "owner_id" uuid,
+    "custom_name" text,
+    "notes" text,
+    "is_favorite" boolean,
+    "source" "public"."contact_source_enum",
+    "last_interacted_at" timestamp with time zone,
+    "created_at" timestamp with time zone,
+    "updated_at" timestamp with time zone,
+    "archived_at" timestamp with time zone,
+    "external_address" text,
+    "chain_id" text,
+    "profile_name" text,
+    "avatar_url" text,
+    "send_id" integer,
+    "main_tag_id" bigint,
+    "main_tag_name" text,
+    "tags" text[],
+    "is_verified" boolean,
+    "label_ids" bigint[]
+);
+ALTER TYPE "public"."contact_search_result" OWNER TO "postgres";
