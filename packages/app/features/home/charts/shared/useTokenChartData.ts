@@ -27,12 +27,31 @@ export function useTokenChartData(tokenId: CoingeckoId | undefined, tf: Timefram
       const currentTimestamp = new Date(currentMarketData.last_updated).getTime()
       const lastHistoricalPoint = historicalPoints[historicalPoints.length - 1]
 
+      // Data freshness validation: check if market data is stale
+      const STALE_THRESHOLD_MS = 60 * 1000 // 1 minute (slightly > 45s refetch interval)
+      const dataAge = Date.now() - currentTimestamp
+      const isFresh = dataAge < STALE_THRESHOLD_MS
+
       // Only append if this is genuinely new data (more than 5 minutes since last point)
       const TIME_GAP_THRESHOLD = 5 * 60 * 1000 // 5 minutes in milliseconds
       const shouldAppend =
         !lastHistoricalPoint || currentTimestamp - lastHistoricalPoint.x > TIME_GAP_THRESHOLD
 
-      if (shouldAppend) {
+      if (isFresh && shouldAppend) {
+        // Interpolation smoothness: validate that new point doesn't create extreme jumps
+        if (lastHistoricalPoint) {
+          const priceChange =
+            Math.abs(currentMarketData.current_price - lastHistoricalPoint.y) /
+            lastHistoricalPoint.y
+          const ANOMALY_THRESHOLD = 0.1 // 10% change
+
+          if (priceChange > ANOMALY_THRESHOLD) {
+            console.warn(
+              `[useTokenChartData] Large price jump detected for ${tokenId}: ${(priceChange * 100).toFixed(2)}%`
+            )
+          }
+        }
+
         return [...historicalPoints, { x: currentTimestamp, y: currentMarketData.current_price }]
       }
     }
