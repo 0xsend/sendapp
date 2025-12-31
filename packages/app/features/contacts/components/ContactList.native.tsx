@@ -47,13 +47,7 @@ export const ContactList = memo(function ContactList({
   onContactPress,
   ...cardProps
 }: ContactListProps) {
-  const {
-    bc = '$color1',
-    br = '$4',
-    f = 1,
-    p = '$2',
-    ...restCardProps
-  } = cardProps
+  const { bc = '$color1', br = '$4', f = 1, p = '$2', ...restCardProps } = cardProps
 
   const outerCardProps = {
     ...restCardProps,
