@@ -11,19 +11,29 @@ const projectRoot = __dirname
 // eslint-disable-next-line no-undef
 const workspaceRoot = path.resolve(__dirname, '../..')
 
-// Load environment variables from root .env.local
-const envPath = path.resolve(workspaceRoot, '.env.local')
+// Load environment variables from root env files (same order as Tiltfile - last wins)
+const envFiles = ['.env', '.env.development', '.env.local', '.localnet.env']
 const envVars = {}
 
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf8')
-  for (const line of envContent.split('\n')) {
-    const [key, ...valueParts] = line.split('=')
-    if (key && valueParts.length > 0) {
-      const value = valueParts.join('=').trim()
-      // Only include NEXT_PUBLIC_ and EXPO_PUBLIC_ variables for client-side
-      if (key.startsWith('NEXT_PUBLIC_') || key.startsWith('EXPO_PUBLIC_')) {
-        envVars[key] = value
+for (const envFile of envFiles) {
+  const envPath = path.resolve(workspaceRoot, envFile)
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8')
+    for (const line of envContent.split('\n')) {
+      // Skip comments and empty lines
+      if (line.startsWith('#') || !line.trim()) continue
+      const [key, ...valueParts] = line.split('=')
+      if (key && valueParts.length > 0) {
+        let value = valueParts.join('=').trim()
+        // Remove surrounding quotes if present
+        if ((value.startsWith("'") && value.endsWith("'")) ||
+            (value.startsWith('"') && value.endsWith('"'))) {
+          value = value.slice(1, -1)
+        }
+        // Only include NEXT_PUBLIC_ and EXPO_PUBLIC_ variables for client-side
+        if (key.startsWith('NEXT_PUBLIC_') || key.startsWith('EXPO_PUBLIC_')) {
+          envVars[key] = value
+        }
       }
     }
   }

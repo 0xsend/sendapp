@@ -28,6 +28,7 @@ module.exports = (api) => {
         {
           components: ['@my/ui', 'tamagui'],
           config: './tamagui.config.ts',
+          exclude: /react-native-gesture-handler/,
         },
       ],
     ],
