@@ -559,7 +559,7 @@ Test the API route with mocked signatures in Playwright (use `X-Webhook-Signatur
 - [x] Export webhook utilities from `packages/bridge/src/index.ts`
 - [x] Add `BRIDGE_WEBHOOK_PUBLIC_KEY` to `.env.local`
 - [x] Remove any Tilt/K8s config for separate webhook service (N/A - not added)
-- [ ] Configure webhook URL in Bridge dashboard (deployment step)
+- [ ] Configure webhook URL in Bridge dashboard (out of scope - deployment/ops task)
 - [x] Test webhook signature verification (unit tests)
-- [ ] Test KYC status updates via webhook (integration test - out of scope)
-- [ ] Test deposit event processing via webhook (integration test - out of scope)
+- [ ] Test KYC status updates via webhook (out of scope - integration test)
+- [ ] Test deposit event processing via webhook (out of scope - integration test)

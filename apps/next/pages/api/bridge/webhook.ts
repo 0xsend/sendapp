@@ -138,7 +138,9 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
   const source = data.source ?? {}
   const receipt = data.receipt ?? {}
 
-  const paymentRail = source.payment_rail ?? 'unknown'
+  // Default to 'ach_push' as it's the most common rail for USD deposits
+  // DB constraint only allows 'ach_push' or 'wire'
+  const paymentRail = source.payment_rail ?? 'ach_push'
   const senderRoutingNumber =
     source.sender_bank_routing_number ?? source.bank_routing_number ?? null
   const senderName = source.sender_name ?? source.originator_name ?? null
