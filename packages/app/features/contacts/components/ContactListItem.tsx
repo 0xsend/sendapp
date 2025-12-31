@@ -85,22 +85,26 @@ export const ContactListItem = memo(function ContactListItem({
     borderBottomRightRadius: isLast ? '$4' : 0,
   }
 
+  // On native, use transparent background to avoid tint artifacts against page background
+  const isNative = Platform.OS !== 'web'
+
   return (
     <Card
       width="100%"
       height={72}
-      elevation="$0.75"
+      elevation={isNative ? 0 : '$0.75'}
+      shadowOpacity={isNative ? 0 : undefined}
       ai="center"
       jc="space-between"
       gap="$3"
       px="$3.5"
       py="$2.5"
-      bc="$color1"
+      bc={isNative ? 'transparent' : '$color1'}
       cursor="pointer"
       hoverStyle={hoverStyles}
       onPress={handlePress}
       flexDirection="row"
-      {...borderRadiusStyle}
+      {...(isNative ? {} : borderRadiusStyle)}
     >
       <XStack gap="$3" f={1} ai="center">
         {/* Avatar with verified/chain badge */}

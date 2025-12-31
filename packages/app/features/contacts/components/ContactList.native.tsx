@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo } from 'react'
 import { FlatList, type ListRenderItem } from 'react-native'
-import { Card, type CardProps, Paragraph, Shimmer, Spinner, YStack } from '@my/ui'
+import { Paragraph, Shimmer, Spinner, YStack, type YStackProps } from '@my/ui'
 import { useContactBook } from '../ContactBookProvider'
 import type { ContactView } from '../types'
 import { ContactListItem } from './ContactListItem'
@@ -9,13 +9,22 @@ import { SearchX } from '@tamagui/lucide-icons'
 /**
  * Props for ContactList component.
  */
-export interface ContactListProps extends Omit<CardProps, 'children'> {
+export interface ContactListProps extends Omit<YStackProps, 'children'> {
   /** Handler when a contact is pressed */
   onContactPress?: (contact: ContactView) => void
 }
 
 /** Height of each contact list item in pixels */
 const CONTACT_ITEM_HEIGHT = 72
+
+/** Subtle shadow props matching Account screen cards */
+const shadowProps = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  elevationAndroid: 7,
+} as const
 
 /**
  * ContactList displays contacts using FlatList for optimized native scrolling.
@@ -38,6 +47,30 @@ export const ContactList = memo(function ContactList({
   onContactPress,
   ...cardProps
 }: ContactListProps) {
+  const {
+    bc = '$color1',
+    br = '$4',
+    f = 1,
+    p = '$2',
+    ...restCardProps
+  } = cardProps
+
+  const outerCardProps = {
+    ...restCardProps,
+    f,
+    bc,
+    br,
+    ...shadowProps,
+  } as const
+
+  const innerCardProps = {
+    f: 1,
+    bc,
+    br,
+    p,
+    overflow: 'hidden',
+  } as const
+
   const { contacts, isLoading, isFetchingNextPage, hasNextPage, error, fetchNextPage, query } =
     useContactBook()
 
@@ -90,54 +123,62 @@ export const ContactList = memo(function ContactList({
   // Error state
   if (error) {
     return (
-      <Card {...cardProps} f={1}>
-        <YStack f={1} ai="center" jc="center" p="$4" gap="$3">
-          <Paragraph color="$red10" ta="center">
-            {error.message?.split('.').at(0) ?? 'Failed to load contacts'}
-          </Paragraph>
+      <YStack {...outerCardProps}>
+        <YStack {...innerCardProps}>
+          <YStack f={1} ai="center" jc="center" p="$4" gap="$3">
+            <Paragraph color="$red10" ta="center">
+              {error.message?.split('.').at(0) ?? 'Failed to load contacts'}
+            </Paragraph>
+          </YStack>
         </YStack>
-      </Card>
+      </YStack>
     )
   }
 
   // Loading state
   if (isLoading) {
     return (
-      <Card {...cardProps} f={1}>
-        <ContactListSkeleton />
-      </Card>
+      <YStack {...outerCardProps}>
+        <YStack {...innerCardProps}>
+          <ContactListSkeleton />
+        </YStack>
+      </YStack>
     )
   }
 
   // Empty state
   if (contacts.length === 0) {
     return (
-      <Card {...cardProps} f={1}>
-        <ContactListEmpty hasQuery={Boolean(query)} query={query} />
-      </Card>
+      <YStack {...outerCardProps}>
+        <YStack {...innerCardProps}>
+          <ContactListEmpty hasQuery={Boolean(query)} query={query} />
+        </YStack>
+      </YStack>
     )
   }
 
   return (
-    <Card {...cardProps} f={1}>
-      <FlatList
-        data={contacts}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.5}
-        getItemLayout={getItemLayout}
-        ListFooterComponent={ListFooterComponent}
-        showsVerticalScrollIndicator={false}
-        overScrollMode="never"
-        removeClippedSubviews
-        maxToRenderPerBatch={10}
-        windowSize={5}
-        initialNumToRender={10}
-        style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
-      />
-    </Card>
+    <YStack {...outerCardProps}>
+      <YStack {...innerCardProps}>
+        <FlatList
+          data={contacts}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.5}
+          getItemLayout={getItemLayout}
+          ListFooterComponent={ListFooterComponent}
+          showsVerticalScrollIndicator={false}
+          overScrollMode="never"
+          removeClippedSubviews
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          initialNumToRender={10}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
+      </YStack>
+    </YStack>
   )
 })
 
