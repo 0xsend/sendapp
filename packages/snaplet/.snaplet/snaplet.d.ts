@@ -14,6 +14,7 @@ type Enum_auth_one_time_token_type = 'confirmation_token' | 'email_change_token_
 type Enum_net_request_status = 'ERROR' | 'PENDING' | 'SUCCESS';
 type Enum_pgtle_password_types = 'PASSWORD_TYPE_MD5' | 'PASSWORD_TYPE_PLAINTEXT' | 'PASSWORD_TYPE_SCRAM_SHA_256';
 type Enum_pgtle_pg_tle_features = 'clientauth' | 'passcheck';
+type Enum_public_contact_source_enum = 'activity' | 'external' | 'manual' | 'referral';
 type Enum_public_key_type_enum = 'ES256';
 type Enum_public_link_in_bio_domain_names = 'Discord' | 'Facebook' | 'GitHub' | 'Instagram' | 'OnlyFans' | 'Snapchat' | 'Telegram' | 'TikTok' | 'Twitch' | 'WhatsApp' | 'X' | 'YouTube';
 type Enum_public_lookup_type_enum = 'address' | 'phone' | 'refcode' | 'sendid' | 'tag';
@@ -96,6 +97,35 @@ interface Table_public_challenges {
   challenge: string;
   created_at: string;
   expires_at: string;
+}
+interface Table_public_contact_label_assignments {
+  id: number;
+  contact_id: number;
+  label_id: number;
+  created_at: string;
+}
+interface Table_public_contact_labels {
+  id: number;
+  owner_id: string;
+  name: string;
+  color: string | null;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_public_contacts {
+  id: number;
+  owner_id: string;
+  contact_user_id: string | null;
+  external_address: string | null;
+  chain_id: string | null;
+  custom_name: string | null;
+  notes: string | null;
+  is_favorite: boolean;
+  source: Enum_public_contact_source_enum;
+  last_interacted_at: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_public_distribution_shares {
   id: number;
@@ -396,6 +426,7 @@ interface Table_public_profiles {
   birthday: string | null;
   banner_url: string | null;
   verified_at: string | null;
+  sync_referrals_to_contacts: boolean;
 }
 interface Table_public_receipts {
   hash: string | null;
@@ -1080,6 +1111,9 @@ interface Schema_public {
   canton_party_verifications: Table_public_canton_party_verifications;
   chain_addresses: Table_public_chain_addresses;
   challenges: Table_public_challenges;
+  contact_label_assignments: Table_public_contact_label_assignments;
+  contact_labels: Table_public_contact_labels;
+  contacts: Table_public_contacts;
   distribution_shares: Table_public_distribution_shares;
   distribution_verification_values: Table_public_distribution_verification_values;
   distribution_verifications: Table_public_distribution_verifications;
@@ -1252,6 +1286,41 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "auth.users" | {};
     childDestinationsTables:  | {};
+    
+  };
+  "public.contact_label_assignments": {
+    parent: {
+       contact_label_assignments_label_id_fkey: "public.contact_labels";
+       contact_label_assignments_contact_id_fkey: "public.contacts";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.contact_labels" | "public.contacts" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "public.contact_labels": {
+    parent: {
+       contact_labels_owner_id_fkey: "auth.users";
+    };
+    children: {
+       contact_label_assignments_label_id_fkey: "public.contact_label_assignments";
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.contact_label_assignments" | {};
+    
+  };
+  "public.contacts": {
+    parent: {
+       contacts_contact_user_id_fkey: "auth.users";
+       contacts_owner_id_fkey: "auth.users";
+    };
+    children: {
+       contact_label_assignments_contact_id_fkey: "public.contact_label_assignments";
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.contact_label_assignments" | {};
     
   };
   "public.distribution_shares": {
@@ -1725,6 +1794,9 @@ interface Tables_relationships {
        activity_to_user_id_fkey: "public.activity";
        canton_party_verifications_user_id_fkey: "public.canton_party_verifications";
        chain_addresses_user_id_fkey: "public.chain_addresses";
+       contact_labels_owner_id_fkey: "public.contact_labels";
+       contacts_contact_user_id_fkey: "public.contacts";
+       contacts_owner_id_fkey: "public.contacts";
        distribution_shares_user_id_fkey: "public.distribution_shares";
        distribution_verifications_user_id_fkey: "public.distribution_verifications";
        link_in_bio_user_id_fkey: "public.link_in_bio";
@@ -1735,7 +1807,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.contact_labels" | "public.contacts" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {

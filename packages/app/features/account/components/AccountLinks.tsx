@@ -5,6 +5,7 @@ import {
   IconAccount,
   IconDollar,
   IconFingerprint,
+  IconGroup,
   IconIdCard,
   IconInfoCircle,
   IconLogout,
@@ -60,6 +61,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       xLogo: <IconXLogo {...iconProps} />,
       fingerprint: <IconFingerprint {...iconProps} />,
       slash: <IconSlash {...iconProps} />,
+      group: <IconGroup {...iconProps} />,
       starOutline: <IconStarOutline {...iconProps} />,
       worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
@@ -114,6 +116,9 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               href="/account/sendtag"
               icon={icons.slash}
             />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink text={t('links.items.contacts')} href="/contacts" icon={icons.group} />
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink

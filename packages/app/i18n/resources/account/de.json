@@ -33,6 +33,7 @@
   },
   "links": {
     "items": {
+      "contacts": "Kontakte",
       "deleteAccount": "Konto löschen",
       "language": "Sprache",
       "learnMore": "Mehr über Send erfahren",

@@ -4,6 +4,7 @@
     "secretShop": "秘密商店"
   },
   "stack": {
+    "contacts": "联系人",
     "account": {
       "language": "语言",
       "linkInBio": "个人主页链接",

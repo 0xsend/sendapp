@@ -76,6 +76,52 @@ type Override = {
       users?: string;
     };
   }
+  contact_label_assignments?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      contact_id?: string;
+      label_id?: string;
+      created_at?: string;
+      contact_labels?: string;
+      contacts?: string;
+    };
+  }
+  contact_labels?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      owner_id?: string;
+      name?: string;
+      color?: string;
+      created_at?: string;
+      updated_at?: string;
+      users?: string;
+      contact_label_assignments?: string;
+    };
+  }
+  contacts?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      owner_id?: string;
+      contact_user_id?: string;
+      external_address?: string;
+      chain_id?: string;
+      custom_name?: string;
+      notes?: string;
+      is_favorite?: string;
+      source?: string;
+      last_interacted_at?: string;
+      archived_at?: string;
+      created_at?: string;
+      updated_at?: string;
+      normalized_external_address?: string;
+      users_contacts_contact_user_idTousers?: string;
+      users_contacts_owner_idTousers?: string;
+      contact_label_assignments?: string;
+    };
+  }
   distribution_shares?: {
     name?: string;
     fields?: {
@@ -344,6 +390,7 @@ type Override = {
       birthday?: string;
       banner_url?: string;
       verified_at?: string;
+      sync_referrals_to_contacts?: string;
       users?: string;
       affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;
@@ -928,6 +975,9 @@ type Override = {
       leaderboard_referrals_all_time?: string;
       canton_party_verifications?: string;
       chain_addresses?: string;
+      contact_labels?: string;
+      contacts_contacts_contact_user_idTousers?: string;
+      contacts_contacts_owner_idTousers?: string;
       distribution_shares?: string;
       distribution_verifications?: string;
       link_in_bio?: string;
@@ -1007,6 +1057,31 @@ export interface Fingerprint {
   chainAddresses?: {
     createdAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+  }
+  contactLabelAssignments?: {
+    id?: FingerprintNumberField;
+    contactId?: FingerprintNumberField;
+    labelId?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    label?: FingerprintRelationField;
+    contact?: FingerprintRelationField;
+  }
+  contactLabels?: {
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    owner?: FingerprintRelationField;
+    contactLabelAssignmentsByLabelId?: FingerprintRelationField;
+  }
+  contacts?: {
+    id?: FingerprintNumberField;
+    lastInteractedAt?: FingerprintDateField;
+    archivedAt?: FingerprintDateField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    contactUser?: FingerprintRelationField;
+    owner?: FingerprintRelationField;
+    contactLabelAssignments?: FingerprintRelationField;
   }
   distributionShares?: {
     id?: FingerprintNumberField;
@@ -1456,6 +1531,9 @@ export interface Fingerprint {
     leaderboardReferralsAllTimes?: FingerprintRelationField;
     cantonPartyVerifications?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
+    contactLabelsByOwnerId?: FingerprintRelationField;
+    contactsByContactUserId?: FingerprintRelationField;
+    contactsByOwnerId?: FingerprintRelationField;
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
     linkInBios?: FingerprintRelationField;
