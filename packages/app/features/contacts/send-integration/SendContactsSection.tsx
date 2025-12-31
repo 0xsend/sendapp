@@ -10,6 +10,7 @@ import {
   LinearGradient,
   Paragraph,
   Text,
+  useTheme,
   useThemeName,
   View,
   XStack,
@@ -107,6 +108,7 @@ const ContactsRow = memo(function ContactsRow({
 }: {
   contacts: SendContactItem[]
 }) {
+  const theme = useTheme()
   return (
     <View
       animation={[
@@ -141,7 +143,7 @@ const ContactsRow = memo(function ContactsRow({
         display="none"
         $sm={{ display: 'flex' }}
         pointerEvents="none"
-        colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+        colors={[`${theme.background.val}00`, `${theme.background.val}`]}
         start={{ x: 0, y: 0.5 }}
         end={{ x: 1, y: 0.5 }}
         width="$4"

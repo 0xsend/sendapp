@@ -7,6 +7,7 @@ import {
   Paragraph,
   ScrollView,
   Tooltip,
+  useTheme,
   View,
   XStack,
   type XStackProps,
@@ -67,6 +68,7 @@ export const ContactFilters = memo(function ContactFilters({
 }: ContactFiltersProps) {
   const { filter, setFilter } = useContactBook()
   const { data: labels } = useContactLabels()
+  const theme = useTheme()
   const [showLabelManager, setShowLabelManager] = useState(false)
   const [showLeftGradient, setShowLeftGradient] = useState(false)
   const [showRightGradient, setShowRightGradient] = useState(true)
@@ -172,7 +174,7 @@ export const ContactFilters = memo(function ContactFilters({
         {showLeftGradient && (
           <LinearGradient
             pointerEvents="none"
-            colors={['$background', 'transparent']}
+            colors={[`${theme.background.val}`, `${theme.background.val}00`]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             width="$4"
@@ -188,7 +190,7 @@ export const ContactFilters = memo(function ContactFilters({
         {showRightGradient && (
           <LinearGradient
             pointerEvents="none"
-            colors={['transparent', '$background']}
+            colors={[`${theme.background.val}00`, `${theme.background.val}`]}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             width="$4"
