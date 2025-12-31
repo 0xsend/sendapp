@@ -133,6 +133,106 @@ END;
 $$;
 ALTER FUNCTION "temporal"."temporal_deposit_insert_pending_activity"() OWNER TO "postgres";
 
+CREATE OR REPLACE FUNCTION "temporal"."temporal_transfer_insert_pending_activity"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+DECLARE
+  inserted_activity_id BIGINT;
+  from_user_id UUID;
+  to_user_id UUID;
+  activity_data jsonb;
+  from_address bytea;
+  to_address bytea;
+BEGIN
+  -- Only create activity when status changes to 'sent'
+  IF NEW.status != 'sent' THEN
+    RETURN NULL;
+  END IF;
+
+  -- For token transfers, addresses are in 'f' and 't' fields
+  -- For ETH transfers, addresses are in 'sender' and 'log_addr' fields
+  IF NEW.data ? 't' THEN
+    -- Token transfer
+    from_address := (NEW.data->>'f')::bytea;
+    to_address := (NEW.data->>'t')::bytea;
+  ELSIF NEW.data ? 'log_addr' THEN
+    -- ETH transfer
+    from_address := (NEW.data->>'sender')::bytea;
+    to_address := (NEW.data->>'log_addr')::bytea;
+  ELSE
+    -- No valid address data, skip activity creation
+    RETURN NULL;
+  END IF;
+
+  -- Look up user IDs for from and to addresses
+  SELECT user_id INTO from_user_id
+  FROM public.send_accounts
+  WHERE address = concat('0x', encode(from_address, 'hex'))::citext
+  LIMIT 1;
+
+  SELECT user_id INTO to_user_id
+  FROM public.send_accounts
+  WHERE address = concat('0x', encode(to_address, 'hex'))::citext
+  LIMIT 1;
+
+  -- Skip if we can't find the sender (from_user_id)
+  IF from_user_id IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  -- Build data object with workflow_id and transfer details
+  activity_data := jsonb_build_object(
+    'workflow_id', NEW.workflow_id,
+    'status', NEW.status
+  );
+
+  -- Add transfer-specific fields from NEW.data
+  IF NEW.data ? 'user_op_hash' THEN
+    activity_data := activity_data || jsonb_build_object('user_op_hash', NEW.data->'user_op_hash');
+  END IF;
+
+  IF NEW.data ? 'note' THEN
+    activity_data := activity_data || jsonb_build_object('note', NEW.data->>'note');
+  END IF;
+
+  -- Add token transfer fields
+  IF NEW.data ? 't' THEN
+    activity_data := activity_data || jsonb_build_object(
+      'log_addr', NEW.data->>'log_addr',
+      'f', NEW.data->>'f',
+      't', NEW.data->>'t',
+      'v', NEW.data->>'v'
+    );
+  -- Add ETH transfer fields
+  ELSIF NEW.data ? 'log_addr' THEN
+    activity_data := activity_data || jsonb_build_object(
+      'sender', NEW.data->>'sender',
+      'log_addr', NEW.data->>'log_addr',
+      'value', NEW.data->>'value'
+    );
+  END IF;
+
+  -- Insert into public.activity
+  INSERT INTO public.activity (event_name, event_id, data, from_user_id, to_user_id)
+  VALUES (
+    'temporal_send_account_transfers',
+    NEW.workflow_id,
+    activity_data,
+    from_user_id,
+    to_user_id
+  )
+  RETURNING id INTO inserted_activity_id;
+
+  -- Update the temporal.send_account_transfers row with the new activity_id
+  UPDATE temporal.send_account_transfers
+  SET activity_id = inserted_activity_id
+  WHERE workflow_id = NEW.workflow_id;
+
+  RETURN NULL; -- AFTER triggers should return NULL
+END;
+$$;
+ALTER FUNCTION "temporal"."temporal_transfer_insert_pending_activity"() OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "temporal"."temporal_deposit_update_activity_on_status_change"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -194,7 +294,8 @@ CREATE TABLE IF NOT EXISTS "temporal"."send_account_transfers" (
     "created_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "updated_at" timestamp with time zone DEFAULT ("now"() AT TIME ZONE 'utc'::"text") NOT NULL,
     "send_account_transfers_activity_event_id" "text",
-    "send_account_transfers_activity_event_name" "text"
+    "send_account_transfers_activity_event_name" "text",
+    "activity_id" bigint
 );
 ALTER TABLE "temporal"."send_account_transfers" OWNER TO "postgres";
 
@@ -234,6 +335,7 @@ CREATE INDEX "send_account_transfers_workflow_id_updated_at_idx" ON "temporal"."
 CREATE INDEX "temporal_send_account_transfers_activity_event_name_event_id_id" ON "temporal"."send_account_transfers" USING "btree" ("send_account_transfers_activity_event_id", "send_account_transfers_activity_event_name");
 CREATE INDEX "temporal_send_account_transfers_user_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("user_id");
 CREATE UNIQUE INDEX "temporal_send_account_transfers_workflow_id_idx" ON "temporal"."send_account_transfers" USING "btree" ("workflow_id");
+CREATE INDEX "idx_temporal_send_account_transfers_activity_id" ON "temporal"."send_account_transfers" USING "btree" ("activity_id");
 
 -- Add missing indexes for send_earn_deposits
 CREATE INDEX "idx_temporal_send_earn_deposits_activity_id" ON "temporal"."send_earn_deposits" USING "btree" ("activity_id");
@@ -246,6 +348,10 @@ ALTER TABLE temporal.send_earn_deposits
 ADD CONSTRAINT fk_activity
 FOREIGN KEY (activity_id) REFERENCES public.activity(id) ON DELETE CASCADE;
 
+ALTER TABLE temporal.send_account_transfers
+ADD CONSTRAINT fk_transfer_activity
+FOREIGN KEY (activity_id) REFERENCES public.activity(id) ON DELETE CASCADE;
+
 -- RLS
 ALTER TABLE "temporal"."send_account_transfers" ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "users can see their own temporal transfers" ON "temporal"."send_account_transfers" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
@@ -256,106 +362,33 @@ CREATE OR REPLACE FUNCTION temporal.temporal_transfer_after_upsert()
  LANGUAGE plpgsql
  SECURITY DEFINER
 AS $function$
-DECLARE
-  _to_user_id uuid;
-  _data jsonb;
 BEGIN
-    -- Do nothing if we haven't sent the transfer yet
-    IF NEW.status = 'initialized' THEN
+    -- Only process when status is 'confirmed'
+    IF NEW.status != 'confirmed' THEN
         RETURN NEW;
     END IF;
 
-    -- Update send_account_transfers activity with note
-    IF NEW.status = 'confirmed' THEN
-        IF EXISTS (
-            SELECT 1 FROM public.activity a
+    -- When confirmed, update the indexed activity with note if it exists
+    IF EXISTS (
+        SELECT 1 FROM public.activity a
+        WHERE event_name = NEW.send_account_transfers_activity_event_name
+        AND event_id = NEW.send_account_transfers_activity_event_id
+    ) THEN
+        -- Add note to indexed activity if present
+        IF NEW.data ? 'note' THEN
+            UPDATE public.activity a
+            SET data = a.data || jsonb_build_object('note', NEW.data->>'note')
             WHERE event_name = NEW.send_account_transfers_activity_event_name
-            AND event_id = NEW.send_account_transfers_activity_event_id
-        ) THEN
-            IF NEW.data ? 'note' THEN
-                UPDATE public.activity a
-                SET data = a.data || jsonb_build_object('note', NEW.data->>'note')
-                WHERE event_name = NEW.send_account_transfers_activity_event_name
-                AND event_id = NEW.send_account_transfers_activity_event_id;
-            END IF;
+            AND event_id = NEW.send_account_transfers_activity_event_id;
+        END IF;
 
+        -- Delete the temporal pending activity now that transfer is confirmed and indexed
+        IF NEW.activity_id IS NOT NULL THEN
             DELETE FROM public.activity
-            WHERE event_id = NEW.workflow_id
-            AND event_name = 'temporal_send_account_transfers';
-
-            RETURN NEW;
+            WHERE id = NEW.activity_id;
         END IF;
     END IF;
 
-    -- Do nothing if we have already indexed the transfer and its not failed
-    -- Use the index on block_num for efficient lookup
-    IF NEW.status != 'failed' AND NEW.created_at_block_num IS NOT NULL THEN
-        IF EXISTS (
-            SELECT 1
-            FROM public.send_account_transfers
-            WHERE block_num >= NEW.created_at_block_num
-            LIMIT 1
-        ) THEN
-            RETURN NEW;
-        END IF;
-    END IF;
-
-    -- token transfers
-    IF NEW.data ? 't' THEN
-        SELECT user_id INTO _to_user_id
-        FROM send_accounts
-        WHERE address_bytes = (NEW.data->>'t')::bytea
-        LIMIT 1;
-
-        _data := jsonb_build_object(
-            'status', NEW.status,
-            'user_op_hash', NEW.data->'user_op_hash',
-            'log_addr', NEW.data->>'log_addr',
-            'f', NEW.data->>'f',
-            't', NEW.data->>'t',
-            'v', NEW.data->>'v',
-            'tx_hash', NEW.data->>'tx_hash',
-            'block_num', NEW.data->>'block_num',
-            'note', NEW.data->>'note'
-        );
-    -- eth transfers
-    ELSE
-        SELECT user_id INTO _to_user_id
-        FROM send_accounts
-        WHERE address_bytes = (NEW.data->>'log_addr')::bytea
-        LIMIT 1;
-
-        _data := jsonb_build_object(
-            'status', NEW.status,
-            'user_op_hash', NEW.data->'user_op_hash',
-            'log_addr', NEW.data->>'log_addr',
-            'sender', NEW.data->>'sender',
-            'value', NEW.data->>'value',
-            'tx_hash', NEW.data->>'tx_hash',
-            'block_num', NEW.data->>'block_num',
-            'note', NEW.data->>'note'
-        );
-    END IF;
-
-    _data := jsonb_strip_nulls(_data);
-
-    INSERT INTO activity(
-        event_name,
-        event_id,
-        from_user_id,
-        to_user_id,
-        data
-    )
-    VALUES (
-        'temporal_send_account_transfers',
-        NEW.workflow_id,
-        NEW.user_id,
-        _to_user_id,
-        _data
-    )
-    ON CONFLICT (event_name, event_id)
-    DO UPDATE SET
-        data = EXCLUDED.data;
     RETURN NEW;
 END;
 $function$
@@ -370,6 +403,8 @@ CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_after_upsert"
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_before_insert" BEFORE INSERT ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_transfer_before_insert"();
 
 CREATE OR REPLACE TRIGGER "temporal_send_account_transfers_trigger_delete_activity" BEFORE DELETE ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"();
+
+CREATE OR REPLACE TRIGGER "aaa_temporal_transfer_insert_pending_activity" AFTER INSERT OR UPDATE ON "temporal"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_transfer_insert_pending_activity"();
 
 CREATE OR REPLACE TRIGGER "aaa_temporal_deposit_insert_pending_activity" AFTER INSERT ON "temporal"."send_earn_deposits" FOR EACH ROW EXECUTE FUNCTION "temporal"."temporal_deposit_insert_pending_activity"();
 
@@ -386,6 +421,9 @@ GRANT ALL ON FUNCTION "temporal"."temporal_deposit_update_activity_on_status_cha
 
 REVOKE ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "temporal"."temporal_send_account_transfers_trigger_delete_activity"() TO "service_role";
+
+REVOKE ALL ON FUNCTION "temporal"."temporal_transfer_insert_pending_activity"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "temporal"."temporal_transfer_insert_pending_activity"() TO "service_role";
 
 GRANT ALL ON FUNCTION "temporal"."add_note_activity_temporal_transfer_before_confirmed"() TO "service_role";
 
