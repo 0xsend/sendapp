@@ -2,7 +2,7 @@
 -- Tests tables, functions, constraints, RLS, and labels
 
 BEGIN;
-SELECT plan(43);
+SELECT plan(44);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -177,7 +177,7 @@ VALUES (
 );
 
 -- ============================================================================
--- Test 14-18: contact_search function tests
+-- Test 14-19: contact_search function tests
 -- ============================================================================
 
 -- Test 14: contact_search requires authentication
@@ -201,23 +201,29 @@ SELECT ok(
     'contact_search with query filter finds matching custom_name'
 );
 
--- Test 17: contact_search with favorites_only filter
+-- Test 17: contact_search supports trigram distance matches
+SELECT ok(
+    (SELECT COUNT(*) FROM contact_search('Frend')) >= 1,
+    'contact_search supports trigram distance matches'
+);
+
+-- Test 18: contact_search with favorites_only filter
 SELECT ok(
     (SELECT COUNT(*) FROM contact_search(NULL, 50, 0, TRUE)) >= 1,
     'contact_search with favorites_only returns favorite contacts'
 );
 
--- Test 18: contact_search with source filter
+-- Test 19: contact_search with source filter
 SELECT ok(
     (SELECT COUNT(*) FROM contact_search(NULL, 50, 0, FALSE, NULL, ARRAY['external'::contact_source_enum])) >= 1,
     'contact_search with source filter returns external contacts'
 );
 
 -- ============================================================================
--- Test 19-21: toggle_contact_favorite function tests
+-- Test 20-22: toggle_contact_favorite function tests
 -- ============================================================================
 
--- Test 19: toggle_contact_favorite fails for non-existent contact when unauthenticated
+-- Test 20: toggle_contact_favorite fails for non-existent contact when unauthenticated
 SELECT tests.clear_authentication();
 SELECT throws_ok(
     $$ SELECT toggle_contact_favorite(999999) $$,
@@ -225,7 +231,7 @@ SELECT throws_ok(
     'toggle_contact_favorite fails for non-existent contact'
 );
 
--- Test 20: toggle_contact_favorite works for owned contact
+-- Test 21: toggle_contact_favorite works for owned contact
 SELECT tests.authenticate_as('contact_owner');
 DO $$
 DECLARE
@@ -251,7 +257,7 @@ SELECT is(
     'toggle_contact_favorite toggles favorite status'
 );
 
--- Test 21: toggle_contact_favorite fails for other user's contact
+-- Test 22: toggle_contact_favorite fails for other user's contact
 SELECT tests.authenticate_as('other_user');
 SELECT throws_ok(
     $$ SELECT toggle_contact_favorite(
@@ -262,10 +268,10 @@ SELECT throws_ok(
 );
 
 -- ============================================================================
--- Test 22-24: sync_contacts_from_activity function tests
+-- Test 23-25: sync_contacts_from_activity function tests
 -- ============================================================================
 
--- Test 22: sync_contacts_from_activity requires authentication
+-- Test 23: sync_contacts_from_activity requires authentication
 SELECT tests.clear_authentication();
 SELECT throws_ok(
     $$ SELECT sync_contacts_from_activity() $$,
@@ -273,7 +279,7 @@ SELECT throws_ok(
     'sync_contacts_from_activity requires authentication'
 );
 
--- Test 23: sync_contacts_from_activity creates contacts from transfer activity
+-- Test 24: sync_contacts_from_activity creates contacts from transfer activity
 SET ROLE service_role;
 INSERT INTO activity (event_id, created_at, event_name, from_user_id, to_user_id, data)
 VALUES
@@ -288,17 +294,17 @@ SELECT ok(
     'sync_contacts_from_activity executes and returns count'
 );
 
--- Test 24: sync_contacts_from_activity does not duplicate existing contacts
+-- Test 25: sync_contacts_from_activity does not duplicate existing contacts
 SELECT ok(
     (SELECT sync_contacts_from_activity()) >= 0,
     'sync_contacts_from_activity does not duplicate existing contacts'
 );
 
 -- ============================================================================
--- Test 25-26: contact_favorites function tests
+-- Test 26-27: contact_favorites function tests
 -- ============================================================================
 
--- Test 25: contact_favorites requires authentication
+-- Test 26: contact_favorites requires authentication
 SELECT tests.clear_authentication();
 SELECT throws_ok(
     $$ SELECT * FROM contact_favorites() $$,
@@ -306,7 +312,7 @@ SELECT throws_ok(
     'contact_favorites requires authentication'
 );
 
--- Test 26: contact_favorites function exists and is SECURITY DEFINER
+-- Test 27: contact_favorites function exists and is SECURITY DEFINER
 SELECT ok(
     EXISTS(
         SELECT 1 FROM pg_proc
@@ -317,17 +323,17 @@ SELECT ok(
 );
 
 -- ============================================================================
--- Test 27-29: RLS policy tests
+-- Test 28-30: RLS policy tests
 -- ============================================================================
 
--- Test 27: Users can only see their own contacts
+-- Test 28: Users can only see their own contacts
 SELECT tests.authenticate_as('contact_owner');
 SELECT ok(
     (SELECT COUNT(*) FROM contacts WHERE owner_id != tests.get_supabase_uid('contact_owner')) = 0,
     'RLS prevents users from seeing other users'' contacts'
 );
 
--- Test 28: Users cannot insert contacts for other users
+-- Test 29: Users cannot insert contacts for other users
 SELECT tests.authenticate_as('other_user');
 SELECT throws_ok(
     $$ INSERT INTO contacts (owner_id, contact_user_id)
@@ -337,7 +343,7 @@ SELECT throws_ok(
     'RLS prevents inserting contacts for other users'
 );
 
--- Test 29: Users cannot update or delete other users' contacts (RLS filters them out)
+-- Test 30: Users cannot update or delete other users' contacts (RLS filters them out)
 -- Note: With RLS, UPDATE/DELETE simply affect 0 rows, no error thrown
 SELECT ok(
     NOT EXISTS (
@@ -348,10 +354,10 @@ SELECT ok(
 );
 
 -- ============================================================================
--- Test 30-33: Constraint violation tests
+-- Test 31-34: Constraint violation tests
 -- ============================================================================
 
--- Test 30: contacts_no_self constraint prevents self-contacts
+-- Test 31: contacts_no_self constraint prevents self-contacts
 SELECT tests.authenticate_as('contact_owner');
 SELECT throws_ok(
     $$ INSERT INTO contacts (owner_id, contact_user_id)
@@ -361,7 +367,7 @@ SELECT throws_ok(
     'contacts_no_self constraint prevents self-contacts'
 );
 
--- Test 31: contacts_has_identity constraint requires identity
+-- Test 32: contacts_has_identity constraint requires identity
 SELECT throws_ok(
     $$ INSERT INTO contacts (owner_id, contact_user_id, external_address)
        VALUES (tests.get_supabase_uid('contact_owner'), NULL, NULL) $$,
@@ -370,7 +376,7 @@ SELECT throws_ok(
     'contacts_has_identity constraint requires contact_user_id or external_address'
 );
 
--- Test 32: contacts_identity_exclusive constraint prevents both identities
+-- Test 33: contacts_identity_exclusive constraint prevents both identities
 SELECT throws_ok(
     $$ INSERT INTO contacts (owner_id, contact_user_id, external_address, chain_id, source)
        VALUES (
@@ -385,7 +391,7 @@ SELECT throws_ok(
     'contacts_identity_exclusive constraint prevents both contact_user_id and external_address'
 );
 
--- Test 33: contacts_chain_id_iff_external constraint requires chain_id with external_address
+-- Test 34: contacts_chain_id_iff_external constraint requires chain_id with external_address
 SELECT throws_ok(
     $$ INSERT INTO contacts (owner_id, external_address, chain_id, source)
        VALUES (tests.get_supabase_uid('contact_owner'), '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', NULL, 'external') $$,
@@ -395,10 +401,10 @@ SELECT throws_ok(
 );
 
 -- ============================================================================
--- Test 34-38: Label management tests
+-- Test 35-39: Label management tests
 -- ============================================================================
 
--- Test 34: Users can create labels
+-- Test 35: Users can create labels
 SELECT tests.authenticate_as('contact_owner');
 SELECT lives_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
@@ -406,7 +412,7 @@ SELECT lives_ok(
     'Users can create contact labels'
 );
 
--- Test 35: Label color format constraint (hex only)
+-- Test 36: Label color format constraint (hex only)
 SELECT throws_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'BadColor', 'red') $$,
@@ -415,7 +421,7 @@ SELECT throws_ok(
     'contact_labels color must be hex format'
 );
 
--- Test 36: Label name uniqueness per owner
+-- Test 37: Label name uniqueness per owner
 SELECT throws_ok(
     $$ INSERT INTO contact_labels (owner_id, name)
        VALUES (tests.get_supabase_uid('contact_owner'), 'Work') $$,
@@ -424,7 +430,7 @@ SELECT throws_ok(
     'Label names must be unique per owner'
 );
 
--- Test 37: Users can assign labels to contacts
+-- Test 38: Users can assign labels to contacts
 SELECT lives_ok(
     $$ INSERT INTO contact_label_assignments (contact_id, label_id)
        VALUES (
@@ -434,7 +440,7 @@ SELECT lives_ok(
     'Users can assign labels to their contacts'
 );
 
--- Test 38: contact_search with label filter
+-- Test 39: contact_search with label filter
 SELECT ok(
     (SELECT COUNT(*) FROM contact_search(
         NULL, 50, 0, FALSE,
@@ -444,21 +450,21 @@ SELECT ok(
     'contact_search with label filter returns labeled contacts'
 );
 
--- Test 39: Users can create up to 3 labels (2nd label)
+-- Test 40: Users can create up to 3 labels (2nd label)
 SELECT lives_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'Personal', '#00FF00') $$,
     'Users can create a second label'
 );
 
--- Test 40: Users can create up to 3 labels (3rd label)
+-- Test 41: Users can create up to 3 labels (3rd label)
 SELECT lives_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'Family', '#0000FF') $$,
     'Users can create a third label'
 );
 
--- Test 41: Users cannot create more than 3 labels
+-- Test 42: Users cannot create more than 3 labels
 SELECT throws_ok(
     $$ INSERT INTO contact_labels (owner_id, name, color)
        VALUES (tests.get_supabase_uid('contact_owner'), 'FourthLabel', '#FFFF00') $$,
@@ -467,7 +473,7 @@ SELECT throws_ok(
 );
 
 -- ============================================================================
--- Test 42: add_contact function (service_role only) upserts correctly
+-- Test 43: add_contact function (service_role only) upserts correctly
 -- ============================================================================
 
 SET ROLE service_role;
@@ -485,7 +491,7 @@ SELECT lives_ok(
 SET ROLE postgres;
 
 -- ============================================================================
--- Test 43: add_contact_by_lookup preserves favorite status on re-add
+-- Test 44: add_contact_by_lookup preserves favorite status on re-add
 -- ============================================================================
 
 -- This tests the bug fix where re-adding an archived favorite contact
