@@ -20,6 +20,7 @@
 - [x] Update `.env.local.template` with `BRIDGE_WEBHOOK_PUBLIC_KEY`
 - [x] Fix payment_rail fallback to use 'ach_push' (DB constraint compliance)
 - [x] Mark remaining checklist items as explicitly out of scope
+- [x] Add awaiting_questionnaire/awaiting_ubo to DB kyc_status constraint
 
 ## In Progress
 (none)
