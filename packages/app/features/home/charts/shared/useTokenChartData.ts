@@ -23,8 +23,18 @@ export function useTokenChartData(tokenId: CoingeckoId | undefined, tf: Timefram
 
     // Append current price as the latest data point
     const currentMarketData = marketData?.find((m) => m.id === tokenId)
-    if (currentMarketData?.current_price) {
-      return [...historicalPoints, { x: Date.now(), y: currentMarketData.current_price }]
+    if (currentMarketData?.current_price && currentMarketData?.last_updated) {
+      const currentTimestamp = new Date(currentMarketData.last_updated).getTime()
+      const lastHistoricalPoint = historicalPoints[historicalPoints.length - 1]
+
+      // Only append if this is genuinely new data (more than 5 minutes since last point)
+      const TIME_GAP_THRESHOLD = 5 * 60 * 1000 // 5 minutes in milliseconds
+      const shouldAppend =
+        !lastHistoricalPoint || currentTimestamp - lastHistoricalPoint.x > TIME_GAP_THRESHOLD
+
+      if (shouldAppend) {
+        return [...historicalPoints, { x: currentTimestamp, y: currentMarketData.current_price }]
+      }
     }
 
     return historicalPoints
