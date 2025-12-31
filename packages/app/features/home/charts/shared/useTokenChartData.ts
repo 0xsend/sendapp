@@ -8,6 +8,23 @@ import { getDaysForTimeframe, getInterpolationRange, type Timeframe } from './ti
 import { monotoneCubicInterpolation } from '@my/ui'
 import type { CoingeckoId } from 'app/data/coins'
 
+/**
+ * Fetches and combines token chart data from two sources:
+ * 1. Historical data (CoinGecko Pro API via server) - updated per timeframe cadence
+ * 2. Real-time price (CoinGecko Free API direct) - updated every 45 seconds
+ *
+ * The hook implements several data quality safeguards:
+ * - Uses API's last_updated timestamp for accuracy (not client Date.now())
+ * - Validates data freshness (< 60s old) before appending
+ * - Prevents duplicates by enforcing minimum 5-minute gaps
+ * - Detects anomalous price jumps (> 10%) and logs warnings
+ *
+ * Note: Real-time data point may have up to 45-second latency based on refetch interval.
+ *
+ * @param tokenId - CoinGecko token identifier
+ * @param tf - Timeframe for historical data (1H, 1D, 1W, 1M, 1Y, ALL)
+ * @returns Chart points, smoothed interpolation, latest price, change %, loading/error states
+ */
 export function useTokenChartData(tokenId: CoingeckoId | undefined, tf: Timeframe) {
   const days = getDaysForTimeframe(tf)
 
