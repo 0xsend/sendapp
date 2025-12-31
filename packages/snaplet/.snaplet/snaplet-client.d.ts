@@ -384,6 +384,22 @@ type Override = {
       inserted_at?: string;
     };
   }
+  notifications?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      type?: string;
+      title?: string;
+      body?: string;
+      data?: string;
+      read?: string;
+      created_at?: string;
+      delivered_at?: string;
+      read_at?: string;
+      users?: string;
+    };
+  }
   oauth_authorizations?: {
     name?: string;
     fields?: {
@@ -489,6 +505,24 @@ type Override = {
       affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;
       referrals_referrals_referrer_idToprofiles?: string;
+    };
+  }
+  push_tokens?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      platform?: string;
+      token?: string;
+      endpoint?: string;
+      p256dh?: string;
+      auth?: string;
+      created_at?: string;
+      updated_at?: string;
+      device_id?: string;
+      is_active?: string;
+      last_used_at?: string;
+      users?: string;
     };
   }
   receipts?: {
@@ -1076,7 +1110,9 @@ type Override = {
       distribution_shares?: string;
       distribution_verifications?: string;
       link_in_bio?: string;
+      notifications?: string;
       profiles?: string;
+      push_tokens?: string;
       receipts?: string;
       send_accounts?: string;
       tags?: string;
@@ -1319,6 +1355,14 @@ export interface Fingerprint {
   migrations?: {
     insertedAt?: FingerprintDateField;
   }
+  notifications?: {
+    id?: FingerprintNumberField;
+    data?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    deliveredAt?: FingerprintDateField;
+    readAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+  }
   oauthAuthorizations?: {
     createdAt?: FingerprintDateField;
     expiresAt?: FingerprintDateField;
@@ -1362,6 +1406,13 @@ export interface Fingerprint {
     affiliateStatsByUserId?: FingerprintRelationField;
     referralsByReferredId?: FingerprintRelationField;
     referralsByReferrerId?: FingerprintRelationField;
+  }
+  pushTokens?: {
+    id?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    lastUsedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
   }
   receipts?: {
     createdAt?: FingerprintDateField;
@@ -1671,7 +1722,9 @@ export interface Fingerprint {
     distributionShares?: FingerprintRelationField;
     distributionVerifications?: FingerprintRelationField;
     linkInBios?: FingerprintRelationField;
+    notifications?: FingerprintRelationField;
     profiles?: FingerprintRelationField;
+    pushTokens?: FingerprintRelationField;
     receipts?: FingerprintRelationField;
     sendAccounts?: FingerprintRelationField;
     tags?: FingerprintRelationField;
