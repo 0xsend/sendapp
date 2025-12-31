@@ -18,6 +18,8 @@
 - [x] Run tests (29 tests passing)
 - [x] Update migration plan checklist
 - [x] Update `.env.local.template` with `BRIDGE_WEBHOOK_PUBLIC_KEY`
+- [x] Fix payment_rail fallback to use 'ach_push' (DB constraint compliance)
+- [x] Mark remaining checklist items as explicitly out of scope
 
 ## In Progress
 (none)
@@ -32,5 +34,7 @@
 - Current implementation now uses RSA-SHA256 signature verification with timestamped payload
 - Event schema uses `event_id`, `event_type`, `event_category`, `event_object`, etc.
 - Tests directory created with comprehensive unit tests
-- Integration tests (KYC/deposit event processing) marked as out of scope for this iteration
-- Dashboard webhook URL configuration is a deployment step
+- payment_rail defaults to 'ach_push' when missing (DB only allows 'ach_push' or 'wire')
+- Out of scope items marked in checklist:
+  - Dashboard webhook URL configuration (deployment/ops task)
+  - Integration tests for KYC and deposit event processing
