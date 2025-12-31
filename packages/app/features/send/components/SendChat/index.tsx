@@ -352,7 +352,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
         {/* Badge priority: favorite > verified > none */}
         {!isExternalAddress && contact?.is_favorite ? (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
-            <IconHeart size="$1" color="$red9" elevation={"$2"} />
+            <IconHeart size="$1" color="$red9" />
           </XStack>
         ) : profile?.is_verified && !isExternalAddress ? (
           <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
