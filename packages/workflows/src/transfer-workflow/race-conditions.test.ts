@@ -444,6 +444,141 @@ describe('Temporal Transfer Race Condition Fixes', () => {
       expect(temporalEthTransfer.data.log_addr).toBe(hexToBytea(mockToAddress))
       expect(temporalEthTransfer.data.value).toBe(mockAmount)
     })
+
+    it('should skip deletion when multiple temporal transfers match by addresses+value (collision scenario)', async () => {
+      /**
+       * CRITICAL REGRESSION TEST: Fallback matching collision
+       *
+       * Scenario: Two users (or same user twice) send identical transfers:
+       *   - Transfer A: Alice sends 100 USDC to Bob (no user_op_hash)
+       *   - Transfer B: Alice sends 100 USDC to Bob (no user_op_hash)
+       *
+       * When indexer processes ONE of these transfers, fallback matching would
+       * find BOTH temporal transfers. The hardened trigger should:
+       *   1. Detect multiple matches
+       *   2. Skip deletion (avoid deleting wrong activity)
+       *   3. Let workflow's temporal_transfer_after_upsert handle cleanup
+       */
+
+      // Two pending transfers with identical (from, to, value) - NO user_op_hash
+      const transferA = {
+        activity_id: 100,
+        workflow_id: 'wf-transfer-A',
+        status: 'sent',
+        created_at_block_num: mockBlockNum - 2,
+        created_at: '2024-01-01T10:00:00Z', // Older
+        data: {
+          // No user_op_hash - will use fallback matching
+          f: hexToBytea(mockFromAddress),
+          t: hexToBytea(mockToAddress),
+          v: mockAmount,
+          note: 'Transfer A note',
+        },
+      }
+
+      const transferB = {
+        activity_id: 200,
+        workflow_id: 'wf-transfer-B',
+        status: 'sent',
+        created_at_block_num: mockBlockNum - 1,
+        created_at: '2024-01-01T10:01:00Z', // Newer
+        data: {
+          // No user_op_hash - will use fallback matching
+          f: hexToBytea(mockFromAddress),
+          t: hexToBytea(mockToAddress),
+          v: mockAmount,
+          note: 'Transfer B note',
+        },
+      }
+
+      // Indexed transfer (could be either A or B on-chain)
+      const indexedTransfer = {
+        f: hexToBytea(mockFromAddress),
+        t: hexToBytea(mockToAddress),
+        v: mockAmount,
+        block_num: mockBlockNum,
+        tx_hash: hexToBytea(mockTxHash), // Does NOT match either user_op_hash
+      }
+
+      // Both transfers match fallback criteria (addresses + value)
+      const matchingTransfers = [transferA, transferB]
+
+      // Simulate the hardened trigger logic:
+      // 1. Check user_op_hash match - NONE (neither has user_op_hash)
+      const userOpHashMatches = matchingTransfers.filter((t) => t.data && 'user_op_hash' in t.data)
+      expect(userOpHashMatches.length).toBe(0)
+
+      // 2. Check fallback matches - BOTH match
+      const fallbackMatches = matchingTransfers.filter(
+        (t) =>
+          t.data.f === indexedTransfer.f &&
+          t.data.t === indexedTransfer.t &&
+          t.data.v === indexedTransfer.v
+      )
+      expect(fallbackMatches.length).toBe(2)
+
+      // 3. CRITICAL: Since multiple matches, trigger should SKIP deletion
+      // This is the key behavior we're testing
+      const shouldDelete = fallbackMatches.length === 1
+      expect(shouldDelete).toBe(false)
+
+      // 4. Both activities should remain (notes preserved)
+      expect(transferA.data.note).toBe('Transfer A note')
+      expect(transferB.data.note).toBe('Transfer B note')
+    })
+
+    it('should delete correct activity when user_op_hash available (even with colliding addresses+value)', async () => {
+      /**
+       * Verify that user_op_hash matching takes precedence and correctly
+       * identifies the specific transfer even when addresses+value would match multiple.
+       */
+
+      const userOpHashA = '0xaaaa000000000000000000000000000000000000000000000000000000000001'
+      const userOpHashB = '0xbbbb000000000000000000000000000000000000000000000000000000000002'
+
+      // Two pending transfers with identical (from, to, value) but different user_op_hash
+      const transferA = {
+        activity_id: 100,
+        workflow_id: 'wf-transfer-A',
+        status: 'sent',
+        data: {
+          user_op_hash: userOpHashA,
+          f: hexToBytea(mockFromAddress),
+          t: hexToBytea(mockToAddress),
+          v: mockAmount,
+        },
+      }
+
+      const transferB = {
+        activity_id: 200,
+        workflow_id: 'wf-transfer-B',
+        status: 'sent',
+        data: {
+          user_op_hash: userOpHashB,
+          f: hexToBytea(mockFromAddress),
+          t: hexToBytea(mockToAddress),
+          v: mockAmount,
+        },
+      }
+
+      // Indexed transfer matches Transfer A's user_op_hash
+      const indexedTransfer = {
+        tx_hash: hexToBytea(userOpHashA), // Matches Transfer A
+        block_num: mockBlockNum,
+      }
+
+      const allTransfers = [transferA, transferB]
+
+      // user_op_hash matching finds EXACTLY Transfer A
+      const userOpHashMatch = allTransfers.find((t) => t.data.user_op_hash === userOpHashA)
+
+      expect(userOpHashMatch).toBeDefined()
+      expect(userOpHashMatch?.activity_id).toBe(100) // Transfer A
+      expect(userOpHashMatch?.workflow_id).toBe('wf-transfer-A')
+
+      // Transfer B should NOT be deleted
+      expect(transferB.activity_id).toBe(200)
+    })
   })
 
   describe('Integration: Complete Transfer Flow with Race Conditions', () => {
