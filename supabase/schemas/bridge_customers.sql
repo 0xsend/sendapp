@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_customers" (
 
     CONSTRAINT "bridge_customers_user_id_unique" UNIQUE ("user_id"),
     CONSTRAINT "bridge_customers_kyc_status_check" CHECK (
-        "kyc_status" IN ('not_started', 'incomplete', 'under_review', 'approved', 'rejected', 'paused', 'offboarded')
+        "kyc_status" IN ('not_started', 'incomplete', 'under_review', 'approved', 'rejected', 'paused', 'offboarded', 'awaiting_questionnaire', 'awaiting_ubo')
     ),
     CONSTRAINT "bridge_customers_tos_status_check" CHECK (
         "tos_status" IN ('pending', 'approved')

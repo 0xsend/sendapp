@@ -135,7 +135,7 @@ alter table "public"."bridge_customers" add constraint "bridge_customers_bridge_
 
 alter table "public"."bridge_customers" add constraint "bridge_customers_kyc_link_id_key" UNIQUE using index "bridge_customers_kyc_link_id_key";
 
-alter table "public"."bridge_customers" add constraint "bridge_customers_kyc_status_check" CHECK ((kyc_status = ANY (ARRAY['not_started'::text, 'incomplete'::text, 'under_review'::text, 'approved'::text, 'rejected'::text, 'paused'::text, 'offboarded'::text]))) not valid;
+alter table "public"."bridge_customers" add constraint "bridge_customers_kyc_status_check" CHECK ((kyc_status = ANY (ARRAY['not_started'::text, 'incomplete'::text, 'under_review'::text, 'approved'::text, 'rejected'::text, 'paused'::text, 'offboarded'::text, 'awaiting_questionnaire'::text, 'awaiting_ubo'::text]))) not valid;
 
 alter table "public"."bridge_customers" validate constraint "bridge_customers_kyc_status_check";
 
