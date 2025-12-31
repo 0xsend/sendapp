@@ -27,62 +27,103 @@ end;
 $$;
 ALTER FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"() OWNER TO "postgres";
 
--- Delete temporal activity function
-CREATE OR REPLACE FUNCTION public.send_account_transfers_delete_temporal_activity()
- RETURNS trigger
- LANGUAGE plpgsql
- SECURITY DEFINER
+-- Deterministic Reconciliation Trigger Function
+-- 
+-- This function implements deterministic reconciliation by linking transfer_intents
+-- to on-chain events using exact keys (tx_hash, user_op_hash).
+-- It replaces the old fuzzy matching approach that could cause cross-linking.
+--
+-- Key properties:
+-- - Uses exact tx_hash or user_op_hash matching (no fuzzy fallback)
+-- - Creates transfer_reconciliations record with (chain_id, tx_hash, log_idx) unique key
+-- - Propagates notes from intents to indexed activities
+-- - Cleans up temporal activities deterministically
+--
+CREATE OR REPLACE FUNCTION public.reconcile_transfer_on_index()
+    RETURNS trigger
+    LANGUAGE plpgsql
+    SECURITY DEFINER
 AS $function$
-declare
-    ignored_addresses bytea[] := ARRAY['\xb1b01dc21a6537af7f9a46c76276b14fd7ceac67'::bytea, '\x592e1224d203be4214b15e205f6081fbbacfcd2d'::bytea, '\x36f43082d01df4801af2d95aeed1a0200c5510ae'::bytea];
-begin
-    -- Check if it's from or to any ignored address (e.g., paymaster)
-    if (NEW.f is not null and NEW.f = ANY (ignored_addresses)) or
-       (NEW.t is not null and NEW.t = ANY (ignored_addresses)) then
-        return NEW;
-    end if;
+DECLARE
+    _intent_id bigint;
+    _intent_note text;
+    _intent_workflow_id text;
+    _event_id text;
+BEGIN
+    -- Build the event_id to reference the indexed event
+    _event_id := NEW.ig_name || '/' || NEW.src_name || '/' || NEW.block_num::text || '/' || NEW.tx_idx::text || '/' || NEW.log_idx::text;
     
-    -- Delete pending temporal activities by activity_id (direct FK reference)
-    -- Match the specific temporal transfer by user_op_hash or addresses+value
-    delete from public.activity
-    where id IN (
-        SELECT activity_id
-        FROM temporal.send_account_transfers
-        WHERE activity_id IS NOT NULL
-          AND created_at_block_num <= NEW.block_num
-          AND status IN ('initialized', 'submitted', 'sent')
-          AND (
-            -- Match by user_op_hash (most reliable - exact tx match)
-            (data ? 'user_op_hash' AND (data->>'user_op_hash')::bytea = NEW.tx_hash)
-            OR
-            -- Fallback: match by addresses + value (for cases without user_op_hash)
-            (
-              (
-                (data ? 'f' AND (data->>'f')::bytea = NEW.f) 
-                OR 
-                (data ? 'sender' AND (data->>'sender')::bytea = NEW.f)
-              )
-              AND
-              (
-                (data ? 't' AND (data->>'t')::bytea = NEW.t)
-                OR
-                (data ? 'log_addr' AND (data->>'log_addr')::bytea = NEW.t)
-              )
-              AND
-              (
-                (data ? 'v' AND (data->>'v')::numeric = NEW.v)
-                OR
-                (data ? 'value' AND (data->>'value')::numeric = NEW.v)
-              )
-            )
-          )
-    );
+    -- Strategy 1: Match by tx_hash (exact transaction match)
+    -- This works when the transfer_intent has the tx_hash set after submission
+    SELECT id, note, workflow_id INTO _intent_id, _intent_note, _intent_workflow_id
+    FROM public.transfer_intents
+    WHERE tx_hash = NEW.tx_hash
+      AND status IN ('pending', 'submitted')
+      AND chain_id = NEW.chain_id
+    LIMIT 1;
     
-    return NEW;
-end;
-$function$
-;
-ALTER FUNCTION "public"."send_account_transfers_delete_temporal_activity"() OWNER TO "postgres";
+    -- Strategy 2: Match by user_op_hash if tx_hash match fails
+    -- For 4337 transactions, the user_op_hash is stored in the intent
+    -- and the tx_hash is actually the user_op_hash
+    IF _intent_id IS NULL THEN
+        SELECT id, note, workflow_id INTO _intent_id, _intent_note, _intent_workflow_id
+        FROM public.transfer_intents
+        WHERE user_op_hash = NEW.tx_hash
+          AND status IN ('pending', 'submitted')
+          AND chain_id = NEW.chain_id
+        LIMIT 1;
+    END IF;
+    
+    -- If we found a matching intent, create the reconciliation
+    IF _intent_id IS NOT NULL THEN
+        -- Insert the reconciliation record (deterministic link)
+        -- The UNIQUE constraint on (chain_id, tx_hash, log_idx) ensures collision invariants
+        INSERT INTO public.transfer_reconciliations (
+            intent_id,
+            chain_id,
+            tx_hash,
+            log_idx,
+            block_num,
+            block_time,
+            event_id
+        ) VALUES (
+            _intent_id,
+            NEW.chain_id,
+            NEW.tx_hash,
+            NEW.log_idx,
+            NEW.block_num,
+            NEW.block_time,
+            _event_id
+        )
+        ON CONFLICT (chain_id, tx_hash, log_idx) DO NOTHING;
+        
+        -- Update the intent status to confirmed
+        UPDATE public.transfer_intents
+        SET status = 'confirmed'
+        WHERE id = _intent_id;
+        
+        -- If the intent had a note, propagate it to the indexed activity
+        IF _intent_note IS NOT NULL THEN
+            UPDATE public.activity
+            SET data = data || jsonb_build_object('note', _intent_note)
+            WHERE event_name = 'send_account_transfers'
+              AND event_id = _event_id;
+        END IF;
+        
+        -- Delete the pending temporal activity if it exists
+        -- (cleanup the old temporal activity row)
+        IF _intent_workflow_id IS NOT NULL THEN
+            DELETE FROM public.activity
+            WHERE event_name = 'temporal_send_account_transfers'
+              AND event_id = _intent_workflow_id;
+        END IF;
+    END IF;
+    
+    RETURN NEW;
+END;
+$function$;
+
+ALTER FUNCTION "public"."reconcile_transfer_on_index"() OWNER TO "postgres";
 
 -- Activity trigger functions
 CREATE OR REPLACE FUNCTION public.send_account_transfers_trigger_delete_activity()
@@ -207,7 +248,8 @@ CREATE UNIQUE INDEX "u_send_account_transfers" ON "public"."send_account_transfe
 -- Triggers
 CREATE OR REPLACE TRIGGER "filter_send_account_transfers_with_no_send_account_created" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "private"."filter_send_account_transfers_with_no_send_account_created"();
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_activity" AFTER DELETE ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_delete_activity"();
-CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_delete_temporal_activity" BEFORE INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_delete_temporal_activity"();
+-- Note: send_account_transfers_trigger_delete_temporal_activity removed - replaced by deterministic reconciliation
+CREATE OR REPLACE TRIGGER "send_account_transfers_reconcile_on_index" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."reconcile_transfer_on_index"();
 CREATE OR REPLACE TRIGGER "send_account_transfers_trigger_insert_activity" AFTER INSERT ON "public"."send_account_transfers" FOR EACH ROW EXECUTE FUNCTION "public"."send_account_transfers_trigger_insert_activity"();
 
 -- RLS
