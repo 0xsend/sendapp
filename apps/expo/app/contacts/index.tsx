@@ -13,7 +13,7 @@ export default function ContactsRoute() {
           title: t('stack.contacts'),
         }}
       />
-      <ScreenContainer>
+      <ScreenContainer scrollable={false}>
         <ContactsScreen />
       </ScreenContainer>
     </>
