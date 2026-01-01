@@ -39,6 +39,7 @@ import { Platform } from 'react-native'
 import useIsScreenFocused from 'app/utils/useIsScreenFocused'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
+import { useAnalytics } from 'app/provider/analytics'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -71,6 +72,7 @@ export const SignUpScreen = () => {
   const isScreenFocused = useIsScreenFocused()
   const { xxs } = useMedia()
   const { redirect } = useAuthRedirect()
+  const analytics = useAnalytics()
   const passkeyDiagnosticErrorMessage = PASSKEY_DIAGNOSTIC_ERROR_MESSAGE
   const PASSKEY_TOAST_ID = 'passkey-integrity-signup'
   const [diagnosticStatus, setDiagnosticStatus] = useState<
@@ -296,6 +298,21 @@ export const SignUpScreen = () => {
           referralCode,
         })
         setHasCompletedPasskey(true)
+
+        // Identify user and capture sign-up event
+        analytics.identify(createdSendAccount.id, {
+          sendtag: validatedSendtag,
+          has_referral: !!referralCode,
+        })
+        analytics.capture({
+          name: 'user_signed_up',
+          properties: {
+            sendtag: validatedSendtag,
+            has_referral: !!referralCode,
+            send_account_id: createdSendAccount.id,
+          },
+        })
+
         redirect()
       } catch (error) {
         setFormState(FormState.Idle)
@@ -323,6 +340,14 @@ export const SignUpScreen = () => {
               type: 'custom',
               message: passkeyDiagnosticErrorMessage,
             })
+
+            // Track passkey integrity failure
+            analytics.capture({
+              name: 'passkey_integrity_failed',
+              properties: {
+                error_type: 'user_rejection',
+              },
+            })
             return
           }
         }
@@ -336,10 +361,21 @@ export const SignUpScreen = () => {
         setDiagnosticStatus('idle')
         setDiagnosticMessage(null)
         setHasCompletedPasskey(false)
+
+        // Track auth error
+        analytics.capture({
+          name: 'auth_error_occurred',
+          properties: {
+            error_message: message,
+            auth_type: 'sign_up',
+          },
+        })
+        analytics.captureException(error instanceof Error ? error : new Error(message))
         return
       }
     },
     [
+      analytics,
       captchaToken,
       createAccount,
       createSendAccount,

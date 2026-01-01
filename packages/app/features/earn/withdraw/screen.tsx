@@ -31,6 +31,7 @@ import { useSendEarnWithdrawCalls, useSendEarnWithdrawVaults } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export const log = debug('app:earn:withdraw')
 
@@ -164,6 +165,7 @@ export function WithdrawForm() {
     calls: calls.data ?? undefined,
   })
   const { t } = useTranslation('earn')
+  const analytics = useAnalytics()
   const webauthnCreds = useMemo(
     () =>
       sendAccount?.data?.send_account_credentials
@@ -232,6 +234,15 @@ export function WithdrawForm() {
       log('onSuccess', data, variables, context)
 
       toast.show(t('withdraw.toast.success'))
+
+      // Capture earn withdraw submitted event
+      analytics.capture({
+        name: 'earn_withdraw_submitted',
+        properties: {
+          coin_symbol: coinData?.symbol,
+          amount: parsedAmount?.toString(),
+        },
+      })
 
       if (coinData && Platform.OS === 'web') {
         router.push({

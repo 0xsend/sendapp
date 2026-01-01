@@ -37,6 +37,7 @@ import { Platform } from 'react-native'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -62,6 +63,7 @@ export function OnboardingScreen() {
   const { data: referralCode } = useReferralCodeQuery()
   const { redirect } = useAuthRedirect()
   const { t } = useTranslation('onboarding')
+  const analytics = useAnalytics()
   const passkeyDiagnosticErrorMessage = t('passkey.status.failureDetailed', {
     defaultValue: PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   })
@@ -308,6 +310,21 @@ export function OnboardingScreen() {
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
+
+      // Identify user and capture onboarding completed event
+      analytics.identify(createdSendAccount.id, {
+        sendtag: name,
+        has_referral: !!referralCode,
+      })
+      analytics.capture({
+        name: 'onboarding_completed',
+        properties: {
+          sendtag: name,
+          has_referral: !!referralCode,
+          send_account_id: createdSendAccount.id,
+        },
+      })
+
       redirect()
     } catch (error) {
       console.error('Error creating account', error)

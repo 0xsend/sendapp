@@ -65,6 +65,7 @@
     "expo-updates": "~29.0.15",
     "expo-web-browser": "~15.0.8",
     "intl-pluralrules": "^2.0.1",
+    "posthog-react-native": "^3.4.1",
     "react": "19.1.2",
     "react-dom": "19.1.2",
     "react-native": "0.81.5",

@@ -49,6 +49,7 @@ import { useSendEarnDepositCalls, useSendEarnDepositVault } from './hooks'
 import { useSendEarnAPY } from '../hooks'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 const log = debug('app:earn:deposit')
 const MINIMUM_DEPOSIT = BigInt(5 * 1e6) // 5 USDC
@@ -183,6 +184,7 @@ export function DepositForm() {
   const nonce = useAccountNonce({ sender })
   const calls = useSendEarnDepositCalls({ sender, asset, amount: parsedAmount })
   const { t } = useTranslation('earn')
+  const analytics = useAnalytics()
 
   const uop = useUserOp({
     sender,
@@ -216,6 +218,17 @@ export function DepositForm() {
       toast.show(t('deposit.toast.success.title'), {
         message: t('deposit.toast.success.message'),
       })
+
+      // Capture earn deposit submitted event
+      analytics.capture({
+        name: 'earn_deposit_submitted',
+        properties: {
+          coin_symbol: coin.data?.symbol,
+          amount: parsedAmount?.toString(),
+          has_existing_deposit: hasExistingDeposit,
+        },
+      })
+
       if (!coin.data) return
 
       if (Platform.OS !== 'web') {
