@@ -8,6 +8,7 @@ import * as ImagePicker from 'expo-image-picker'
 import type React from 'react'
 import { type PropsWithChildren, type Ref, forwardRef, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export interface UploadBannerRefObject {
   pickImage: () => void
@@ -19,6 +20,7 @@ export const UploadBanner = forwardRef(function UploadBanner(
 ) {
   const { user, profile, updateProfile } = useUser()
   const supabase = useSupabase()
+  const analytics = useAnalytics()
   const [errMsg, setErrMsg] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const isDark = useThemeName()?.startsWith('dark')
@@ -95,6 +97,14 @@ export const UploadBanner = forwardRef(function UploadBanner(
       return
     }
     setIsUploading(false)
+
+    // Track profile update
+    analytics.capture({
+      name: 'profile_updated',
+      properties: {
+        field: 'banner_url',
+      },
+    })
 
     await updateProfile()
   }

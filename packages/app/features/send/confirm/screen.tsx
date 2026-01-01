@@ -289,6 +289,20 @@ export function SendConfirm() {
       //   return
       // }
       console.error(e)
+
+      // Capture transfer failed event
+      analytics.capture({
+        name: 'send_transfer_failed',
+        properties: {
+          token_address: selectedCoin?.token,
+          amount: amount,
+          recipient_type: idType,
+          has_note: !!note,
+          workflow_id: 'failed',
+          error_type: 'unknown',
+        },
+      })
+
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }

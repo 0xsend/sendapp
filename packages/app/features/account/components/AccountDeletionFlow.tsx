@@ -30,6 +30,7 @@ import { bytesToHex, hexToBytes } from 'viem'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { OverlappingCoinIcons } from 'app/features/home/InvestmentsBalanceCard'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useAnalytics } from 'app/provider/analytics'
 
 interface AccountDeletionFlowProps {
   open: boolean
@@ -47,6 +48,7 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
   const media = useMedia()
   const hoverStyles = useHoverStyles()
   const supabase = useSupabase()
+  const analytics = useAnalytics()
 
   const { dollarBalances } = useSendAccountBalances()
   const { data: sendAccount } = useSendAccount()
@@ -82,6 +84,12 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
 
   const { mutateAsync: deleteAccount, isPending: isDeleting } = api.auth.deleteAccount.useMutation({
     onSuccess: async () => {
+      // Track account deletion completed
+      analytics.capture({
+        name: 'account_deletion_completed',
+        properties: {},
+      })
+
       toast.show('Account deleted successfully')
       onOpenChange(false)
 
@@ -130,6 +138,12 @@ export function AccountDeletionFlow({ open, onOpenChange }: AccountDeletionFlowP
 
   const handleDelete = async () => {
     if (deleteConfirmation.toUpperCase() !== 'DELETE') return
+
+    // Track account deletion started
+    analytics.capture({
+      name: 'account_deletion_started',
+      properties: {},
+    })
 
     setIsAuthenticating(true)
     try {

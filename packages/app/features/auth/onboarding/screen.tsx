@@ -23,7 +23,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useCreateSendAccount, useSendAccount } from 'app/utils/send-accounts'
 import { useRouter } from 'solito/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useIsClient } from 'app/utils/useIsClient'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
@@ -66,9 +66,23 @@ export function OnboardingScreen() {
   const { t } = useTranslation('onboarding')
   const analytics = useAnalytics()
   const supabase = useSupabase()
+  const hasTrackedOnboardingStart = useRef(false)
   const passkeyDiagnosticErrorMessage = t('passkey.status.failureDetailed', {
     defaultValue: PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   })
+
+  // Track onboarding started on mount
+  useEffect(() => {
+    if (!hasTrackedOnboardingStart.current) {
+      analytics.capture({
+        name: 'onboarding_started',
+        properties: {
+          has_referral: !!referralCode,
+        },
+      })
+      hasTrackedOnboardingStart.current = true
+    }
+  }, [analytics, referralCode])
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
