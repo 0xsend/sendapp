@@ -17,15 +17,15 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!analytics.isInitialized()) return
 
-    if (user?.id && profile?.id) {
-      analytics.identify(profile.id, {
-        send_account_id: profile.id,
+    if (user?.id && profile?.send_id) {
+      analytics.identify(String(profile.send_id), {
+        send_account_id: String(profile.send_id),
         sendtag: profile.main_tag?.name ?? undefined,
       })
     } else {
       analytics.reset()
     }
-  }, [user?.id, profile?.id, profile?.main_tag?.name])
+  }, [user?.id, profile?.send_id, profile?.main_tag?.name])
 
   return <AnalyticsContext.Provider value={analytics}>{children}</AnalyticsContext.Provider>
 }
