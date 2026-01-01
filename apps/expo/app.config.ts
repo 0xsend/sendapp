@@ -129,6 +129,7 @@ module.exports = {
       },
     ],
     'expo-localization',
+    'expo-notifications',
   ],
   extra: {
     eas: {
