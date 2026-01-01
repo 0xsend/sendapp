@@ -200,31 +200,18 @@ REVOKE ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("
 REVOKE ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) FROM authenticated;
 GRANT ALL ON FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) TO service_role;
 
--- Insert verification value for the current/latest distribution
+-- Insert verification value for distribution number 22
 -- Future distributions will inherit this value via insert_verification_value()'s default behavior
 DO $$
-DECLARE
-    current_dist_num integer;
 BEGIN
-    -- Get the latest distribution number
-    SELECT number INTO current_dist_num
-    FROM distributions
-    WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-      AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
-    ORDER BY qualification_start DESC
-    LIMIT 1;
-
-    IF current_dist_num IS NOT NULL THEN
-        -- Insert verification value: fixed_value = 3 * 10^18
-        PERFORM insert_verification_value(
-            distribution_number => current_dist_num,
-            type => 'sendpot_ticket_purchase'::public.verification_type,
-            fixed_value => 3000000000000000000,
-            multiplier_min => 1.0,
-            multiplier_max => 1.0,
-            multiplier_step => 0.0
-        );
-    END IF;
+  PERFORM insert_verification_value(
+    distribution_number => 22,
+    type            => 'sendpot_ticket_purchase'::public.verification_type,
+    fixed_value     => 3000000000000000000,
+    multiplier_min  => 1.0,
+    multiplier_max  => 1.0,
+    multiplier_step => 0.0
+  );
 END $$;
 
 -- Backfill existing ticket purchases for the current active distribution
@@ -245,4 +232,3 @@ BEGIN
         PERFORM insert_sendpot_ticket_purchase_verifications(current_dist_num);
     END IF;
 END $$;
-
