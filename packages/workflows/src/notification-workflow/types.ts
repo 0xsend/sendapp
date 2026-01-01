@@ -1,6 +1,12 @@
 import type { Database } from '@my/supabase/database.types'
 import type { Address } from 'viem'
 
+// Push notification payload size limits
+// APNs limit is 4KB total; we target smaller to leave room for other payload fields
+export const MAX_NOTE_LENGTH = 256
+export const MAX_BODY_LENGTH = 500
+export const MAX_TITLE_LENGTH = 100
+
 // Database types
 export type Notification = Database['public']['Tables']['notifications']['Row']
 export type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
@@ -25,6 +31,8 @@ export type TransferNotificationParams = {
   token: Address | null // null for ETH
   txHash: string
   note?: string
+  /** Workflow ID for idempotency - prevents duplicate notifications on retries */
+  workflowId?: string
 }
 
 export type PushNotificationPayload = {

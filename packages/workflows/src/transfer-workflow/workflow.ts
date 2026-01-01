@@ -171,6 +171,9 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
   })
 
   // Send notifications after transfer is confirmed
+  // Note: Temporal activities are idempotent on retry within the same workflow run.
+  // The workflowId is passed for logging/tracing and to enable future idempotency
+  // checks if needed (e.g., deduplication in notification storage).
   debugLog('Sending transfer notifications', workflowId)
   try {
     // Notify recipient of received transfer
@@ -181,6 +184,7 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
       token,
       txHash: bundlerReceipt.receipt.transactionHash,
       note,
+      workflowId,
     })
 
     // Notify sender of sent transfer confirmation
@@ -191,6 +195,7 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
       token,
       txHash: bundlerReceipt.receipt.transactionHash,
       note,
+      workflowId,
     })
     debugLog('Transfer notifications sent successfully', workflowId)
   } catch (notificationError) {
