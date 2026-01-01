@@ -32,6 +32,7 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { ReferrerBanner } from 'app/components/ReferrerBanner'
 import { Platform } from 'react-native'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
@@ -64,6 +65,7 @@ export function OnboardingScreen() {
   const { redirect } = useAuthRedirect()
   const { t } = useTranslation('onboarding')
   const analytics = useAnalytics()
+  const supabase = useSupabase()
   const passkeyDiagnosticErrorMessage = t('passkey.status.failureDetailed', {
     defaultValue: PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   })
@@ -311,8 +313,16 @@ export function OnboardingScreen() {
         referralCode,
       })
 
+      // Fetch profile to get send_id for analytics
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('send_id')
+        .eq('id', user.id)
+        .single()
+
       // Identify user and capture onboarding completed event
-      analytics.identify(createdSendAccount.id, {
+      const sendId = String(profileData?.send_id ?? '')
+      analytics.identify(sendId, {
         sendtag: name,
         has_referral: !!referralCode,
       })
@@ -321,7 +331,7 @@ export function OnboardingScreen() {
         properties: {
           sendtag: name,
           has_referral: !!referralCode,
-          send_account_id: createdSendAccount.id,
+          send_account_id: sendId,
         },
       })
 

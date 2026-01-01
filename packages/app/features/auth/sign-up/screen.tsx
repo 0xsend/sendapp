@@ -299,8 +299,16 @@ export const SignUpScreen = () => {
         })
         setHasCompletedPasskey(true)
 
+        // Fetch profile to get send_id for analytics
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('send_id')
+          .eq('id', sessionUser.id)
+          .single()
+
         // Identify user and capture sign-up event
-        analytics.identify(createdSendAccount.id, {
+        const sendId = String(profileData?.send_id ?? '')
+        analytics.identify(sendId, {
           sendtag: validatedSendtag,
           has_referral: !!referralCode,
         })
@@ -309,7 +317,7 @@ export const SignUpScreen = () => {
           properties: {
             sendtag: validatedSendtag,
             has_referral: !!referralCode,
-            send_account_id: createdSendAccount.id,
+            send_account_id: sendId,
           },
         })
 
@@ -386,7 +394,7 @@ export const SignUpScreen = () => {
       registerFirstSendtagMutateAsync,
       setFirstSendtagMutateAsync,
       signUpMutateAsync,
-      supabase.auth,
+      supabase,
       toast,
       validateSendtagMutateAsync,
     ]
