@@ -19,6 +19,10 @@ import '@formatjs/intl-relativetimeformat/locale-data/es' // Spanish
 import '@formatjs/intl-relativetimeformat/locale-data/zh' // Chinese
 
 import 'intl-pluralrules'
+
+// Configure push notifications handler (must be before any notification imports)
+import { configureNotificationHandler } from 'app/utils/useNotifications'
+configureNotificationHandler()
 import type { Session } from '@supabase/supabase-js'
 import { AnalyticsErrorBoundary, ErrorFallback } from 'app/components/ErrorBoundary'
 import { loadThemePromise, Provider } from 'app/provider'
@@ -38,6 +42,7 @@ import {
 } from '@expo-google-fonts/dm-sans'
 import { DMMono_400Regular } from '@expo-google-fonts/dm-mono'
 import * as SystemUI from 'expo-system-ui'
+import { NotificationPermissionPrompt } from 'app/components/NotificationPermissionPrompt'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -125,6 +130,7 @@ export default function RootLayout() {
             )}
           >
             <StackNavigator />
+            <NotificationPermissionPrompt delayMs={5000} />
           </AnalyticsErrorBoundary>
         </Provider>
       </View>
