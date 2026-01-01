@@ -1,9 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import debug from 'debug'
+import { useMedia, View } from '@my/ui'
 
 import { useSessionContext } from 'app/utils/supabase/useSessionContext'
+
+import { NotificationPrompt } from './NotificationPrompt'
+import { useWebPush } from './WebPushSubscription'
 
 const log = debug('app:web-push:auto-sync')
 
@@ -38,14 +42,28 @@ async function getReadyRegistration(): Promise<ServiceWorkerRegistration | null>
 }
 
 /**
- * Global helper that listens for SW subscription-change messages and, when a user is logged in,
- * best-effort re-syncs the current PushSubscription to the backend.
+ * Automatically shows notification permission prompt after user logs in.
  *
- * IMPORTANT: This component intentionally does NOT call Notification.requestPermission().
- * Browsers expect permission prompts to be triggered by an explicit user gesture.
+ * Shows a UI banner that allows user to enable notifications if:
+ * - User is authenticated
+ * - Browser supports notifications
+ * - Permission hasn't been requested yet (state is 'prompt')
+ * - User hasn't denied permission
+ * - This is a new session (hasn't seen banner this session)
+ *
+ * Also best-effort re-syncs the current PushSubscription to the backend when:
+ * - a user logs in (no user-visible side effects)
+ * - the service worker notifies us of a rotated subscription
+ *
+ * Note: Requires user interaction to request permission (browser security requirement)
  */
-export function NotificationAutoPrompt(): React.ReactNode {
+export function NotificationAutoPrompt() {
+  const media = useMedia()
   const { session } = useSessionContext()
+  const { permission, isSupported, isSubscribed } = useWebPush()
+
+  const hasShown = useRef(false)
+  const [showBanner, setShowBanner] = useState(false)
 
   const userIdRef = useRef<string | null>(null)
   const syncInFlight = useRef(false)
@@ -58,9 +76,7 @@ export function NotificationAutoPrompt(): React.ReactNode {
   const syncCurrentSubscription = useCallback(
     async (source: 'login' | 'subscriptionchange'): Promise<void> => {
       if (syncInFlight.current) return
-
-      const userId = userIdRef.current
-      if (!userId) return
+      if (!userIdRef.current) return
 
       // Simple debounce to avoid loops when multiple windows are open.
       const now = Date.now()
@@ -122,5 +138,49 @@ export function NotificationAutoPrompt(): React.ReactNode {
     return () => navigator.serviceWorker.removeEventListener('message', handleMessage)
   }, [syncCurrentSubscription])
 
-  return null
+  useEffect(() => {
+    // Don't show banner if:
+    // - Already shown this session
+    // - Not supported
+    // - User not authenticated
+    // - Permission already requested or denied
+    // - Already subscribed
+    if (
+      hasShown.current ||
+      !isSupported ||
+      !session?.user ||
+      permission !== 'prompt' ||
+      isSubscribed
+    ) {
+      return
+    }
+
+    // Add a small delay to avoid interrupting login flow
+    const timer = setTimeout(() => {
+      hasShown.current = true
+      setShowBanner(true)
+    }, 2000) // 2 second delay after login
+
+    return () => clearTimeout(timer)
+  }, [session?.user, permission, isSupported, isSubscribed])
+
+  if (!showBanner) {
+    return null
+  }
+
+  return (
+    <View
+      position="absolute"
+      right={20}
+      maxWidth={400}
+      zIndex={9999}
+      {...(media.gtMd ? { bottom: 20, marginTop: 'auto' } : { top: 20, marginBottom: 'auto' })}
+    >
+      <NotificationPrompt
+        onDismiss={() => setShowBanner(false)}
+        title="Enable notifications"
+        description="Get notified instantly when you receive payments"
+      />
+    </View>
+  )
 }
