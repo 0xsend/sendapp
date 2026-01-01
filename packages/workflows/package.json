@@ -47,6 +47,7 @@
     "@temporalio/nyc-test-coverage": "^1.11.7",
     "@temporalio/testing": "^1.11.7",
     "@types/source-map-support": "^0",
+    "@types/web-push": "^3.6.4",
     "dotenv-cli": "^7.3.0",
     "jest": "^29",
     "nyc": "^17.0.0",
@@ -68,6 +69,7 @@
     "app": "workspace:*",
     "permissionless": "^0.1.49",
     "viem": "^2.27.2",
-    "wagmi": "^2.14.16"
+    "wagmi": "^2.14.16",
+    "web-push": "^3.6.7"
   }
 }
