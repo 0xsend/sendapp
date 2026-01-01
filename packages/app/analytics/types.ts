@@ -1,3 +1,5 @@
+import type { Address } from 'viem'
+
 // Transaction metadata for all onchain operations
 interface TransactionMetadata {
   chain_id?: number
@@ -59,7 +61,7 @@ interface OnboardingCompletedProps {
 }
 
 interface SendTransferProps extends TransactionProps {
-  token_symbol: string | undefined
+  token_address: Address | 'eth' | undefined
   amount: string | undefined
   recipient_type: string | undefined
   has_note: boolean
@@ -97,7 +99,7 @@ interface SendCheckFailedProps extends TransactionProps {
 }
 
 interface EarnDepositProps extends TransactionProps {
-  coin_symbol: string | undefined
+  token_address: Address | undefined
   amount: string | undefined
   has_existing_deposit: boolean
 }
@@ -105,7 +107,7 @@ interface EarnDepositProps extends TransactionProps {
 interface EarnDepositConfirmedProps extends EarnDepositProps {}
 
 interface EarnWithdrawProps extends TransactionProps {
-  coin_symbol: string | undefined
+  token_address: Address | undefined
   amount: string | undefined
 }
 
@@ -261,8 +263,8 @@ interface ProfileVerificationFailedProps extends ProfileVerificationProps {
 }
 
 interface TokenUpgradeProps extends TransactionProps {
-  from_token?: string
-  to_token?: string
+  from_token_address?: Address
+  to_token_address?: Address
   amount?: string
 }
 
@@ -273,7 +275,7 @@ interface TokenUpgradeFailedProps extends TokenUpgradeProps {
 }
 
 interface WrapProps extends TransactionProps {
-  token?: string
+  token_address?: Address
   amount?: string
 }
 
@@ -299,8 +301,8 @@ interface SendtagTransferredProps {
 }
 
 interface SwapReviewProps extends TransactionProps {
-  token_in: string
-  token_out: string
+  token_in_address: Address
+  token_out_address: Address
   amount_in?: string
   amount_out?: string
   slippage_bps?: number

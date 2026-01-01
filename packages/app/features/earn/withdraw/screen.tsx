@@ -239,7 +239,7 @@ export function WithdrawForm() {
       analytics.capture({
         name: 'earn_withdraw_submitted',
         properties: {
-          coin_symbol: coinData?.symbol,
+          token_address: coinData?.token,
           amount: parsedAmount?.toString(),
         },
       })

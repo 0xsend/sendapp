@@ -100,6 +100,8 @@ packages/app/
 Create `packages/app/analytics/types.ts`:
 
 ```typescript
+import type { Address } from 'viem'
+
 // Discriminated union for type-safe events
 export type AnalyticsEvent =
   | { name: 'user_signup_started'; properties: UserSignupStartedProps }
@@ -273,7 +275,7 @@ interface OnboardingCompletedProps {
 }
 
 interface SendTransferProps extends TransactionProps {
-  token_symbol: string | undefined
+  token_address: Address | 'eth' | undefined  // Use token address, not symbol (symbols are not unique)
   amount: string | undefined
   recipient_type: string | undefined
   has_note: boolean
@@ -311,7 +313,7 @@ interface SendCheckFailedProps extends TransactionProps {
 }
 
 interface EarnDepositProps extends TransactionProps {
-  coin_symbol: string | undefined
+  token_address: Address | undefined  // Use token address, not symbol (symbols are not unique)
   amount: string | undefined
   has_existing_deposit: boolean
 }
@@ -319,7 +321,7 @@ interface EarnDepositProps extends TransactionProps {
 interface EarnDepositConfirmedProps extends EarnDepositProps {}
 
 interface EarnWithdrawProps extends TransactionProps {
-  coin_symbol: string | undefined
+  token_address: Address | undefined  // Use token address, not symbol (symbols are not unique)
   amount: string | undefined
 }
 
@@ -475,8 +477,8 @@ interface ProfileVerificationFailedProps extends ProfileVerificationProps {
 }
 
 interface TokenUpgradeProps extends TransactionProps {
-  from_token?: string
-  to_token?: string
+  from_token_address?: Address  // Use token address, not symbol (symbols are not unique)
+  to_token_address?: Address
   amount?: string
 }
 
@@ -487,7 +489,7 @@ interface TokenUpgradeFailedProps extends TokenUpgradeProps {
 }
 
 interface WrapProps extends TransactionProps {
-  token?: string
+  token_address?: Address  // Use token address, not symbol (symbols are not unique)
   amount?: string
 }
 
@@ -513,8 +515,8 @@ interface SendtagTransferredProps {
 }
 
 interface SwapReviewProps extends TransactionProps {
-  token_in: string
-  token_out: string
+  token_in_address: Address  // Use token address, not symbol (symbols are not unique)
+  token_out_address: Address
   amount_in?: string
   amount_out?: string
   slippage_bps?: number
@@ -898,31 +900,35 @@ Include `runtime_version` (filterable) and `update_id` (raw only) on these event
 ## Migration Checklist
 
 ### Phase 1: Core Setup
-- [ ] Create `packages/app/analytics/types.ts` with event types
-- [ ] Create `packages/app/analytics/analytics.web.ts`
-- [ ] Create `packages/app/analytics/analytics.native.ts`
-- [ ] Create `packages/app/analytics/index.ts` (re-exports)
-- [ ] Create `packages/app/provider/analytics/AnalyticsProvider.tsx`
-- [ ] Create `packages/app/provider/analytics/AnalyticsProvider.native.tsx` (if needed)
-- [ ] Add `AnalyticsProvider` to provider composition
+- [x] Create `packages/app/analytics/types.ts` with event types
+- [x] Update token tracking to use `token_address` instead of `token_symbol` (symbols are not unique identifiers)
+- [x] Create `packages/app/analytics/analytics.web.ts`
+- [x] Create `packages/app/analytics/analytics.native.ts`
+- [x] Create `packages/app/analytics/index.ts` (re-exports)
+- [x] Create `packages/app/provider/analytics/AnalyticsProvider.tsx`
+- [x] Create `packages/app/provider/analytics/AnalyticsProvider.native.tsx` (if needed) - not needed, shared implementation works
+- [x] Add `AnalyticsProvider` to provider composition
 
 ### Phase 2: Dependencies
-- [ ] Install `posthog-react-native` in `apps/expo`
-- [ ] Configure environment variables for Expo
-- [ ] Verify posthog-js version in `apps/next`
+- [x] Install `posthog-react-native` in `apps/expo`
+- [x] Configure environment variables for Expo (documented in plan)
+- [x] Verify posthog-js version in `apps/next`
 
 ### Phase 3: Migration
-- [ ] Migrate `packages/app/features/auth/sign-up/screen.tsx`
-- [ ] Migrate `packages/app/features/auth/loginWithPhone/screen.tsx`
-- [ ] Migrate `packages/app/features/auth/onboarding/screen.tsx`
-- [ ] Migrate `packages/app/features/send/confirm/screen.tsx`
-- [ ] Migrate `packages/app/features/earn/deposit/screen.tsx`
-- [ ] Migrate `packages/app/features/earn/withdraw/screen.tsx`
-- [ ] Migrate `packages/app/features/account/sendtag/checkout/components/checkout-confirm-button.tsx`
-- [ ] Add missing event coverage (account, activity, affiliate, contacts, rewards, send checks, sendpot, swaps, invest, wrap/unwrap, token upgrade, paymaster allowance, profile)
-- [ ] Remove PostHog usage from `packages/app/features/secret-shop/screen.tsx` (no tracking needed)
-- [ ] Remove `apps/next/instrumentation-client.ts`
-- [ ] Remove user identification from individual components (handled by provider)
+- [x] Migrate `packages/app/features/auth/sign-up/screen.tsx`
+- [x] Migrate `packages/app/features/auth/loginWithPhone/screen.tsx`
+- [x] Migrate `packages/app/features/auth/onboarding/screen.tsx`
+- [x] Migrate `packages/app/features/send/confirm/screen.tsx` (updated to use `token_address`)
+- [x] Migrate `packages/app/features/earn/deposit/screen.tsx` (updated to use `token_address`)
+- [x] Migrate `packages/app/features/earn/withdraw/screen.tsx` (updated to use `token_address`)
+- [x] Migrate `packages/app/features/account/sendtag/checkout/components/checkout-confirm-button.tsx`
+- [ ] Add analytics to swap feature (`packages/app/features/swap/summary/screen.tsx`)
+- [ ] Add analytics to token upgrade feature (`packages/app/features/send-token-upgrade/screen.tsx`)
+- [ ] Add analytics to wrap/unwrap feature (location TBD)
+- [ ] Add missing event coverage (account, activity, affiliate, contacts, rewards, send checks, sendpot, invest, paymaster allowance, profile)
+- [x] Remove PostHog usage from `packages/app/features/secret-shop/screen.tsx` (no tracking needed)
+- [x] Remove `apps/next/instrumentation-client.ts`
+- [x] Remove user identification from individual components (handled by provider)
 
 ### Phase 4: Testing
 - [ ] Test analytics on web (Next.js)
@@ -954,6 +960,7 @@ Follow these conventions for all events:
 Reserved PostHog events: `$pageview`, `$screen`, `$exception`.
 
 ## Event Property Improvements
+- **Use `token_address` instead of `token_symbol`** - Token symbols are not unique identifiers (e.g., multiple tokens can have the same symbol). Always use the token's contract address for unambiguous tracking.
 - Prefer numeric amounts (or string + `amount_usd`) for aggregation.
 - Include `workflow_id` on all steps in multi-stage flows.
 - Add chain/network context (`chain_id`, `network`, `token_address`) when applicable.

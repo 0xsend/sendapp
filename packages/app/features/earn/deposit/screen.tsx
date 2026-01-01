@@ -223,7 +223,7 @@ export function DepositForm() {
       analytics.capture({
         name: 'earn_deposit_submitted',
         properties: {
-          coin_symbol: coin.data?.symbol,
+          token_address: coin.data?.token,
           amount: parsedAmount?.toString(),
           has_existing_deposit: hasExistingDeposit,
         },

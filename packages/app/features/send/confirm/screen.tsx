@@ -237,7 +237,7 @@ export function SendConfirm() {
       analytics.capture({
         name: 'send_transfer_initiated',
         properties: {
-          token_symbol: selectedCoin?.symbol,
+          token_address: selectedCoin?.token,
           amount: amount,
           recipient_type: idType,
           has_note: !!note,
@@ -258,7 +258,7 @@ export function SendConfirm() {
         analytics.capture({
           name: 'send_transfer_completed',
           properties: {
-            token_symbol: selectedCoin?.symbol,
+            token_address: selectedCoin?.token,
             amount: amount,
             recipient_type: idType,
             has_note: !!note,
