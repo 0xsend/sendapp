@@ -3,38 +3,41 @@ import { YStack } from '@my/ui'
 import { DepositOptionButton } from './components/DepositOptionButton'
 import { IconApple, IconDebitCard, IconWallet, IconDollar } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
+import { useBankTransferEnabled } from 'app/utils/useFeatureFlag'
 
 export function DepositScreen() {
   const { t } = useTranslation('deposit')
+  const isBankTransferEnabled = useBankTransferEnabled()
 
   const options = useMemo(
-    () => [
-      {
-        Icon: IconWallet,
-        href: '/deposit/crypto',
-        title: t('options.crypto.title'),
-        description: t('options.crypto.description'),
-      },
-      {
-        Icon: IconDollar,
-        href: '/deposit/bank-transfer',
-        title: t('options.bankTransfer.title', 'Bank Transfer'),
-        description: t('options.bankTransfer.description', 'Deposit via ACH or wire transfer'),
-      },
-      {
-        Icon: IconApple,
-        href: '/deposit/apple-pay',
-        title: t('options.applePay.title'),
-        description: t('options.applePay.description'),
-      },
-      {
-        Icon: IconDebitCard,
-        href: '/deposit/debit-card',
-        title: t('options.debitCard.title'),
-        description: t('options.debitCard.description'),
-      },
-    ],
-    [t]
+    () =>
+      [
+        {
+          Icon: IconWallet,
+          href: '/deposit/crypto',
+          title: t('options.crypto.title'),
+          description: t('options.crypto.description'),
+        },
+        isBankTransferEnabled && {
+          Icon: IconDollar,
+          href: '/deposit/bank-transfer',
+          title: t('options.bankTransfer.title', 'Bank Transfer'),
+          description: t('options.bankTransfer.description', 'Deposit via ACH or wire transfer'),
+        },
+        {
+          Icon: IconApple,
+          href: '/deposit/apple-pay',
+          title: t('options.applePay.title'),
+          description: t('options.applePay.description'),
+        },
+        {
+          Icon: IconDebitCard,
+          href: '/deposit/debit-card',
+          title: t('options.debitCard.title'),
+          description: t('options.debitCard.description'),
+        },
+      ].filter(Boolean),
+    [t, isBankTransferEnabled]
   )
 
   return (
