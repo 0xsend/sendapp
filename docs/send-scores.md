@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Send Scores system is a comprehensive scoring mechanism that tracks and calculates user activity based on SEND token transfers across different distribution periods. These scores are used throughout the application for ranking, verification, and reputation systems, including enhancing the tag search function's result ordering.
+The Send Scores system is a comprehensive scoring mechanism that tracks and calculates user activity based on SEND token transfers and qualifying Send Check claim events (`send_check_claimed`) across different distribution periods. These scores are used throughout the application for ranking, verification, and reputation systems, including enhancing the tag search function's result ordering.
 
 ## System Architecture
 
@@ -91,6 +91,15 @@ If the distribution has `earn_min_balance > 0`:
 
 - **Current SEND Token**: Direct value counting
 - **SEND Token v0**: Values multiplied by `10^16` for decimal adjustment
+
+#### Send Check Claims (qualifying `send_check_claimed` events)
+
+In addition to token transfers, scores also include qualifying Send Check claim events as transfer-equivalent contributions (treated as `sender -> redeemer` for the claimed amount):
+
+- Token must be SEND
+- Redeemer must be a **verified** Send account (`profiles.verified_at IS NOT NULL`)
+- Canceled claims are excluded (`redeemer = sender`)
+- Amounts are included in `score` (capped by `send_ceiling`) and the `redeemer` counts toward `unique_sends`
 
 ## Data Views and Access
 
