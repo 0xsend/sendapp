@@ -16,6 +16,7 @@ import {
   IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
+import { Bell } from '@tamagui/lucide-icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo, useState } from 'react'
@@ -68,6 +69,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       trash: <IconTrash {...iconProps} />,
       infoCircle: <IconInfoCircle {...iconProps} />,
       questionCircle: <IconQuestionCircle {...iconProps} />,
+      bell: <Bell {...iconProps} />,
     }),
     []
   )
@@ -96,6 +98,13 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               text={t('links.items.language')}
               href="/account/language"
               icon={icons.worldSearch}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.notifications', 'Notifications')}
+              href="/account/notifications"
+              icon={icons.bell}
             />
           </YGroup.Item>
           <YGroup.Item>
