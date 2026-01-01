@@ -222,7 +222,12 @@ describe('Expo Push Module', () => {
         key: 'value',
       })
 
-      expect(result).toEqual({ success: true, sent: 2, failed: 0 })
+      expect(result).toEqual({
+        success: true,
+        sent: 2,
+        failed: 0,
+        ticketIds: ['ticket-1', 'ticket-2'],
+      })
       expect(mockFetch).toHaveBeenCalledTimes(1)
       expect(mockFetch).toHaveBeenCalledWith(
         'https://exp.host/--/api/v2/push/send',
@@ -285,6 +290,8 @@ describe('Expo Push Module', () => {
         sent: 1,
         failed: 1,
         errors: ['Device not registered (DeviceNotRegistered)'],
+        ticketIds: ['ticket-1'],
+        tokensToDeactivate: ['ExpoPushToken[device2]'],
       })
     })
 
@@ -298,11 +305,28 @@ describe('Expo Push Module', () => {
         },
       ]
 
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve('Internal Server Error'),
-      } as Response)
+      // The retry logic will retry up to MAX_RETRIES (3) times, so we need to mock all retries
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: () => Promise.resolve('Internal Server Error'),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: () => Promise.resolve('Internal Server Error'),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: () => Promise.resolve('Internal Server Error'),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 500,
+          text: () => Promise.resolve('Internal Server Error'),
+        } as Response)
 
       const result = await sendExpoPushNotifications(tokens, 'Test', 'Body')
 
@@ -312,7 +336,7 @@ describe('Expo Push Module', () => {
         failed: 1,
         errors: ['Expo Push API returned 500: Internal Server Error'],
       })
-    })
+    }, 60000) // Increase timeout for retry delays
 
     it('should chunk large batches of tokens', async () => {
       // Create 150 tokens (should be split into 2 chunks: 100 + 50)
@@ -343,7 +367,17 @@ describe('Expo Push Module', () => {
 
       const result = await sendExpoPushNotifications(tokens, 'Test', 'Body')
 
-      expect(result).toEqual({ success: true, sent: 150, failed: 0 })
+      // Expect 150 ticket IDs from both chunks
+      const expectedTicketIds = [
+        ...tokens.slice(0, 100).map((_, i) => `ticket-${i}`),
+        ...tokens.slice(100).map((_, i) => `ticket-${100 + i}`),
+      ]
+      expect(result).toEqual({
+        success: true,
+        sent: 150,
+        failed: 0,
+        ticketIds: expectedTicketIds,
+      })
       expect(mockFetch).toHaveBeenCalledTimes(2)
 
       // Verify first chunk has 100 messages
