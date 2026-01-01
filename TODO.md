@@ -6,8 +6,8 @@
 - [x] user_signup_started (sign-up/screen.tsx:237)
 - [x] user_login_succeeded (loginWithPhone/screen.tsx:60, sign-up/screen.tsx:468)
 - [x] user_logged_out (AccountLinks.tsx:57)
-- [x] phone_otp_sent (useAuthUserMutation.ts:37)
-- [x] phone_otp_verified (VerifyCode.tsx:45)
+- [x] phone_otp_sent (useAuthUserMutation.ts:37) - country_code now optional
+- [x] phone_otp_verified (VerifyCode.tsx:45) - country_code now optional
 - [x] token_upgrade_started (send-token-upgrade/screen.tsx:210)
 - [x] token_upgrade_completed (send-token-upgrade/screen.tsx:256)
 - [x] token_upgrade_failed (send-token-upgrade/screen.tsx:277)
@@ -16,41 +16,41 @@
 - [x] ota_update_download_completed (useExpoUpdates.ts:88)
 - [x] ota_update_download_failed (useExpoUpdates.ts:99)
 - [x] $screen (native) (StackNavigator.tsx:19)
+- [x] onboarding_started (onboarding/screen.tsx)
+- [x] onboarding_completed (onboarding/screen.tsx)
 
 ### Phase 2 - Sendpot
 - [x] sendpot_buy_tickets_started (BuyTicketsScreen.tsx:35) - with ticket_count property
 
 ### Previously Completed
-- [x] Types defined for all events in analytics/types.ts
 - [x] activity_feed_viewed (activity/screen.tsx:19)
 - [x] leaderboard_viewed (leaderboard/screen.tsx:17)
 - [x] invest_viewed (invest/screen.tsx:14)
 - [x] explore_viewed (explore/screen.tsx:14)
 - [x] sendpot_ticket_purchase_submitted, completed, failed (ConfirmBuyTicketsScreen.tsx)
-- [x] onboarding_started, onboarding_completed (onboarding/screen.tsx)
 - [x] user_signed_up (sign-up/screen.tsx:315)
 - [x] earn_deposit_initiated, earn_deposit_submitted (earn/deposit/screen.tsx)
 
-## Not Applicable (UI/Backend Not Available)
+## Removed from Types (Not Implementable Client-Side)
 
-These events are defined in types but cannot be implemented client-side because the required UI or backend integration does not exist:
+The following events were removed from analytics/types.ts because they require backend integration or non-existent UI:
 
-### Phase 1 - Requires Backend Integration
-- [ ] onboarding_step_completed - Current onboarding is single-step (create sendtag + passkey). No multi-step wizard exists.
-- [ ] earn_deposit_completed - Requires on-chain transaction confirmation tracking, which happens in the backend Temporal workflow.
+### Phase 1 - Backend Required
+- onboarding_step_completed - Current onboarding is single-step
+- earn_deposit_completed - Requires on-chain confirmation tracking (backend)
+- earn_withdraw_completed - Requires on-chain confirmation tracking (backend)
 
-### Phase 2 - Requires UI Changes or Backend
-- [ ] referral_invite_accepted - Backend event: triggered when someone uses a referral code (happens in onboarding)
-- [ ] referral_reward_earned - Backend event: triggered when referral rewards are distributed
-- [ ] activity_filter_applied - No user-controlled filter UI exists on the activity screen (filtering is automatic/internal)
-- [ ] invest_banner_clicked - LinkBanner component doesn't support onPress callback; would require UI component modification
-- [ ] explore_banner_clicked - Same as invest_banner_clicked
-- [ ] promo_card_clicked - No promo cards found in the codebase
-- [ ] leaderboard_filter_changed - No filter UI exists on the leaderboard screen
+### Phase 2 - UI/Backend Not Available
+- referral_invite_accepted - Backend event when referral code is used
+- referral_reward_earned - Backend event when rewards distributed
+- activity_filter_applied - No filter UI exists
+- invest_banner_clicked - LinkBanner doesn't support onPress
+- explore_banner_clicked - LinkBanner doesn't support onPress
+- promo_card_clicked - No promo cards in codebase
+- leaderboard_filter_changed - No filter UI exists
 
 ## Verification
 
 All checks pass:
 - [x] TypeScript: `yarn tsc --noEmit` passes
 - [x] Biome: `npx @biomejs/biome check packages/app` passes
-- [x] All implemented events verified via grep

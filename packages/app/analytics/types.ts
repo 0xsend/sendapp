@@ -38,20 +38,15 @@ interface UserLoginSucceededProps {
 }
 
 interface PhoneOtpSentProps {
-  country_code: string
+  country_code?: string
 }
 
 interface PhoneOtpVerifiedProps {
-  country_code: string
+  country_code?: string
 }
 
 interface OnboardingStartedProps {
   has_referral: boolean
-}
-
-interface OnboardingStepCompletedProps {
-  step_name: string
-  step_index?: number
 }
 
 interface OnboardingCompletedProps {
@@ -104,14 +99,10 @@ interface EarnDepositProps extends TransactionProps {
   has_existing_deposit: boolean
 }
 
-interface EarnDepositConfirmedProps extends EarnDepositProps {}
-
 interface EarnWithdrawProps extends TransactionProps {
   token_address: Address | undefined
   amount: string | undefined
 }
-
-interface EarnWithdrawConfirmedProps extends EarnWithdrawProps {}
 
 interface SendpotTicketPurchaseProps extends TransactionProps {
   ticket_count: number
@@ -151,25 +142,12 @@ interface AccountDeletionProps {
   reason?: string
 }
 
-interface ActivityFilterProps {
-  filter: string
-}
-
 interface ActivityItemProps {
   item_type: string
 }
 
 interface ReferralSharedProps {
   channel?: 'copy_link' | 'share_sheet' | 'qr' | 'unknown'
-}
-
-interface ReferralInviteProps {
-  source?: 'link' | 'code' | 'unknown'
-}
-
-interface ReferralRewardProps {
-  amount?: string
-  currency?: string
 }
 
 interface CantonVerificationProps {
@@ -207,22 +185,6 @@ interface DepositCompletedProps extends DepositProps {}
 
 interface DepositFailedProps extends DepositProps {
   error_type: 'user_rejection' | 'network' | 'provider_error' | 'unknown'
-}
-
-interface PromoCardClickedProps {
-  promo_id?: string
-}
-
-interface ExploreBannerClickedProps {
-  banner_id?: string
-}
-
-interface InvestBannerClickedProps {
-  destination?: string
-}
-
-interface LeaderboardFilterProps {
-  filter: string
 }
 
 interface MaintenanceViewedProps {
@@ -343,7 +305,6 @@ export type AnalyticsEvent =
   | { name: 'phone_otp_sent'; properties: PhoneOtpSentProps }
   | { name: 'phone_otp_verified'; properties: PhoneOtpVerifiedProps }
   | { name: 'onboarding_started'; properties: OnboardingStartedProps }
-  | { name: 'onboarding_step_completed'; properties: OnboardingStepCompletedProps }
   | { name: 'onboarding_completed'; properties: OnboardingCompletedProps }
   | { name: 'send_transfer_initiated'; properties: SendTransferProps & { workflow_id: string } }
   | { name: 'send_transfer_completed'; properties: SendTransferProps & { workflow_id: string } }
@@ -356,10 +317,8 @@ export type AnalyticsEvent =
   | { name: 'send_check_failed'; properties: SendCheckFailedProps }
   | { name: 'earn_deposit_initiated'; properties: EarnDepositProps }
   | { name: 'earn_deposit_submitted'; properties: EarnDepositProps }
-  | { name: 'earn_deposit_completed'; properties: EarnDepositConfirmedProps }
   | { name: 'earn_withdraw_initiated'; properties: EarnWithdrawProps }
   | { name: 'earn_withdraw_submitted'; properties: EarnWithdrawProps }
-  | { name: 'earn_withdraw_completed'; properties: EarnWithdrawConfirmedProps }
   | { name: 'sendpot_viewed'; properties: Record<string, never> }
   | { name: 'sendpot_disclaimer_viewed'; properties: Record<string, never> }
   | { name: 'sendpot_disclaimer_accepted'; properties: Record<string, never> }
@@ -379,11 +338,8 @@ export type AnalyticsEvent =
   | { name: 'account_deletion_started'; properties: AccountDeletionProps }
   | { name: 'account_deletion_completed'; properties: AccountDeletionProps }
   | { name: 'activity_feed_viewed'; properties: Record<string, never> }
-  | { name: 'activity_filter_applied'; properties: ActivityFilterProps }
   | { name: 'activity_item_opened'; properties: ActivityItemProps }
   | { name: 'referral_link_shared'; properties: ReferralSharedProps }
-  | { name: 'referral_invite_accepted'; properties: ReferralInviteProps }
-  | { name: 'referral_reward_earned'; properties: ReferralRewardProps }
   | { name: 'canton_verification_viewed'; properties: Record<string, never> }
   | { name: 'canton_verification_completed'; properties: CantonVerificationProps }
   | { name: 'canton_verification_failed'; properties: CantonVerificationFailedProps }
@@ -397,11 +353,7 @@ export type AnalyticsEvent =
   | { name: 'home_viewed'; properties: Record<string, never> }
   | { name: 'explore_viewed'; properties: Record<string, never> }
   | { name: 'invest_viewed'; properties: Record<string, never> }
-  | { name: 'invest_banner_clicked'; properties: InvestBannerClickedProps }
-  | { name: 'promo_card_clicked'; properties: PromoCardClickedProps }
-  | { name: 'explore_banner_clicked'; properties: ExploreBannerClickedProps }
   | { name: 'leaderboard_viewed'; properties: Record<string, never> }
-  | { name: 'leaderboard_filter_changed'; properties: LeaderboardFilterProps }
   | { name: 'splash_viewed'; properties: Record<string, never> }
   | { name: 'maintenance_viewed'; properties: MaintenanceViewedProps }
   | { name: 'force_update_prompted'; properties: ForceUpdateProps }
