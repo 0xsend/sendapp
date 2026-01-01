@@ -266,6 +266,16 @@ export function DepositForm() {
     assert(calls.isSuccess, 'calls is not success')
     assert(uop.isSuccess, 'uop is not success')
 
+    // Capture earn deposit initiated event
+    analytics.capture({
+      name: 'earn_deposit_initiated',
+      properties: {
+        token_address: coin.data?.token,
+        amount: parsedAmount?.toString(),
+        has_existing_deposit: hasExistingDeposit,
+      },
+    })
+
     try {
       let sponsoredUserOp = { ...uop.data }
 
@@ -332,6 +342,10 @@ export function DepositForm() {
     paymasterSignMutation,
     toast,
     t,
+    analytics,
+    coin.data?.token,
+    parsedAmount,
+    hasExistingDeposit,
   ])
 
   // DEBUG

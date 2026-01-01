@@ -22,7 +22,8 @@ import {
 } from 'app/utils/distributions'
 import formatAmount from 'app/utils/formatAmount'
 import { formatUnits } from 'viem'
-import { type PropsWithChildren, useMemo } from 'react'
+import { type PropsWithChildren, useMemo, useEffect, useRef } from 'react'
+import { useAnalytics } from 'app/provider/analytics'
 import { DistributionClaimButton } from '../components/DistributionClaimButton'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { DistributionSelect } from '../components/DistributionSelect'
@@ -72,9 +73,22 @@ const getTaskHref = (verificationType: keyof typeof verificationTypeTitleKey): s
 
 export function ActivityRewardsScreen() {
   const { t } = useTranslation('rewards')
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
   const distribution = queryParams.distribution
   const { data: distributions, isLoading } = useMonthlyDistributions()
+
+  // Track rewards_screen_viewed on mount
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      analytics.capture({
+        name: 'rewards_screen_viewed',
+        properties: {},
+      })
+      hasTrackedView.current = true
+    }
+  }, [analytics])
   const selectedDistributionIndex =
     distribution !== undefined && distributions !== undefined
       ? Math.max(

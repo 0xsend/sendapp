@@ -4,9 +4,24 @@ import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import Search from '../../components/SearchBar'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useEffect, useRef } from 'react'
+import { useAnalytics } from 'app/provider/analytics'
 
 export function ActivityScreen() {
   const theme = useTheme()
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
+
+  // Track activity_feed_viewed on mount
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      analytics.capture({
+        name: 'activity_feed_viewed',
+        properties: {},
+      })
+      hasTrackedView.current = true
+    }
+  }, [analytics])
 
   return (
     <TagSearchProvider>

@@ -184,6 +184,15 @@ export function WithdrawForm() {
       assert(Object.keys(form.formState.errors).length === 0, 'form is not valid')
       assert(uop.isSuccess, 'uop is not success')
 
+      // Capture earn withdraw initiated event
+      analytics.capture({
+        name: 'earn_withdraw_initiated',
+        properties: {
+          token_address: coinData?.token,
+          amount: parsedAmount?.toString(),
+        },
+      })
+
       uop.data.signature = await signUserOp({
         userOp: uop.data,
         webauthnCreds,
@@ -195,6 +204,15 @@ export function WithdrawForm() {
 
       const userOpHash = await sendBaseMainnetBundlerClient.sendUserOperation({
         userOperation: uop.data,
+      })
+
+      // Capture earn withdraw submitted event (userOp sent, awaiting confirmation)
+      analytics.capture({
+        name: 'earn_withdraw_submitted',
+        properties: {
+          token_address: coinData?.token,
+          amount: parsedAmount?.toString(),
+        },
       })
 
       setUseropState(t('withdraw.status.waiting'))
@@ -235,9 +253,9 @@ export function WithdrawForm() {
 
       toast.show(t('withdraw.toast.success'))
 
-      // Capture earn withdraw submitted event
+      // Capture earn withdraw completed event (transaction confirmed on-chain)
       analytics.capture({
-        name: 'earn_withdraw_submitted',
+        name: 'earn_withdraw_completed',
         properties: {
           token_address: coinData?.token,
           amount: parsedAmount?.toString(),

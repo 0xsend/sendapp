@@ -2,10 +2,25 @@ import { Avatar, Card, H2, H3, Paragraph, XStack, YStack } from '@my/ui'
 import { useLeaderboard } from './utils/useLeaderboard'
 import type { LeaderboardEntry } from 'app/utils/zod/leaderboard'
 import { useTranslation } from 'react-i18next'
+import { useEffect, useRef } from 'react'
+import { useAnalytics } from 'app/provider/analytics'
 
 export function LeaderboardScreen() {
   const { data } = useLeaderboard()
   const { t } = useTranslation('leaderboard')
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
+
+  // Track leaderboard_viewed on mount
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      analytics.capture({
+        name: 'leaderboard_viewed',
+        properties: {},
+      })
+      hasTrackedView.current = true
+    }
+  }, [analytics])
 
   return (
     <YStack w={'100%'} gap={'$3.5'} pb={'$2'} $gtMd={{ pt: 0 }} pt={'$3.5'}>

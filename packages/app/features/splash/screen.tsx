@@ -19,8 +19,9 @@ import { useAuthCarouselContext } from 'app/features/auth/AuthCarouselContext'
 import { Carousel, carouselImagePositions } from 'app/features/auth/components/Carousel'
 import { useAuthScreenParams } from 'app/routers/params'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { SolitoImage } from 'solito/image'
+import { useAnalytics } from 'app/provider/analytics'
 import { useLink } from 'solito/link'
 import { AnimationLayout } from '../../components/layout/animation-layout'
 import { useSignIn } from 'app/utils/send-accounts'
@@ -29,6 +30,20 @@ import { useTranslation } from 'react-i18next'
 
 export function SplashScreen({ hidden }: { hidden: boolean }) {
   const { t } = useTranslation('splash')
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
+
+  // Track splash_viewed on mount when not hidden
+  useEffect(() => {
+    if (!hidden && !hasTrackedView.current) {
+      analytics.capture({
+        name: 'splash_viewed',
+        properties: {},
+      })
+      hasTrackedView.current = true
+    }
+  }, [hidden, analytics])
+
   return (
     <XStack
       flex={1}

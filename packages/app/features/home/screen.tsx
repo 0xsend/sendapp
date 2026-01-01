@@ -36,7 +36,7 @@ import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import { type PropsWithChildren, useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { coin } from 'app/data/coins'
 import { investmentCoins, cantonCoin } from 'app/data/coins'
@@ -51,12 +51,26 @@ import { IconX } from 'app/components/icons'
 import { dynamic } from 'app/utils/dynamic'
 import { ActivityRewardsScreenLazy } from 'app/features/rewards/activity/screen'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export function HomeScreen() {
   const router = useRouter()
   const supabase = useSupabase()
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const { t } = useTranslation('home')
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
+
+  // Track home_viewed on mount
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      analytics.capture({
+        name: 'home_viewed',
+        properties: {},
+      })
+      hasTrackedView.current = true
+    }
+  }, [analytics])
 
   return (
     <YStack f={1}>
