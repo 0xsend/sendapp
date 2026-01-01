@@ -7,6 +7,9 @@ const requiredEnvVars = [
   'SUPABASE_DB_URL',
   'SUPABASE_JWT_SECRET',
   'SUPABASE_SERVICE_ROLE',
+  'VAPID_PUBLIC_KEY',
+  'VAPID_PRIVATE_KEY',
+  'VAPID_SUBJECT',
 ] as const
 
 const optionalEnvVars = ['DEBUG']
