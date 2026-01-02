@@ -1,0 +1,329 @@
+name: Deploy to preview
+
+on:
+  workflow_dispatch:
+    branches: ['preview']
+
+jobs:
+  fingerprint:
+    name: Fingerprint
+    type: fingerprint
+    environment: production
+    env:
+      APP_VARIANT: preview
+
+  get_android_build:
+    name: Check for existing android build
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+      profile: preview
+
+  get_ios_build:
+    name: Check for existing ios build
+    needs: [fingerprint]
+    type: get-build
+    params:
+      fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+      profile: preview
+
+  build_android:
+    name: Build Android
+    needs: [get_android_build]
+    if: ${{ !needs.get_android_build.outputs.build_id }}
+    type: build
+    params:
+      platform: android
+      profile: preview
+
+  build_ios:
+    name: Build iOS
+    needs: [get_ios_build]
+    if: ${{ !needs.get_ios_build.outputs.build_id }}
+    type: build
+    params:
+      platform: ios
+      profile: preview
+
+  publish_android_update:
+    name: Publish Android update
+    needs: [get_android_build]
+    if: ${{ needs.get_android_build.outputs.build_id }}
+    environment: production
+    steps:
+      - name: Check working directory
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+
+      - name: Install Foundry
+        run: |
+          # Install Foundry (ignore shell detection errors)
+          curl -L https://foundry.paradigm.xyz | bash || true
+
+          # Manually add to PATH for this session
+          export PATH="$HOME/.foundry/bin:$PATH"
+
+          # Run foundryup directly from its installed location
+          if [ -f "$HOME/.foundry/bin/foundryup" ]; then
+            $HOME/.foundry/bin/foundryup
+          else
+            echo "ERROR: foundryup not found at $HOME/.foundry/bin/foundryup"
+            exit 1
+          fi
+
+      - name: Install Bun
+        run: |
+          # Install Bun (ignore shell detection errors)
+          curl -fsSL https://bun.sh/install | bash || true
+
+          # Manually add to PATH for this session
+          export PATH="$HOME/.bun/bin:$PATH"
+
+          # Verify Bun is installed
+          if [ -f "$HOME/.bun/bin/bun" ]; then
+            echo "✓ Bun installed successfully"
+            $HOME/.bun/bin/bun --version
+          else
+            echo "ERROR: bun not found at $HOME/.bun/bin/bun"
+            exit 1
+          fi
+
+      - name: Build monorepo
+        run: |
+          # Add tools to PATH
+          export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+
+          # Verify tools are available
+          echo "Verifying tools..."
+          which forge || echo "WARNING: forge not in PATH"
+          which bun || echo "WARNING: bun not in PATH"
+
+          # Debug: show where we are and what's here
+          echo "===== Debugging directory structure ====="
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "=========================================="
+
+          # Look for common EAS source locations
+          POSSIBLE_LOCATIONS=(
+            "$(pwd)"
+            "/home/expo/workingdir"
+            "$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+          )
+
+          MONOREPO_ROOT=""
+          for location in "${POSSIBLE_LOCATIONS[@]}"; do
+            if [ -n "$location" ] && [ -f "$location/package.json" ] && grep -q "workspaces" "$location/package.json" 2>/dev/null; then
+              MONOREPO_ROOT="$location"
+              echo "Found monorepo root at: $MONOREPO_ROOT"
+              break
+            fi
+          done
+
+          if [ -z "$MONOREPO_ROOT" ]; then
+            echo "ERROR: Could not find monorepo root"
+            echo "Searched locations:"
+            printf '%s\n' "${POSSIBLE_LOCATIONS[@]}"
+            echo "Trying to find any package.json files:"
+            find /home/expo/workingdir -name package.json -type f 2>/dev/null | head -5
+            exit 1
+          fi
+
+          # Navigate to monorepo root
+          cd "$MONOREPO_ROOT"
+          echo "Found monorepo at $(pwd)"
+          ls -la package.json
+
+          # Install dependencies
+          echo "Installing dependencies..."
+          yarn install --immutable
+
+          # Build monorepo
+          echo "Building monorepo..."
+          yarn build
+
+      - name: Publish update
+        run: |
+          # Install EAS CLI
+          echo "Installing EAS CLI..."
+          npm install -g eas-cli
+
+          # Verify installation
+          which eas
+          eas --version
+
+          # Find monorepo root (same as Build step)
+          echo "Searching for monorepo root..."
+          MONOREPO_ROOT=$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)
+
+          if [ -z "$MONOREPO_ROOT" ]; then
+            echo "ERROR: Could not find monorepo root"
+            exit 1
+          fi
+
+          echo "Found monorepo at: $MONOREPO_ROOT"
+
+          # Construct Expo app path
+          EXPO_APP_DIR="$MONOREPO_ROOT/apps/expo"
+
+          if [ ! -d "$EXPO_APP_DIR" ]; then
+            echo "ERROR: Expo app directory does not exist at: $EXPO_APP_DIR"
+            exit 1
+          fi
+
+          echo "Found Expo app at: $EXPO_APP_DIR"
+
+          # Navigate to Expo app directory
+          cd "$EXPO_APP_DIR"
+          echo "Publishing update from $(pwd)..."
+          echo "Contents:"
+          ls -la | head -20
+
+          # Publish update with latest commit message
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          eas update --channel preview --platform android --message "$COMMIT_MESSAGE" --non-interactive
+
+  publish_ios_update:
+    name: Publish iOS update
+    needs: [get_ios_build]
+    if: ${{ needs.get_ios_build.outputs.build_id }}
+    environment: production
+    steps:
+      - name: Check working directory
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+
+      - name: Install Foundry
+        run: |
+          # Install Foundry (ignore shell detection errors)
+          curl -L https://foundry.paradigm.xyz | bash || true
+
+          # Manually add to PATH for this session
+          export PATH="$HOME/.foundry/bin:$PATH"
+
+          # Run foundryup directly from its installed location
+          if [ -f "$HOME/.foundry/bin/foundryup" ]; then
+            $HOME/.foundry/bin/foundryup
+          else
+            echo "ERROR: foundryup not found at $HOME/.foundry/bin/foundryup"
+            exit 1
+          fi
+
+      - name: Install Bun
+        run: |
+          # Install Bun (ignore shell detection errors)
+          curl -fsSL https://bun.sh/install | bash || true
+
+          # Manually add to PATH for this session
+          export PATH="$HOME/.bun/bin:$PATH"
+
+          # Verify Bun is installed
+          if [ -f "$HOME/.bun/bin/bun" ]; then
+            echo "✓ Bun installed successfully"
+            $HOME/.bun/bin/bun --version
+          else
+            echo "ERROR: bun not found at $HOME/.bun/bin/bun"
+            exit 1
+          fi
+
+      - name: Build monorepo
+        run: |
+          # Add tools to PATH
+          export PATH="$HOME/.foundry/bin:$HOME/.bun/bin:$PATH"
+
+          # Verify tools are available
+          echo "Verifying tools..."
+          which forge || echo "WARNING: forge not in PATH"
+          which bun || echo "WARNING: bun not in PATH"
+
+          # Debug: show where we are and what's here
+          echo "===== Debugging directory structure ====="
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "=========================================="
+
+          # Look for common EAS source locations
+          POSSIBLE_LOCATIONS=(
+            "$(pwd)"
+            "/home/expo/workingdir"
+            "$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)"
+          )
+
+          MONOREPO_ROOT=""
+          for location in "${POSSIBLE_LOCATIONS[@]}"; do
+            if [ -n "$location" ] && [ -f "$location/package.json" ] && grep -q "workspaces" "$location/package.json" 2>/dev/null; then
+              MONOREPO_ROOT="$location"
+              echo "Found monorepo root at: $MONOREPO_ROOT"
+              break
+            fi
+          done
+
+          if [ -z "$MONOREPO_ROOT" ]; then
+            echo "ERROR: Could not find monorepo root"
+            echo "Searched locations:"
+            printf '%s\n' "${POSSIBLE_LOCATIONS[@]}"
+            echo "Trying to find any package.json files:"
+            find /home/expo/workingdir -name package.json -type f 2>/dev/null | head -5
+            exit 1
+          fi
+
+          # Navigate to monorepo root
+          cd "$MONOREPO_ROOT"
+          echo "Found monorepo at $(pwd)"
+          ls -la package.json
+
+          # Install dependencies
+          echo "Installing dependencies..."
+          yarn install --immutable
+
+          # Build monorepo
+          echo "Building monorepo..."
+          yarn build
+
+      - name: Publish update
+        run: |
+          # Install EAS CLI
+          echo "Installing EAS CLI..."
+          npm install -g eas-cli
+
+          # Verify installation
+          which eas
+          eas --version
+
+          # Find monorepo root (same as Build step)
+          echo "Searching for monorepo root..."
+          MONOREPO_ROOT=$(find /home/expo/workingdir -maxdepth 3 -name package.json -type f -exec grep -l "workspaces" {} \; 2>/dev/null | head -1 | xargs dirname 2>/dev/null)
+
+          if [ -z "$MONOREPO_ROOT" ]; then
+            echo "ERROR: Could not find monorepo root"
+            exit 1
+          fi
+
+          echo "Found monorepo at: $MONOREPO_ROOT"
+
+          # Construct Expo app path
+          EXPO_APP_DIR="$MONOREPO_ROOT/apps/expo"
+
+          if [ ! -d "$EXPO_APP_DIR" ]; then
+            echo "ERROR: Expo app directory does not exist at: $EXPO_APP_DIR"
+            exit 1
+          fi
+
+          echo "Found Expo app at: $EXPO_APP_DIR"
+
+          # Navigate to Expo app directory
+          cd "$EXPO_APP_DIR"
+          echo "Publishing update from $(pwd)..."
+          echo "Contents:"
+          ls -la | head -20
+
+          # Publish update with latest commit message
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          eas update --branch preview --platform ios --message "$COMMIT_MESSAGE" --non-interactive
