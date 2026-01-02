@@ -28,6 +28,11 @@
 
 #### Phase 4: Error Boundaries
 - [x] Created AnalyticsErrorBoundary component
+- [x] Created ErrorFallback.tsx with @my/ui components (iteration 2)
+- [x] Created ErrorFallback.native.tsx with React Native components (iteration 2)
+- [x] Updated AnalyticsErrorBoundary with resetError and render prop support (iteration 2)
+- [x] Integrated AnalyticsErrorBoundary in apps/next/pages/_app.tsx (iteration 2)
+- [x] Integrated AnalyticsErrorBoundary in apps/expo/app/_layout.tsx (iteration 2)
 
 ### Skipped (Manual PostHog UI Tasks)
 - Phase 5: Error Filtering and Grouping (dashboard configuration)
