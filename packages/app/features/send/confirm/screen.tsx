@@ -44,6 +44,7 @@ import ConfirmScreenAvatar from 'app/features/send/confirm/ConfirmScreenAvatar'
 import useRedirectAfterSend from 'app/features/send/confirm/useRedirectAfterSend'
 import { useTranslation } from 'react-i18next'
 import { useAnalytics } from 'app/provider/analytics'
+import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -105,6 +106,11 @@ export function SendConfirm() {
     idType ?? 'tag',
     recipient ?? ''
   )
+
+  // Check if recipient is a contact
+  const { data: recipientContact } = useContactBySendId(profile?.sendid)
+  const isContact = !!recipientContact
+  const isFavorite = recipientContact?.is_favorite ?? false
 
   const href = profile ? `/profile/${profile?.sendid}` : ''
 
@@ -241,6 +247,8 @@ export function SendConfirm() {
           amount: amount,
           recipient_type: idType,
           has_note: !!note,
+          is_contact: isContact,
+          is_favorite: isFavorite,
           workflow_id: 'pending',
         },
       })
@@ -262,6 +270,8 @@ export function SendConfirm() {
             amount: amount,
             recipient_type: idType,
             has_note: !!note,
+            is_contact: isContact,
+            is_favorite: isFavorite,
             workflow_id: workflowId,
           },
         })
@@ -298,6 +308,8 @@ export function SendConfirm() {
           amount: amount,
           recipient_type: idType,
           has_note: !!note,
+          is_contact: isContact,
+          is_favorite: isFavorite,
           workflow_id: 'failed',
           error_type: 'unknown',
         },

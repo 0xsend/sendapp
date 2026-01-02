@@ -55,6 +55,25 @@ interface SendTransferProps extends TransactionProps {
   amount: string | undefined
   recipient_type: string | undefined
   has_note: boolean
+  is_contact: boolean
+  is_favorite: boolean
+}
+
+// Contact events
+interface ContactAddedProps {
+  contact_type: 'sendtag' | 'address'
+}
+
+interface ContactArchivedProps {
+  contact_type: 'sendtag' | 'address'
+}
+
+interface ContactUnarchivedProps {
+  contact_type: 'sendtag' | 'address'
+}
+
+interface ContactFavoritedProps {
+  is_favorited: boolean
 }
 
 interface SendTransferFailedProps extends SendTransferProps {
@@ -290,6 +309,11 @@ export type AnalyticsEvent =
   // Activity & Sharing
   | { name: 'activity_item_opened'; properties: ActivityItemProps }
   | { name: 'referral_link_shared'; properties: ReferralSharedProps }
+  // Contacts
+  | { name: 'contact_added'; properties: ContactAddedProps }
+  | { name: 'contact_archived'; properties: ContactArchivedProps }
+  | { name: 'contact_unarchived'; properties: ContactUnarchivedProps }
+  | { name: 'contact_favorited'; properties: ContactFavoritedProps }
   // Canton Verification
   | { name: 'canton_verification_completed'; properties: CantonVerificationProps }
   | { name: 'canton_verification_failed'; properties: CantonVerificationFailedProps }
