@@ -3,7 +3,7 @@ import { analytics } from 'app/analytics'
 
 interface Props {
   children: ReactNode
-  fallback?: ReactNode
+  fallback?: ReactNode | ((props: { error?: Error; resetError: () => void }) => ReactNode)
   componentName?: string
 }
 
@@ -29,9 +29,17 @@ export class AnalyticsErrorBoundary extends Component<Props, State> {
     })
   }
 
+  resetError = () => {
+    this.setState({ hasError: false, error: undefined })
+  }
+
   render() {
     if (this.state.hasError) {
-      return this.props.fallback ?? null
+      const { fallback } = this.props
+      if (typeof fallback === 'function') {
+        return fallback({ error: this.state.error, resetError: this.resetError })
+      }
+      return fallback ?? null
     }
     return this.props.children
   }

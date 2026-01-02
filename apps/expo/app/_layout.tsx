@@ -20,6 +20,8 @@ import '@formatjs/intl-relativetimeformat/locale-data/zh' // Chinese
 
 import 'intl-pluralrules'
 import type { Session } from '@supabase/supabase-js'
+import { AnalyticsErrorBoundary } from 'app/components/AnalyticsErrorBoundary'
+import { ErrorFallback } from 'app/components/ErrorFallback'
 import { loadThemePromise, Provider } from 'app/provider'
 import { getI18n, initSharedI18n } from 'app/i18n'
 import { supabase } from 'app/utils/supabase/client.native'
@@ -117,7 +119,14 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
         <Provider initialSession={initialSession} i18n={getI18n()}>
-          <StackNavigator />
+          <AnalyticsErrorBoundary
+            componentName="AppRoot"
+            fallback={({ error, resetError }) => (
+              <ErrorFallback error={error} resetError={resetError} />
+            )}
+          >
+            <StackNavigator />
+          </AnalyticsErrorBoundary>
         </Provider>
       </View>
     </GestureHandlerRootView>

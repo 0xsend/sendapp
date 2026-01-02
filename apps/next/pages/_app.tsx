@@ -9,6 +9,8 @@ import '@my/ui/src/config/fonts.css'
 
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 
+import { AnalyticsErrorBoundary } from 'app/components/AnalyticsErrorBoundary'
+import { ErrorFallback } from 'app/components/ErrorFallback'
 import { Provider } from 'app/provider'
 import { getI18n, initSharedI18n, resolvePreferredLocale, DEFAULT_LOCALE } from 'app/i18n'
 import type { AuthProviderProps } from 'app/provider/auth'
@@ -91,7 +93,14 @@ function MyApp({
         }}
       >
         <Provider initialSession={pageProps.initialSession} i18n={i18n}>
-          {getLayout(<Component {...pageProps} />)}
+          <AnalyticsErrorBoundary
+            componentName="AppRoot"
+            fallback={({ error, resetError }) => (
+              <ErrorFallback error={error} resetError={resetError} />
+            )}
+          >
+            {getLayout(<Component {...pageProps} />)}
+          </AnalyticsErrorBoundary>
         </Provider>
       </NextThemeProvider>
     </>
