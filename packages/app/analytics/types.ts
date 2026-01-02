@@ -18,11 +18,6 @@ interface TransactionProps {
   tx?: TransactionMetadata
 }
 
-interface UserSignupStartedProps {
-  has_referral: boolean
-  auth_type: 'passkey' | 'phone' | 'unknown'
-}
-
 interface UserSignedUpProps {
   sendtag: string
   has_referral: boolean
@@ -104,6 +99,11 @@ interface EarnWithdrawProps extends TransactionProps {
   amount: string | undefined
 }
 
+interface EarnWithdrawCompletedProps {
+  token_address: Address | undefined
+  amount: string | undefined
+}
+
 interface SendpotTicketPurchaseProps extends TransactionProps {
   ticket_count: number
   total_amount?: string
@@ -159,22 +159,6 @@ interface CantonVerificationFailedProps extends CantonVerificationProps {
   error_type: 'not_eligible' | 'network' | 'unknown'
 }
 
-interface ContactsSyncProps {
-  provider?: 'phone' | 'google' | 'apple' | 'unknown'
-}
-
-interface ContactsSyncCompletedProps extends ContactsSyncProps {
-  contacts_count?: number
-}
-
-interface ContactsSyncFailedProps extends ContactsSyncProps {
-  error_type: 'permission_denied' | 'network' | 'unknown'
-}
-
-interface ContactsPermissionProps {
-  permission: 'contacts'
-}
-
 interface DepositProps extends TransactionProps {
   amount?: string
   currency?: string
@@ -191,10 +175,6 @@ interface MaintenanceViewedProps {
   reason?: string
 }
 
-interface ForceUpdateProps {
-  minimum_version?: string
-}
-
 interface OtaUpdateProps {
   runtime_version?: string
   update_id?: string
@@ -204,24 +184,8 @@ interface OtaUpdateFailedProps extends OtaUpdateProps {
   error_type: 'network' | 'unknown'
 }
 
-interface PaymasterApprovalProps extends TransactionProps {
-  chain_id?: number
-}
-
-interface PaymasterApprovalFailedProps extends PaymasterApprovalProps {
-  error_type: 'user_rejection' | 'network' | 'unknown'
-}
-
 interface ProfileUpdatedProps {
   fields_updated: string[]
-}
-
-interface ProfileVerificationProps {
-  method?: string
-}
-
-interface ProfileVerificationFailedProps extends ProfileVerificationProps {
-  error_type: 'user_rejection' | 'network' | 'unknown'
 }
 
 interface TokenUpgradeProps extends TransactionProps {
@@ -236,17 +200,6 @@ interface TokenUpgradeFailedProps extends TokenUpgradeProps {
   error_type: 'user_rejection' | 'network' | 'unknown'
 }
 
-interface WrapProps extends TransactionProps {
-  token_address?: Address
-  amount?: string
-}
-
-interface WrapCompletedProps extends WrapProps {}
-
-interface WrapFailedProps extends WrapProps {
-  error_type: 'user_rejection' | 'network' | 'unknown'
-}
-
 interface SendtagCheckoutProps extends TransactionProps {
   tag_count: number
   total_price_usd: number
@@ -256,15 +209,9 @@ interface SendtagCheckoutFailedProps extends SendtagCheckoutProps {
   error_type: 'payment_failed' | 'user_cancelled' | 'unknown'
 }
 
-interface SendtagTransferredProps {
-  sendtag: string
-  direction: 'sent' | 'received'
-  transfer_type: 'gift' | 'sale' | 'unknown'
-}
-
 interface SwapReviewProps extends TransactionProps {
-  token_in_address: Address
-  token_out_address: Address
+  token_in_address: Address | 'eth'
+  token_out_address: Address | 'eth'
   amount_in?: string
   amount_out?: string
   slippage_bps?: number
@@ -278,14 +225,6 @@ interface SwapFailedProps extends SwapReviewProps {
   error_type: 'user_rejection' | 'insufficient_funds' | 'network' | 'quote_expired' | 'unknown'
 }
 
-interface PageviewProps {
-  $current_url: string
-}
-
-interface ScreenViewProps {
-  $screen_name: string
-}
-
 interface AuthErrorProps {
   error_message: string
   auth_type: 'sign_up' | 'login_with_phone' | 'passkey'
@@ -297,7 +236,7 @@ interface PasskeyIntegrityFailedProps {
 
 // Discriminated union for type-safe events
 export type AnalyticsEvent =
-  | { name: 'user_signup_started'; properties: UserSignupStartedProps }
+  // Auth & Onboarding
   | { name: 'user_signed_up'; properties: UserSignedUpProps }
   | { name: 'user_login_with_phone'; properties: UserLoginWithPhoneProps }
   | { name: 'user_login_succeeded'; properties: UserLoginSucceededProps }
@@ -306,19 +245,26 @@ export type AnalyticsEvent =
   | { name: 'phone_otp_verified'; properties: PhoneOtpVerifiedProps }
   | { name: 'onboarding_started'; properties: OnboardingStartedProps }
   | { name: 'onboarding_completed'; properties: OnboardingCompletedProps }
+  | { name: 'auth_error_occurred'; properties: AuthErrorProps }
+  | { name: 'passkey_integrity_failed'; properties: PasskeyIntegrityFailedProps }
+  // Send Transfers
   | { name: 'send_transfer_initiated'; properties: SendTransferProps & { workflow_id: string } }
   | { name: 'send_transfer_submitted'; properties: SendTransferProps & { workflow_id: string } }
   | { name: 'send_transfer_failed'; properties: SendTransferFailedProps }
+  // Send Checks
   | { name: 'send_check_created'; properties: SendCheckCreatedProps }
   | { name: 'send_check_shared'; properties: SendCheckSharedProps }
   | { name: 'send_check_claim_started'; properties: SendCheckClaimProps }
   | { name: 'send_check_claimed'; properties: SendCheckClaimProps }
   | { name: 'send_check_revoked'; properties: SendCheckRevokeProps }
   | { name: 'send_check_failed'; properties: SendCheckFailedProps }
+  // Earn
   | { name: 'earn_deposit_initiated'; properties: EarnDepositProps }
   | { name: 'earn_deposit_submitted'; properties: EarnDepositProps }
   | { name: 'earn_withdraw_initiated'; properties: EarnWithdrawProps }
   | { name: 'earn_withdraw_submitted'; properties: EarnWithdrawProps }
+  | { name: 'earn_withdraw_completed'; properties: EarnWithdrawCompletedProps }
+  // Sendpot
   | { name: 'sendpot_disclaimer_viewed'; properties: Record<string, never> }
   | { name: 'sendpot_disclaimer_accepted'; properties: Record<string, never> }
   | { name: 'sendpot_buy_tickets_started'; properties: SendpotTicketPurchaseProps }
@@ -327,62 +273,49 @@ export type AnalyticsEvent =
   | { name: 'sendpot_ticket_purchase_failed'; properties: SendpotTicketPurchaseFailedProps }
   | { name: 'sendpot_winnings_claimed'; properties: SendpotWinningsClaimedProps }
   | { name: 'sendpot_winnings_claim_failed'; properties: SendpotWinningsClaimFailedProps }
+  // Rewards
   | { name: 'rewards_claim_started'; properties: RewardsClaimProps }
   | { name: 'rewards_claim_completed'; properties: RewardsClaimCompletedProps }
   | { name: 'rewards_claim_failed'; properties: RewardsClaimFailedProps }
+  // Sendtag
   | { name: 'sendtag_added'; properties: SendtagAddedProps }
+  | { name: 'sendtag_checkout_started'; properties: SendtagCheckoutProps }
+  | { name: 'sendtag_checkout_completed'; properties: SendtagCheckoutProps }
+  | { name: 'sendtag_checkout_failed'; properties: SendtagCheckoutFailedProps }
+  // Account Management
   | { name: 'backup_passkey_created'; properties: Record<string, never> }
   | { name: 'account_deletion_started'; properties: AccountDeletionProps }
   | { name: 'account_deletion_completed'; properties: AccountDeletionProps }
+  | { name: 'profile_updated'; properties: ProfileUpdatedProps }
+  // Activity & Sharing
   | { name: 'activity_item_opened'; properties: ActivityItemProps }
   | { name: 'referral_link_shared'; properties: ReferralSharedProps }
+  // Canton Verification
   | { name: 'canton_verification_completed'; properties: CantonVerificationProps }
   | { name: 'canton_verification_failed'; properties: CantonVerificationFailedProps }
-  | { name: 'contacts_sync_started'; properties: ContactsSyncProps }
-  | { name: 'contacts_sync_completed'; properties: ContactsSyncCompletedProps }
-  | { name: 'contacts_sync_failed'; properties: ContactsSyncFailedProps }
-  | { name: 'contacts_permission_denied'; properties: ContactsPermissionProps }
+  // Deposit
   | { name: 'deposit_started'; properties: DepositProps }
   | { name: 'deposit_completed'; properties: DepositCompletedProps }
   | { name: 'deposit_failed'; properties: DepositFailedProps }
+  // Maintenance & Updates
   | { name: 'maintenance_viewed'; properties: MaintenanceViewedProps }
-  | { name: 'force_update_prompted'; properties: ForceUpdateProps }
   | { name: 'ota_update_available'; properties: OtaUpdateProps }
   | { name: 'ota_update_download_started'; properties: OtaUpdateProps }
   | { name: 'ota_update_download_completed'; properties: OtaUpdateProps }
   | { name: 'ota_update_download_failed'; properties: OtaUpdateFailedProps }
   | { name: 'ota_update_prompt_shown'; properties: OtaUpdateProps }
   | { name: 'ota_update_restart_clicked'; properties: OtaUpdateProps }
-  | { name: 'paymaster_approval_started'; properties: PaymasterApprovalProps }
-  | { name: 'paymaster_approval_completed'; properties: PaymasterApprovalProps }
-  | { name: 'paymaster_approval_failed'; properties: PaymasterApprovalFailedProps }
-  | { name: 'profile_updated'; properties: ProfileUpdatedProps }
-  | { name: 'profile_verification_started'; properties: ProfileVerificationProps }
-  | { name: 'profile_verification_completed'; properties: ProfileVerificationProps }
-  | { name: 'profile_verification_failed'; properties: ProfileVerificationFailedProps }
+  // Token Upgrade
   | { name: 'token_upgrade_started'; properties: TokenUpgradeProps }
   | { name: 'token_upgrade_completed'; properties: TokenUpgradeCompletedProps }
   | { name: 'token_upgrade_failed'; properties: TokenUpgradeFailedProps }
-  | { name: 'wrap_started'; properties: WrapProps }
-  | { name: 'wrap_completed'; properties: WrapCompletedProps }
-  | { name: 'wrap_failed'; properties: WrapFailedProps }
-  | { name: 'unwrap_started'; properties: WrapProps }
-  | { name: 'unwrap_completed'; properties: WrapCompletedProps }
-  | { name: 'unwrap_failed'; properties: WrapFailedProps }
-  | { name: 'sendtag_checkout_started'; properties: SendtagCheckoutProps }
-  | { name: 'sendtag_checkout_completed'; properties: SendtagCheckoutProps }
-  | { name: 'sendtag_checkout_failed'; properties: SendtagCheckoutFailedProps }
-  | { name: 'sendtag_transferred'; properties: SendtagTransferredProps }
+  // Swap
   | { name: 'swap_disclaimer_viewed'; properties: Record<string, never> }
   | { name: 'swap_disclaimer_accepted'; properties: Record<string, never> }
   | { name: 'swap_review_started'; properties: SwapReviewProps }
   | { name: 'swap_submitted'; properties: SwapSubmittedProps }
   | { name: 'swap_completed'; properties: SwapCompletedProps }
   | { name: 'swap_failed'; properties: SwapFailedProps }
-  | { name: 'auth_error_occurred'; properties: AuthErrorProps }
-  | { name: 'passkey_integrity_failed'; properties: PasskeyIntegrityFailedProps }
-  | { name: '$pageview'; properties: PageviewProps }
-  | { name: '$screen'; properties: ScreenViewProps }
 
 // User identification
 export interface AnalyticsUserProperties {
@@ -397,6 +330,12 @@ export interface AnalyticsService {
   identify(distinctId: string, properties?: AnalyticsUserProperties): void
   capture<E extends AnalyticsEvent>(event: E): void
   captureException(error: Error, context?: Record<string, unknown>): void
+  /**
+   * Track screen views on native platforms.
+   * Uses PostHog's dedicated screen() method for React Navigation v7+ compatibility.
+   * On web, this is a no-op as pageviews are handled automatically.
+   */
+  screen(name: string, properties?: Record<string, unknown>): void
   reset(): void
   isInitialized(): boolean
 }

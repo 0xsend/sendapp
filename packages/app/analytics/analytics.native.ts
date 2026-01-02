@@ -1,4 +1,5 @@
-import PostHog, { type PostHogEventProperties } from 'posthog-react-native'
+import PostHog from 'posthog-react-native'
+import type { PostHogEventProperties } from 'posthog-react-native/lib/posthog-core/src/types'
 import type { AnalyticsEvent, AnalyticsService, AnalyticsUserProperties } from './types'
 
 let client: PostHog | null = null
@@ -37,6 +38,10 @@ export const analytics: AnalyticsService = {
       $exception_stack_trace_raw: error.stack ?? '',
       ...(context as PostHogEventProperties),
     })
+  },
+
+  screen(name: string, properties?: Record<string, unknown>) {
+    client?.screen(name, properties as PostHogEventProperties)
   },
 
   reset() {

@@ -17,7 +17,7 @@ export const analytics: AnalyticsService = {
 
     posthog.init(key, {
       api_host: host,
-      capture_pageview: false,
+      capture_pageview: true,
       capture_pageleave: true,
       persistence: 'localStorage+cookie',
     })
@@ -42,6 +42,10 @@ export const analytics: AnalyticsService = {
       $exception_stack_trace_raw: error.stack,
       ...context,
     })
+  },
+
+  screen(_name: string, _properties?: Record<string, unknown>) {
+    // No-op on web - pageviews are captured automatically via capture_pageview option
   },
 
   reset() {

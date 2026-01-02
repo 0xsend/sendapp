@@ -78,7 +78,6 @@ export const SignUpScreen = () => {
   const [diagnosticStatus, setDiagnosticStatus] = useState<
     'idle' | 'running' | 'success' | 'failure'
   >('idle')
-  const hasTrackedSignupStarted = useRef(false)
   const [diagnosticMessage, setDiagnosticMessage] = useState<string | null>(null)
   const [hasCompletedPasskey, setHasCompletedPasskey] = useState(false)
   const hasSignedUpRef = useRef(false)
@@ -231,18 +230,6 @@ export const SignUpScreen = () => {
         setHasCompletedPasskey(false)
         setDiagnosticStatus('idle')
         setDiagnosticMessage(null)
-
-        // Track user_signup_started once per session
-        if (!hasTrackedSignupStarted.current) {
-          analytics.capture({
-            name: 'user_signup_started',
-            properties: {
-              has_referral: !!referralCode,
-              auth_type: 'passkey',
-            },
-          })
-          hasTrackedSignupStarted.current = true
-        }
 
         const validatedSendtag = await validateSendtagMutateAsync({ name })
 

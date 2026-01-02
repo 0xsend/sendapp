@@ -1,17 +1,26 @@
-import { Stack, useRouter } from 'expo-router'
+import { Stack, usePathname, useRouter } from 'expo-router'
 import { config, Paragraph, useTheme, XStack } from '@my/ui'
 import { useIsDarkTheme } from 'apps-expo/utils/layout/useIsDarkTheme'
 import { Platform, Pressable } from 'react-native'
 import { IconArrowLeft } from 'app/components/icons'
-import { useMemo } from 'react'
-import { usePageviewTracking } from 'app/analytics/usePageviewTracking'
+import { useEffect, useMemo, useRef } from 'react'
+import { analytics } from 'app/analytics'
 
 export default function StackNavigator() {
   const theme = useTheme()
   const isDark = useIsDarkTheme()
   const router = useRouter()
+  const pathname = usePathname()
+  const previousPathname = useRef<string | undefined>(undefined)
 
-  usePageviewTracking()
+  // Track screen views using PostHog's screen() method for React Navigation v7+ compatibility
+  useEffect(() => {
+    if (!pathname) return
+    if (pathname === previousPathname.current) return
+
+    analytics.screen(pathname)
+    previousPathname.current = pathname
+  }, [pathname])
 
   const iosMajorVersion = useMemo(() => {
     if (Platform.OS !== 'ios') return null
