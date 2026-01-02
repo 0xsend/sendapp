@@ -302,6 +302,76 @@ describe('Expo Push Module', () => {
       })
     })
 
+    it('should retry on MessageRateExceeded and succeed', async () => {
+      jest.useFakeTimers()
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0)
+
+      try {
+        const tokens: PushToken[] = [
+          {
+            ...baseToken,
+            token: 'ExponentPushToken[device1]',
+            platform: 'expo',
+            is_active: true,
+          },
+          {
+            ...baseToken,
+            id: 2,
+            token: 'ExpoPushToken[device2]',
+            platform: 'expo',
+            is_active: true,
+          },
+        ]
+
+        const firstResponse: ExpoPushResponse = {
+          data: [
+            { status: 'ok', id: 'ticket-1' },
+            {
+              status: 'error',
+              message: 'Too many requests',
+              details: { error: 'MessageRateExceeded' },
+            },
+          ],
+        }
+
+        const retryResponse: ExpoPushResponse = {
+          data: [{ status: 'ok', id: 'ticket-2' }],
+        }
+
+        mockFetch
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(firstResponse),
+          } as Response)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve(retryResponse),
+          } as Response)
+
+        const promise = sendExpoPushNotifications(tokens, 'Test', 'Body')
+
+        // First retry happens after INITIAL_RETRY_DELAY_MS (1000ms) when Math.random() === 0
+        await jest.advanceTimersByTimeAsync(1000)
+
+        const result = await promise
+
+        expect(result).toMatchObject({
+          success: true,
+          sent: 2,
+          failed: 0,
+          ticketIds: ['ticket-1', 'ticket-2'],
+        })
+        expect(result.ticketIdToTokenId).toEqual({
+          'ticket-1': 1,
+          'ticket-2': 2,
+        })
+        expect(mockFetch).toHaveBeenCalledTimes(2)
+      } finally {
+        randomSpy.mockRestore()
+        jest.useRealTimers()
+      }
+    })
+
     it('should handle HTTP errors from API', async () => {
       const tokens: PushToken[] = [
         {

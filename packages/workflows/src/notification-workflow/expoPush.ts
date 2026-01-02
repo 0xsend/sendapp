@@ -170,39 +170,42 @@ function isRetryableError(ticket: ExpoPushTicket): boolean {
 }
 
 /**
- * Runs async functions with limited concurrency
+ * Runs async functions with limited concurrency.
+ *
+ * Note: preserves input order in returned results.
  */
 async function runWithConcurrency<T, R>(
   items: T[],
   fn: (item: T) => Promise<R>,
   concurrency: number
 ): Promise<R[]> {
-  const results: R[] = []
-  const executing: Promise<void>[] = []
+  if (items.length === 0) return []
 
-  for (const item of items) {
-    const p = fn(item).then((result) => {
-      results.push(result)
-    })
-    executing.push(p as Promise<void>)
+  const results = new Array<R>(items.length)
+  const workerCount = Math.max(1, Math.min(concurrency, items.length))
 
-    if (executing.length >= concurrency) {
-      await Promise.race(executing)
-      // Remove completed promises
-      for (let i = executing.length - 1; i >= 0; i--) {
-        // Check if promise is settled by racing with an immediately resolved promise
-        const settled = await Promise.race([
-          executing[i]?.then(() => true).catch(() => true),
-          Promise.resolve(false),
-        ])
-        if (settled) {
-          executing.splice(i, 1)
+  let nextIndex = 0
+
+  await Promise.all(
+    Array.from({ length: workerCount }, async () => {
+      while (true) {
+        const current = nextIndex
+        nextIndex++
+
+        if (current >= items.length) {
+          return
         }
-      }
-    }
-  }
 
-  await Promise.all(executing)
+        const item = items[current]
+        if (item === undefined) {
+          throw new Error('runWithConcurrency invariant violated: item was undefined')
+        }
+
+        results[current] = await fn(item)
+      }
+    })
+  )
+
   return results
 }
 
