@@ -282,7 +282,8 @@ SELECT throws_ok(
             now(),
             now(),
             NULL, -- deleted_at
-            '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea  -- address_bytes
+            '\x1234567890ABCDEF1234567890ABCDEF12345678'::bytea,  -- address_bytes
+            FALSE -- is_verified
           )::send_accounts
         ),
         tests.new_webauthn_credential(),

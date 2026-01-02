@@ -1339,3 +1339,16 @@ CREATE TRIGGER "update_profile_verified_at_on_delete"
     AFTER DELETE ON "public"."distribution_shares"
     FOR EACH ROW
     EXECUTE FUNCTION "public"."update_profile_verified_at_on_share_delete"();
+
+-- Triggers for send_accounts is_verified sync (functions defined in send_accounts.sql)
+DROP TRIGGER IF EXISTS "update_send_account_verified_on_insert" ON "public"."distribution_shares";
+CREATE TRIGGER "update_send_account_verified_on_insert"
+    AFTER INSERT ON "public"."distribution_shares"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."update_send_account_verified_on_share_insert"();
+
+DROP TRIGGER IF EXISTS "update_send_account_verified_on_delete" ON "public"."distribution_shares";
+CREATE TRIGGER "update_send_account_verified_on_delete"
+    AFTER DELETE ON "public"."distribution_shares"
+    FOR EACH ROW
+    EXECUTE FUNCTION "public"."update_send_account_verified_on_share_delete"();

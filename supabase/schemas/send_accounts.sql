@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS "public"."send_accounts" (
                 THEN decode(replace(address::text,'0x',''),'hex')
             ELSE NULL::bytea
         END
-    ) STORED
+    ) STORED,
+    "is_verified" BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 ALTER TABLE "public"."send_accounts" OWNER TO "postgres";
@@ -33,6 +34,7 @@ CREATE INDEX "idx_send_accounts_main_tag_id" ON "public"."send_accounts" USING "
 CREATE INDEX "idx_send_accounts_address_bytes" ON "public"."send_accounts" USING "btree" ( "address_bytes");
 CREATE UNIQUE INDEX "send_accounts_address_bytes_key" ON "public"."send_accounts" USING "btree" ("address_bytes", "chain_id");
 CREATE INDEX "idx_send_accounts_user_address_bytes" ON "public"."send_accounts" USING "btree" ("user_id", "address_bytes");
+CREATE INDEX "idx_send_accounts_is_verified" ON "public"."send_accounts" USING "btree" ("address_bytes") WHERE "is_verified" = TRUE;
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."send_accounts"
@@ -348,6 +350,100 @@ GRANT ALL ON FUNCTION "public"."validate_main_tag_update"() TO "anon";
 GRANT ALL ON FUNCTION "public"."validate_main_tag_update"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."validate_main_tag_update"() TO "service_role";
 
+
+-- Functions for is_verified sync from distribution_shares (same pattern as profiles.verified_at)
+CREATE OR REPLACE FUNCTION public.update_send_account_verified_on_share_insert()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    curr_distribution_id bigint;
+BEGIN
+    -- Get current distribution
+    SELECT id INTO curr_distribution_id
+    FROM distributions
+    WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+      AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    ORDER BY qualification_start DESC
+    LIMIT 1;
+
+    -- Only update if inserting a share for the current distribution
+    IF curr_distribution_id IS NOT NULL AND NEW.distribution_id = curr_distribution_id THEN
+        UPDATE send_accounts
+        SET is_verified = TRUE
+        WHERE user_id = NEW.user_id
+          AND is_verified = FALSE;
+    END IF;
+
+    RETURN NEW;
+END;
+$function$;
+
+ALTER FUNCTION "public"."update_send_account_verified_on_share_insert"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."update_send_account_verified_on_share_insert"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."update_send_account_verified_on_share_insert"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_send_account_verified_on_share_insert"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_send_account_verified_on_share_insert"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION public.update_send_account_verified_on_share_delete()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+    -- No-op: once verified, always verified
+    -- We don't clear is_verified when shares are deleted
+    RETURN OLD;
+END;
+$function$;
+
+ALTER FUNCTION "public"."update_send_account_verified_on_share_delete"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."update_send_account_verified_on_share_delete"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."update_send_account_verified_on_share_delete"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_send_account_verified_on_share_delete"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_send_account_verified_on_share_delete"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION public.refresh_send_account_verification_status()
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+    curr_distribution_id bigint;
+BEGIN
+    -- Get current distribution
+    SELECT id INTO curr_distribution_id
+    FROM distributions
+    WHERE qualification_start <= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+      AND qualification_end >= CURRENT_TIMESTAMP AT TIME ZONE 'UTC'
+    ORDER BY qualification_start DESC
+    LIMIT 1;
+
+    -- Only set is_verified for users with shares in current distribution
+    -- Never clear is_verified - once verified, always verified
+    IF curr_distribution_id IS NOT NULL THEN
+        UPDATE send_accounts
+        SET is_verified = TRUE
+        WHERE user_id IN (
+            SELECT DISTINCT user_id
+            FROM distribution_shares
+            WHERE distribution_id = curr_distribution_id
+        )
+        AND is_verified = FALSE;
+    END IF;
+END;
+$function$;
+
+ALTER FUNCTION "public"."refresh_send_account_verification_status"() OWNER TO "postgres";
+-- service_role ONLY: This function can reset all verification status and should not be callable by clients
+REVOKE ALL ON FUNCTION "public"."refresh_send_account_verification_status"() FROM PUBLIC;
+REVOKE ALL ON FUNCTION "public"."refresh_send_account_verification_status"() FROM anon;
+REVOKE ALL ON FUNCTION "public"."refresh_send_account_verification_status"() FROM authenticated;
+GRANT ALL ON FUNCTION "public"."refresh_send_account_verification_status"() TO "service_role";
 
 -- Triggers
 CREATE OR REPLACE TRIGGER "insert_verification_create_passkey" AFTER INSERT ON "public"."send_accounts" FOR EACH ROW EXECUTE FUNCTION "public"."insert_verification_create_passkey"();

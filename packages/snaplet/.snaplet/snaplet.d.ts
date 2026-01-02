@@ -522,10 +522,6 @@ interface Table_vault_secrets {
   created_at: string;
   updated_at: string;
 }
-interface Table_supabase_migrations_seed_files {
-  path: string;
-  hash: string;
-}
 interface Table_public_send_account_created {
   chain_id: number;
   log_addr: string;
@@ -638,6 +634,7 @@ interface Table_public_send_accounts {
   updated_at: string;
   deleted_at: string | null;
   main_tag_id: number | null;
+  is_verified: boolean;
 }
 interface Table_public_send_check_claimed {
   id: number;
@@ -1180,7 +1177,6 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
-  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_temporal {
   send_account_transfers: Table_temporal_send_account_transfers;
