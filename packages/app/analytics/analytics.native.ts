@@ -1,5 +1,5 @@
+import type { PostHogEventProperties } from '@posthog/core'
 import PostHog from 'posthog-react-native'
-import type { PostHogEventProperties } from 'posthog-react-native/lib/posthog-core/src/types'
 import type {
   AnalyticsEvent,
   AnalyticsService,
@@ -31,10 +31,6 @@ export const analytics: AnalyticsService = {
           uncaughtExceptions: true,
           unhandledRejections: true,
           console: ['error'],
-        },
-        rateLimiter: {
-          refillRate: 5,
-          bucketSize: 20,
         },
       },
     })

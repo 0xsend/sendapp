@@ -41,6 +41,7 @@ export const analytics: AnalyticsService = {
         __exceptionRateLimiterBucketSize: 20,
       },
       before_send: (event) => {
+        if (!event) return null
         if (event.event === '$exception') {
           const exceptionList = event.properties?.$exception_list
           const message = Array.isArray(exceptionList) ? exceptionList[0]?.value : undefined
