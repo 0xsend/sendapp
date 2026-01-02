@@ -348,6 +348,16 @@ export interface AnalyticsUserProperties {
   send_account_id?: string
 }
 
+// Exception tracking properties
+export interface ExceptionProperties {
+  /** Component or function where error occurred */
+  source?: string
+  /** Whether this was handled or unhandled */
+  handled?: boolean
+  /** Additional context to attach to the event */
+  context?: Record<string, unknown>
+}
+
 // Analytics service interface
 export interface AnalyticsService {
   init(): Promise<void>
@@ -361,4 +371,9 @@ export interface AnalyticsService {
   screen(name: string, properties?: Record<string, unknown>): void
   reset(): void
   isInitialized(): boolean
+  /**
+   * Capture exceptions and errors for error tracking.
+   * Filters known/expected errors and sends to PostHog Error Tracking.
+   */
+  captureException(error: unknown, properties?: ExceptionProperties): void
 }

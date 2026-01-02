@@ -1,8 +1,15 @@
 import PostHog from 'posthog-react-native'
 import type { PostHogEventProperties } from 'posthog-react-native/lib/posthog-core/src/types'
-import type { AnalyticsEvent, AnalyticsService, AnalyticsUserProperties } from './types'
+import type {
+  AnalyticsEvent,
+  AnalyticsService,
+  AnalyticsUserProperties,
+  ExceptionProperties,
+} from './types'
 
 let client: PostHog | null = null
+
+const IGNORED_ERRORS = ['Network request failed', 'AbortError', 'The operation was aborted']
 
 export const analytics: AnalyticsService = {
   async init() {
@@ -19,6 +26,17 @@ export const analytics: AnalyticsService = {
     client = new PostHog(key, {
       host,
       enableSessionReplay: false,
+      errorTracking: {
+        autocapture: {
+          uncaughtExceptions: true,
+          unhandledRejections: true,
+          console: ['error'],
+        },
+        rateLimiter: {
+          refillRate: 5,
+          bucketSize: 20,
+        },
+      },
     })
 
     await client.ready()
@@ -42,5 +60,24 @@ export const analytics: AnalyticsService = {
 
   isInitialized() {
     return client !== null
+  },
+
+  captureException(error: unknown, properties?: ExceptionProperties) {
+    if (!client) {
+      console.error('[Analytics] Not initialized, cannot capture exception')
+      return
+    }
+
+    // Filter known/expected errors
+    const message = error instanceof Error ? error.message : String(error)
+    if (IGNORED_ERRORS.some((ignored) => message.includes(ignored))) {
+      return
+    }
+
+    client.captureException(error, {
+      source: properties?.source,
+      handled: properties?.handled ?? true,
+      ...properties?.context,
+    })
   },
 }

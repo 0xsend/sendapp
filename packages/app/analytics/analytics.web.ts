@@ -1,7 +1,18 @@
 import posthog from 'posthog-js'
-import type { AnalyticsEvent, AnalyticsService, AnalyticsUserProperties } from './types'
+import type {
+  AnalyticsEvent,
+  AnalyticsService,
+  AnalyticsUserProperties,
+  ExceptionProperties,
+} from './types'
 
 let initialized = false
+
+const IGNORED_ERRORS = [
+  'ResizeObserver loop limit exceeded',
+  'Network request failed',
+  'AbortError',
+]
 
 export const analytics: AnalyticsService = {
   async init() {
@@ -20,6 +31,25 @@ export const analytics: AnalyticsService = {
       capture_pageview: true,
       capture_pageleave: true,
       persistence: 'localStorage+cookie',
+      capture_exceptions: {
+        capture_unhandled_errors: true,
+        capture_unhandled_rejections: true,
+        capture_console_errors: false,
+      },
+      error_tracking: {
+        __exceptionRateLimiterRefillRate: 5,
+        __exceptionRateLimiterBucketSize: 20,
+      },
+      before_send: (event) => {
+        if (event.event === '$exception') {
+          const exceptionList = event.properties?.$exception_list
+          const message = Array.isArray(exceptionList) ? exceptionList[0]?.value : undefined
+          if (IGNORED_ERRORS.some((ignored) => message?.includes(ignored))) {
+            return null
+          }
+        }
+        return event
+      },
     })
 
     initialized = true
@@ -46,5 +76,18 @@ export const analytics: AnalyticsService = {
 
   isInitialized() {
     return initialized
+  },
+
+  captureException(error: unknown, properties?: ExceptionProperties) {
+    if (!initialized) {
+      console.error('[Analytics] Not initialized, cannot capture exception')
+      return
+    }
+
+    posthog.captureException(error, {
+      source: properties?.source,
+      handled: properties?.handled ?? true,
+      ...properties?.context,
+    })
   },
 }
