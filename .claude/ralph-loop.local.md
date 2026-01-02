@@ -1,16 +1,16 @@
 ---
 active: true
-iteration: 1
+iteration: 2
 max_iterations: 30
 completion_promise: "COMPLETE"
 original_prompt: |
   Read ~/.claude/handoffs/ralph-sendapp-add-post-hog.md and complete the task described there. Follow the success criteria and verification loop. Output COMPLETE when all verifications pass, or BLOCKED if stuck after 15 iterations.
 timestamp: "2026-01-02T13:55:59Z"
 review_enabled: true
-review_count: 1
+review_count: 2
 max_review_cycles: 5
-pending_feedback: "- [ISSUE-1] major: Dependency upgrade is incomplete—`posthog-react-native` is not updated in `packages/app/package.json`, and the lockfile still pins `posthog-react-native@npm:^3.4.1`, so the required >=4.14.0 upgrade isn’t fully applied. (Refs: `packages/app/package.json`, `yarn.lock:30442`)"
-review_history: [{"cycle":1,"decision":"REJECT","issues":[{"id":1,"severity":"major","description":"Dependency upgrade is incomplete—`posthog-react-native` is not updated in `packages/app/package.json`, and the lockfile still pins `posthog-react-native@npm:^3.4.1`, so the required >=4.14.0 upgrade isn’t fully applied. (Refs: `packages/app/package.json`, `yarn.lock:30442`)"}],"resolved":[],"notes":"Unable to run `yarn tsc --noEmit` because the sandbox blocks temp dir creation; Biome check passed. Git commands fail in this sandbox due to xcrun cache write errors, so I couldn’t review diffs via git."}]
+pending_feedback: "- [ISSUE-2] major: `AnalyticsErrorBoundary` references `React.ErrorInfo` without importing the `React` namespace or `ErrorInfo`, which will fail TypeScript compilation. Fix by importing `type ErrorInfo` or `React` in `packages/app/components/AnalyticsErrorBoundary.tsx:22`."
+review_history: [{"cycle":1,"decision":"REJECT","issues":[{"id":1,"severity":"major","description":"Dependency upgrade is incomplete—`posthog-react-native` is not updated in `packages/app/package.json`, and the lockfile still pins `posthog-react-native@npm:^3.4.1`, so the required >=4.14.0 upgrade isn’t fully applied. (Refs: `packages/app/package.json`, `yarn.lock:30442`)"}],"resolved":[],"notes":"Unable to run `yarn tsc --noEmit` because the sandbox blocks temp dir creation; Biome check passed. Git commands fail in this sandbox due to xcrun cache write errors, so I couldn’t review diffs via git."},{"cycle":2,"decision":"REJECT","issues":[{"id":2,"severity":"major","description":"`AnalyticsErrorBoundary` references `React.ErrorInfo` without importing the `React` namespace or `ErrorInfo`, which will fail TypeScript compilation. Fix by importing `type ErrorInfo` or `React` in `packages/app/components/AnalyticsErrorBoundary.tsx:22`."}],"resolved":[{"id":1,"verification":"Confirmed `posthog-react-native` is `^4.14.0` in `packages/app/package.json`, `apps/expo/package.json`, and `yarn.lock` resolves to `4.17.2` (no lingering `3.4.1` entries)."}],"notes":"Git commands still fail in this sandbox due to xcrun cache/FS errors. `yarn tsc --noEmit` failed because the sandbox blocks temp dir creation; Biome check passed."}]
 debug: false
 ---
 

@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from 'react'
+import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { analytics } from 'app/analytics'
 
 interface Props {
@@ -19,7 +19,7 @@ export class AnalyticsErrorBoundary extends Component<Props, State> {
     return { hasError: true, error }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     analytics.captureException(error, {
       source: this.props.componentName ?? 'ErrorBoundary',
       handled: true,
