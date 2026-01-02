@@ -15139,6 +15139,7 @@ __metadata:
     next: "npm:15.5.7"
     nock: "npm:^14.0.3"
     permissionless: "npm:^0.1.49"
+    posthog-react-native: "npm:^4.14.0"
     react-hook-form: "npm:^7.48.2"
     react-i18next: "npm:^15.4.0"
     react-native: "npm:0.81.5"
@@ -21138,7 +21139,7 @@ __metadata:
     expo-web-browser: "npm:~15.0.8"
     intl-pluralrules: "npm:^2.0.1"
     metro-minify-terser: "npm:^0.74.1"
-    posthog-react-native: "npm:^3.4.1"
+    posthog-react-native: "npm:^4.14.0"
     react: "npm:19.1.2"
     react-dom: "npm:19.1.2"
     react-native: "npm:0.81.5"
@@ -30439,9 +30440,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-react-native@npm:^3.4.1":
-  version: 3.16.1
-  resolution: "posthog-react-native@npm:3.16.1"
+"posthog-react-native@npm:^4.14.0":
+  version: 4.17.2
+  resolution: "posthog-react-native@npm:4.17.2"
+  dependencies:
+    "@posthog/core": "npm:1.9.0"
   peerDependencies:
     "@react-native-async-storage/async-storage": ">=1.0.0"
     "@react-navigation/native": ">= 5.0.0"
@@ -30449,7 +30452,7 @@ __metadata:
     expo-device: ">= 4.0.0"
     expo-file-system: ">= 13.0.0"
     expo-localization: ">= 11.0.0"
-    posthog-react-native-session-replay: ">= 1.0.0"
+    posthog-react-native-session-replay: ">= 1.2.0"
     react-native-device-info: ">= 10.0.0"
     react-native-localize: ">= 3.0.0"
     react-native-navigation: ">= 6.0.0"
@@ -30478,7 +30481,7 @@ __metadata:
       optional: true
     react-native-safe-area-context:
       optional: true
-  checksum: 10/243aac2f0e30c029a89d748f86986e3e4d18f0509151e207fcb7adca5323eff77a2e9084365edf0944ea404358be3743c8abe0930ffa67d834134b451922713f
+  checksum: 10/31d232805a9ea04f6061dd5b74381c34de21c0ed49fc15e9e1e9bfb17e55011042e3e37955c63f4615d8f57bfbf551d6e39868d9093c19bfb14423c74264b4cd
   languageName: node
   linkType: hard
 

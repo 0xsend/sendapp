@@ -11,6 +11,8 @@
 
 #### Phase 2: RN JS Autocapture
 - [x] Upgraded posthog-react-native to ^4.14.0 in apps/expo/package.json
+- [x] Upgraded posthog-react-native to ^4.14.0 in packages/app/package.json (iteration 2)
+- [x] Ran yarn install to update lockfile to 4.17.2 (iteration 2)
 - [x] Added `errorTracking.autocapture` config to analytics.native.ts
 - [x] Configured rate limiter in errorTracking options
 
