@@ -4,24 +4,9 @@ import { DrawingHistory } from './DrawingHistory'
 import SendpotRiskDialog from './SendpotRiskDialog'
 import { ClaimWinnings } from './ClaimWinnings'
 import { useClaimableWinnings } from './hooks/useClaimableWinnings'
-import { useEffect, useRef } from 'react'
-import { useAnalytics } from 'app/provider/analytics'
 
 export function SendPotScreen() {
   const { hasClaimableWinnings, isLoading } = useClaimableWinnings()
-  const analytics = useAnalytics()
-  const hasTrackedView = useRef(false)
-
-  // Track sendpot_viewed on mount
-  useEffect(() => {
-    if (!hasTrackedView.current) {
-      analytics.capture({
-        name: 'sendpot_viewed',
-        properties: {},
-      })
-      hasTrackedView.current = true
-    }
-  }, [analytics])
 
   if (isLoading) {
     return <Spinner size="large" color="$color12" />

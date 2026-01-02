@@ -102,7 +102,7 @@ export const UploadBanner = forwardRef(function UploadBanner(
     analytics.capture({
       name: 'profile_updated',
       properties: {
-        field: 'banner_url',
+        fields_updated: ['banner_url'],
       },
     })
 

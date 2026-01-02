@@ -17,7 +17,7 @@ export const analytics: AnalyticsService = {
 
     posthog.init(key, {
       api_host: host,
-      capture_pageview: false, // We handle this manually
+      capture_pageview: false,
       capture_pageleave: true,
       persistence: 'localStorage+cookie',
     })

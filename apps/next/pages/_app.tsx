@@ -22,6 +22,7 @@ import { defaultSEOConfig } from '../config/next-seo'
 import Head from 'next/head'
 import { NextSeo } from 'next-seo'
 import type { buildSeo } from 'utils/seo'
+import { usePageviewTracking } from 'app/analytics/usePageviewTracking'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -48,6 +49,8 @@ function MyApp({
   seo?: ReturnType<typeof buildSeo>
 }>) {
   const [, setTheme] = useRootTheme()
+
+  usePageviewTracking()
 
   useEffect(() => {
     // Update to user's preferred locale after hydration (stored preference only)

@@ -4,11 +4,14 @@ import { useIsDarkTheme } from 'apps-expo/utils/layout/useIsDarkTheme'
 import { Platform, Pressable } from 'react-native'
 import { IconArrowLeft } from 'app/components/icons'
 import { useMemo } from 'react'
+import { usePageviewTracking } from 'app/analytics/usePageviewTracking'
 
 export default function StackNavigator() {
   const theme = useTheme()
   const isDark = useIsDarkTheme()
   const router = useRouter()
+
+  usePageviewTracking()
 
   const iosMajorVersion = useMemo(() => {
     if (Platform.OS !== 'ios') return null

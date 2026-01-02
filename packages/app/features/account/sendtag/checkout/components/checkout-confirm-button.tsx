@@ -171,6 +171,15 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   })
 
   async function handleCheckoutTx() {
+    // Track sendtag checkout started
+    analytics.capture({
+      name: 'sendtag_checkout_started',
+      properties: {
+        tag_count: pendingTags.length,
+        total_price_usd: Number(amountDue) / 1e6, // Convert from USDC decimals
+      },
+    })
+
     try {
       throwIf(userOpError)
       assert(!!userOp, 'User op is required')
@@ -179,6 +188,16 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       const msg = (e.details ?? e.message)?.split('.').at(0)
       console.error(msg, e)
       setError(msg ?? t('sendtag.messages.genericError'))
+
+      // Track sendtag checkout failed
+      analytics.capture({
+        name: 'sendtag_checkout_failed',
+        properties: {
+          tag_count: pendingTags.length,
+          total_price_usd: Number(amountDue) / 1e6,
+          error_type: 'user_cancelled',
+        },
+      })
     }
   }
 

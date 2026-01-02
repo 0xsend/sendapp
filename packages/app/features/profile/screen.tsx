@@ -49,7 +49,6 @@ import ProfileSendButton from 'app/features/profile/ProfileSendButton'
 import ViewHistoryButton from 'app/features/profile/ViewHistoryButton'
 import VibeButton from 'app/features/profile/VibeButton'
 import { SendChat } from '../send/components/SendChat'
-import { useAnalytics } from 'app/provider/analytics'
 
 interface ProfileScreenProps {
   sendid?: number | null
@@ -61,19 +60,6 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const [sendParams, setSendParams] = useSendScreenParams()
   const [sendChatOpen, setSendChatOpen] = useState(false)
-  const analytics = useAnalytics()
-  const hasTrackedView = useRef(false)
-
-  // Track profile_viewed on mount
-  useEffect(() => {
-    if (!hasTrackedView.current) {
-      analytics.capture({
-        name: 'profile_viewed',
-        properties: {},
-      })
-      hasTrackedView.current = true
-    }
-  }, [analytics])
 
   useEffect(() => {
     if (sendParams.idType && sendParams.recipient) {

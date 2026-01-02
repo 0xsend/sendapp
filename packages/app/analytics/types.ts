@@ -307,7 +307,7 @@ export type AnalyticsEvent =
   | { name: 'onboarding_started'; properties: OnboardingStartedProps }
   | { name: 'onboarding_completed'; properties: OnboardingCompletedProps }
   | { name: 'send_transfer_initiated'; properties: SendTransferProps & { workflow_id: string } }
-  | { name: 'send_transfer_completed'; properties: SendTransferProps & { workflow_id: string } }
+  | { name: 'send_transfer_submitted'; properties: SendTransferProps & { workflow_id: string } }
   | { name: 'send_transfer_failed'; properties: SendTransferFailedProps }
   | { name: 'send_check_created'; properties: SendCheckCreatedProps }
   | { name: 'send_check_shared'; properties: SendCheckSharedProps }
@@ -319,7 +319,6 @@ export type AnalyticsEvent =
   | { name: 'earn_deposit_submitted'; properties: EarnDepositProps }
   | { name: 'earn_withdraw_initiated'; properties: EarnWithdrawProps }
   | { name: 'earn_withdraw_submitted'; properties: EarnWithdrawProps }
-  | { name: 'sendpot_viewed'; properties: Record<string, never> }
   | { name: 'sendpot_disclaimer_viewed'; properties: Record<string, never> }
   | { name: 'sendpot_disclaimer_accepted'; properties: Record<string, never> }
   | { name: 'sendpot_buy_tickets_started'; properties: SendpotTicketPurchaseProps }
@@ -328,19 +327,15 @@ export type AnalyticsEvent =
   | { name: 'sendpot_ticket_purchase_failed'; properties: SendpotTicketPurchaseFailedProps }
   | { name: 'sendpot_winnings_claimed'; properties: SendpotWinningsClaimedProps }
   | { name: 'sendpot_winnings_claim_failed'; properties: SendpotWinningsClaimFailedProps }
-  | { name: 'rewards_screen_viewed'; properties: Record<string, never> }
   | { name: 'rewards_claim_started'; properties: RewardsClaimProps }
   | { name: 'rewards_claim_completed'; properties: RewardsClaimCompletedProps }
   | { name: 'rewards_claim_failed'; properties: RewardsClaimFailedProps }
-  | { name: 'account_settings_viewed'; properties: Record<string, never> }
   | { name: 'sendtag_added'; properties: SendtagAddedProps }
   | { name: 'backup_passkey_created'; properties: Record<string, never> }
   | { name: 'account_deletion_started'; properties: AccountDeletionProps }
   | { name: 'account_deletion_completed'; properties: AccountDeletionProps }
-  | { name: 'activity_feed_viewed'; properties: Record<string, never> }
   | { name: 'activity_item_opened'; properties: ActivityItemProps }
   | { name: 'referral_link_shared'; properties: ReferralSharedProps }
-  | { name: 'canton_verification_viewed'; properties: Record<string, never> }
   | { name: 'canton_verification_completed'; properties: CantonVerificationProps }
   | { name: 'canton_verification_failed'; properties: CantonVerificationFailedProps }
   | { name: 'contacts_sync_started'; properties: ContactsSyncProps }
@@ -350,11 +345,6 @@ export type AnalyticsEvent =
   | { name: 'deposit_started'; properties: DepositProps }
   | { name: 'deposit_completed'; properties: DepositCompletedProps }
   | { name: 'deposit_failed'; properties: DepositFailedProps }
-  | { name: 'home_viewed'; properties: Record<string, never> }
-  | { name: 'explore_viewed'; properties: Record<string, never> }
-  | { name: 'invest_viewed'; properties: Record<string, never> }
-  | { name: 'leaderboard_viewed'; properties: Record<string, never> }
-  | { name: 'splash_viewed'; properties: Record<string, never> }
   | { name: 'maintenance_viewed'; properties: MaintenanceViewedProps }
   | { name: 'force_update_prompted'; properties: ForceUpdateProps }
   | { name: 'ota_update_available'; properties: OtaUpdateProps }
@@ -366,7 +356,6 @@ export type AnalyticsEvent =
   | { name: 'paymaster_approval_started'; properties: PaymasterApprovalProps }
   | { name: 'paymaster_approval_completed'; properties: PaymasterApprovalProps }
   | { name: 'paymaster_approval_failed'; properties: PaymasterApprovalFailedProps }
-  | { name: 'profile_viewed'; properties: Record<string, never> }
   | { name: 'profile_updated'; properties: ProfileUpdatedProps }
   | { name: 'profile_verification_started'; properties: ProfileVerificationProps }
   | { name: 'profile_verification_completed'; properties: ProfileVerificationProps }

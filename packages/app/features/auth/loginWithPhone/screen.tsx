@@ -55,6 +55,14 @@ export const LoginWithPhoneScreen = () => {
           country_code: formData.countryCode,
         },
       })
+
+      // Capture login succeeded event
+      analytics.capture({
+        name: 'user_login_succeeded',
+        properties: {
+          auth_type: 'phone',
+        },
+      })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
       form.setError('root', {

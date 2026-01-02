@@ -254,9 +254,9 @@ export function SendConfirm() {
       })
 
       if (workflowId) {
-        // Capture transfer completed event
+        // Capture transfer submitted event
         analytics.capture({
-          name: 'send_transfer_completed',
+          name: 'send_transfer_submitted',
           properties: {
             token_address: selectedCoin?.token,
             amount: amount,

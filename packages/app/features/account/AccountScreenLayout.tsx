@@ -1,10 +1,9 @@
 import { ScrollView, useMedia, XStack, YStack } from '@my/ui'
-import { type ReactNode, useEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { AccountLinks } from 'app/features/account/components/AccountLinks'
 import { AccountHeader } from 'app/features/account/components/AccountHeader'
 import { Platform } from 'react-native'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
-import { useAnalytics } from 'app/provider/analytics'
 
 export type SettingsLayoutProps = {
   children?: ReactNode
@@ -12,18 +11,6 @@ export type SettingsLayoutProps = {
 
 export const AccountScreenLayout = ({ children }: SettingsLayoutProps) => {
   const media = useMedia()
-  const analytics = useAnalytics()
-  const hasTrackedView = useRef(false)
-
-  useEffect(() => {
-    if (!hasTrackedView.current) {
-      analytics.capture({
-        name: 'account_settings_viewed',
-        properties: {},
-      })
-      hasTrackedView.current = true
-    }
-  }, [analytics])
 
   if (media.gtLg) {
     return <DesktopAccountLayout>{children}</DesktopAccountLayout>

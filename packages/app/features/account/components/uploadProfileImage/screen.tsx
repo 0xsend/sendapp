@@ -101,7 +101,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
     analytics.capture({
       name: 'profile_updated',
       properties: {
-        field: 'avatar_url',
+        fields_updated: ['avatar_url'],
       },
     })
 
