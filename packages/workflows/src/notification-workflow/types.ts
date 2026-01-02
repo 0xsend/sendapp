@@ -58,6 +58,34 @@ export type SendPushResult = {
   errors?: string[]
   /** Number of notifications skipped due to missing configuration (e.g., VAPID keys) */
   skipped?: number
+
+  /** Expo ticket IDs from successful sends (used for receipt checks). */
+  ticketIds?: string[]
+
+  /** Mapping from Expo ticket ID -> push_tokens.id (for receipt-based invalidation). */
+  ticketIdToTokenId?: Record<string, number>
+
+  /** push_tokens.id values that should be marked inactive immediately (e.g. DeviceNotRegistered). */
+  tokenIdsToDeactivate?: number[]
+}
+
+export type ReceiptCheckResult = {
+  checked: number
+  delivered: number
+  failed: number
+  errors?: string[]
+
+  /** Ticket IDs whose receipts indicate the device/token is no longer valid. */
+  ticketIdsToDeactivate?: string[]
+}
+
+export type CheckPushReceiptsPayload = {
+  ticketIds: string[]
+  userId: string
+}
+
+export type DeactivateTokensPayload = {
+  tokenIds: number[]
 }
 
 export type CreateNotificationResult = {

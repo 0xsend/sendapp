@@ -122,11 +122,13 @@ export function isExpoPushToken(token: string): boolean {
  */
 export function filterExpoTokens(tokens: PushToken[]): PushToken[] {
   return tokens.filter((token) => {
+    if (token.platform !== 'expo') {
+      return false
+    }
     if (!token.token || !token.is_active) {
       return false
     }
     // Only process tokens that match Expo format
-    // The platform field might be 'expo', 'ios', or 'android' for Expo tokens
     return isExpoPushToken(token.token)
   })
 }
@@ -263,10 +265,18 @@ export async function sendExpoPushNotifications(
     concurrency: MAX_CONCURRENT_CHUNKS,
   })
 
+  // Map Expo push token string -> push_tokens.id for later deactivation and receipt mapping
+  const tokenIdByTo = new Map<string, number>()
+  for (const token of expoTokens) {
+    if (token.token) {
+      tokenIdByTo.set(token.token, Number(token.id))
+    }
+  }
+
   // Send chunks with concurrency limit
   const chunkResults = await runWithConcurrency(
     chunks,
-    (chunk) => sendExpoPushChunkWithRetry(chunk),
+    (chunk) => sendExpoPushChunkWithRetry(chunk, tokenIdByTo),
     MAX_CONCURRENT_CHUNKS
   )
 
@@ -275,19 +285,29 @@ export async function sendExpoPushNotifications(
   let failed = 0
   const errors: string[] = []
   const ticketIds: string[] = []
-  const tokensToDeactivate: string[] = []
+  const tokenIdsToDeactivate = new Set<number>()
+  const ticketIdToTokenId: Record<string, number> = {}
 
   for (const result of chunkResults) {
     sent += result.sent
     failed += result.failed
+
     if (result.errors) {
       errors.push(...result.errors)
     }
+
     if (result.ticketIds) {
       ticketIds.push(...result.ticketIds)
     }
-    if (result.tokensToDeactivate) {
-      tokensToDeactivate.push(...result.tokensToDeactivate)
+
+    if (result.tokenIdsToDeactivate) {
+      for (const tokenId of result.tokenIdsToDeactivate) {
+        tokenIdsToDeactivate.add(tokenId)
+      }
+    }
+
+    if (result.ticketIdToTokenId) {
+      Object.assign(ticketIdToTokenId, result.ticketIdToTokenId)
     }
   }
 
@@ -295,7 +315,7 @@ export async function sendExpoPushNotifications(
     sent,
     failed,
     ticketCount: ticketIds.length,
-    tokensToDeactivate: tokensToDeactivate.length,
+    tokenIdsToDeactivate: tokenIdsToDeactivate.size,
   })
 
   return {
@@ -304,20 +324,26 @@ export async function sendExpoPushNotifications(
     failed,
     errors: errors.length > 0 ? errors : undefined,
     ticketIds: ticketIds.length > 0 ? ticketIds : undefined,
-    tokensToDeactivate: tokensToDeactivate.length > 0 ? tokensToDeactivate : undefined,
+    ticketIdToTokenId: Object.keys(ticketIdToTokenId).length > 0 ? ticketIdToTokenId : undefined,
+    tokenIdsToDeactivate: tokenIdsToDeactivate.size > 0 ? [...tokenIdsToDeactivate] : undefined,
   }
 }
 
 /**
  * Sends a chunk with retry logic for transient errors (rate limiting).
  */
-async function sendExpoPushChunkWithRetry(messages: ExpoPushMessage[]): Promise<SendPushResult> {
+async function sendExpoPushChunkWithRetry(
+  messages: ExpoPushMessage[],
+  tokenIdByTo: ReadonlyMap<string, number>
+): Promise<SendPushResult> {
   let currentMessages = messages
   let totalSent = 0
   let totalFailed = 0
+
   const allErrors: string[] = []
   const allTicketIds: string[] = []
-  const allTokensToDeactivate: string[] = []
+  const tokenIdsToDeactivate = new Set<number>()
+  const ticketIdToTokenId: Record<string, number> = {}
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     if (currentMessages.length === 0) break
@@ -333,10 +359,11 @@ async function sendExpoPushChunkWithRetry(messages: ExpoPushMessage[]): Promise<
     }
 
     try {
-      const result = await sendExpoPushChunk(currentMessages)
+      const result = await sendExpoPushChunk(currentMessages, tokenIdByTo)
 
       totalSent += result.sent
-      totalFailed += result.failed - (result.messagesToRetry?.length || 0)
+      // result.failed only counts non-retryable failures
+      totalFailed += result.failed
 
       if (result.errors) {
         // Filter out rate limit errors from final errors if we'll retry
@@ -352,12 +379,24 @@ async function sendExpoPushChunkWithRetry(messages: ExpoPushMessage[]): Promise<
         allTicketIds.push(...result.ticketIds)
       }
 
-      if (result.tokensToDeactivate) {
-        allTokensToDeactivate.push(...result.tokensToDeactivate)
+      if (result.ticketIdToTokenId) {
+        Object.assign(ticketIdToTokenId, result.ticketIdToTokenId)
+      }
+
+      if (result.tokenIdsToDeactivate) {
+        for (const tokenId of result.tokenIdsToDeactivate) {
+          tokenIdsToDeactivate.add(tokenId)
+        }
       }
 
       // Check if we have messages to retry
       if (result.messagesToRetry && result.messagesToRetry.length > 0) {
+        // If we've hit our last attempt, count remaining as failed
+        if (attempt >= MAX_RETRIES) {
+          totalFailed += result.messagesToRetry.length
+          allErrors.push(`Rate limited after ${MAX_RETRIES + 1} attempts`)
+          break
+        }
         currentMessages = result.messagesToRetry
       } else {
         break // No more retries needed
@@ -389,7 +428,8 @@ async function sendExpoPushChunkWithRetry(messages: ExpoPushMessage[]): Promise<
     failed: totalFailed,
     errors: allErrors.length > 0 ? allErrors : undefined,
     ticketIds: allTicketIds.length > 0 ? allTicketIds : undefined,
-    tokensToDeactivate: allTokensToDeactivate.length > 0 ? allTokensToDeactivate : undefined,
+    ticketIdToTokenId: Object.keys(ticketIdToTokenId).length > 0 ? ticketIdToTokenId : undefined,
+    tokenIdsToDeactivate: tokenIdsToDeactivate.size > 0 ? [...tokenIdsToDeactivate] : undefined,
   }
 }
 
@@ -397,7 +437,10 @@ async function sendExpoPushChunkWithRetry(messages: ExpoPushMessage[]): Promise<
  * Sends a single chunk of messages to the Expo Push API.
  * Returns messages that should be retried due to rate limiting.
  */
-async function sendExpoPushChunk(messages: ExpoPushMessage[]): Promise<ChunkSendResult> {
+async function sendExpoPushChunk(
+  messages: ExpoPushMessage[],
+  tokenIdByTo: ReadonlyMap<string, number>
+): Promise<ChunkSendResult> {
   log.debug('Sending Expo push chunk', { count: messages.length })
 
   const response = await fetch(EXPO_PUSH_API_URL, {
@@ -427,7 +470,8 @@ async function sendExpoPushChunk(messages: ExpoPushMessage[]): Promise<ChunkSend
   let failed = 0
   const errors: string[] = []
   const ticketIds: string[] = []
-  const tokensToDeactivate: string[] = []
+  const tokenIdsToDeactivate = new Set<number>()
+  const ticketIdToTokenId: Record<string, number> = {}
   const messagesToRetry: ExpoPushMessage[] = []
 
   for (let i = 0; i < result.data.length; i++) {
@@ -438,9 +482,14 @@ async function sendExpoPushChunk(messages: ExpoPushMessage[]): Promise<ChunkSend
       continue
     }
 
+    const tokenId = tokenIdByTo.get(message.to)
+
     if (ticket.status === 'ok') {
       sent++
       ticketIds.push(ticket.id)
+      if (typeof tokenId === 'number') {
+        ticketIdToTokenId[ticket.id] = tokenId
+      }
       log.debug('Expo push sent successfully', {
         token: maskToken(message.to),
         ticketId: ticket.id,
@@ -458,7 +507,9 @@ async function sendExpoPushChunk(messages: ExpoPushMessage[]): Promise<ChunkSend
 
         // Handle DeviceNotRegistered - collect token for deactivation
         if (ticket.details?.error === 'DeviceNotRegistered') {
-          tokensToDeactivate.push(message.to)
+          if (typeof tokenId === 'number') {
+            tokenIdsToDeactivate.add(tokenId)
+          }
           log.warn('Token no longer valid (DeviceNotRegistered)', {
             token: maskToken(message.to),
           })
@@ -479,7 +530,8 @@ async function sendExpoPushChunk(messages: ExpoPushMessage[]): Promise<ChunkSend
     failed,
     errors: errors.length > 0 ? errors : undefined,
     ticketIds: ticketIds.length > 0 ? ticketIds : undefined,
-    tokensToDeactivate: tokensToDeactivate.length > 0 ? tokensToDeactivate : undefined,
+    ticketIdToTokenId: Object.keys(ticketIdToTokenId).length > 0 ? ticketIdToTokenId : undefined,
+    tokenIdsToDeactivate: tokenIdsToDeactivate.size > 0 ? [...tokenIdsToDeactivate] : undefined,
     messagesToRetry: messagesToRetry.length > 0 ? messagesToRetry : undefined,
   }
 }
@@ -505,7 +557,7 @@ export async function checkExpoPushReceipts(ticketIds: string[]): Promise<Receip
   let delivered = 0
   let failed = 0
   const errors: string[] = []
-  const tokensToDeactivate: string[] = []
+  const ticketIdsToDeactivate: string[] = []
 
   for (const chunk of chunks) {
     try {
@@ -545,8 +597,8 @@ export async function checkExpoPushReceipts(ticketIds: string[]): Promise<Receip
           // Note: We don't have the token here, but the caller can map ticketId -> token
           if (receipt.details?.error === 'DeviceNotRegistered') {
             log.warn('Receipt indicates device not registered', { ticketId })
-            // Store ticketId; caller needs to map to token
-            tokensToDeactivate.push(ticketId)
+            // Store ticketId; caller needs to map ticketId -> push token
+            ticketIdsToDeactivate.push(ticketId)
           } else {
             log.error('Push delivery failed', {
               ticketId,
@@ -566,7 +618,7 @@ export async function checkExpoPushReceipts(ticketIds: string[]): Promise<Receip
     checked,
     delivered,
     failed,
-    tokensToDeactivate: tokensToDeactivate.length,
+    ticketIdsToDeactivate: ticketIdsToDeactivate.length,
   })
 
   return {
@@ -574,6 +626,6 @@ export async function checkExpoPushReceipts(ticketIds: string[]): Promise<Receip
     delivered,
     failed,
     errors: errors.length > 0 ? errors : undefined,
-    tokensToDeactivate: tokensToDeactivate.length > 0 ? tokensToDeactivate : undefined,
+    ticketIdsToDeactivate: ticketIdsToDeactivate.length > 0 ? ticketIdsToDeactivate : undefined,
   }
 }

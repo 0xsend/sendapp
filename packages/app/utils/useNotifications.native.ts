@@ -157,12 +157,10 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       log('Registering push token with backend...')
 
       // Use Supabase RPC to register token via the register_push_token function
-      // Note: The 'expo' platform value needs to be added to the enum in the database
-      // For now, we map to the appropriate native platform
-      const platform = Platform.OS === 'ios' ? 'ios' : 'android'
+      // Backend schema uses push_token_platform = ('expo' | 'web')
       const { data, error: rpcError } = await supabase.rpc('register_push_token', {
         token_value: tokenToRegister,
-        token_platform: platform as 'ios' | 'android' | 'web',
+        token_platform: 'expo',
         token_device_id: Device.deviceName || undefined,
       })
 
@@ -172,7 +170,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         return false
       }
 
-      log('Successfully registered push token:', data?.id)
+      log('Successfully registered push token:', data?.[0]?.id)
       return true
     } catch (e) {
       const err = e instanceof Error ? e : new Error('Failed to register push token')

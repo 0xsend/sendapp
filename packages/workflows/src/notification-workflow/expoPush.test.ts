@@ -222,11 +222,15 @@ describe('Expo Push Module', () => {
         key: 'value',
       })
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: true,
         sent: 2,
         failed: 0,
         ticketIds: ['ticket-1', 'ticket-2'],
+      })
+      expect(result.ticketIdToTokenId).toEqual({
+        'ticket-1': 1,
+        'ticket-2': 2,
       })
       expect(mockFetch).toHaveBeenCalledTimes(1)
       expect(mockFetch).toHaveBeenCalledWith(
@@ -285,13 +289,16 @@ describe('Expo Push Module', () => {
 
       const result = await sendExpoPushNotifications(tokens, 'Test', 'Body')
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: false,
         sent: 1,
         failed: 1,
         errors: ['Device not registered (DeviceNotRegistered)'],
         ticketIds: ['ticket-1'],
-        tokensToDeactivate: ['ExpoPushToken[device2]'],
+        tokenIdsToDeactivate: [2],
+      })
+      expect(result.ticketIdToTokenId).toEqual({
+        'ticket-1': 1,
       })
     })
 
@@ -372,12 +379,14 @@ describe('Expo Push Module', () => {
         ...tokens.slice(0, 100).map((_, i) => `ticket-${i}`),
         ...tokens.slice(100).map((_, i) => `ticket-${100 + i}`),
       ]
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: true,
         sent: 150,
         failed: 0,
         ticketIds: expectedTicketIds,
       })
+      expect(result.ticketIdToTokenId?.['ticket-0']).toBe(1)
+      expect(result.ticketIdToTokenId?.['ticket-149']).toBe(150)
       expect(mockFetch).toHaveBeenCalledTimes(2)
 
       // Verify first chunk has 100 messages

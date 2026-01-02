@@ -33,6 +33,8 @@ export interface ReceiptCheckWorkflowInput {
   userId: string
   /** Optional custom delay in ms (defaults to 15 minutes) */
   delayMs?: number
+  /** Optional mapping from ticket ID -> push_tokens.id to allow receipt-based deactivation */
+  ticketIdToTokenId?: Record<string, number>
 }
 
 export interface ReceiptCheckWorkflowResult {
@@ -76,23 +78,49 @@ export async function receiptCheckWorkflow(
     userId,
   })
 
-  const tokensDeactivated = 0
+  let tokensDeactivated = 0
 
-  // Deactivate any tokens that are no longer valid
-  // Note: tokensToDeactivate from receipt check contains ticket IDs, not tokens
-  // The activity handles mapping if needed, or we handle at the push send level
-  if (result.tokensToDeactivate && result.tokensToDeactivate.length > 0) {
-    log.info('Deactivating invalid tokens from receipt check', {
+  // Deactivate any tokens that are no longer valid.
+  // Receipts identify invalid devices via ticket IDs, so we need a mapping to push_tokens.id.
+  if (result.ticketIdsToDeactivate && result.ticketIdsToDeactivate.length > 0) {
+    log.info('Receipt check found invalid devices', {
       userId,
-      count: result.tokensToDeactivate.length,
+      count: result.ticketIdsToDeactivate.length,
     })
 
-    // The tokensToDeactivate from receipt check are ticket IDs
-    // We need to handle this differently - for now, log a warning
-    // The main token deactivation happens at send time via sendExpoPushNotifications
-    log.warn('Receipt-based token deactivation requires ticketId->token mapping', {
-      ticketIds: result.tokensToDeactivate,
-    })
+    const mapping = input.ticketIdToTokenId
+    if (!mapping) {
+      log.warn('Receipt-based token deactivation skipped (missing ticketIdToTokenId mapping)', {
+        userId,
+        ticketIds: result.ticketIdsToDeactivate,
+      })
+    } else {
+      const tokenIds = new Set<number>()
+      const unmappedTicketIds: string[] = []
+
+      for (const ticketId of result.ticketIdsToDeactivate) {
+        const tokenId = mapping[ticketId]
+        if (typeof tokenId === 'number') {
+          tokenIds.add(tokenId)
+        } else {
+          unmappedTicketIds.push(ticketId)
+        }
+      }
+
+      if (unmappedTicketIds.length > 0) {
+        log.warn('Some receipt ticket IDs did not map to token IDs', {
+          userId,
+          count: unmappedTicketIds.length,
+          ticketIds: unmappedTicketIds,
+        })
+      }
+
+      if (tokenIds.size > 0) {
+        tokensDeactivated = await deactivateTokensActivity({
+          tokenIds: [...tokenIds],
+        })
+      }
+    }
   }
 
   log.info('Receipt check workflow complete', {
