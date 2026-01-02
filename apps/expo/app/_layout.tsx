@@ -19,6 +19,7 @@ import '@formatjs/intl-relativetimeformat/locale-data/es' // Spanish
 import '@formatjs/intl-relativetimeformat/locale-data/zh' // Chinese
 
 import 'intl-pluralrules'
+
 import type { Session } from '@supabase/supabase-js'
 import { loadThemePromise, Provider } from 'app/provider'
 import { getI18n, initSharedI18n } from 'app/i18n'
@@ -37,6 +38,19 @@ import {
 } from '@expo-google-fonts/dm-sans'
 import { DMMono_400Regular } from '@expo-google-fonts/dm-mono'
 import * as SystemUI from 'expo-system-ui'
+
+// Configure push notifications handler (call early in app initialization)
+import { configureNotificationHandler } from 'app/utils/useNotifications'
+import {
+  initializeNotificationConfig,
+  useNotificationHandler,
+} from 'app/hooks/useNotificationHandler'
+
+// Configure notification handler for foreground behavior
+configureNotificationHandler()
+
+// Initialize Android channels and iOS categories
+void initializeNotificationConfig()
 
 SplashScreen.preventAutoHideAsync()
 
@@ -61,6 +75,9 @@ export default function RootLayout() {
   const [initialSession, setInitialSession] = useState<Session | null>(null)
   const [i18nReady, setI18nReady] = useState(false)
   const scheme = useColorScheme()
+
+  // Set up notification handlers for tap responses and deep linking
+  useNotificationHandler()
 
   useEffect(() => {
     if (scheme === 'dark') {
