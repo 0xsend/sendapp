@@ -117,14 +117,11 @@ client = new PostHog(key, {
       unhandledRejections: true,
       console: ['error'], // Only capture console.error, not warn
     },
-    // Rate limit exceptions to prevent flooding
-    rateLimiter: {
-      refillRate: 5,   // Tokens added per second
-      bucketSize: 20,  // Max burst capacity
-    },
   },
 })
 ```
+
+**Note**: The posthog-react-native SDK v4.x does not expose a `rateLimiter` option in `ErrorTrackingOptions`. Rate limiting for error tracking is handled internally by the SDK. The web SDK (`posthog-js`) does support explicit rate limiter configuration via `error_tracking.__exceptionRateLimiterRefillRate` and `error_tracking.__exceptionRateLimiterBucketSize`.
 
 No `PostHogProvider` is required for this; it works with the existing `AnalyticsProvider` pattern.
 
@@ -407,11 +404,11 @@ Configure webhook to Slack/PagerDuty for critical errors:
 ### Phase 2: React Native JS Autocapture
 - [ ] Upgrade `posthog-react-native` to >= 4.14.0
 - [ ] Enable `errorTracking.autocapture` in `analytics.native.ts`
-- [ ] Configure rate limiter in errorTracking options
 - [ ] Ensure Hermes is enabled
 - [ ] Test on iOS simulator
 - [ ] Test on physical device with release build
 - [ ] Verify exceptions appear in PostHog dashboard
+- Note: Rate limiting is handled internally by the RN SDK (no explicit config option)
 
 ### Phase 3: Manual Capture API
 - [ ] Add `ExceptionProperties` type

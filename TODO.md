@@ -15,8 +15,9 @@
 - [x] Ran yarn install to update lockfile to 4.17.2 (iteration 2)
 - [x] Added `errorTracking.autocapture` config to analytics.native.ts
 - [x] Fixed PostHogEventProperties import to use @posthog/core (iteration 3)
-- [x] Removed unsupported rateLimiter option from errorTracking (iteration 3)
-- Note: Rate limiting for RN SDK v4.x is handled internally by the SDK
+- [x] Updated docs/posthog-exception-handling.md to reflect SDK reality (iteration 4)
+
+**SDK Clarification**: The posthog-react-native v4.x `ErrorTrackingOptions` interface only supports `autocapture`. There is no `rateLimiter` option exposed in the public API. The original implementation plan was based on early documentation that didn't match the released SDK types. Rate limiting for RN error tracking is handled internally by the SDK.
 
 #### Phase 3: Manual Capture API
 - [x] Added ExceptionProperties interface to types.ts
