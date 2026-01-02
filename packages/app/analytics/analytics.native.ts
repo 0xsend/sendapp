@@ -71,7 +71,7 @@ export const analytics: AnalyticsService = {
     }
 
     client.captureException(error, {
-      source: properties?.source,
+      ...(properties?.source && { source: properties.source }),
       handled: properties?.handled ?? true,
       ...properties?.context,
     })
