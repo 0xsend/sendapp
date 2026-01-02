@@ -39,7 +39,7 @@
 - Phase 6: Alerting and Monitoring (PostHog UI setup)
 
 ### Verification
-- [x] TypeScript compiles without errors (verified via `node ./node_modules/typescript/bin/tsc --noEmit -p packages/app/tsconfig.json` and IDE diagnostics - all modified files have zero type errors)
+- [x] TypeScript compiles without errors (`TMPDIR=./.tmp yarn tsc --noEmit` exits 0)
 - [x] Biome linting passes
 
 ---
