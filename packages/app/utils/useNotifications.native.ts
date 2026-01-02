@@ -106,8 +106,9 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     }
 
     try {
-      // Get project ID from app config
-      const projectId = Constants.expoConfig?.extra?.eas?.projectId
+      // Prefer the modern EAS config, fall back to legacy expoConfig.extra.eas.
+      const projectId =
+        Constants.easConfig?.projectId ?? Constants.expoConfig?.extra?.eas?.projectId
 
       if (!projectId) {
         log('Missing EAS project ID in app config')
@@ -138,19 +139,20 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       return false
     }
 
-    if (!expoPushToken) {
-      // Try to get token first
-      const token = await getExpoPushToken()
-      if (!token) {
-        log('Cannot register token: Failed to get push token')
-        return false
-      }
-      setExpoPushToken(token)
+    if (!isEnabled) {
+      log('Cannot register token: Notifications permission not granted')
+      return false
     }
 
-    const tokenToRegister = expoPushToken || (await getExpoPushToken())
-    if (!tokenToRegister) {
+    const token = expoPushToken ?? (await getExpoPushToken())
+    if (!token) {
+      log('Cannot register token: Failed to get push token')
       return false
+    }
+
+    // Keep local state in sync, but avoid extra token fetches.
+    if (!expoPushToken) {
+      setExpoPushToken(token)
     }
 
     try {
@@ -159,7 +161,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       // Use Supabase RPC to register token via the register_push_token function
       // Backend schema uses push_token_platform = ('expo' | 'web')
       const { data, error: rpcError } = await supabase.rpc('register_push_token', {
-        token_value: tokenToRegister,
+        token_value: token,
         token_platform: 'expo',
         token_device_id: Device.deviceName || undefined,
       })
@@ -178,7 +180,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       setError(err)
       return false
     }
-  }, [session?.user?.id, expoPushToken, getExpoPushToken, supabase])
+  }, [session?.user?.id, isEnabled, expoPushToken, getExpoPushToken, supabase])
 
   /**
    * Unregister push token from backend
@@ -195,6 +197,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         .from('push_tokens')
         .delete()
         .eq('token', expoPushToken)
+        .eq('platform', 'expo')
         .eq('user_id', session.user.id)
 
       if (deleteError) {
