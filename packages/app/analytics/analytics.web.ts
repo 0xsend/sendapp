@@ -35,15 +35,6 @@ export const analytics: AnalyticsService = {
     posthog.capture(event.name, event.properties)
   },
 
-  captureException(error: Error, context?: Record<string, unknown>) {
-    if (!initialized) return
-    posthog.capture('$exception', {
-      $exception_message: error.message,
-      $exception_stack_trace_raw: error.stack,
-      ...context,
-    })
-  },
-
   screen(_name: string, _properties?: Record<string, unknown>) {
     // No-op on web - pageviews are captured automatically via capture_pageview option
   },

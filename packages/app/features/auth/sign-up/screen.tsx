@@ -379,7 +379,6 @@ export const SignUpScreen = () => {
             auth_type: 'sign_up',
           },
         })
-        analytics.captureException(error instanceof Error ? error : new Error(message))
         return
       }
     },

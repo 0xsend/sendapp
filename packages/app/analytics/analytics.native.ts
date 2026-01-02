@@ -32,14 +32,6 @@ export const analytics: AnalyticsService = {
     client?.capture(event.name, event.properties as PostHogEventProperties)
   },
 
-  captureException(error: Error, context?: Record<string, unknown>) {
-    client?.capture('$exception', {
-      $exception_message: error.message,
-      $exception_stack_trace_raw: error.stack ?? '',
-      ...(context as PostHogEventProperties),
-    })
-  },
-
   screen(name: string, properties?: Record<string, unknown>) {
     client?.screen(name, properties as PostHogEventProperties)
   },

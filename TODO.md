@@ -71,6 +71,12 @@ Screen and page views are tracked automatically:
 - [x] activity_item_opened (ActivityDetailsProvider.tsx:22)
 - [x] referral_link_shared (ReferralLink.tsx:57)
 
+### Contacts
+- [x] contact_added (useContactMutation.ts:80, with contact_type: 'sendtag' | 'address')
+- [x] contact_favorited (useContactMutation.ts:178, with is_favorited boolean)
+- [x] contact_archived (useContactMutation.ts:274, with contact_type)
+- [x] contact_unarchived (useContactMutation.ts:322, with contact_type)
+
 ### Canton Verification
 - [x] canton_verification_completed (CantonWalletVerification.tsx:716)
 - [x] canton_verification_failed (CantonWalletVerification.tsx:728)

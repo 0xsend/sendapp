@@ -353,7 +353,6 @@ export interface AnalyticsService {
   init(): Promise<void>
   identify(distinctId: string, properties?: AnalyticsUserProperties): void
   capture<E extends AnalyticsEvent>(event: E): void
-  captureException(error: Error, context?: Record<string, unknown>): void
   /**
    * Track screen views on native platforms.
    * Uses PostHog's dedicated screen() method for React Navigation v7+ compatibility.
