@@ -139,7 +139,7 @@ create materialized view "private"."send_scores_history" as  WITH dws AS (
          SELECT min(dws.start_time) AS min_start,
             max(dws.end_time) AS max_end
            FROM dws
-        ), transfers AS (
+), transfers AS (
          SELECT stt.f,
             stt.t,
             stt.v,
@@ -155,6 +155,17 @@ create materialized view "private"."send_scores_history" as  WITH dws AS (
            FROM (send_token_v0_transfers stv
              CROSS JOIN bounds)
           WHERE ((stv.block_time >= bounds.min_start) AND (stv.block_time <= bounds.max_end))
+        UNION ALL
+         -- Send Check claims (SEND token only)
+         SELECT scc.sender AS f,
+            scc.redeemer AS t,
+            scc.amount AS v,
+            scc.block_time
+           FROM (send_check_claimed scc
+             CROSS JOIN bounds)
+          WHERE ((scc.block_time >= bounds.min_start) AND (scc.block_time <= bounds.max_end))
+            AND (scc.token = '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea)
+            AND (scc.redeemer != scc.sender)
         ), window_transfers AS (
          SELECT dws.id AS distribution_id,
             tr.f,
@@ -282,6 +293,15 @@ create or replace view "public"."send_scores_current" as  WITH dws AS (
            FROM send_token_v0_transfers stv
            CROSS JOIN dws dws_1
            WHERE (stv.block_time >= dws_1.start_time) AND (stv.block_time <= dws_1.end_time)
+           UNION ALL
+           -- Send Check claims senders (SEND token only)
+           SELECT scc.sender AS f
+           FROM send_check_claimed scc
+           CROSS JOIN dws dws_1
+           WHERE scc.block_time >= dws_1.start_time
+             AND scc.block_time <= dws_1.end_time
+             AND scc.token = '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea
+             AND scc.redeemer != scc.sender
          ) all_senders
          WHERE f IS NOT NULL
         ), sender_accounts AS (
@@ -314,6 +334,19 @@ AND stt.f IN (SELECT address_bytes FROM sender_accounts)
                 AND stv.t IS NOT NULL
 AND stv.f IN (SELECT address_bytes FROM sender_accounts)
                 AND ((dws_1.earn_min_balance = 0) OR (stv.t IN (SELECT owner FROM eligible_earn_accounts)))
+             UNION ALL
+             -- Send Check claims (SEND token only)
+             SELECT scc.sender AS f,
+                    scc.redeemer AS t,
+                    scc.amount AS v
+               FROM send_check_claimed scc
+               CROSS JOIN dws dws_1
+              WHERE scc.block_time >= dws_1.start_time
+                AND scc.block_time <= dws_1.end_time
+                AND scc.token = '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea
+                AND scc.redeemer != scc.sender
+                AND scc.sender IN (SELECT address_bytes FROM sender_accounts)
+                AND ((dws_1.earn_min_balance = 0) OR (scc.redeemer IN (SELECT owner FROM eligible_earn_accounts)))
            ) u
           GROUP BY u.f, u.t
         ), filtered_window_transfers AS (
