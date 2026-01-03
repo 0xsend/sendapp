@@ -1,8 +1,8 @@
 #!/usr/bin/env bun run
-import 'zx/globals'
 import { createServer, type AddressInfo } from 'node:net'
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
+import { parseArgs } from 'node:util'
 
 /**
  * gen-env: Generate a .localnet.env file with dynamically allocated free ports.
@@ -11,9 +11,10 @@ import { join } from 'node:path'
  * simultaneously without port conflicts.
  *
  * Usage:
- *   bun run bin/gen-env.ts local --name <workspace>          # Generate .localnet.env with free ports
- *   bun run bin/gen-env.ts local --name <workspace> --force  # Force regenerate even if lockfile exists
- *   bun run bin/gen-env.ts local --clean                     # Remove .localnet.env and lockfile
+ *   bun run bin/gen-env.ts                     # Interactive prompt for workspace name
+ *   bun run bin/gen-env.ts --name <workspace>  # Generate .localnet.env with free ports
+ *   bun run bin/gen-env.ts --force             # Force regenerate even if lockfile exists
+ *   bun run bin/gen-env.ts --clean             # Remove .localnet.env and lockfile
  */
 
 // Port configuration structure
@@ -163,7 +164,7 @@ async function validatePorts(config: PortConfig): Promise<boolean> {
   for (const key of PORT_KEYS) {
     const port = config[key]
     if (await isPortInUse(port)) {
-      console.log(chalk.yellow(`Port ${port} (${key}) is in use`))
+      console.log(`\x1b[33mPort ${port} (${key}) is in use\x1b[0m`)
       return false
     }
   }
@@ -184,26 +185,26 @@ function loadLockfile(): LockfileData | null {
 
     // Validate workspace name exists
     if (typeof data.workspaceName !== 'string' || !data.workspaceName) {
-      console.log(chalk.yellow('Lockfile missing workspace name, regenerating...'))
+      console.log('\x1b[33mLockfile missing workspace name, regenerating...\x1b[0m')
       return null
     }
 
     // Validate all required port keys exist
     if (!data.ports || typeof data.ports !== 'object') {
-      console.log(chalk.yellow('Lockfile missing ports, regenerating...'))
+      console.log('\x1b[33mLockfile missing ports, regenerating...\x1b[0m')
       return null
     }
 
     for (const key of PORT_KEYS) {
       if (typeof data.ports[key] !== 'number') {
-        console.log(chalk.yellow(`Lockfile missing or invalid ${key}, regenerating...`))
+        console.log(`\x1b[33mLockfile missing or invalid ${key}, regenerating...\x1b[0m`)
         return null
       }
     }
 
     return data
   } catch {
-    console.log(chalk.yellow('Failed to parse lockfile, regenerating...'))
+    console.log('\x1b[33mFailed to parse lockfile, regenerating...\x1b[0m')
     return null
   }
 }
@@ -287,74 +288,78 @@ function generateEnvContent(workspaceName: string, ports: PortConfig): string {
 function printSummary(workspaceName: string, ports: PortConfig): void {
   const tiltHost = `${workspaceName}.localhost`
   console.log('')
-  console.log(chalk.cyan('=== Localnet Port Configuration ==='))
+  console.log('\x1b[36m=== Localnet Port Configuration ===\x1b[0m')
   console.log('')
-  console.log(chalk.bold(`Workspace: ${workspaceName}`))
+  console.log(`\x1b[1mWorkspace: ${workspaceName}\x1b[0m`)
   console.log('')
-  console.log(chalk.green('Tilt:'))
+  console.log('\x1b[32mTilt:\x1b[0m')
   console.log(`  Web UI:           http://${tiltHost}:${ports.TILT_PORT}`)
   console.log('')
-  console.log(chalk.green('Next.js:'))
+  console.log('\x1b[32mNext.js:\x1b[0m')
   console.log(`  Web App:          http://localhost:${ports.NEXTJS_PORT}`)
   console.log('')
-  console.log(chalk.green('Supabase:'))
+  console.log('\x1b[32mSupabase:\x1b[0m')
   console.log(`  API:              http://localhost:${ports.SUPABASE_API_PORT}`)
   console.log(`  Studio:           http://localhost:${ports.SUPABASE_STUDIO_PORT}`)
   console.log(`  Database:         postgresql://localhost:${ports.SUPABASE_DB_PORT}`)
   console.log(`  Inbucket:         http://localhost:${ports.SUPABASE_INBUCKET_PORT}`)
   console.log('')
-  console.log(chalk.green('Blockchain:'))
+  console.log('\x1b[32mBlockchain:\x1b[0m')
   console.log(`  Anvil Mainnet:    http://localhost:${ports.ANVIL_MAINNET_PORT}`)
   console.log(`  Anvil Base:       http://localhost:${ports.ANVIL_BASE_PORT}`)
   console.log(`  Bundler:          http://localhost:${ports.BUNDLER_PORT}`)
   console.log(`  Otterscan (main): http://localhost:${ports.OTTERSCAN_MAINNET_PORT}`)
   console.log(`  Otterscan (base): http://localhost:${ports.OTTERSCAN_BASE_PORT}`)
   console.log('')
-  console.log(chalk.green('Infrastructure:'))
+  console.log('\x1b[32mInfrastructure:\x1b[0m')
   console.log(`  Shovel:           http://localhost:${ports.SHOVEL_PORT}`)
   console.log(`  Temporal:         localhost:${ports.TEMPORAL_PORT}`)
   console.log(`  Temporal UI:      http://localhost:${ports.TEMPORAL_UI_PORT}`)
   console.log('')
 }
 
-/**
- * Parse --name argument from args array.
- */
-function parseNameArg(args: string[]): string | undefined {
-  const nameIndex = args.indexOf('--name')
-  if (nameIndex === -1) {
-    return undefined
+function printUsage(): void {
+  console.log('Usage: gen-env [--name <workspace>] [--force] [--clean] [--help]')
+  console.log('')
+  console.log('Generate .localnet.env with dynamically allocated free ports.')
+  console.log('')
+  console.log('Options:')
+  console.log('  --name <workspace>  Workspace name (e.g., main, feature-x, bb-dev)')
+  console.log('                      Used for TILT_HOST (<name>.localhost) and resource prefixes')
+  console.log('                      If not provided, prompts interactively')
+  console.log('  --force             Force regenerate even if lockfile exists')
+  console.log('  --clean             Remove .localnet.env and lockfile')
+  console.log('  --help              Show this help message')
+}
+
+function promptWorkspaceName(): string {
+  const response = prompt('Enter workspace name (e.g., bb-dev): ')
+  if (!response || !response.trim()) {
+    console.log('\x1b[31mWorkspace name is required\x1b[0m')
+    process.exit(1)
   }
-  return args[nameIndex + 1]
+  return response.trim()
 }
 
 async function main() {
-  const args = process.argv.slice(2)
-  const command = args[0]
+  const { values } = parseArgs({
+    args: process.argv.slice(2),
+    options: {
+      name: { type: 'string', short: 'n' },
+      force: { type: 'boolean', short: 'f', default: false },
+      clean: { type: 'boolean', short: 'c', default: false },
+      help: { type: 'boolean', short: 'h', default: false },
+    },
+    allowPositionals: false,
+  })
 
-  if (command !== 'local') {
-    console.log(chalk.yellow('Usage: gen-env local --name <workspace> [--force] [--clean]'))
-    console.log('')
-    console.log('Commands:')
-    console.log('  local                    Generate .localnet.env with free ports')
-    console.log('')
-    console.log('Required:')
-    console.log('  --name <workspace>       Workspace name (e.g., main, feature-x, bb-dev)')
-    console.log(
-      '                           Used for TILT_HOST (<name>.localhost) and resource prefixes'
-    )
-    console.log('')
-    console.log('Options:')
-    console.log('  --force                  Force regenerate even if lockfile exists')
-    console.log('  --clean                  Remove .localnet.env and lockfile')
-    process.exit(1)
+  if (values.help) {
+    printUsage()
+    process.exit(0)
   }
 
-  const forceRegenerate = args.includes('--force')
-  const clean = args.includes('--clean')
-
-  if (clean) {
-    console.log(chalk.yellow('Cleaning up...'))
+  if (values.clean) {
+    console.log('\x1b[33mCleaning up...\x1b[0m')
     if (existsSync(LOCKFILE_PATH)) {
       unlinkSync(LOCKFILE_PATH)
       console.log(`  Removed ${LOCKFILE_PATH}`)
@@ -363,48 +368,40 @@ async function main() {
       unlinkSync(ENV_FILE_PATH)
       console.log(`  Removed ${ENV_FILE_PATH}`)
     }
-    console.log(chalk.green('Done!'))
+    console.log('\x1b[32mDone!\x1b[0m')
     return
   }
 
-  // Parse and validate workspace name
-  const workspaceName = parseNameArg(args)
-  if (!workspaceName) {
-    console.log(chalk.red('Error: --name <workspace> is required'))
-    console.log('')
-    console.log('Example: gen-env local --name bb-dev')
-    process.exit(1)
-  }
+  // Get workspace name from flag or prompt interactively
+  const workspaceName = values.name ?? promptWorkspaceName()
   validateWorkspaceName(workspaceName)
 
   let ports: PortConfig | undefined
 
   // Try to load existing lockfile
-  if (!forceRegenerate) {
+  if (!values.force) {
     const existingData = loadLockfile()
     if (existingData) {
       // Check if workspace name changed
       if (existingData.workspaceName !== workspaceName) {
         console.log(
-          chalk.yellow(
-            `Workspace name changed from "${existingData.workspaceName}" to "${workspaceName}", regenerating...`
-          )
+          `\x1b[33mWorkspace name changed from "${existingData.workspaceName}" to "${workspaceName}", regenerating...\x1b[0m`
         )
       } else {
-        console.log(chalk.blue('Found existing port configuration, validating...'))
+        console.log('\x1b[34mFound existing port configuration, validating...\x1b[0m')
         const valid = await validatePorts(existingData.ports)
         if (valid) {
-          console.log(chalk.green('Existing ports are available, reusing configuration.'))
+          console.log('\x1b[32mExisting ports are available, reusing configuration.\x1b[0m')
           ports = existingData.ports
         } else {
-          console.log(chalk.yellow('Some ports are in use, allocating new ports...'))
+          console.log('\x1b[33mSome ports are in use, allocating new ports...\x1b[0m')
         }
       }
     } else {
-      console.log(chalk.blue('Allocating new ports...'))
+      console.log('\x1b[34mAllocating new ports...\x1b[0m')
     }
   } else {
-    console.log(chalk.blue('Force regenerating ports...'))
+    console.log('\x1b[34mForce regenerating ports...\x1b[0m')
   }
 
   if (ports === undefined) {
@@ -415,18 +412,18 @@ async function main() {
   // Generate .localnet.env
   const envContent = generateEnvContent(workspaceName, ports)
   writeFileSync(ENV_FILE_PATH, envContent)
-  console.log(chalk.green(`Generated ${ENV_FILE_PATH}`))
+  console.log(`\x1b[32mGenerated ${ENV_FILE_PATH}\x1b[0m`)
 
   printSummary(workspaceName, ports)
 
-  console.log(chalk.cyan('Next steps:'))
+  console.log('\x1b[36mNext steps:\x1b[0m')
   console.log('  1. Reload direnv: direnv allow')
   console.log('  2. Start Tilt:    tilt up')
   console.log('')
-  console.log(chalk.gray('Tilt reads TILT_HOST and TILT_PORT from .localnet.env automatically'))
+  console.log('\x1b[90mTilt reads TILT_HOST and TILT_PORT from .localnet.env automatically\x1b[0m')
 }
 
 main().catch((err) => {
-  console.error(chalk.red('Error:'), err)
+  console.error('\x1b[31mError:\x1b[0m', err)
   process.exit(1)
 })
