@@ -1,6 +1,23 @@
 import { useCallback, useState } from 'react'
 import { Button, H2, Paragraph, YStack } from '@my/ui'
+import { Image, type ImageSourcePropType } from 'react-native'
 import { useRouter } from 'solito/router'
+
+// Handle different module formats for cross-platform compatibility
+function getImageSource(): ImageSourcePropType {
+  let source: ImageSourcePropType = require('./error-robot.png')
+  if (typeof source === 'object' && source !== null) {
+    if ('default' in source) {
+      source = (source as { default: ImageSourcePropType }).default
+    }
+    if (typeof source === 'object' && source !== null && 'src' in source) {
+      source = { uri: (source as { src: string }).src }
+    }
+  }
+  return source
+}
+
+const errorRobotImage = getImageSource()
 
 /**
  * Temporary component to test error boundary UI.
@@ -38,6 +55,7 @@ export function ErrorFallback({ error, resetError }: Props) {
 
   return (
     <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" gap="$4">
+      <Image source={errorRobotImage} style={{ width: 200, height: 200 }} resizeMode="contain" />
       <H2>Something went wrong</H2>
       <Paragraph color="$gray10" textAlign="center">
         An unexpected error occurred. Please try again.
