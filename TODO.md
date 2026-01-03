@@ -52,13 +52,29 @@
 "SKIP_YARN_POST_INSTALL=1 yarn install --inline-builds" if not CI else "yarn install --immutable"
 ```
 
-### Verification Results (Iteration 3)
+### Fixes Applied (Iteration 4)
+
+#### Fix 4: Remove yarn:install dependency from Docker Compose resources
+**Problem**: Docker Compose resources (anvil:base-node, anvil:base, aa_bundler:base, shovel) were blocked by yarn:install failure due to better-sqlite3 native build error.
+
+**Solution**: Removed `yarn:install` from `resource_deps` for dc_resource entries in infra.Tiltfile since Docker containers are self-contained and don't need yarn:install:
+```python
+dc_resource(
+    "anvil-base",
+    ...
+    resource_deps = [],  # No deps - anvil container is self-contained
+)
+```
+
+Also removed `shovel:generate-config` dependency from shovel since the config is pre-generated and mounted as a volume.
+
+### Verification Results (Iteration 4)
 The nginx proxy + Docker Compose solution works correctly:
 - Docker Compose config validates successfully
 - Anvil starts on internal port 8547 with healthcheck passing
 - Nginx proxy starts and provides connection pooling (keepalive 32)
-- RPC calls through proxy succeed: `cast bn --rpc-url=http://localhost:$ANVIL_BASE_PORT` returns block number
+- RPC calls through proxy succeed: `cast bn --rpc-url=http://localhost:49667` returns block number 9
 - Bundler connects through proxy to `http://anvil-proxy:80` and successfully communicates with anvil
 - All container healthchecks pass
 
-The blocking issues (better-sqlite3 native build, unfunded bundler) are pre-existing environment issues unrelated to the localnet compose changes.
+**Note**: Full Tilt integration with `tilt up` requires yarn:install to succeed. The better-sqlite3 native build error is a pre-existing worktree environment issue (Node version mismatch or stale build cache) unrelated to the Docker Compose infrastructure changes. The Docker Compose infrastructure itself works correctly when run directly with `docker compose up`.

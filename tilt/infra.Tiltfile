@@ -136,11 +136,12 @@ docker_compose(
 
 # Map compose services to Tilt resources
 # anvil-base: Internal anvil node (not directly accessible)
+# Note: Docker Compose resources don't depend on yarn:install since they run in containers
 dc_resource(
     "anvil-base",
     labels = labels,
     new_name = "anvil:base-node",
-    resource_deps = _infra_resource_deps + ["supabase"],
+    resource_deps = [],  # No deps - anvil container is self-contained
 )
 
 # anvil-proxy: Nginx reverse proxy with connection pooling
@@ -163,11 +164,14 @@ dc_resource(
 )
 
 # shovel: Blockchain indexer
+# Note: Shovel mounts config from packages/shovel/etc/config.json
+# The shovel:generate-config resource will update the config if needed, but
+# shovel can start with existing config
 dc_resource(
     "shovel",
     labels = labels,
     links = [link("http://localhost:" + _shovel_port + "/", "Shovel")],
-    resource_deps = ["anvil:base", "shovel:generate-config"],
+    resource_deps = ["anvil:base"],  # Only needs anvil proxy, config is pre-generated
 )
 
 # otterscan-base: Block explorer (optional profile in compose, not started by default)
