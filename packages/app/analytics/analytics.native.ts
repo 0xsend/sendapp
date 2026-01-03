@@ -18,8 +18,8 @@ export const analytics: AnalyticsService = {
   async init() {
     if (client) return
 
-    const key = process.env.EXPO_PUBLIC_POSTHOG_KEY
-    const host = process.env.EXPO_PUBLIC_POSTHOG_HOST
+    const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
+    const host = process.env.NEXT_PUBLIC_POSTHOG_HOST
 
     if (!key) {
       log('PostHog key not configured')

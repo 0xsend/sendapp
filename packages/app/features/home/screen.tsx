@@ -188,6 +188,7 @@ function HomeBody(props: XStackProps) {
             gap="$3"
             ai={'center'}
           >
+            <CrashTestButton />
             <StablesBalanceCard>
               <StablesBalanceCard.HomeScreenHeader />
               <StablesBalanceCard.Footer>
@@ -213,7 +214,6 @@ function HomeBody(props: XStackProps) {
               <RewardsCard w="55%" f={1} />
               <FriendsCard f={1} />
             </HomeBodyCardRow>
-            <CrashTestButton />
           </YStack>
           <RightPanel />
         </XStack>
