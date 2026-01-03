@@ -7,6 +7,7 @@ const requiredEnvVars = [
   'SUPABASE_DB_URL',
   'SUPABASE_JWT_SECRET',
   'SUPABASE_SERVICE_ROLE',
+  'FUNDING_TOPOFF_PRIVATE_KEY',
 ] as const
 
 const optionalEnvVars = ['DEBUG']

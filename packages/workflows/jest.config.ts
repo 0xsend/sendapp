@@ -16,6 +16,9 @@ const config: Config = {
   coveragePathIgnorePatterns: ['/node_modules/'],
   coverageProvider: 'babel',
   workerThreads: true,
+  globals: {
+    __DEV__: true,
+  },
   globalSetup: '<rootDir>/jest.setup.ts',
   transformIgnorePatterns: ['node_modules/(?!(get-port))'],
   moduleNameMapper: {
