@@ -53,22 +53,27 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
 
   // Fetch activity involving this address from the user's activity feed
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery({
+    useInfiniteQuery<Activity[], Error>({
       queryKey: ['external_address_activity', address, user?.id],
       initialPageParam: 0,
       getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-        if (lastPage !== null && lastPage.length < 10) return undefined
-        return lastPageParam + 1
+        if (!lastPage || lastPage.length < 10) return undefined
+        return (lastPageParam as number) + 1
       },
-      queryFn: async ({ pageParam }) => {
-        const from = pageParam * 10
-        const to = (pageParam + 1) * 10 - 1
+      queryFn: async ({ pageParam }): Promise<Activity[]> => {
+        const page = pageParam as number
+        const from = page * 10
+        const to = (page + 1) * 10 - 1
 
-        // Query activity_feed for activities where the external address appears in data.f or data.t
+        // Query activity_feed for activities where the external address appears in data.f, data.t, or data.sender
+        // - data.f/data.t: used by SendAccountTransfers and token TemporalSendAccountTransfers
+        // - data.sender: used by SendAccountReceive and ETH TemporalSendAccountTransfers
         const { data: activities, error } = await supabase
           .from('activity_feed')
           .select('*')
-          .or(`data->>f.eq.${addressBytea},data->>t.eq.${addressBytea}`)
+          .or(
+            `data->>f.eq.${addressBytea},data->>t.eq.${addressBytea},data->>sender.eq.${addressBytea}`
+          )
           .in('event_name', [
             Events.SendAccountTransfers,
             Events.SendAccountReceive,
@@ -95,11 +100,18 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
   // Block explorer URL for Base chain
   const blockExplorerUrl = `https://basescan.org/address/${address}`
 
-  // Determine if an activity was sent by the current user or received
+  // Determine if an activity was sent by the current user or received from the external address
   const isSent = (activity: Activity) => {
-    // If the external address is in the 'to' field, current user sent TO them
-    const toAddressBytea = activity.data.t
-    return toAddressBytea === addressBytea
+    // After parsing, data.t and data.sender are hex addresses (transformed by byteaToHexEthAddress)
+    // For transfer events: if external address is in 'to' field, current user sent TO them
+    // For receive events: if external address is in 'sender' field, they sent TO us (so we received)
+    const toAddress = activity.data.t
+    const senderAddress = 'sender' in activity.data ? activity.data.sender : undefined
+    // If external address is the recipient (data.t), we sent to them
+    // If external address is the sender (data.sender), we received from them (not sent)
+    if (toAddress?.toLowerCase() === address.toLowerCase()) return true
+    if (senderAddress?.toLowerCase() === address.toLowerCase()) return false
+    return false
   }
 
   return (
@@ -173,7 +185,7 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
               </Paragraph>
             </YStack>
           ) : (
-            <FlatList
+            <FlatList<Activity>
               testID="ExternalAddressActivityFeed"
               style={{ flex: 1 }}
               data={activities}
