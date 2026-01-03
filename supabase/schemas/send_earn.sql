@@ -680,3 +680,58 @@ REVOKE ALL ON "public"."send_earn_balances_timeline" FROM PUBLIC;
 REVOKE ALL ON "public"."send_earn_balances_timeline" FROM anon;
 GRANT ALL ON "public"."send_earn_balances_timeline" TO authenticated;
 GRANT ALL ON "public"."send_earn_balances_timeline" TO service_role;
+
+-- Table: send_earn_reward_claims
+-- Tracks reward claims from Merkl distribution system (MORPHO and WELL tokens)
+CREATE TABLE IF NOT EXISTS "public"."send_earn_reward_claims" (
+    "id" bigint NOT NULL,
+    "vault" "bytea" NOT NULL,
+    "token" "bytea" NOT NULL,
+    "amount" numeric NOT NULL,
+    "tx_hash" "bytea" NOT NULL,
+    "block_num" numeric NOT NULL,
+    "block_time" numeric NOT NULL,
+    "created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+
+ALTER TABLE "public"."send_earn_reward_claims" OWNER TO "postgres";
+
+ALTER TABLE "public"."send_earn_reward_claims" ALTER COLUMN "id"
+ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME "public"."send_earn_reward_claims_id_seq"
+    START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1
+);
+
+-- Indexes for send_earn_reward_claims
+CREATE INDEX "idx_reward_claims_vault" ON "public"."send_earn_reward_claims" USING "btree" ("vault");
+CREATE INDEX "idx_reward_claims_token" ON "public"."send_earn_reward_claims" USING "btree" ("token");
+CREATE INDEX "idx_reward_claims_block_time" ON "public"."send_earn_reward_claims" USING "btree" ("block_time");
+CREATE UNIQUE INDEX "u_reward_claims" ON "public"."send_earn_reward_claims" USING "btree" ("vault", "token", "tx_hash");
+
+-- RLS & Policies for send_earn_reward_claims
+ALTER TABLE "public"."send_earn_reward_claims" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "send_earn_reward_claims viewable by authenticated users" ON "public"."send_earn_reward_claims" FOR SELECT TO "authenticated" USING (true);
+
+-- Grants for send_earn_reward_claims
+GRANT ALL ON TABLE "public"."send_earn_reward_claims" TO "anon";
+GRANT ALL ON TABLE "public"."send_earn_reward_claims" TO "authenticated";
+GRANT ALL ON TABLE "public"."send_earn_reward_claims" TO "service_role";
+GRANT ALL ON SEQUENCE "public"."send_earn_reward_claims_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."send_earn_reward_claims_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."send_earn_reward_claims_id_seq" TO "service_role";
+
+-- View: send_earn_rewards_summary
+-- Aggregates reward claims by vault and token
+CREATE OR REPLACE VIEW "public"."send_earn_rewards_summary"
+WITH ("security_invoker"='on', "security_barrier"='on') AS
+SELECT
+    vault,
+    token,
+    SUM(amount) as total_claimed,
+    COUNT(*) as claim_count,
+    MAX(block_time) as last_claim_time
+FROM send_earn_reward_claims
+GROUP BY vault, token;
+
+GRANT ALL ON TABLE "public"."send_earn_rewards_summary" TO "authenticated";
+GRANT ALL ON TABLE "public"."send_earn_rewards_summary" TO "service_role";

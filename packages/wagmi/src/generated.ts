@@ -2727,6 +2727,48 @@ export const masqAddress = {
 export const masqConfig = { address: masqAddress, abi: masqAbi } as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MerklDistributor
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const merklDistributorAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'users', internalType: 'address[]', type: 'address[]' },
+      { name: 'tokens', internalType: 'address[]', type: 'address[]' },
+      { name: 'amounts', internalType: 'uint256[]', type: 'uint256[]' },
+      { name: 'proofs', internalType: 'bytes32[][]', type: 'bytes32[][]' },
+    ],
+    name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const merklDistributorAddress = {
+  8453: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
+  84532: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
+  845337: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
+} as const
+
+/**
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const merklDistributorConfig = {
+  address: merklDistributorAddress,
+  abi: merklDistributorAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Moonwell
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -6062,7 +6104,6 @@ export const sendVerifyingPaymasterAbi = [
 export const sendVerifyingPaymasterAddress = {
   8453: '0x8A77aE0c07047c5b307B2319A8F4Bd9d3604DdD8',
   84532: '0x3CA2b4DAE6cFA762a690EbC4C45cA2f6b896dB80',
-  845337: '0xBdf361C9279a08d69d86CCd217B64374ab334583',
 } as const
 
 /**
@@ -10195,6 +10236,52 @@ export const watchMasqTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: masqAbi,
   address: masqAddress,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link merklDistributorAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const writeMerklDistributor = /*#__PURE__*/ createWriteContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link merklDistributorAbi}__ and `functionName` set to `"claim"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const writeMerklDistributorClaim = /*#__PURE__*/ createWriteContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+  functionName: 'claim',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link merklDistributorAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const prepareWriteMerklDistributor = /*#__PURE__*/ createSimulateContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link merklDistributorAbi}__ and `functionName` set to `"claim"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const prepareWriteMerklDistributorClaim = /*#__PURE__*/ createSimulateContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+  functionName: 'claim',
 })
 
 /**
@@ -19866,6 +19953,52 @@ export const useWatchMasqTransferEvent = /*#__PURE__*/ createUseWatchContractEve
   abi: masqAbi,
   address: masqAddress,
   eventName: 'Transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link merklDistributorAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const useWriteMerklDistributor = /*#__PURE__*/ createUseWriteContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link merklDistributorAbi}__ and `functionName` set to `"claim"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const useWriteMerklDistributorClaim = /*#__PURE__*/ createUseWriteContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+  functionName: 'claim',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link merklDistributorAbi}__
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const useSimulateMerklDistributor = /*#__PURE__*/ createUseSimulateContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link merklDistributorAbi}__ and `functionName` set to `"claim"`
+ *
+ * - [__View Contract on Base Basescan__](https://basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae)
+ */
+export const useSimulateMerklDistributorClaim = /*#__PURE__*/ createUseSimulateContract({
+  abi: merklDistributorAbi,
+  address: merklDistributorAddress,
+  functionName: 'claim',
 })
 
 /**
