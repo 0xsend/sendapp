@@ -15,10 +15,19 @@
     "//#biome:check": {},
     "//#biome:check:fix": {},
     "lint": {
-      "dependsOn": ["^//#biome:check"]
+      "dependsOn": ["^//#biome:check"],
+      "outputs": [".cache/eslint/**"]
+    },
+    "lint:fast": {
+      "dependsOn": ["^//#biome:check"],
+      "outputs": [".cache/eslint-fast/**"]
     },
     "lint:fix": {
       "dependsOn": ["^//#biome:check:fix"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
     },
     "clean": {
       "cache": false

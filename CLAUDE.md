@@ -12,7 +12,7 @@ Send is a next-generation payments app built as a monorepo with cross-platform s
 - **Database/Auth**: Supabase (PostgreSQL + Auth)
 - **Blockchain**: Foundry, Wagmi, Viem, Base chain
 - **Testing**: Jest (packages), pgTAP (Supabase), Playwright (E2E)
-- **Linting**: Biome
+- **Linting/Formatting**: Biome (repo-wide) + ESLint (React packages) + TypeScript typechecking
 - **Development**: Tilt for orchestration
 
 ### Key Directories
@@ -62,18 +62,37 @@ cd packages/playwright && yarn playwright test
 cd packages/<package-name> && yarn test path/to/test.test.ts
 ```
 
-### Linting & Formatting
+### Linting, Typecheck & Formatting (Fast Agent Workflow)
+Biome is the repo-wide formatter/linter. ESLint is used primarily for React/React Native packages (e.g. `packages/app`, `apps/expo`).
+
+**Key idea:** `yarn lint` is the strict gate (CI parity). Use `yarn lint:fast` for quick local iteration.
+
 ```bash
-# Check code with Biome
-npx @biomejs/biome check
+# Fastest first signal (repo-wide formatting/lint)
+yarn biome:check
 
-# Fix issues automatically
-npx @biomejs/biome check . --write
+# Fast lint for local iteration (non-typed ESLint, skips tsc)
+yarn lint:fast
+# Or target a single package:
+npx turbo lint:fast --filter=app
 
-# Run linting via Turbo
+# Full lint (CI parity: tsc --noEmit + typed ESLint in packages/app)
 yarn lint
+# Or filter to affected packages:
+npx turbo lint --affected
+
+# Standalone typecheck (useful if you only want TS errors)
+yarn typecheck
+
+# Auto-fix lint where supported
 yarn lint:fix
 ```
+
+Notes:
+- `packages/app` has two ESLint configs:
+  - `.eslintrc.cjs` (strict, with `parserOptions.project` for type-aware rules; used by `yarn lint`)
+  - `.eslintrc.fast.cjs` (fast, no type-aware rules; used by `yarn lint:fast`)
+- ESLint disk caching is enabled (`--cache`) and Turbo caches/restores `.cache/eslint/**` outputs. Avoid deleting `.cache/` and `.turbo/` unless debugging.
 
 ### Database
 
@@ -306,10 +325,17 @@ Applications located under `/apps` (excluding `/apps/next`) do not currently hav
 
 ### Linting and Testing
 
-This project uses Biome for linting and formatting. Run lint checks with:
+Quick checks:
 
 ```bash
-npx @biomejs/biome check
+# Biome (fast, repo-wide)
+yarn biome:check
+
+# Fast lint for local iteration
+yarn lint:fast
+
+# Full lint (CI parity)
+yarn lint
 ```
 
 ## Continuous Improvement
