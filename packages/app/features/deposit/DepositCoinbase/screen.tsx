@@ -6,10 +6,11 @@ import { IconError } from 'app/components/icons'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { CoinbaseOnrampVerifyScreen } from '../components/CoinbaseOnrampVerifyScreen'
 import { useRouter } from 'solito/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DepositCoinbaseForm } from 'app/features/deposit/DepositCoinbase/DepositCoinbaseForm'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 interface DepositCoinbaseScreenProps {
   defaultPaymentMethod?: 'APPLE_PAY' | 'CARD'
@@ -18,6 +19,7 @@ interface DepositCoinbaseScreenProps {
 export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseScreenProps) {
   const router = useRouter()
   const { data: sendAccount } = useSendAccount()
+  const analytics = useAnalytics()
   const {
     openOnramp,
     closeOnramp,
@@ -34,6 +36,9 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const { t } = useTranslation('deposit')
+  const depositAmountRef = useRef<number | undefined>(undefined)
+  const hasTrackedSuccess = useRef(false)
+  const hasTrackedFailure = useRef(false)
 
   // Web-only: detect iOS Safari to guide users when popups are blocked
   const niceError = error ? toNiceError(error) : null
@@ -47,6 +52,18 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
   )
 
   const handleConfirmTransaction = (amount: number) => {
+    depositAmountRef.current = amount
+
+    // Track deposit started
+    analytics.capture({
+      name: 'deposit_started',
+      properties: {
+        amount: amount.toString(),
+        currency: 'USD',
+        provider: 'coinbase',
+      },
+    })
+
     openOnramp(amount)
   }
 
@@ -55,6 +72,38 @@ export function DepositCoinbaseScreen({ defaultPaymentMethod }: DepositCoinbaseS
       router.push('/deposit/success')
     }
   }, [coinbaseStatus, router])
+
+  // Track deposit completed
+  useEffect(() => {
+    if (coinbaseStatus === 'success' && !hasTrackedSuccess.current) {
+      hasTrackedSuccess.current = true
+      analytics.capture({
+        name: 'deposit_completed',
+        properties: {
+          amount: depositAmountRef.current?.toString(),
+          currency: 'USD',
+          provider: 'coinbase',
+        },
+      })
+    }
+  }, [coinbaseStatus, analytics])
+
+  // Track deposit failed
+  useEffect(() => {
+    const isFailed = error || status === 'failure' || coinbaseStatus === 'failed'
+    if (isFailed && !hasTrackedFailure.current) {
+      hasTrackedFailure.current = true
+      analytics.capture({
+        name: 'deposit_failed',
+        properties: {
+          amount: depositAmountRef.current?.toString(),
+          currency: 'USD',
+          provider: 'coinbase',
+          error_type: error ? 'provider_error' : 'unknown',
+        },
+      })
+    }
+  }, [error, status, coinbaseStatus, analytics])
 
   const renderContent = () => {
     switch (true) {

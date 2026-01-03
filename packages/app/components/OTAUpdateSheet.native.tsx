@@ -2,6 +2,8 @@ import { Button, H2, Paragraph, Sheet, Spinner, YStack } from '@my/ui'
 import { Rocket } from '@tamagui/lucide-icons'
 import { useExpoUpdates } from 'app/utils/useExpoUpdates'
 import { useTranslation } from 'react-i18next'
+import { useEffect, useRef } from 'react'
+import { useAnalytics } from 'app/provider/analytics'
 
 /**
  * Native OTA update sheet component.
@@ -15,9 +17,31 @@ import { useTranslation } from 'react-i18next'
 export function OTAUpdateSheet() {
   const { t } = useTranslation('common')
   const { isDownloaded, isDownloading, restartApp, error } = useExpoUpdates()
+  const analytics = useAnalytics()
+  const hasTrackedPrompt = useRef(false)
 
   // Only show when update is downloaded and ready to apply
   const isOpen = isDownloaded && !error
+
+  // Track when update prompt is shown
+  useEffect(() => {
+    if (isOpen && !hasTrackedPrompt.current) {
+      analytics.capture({
+        name: 'ota_update_prompt_shown',
+        properties: {},
+      })
+      hasTrackedPrompt.current = true
+    }
+  }, [isOpen, analytics])
+
+  const handleRestartPress = () => {
+    // Track restart clicked
+    analytics.capture({
+      name: 'ota_update_restart_clicked',
+      properties: {},
+    })
+    void restartApp()
+  }
 
   return (
     <Sheet
@@ -61,7 +85,7 @@ export function OTAUpdateSheet() {
             testID="otaUpdateRestartButton"
             backgroundColor="$neon7"
             size="$5"
-            onPress={restartApp}
+            onPress={handleRestartPress}
             br="$4"
             w="100%"
             maxWidth={280}

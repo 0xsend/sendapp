@@ -13,6 +13,7 @@ import { useRouter } from 'solito/router'
 import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import { usePurchaseJackpotTicket } from './hooks/usePurchaseJackpotTicketMutation'
+import { useAnalytics } from 'app/provider/analytics'
 import formatAmount from 'app/utils/formatAmount'
 import { toNiceError } from 'app/utils/toNiceError'
 import { useQueryClient } from '@tanstack/react-query'
@@ -43,6 +44,7 @@ export function ConfirmBuyTicketsScreen() {
   const { t } = useTranslation('sendpot')
   const [rawNumberOfTickets] = useParam('numberOfTickets')
   const numberOfTickets = Number.parseInt(rawNumberOfTickets || '0', 10) || 0
+  const analytics = useAnalytics()
 
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
   const recipientAddress = useMemo(() => sendAccount?.address, [sendAccount?.address])
@@ -82,12 +84,27 @@ export function ConfirmBuyTicketsScreen() {
     {
       onSuccess: () => {
         console.log('Purchase successful')
+        // Track purchase completed
+        analytics.capture({
+          name: 'sendpot_ticket_purchase_completed',
+          properties: {
+            ticket_count: numberOfTickets,
+          },
+        })
         queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
         toast.show(t('confirm.toast.success'))
         router.push('/sendpot')
       },
       onError: (error) => {
         console.error('Purchase mutation failed:', error)
+        // Track purchase failed
+        analytics.capture({
+          name: 'sendpot_ticket_purchase_failed',
+          properties: {
+            ticket_count: numberOfTickets,
+            error_type: 'unknown',
+          },
+        })
         toast.error(t('confirm.toast.error'))
       },
     }
@@ -98,6 +115,15 @@ export function ConfirmBuyTicketsScreen() {
       console.error('Invalid jackpotId or numberOfTickets')
       return
     }
+
+    // Track purchase submitted
+    analytics.capture({
+      name: 'sendpot_ticket_purchase_submitted',
+      properties: {
+        ticket_count: numberOfTickets,
+      },
+    })
+
     // if we never prepared or the last prepare errored, re‐run it
     if (!userOp) {
       await refetchPrepare()

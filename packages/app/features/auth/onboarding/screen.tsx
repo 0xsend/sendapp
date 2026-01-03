@@ -23,7 +23,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useCreateSendAccount, useSendAccount } from 'app/utils/send-accounts'
 import { useRouter } from 'solito/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useIsClient } from 'app/utils/useIsClient'
 import { api } from 'app/utils/api'
 import { assert } from 'app/utils/assert'
@@ -32,11 +32,13 @@ import { useValidateSendtag } from 'app/utils/tags/useValidateSendtag'
 import { formatErrorMessage } from 'app/utils/formatErrorMessage'
 import { useFirstSendtagQuery } from 'app/utils/useFirstSendtag'
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
+import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { ReferrerBanner } from 'app/components/ReferrerBanner'
 import { Platform } from 'react-native'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 const OnboardingSchema = z.object({
   name: formFields.text,
@@ -62,9 +64,25 @@ export function OnboardingScreen() {
   const { data: referralCode } = useReferralCodeQuery()
   const { redirect } = useAuthRedirect()
   const { t } = useTranslation('onboarding')
+  const analytics = useAnalytics()
+  const supabase = useSupabase()
+  const hasTrackedOnboardingStart = useRef(false)
   const passkeyDiagnosticErrorMessage = t('passkey.status.failureDetailed', {
     defaultValue: PASSKEY_DIAGNOSTIC_ERROR_MESSAGE,
   })
+
+  // Track onboarding started on mount
+  useEffect(() => {
+    if (!hasTrackedOnboardingStart.current) {
+      analytics.capture({
+        name: 'onboarding_started',
+        properties: {
+          has_referral: !!referralCode,
+        },
+      })
+      hasTrackedOnboardingStart.current = true
+    }
+  }, [analytics, referralCode])
 
   const formName = form.watch('name')
   const validationError = form.formState.errors.root
@@ -308,6 +326,29 @@ export function OnboardingScreen() {
         sendAccountId: createdSendAccount.id,
         referralCode,
       })
+
+      // Fetch profile to get send_id for analytics
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('send_id')
+        .eq('id', user.id)
+        .single()
+
+      // Identify user and capture onboarding completed event
+      const sendId = String(profileData?.send_id ?? '')
+      analytics.identify(sendId, {
+        sendtag: name,
+        has_referral: !!referralCode,
+      })
+      analytics.capture({
+        name: 'onboarding_completed',
+        properties: {
+          sendtag: name,
+          has_referral: !!referralCode,
+          send_account_id: sendId,
+        },
+      })
+
       redirect()
     } catch (error) {
       console.error('Error creating account', error)

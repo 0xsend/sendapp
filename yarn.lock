@@ -7771,6 +7771,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@posthog/core@npm:1.9.0":
+  version: 1.9.0
+  resolution: "@posthog/core@npm:1.9.0"
+  dependencies:
+    cross-spawn: "npm:^7.0.6"
+  checksum: 10/6c0d7fcbb8b51fe3bfcd3064fe28ff458a75fed647a6c6be000186a376e7194ca6c2be06784b81a882455fed7e093c68f717a24ed34fdfe429e5445a53831503
+  languageName: node
+  linkType: hard
+
 "@prisma/debug@npm:5.14.0-dev.34":
   version: 5.14.0-dev.34
   resolution: "@prisma/debug@npm:5.14.0-dev.34"
@@ -15130,6 +15139,7 @@ __metadata:
     next: "npm:15.5.7"
     nock: "npm:^14.0.3"
     permissionless: "npm:^0.1.49"
+    posthog-react-native: "npm:^4.14.0"
     react-hook-form: "npm:^7.48.2"
     react-i18next: "npm:^15.4.0"
     react-native: "npm:0.81.5"
@@ -17770,6 +17780,13 @@ __metadata:
   dependencies:
     browserslist: "npm:^4.24.4"
   checksum: 10/a59da111fc437cc7ed1a1448dae6883617cabebd7731433d27ad75e0ff77df5f411204979bd8eb5668d2600f99db46eedf6f87e123109b6de728bef489d4229a
+  languageName: node
+  linkType: hard
+
+"core-js@npm:^3.38.1":
+  version: 3.47.0
+  resolution: "core-js@npm:3.47.0"
+  checksum: 10/c02dc6a091c7e6799e3527dc06a428c44bbcff7f8f6ee700ff818b90aa2ebaf1f17b0234146e692811da97cda5a39a6095ecadec9fd1a74b1135103eb0e96cb1
   languageName: node
   linkType: hard
 
@@ -21122,6 +21139,7 @@ __metadata:
     expo-web-browser: "npm:~15.0.8"
     intl-pluralrules: "npm:^2.0.1"
     metro-minify-terser: "npm:^0.74.1"
+    posthog-react-native: "npm:^4.14.0"
     react: "npm:19.1.2"
     react-dom: "npm:19.1.2"
     react-native: "npm:0.81.5"
@@ -22040,6 +22058,13 @@ __metadata:
   version: 5.0.5
   resolution: "fetch-retry@npm:5.0.5"
   checksum: 10/e1c7abf2991e53c5c39c22f20707c9c10a47e31aaa2aa4607f33c4ea4060a67210c95f7038ec886ecbdf7e9c92b2ba7a6c1cdcd05e16cc7b145707ec12f5fd9b
+  languageName: node
+  linkType: hard
+
+"fflate@npm:^0.4.8":
+  version: 0.4.8
+  resolution: "fflate@npm:0.4.8"
+  checksum: 10/c0c75029bcbefd0b47cede4ad2a3698f571e38d3d93dfbb96d744c655ec3bf5e31111044c2c01fa3965109874f5be8b5a6b3686b958392693689665cbabf3ece
   languageName: node
   linkType: hard
 
@@ -28101,6 +28126,7 @@ __metadata:
     next: "npm:15.5.7"
     next-seo: "npm:^6.8.0"
     plaiceholder: "npm:^3.0.0"
+    posthog-js: "npm:^1.312.0"
     raf: "npm:^3.4.1"
     react: "npm:19.1.2"
     react-dom: "npm:19.1.2"
@@ -30391,6 +30417,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"posthog-js@npm:^1.312.0":
+  version: 1.312.0
+  resolution: "posthog-js@npm:1.312.0"
+  dependencies:
+    "@posthog/core": "npm:1.9.0"
+    core-js: "npm:^3.38.1"
+    fflate: "npm:^0.4.8"
+    preact: "npm:^10.19.3"
+    web-vitals: "npm:^4.2.4"
+  checksum: 10/c0dfc9b44897515241cb68fc5efd9e651fe6b9d65555b022df7cfdcb189a154efcff1346ff44f1747df6bb573f1963a11b23df61f978828581b68af7266c3b20
+  languageName: node
+  linkType: hard
+
 "posthog-node@npm:3.1.2":
   version: 3.1.2
   resolution: "posthog-node@npm:3.1.2"
@@ -30398,6 +30437,51 @@ __metadata:
     axios: "npm:^0.27.0"
     rusha: "npm:^0.8.14"
   checksum: 10/e6aac81332c95e0a2f56be13fdaecf2b111e4013fcc8260f373c64cf177b7c0b01ba2f8a7c1e633c2886c311821b760848326587034b17a4b57d2319047bccf6
+  languageName: node
+  linkType: hard
+
+"posthog-react-native@npm:^4.14.0":
+  version: 4.17.2
+  resolution: "posthog-react-native@npm:4.17.2"
+  dependencies:
+    "@posthog/core": "npm:1.9.0"
+  peerDependencies:
+    "@react-native-async-storage/async-storage": ">=1.0.0"
+    "@react-navigation/native": ">= 5.0.0"
+    expo-application: ">= 4.0.0"
+    expo-device: ">= 4.0.0"
+    expo-file-system: ">= 13.0.0"
+    expo-localization: ">= 11.0.0"
+    posthog-react-native-session-replay: ">= 1.2.0"
+    react-native-device-info: ">= 10.0.0"
+    react-native-localize: ">= 3.0.0"
+    react-native-navigation: ">= 6.0.0"
+    react-native-safe-area-context: ">= 4.0.0"
+    react-native-svg: ">= 15.0.0"
+  peerDependenciesMeta:
+    "@react-native-async-storage/async-storage":
+      optional: true
+    "@react-navigation/native":
+      optional: true
+    expo-application:
+      optional: true
+    expo-device:
+      optional: true
+    expo-file-system:
+      optional: true
+    expo-localization:
+      optional: true
+    posthog-react-native-session-replay:
+      optional: true
+    react-native-device-info:
+      optional: true
+    react-native-localize:
+      optional: true
+    react-native-navigation:
+      optional: true
+    react-native-safe-area-context:
+      optional: true
+  checksum: 10/31d232805a9ea04f6061dd5b74381c34de21c0ed49fc15e9e1e9bfb17e55011042e3e37955c63f4615d8f57bfbf551d6e39868d9093c19bfb14423c74264b4cd
   languageName: node
   linkType: hard
 
@@ -30416,6 +30500,13 @@ __metadata:
   version: 10.19.3
   resolution: "preact@npm:10.19.3"
   checksum: 10/16478272162a986f03bbde7bb681103339dd00bfe0a6dffe78f9124f3999586647a31e9cb2324ae59ca51eb7d8dd5659eef6df0f7a5f424107cd9f99dddb08e8
+  languageName: node
+  linkType: hard
+
+"preact@npm:^10.19.3":
+  version: 10.28.1
+  resolution: "preact@npm:10.28.1"
+  checksum: 10/83c9d5f17708ecaf7b6abe53e2914c91a80ac2a04fa8d6fdde7086ac35cf1b8a36c1e0c79a41e8e98c480ee3afa7333ef0ee5b795b422cd34128b928563ee9e8
   languageName: node
   linkType: hard
 
@@ -36795,6 +36886,13 @@ __metadata:
   version: 0.2.4
   resolution: "web-vitals@npm:0.2.4"
   checksum: 10/e0f1873ea321d484f4ea904a07bb3c1481a2bb049a26c65c22fabdbf648c73f48c49ecc580875a5e2942d244821c09b93371d5e18872815f2cbdc2370cba532f
+  languageName: node
+  linkType: hard
+
+"web-vitals@npm:^4.2.4":
+  version: 4.2.4
+  resolution: "web-vitals@npm:4.2.4"
+  checksum: 10/68cd1c2625a04b26e7eab67110623396afc6c9ef8c3a76f4e780aefe5b7d4ca1691737a0b99119e1d1ca9a463c4d468c0f0090b1875b6d784589d3a4a8503313
   languageName: node
   linkType: hard
 

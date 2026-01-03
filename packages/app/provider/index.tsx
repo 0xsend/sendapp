@@ -10,6 +10,7 @@ import type React from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { ShimmerProvider } from '@my/ui'
 import { ActivityDetailsProvider } from './activity-details'
+import { AnalyticsProvider } from './analytics'
 import { AuthProvider } from './auth'
 import { CoinsProvider } from './coins'
 import { GlobalDatePickerProvider } from './datepicker'
@@ -72,6 +73,7 @@ const Providers = compose([
   WagmiProvider,
   OnchainKitProvider,
   QueryClientProvider,
+  AnalyticsProvider,
   UniversalThemeProvider,
   SafeAreaProvider,
   CoinsProvider,

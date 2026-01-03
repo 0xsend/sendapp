@@ -52,9 +52,11 @@ export function useContactArchive(
   const handleArchiveToggle = useCallback(() => {
     if (contact.contact_id === null) return
 
+    const contactType = contact.send_id ? 'sendtag' : 'address'
+
     if (isArchived) {
       unarchiveContact(
-        { contactId: contact.contact_id },
+        { contactId: contact.contact_id, contactType },
         {
           onSuccess: () => {
             toast.show('Contact restored')
@@ -68,7 +70,7 @@ export function useContactArchive(
       )
     } else {
       archiveContact(
-        { contactId: contact.contact_id },
+        { contactId: contact.contact_id, contactType },
         {
           onSuccess: () => {
             toast.show('Contact archived')
@@ -84,6 +86,7 @@ export function useContactArchive(
     }
   }, [
     contact.contact_id,
+    contact.send_id,
     isArchived,
     archiveContact,
     unarchiveContact,

@@ -14,12 +14,14 @@ import { CheckCheck, Copy } from '@tamagui/lucide-icons'
 import { useEffect, useState, memo, useMemo, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
   const { profile } = useUser()
   const toast = useAppToast()
   const [hasCopied, setHasCopied] = useState(false)
   const { t } = useTranslation('affiliate')
+  const analytics = useAnalytics()
 
   const send_id = useMemo(() => profile?.send_id, [profile?.send_id])
   const referralCode = useMemo(() => profile?.main_tag?.name, [profile?.main_tag?.name])
@@ -48,13 +50,23 @@ export const ReferralLink = memo<ButtonProps>(function ReferralLink(props) {
 
   const copyAndMaybeShareOnPress = useCallback(async () => {
     await Clipboard.setStringAsync(referralHref)
-      .then(() => toast.show(t('referralLink.toast.copied')))
+      .then(() => {
+        toast.show(t('referralLink.toast.copied'))
+
+        // Track referral link shared
+        analytics.capture({
+          name: 'referral_link_shared',
+          properties: {
+            channel: 'copy_link',
+          },
+        })
+      })
       .catch(() =>
         toast.error(t('referralLink.toast.errorTitle'), {
           message: t('referralLink.toast.errorMessage'),
         })
       )
-  }, [referralHref, t, toast])
+  }, [referralHref, t, toast, analytics])
 
   const handlePress = useCallback(
     (e) => {

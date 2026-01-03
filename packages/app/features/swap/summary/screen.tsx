@@ -10,7 +10,7 @@ import { useSendAccount } from 'app/utils/send-accounts'
 import { api } from 'app/utils/api'
 import { useSwap } from 'app/features/swap/hooks/useSwap'
 import { useSendUserOpMutation } from 'app/utils/sendUserOp'
-import { type ReactNode, useCallback, useEffect, useMemo } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useCoinFromSendTokenParam } from 'app/utils/useCoinFromTokenParam'
 import { useRouter } from 'solito/router'
 import { useQueryClient } from '@tanstack/react-query'
@@ -25,6 +25,7 @@ import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useUser } from 'app/utils/useUser'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export const SwapSummaryScreen = () => {
   const router = useRouter()
@@ -41,6 +42,8 @@ export const SwapSummaryScreen = () => {
   const queryClient = useQueryClient()
   const { distributionShares } = useUser()
   const { t } = useTranslation('trade')
+  const analytics = useAnalytics()
+  const hasTrackedReview = useRef(false)
 
   // Compute if user is verified
   const isVerified = useMemo(
@@ -138,9 +141,23 @@ export const SwapSummaryScreen = () => {
   }, [sendAccount, routeSummary, encodeRouteMutateAsync, slippage])
 
   const submit = async () => {
-    if (!userOp) {
+    if (!userOp || !inCoin?.token || !outCoin?.token) {
       return
     }
+
+    const swapProps = {
+      token_in_address: inCoin.token,
+      token_out_address: outCoin.token,
+      amount_in: inAmount,
+      amount_out: routeSummary?.amountOut,
+      slippage_bps: Number(slippage || DEFAULT_SLIPPAGE),
+    } as const
+
+    // Track swap submitted
+    analytics.capture({
+      name: 'swap_submitted',
+      properties: swapProps,
+    })
 
     if (__DEV__ || baseMainnet.id === 84532) {
       userOp.callGasLimit = userOp.callGasLimit * 3n
@@ -150,6 +167,12 @@ export const SwapSummaryScreen = () => {
       await sendUserOpMutateAsync({
         userOp,
         webauthnCreds,
+      })
+
+      // Track swap completed
+      analytics.capture({
+        name: 'swap_completed',
+        properties: swapProps,
       })
 
       await Promise.all([
@@ -169,9 +192,34 @@ export const SwapSummaryScreen = () => {
       router.back()
       router.back()
     } catch (e) {
+      // Track swap failed
+      analytics.capture({
+        name: 'swap_failed',
+        properties: {
+          ...swapProps,
+          error_type: 'unknown',
+        },
+      })
       console.error(e)
     }
   }
+
+  // Track swap review started
+  useEffect(() => {
+    if (!hasTrackedReview.current && inCoin?.token && outCoin?.token && inAmount) {
+      analytics.capture({
+        name: 'swap_review_started',
+        properties: {
+          token_in_address: inCoin.token,
+          token_out_address: outCoin.token,
+          amount_in: inAmount,
+          amount_out: routeSummary?.amountOut,
+          slippage_bps: Number(slippage || DEFAULT_SLIPPAGE),
+        },
+      })
+      hasTrackedReview.current = true
+    }
+  }, [analytics, inCoin?.token, outCoin?.token, inAmount, routeSummary?.amountOut, slippage])
 
   useEffect(() => {
     if (!routeSummary) {

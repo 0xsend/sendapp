@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next'
 
 export function SplashScreen({ hidden }: { hidden: boolean }) {
   const { t } = useTranslation('splash')
+
   return (
     <XStack
       flex={1}

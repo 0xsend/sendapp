@@ -32,6 +32,7 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { z } from 'zod'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 const log = debug('app:settings:backup:confirm')
 
@@ -113,6 +114,7 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
   const toast = useAppToast()
   const queryClient = useQueryClient()
   const { t } = useTranslation('account')
+  const analytics = useAnalytics()
   const {
     data: sendAccount,
     error: sendAccountError,
@@ -227,6 +229,13 @@ const AddSignerButton = ({ webauthnCred }: { webauthnCred: Tables<'webauthn_cred
         receipt: { transactionHash },
       } = await sendUserOp({ userOp, webauthnCreds })
       console.log('sent user op', transactionHash)
+
+      // Track backup passkey created
+      analytics.capture({
+        name: 'backup_passkey_created',
+        properties: {},
+      })
+
       toast.show(t('common.success'))
       queryClient.invalidateQueries({ queryKey: [useSendAccount.queryKey] })
       router.replace('/account/backup')

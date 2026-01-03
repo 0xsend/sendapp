@@ -15,6 +15,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react'
 import { useSendCheckClaim } from 'app/utils/useSendCheckClaim'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { CheckPreviewCard, useCheckPreview } from './components/CheckPreviewCard'
+import { useAnalytics } from 'app/provider/analytics'
 import debug from 'debug'
 
 const log = debug('app:features:check:claim:preview')
@@ -27,6 +28,7 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
   const router = useRouter()
   const { t } = useTranslation('send')
   const toast = useAppToast()
+  const analytics = useAnalytics()
   const { data: sendAccount, isLoading: isLoadingAccount } = useSendAccount()
   const { claimCheck, isPending: isSubmitting, isReady } = useSendCheckClaim()
   const [claimed, setClaimed] = useState(false)
@@ -70,15 +72,43 @@ export function CheckClaimPreviewScreen({ checkCode }: CheckClaimPreviewScreenPr
     !previewData.isClaimed
 
   const onClaim = useCallback(async () => {
+    const claimProps = {
+      token_count: previewData?.tokens.length ?? 0,
+      total_amount: previewData?.tokens.map((t) => t.amount).join(', '),
+    }
+
+    // Track claim started
+    analytics.capture({
+      name: 'send_check_claim_started',
+      properties: claimProps,
+    })
+
     try {
       await claimCheck({ checkCode, webauthnCreds })
+
+      // Track claim success
+      analytics.capture({
+        name: 'send_check_claimed',
+        properties: claimProps,
+      })
+
       setClaimed(true)
       toast.show(t('check.claim.success'))
     } catch (err) {
       log('Failed to claim check:', err)
+
+      // Track claim failed
+      analytics.capture({
+        name: 'send_check_failed',
+        properties: {
+          step: 'claim',
+          error_type: 'unknown',
+        },
+      })
+
       toast.error(err instanceof Error ? err.message : t('check.claim.error'))
     }
-  }, [claimCheck, checkCode, webauthnCreds, toast, t])
+  }, [claimCheck, checkCode, webauthnCreds, toast, t, analytics, previewData])
 
   // Loading state (including waiting for auth check, redirect, or router hydration)
   if (isLoading || isLoadingAccount || !sendAccount || !checkCode) {

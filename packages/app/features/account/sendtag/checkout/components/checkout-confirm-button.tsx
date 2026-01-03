@@ -38,6 +38,7 @@ import {
 import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { useLink } from 'solito/link'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { updateProfile } = useUser()
@@ -57,6 +58,7 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   const { data: referralCode } = useReferralCodeQuery()
   const { coin: usdc, tokensQuery, isLoading: isLoadingUSDC } = useCoin('USDC')
   const { t } = useTranslation('account')
+  const analytics = useAnalytics()
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -169,6 +171,15 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
   })
 
   async function handleCheckoutTx() {
+    // Track sendtag checkout started
+    analytics.capture({
+      name: 'sendtag_checkout_started',
+      properties: {
+        tag_count: pendingTags.length,
+        total_price_usd: Number(amountDue) / 1e6, // Convert from USDC decimals
+      },
+    })
+
     try {
       throwIf(userOpError)
       assert(!!userOp, 'User op is required')
@@ -177,6 +188,16 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       const msg = (e.details ?? e.message)?.split('.').at(0)
       console.error(msg, e)
       setError(msg ?? t('sendtag.messages.genericError'))
+
+      // Track sendtag checkout failed
+      analytics.capture({
+        name: 'sendtag_checkout_failed',
+        properties: {
+          tag_count: pendingTags.length,
+          total_price_usd: Number(amountDue) / 1e6,
+          error_type: 'user_cancelled',
+        },
+      })
     }
   }
 
@@ -193,6 +214,16 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
           })
           // Invalidate canDeleteTags query since user now has a new tag
           await queryClient.invalidateQueries({ queryKey: [['tag', 'canDeleteTags']] })
+
+          // Capture sendtag checkout completed event
+          analytics.capture({
+            name: 'sendtag_checkout_completed',
+            properties: {
+              tag_count: pendingTags.length,
+              total_price_usd: Number(amountDue) / 1e6, // Convert from USDC decimals
+            },
+          })
+
           onConfirmed()
         })
         .catch((err) => {
@@ -231,6 +262,9 @@ export function ConfirmButton({ onConfirmed }: { onConfirmed: () => void }) {
       referralCode,
       queryClient.invalidateQueries,
       t,
+      analytics,
+      pendingTags,
+      amountDue,
     ]
   )
 

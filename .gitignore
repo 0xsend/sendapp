@@ -80,3 +80,4 @@ var/**
 tilt_config.json
 
 coverage
+.tmp

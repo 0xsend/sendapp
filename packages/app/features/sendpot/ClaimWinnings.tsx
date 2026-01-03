@@ -10,6 +10,7 @@ import {
 } from '@my/ui'
 import { useCallback, useMemo } from 'react'
 import { useClaimableWinnings } from './hooks/useClaimableWinnings'
+import { useAnalytics } from 'app/provider/analytics'
 import { useWithdrawWinnings } from './hooks/useWithdrawWinningsMutation'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { formatUnits } from 'viem'
@@ -33,6 +34,7 @@ export const ClaimWinnings = () => {
   const { data: tokenDecimals, isLoading: isLoadingDecimals } = useReadBaseJackpotTokenDecimals()
   const router = useRouter()
   const { t } = useTranslation('sendpot')
+  const analytics = useAnalytics()
 
   const {
     isPreparing,
@@ -45,12 +47,27 @@ export const ClaimWinnings = () => {
   } = useWithdrawWinnings({
     onSuccess: () => {
       console.log('Withdrawal successful')
+      // Track winnings claimed
+      analytics.capture({
+        name: 'sendpot_winnings_claimed',
+        properties: {
+          amount: winningsClaimable?.toString(),
+        },
+      })
       queryClient.invalidateQueries({ queryKey: ['userJackpotSummary', MAX_JACKPOT_HISTORY] })
       toast.show(t('claim.toast.success'))
       router.push('/activity')
     },
     onError: (error) => {
       console.error('Withdrawal mutation failed:', error)
+      // Track winnings claim failed
+      analytics.capture({
+        name: 'sendpot_winnings_claim_failed',
+        properties: {
+          amount: winningsClaimable?.toString(),
+          error_type: 'unknown',
+        },
+      })
       toast.error(t('claim.toast.error'))
     },
   })

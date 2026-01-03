@@ -28,6 +28,7 @@ import { api } from 'app/utils/api'
 import { useLink } from 'solito/link'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export const AddSendtagsForm = () => {
   const user = useUser()
@@ -45,6 +46,7 @@ export const AddSendtagsForm = () => {
     href: '/account/sendtag/checkout',
   })
   const { t } = useTranslation('account')
+  const analytics = useAnalytics()
 
   const { mutateAsync: createTagMutateAsync, isPending: isCreateSendtagLoading } =
     api.tag.create.useMutation()
@@ -65,6 +67,15 @@ export const AddSendtagsForm = () => {
 
     try {
       await createTagMutateAsync({ name: data.name })
+
+      // Track sendtag added
+      analytics.capture({
+        name: 'sendtag_added',
+        properties: {
+          sendtag: data.name,
+        },
+      })
+
       // form state is successfully submitted, show the purchase confirmation screen
       form.reset()
       user?.updateProfile()

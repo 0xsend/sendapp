@@ -3,6 +3,7 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { formFields } from 'app/utils/SchemaForm'
 import { z } from 'zod'
 import { useAppToast } from '@my/ui'
+import { useAnalytics } from 'app/provider/analytics'
 
 export const AuthUserSchema = z.object({
   phone: formFields.text,
@@ -16,6 +17,7 @@ export const useAuthUserMutation = () => {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
   const toast = useAppToast()
+  const analytics = useAnalytics()
 
   return useMutation({
     async mutationFn(data: z.infer<typeof AuthUserSchema>) {
@@ -31,6 +33,11 @@ export const useAuthUserMutation = () => {
     },
     async onSuccess() {
       await queryClient.invalidateQueries({ queryKey: ['user'] })
+
+      analytics.capture({
+        name: 'phone_otp_sent',
+        properties: {},
+      })
 
       toast.show('Check your phone', {
         message: 'We sent you a confirmation code to your phone.',

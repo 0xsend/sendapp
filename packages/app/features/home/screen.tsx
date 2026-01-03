@@ -51,6 +51,7 @@ import { IconX } from 'app/components/icons'
 import { dynamic } from 'app/utils/dynamic'
 import { ActivityRewardsScreenLazy } from 'app/features/rewards/activity/screen'
 import { useTranslation } from 'react-i18next'
+import { CrashTestButton } from 'app/components/ErrorBoundary'
 
 export function HomeScreen() {
   const router = useRouter()
@@ -187,6 +188,7 @@ function HomeBody(props: XStackProps) {
             gap="$3"
             ai={'center'}
           >
+            <CrashTestButton />
             <StablesBalanceCard>
               <StablesBalanceCard.HomeScreenHeader />
               <StablesBalanceCard.Footer>

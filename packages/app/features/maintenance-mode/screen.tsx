@@ -1,7 +1,8 @@
 import { IconSendLogo } from 'app/components/icons'
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect, useRef } from 'react'
 import { YStack, H1, H2 } from 'tamagui'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 /**
  * This screen is used to display a maintenance mode screen.
@@ -10,7 +11,22 @@ import { useTranslation } from 'react-i18next'
  */
 export function MaintenanceModeScreen({ children }: { children: ReactNode }) {
   const { t } = useTranslation('maintenance')
-  if (process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true') {
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true'
+
+  // Track maintenance_viewed when in maintenance mode
+  useEffect(() => {
+    if (isMaintenanceMode && !hasTrackedView.current) {
+      analytics.capture({
+        name: 'maintenance_viewed',
+        properties: {},
+      })
+      hasTrackedView.current = true
+    }
+  }, [isMaintenanceMode, analytics])
+
+  if (isMaintenanceMode) {
     return (
       <YStack
         p="$4"

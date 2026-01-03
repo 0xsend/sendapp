@@ -7,6 +7,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
+import { useAnalytics } from 'app/provider/analytics'
 import { CONTACTS_QUERY_KEY } from '../constants'
 import type {
   AddContactByLookupParams,
@@ -42,6 +43,7 @@ function invalidateContactQueries(queryClient: ReturnType<typeof useQueryClient>
 export function useAddContactByLookup() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
+  const analytics = useAnalytics()
 
   return useMutation({
     async mutationFn(params: {
@@ -75,6 +77,10 @@ export function useAddContactByLookup() {
       return data
     },
     async onSuccess() {
+      analytics.capture({
+        name: 'contact_added',
+        properties: { contact_type: 'sendtag' },
+      })
       await invalidateContactQueries(queryClient)
     },
   })
@@ -99,6 +105,7 @@ export function useAddContactByLookup() {
 export function useAddExternalContact() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
+  const analytics = useAnalytics()
 
   return useMutation({
     async mutationFn(params: {
@@ -130,6 +137,10 @@ export function useAddExternalContact() {
       return data
     },
     async onSuccess() {
+      analytics.capture({
+        name: 'contact_added',
+        properties: { contact_type: 'address' },
+      })
       await invalidateContactQueries(queryClient)
     },
   })
@@ -148,6 +159,7 @@ export function useAddExternalContact() {
 export function useToggleContactFavorite() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
+  const analytics = useAnalytics()
 
   return useMutation({
     async mutationFn({ contactId }: { contactId: number }): Promise<boolean> {
@@ -162,7 +174,11 @@ export function useToggleContactFavorite() {
       // RPC returns the new is_favorite value
       return data
     },
-    async onSuccess() {
+    async onSuccess(isFavorited) {
+      analytics.capture({
+        name: 'contact_favorited',
+        properties: { is_favorited: isFavorited },
+      })
       await invalidateContactQueries(queryClient)
     },
   })
@@ -233,9 +249,16 @@ export function useUpdateContact() {
 export function useArchiveContact() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
+  const analytics = useAnalytics()
 
   return useMutation({
-    async mutationFn({ contactId }: { contactId: number }): Promise<void> {
+    async mutationFn({
+      contactId,
+      contactType,
+    }: {
+      contactId: number
+      contactType: 'sendtag' | 'address'
+    }): Promise<'sendtag' | 'address'> {
       const { error } = await supabase
         .from('contacts')
         .update({ archived_at: new Date().toISOString() })
@@ -244,8 +267,14 @@ export function useArchiveContact() {
       if (error) {
         throw new Error(error.message)
       }
+
+      return contactType
     },
-    async onSuccess() {
+    async onSuccess(contactType) {
+      analytics.capture({
+        name: 'contact_archived',
+        properties: { contact_type: contactType },
+      })
       await invalidateContactQueries(queryClient)
     },
   })
@@ -266,9 +295,16 @@ export function useArchiveContact() {
 export function useUnarchiveContact() {
   const supabase = useSupabase()
   const queryClient = useQueryClient()
+  const analytics = useAnalytics()
 
   return useMutation({
-    async mutationFn({ contactId }: { contactId: number }): Promise<void> {
+    async mutationFn({
+      contactId,
+      contactType,
+    }: {
+      contactId: number
+      contactType: 'sendtag' | 'address'
+    }): Promise<'sendtag' | 'address'> {
       const { error } = await supabase
         .from('contacts')
         .update({ archived_at: null })
@@ -277,8 +313,14 @@ export function useUnarchiveContact() {
       if (error) {
         throw new Error(error.message)
       }
+
+      return contactType
     },
-    async onSuccess() {
+    async onSuccess(contactType) {
+      analytics.capture({
+        name: 'contact_unarchived',
+        properties: { contact_type: contactType },
+      })
       await invalidateContactQueries(queryClient)
     },
   })
