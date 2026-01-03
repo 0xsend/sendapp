@@ -281,10 +281,10 @@ local_resource(
     ],
     serve_cmd = """
     # Wait for Anvil to be ready before starting bundler
-    echo "Waiting for Anvil at host.docker.internal:{anvil_port}..."
+    echo "Waiting for Anvil at localhost:{anvil_port}..."
     until curl -sf -X POST -H "Content-Type: application/json" \
         --data '{{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}}' \
-        http://host.docker.internal:{anvil_port} > /dev/null 2>&1; do
+        http://localhost:{anvil_port} > /dev/null 2>&1; do
         echo "Anvil not ready, retrying in 2s..."
         sleep 2
     done
