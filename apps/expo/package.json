@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "remove-xcode-env-local-file": "rm ios/.xcode.env.local",
-    "lint": "eslint ./app",
-    "lint:fix": "eslint ./app --fix",
+    "lint": "eslint ./app --cache --cache-location .cache/eslint",
+    "lint:fix": "eslint ./app --fix --cache --cache-location .cache/eslint",
     "start": "yarn prebuild && yarn expo start --dev-client",
     "prebuild": "expo prebuild --skip-dependency-update react-native,react",
     "android": "expo run:android",
