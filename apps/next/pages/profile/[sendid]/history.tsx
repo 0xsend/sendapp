@@ -70,6 +70,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     }
 
     if (profile) {
+      // Check if profile is public or user is logged in before redirecting
+      if (!profile.is_public && !session) {
+        // Private profile and anonymous user - return 404 to avoid leaking account existence
+        return { notFound: true }
+      }
       // Address has a Send account - redirect to canonical history URL
       const redirectUrl = `/profile/${profile.sendid}/history`
       return { redirect: { destination: redirectUrl, permanent: false } }
@@ -82,6 +87,11 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
         isExternalAddress: true,
       },
     }
+  }
+
+  // Invalid 0x-prefixed identifiers that aren't valid addresses should 404
+  if (identifier.startsWith('0x')) {
+    return { notFound: true }
   }
 
   // Handle numeric sendid lookup (existing behavior)
