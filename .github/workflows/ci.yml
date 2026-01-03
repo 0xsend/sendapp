@@ -195,9 +195,7 @@ jobs:
 
   playwright-tests:
     name: Playwright Tests (Shard ${{ matrix.shard }}/4)
-    needs: [build_next_image]
-    # Only run playwright tests when we build the image (PRs and manual triggers)
-    if: false
+    needs: [unit-tests, lint]
     runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
       # Don't stop all shards if one fails
@@ -208,7 +206,6 @@ jobs:
       ANVIL_MAINNET_FORK_URL: ${{ secrets.CI_ANVIL_MAINNET_FORK_URL }}
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
-      NEXT_APP_IMAGE_TAG: ${{ needs.build_next_image.outputs.image-tag }}
       SUPABASE_PROJECT_ID: sendapp
 
     # for writing PR comments
@@ -239,22 +236,9 @@ jobs:
         shell: bash
         run: yarn install --immutable
 
-      - name: Download Docker image artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: next-app-image
-          path: ./
-
-      - name: Load Docker image
-        run: |
-          docker load < next-app-image.tar
-          echo "Loaded Docker image: ${{ env.NEXT_APP_IMAGE_TAG }}"
-          docker images
-
-      # @todo anvil fixtures cause dirty repo, but only in github actions 😢
-      # - name: All Changes Committed
-      #   shell: bash
-      #   run: git diff --exit-code
+      - name: Build Next.js
+        shell: bash
+        run: yarn workspace next-app build
 
       - name: Install Playwright Dependencies
         run: yarn playwright playwright install --with-deps > /dev/null
@@ -335,33 +319,11 @@ jobs:
               exit 1
             fi
           done
-      - name: Start Next App
-        shell: bash
-        run: |
-          export NEXT_APP_PORT=0.0.0.0:3000
-          docker compose --env-file ./.env.local up -d next-app
-          # wait for next app to be ready
-          started=0
-          for i in {1..30}; do
-            if curl -s http://localhost:3000 > /dev/null; then
-              started=1
-              break
-            fi
-            echo "Attempt $i failed, trying again..."
-            sleep 1
-          done
-
-          if [ $started -eq 0 ]; then
-            echo "Next app did not start"
-            exit 1
-          fi
 
       - name: Playwright Tests
         id: playwright
         shell: bash
-        run: |
-          docker compose logs -f --no-log-prefix next-app &
-          yarn playwright test --shard=${{ matrix.shard }}/4
+        run: yarn playwright test --shard=${{ matrix.shard }}/4
 
       - name: Tilt Down
         # always run tilt down if tilt ci started
@@ -379,7 +341,7 @@ jobs:
   playwright-merge-reports:
     name: Playwright Merge Reports
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: false
+    if: ${{ !cancelled() }}
     needs: [playwright-tests]
     # for writing PR comments
     permissions:
