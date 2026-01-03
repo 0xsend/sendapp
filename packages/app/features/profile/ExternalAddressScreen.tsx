@@ -22,7 +22,6 @@ import { formatUnits } from 'viem'
 import { useBalance, useReadContracts } from 'wagmi'
 import { baseMainnet, erc20Abi, multicall3Address, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { IconArrowUp } from 'app/components/icons'
-import { useSendScreenParams } from 'app/routers/params'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { sendCoin, usdcCoin } from 'app/data/coins'
 
@@ -35,7 +34,6 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   const toast = useAppToast()
   const isDark = useThemeName()?.startsWith('dark')
   const [hasCopied, setHasCopied] = useState(false)
-  const [, setSendParams] = useSendScreenParams()
 
   // Truncate address for display
   const truncatedAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -99,13 +97,6 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
     setHasCopied(true)
     toast.show('Address copied')
     setTimeout(() => setHasCopied(false), 2000)
-  }
-
-  const handleSend = () => {
-    setSendParams({
-      recipient: address,
-      idType: address, // Use the address as the idType for direct address sends
-    })
   }
 
   // Block explorer URL for Base chain
@@ -221,7 +212,7 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
         {/* Action Buttons */}
         <XStack w="100%" gap="$4">
           {/* Send Button */}
-          <Link href={`/send?recipient=${address}&idType=${address}`} asChild f={1}>
+          <Link href={`/send?recipient=${address}&idType=address`} asChild f={1}>
             <Button
               borderRadius="$4"
               jc="center"
