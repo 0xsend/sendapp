@@ -1,3 +1,4 @@
+import debug from 'debug'
 import posthog from 'posthog-js'
 import type {
   AnalyticsEvent,
@@ -5,6 +6,8 @@ import type {
   AnalyticsUserProperties,
   ExceptionProperties,
 } from './types'
+
+const log = debug('app:analytics')
 
 let initialized = false
 
@@ -22,7 +25,7 @@ export const analytics: AnalyticsService = {
     const host = process.env.NEXT_PUBLIC_POSTHOG_HOST
 
     if (!key) {
-      console.warn('[Analytics] PostHog key not configured')
+      log('PostHog key not configured')
       return
     }
 
@@ -35,10 +38,6 @@ export const analytics: AnalyticsService = {
         capture_unhandled_errors: true,
         capture_unhandled_rejections: true,
         capture_console_errors: false,
-      },
-      error_tracking: {
-        __exceptionRateLimiterRefillRate: 5,
-        __exceptionRateLimiterBucketSize: 20,
       },
       before_send: (event) => {
         if (!event) return null
@@ -81,7 +80,7 @@ export const analytics: AnalyticsService = {
 
   captureException(error: unknown, properties?: ExceptionProperties) {
     if (!initialized) {
-      console.error('[Analytics] Not initialized, cannot capture exception')
+      log('Not initialized, cannot capture exception')
       return
     }
 

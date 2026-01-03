@@ -1,4 +1,5 @@
 import type { PostHogEventProperties } from '@posthog/core'
+import debug from 'debug'
 import PostHog from 'posthog-react-native'
 import type {
   AnalyticsEvent,
@@ -6,6 +7,8 @@ import type {
   AnalyticsUserProperties,
   ExceptionProperties,
 } from './types'
+
+const log = debug('app:analytics')
 
 let client: PostHog | null = null
 
@@ -19,7 +22,7 @@ export const analytics: AnalyticsService = {
     const host = process.env.EXPO_PUBLIC_POSTHOG_HOST
 
     if (!key) {
-      console.warn('[Analytics] PostHog key not configured')
+      log('PostHog key not configured')
       return
     }
 
@@ -60,7 +63,7 @@ export const analytics: AnalyticsService = {
 
   captureException(error: unknown, properties?: ExceptionProperties) {
     if (!client) {
-      console.error('[Analytics] Not initialized, cannot capture exception')
+      log('Not initialized, cannot capture exception')
       return
     }
 

@@ -1,6 +1,26 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Button, H2, Paragraph, YStack } from '@my/ui'
 import { useRouter } from 'solito/router'
+
+/**
+ * Temporary component to test error boundary UI.
+ * Remove after testing.
+ */
+export function CrashTestButton() {
+  const [shouldCrash, setShouldCrash] = useState(false)
+
+  if (shouldCrash) {
+    throw new Error('Test error boundary crash')
+  }
+
+  if (!__DEV__) return null
+
+  return (
+    <Button size="$2" theme="red" onPress={() => setShouldCrash(true)}>
+      🔴 Test Crash
+    </Button>
+  )
+}
 
 interface Props {
   error?: Error
