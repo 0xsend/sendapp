@@ -33,6 +33,7 @@ interface PortConfig {
   // Anvil (Ethereum nodes)
   ANVIL_MAINNET_PORT: number
   ANVIL_BASE_PORT: number
+  ANVIL_BASE_INTERNAL_PORT: number
 
   // AA Bundler
   BUNDLER_PORT: number
@@ -63,6 +64,7 @@ const PORT_KEYS: (keyof PortConfig)[] = [
   'SUPABASE_INBUCKET_POP3_PORT',
   'ANVIL_MAINNET_PORT',
   'ANVIL_BASE_PORT',
+  'ANVIL_BASE_INTERNAL_PORT',
   'BUNDLER_PORT',
   'SHOVEL_PORT',
   'OTTERSCAN_MAINNET_PORT',
@@ -259,6 +261,8 @@ function generateEnvContent(workspaceName: string, ports: PortConfig): string {
     `NEXT_PUBLIC_BASE_RPC_URL=http://localhost:${ports.ANVIL_BASE_PORT}`,
     `ANVIL_MAINNET_PORT=${ports.ANVIL_MAINNET_PORT}`,
     `ANVIL_BASE_PORT=${ports.ANVIL_BASE_PORT}`,
+    '# Internal port for anvil (nginx proxies external traffic via ANVIL_BASE_PORT)',
+    `ANVIL_BASE_INTERNAL_PORT=${ports.ANVIL_BASE_INTERNAL_PORT}`,
     '',
     '# AA Bundler',
     `NEXT_PUBLIC_BUNDLER_RPC_URL=http://localhost:${ports.BUNDLER_PORT}/rpc`,
@@ -306,7 +310,8 @@ function printSummary(workspaceName: string, ports: PortConfig): void {
   console.log('')
   console.log('\x1b[32mBlockchain:\x1b[0m')
   console.log(`  Anvil Mainnet:    http://localhost:${ports.ANVIL_MAINNET_PORT}`)
-  console.log(`  Anvil Base:       http://localhost:${ports.ANVIL_BASE_PORT}`)
+  console.log(`  Anvil Base:       http://localhost:${ports.ANVIL_BASE_PORT} (via nginx proxy)`)
+  console.log(`  Anvil Internal:   port ${ports.ANVIL_BASE_INTERNAL_PORT} (internal, not exposed)`)
   console.log(`  Bundler:          http://localhost:${ports.BUNDLER_PORT}`)
   console.log(`  Otterscan (main): http://localhost:${ports.OTTERSCAN_MAINNET_PORT}`)
   console.log(`  Otterscan (base): http://localhost:${ports.OTTERSCAN_BASE_PORT}`)

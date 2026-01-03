@@ -1,0 +1,175 @@
+# compose.localnet.yaml
+# Localnet infrastructure for Send app development
+# Managed by Tilt via docker_compose()
+#
+# Services:
+#   - anvil-base: Foundry fork node (internal, proxied by nginx)
+#   - anvil-proxy: Nginx reverse proxy with connection pooling
+#   - aa-bundler: ERC-4337 bundler
+#   - shovel: Blockchain indexer
+#   - otterscan-base: Block explorer (optional, use --profile explorer)
+#
+# Usage:
+#   Standalone: docker compose -f compose.localnet.yaml --env-file .localnet.env up
+#   With Tilt: Managed automatically via docker_compose() in infra.Tiltfile
+
+x-common: &common
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  restart: "no"
+
+services:
+  # ===========================================
+  # ANVIL - Ethereum Fork Node
+  # ===========================================
+  anvil-base:
+    <<: *common
+    container_name: ${WORKSPACE_NAME:-sendapp}-anvil-base
+    image: ghcr.io/foundry-rs/foundry:stable
+    platform: linux/amd64
+    mem_limit: 2g
+    memswap_limit: 2g
+    networks:
+      - supabase_network
+    # Internal port only - nginx proxies external traffic
+    expose:
+      - "${ANVIL_BASE_INTERNAL_PORT:-8547}"
+    # Override entrypoint to run anvil directly (foundry image uses /bin/sh -c)
+    entrypoint: ["anvil"]
+    command:
+      - "--host=0.0.0.0"
+      - "--port=${ANVIL_BASE_INTERNAL_PORT:-8547}"
+      - "--chain-id=${NEXT_PUBLIC_BASE_CHAIN_ID:-845337}"
+      - "--fork-url=${ANVIL_BASE_FORK_URL}"
+      - "--block-time=${ANVIL_BASE_BLOCK_TIME:-2}"
+      - "--base-fee=${ANVIL_BASE_BASE_FEE:-1000000}"
+      - "--gas-price=${ANVIL_BASE_GAS_PRICE:-1000000000}"
+      - "--fork-block-number=${ANVIL_BASE_FORK_BLOCK:-0}"
+      - "${ANVIL_BASE_EXTRA_ARGS:---silent}"
+    healthcheck:
+      test: ["CMD-SHELL", "cast bn --rpc-url=http://127.0.0.1:${ANVIL_BASE_INTERNAL_PORT:-8547} || exit 1"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  # ===========================================
+  # NGINX - Reverse Proxy for Anvil
+  # Provides connection pooling to prevent exhaustion
+  # ===========================================
+  anvil-proxy:
+    <<: *common
+    container_name: ${WORKSPACE_NAME:-sendapp}-anvil-proxy
+    image: nginx:1.25-alpine
+    depends_on:
+      anvil-base:
+        condition: service_healthy
+    networks:
+      - supabase_network
+    ports:
+      - "${ANVIL_BASE_PORT:-8546}:80"
+    volumes:
+      - ./tilt/nginx.localnet.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ===========================================
+  # AA BUNDLER - ERC-4337 Bundler
+  # ===========================================
+  aa-bundler:
+    <<: *common
+    container_name: ${WORKSPACE_NAME:-sendapp}-aa-bundler
+    image: docker.io/0xbigboss/bundler:latest
+    pull_policy: always
+    mem_limit: 500m
+    depends_on:
+      anvil-proxy:
+        condition: service_healthy
+    networks:
+      - supabase_network
+    ports:
+      - "${BUNDLER_PORT:-3030}:${BUNDLER_PORT:-3030}"
+    volumes:
+      - ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:ro
+      - ./apps/aabundler/etc:/app/etc/aabundler:ro
+    environment:
+      DEBUG: ${BUNDLER_DEBUG:-aa.rpc}
+      DEBUG_COLORS: "true"
+    command: >
+      --port ${BUNDLER_PORT:-3030}
+      --config /app/etc/aabundler/aabundler.config.json
+      --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      --network http://anvil-proxy:80
+      --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032
+      --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+      --unsafe
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:${BUNDLER_PORT:-3030}/"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ===========================================
+  # SHOVEL - Blockchain Indexer
+  # ===========================================
+  shovel:
+    <<: *common
+    container_name: ${WORKSPACE_NAME:-sendapp}-shovel
+    image: docker.io/indexsupply/shovel:${SHOVEL_VERSION:-af07}
+    mem_limit: 300m
+    cpus: 1
+    depends_on:
+      anvil-proxy:
+        condition: service_healthy
+    networks:
+      - supabase_network
+    ports:
+      - "${SHOVEL_PORT:-8383}:80"
+    volumes:
+      - ./packages/shovel/etc:/etc/shovel:ro
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:${SUPABASE_DB_PORT:-54322}/postgres
+      BASE_NAME: base
+      BASE_RPC_URL_PRIMARY: http://anvil-proxy:80
+      BASE_RPC_URL_BACKUP1: http://anvil-proxy:80
+      BASE_RPC_URL_BACKUP2: http://anvil-proxy:80
+      BASE_RPC_URL_BACKUP3: http://anvil-proxy:80
+      BASE_CHAIN_ID: ${NEXT_PUBLIC_BASE_CHAIN_ID:-845337}
+      BASE_BLOCK_START: ${ANVIL_BASE_BLOCK_START:-0}
+      DASHBOARD_ROOT_PASSWORD: shoveladmin
+    entrypoint: /usr/local/bin/shovel
+    working_dir: /usr/local/bin
+    command: -l :80 -skip-migrate -config /etc/shovel/config.json
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/diag"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # ===========================================
+  # OTTERSCAN - Block Explorer (Optional)
+  # Enable with: --profile explorer
+  # ===========================================
+  otterscan-base:
+    <<: *common
+    container_name: ${WORKSPACE_NAME:-sendapp}-otterscan-base
+    image: otterscan/otterscan:v2.3.0
+    depends_on:
+      anvil-proxy:
+        condition: service_healthy
+    networks:
+      - supabase_network
+    ports:
+      - "${OTTERSCAN_BASE_PORT:-5101}:80"
+    environment:
+      ERIGON_URL: http://anvil-proxy:80
+    profiles:
+      - explorer
+
+networks:
+  supabase_network:
+    name: supabase_network_${SUPABASE_PROJECT_ID:-sendapp}
+    external: true
