@@ -155,23 +155,23 @@ dc_resource(
 )
 
 # aa-bundler: ERC-4337 bundler
+# Depends on anvil:fixtures to ensure paymaster is funded before bundler starts
 dc_resource(
     "aa-bundler",
     labels = labels,
     links = [link("http://localhost:" + _bundler_port + "/", "AA Bundler")],
     new_name = "aa_bundler:base",
-    resource_deps = ["anvil:base"],
+    resource_deps = ["anvil:fixtures"],
 )
 
 # shovel: Blockchain indexer
-# Note: Shovel mounts config from packages/shovel/etc/config.json
-# The shovel:generate-config resource will update the config if needed, but
-# shovel can start with existing config
+# Depends on supabase for database and anvil for RPC
+# Config is pre-generated and mounted from packages/shovel/etc/config.json
 dc_resource(
     "shovel",
     labels = labels,
     links = [link("http://localhost:" + _shovel_port + "/", "Shovel")],
-    resource_deps = ["anvil:base"],  # Only needs anvil proxy, config is pre-generated
+    resource_deps = ["anvil:base", "supabase"],  # Needs both anvil proxy and database
 )
 
 # otterscan-base: Block explorer (optional profile in compose, not started by default)
