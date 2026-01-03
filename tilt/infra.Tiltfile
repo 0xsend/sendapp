@@ -128,6 +128,13 @@ cmd_button(
 # Provides connection-pooled anvil via nginx proxy to prevent
 # CLOSE_WAIT exhaustion from bundler, shovel, and E2E tests.
 
+# Fetch fork block height if not already set (current block - 30 to avoid reorgs)
+_anvil_fork_url = os.getenv("ANVIL_BASE_FORK_URL", "")
+if _anvil_fork_url and not os.getenv("ANVIL_BASE_FORK_BLOCK"):
+    _current_block = int(str(local("cast bn --rpc-url " + _anvil_fork_url, quiet=True)).strip())
+    _fork_block = str(_current_block - 30)
+    os.putenv("ANVIL_BASE_FORK_BLOCK", _fork_block)
+
 docker_compose(
     configPaths = ["../compose.localnet.yaml"],
     env_file = "../.localnet.env",
