@@ -48,6 +48,10 @@ export default class Document extends NextDocument {
           {DEV && !!process.env.NEXT_PUBLIC_REACT_SCAN_ENABLED ? (
             <script src="https://unpkg.com/react-scan/dist/auto.global.js" />
           ) : null}
+          <meta
+            name="google-site-verification"
+            content="mLofwUFnqATwLTDk850EFviFiXoO9FElJEz3t2aBIBU"
+          />
           <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
