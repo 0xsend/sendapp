@@ -57,6 +57,9 @@ export default defineConfig({
     public: {
       challenges: false,
       activity: false,
+      contacts: true,
+      contact_labels: true,
+      contact_label_assignments: true,
     },
     temporal: false,
   },

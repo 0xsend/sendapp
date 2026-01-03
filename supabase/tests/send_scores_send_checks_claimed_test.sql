@@ -1,11 +1,13 @@
 SET client_min_messages TO NOTICE;
 
 BEGIN;
-SELECT plan(2);
 
-CREATE EXTENSION "basejump-supabase_test_helpers";
+SELECT plan(4);
 
--- Switch to service_role for tests
+CREATE EXTENSION IF NOT EXISTS pgtap;
+CREATE EXTENSION IF NOT EXISTS "basejump-supabase_test_helpers";
+
+-- Use service_role for test setup and for querying the score views.
 SELECT set_config('role', 'service_role', TRUE);
 
 -- Create test users
@@ -14,12 +16,13 @@ SELECT tests.create_supabase_user('ssc_redeemer_verified_1');
 SELECT tests.create_supabase_user('ssc_redeemer_verified_2');
 SELECT tests.create_supabase_user('ssc_redeemer_unverified');
 
--- Ensure there is exactly one active distribution window for send_scores_current
+-- Ensure there is exactly one active distribution for send_scores_current to select.
 DELETE FROM distributions
 WHERE qualification_start <= (now() AT TIME ZONE 'UTC')
   AND qualification_end >= (now() AT TIME ZONE 'UTC');
 
--- Create a minimal active distribution and send_slash settings
+-- Create an active distribution with a deterministic send_ceiling:
+-- hodler_min_balance=1000, minimum_sends=1, scaling_divisor=10 => send_ceiling=100
 INSERT INTO distributions(
   number,
   tranche_id,
@@ -41,19 +44,20 @@ VALUES (
   424242,
   424242,
   'send_scores checks claimed test',
-  'active distribution for pgTAP',
+  'active distribution for send_scores_current check-claim tests',
   100000,
   1000000,
   1000000,
   1000000,
   (now() AT TIME ZONE 'UTC')::timestamp(3)::timestamptz - interval '1 day',
   (now() AT TIME ZONE 'UTC')::timestamp(3)::timestamptz + interval '1 day',
-  100::bigint,
+  1000::bigint,
   0::bigint,
-  (now() AT TIME ZONE 'UTC')::timestamp(3)::timestamptz + interval '30 days',
+  (now() AT TIME ZONE 'UTC')::timestamp(3)::timestamptz + interval '2 days',
   8453,
   '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea
-);
+)
+ON CONFLICT DO NOTHING;
 
 INSERT INTO send_slash(
   distribution_id,
@@ -65,8 +69,9 @@ VALUES (
   (SELECT id FROM distributions WHERE number = 424242),
   424242,
   1,
-  1
-);
+  10
+)
+ON CONFLICT DO NOTHING;
 
 -- Satisfy FK required by insert_verification_create_passkey() trigger on send_accounts
 INSERT INTO public.distribution_verification_values(
@@ -83,9 +88,7 @@ VALUES (
 )
 ON CONFLICT DO NOTHING;
 
--- Create send accounts. address_bytes is generated from address.
--- NOTE: is_verified is populated by a BEFORE INSERT trigger based on profiles.verified_at,
--- so we set it explicitly after insert for deterministic test behavior.
+-- Create send_accounts. address_bytes is generated from address.
 INSERT INTO send_accounts(user_id, address, chain_id, init_code)
 VALUES
   (tests.get_supabase_uid('ssc_sender'), '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 8453, '\\x00'),
@@ -94,11 +97,51 @@ VALUES
   (tests.get_supabase_uid('ssc_redeemer_unverified'), '0xcccccccccccccccccccccccccccccccccccccccc', 8453, '\\x00')
 ON CONFLICT DO NOTHING;
 
-UPDATE send_accounts
-SET is_verified = TRUE
-WHERE address IN (
-  '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::citext,
-  '0xdddddddddddddddddddddddddddddddddddddddd'::citext
+-- Mark redeemers as verified via distribution_shares.
+-- This mirrors how profiles.verified_at is set and how send_accounts.is_verified is now populated.
+INSERT INTO public.distribution_shares(
+  distribution_id,
+  user_id,
+  address,
+  amount,
+  hodler_pool_amount,
+  bonus_pool_amount,
+  fixed_pool_amount,
+  index
+)
+VALUES
+  ((SELECT id FROM distributions WHERE number = 424242), tests.get_supabase_uid('ssc_redeemer_verified_1'), '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 1::numeric, 0::numeric, 0::numeric, 0::numeric, 1),
+  ((SELECT id FROM distributions WHERE number = 424242), tests.get_supabase_uid('ssc_redeemer_verified_2'), '0xdddddddddddddddddddddddddddddddddddddddd', 1::numeric, 0::numeric, 0::numeric, 0::numeric, 2)
+ON CONFLICT DO NOTHING;
+
+SELECT results_eq(
+  $$
+    SELECT is_verified
+    FROM send_accounts
+    WHERE user_id = tests.get_supabase_uid('ssc_redeemer_verified_1')
+  $$,
+  $$VALUES (true)$$,
+  'Verified redeemer 1 has send_accounts.is_verified = true'
+);
+
+SELECT results_eq(
+  $$
+    SELECT is_verified
+    FROM send_accounts
+    WHERE user_id = tests.get_supabase_uid('ssc_redeemer_verified_2')
+  $$,
+  $$VALUES (true)$$,
+  'Verified redeemer 2 has send_accounts.is_verified = true'
+);
+
+SELECT results_eq(
+  $$
+    SELECT is_verified
+    FROM send_accounts
+    WHERE user_id = tests.get_supabase_uid('ssc_redeemer_unverified')
+  $$,
+  $$VALUES (false)$$,
+  'Unverified redeemer has send_accounts.is_verified = false'
 );
 
 -- Insert send_check_claimed rows.
@@ -107,92 +150,91 @@ INSERT INTO send_check_claimed(
   chain_id, log_addr, block_time, tx_hash, tx_idx,
   ephemeral_address, sender, token, amount, expires_at, redeemer,
   ig_name, src_name, block_num, log_idx, abi_idx
-) VALUES
+)
+VALUES
   -- valid: verified redeemer 1, amount 42
-  (8453, '\x01020304', extract(epoch from (now() at time zone 'UTC')),
-   '\x' || encode(gen_random_bytes(16),'hex')::text::bytea, 0,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  (8453, '\x01020304'::bytea, extract(epoch from (now() at time zone 'UTC')),
+   '\x00000000000000000000000000000001'::bytea, 0,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea,
    42::numeric, extract(epoch from (now() at time zone 'UTC')) + 1000,
-   '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+   '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea,
    'ssc', 'ssc', 5000, 0, 0),
 
   -- invalid: unverified redeemer, should not count
-  (8453, '\x01020304', extract(epoch from (now() at time zone 'UTC')),
-   '\x' || encode(gen_random_bytes(16),'hex')::text::bytea, 0,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  (8453, '\x01020304'::bytea, extract(epoch from (now() at time zone 'UTC')),
+   '\x00000000000000000000000000000002'::bytea, 0,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea,
    50::numeric, extract(epoch from (now() at time zone 'UTC')) + 1000,
-   '\xcccccccccccccccccccccccccccccccccccccccc',
+   '\xcccccccccccccccccccccccccccccccccccccccc'::bytea,
    'ssc', 'ssc', 5001, 0, 0),
 
   -- invalid: wrong token, should not count
-  (8453, '\x01020304', extract(epoch from (now() at time zone 'UTC')),
-   '\x' || encode(gen_random_bytes(16),'hex')::text::bytea, 0,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  (8453, '\x01020304'::bytea, extract(epoch from (now() at time zone 'UTC')),
+   '\x00000000000000000000000000000003'::bytea, 0,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    '\x833589fcd6edb6e08f4c7c32d4f71b54bda02913'::bytea,
    60::numeric, extract(epoch from (now() at time zone 'UTC')) + 1000,
-   '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+   '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea,
    'ssc', 'ssc', 5002, 0, 0),
 
   -- invalid: self-claim, should not count
-  (8453, '\x01020304', extract(epoch from (now() at time zone 'UTC')),
-   '\x' || encode(gen_random_bytes(16),'hex')::text::bytea, 0,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  (8453, '\x01020304'::bytea, extract(epoch from (now() at time zone 'UTC')),
+   '\x00000000000000000000000000000004'::bytea, 0,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea,
    70::numeric, extract(epoch from (now() at time zone 'UTC')) + 1000,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    'ssc', 'ssc', 5003, 0, 0),
 
   -- valid: second claim to same verified redeemer 1, causes per-recipient capping at send_ceiling=100
-  (8453, '\x01020304', extract(epoch from (now() at time zone 'UTC')),
-   '\x' || encode(gen_random_bytes(16),'hex')::text::bytea, 0,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  (8453, '\x01020304'::bytea, extract(epoch from (now() at time zone 'UTC')),
+   '\x00000000000000000000000000000005'::bytea, 0,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea,
    100::numeric, extract(epoch from (now() at time zone 'UTC')) + 1000,
-   '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+   '\xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'::bytea,
    'ssc', 'ssc', 5004, 0, 0),
 
   -- valid: verified redeemer 2 adds a second unique send
-  (8453, '\x01020304', extract(epoch from (now() at time zone 'UTC')),
-   '\x' || encode(gen_random_bytes(16),'hex')::text::bytea, 0,
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  (8453, '\x01020304'::bytea, extract(epoch from (now() at time zone 'UTC')),
+   '\x00000000000000000000000000000006'::bytea, 0,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
+   '\xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'::bytea,
    '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea,
    10::numeric, extract(epoch from (now() at time zone 'UTC')) + 1000,
-   '\xdddddddddddddddddddddddddddddddddddddddd',
+   '\xdddddddddddddddddddddddddddddddddddddddd'::bytea,
    'ssc', 'ssc', 5005, 0, 0);
 
 -- send_ceiling = ROUND(hodler_min_balance / (minimum_sends * scaling_divisor)) = 100.
 -- For verified redeemer 1: amounts 42 + 100 = 142, capped to 100.
 -- For verified redeemer 2: amount 10, capped to 10.
 -- Total score = 110, unique_sends = 2.
-SELECT results_eq($$
-  SELECT
-    score::text,
-    unique_sends::bigint,
-    send_ceiling::text
-  FROM send_scores_current
-  WHERE user_id = tests.get_supabase_uid('ssc_sender')
-$$,
-$$VALUES (
-  110::text,
-  2::bigint,
-  100::text
-)$$,
-'send_check_claimed contributes to send_scores_current only for verified redeemers + SEND token, with per-recipient capping');
-
-SELECT ok(
-  (SELECT COUNT(*) FROM send_scores_current WHERE user_id = tests.get_supabase_uid('ssc_sender')) = 1,
-  'send_scores_current has exactly one row for sender'
+SELECT results_eq(
+  $$
+    SELECT
+      score::text,
+      unique_sends::bigint,
+      send_ceiling::text
+    FROM send_scores_current
+    WHERE user_id = tests.get_supabase_uid('ssc_sender')
+  $$,
+  $$VALUES (
+    110::text,
+    2::bigint,
+    100::text
+  )$$,
+  'send_check_claimed contributes to send_scores_current only for verified redeemers + SEND token, with per-recipient capping'
 );
 
-SELECT finish();
+SELECT * FROM finish();
+
 ROLLBACK;
 
 RESET client_min_messages;
