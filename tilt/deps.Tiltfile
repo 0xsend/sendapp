@@ -8,7 +8,9 @@ labels = ["deps"]
 
 local_resource(
     "yarn:install",
-    "yarn install --inline-builds" if not CI else "yarn install --immutable",
+    # SKIP_YARN_POST_INSTALL=1 skips postinstall build step (handled by separate Tilt resources)
+    # This prevents issues with unset variable errors and redundant builds
+    "SKIP_YARN_POST_INSTALL=1 yarn install --inline-builds" if not CI else "yarn install --immutable",
     labels = labels,
     deps = [
         "package.json",
