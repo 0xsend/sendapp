@@ -4,8 +4,8 @@ import { Image, type ImageSourcePropType } from 'react-native'
 import { useRouter } from 'solito/router'
 
 // Handle different module formats for cross-platform compatibility
-function getImageSource(): ImageSourcePropType {
-  let source: ImageSourcePropType = require('./error-robot.png')
+function getImageSource(input: ImageSourcePropType): ImageSourcePropType {
+  let source: ImageSourcePropType = input
   if (typeof source === 'object' && source !== null) {
     if ('default' in source) {
       source = (source as { default: ImageSourcePropType }).default
@@ -17,7 +17,8 @@ function getImageSource(): ImageSourcePropType {
   return source
 }
 
-const errorRobotImage = getImageSource()
+const errorRobotAsset = { source: require('./error-robot.png') }
+const errorRobotImage = getImageSource(errorRobotAsset.source)
 
 interface Props {
   error?: Error
