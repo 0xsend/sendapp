@@ -9,6 +9,7 @@ import { api } from 'app/utils/api'
 import { useSignIn } from 'app/utils/send-accounts'
 import { Platform } from 'react-native'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
+import { useAnalytics } from 'app/provider/analytics'
 
 const SignInWithPhoneSchema = z.object({
   countryCode: formFields.countrycode,
@@ -22,6 +23,7 @@ export const LoginWithPhoneScreen = () => {
   const { redirectUri } = queryParams
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const { redirect } = useAuthRedirect()
+  const analytics = useAnalytics()
 
   const formPhone = form.watch('phone')
   const validationError = form.formState.errors.root
@@ -45,10 +47,36 @@ export const LoginWithPhoneScreen = () => {
     try {
       const allowedCredentials = await getCredentialByPhoneMutateAsync(formData)
       await signInMutateAsync({ allowedCredentials })
+
+      // Capture login with phone event
+      analytics.capture({
+        name: 'user_login_with_phone',
+        properties: {
+          country_code: formData.countryCode,
+        },
+      })
+
+      // Capture login succeeded event
+      analytics.capture({
+        name: 'user_login_succeeded',
+        properties: {
+          auth_type: 'phone',
+        },
+      })
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
       form.setError('root', {
         type: 'custom',
-        message: error.message,
+        message: errorMessage,
+      })
+
+      // Track login error
+      analytics.capture({
+        name: 'auth_error_occurred',
+        properties: {
+          error_message: errorMessage,
+          auth_type: 'login_with_phone',
+        },
       })
       return
     }

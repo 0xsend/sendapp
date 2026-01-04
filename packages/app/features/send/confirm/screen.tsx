@@ -43,6 +43,8 @@ import { Platform } from 'react-native'
 import ConfirmScreenAvatar from 'app/features/send/confirm/ConfirmScreenAvatar'
 import useRedirectAfterSend from 'app/features/send/confirm/useRedirectAfterSend'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
+import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
 
 const log = debug('app:features:send:confirm:screen')
 
@@ -82,6 +84,7 @@ export function SendConfirm() {
   const { redirect } = useRedirectAfterSend()
   const { profile: currentUserProfile } = useUser()
   const { t } = useTranslation('send')
+  const analytics = useAnalytics()
 
   const submitButtonRef = useRef<TamaguiElement | null>(null)
 
@@ -103,6 +106,11 @@ export function SendConfirm() {
     idType ?? 'tag',
     recipient ?? ''
   )
+
+  // Check if recipient is a contact
+  const { data: recipientContact } = useContactBySendId(profile?.sendid)
+  const isContact = !!recipientContact
+  const isFavorite = recipientContact?.is_favorite ?? false
 
   const href = profile ? `/profile/${profile?.sendid}` : ''
 
@@ -231,6 +239,20 @@ export function SendConfirm() {
       })
       userOp.signature = signature
 
+      // Capture transfer initiated event
+      analytics.capture({
+        name: 'send_transfer_initiated',
+        properties: {
+          token_address: selectedCoin?.token,
+          amount: amount,
+          recipient_type: idType,
+          has_note: !!note,
+          is_contact: isContact,
+          is_favorite: isFavorite,
+          workflow_id: 'pending',
+        },
+      })
+
       const validatedUserOp = await validateUserOp(userOp)
       assert(!!validatedUserOp, 'Operation expected to fail')
 
@@ -240,6 +262,19 @@ export function SendConfirm() {
       })
 
       if (workflowId) {
+        // Capture transfer submitted event
+        analytics.capture({
+          name: 'send_transfer_submitted',
+          properties: {
+            token_address: selectedCoin?.token,
+            amount: amount,
+            recipient_type: idType,
+            has_note: !!note,
+            is_contact: isContact,
+            is_favorite: isFavorite,
+            workflow_id: workflowId,
+          },
+        })
         // Don't await - fire and forget to avoid iOS hanging on cache operations
         void queryClient.invalidateQueries({
           queryKey: ['activity_feed'],
@@ -264,6 +299,22 @@ export function SendConfirm() {
       //   return
       // }
       console.error(e)
+
+      // Capture transfer failed event
+      analytics.capture({
+        name: 'send_transfer_failed',
+        properties: {
+          token_address: selectedCoin?.token,
+          amount: amount,
+          recipient_type: idType,
+          has_note: !!note,
+          is_contact: isContact,
+          is_favorite: isFavorite,
+          workflow_id: 'failed',
+          error_type: 'unknown',
+        },
+      })
+
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }

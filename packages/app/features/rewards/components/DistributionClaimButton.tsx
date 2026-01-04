@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react'
 import { type Hex, isAddress, formatUnits } from 'viem'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 interface DistributionsClaimButtonProps {
   distribution: UseDistributionsResultData[number]
@@ -30,6 +31,7 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   const { t } = useTranslation('rewards')
   const { data: sendAccount, isLoading: isLoadingSendAccount } = useSendAccount()
   const queryClient = useQueryClient()
+  const analytics = useAnalytics()
   // Check if the user is eligible
   const share = distribution.distribution_shares?.[0]
   const isEligible = !!share && BigInt(share.amount) > 0
@@ -162,6 +164,17 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
   }, [error, toast, share, distribution.token_decimals])
 
   async function onSubmit() {
+    const claimProps = {
+      distribution_number: distribution.number,
+      amount: share?.amount?.toString(),
+    }
+
+    // Track rewards claim started
+    analytics.capture({
+      name: 'rewards_claim_started',
+      properties: claimProps,
+    })
+
     try {
       assert(!!userOp, 'User op is required')
       assert(nonceError === null, `Failed to get nonce: ${nonceError}`)
@@ -182,11 +195,28 @@ export const DistributionClaimButton = ({ distribution }: DistributionsClaimButt
         webauthnCreds,
       })
       assert(receipt.success, 'Failed to send user op')
+
+      // Track rewards claim completed
+      analytics.capture({
+        name: 'rewards_claim_completed',
+        properties: claimProps,
+      })
+
       setSentTxHash(receipt.receipt.transactionHash)
       refetchIsClaimed()
       await queryClient.invalidateQueries({ queryKey: [useSendMerkleDropsAreClaimed.queryKey] })
     } catch (e) {
       console.error(e)
+
+      // Track rewards claim failed
+      analytics.capture({
+        name: 'rewards_claim_failed',
+        properties: {
+          ...claimProps,
+          error_type: 'unknown',
+        },
+      })
+
       setError(e)
       await queryClient.invalidateQueries({ queryKey: [useAccountNonce.queryKey] })
     }

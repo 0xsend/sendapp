@@ -13,7 +13,7 @@ import {
 import { Check } from '@tamagui/lucide-icons'
 
 import { toNiceError } from 'app/utils/toNiceError'
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useState, useRef } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 
@@ -24,6 +24,7 @@ import {
 } from './hooks/useDidUserBuyTicket'
 
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 const SendpotRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
@@ -33,8 +34,15 @@ const SendpotRiskDialog = () => {
   const queryClient = useQueryClient()
   const id = useId()
   const { t } = useTranslation('sendpot')
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
 
   const handleConfirm = () => {
+    // Track disclaimer accepted
+    analytics.capture({
+      name: 'sendpot_disclaimer_accepted',
+      properties: {},
+    })
     // Set the disclaimer accepted flag in the query cache
     queryClient.setQueryData([SENDPOT_DISCLAIMER_ACCEPTED_QUERY_KEY], true)
     setIsOpen(false)
@@ -47,8 +55,16 @@ const SendpotRiskDialog = () => {
   useEffect(() => {
     if (didUserBuyTicket.data === false || didUserBuyTicket.error) {
       setIsOpen(true)
+      // Track disclaimer viewed (only once per session)
+      if (!hasTrackedView.current) {
+        analytics.capture({
+          name: 'sendpot_disclaimer_viewed',
+          properties: {},
+        })
+        hasTrackedView.current = true
+      }
     }
-  }, [didUserBuyTicket.data, didUserBuyTicket.error])
+  }, [didUserBuyTicket.data, didUserBuyTicket.error, analytics])
 
   // Shared content component to avoid duplication
   const dialogContent = (

@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker'
 import type React from 'react'
 import { type Ref, forwardRef, useImperativeHandle, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 export interface UploadAvatarRefObject {
   pickImage: () => void
@@ -18,6 +19,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
 ) {
   const { user, profile, updateProfile } = useUser()
   const supabase = useSupabase()
+  const analytics = useAnalytics()
   const [errMsg, setErrMsg] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const isDark = useThemeName()?.startsWith('dark')
@@ -94,6 +96,14 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
       return
     }
     setIsUploading(false)
+
+    // Track profile update
+    analytics.capture({
+      name: 'profile_updated',
+      properties: {
+        fields_updated: ['avatar_url'],
+      },
+    })
 
     await updateProfile()
   }

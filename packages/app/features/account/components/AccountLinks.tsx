@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next'
 import { Platform } from 'react-native'
 import * as Application from 'expo-application'
 import { AccountDeletionFlow } from './AccountDeletionFlow'
+import { useAnalytics } from 'app/provider/analytics'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -51,10 +52,16 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const { openChat } = useIntercom()
   const { t } = useTranslation('account')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const analytics = useAnalytics()
 
   const handleSignOut = useCallback(() => {
+    // Track logout event before signing out
+    analytics.capture({
+      name: 'user_logged_out',
+      properties: {},
+    })
     void supabase.auth.signOut()
-  }, [supabase.auth])
+  }, [supabase.auth, analytics])
 
   const showSecretShop = __DEV__ || baseMainnet.id === 84532
 

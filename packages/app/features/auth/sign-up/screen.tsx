@@ -39,6 +39,7 @@ import { Platform } from 'react-native'
 import useIsScreenFocused from 'app/utils/useIsScreenFocused'
 import useAuthRedirect from 'app/utils/useAuthRedirect/useAuthRedirect'
 import { AlertTriangle, CheckCircle } from '@tamagui/lucide-icons'
+import { useAnalytics } from 'app/provider/analytics'
 
 const SignUpScreenFormSchema = z.object({
   name: formFields.text,
@@ -71,6 +72,7 @@ export const SignUpScreen = () => {
   const isScreenFocused = useIsScreenFocused()
   const { xxs } = useMedia()
   const { redirect } = useAuthRedirect()
+  const analytics = useAnalytics()
   const passkeyDiagnosticErrorMessage = PASSKEY_DIAGNOSTIC_ERROR_MESSAGE
   const PASSKEY_TOAST_ID = 'passkey-integrity-signup'
   const [diagnosticStatus, setDiagnosticStatus] = useState<
@@ -228,6 +230,7 @@ export const SignUpScreen = () => {
         setHasCompletedPasskey(false)
         setDiagnosticStatus('idle')
         setDiagnosticMessage(null)
+
         const validatedSendtag = await validateSendtagMutateAsync({ name })
 
         if (!hasSignedUpRef.current) {
@@ -296,6 +299,29 @@ export const SignUpScreen = () => {
           referralCode,
         })
         setHasCompletedPasskey(true)
+
+        // Fetch profile to get send_id for analytics
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('send_id')
+          .eq('id', sessionUser.id)
+          .single()
+
+        // Identify user and capture sign-up event
+        const sendId = String(profileData?.send_id ?? '')
+        analytics.identify(sendId, {
+          sendtag: validatedSendtag,
+          has_referral: !!referralCode,
+        })
+        analytics.capture({
+          name: 'user_signed_up',
+          properties: {
+            sendtag: validatedSendtag,
+            has_referral: !!referralCode,
+            send_account_id: sendId,
+          },
+        })
+
         redirect()
       } catch (error) {
         setFormState(FormState.Idle)
@@ -323,6 +349,14 @@ export const SignUpScreen = () => {
               type: 'custom',
               message: passkeyDiagnosticErrorMessage,
             })
+
+            // Track passkey integrity failure
+            analytics.capture({
+              name: 'passkey_integrity_failed',
+              properties: {
+                error_type: 'user_rejection',
+              },
+            })
             return
           }
         }
@@ -336,10 +370,20 @@ export const SignUpScreen = () => {
         setDiagnosticStatus('idle')
         setDiagnosticMessage(null)
         setHasCompletedPasskey(false)
+
+        // Track auth error
+        analytics.capture({
+          name: 'auth_error_occurred',
+          properties: {
+            error_message: message,
+            auth_type: 'sign_up',
+          },
+        })
         return
       }
     },
     [
+      analytics,
       captchaToken,
       createAccount,
       createSendAccount,
@@ -350,7 +394,7 @@ export const SignUpScreen = () => {
       registerFirstSendtagMutateAsync,
       setFirstSendtagMutateAsync,
       signUpMutateAsync,
-      supabase.auth,
+      supabase,
       toast,
       validateSendtagMutateAsync,
     ]
@@ -406,12 +450,21 @@ export const SignUpScreen = () => {
 
     try {
       await signInMutateAsync({})
+
+      // Track passkey login success
+      analytics.capture({
+        name: 'user_login_succeeded',
+        properties: {
+          auth_type: 'passkey',
+        },
+      })
+
       redirect(queryParams.redirectUri)
     } catch (error) {
       setFormState(FormState.Idle)
       toast.error(formatErrorMessage(error))
     }
-  }, [signInMutateAsync, toast, redirect, queryParams.redirectUri])
+  }, [signInMutateAsync, toast, redirect, queryParams.redirectUri, analytics])
 
   return (
     <YStack f={1} jc={'center'} ai={'center'} gap={xxs ? '$3.5' : '$7'} w={'100%'}>
