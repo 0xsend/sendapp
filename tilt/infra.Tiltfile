@@ -1,6 +1,7 @@
 # -*- mode: python -*-
 
 load("./common.Tiltfile", "CI", "WORKSPACE_NAME", "ws_container")
+load("ext://color", "color")
 load("ext://uibutton", "cmd_button", "location")
 
 _prj_root = os.path.join(
@@ -127,6 +128,11 @@ cmd_button(
 # ===========================================
 # Provides connection-pooled anvil via nginx proxy to prevent
 # CLOSE_WAIT exhaustion from bundler, shovel, and E2E tests.
+
+# Ensure .localnet.env exists (copy from template if not)
+if not os.path.exists("../.localnet.env"):
+    local("cp .localnet.env.template .localnet.env", dir="..")
+    print(color.green("📝 Created .localnet.env from template"))
 
 # Fetch fork block height if not already set (current block - 30 to avoid reorgs)
 _anvil_fork_url = os.getenv("ANVIL_BASE_FORK_URL", "")
