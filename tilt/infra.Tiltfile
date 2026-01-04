@@ -176,8 +176,8 @@ local_resource(
     docker run --rm \
         --name {container_name} \
         -p {otterscan_port}:80 \
-        --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
+        --network=host \
+        --env ERIGON_URL="http://localhost:{anvil_port}" \
         otterscan/otterscan:v2.3.0
     """.format(
         container_name = ws_container("otterscan-mainnet"),
@@ -281,10 +281,10 @@ local_resource(
     ],
     serve_cmd = """
     # Wait for Anvil to be ready before starting bundler
-    echo "Waiting for Anvil at host.docker.internal:{anvil_port}..."
+    echo "Waiting for Anvil at localhost:{anvil_port}..."
     until curl -sf -X POST -H "Content-Type: application/json" \
         --data '{{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}}' \
-        http://host.docker.internal:{anvil_port} > /dev/null 2>&1; do
+        http://localhost:{anvil_port} > /dev/null 2>&1; do
         echo "Anvil not ready, retrying in 2s..."
         sleep 2
     done
@@ -293,8 +293,7 @@ local_resource(
     docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
     docker run --rm \
         --name {container_name} \
-        --add-host=host.docker.internal:host-gateway \
-        -p 0.0.0.0:{bundler_port}:{bundler_port} \
+        --network=host \
         -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         -v ./apps/aabundler/etc:/app/etc/aabundler \
         -e "DEBUG={bundler_debug}" \
@@ -305,7 +304,7 @@ local_resource(
         --port {bundler_port} \
         --config /app/etc/aabundler/aabundler.config.json \
         --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        --network http://host.docker.internal:{anvil_port} \
+        --network http://localhost:{anvil_port} \
         --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
         --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
         --unsafe
@@ -401,8 +400,8 @@ local_resource(
     docker run --rm \
         --name {container_name} \
         -p {otterscan_port}:80 \
-        --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
+        --network=host \
+        --env ERIGON_URL="http://localhost:{anvil_port}" \
         otterscan/otterscan:v2.3.0
     """.format(
         container_name = ws_container("otterscan-base"),
