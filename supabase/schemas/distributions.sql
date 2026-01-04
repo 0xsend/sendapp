@@ -638,9 +638,9 @@ BEGIN
         insert_verification_value.type,
         COALESCE(insert_verification_value.fixed_value, prev_verification_values.fixed_value, 0),
         COALESCE(insert_verification_value.bips_value, prev_verification_values.bips_value, 0),
-        COALESCE(insert_verification_value.multiplier_min, prev_verification_values.multiplier_min, 1.0),
-        COALESCE(insert_verification_value.multiplier_max, prev_verification_values.multiplier_max, 1.0),
-        COALESCE(insert_verification_value.multiplier_step, prev_verification_values.multiplier_step, 0.0),
+        COALESCE(insert_verification_value.multiplier_min, prev_verification_values.multiplier_min),
+        COALESCE(insert_verification_value.multiplier_max, prev_verification_values.multiplier_max),
+        COALESCE(insert_verification_value.multiplier_step, prev_verification_values.multiplier_step),
         (SELECT id FROM distributions WHERE "number" = insert_verification_value.distribution_number LIMIT 1)
     );
 END;
@@ -1146,7 +1146,7 @@ BEGIN
             sa.user_id,
             CASE
                 -- If matched a completed jackpot period, use that
-                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time
+                WHEN jp.block_time IS NOT NULL THEN jp.block_time
                 -- If purchase is after max jackpot, use max jackpot (pending period)
                 WHEN (SELECT max_block_time FROM max_jackpot) > 0
                      AND utp.block_time > (SELECT max_block_time FROM max_jackpot)
@@ -1169,7 +1169,7 @@ BEGIN
         ))
         GROUP BY sa.user_id,
             CASE
-                WHEN jp.block_time IS NOT NULL THEN jp.prev_block_time
+                WHEN jp.block_time IS NOT NULL THEN jp.block_time
                 WHEN (SELECT max_block_time FROM max_jackpot) > 0
                      AND utp.block_time > (SELECT max_block_time FROM max_jackpot)
                 THEN (SELECT max_block_time FROM max_jackpot)
