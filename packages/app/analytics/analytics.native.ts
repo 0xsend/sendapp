@@ -29,6 +29,7 @@ export const analytics: AnalyticsService = {
     client = new PostHog(key, {
       host,
       enableSessionReplay: false,
+      debug: __DEV__,
       errorTracking: {
         autocapture: {
           uncaughtExceptions: true,
