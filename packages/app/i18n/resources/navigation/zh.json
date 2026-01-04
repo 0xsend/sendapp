@@ -73,6 +73,9 @@
     },
     "savings": {
       "root": "储蓄"
+    },
+    "secretShop": {
+      "root": "秘密商店"
     }
   },
   "tabs": {

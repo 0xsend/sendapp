@@ -91,6 +91,9 @@
     },
     "savings": {
       "root": "Savings"
+    },
+    "secretShop": {
+      "root": "Secret shop"
     }
   }
 }
