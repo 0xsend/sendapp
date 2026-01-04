@@ -9,8 +9,7 @@ import '@my/ui/src/config/fonts.css'
 
 import { type ColorScheme, NextThemeProvider, useRootTheme } from '@tamagui/next-theme'
 
-import { AnalyticsErrorBoundary } from 'app/components/AnalyticsErrorBoundary'
-import { ErrorFallback } from 'app/components/ErrorFallback'
+import { AnalyticsErrorBoundary, ErrorFallback } from 'app/components/ErrorBoundary'
 import { Provider } from 'app/provider'
 import { getI18n, initSharedI18n, resolvePreferredLocale, DEFAULT_LOCALE } from 'app/i18n'
 import type { AuthProviderProps } from 'app/provider/auth'

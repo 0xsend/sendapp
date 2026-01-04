@@ -20,8 +20,7 @@ import '@formatjs/intl-relativetimeformat/locale-data/zh' // Chinese
 
 import 'intl-pluralrules'
 import type { Session } from '@supabase/supabase-js'
-import { AnalyticsErrorBoundary } from 'app/components/AnalyticsErrorBoundary'
-import { ErrorFallback } from 'app/components/ErrorFallback'
+import { AnalyticsErrorBoundary, ErrorFallback } from 'app/components/ErrorBoundary'
 import { loadThemePromise, Provider } from 'app/provider'
 import { getI18n, initSharedI18n } from 'app/i18n'
 import { supabase } from 'app/utils/supabase/client.native'
