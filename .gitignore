@@ -81,3 +81,6 @@ tilt_config.json
 
 coverage
 .tmp
+
+# ESLint cache
+.cache/

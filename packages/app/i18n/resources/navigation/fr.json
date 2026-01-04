@@ -73,6 +73,9 @@
     },
     "savings": {
       "root": "Épargne"
+    },
+    "secretShop": {
+      "root": "Boutique secrète"
     }
   },
   "tabs": {

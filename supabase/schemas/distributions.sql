@@ -1102,9 +1102,10 @@ $function$;
 
 ALTER FUNCTION "public"."insert_verification_sendpot_ticket_purchase"() OWNER TO "postgres";
 
-CREATE OR REPLACE FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) RETURNS "void"
-    LANGUAGE "plpgsql"
-    AS $$
+CREATE OR REPLACE FUNCTION public.insert_sendpot_ticket_purchase_verifications(distribution_num integer)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
 BEGIN
     -- Insert verification rows for ticket purchases grouped by jackpot period
     -- Pattern mirrored from insert_create_passkey_verifications
@@ -1194,7 +1195,8 @@ BEGIN
     FROM purchases_by_period pbp
     WHERE pbp.user_id IS NOT NULL;
 END;
-$$;
+$function$
+;
 
 ALTER FUNCTION "public"."insert_sendpot_ticket_purchase_verifications"("distribution_num" integer) OWNER TO "postgres";
 

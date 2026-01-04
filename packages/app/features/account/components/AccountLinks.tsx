@@ -1,6 +1,7 @@
 import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { Button, type ColorTokens, Paragraph, type SizeTokens, YGroup, YStack } from '@my/ui'
+import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconDollar,
@@ -16,6 +17,7 @@ import {
   IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
+import { FileSignature, Lock } from '@tamagui/lucide-icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo, useState } from 'react'
@@ -61,6 +63,8 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
     void supabase.auth.signOut()
   }, [supabase.auth, analytics])
 
+  const showSecretShop = __DEV__ || baseMainnet.id === 84532
+
   const icons = useMemo(
     () => ({
       account: <IconAccount {...iconProps} />,
@@ -69,12 +73,14 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       fingerprint: <IconFingerprint {...iconProps} />,
       slash: <IconSlash {...iconProps} />,
       group: <IconGroup {...iconProps} />,
+      fileSignature: <FileSignature {...iconProps} />,
       starOutline: <IconStarOutline {...iconProps} />,
       worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
       trash: <IconTrash {...iconProps} />,
       infoCircle: <IconInfoCircle {...iconProps} />,
       questionCircle: <IconQuestionCircle {...iconProps} />,
+      lock: <Lock {...iconProps} />,
     }),
     []
   )
@@ -129,6 +135,13 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink
+              text={t('links.items.checks')}
+              href="/check"
+              icon={icons.fileSignature}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
               text={t('links.items.referrals')}
               href="/account/affiliate"
               icon={icons.dollar}
@@ -141,6 +154,15 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               icon={icons.starOutline}
             />
           </YGroup.Item>
+          {showSecretShop && (
+            <YGroup.Item>
+              <AccountNavLink
+                text={t('links.items.secretShop')}
+                href="/secret-shop"
+                icon={icons.lock}
+              />
+            </YGroup.Item>
+          )}
         </YGroup>
       </YStack>
       <YStack gap={'$3.5'}>

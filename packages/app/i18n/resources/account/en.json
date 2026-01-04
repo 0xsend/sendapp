@@ -23,8 +23,10 @@
       "passkeys": "Passkeys",
       "sendtags": "Sendtags",
       "contacts": "Contacts",
+      "checks": "Checks",
       "rewards": "Rewards",
       "referrals": "Referrals",
+      "secretShop": "Secret Shop",
       "deleteAccount": "Delete Account",
       "learnMore": "Learn more about Send",
       "liveChat": "Live Chat Support"
