@@ -17,7 +17,7 @@ import {
   IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
-import { Lock } from '@tamagui/lucide-icons'
+import { FileSignature, Lock } from '@tamagui/lucide-icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo, useState } from 'react'
@@ -66,6 +66,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       fingerprint: <IconFingerprint {...iconProps} />,
       slash: <IconSlash {...iconProps} />,
       group: <IconGroup {...iconProps} />,
+      fileSignature: <FileSignature {...iconProps} />,
       starOutline: <IconStarOutline {...iconProps} />,
       worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
@@ -124,6 +125,13 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink text={t('links.items.contacts')} href="/contacts" icon={icons.group} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.checks')}
+              href="/check"
+              icon={icons.fileSignature}
+            />
           </YGroup.Item>
           <YGroup.Item>
             <AccountNavLink

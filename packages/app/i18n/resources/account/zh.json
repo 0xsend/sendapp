@@ -34,6 +34,7 @@
   "links": {
     "items": {
       "contacts": "联系人",
+      "checks": "Checks",
       "deleteAccount": "删除账户",
       "language": "语言",
       "learnMore": "了解更多关于 Send 的信息",
