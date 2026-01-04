@@ -20,6 +20,7 @@ import {
   type TestClient,
 } from 'viem'
 import { shorten } from 'app/utils/strings'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const testClient = createTestClient({
@@ -40,6 +41,11 @@ export function SecretShopScreen() {
   const { data: sendAccts, isPending } = useSendAccounts()
   const sendAcct = sendAccts?.[0]
   const { t } = useTranslation('secretShop')
+  const [shouldCrash, setShouldCrash] = useState(false)
+
+  if (__DEV__ && shouldCrash) {
+    throw new Error('Test error boundary crash')
+  }
 
   if (isPending) {
     return (
@@ -193,6 +199,11 @@ export function SecretShopScreen() {
               </FadeCard>
             )}
           </YStack>
+        )}
+        {__DEV__ && (
+          <PrimaryButton onPress={() => setShouldCrash(true)}>
+            <PrimaryButton.Text>Test Error Boundary</PrimaryButton.Text>
+          </PrimaryButton>
         )}
       </YStack>
     </YStack>

@@ -11,12 +11,13 @@ import type {
 const log = debug('app:analytics')
 
 let client: PostHog | null = null
+let isReady = false
 
 const IGNORED_ERRORS = ['Network request failed', 'AbortError', 'The operation was aborted']
 
 export const analytics: AnalyticsService = {
   async init() {
-    if (client) return
+    if (isReady) return
 
     const key = process.env.NEXT_PUBLIC_POSTHOG_KEY
     const host = process.env.NEXT_PUBLIC_POSTHOG_HOST
@@ -26,10 +27,10 @@ export const analytics: AnalyticsService = {
       return
     }
 
+    log('initializing PostHog')
     client = new PostHog(key, {
       host,
       enableSessionReplay: false,
-      debug: __DEV__,
       errorTracking: {
         autocapture: {
           uncaughtExceptions: true,
@@ -40,10 +41,22 @@ export const analytics: AnalyticsService = {
     })
 
     await client.ready()
+    isReady = true
+    log('PostHog ready')
   },
 
   identify(distinctId: string, properties?: AnalyticsUserProperties) {
-    client?.identify(distinctId, properties as PostHogEventProperties)
+    if (!client) {
+      log('identify called but client not initialized', { distinctId })
+      return
+    }
+    log('identify', { distinctId, properties })
+    client.identify(distinctId, {
+      ...properties,
+      $process_person_profile: true,
+    } as PostHogEventProperties)
+    // Flush immediately to ensure person profile is created
+    client.flush()
   },
 
   capture<E extends AnalyticsEvent>(event: E) {
@@ -59,7 +72,7 @@ export const analytics: AnalyticsService = {
   },
 
   isInitialized() {
-    return client !== null
+    return isReady
   },
 
   captureException(error: unknown, properties?: ExceptionProperties) {
