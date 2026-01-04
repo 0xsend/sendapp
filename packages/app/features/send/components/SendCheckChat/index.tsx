@@ -157,8 +157,7 @@ export const SendCheckChat = memo(
     const sectionHeight = useMemo(() => {
       if (activeSection === 'success') return 600
       if (activeSection === 'reviewAndSend') return 480
-      // enterAmount: 500 (like SendChat) + ~60 for expiration selector
-      return 560
+      return 575
     }, [activeSection])
 
     return (

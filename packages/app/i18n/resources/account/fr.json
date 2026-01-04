@@ -34,6 +34,7 @@
   "links": {
     "items": {
       "contacts": "Contacts",
+      "sendChecks": "Send Checks",
       "deleteAccount": "Supprimer le compte",
       "language": "Langue",
       "learnMore": "En savoir plus sur Send",
