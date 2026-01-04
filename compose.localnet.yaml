@@ -107,7 +107,7 @@ services:
       --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
       --unsafe
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:${BUNDLER_PORT:-3030}/"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:${BUNDLER_PORT:-3030}/"]
       interval: 5s
       timeout: 3s
       retries: 20
