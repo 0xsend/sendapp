@@ -127,7 +127,7 @@ jobs:
       - name: Tilt CI
         id: tilt-ci
         shell: bash
-        run: tilt ci unit-tests --timeout=15m
+        run: tilt ci unit-tests --timeout=15m -- --skip_docker_compose
       # Since we use ephemeral containers, we don't need to clean up anymore
       # - name: Tilt Down
       #   # always run tilt down if tilt ci started
@@ -176,7 +176,7 @@ jobs:
       - name: Lint deps
         shell: bash
         run: |
-          tilt ci lint:deps
+          tilt ci lint:deps -- --skip_docker_compose
 
       - name: Set Workers Count
         id: workers

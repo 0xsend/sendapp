@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 
-load("./common.Tiltfile", "CI", "WORKSPACE_NAME", "ws_container")
+load("./common.Tiltfile", "CFG", "CI", "WORKSPACE_NAME", "ws_container")
 load("ext://color", "color")
 load("ext://uibutton", "cmd_button", "location")
 
@@ -128,142 +128,145 @@ cmd_button(
 # ===========================================
 # Provides connection-pooled anvil via nginx proxy to prevent
 # CLOSE_WAIT exhaustion from bundler, shovel, and E2E tests.
+#
+# Skipped when skip_docker_compose is True (e.g., lint:deps, unit-tests)
 
-# Ensure .localnet.env exists (copy from template if not)
-if not os.path.exists("../.localnet.env"):
-    local("cp .localnet.env.template .localnet.env", dir="..")
-    print(color.green("📝 Created .localnet.env from template"))
+if not CFG.skip_docker_compose:
+    # Ensure .localnet.env exists (copy from template if not)
+    if not os.path.exists("../.localnet.env"):
+        local("cp .localnet.env.template .localnet.env", dir="..")
+        print(color.green("📝 Created .localnet.env from template"))
 
-# Fetch fork block height if not already set (current block - 30 to avoid reorgs)
-_anvil_fork_url = os.getenv("ANVIL_BASE_FORK_URL", "")
-if _anvil_fork_url and not os.getenv("ANVIL_BASE_FORK_BLOCK"):
-    _current_block = int(str(local("cast bn --rpc-url " + _anvil_fork_url, quiet=True)).strip())
-    _fork_block = str(_current_block - 30)
-    os.putenv("ANVIL_BASE_FORK_BLOCK", _fork_block)
+    # Fetch fork block height if not already set (current block - 30 to avoid reorgs)
+    _anvil_fork_url = os.getenv("ANVIL_BASE_FORK_URL", "")
+    if _anvil_fork_url and not os.getenv("ANVIL_BASE_FORK_BLOCK"):
+        _current_block = int(str(local("cast bn --rpc-url " + _anvil_fork_url, quiet=True)).strip())
+        _fork_block = str(_current_block - 30)
+        os.putenv("ANVIL_BASE_FORK_BLOCK", _fork_block)
 
-docker_compose(
-    configPaths = ["../compose.localnet.yaml"],
-    env_file = "../.localnet.env",
-    project_name = WORKSPACE_NAME,
-)
+    docker_compose(
+        configPaths = ["../compose.localnet.yaml"],
+        env_file = "../.localnet.env",
+        project_name = WORKSPACE_NAME,
+    )
 
-# Map compose services to Tilt resources
-# anvil-base: Internal anvil node (not directly accessible)
-# Note: Docker Compose resources don't depend on yarn:install since they run in containers
-dc_resource(
-    "anvil-base",
-    labels = labels,
-    new_name = "anvil:base-node",
-    resource_deps = [],  # No deps - anvil container is self-contained
-)
+    # Map compose services to Tilt resources
+    # anvil-base: Internal anvil node (not directly accessible)
+    # Note: Docker Compose resources don't depend on yarn:install since they run in containers
+    dc_resource(
+        "anvil-base",
+        labels = labels,
+        new_name = "anvil:base-node",
+        resource_deps = [],  # No deps - anvil container is self-contained
+    )
 
-# anvil-proxy: Nginx reverse proxy with connection pooling
-# This is what clients (bundler, shovel, E2E tests) connect to
-dc_resource(
-    "anvil-proxy",
-    labels = labels,
-    links = [link("http://localhost:" + _anvil_base_port + "/", "Anvil Base RPC")],
-    new_name = "anvil:base",
-    resource_deps = ["anvil:base-node"],
-)
+    # anvil-proxy: Nginx reverse proxy with connection pooling
+    # This is what clients (bundler, shovel, E2E tests) connect to
+    dc_resource(
+        "anvil-proxy",
+        labels = labels,
+        links = [link("http://localhost:" + _anvil_base_port + "/", "Anvil Base RPC")],
+        new_name = "anvil:base",
+        resource_deps = ["anvil:base-node"],
+    )
 
-# aa-bundler: ERC-4337 bundler
-# Depends on anvil:fixtures to ensure paymaster is funded before bundler starts
-dc_resource(
-    "aa-bundler",
-    labels = labels,
-    links = [link("http://localhost:" + _bundler_port + "/", "AA Bundler")],
-    new_name = "aa_bundler:base",
-    resource_deps = ["anvil:fixtures"],
-)
+    # aa-bundler: ERC-4337 bundler
+    # Depends on anvil:fixtures to ensure paymaster is funded before bundler starts
+    dc_resource(
+        "aa-bundler",
+        labels = labels,
+        links = [link("http://localhost:" + _bundler_port + "/", "AA Bundler")],
+        new_name = "aa_bundler:base",
+        resource_deps = ["anvil:fixtures"],
+    )
 
-# shovel: Blockchain indexer
-# Depends on supabase for database and anvil for RPC
-# Config is pre-generated and mounted from packages/shovel/etc/config.json
-dc_resource(
-    "shovel",
-    labels = labels,
-    links = [link("http://localhost:" + _shovel_port + "/", "Shovel")],
-    resource_deps = ["anvil:base", "supabase"],  # Needs both anvil proxy and database
-)
+    # shovel: Blockchain indexer
+    # Depends on supabase for database and anvil for RPC
+    # Config is pre-generated and mounted from packages/shovel/etc/config.json
+    dc_resource(
+        "shovel",
+        labels = labels,
+        links = [link("http://localhost:" + _shovel_port + "/", "Shovel")],
+        resource_deps = ["anvil:base", "supabase"],  # Needs both anvil proxy and database
+    )
 
-# otterscan-base: Block explorer (optional profile in compose, not started by default)
-# To enable: docker compose -f compose.localnet.yaml --profile explorer up
-# The dc_resource is not defined here because otterscan uses the "explorer" profile
-# and is not included in the default compose services.
+    # otterscan-base: Block explorer (optional profile in compose, not started by default)
+    # To enable: docker compose -f compose.localnet.yaml --profile explorer up
+    # The dc_resource is not defined here because otterscan uses the "explorer" profile
+    # and is not included in the default compose services.
 
-local_resource(
-    "anvil:anvil-add-send-merkle-drop-fixtures",
-    "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
-    auto_init = False,
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
+    local_resource(
+        "anvil:anvil-add-send-merkle-drop-fixtures",
+        "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
+        auto_init = False,
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+        trigger_mode = TRIGGER_MODE_MANUAL,
+    )
 
-local_resource(
-    "anvil:anvil-token-paymaster-deposit",
-    "yarn contracts dev:anvil-token-paymaster-deposit",
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-)
-
-local_resource(
-    "anvil:anvil-deploy-verifying-paymaster-fixtures",
-    "yarn contracts dev:anvil-deploy-verifying-paymaster-fixtures",
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-)
-
-local_resource(
-    "anvil:anvil-add-send-check-fixtures",
-    "yarn contracts dev:anvil-add-send-check-fixtures",
-    auto_init = False,
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-)
-
-local_resource(
-    "anvil:fixtures",
-    "echo 🥳",
-    labels = labels,
-    resource_deps = [
-        "anvil:base",
+    local_resource(
         "anvil:anvil-token-paymaster-deposit",
-        "anvil:anvil-deploy-verifying-paymaster-fixtures",
-    ],
-)
+        "yarn contracts dev:anvil-token-paymaster-deposit",
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+    )
 
-# Shovel empty button (clears indexed data)
-cmd_button(
-    "shovel:empty",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "yarn workspace @my/shovel run empty",
-    ],
-    dir = _prj_root,
-    icon_name = "delete_forever",
-    location = location.RESOURCE,
-    resource = "shovel",
-    text = "shovel:empty",
-)
+    local_resource(
+        "anvil:anvil-deploy-verifying-paymaster-fixtures",
+        "yarn contracts dev:anvil-deploy-verifying-paymaster-fixtures",
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+    )
+
+    local_resource(
+        "anvil:anvil-add-send-check-fixtures",
+        "yarn contracts dev:anvil-add-send-check-fixtures",
+        auto_init = False,
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+    )
+
+    local_resource(
+        "anvil:fixtures",
+        "echo 🥳",
+        labels = labels,
+        resource_deps = [
+            "anvil:base",
+            "anvil:anvil-token-paymaster-deposit",
+            "anvil:anvil-deploy-verifying-paymaster-fixtures",
+        ],
+    )
+
+    # Shovel empty button (clears indexed data)
+    cmd_button(
+        "shovel:empty",
+        argv = [
+            "/bin/sh",
+            "-c",
+            "yarn workspace @my/shovel run empty",
+        ],
+        dir = _prj_root,
+        icon_name = "delete_forever",
+        location = location.RESOURCE,
+        resource = "shovel",
+        text = "shovel:empty",
+    )
 
 local_resource(
     name = "temporal",
