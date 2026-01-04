@@ -80,3 +80,6 @@ var/**
 tilt_config.json
 
 coverage
+
+# ESLint cache
+.cache/

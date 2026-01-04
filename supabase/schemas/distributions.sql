@@ -638,9 +638,9 @@ BEGIN
         insert_verification_value.type,
         COALESCE(insert_verification_value.fixed_value, prev_verification_values.fixed_value, 0),
         COALESCE(insert_verification_value.bips_value, prev_verification_values.bips_value, 0),
-        COALESCE(insert_verification_value.multiplier_min, prev_verification_values.multiplier_min),
-        COALESCE(insert_verification_value.multiplier_max, prev_verification_values.multiplier_max),
-        COALESCE(insert_verification_value.multiplier_step, prev_verification_values.multiplier_step),
+        COALESCE(insert_verification_value.multiplier_min, prev_verification_values.multiplier_min, 1.0),
+        COALESCE(insert_verification_value.multiplier_max, prev_verification_values.multiplier_max, 1.0),
+        COALESCE(insert_verification_value.multiplier_step, prev_verification_values.multiplier_step, 0.0),
         (SELECT id FROM distributions WHERE "number" = insert_verification_value.distribution_number LIMIT 1)
     );
 END;

@@ -8,8 +8,10 @@
     "*.css"
   ],
   "scripts": {
-    "lint": "tsc --noEmit && eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "tsc --noEmit && eslint . --cache --cache-location .cache/eslint",
+    "lint:fast": "eslint . --config .eslintrc.fast.cjs --cache --cache-location .cache/eslint-fast",
+    "lint:fix": "eslint . --fix --cache --cache-location .cache/eslint",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -f .tsconfig.tsbuildinfo && rm -rf coverage && rm -rf .turbo",
     "test": "jest"
   },

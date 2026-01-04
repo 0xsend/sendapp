@@ -2,11 +2,8 @@
 module.exports = {
   extends: ['custom', 'plugin:@tanstack/eslint-plugin-query/recommended'],
   ignorePatterns: ['.eslintrc.js', '.eslintrc.fast.cjs', 'coverage/**'],
-  parserOptions: {
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname,
-    sourceType: 'module',
-  },
+  // NOTE: No parserOptions.project here - this is the "fast" config for local iteration.
+  // The default .eslintrc.cjs includes type-aware linting for CI parity.
   overrides: [
     {
       // Test files only
