@@ -1319,6 +1319,7 @@ const ChatList = YStack.styleable(() => {
     pageSize: 5,
     otherUserId: isExternalAddress ? undefined : (otherUserProfile?.sendid ?? undefined),
     currentUserId: currentUserProfile?.send_id,
+    externalAddress: isExternalAddress ? (recipientParam as `0x${string}`) : undefined,
   })
 
   const refScrollView = useRef<ScrollView>(null)
@@ -1357,13 +1358,9 @@ const ChatList = YStack.styleable(() => {
       <YStack ai="center" jc="center" f={1} gap="$4">
         <History col="$gray11" size="$6" />
         <YStack jc="center" ai="center" gap="$4">
-          <SizableText size="$8">
-            {isExternalAddress ? 'History not available' : 'No transactions yet'}
-          </SizableText>
+          <SizableText size="$8">No transactions yet</SizableText>
           <SizableText size="$5" col="$gray11">
-            {isExternalAddress
-              ? 'Enter an amount below to send.'
-              : 'Your next transaction will appear here'}
+            Your next transaction will appear here
           </SizableText>
         </YStack>
       </YStack>

@@ -34,8 +34,11 @@ test.describe('External Address Profile - Anonymous User', () => {
     await expect(page.getByTestId('copyAddressButton')).toBeVisible()
     await expect(page.getByText(truncatedAddress)).toBeVisible()
 
-    // Should show on-chain balances section
-    await expect(page.getByText('On-chain Balances (Base)')).toBeVisible()
+    // Should NOT show on-chain balances section (hidden per spec)
+    await expect(page.getByText('On-chain Balances (Base)')).not.toBeVisible()
+
+    // Should show Activity section instead of balances
+    await expect(page.getByRole('heading', { name: 'Activity', exact: true })).toBeVisible()
 
     // Should show send button
     await expect(page.getByTestId('externalAddressSendButton')).toBeVisible()
@@ -43,8 +46,8 @@ test.describe('External Address Profile - Anonymous User', () => {
     // Should show Basescan link
     await expect(page.getByText('Basescan')).toBeVisible()
 
-    // Should show View History link
-    await expect(page.getByText('View History')).toBeVisible()
+    // Should show View Full History link
+    await expect(page.getByText('View Full History')).toBeVisible()
   })
 
   test('redirects to canonical URL when address has public Send account', async ({

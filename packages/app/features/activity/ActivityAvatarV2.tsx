@@ -171,7 +171,9 @@ export const ActivityAvatar = memo(
         )
       }
 
-      return (
+      // Link to external address profile for unknown addresses
+      const isValidAddress = address?.startsWith('0x') && address.length === 42
+      const avatarContent = (
         <Avatar size="$4.5" br="$4" gap="$2" {...props}>
           <Avatar.Image
             src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
@@ -185,6 +187,22 @@ export const ActivityAvatar = memo(
           </Avatar.Fallback>
         </Avatar>
       )
+
+      if (isValidAddress) {
+        return (
+          <XStack
+            onPress={(e) => {
+              e.stopPropagation()
+            }}
+          >
+            <Link href={`/profile/${address}`} br={1000_000}>
+              {avatarContent}
+            </Link>
+          </XStack>
+        )
+      }
+
+      return avatarContent
     }
 
     // @todo make this an icon instead of a fallback TODO

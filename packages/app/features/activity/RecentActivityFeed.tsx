@@ -189,6 +189,7 @@ type ComputedValues = {
   date: ReactNode
   eventName: string
   subtext: string | null
+  subtextAddress: `0x${string}` | null
   isUserTransfer: boolean
 }
 
@@ -224,7 +225,12 @@ import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import {
+  amountFromActivity,
+  eventNameFromActivity,
+  subtextFromActivity,
+  subtextAddressFromActivity,
+} from 'app/utils/activity'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { Spinner } from '@my/ui'
 import {
@@ -390,11 +396,19 @@ const MyList = memo(
           date = CommentsTime(new Date(activity.created_at), locale)
         }
 
+        // Get the external address for linking if subtext is an address
+        const subtextAddress = subtextAddressFromActivity({
+          activity,
+          swapRouters: swapRouters || [],
+          liquidityPools: liquidityPools || [],
+        })
+
         const computed: ComputedValues = {
           amount,
           date,
           eventName,
           subtext,
+          subtextAddress,
           isUserTransfer,
         }
 
@@ -482,6 +496,7 @@ const MyList = memo(
             computedDate={computed.date}
             computedEventName={computed.eventName}
             computedSubtext={computed.subtext}
+            computedSubtextAddress={computed.subtextAddress}
             computedIsUserTransfer={computed.isUserTransfer}
           />
         </YStack>

@@ -714,6 +714,52 @@ export function subtextFromActivity({
   return null
 }
 
+/**
+ * Returns the external address associated with the activity subtext if the subtext
+ * represents an external address (not a Send user).
+ * Used to make address labels clickable links to /profile/{address}
+ */
+export function subtextAddressFromActivity({
+  activity,
+  swapRouters = [],
+  liquidityPools = [],
+}: {
+  activity: Activity
+  swapRouters?: SwapRouter[]
+  liquidityPools?: LiquidityPool[]
+}): `0x${string}` | null {
+  const _user = counterpart(activity)
+  const { from_user, to_user, data } = activity
+  const isERC20Transfer = isSendAccountTransfersEvent(activity)
+  const isETHReceive = isSendAccountReceiveEvent(activity)
+  const isSwapTransfer = isActivitySwapTransfer(activity, swapRouters, liquidityPools)
+
+  // If there's a Send user counterpart, don't return an address (it's not external)
+  if (_user) return null
+  if (isSwapTransfer) return null
+
+  // Return the external address for linking
+  if (isERC20Transfer && from_user?.id) {
+    return data.t as `0x${string}`
+  }
+  if (isETHReceive && from_user?.id) {
+    return data.sender as `0x${string}`
+  }
+  if (isERC20Transfer && to_user?.id) {
+    return data.f as `0x${string}`
+  }
+  if (isETHReceive && to_user?.id) {
+    return data.log_addr as `0x${string}`
+  }
+  if (isTemporalTokenTransfersEvent(activity)) {
+    return activity.data.t as `0x${string}`
+  }
+  if (isTemporalEthTransfersEvent(activity)) {
+    return activity.data.log_addr as `0x${string}`
+  }
+  return null
+}
+
 export function useSubtextFromActivity({
   activity,
   swapRouters = [],

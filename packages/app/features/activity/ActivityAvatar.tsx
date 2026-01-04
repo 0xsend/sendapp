@@ -3,9 +3,11 @@ import {
   LinkableAvatar,
   type LinkableAvatarProps,
   Spinner,
+  styled,
   useThemeName,
   XStack,
 } from '@my/ui'
+import { Link as SolitoLink } from 'solito/link'
 import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
@@ -34,6 +36,8 @@ import {
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity'
 import { Platform } from 'react-native'
+
+const Link = styled(SolitoLink)
 
 export function ActivityAvatar({
   activity,
@@ -165,7 +169,9 @@ export function ActivityAvatar({
       )
     }
 
-    return (
+    // Link to external address profile for unknown addresses
+    const isValidAddress = address?.startsWith('0x') && address.length === 42
+    const avatarContent = (
       <Avatar size="$4.5" br="$4" gap="$2" {...props}>
         <Avatar.Image
           src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
@@ -179,6 +185,22 @@ export function ActivityAvatar({
         </Avatar.Fallback>
       </Avatar>
     )
+
+    if (isValidAddress) {
+      return (
+        <XStack
+          onPress={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          <Link href={`/profile/${address}`} br={1000_000}>
+            {avatarContent}
+          </Link>
+        </XStack>
+      )
+    }
+
+    return avatarContent
   }
 
   // @todo make this an icon instead of a fallback TODO
