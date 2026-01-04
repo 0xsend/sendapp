@@ -86,6 +86,9 @@
     },
     "savings": {
       "root": "Ahorros"
+    },
+    "secretShop": {
+      "root": "Tienda secreta"
     }
   }
 }
