@@ -1039,6 +1039,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
+          is_verified: boolean
           main_tag_id: number | null
           updated_at: string
           user_id: string
@@ -1051,6 +1052,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code: string
+          is_verified?: boolean
           main_tag_id?: number | null
           updated_at?: string
           user_id?: string
@@ -1063,6 +1065,7 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           init_code?: string
+          is_verified?: boolean
           main_tag_id?: number | null
           updated_at?: string
           user_id?: string
@@ -2295,6 +2298,7 @@ export type Database = {
           deleted_at: string | null
           id: string
           init_code: string
+          is_verified: boolean
           main_tag_id: number | null
           updated_at: string
           user_id: string
@@ -2608,6 +2612,10 @@ export type Database = {
         }[]
       }
       refresh_profile_verification_status: { Args: never; Returns: undefined }
+      refresh_send_account_verification_status: {
+        Args: never
+        Returns: undefined
+      }
       refresh_send_scores_history: { Args: never; Returns: undefined }
       register_first_sendtag: {
         Args: {

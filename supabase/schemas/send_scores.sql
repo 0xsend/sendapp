@@ -78,6 +78,21 @@ BEGIN
             WHERE stv.f = addr
             AND stv.block_time >= sc.start_time
             AND stv.block_time <= sc.end_time
+            UNION ALL
+            -- Send Check claims (SEND token only, verified redeemer)
+            -- OPTIMIZED: Direct is_verified check instead of profiles JOIN
+            SELECT
+                scc.redeemer AS t,
+                scc.amount AS v,
+                scc.block_time
+            FROM send_check_claimed scc
+            JOIN send_accounts sa_redeemer ON scc.redeemer = sa_redeemer.address_bytes
+            WHERE scc.sender = addr
+            AND scc.block_time >= sc.start_time
+            AND scc.block_time <= sc.end_time
+            AND scc.token = '\xeab49138ba2ea6dd776220fe26b7b8e446638956'::bytea
+            AND sa_redeemer.is_verified = TRUE  -- OPTIMIZATION: Direct column check
+            AND scc.redeemer != scc.sender
         ) transfers
         WHERE sc.earn_min_balance = 0
         OR EXISTS (
