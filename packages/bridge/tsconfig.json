@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base",
+  "include": ["src", "../../supabase"],
+  "exclude": ["src/__tests__"],
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": ".",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@my/supabase/*": ["../../supabase/*"]
+    }
+  },
+  "references": []
+}

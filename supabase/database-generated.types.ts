@@ -71,6 +71,223 @@ export type Database = {
           },
         ]
       }
+      bridge_customers: {
+        Row: {
+          bridge_customer_id: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          kyc_link_id: string
+          kyc_status: string
+          rejection_reasons: Json | null
+          tos_status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bridge_customer_id?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          kyc_link_id: string
+          kyc_status?: string
+          rejection_reasons?: Json | null
+          tos_status?: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bridge_customer_id?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          kyc_link_id?: string
+          kyc_status?: string
+          rejection_reasons?: Json | null
+          tos_status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bridge_deposits: {
+        Row: {
+          amount: number
+          bridge_transfer_id: string
+          created_at: string
+          currency: string
+          destination_tx_hash: string | null
+          event_data: Json | null
+          fee_amount: number | null
+          id: string
+          last_event_id: string | null
+          last_event_type: string | null
+          net_amount: number | null
+          payment_rail: string
+          sender_name: string | null
+          sender_routing_number: string | null
+          status: string
+          trace_number: string | null
+          updated_at: string
+          virtual_account_id: string
+        }
+        Insert: {
+          amount: number
+          bridge_transfer_id: string
+          created_at?: string
+          currency?: string
+          destination_tx_hash?: string | null
+          event_data?: Json | null
+          fee_amount?: number | null
+          id?: string
+          last_event_id?: string | null
+          last_event_type?: string | null
+          net_amount?: number | null
+          payment_rail: string
+          sender_name?: string | null
+          sender_routing_number?: string | null
+          status?: string
+          trace_number?: string | null
+          updated_at?: string
+          virtual_account_id: string
+        }
+        Update: {
+          amount?: number
+          bridge_transfer_id?: string
+          created_at?: string
+          currency?: string
+          destination_tx_hash?: string | null
+          event_data?: Json | null
+          fee_amount?: number | null
+          id?: string
+          last_event_id?: string | null
+          last_event_type?: string | null
+          net_amount?: number | null
+          payment_rail?: string
+          sender_name?: string | null
+          sender_routing_number?: string | null
+          status?: string
+          trace_number?: string | null
+          updated_at?: string
+          virtual_account_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bridge_deposits_virtual_account_id_fkey"
+            columns: ["virtual_account_id"]
+            isOneToOne: false
+            referencedRelation: "bridge_virtual_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bridge_virtual_accounts: {
+        Row: {
+          bank_account_number: string | null
+          bank_beneficiary_address: string | null
+          bank_beneficiary_name: string | null
+          bank_name: string | null
+          bank_routing_number: string | null
+          bridge_customer_id: string
+          bridge_virtual_account_id: string
+          created_at: string
+          destination_address: string
+          destination_currency: string
+          destination_payment_rail: string
+          id: string
+          payment_rails: string[]
+          source_currency: string
+          source_deposit_instructions: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bank_account_number?: string | null
+          bank_beneficiary_address?: string | null
+          bank_beneficiary_name?: string | null
+          bank_name?: string | null
+          bank_routing_number?: string | null
+          bridge_customer_id: string
+          bridge_virtual_account_id: string
+          created_at?: string
+          destination_address: string
+          destination_currency?: string
+          destination_payment_rail?: string
+          id?: string
+          payment_rails?: string[]
+          source_currency?: string
+          source_deposit_instructions?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bank_account_number?: string | null
+          bank_beneficiary_address?: string | null
+          bank_beneficiary_name?: string | null
+          bank_name?: string | null
+          bank_routing_number?: string | null
+          bridge_customer_id?: string
+          bridge_virtual_account_id?: string
+          created_at?: string
+          destination_address?: string
+          destination_currency?: string
+          destination_payment_rail?: string
+          id?: string
+          payment_rails?: string[]
+          source_currency?: string
+          source_deposit_instructions?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bridge_virtual_accounts_bridge_customer_id_fkey"
+            columns: ["bridge_customer_id"]
+            isOneToOne: false
+            referencedRelation: "bridge_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bridge_webhook_events: {
+        Row: {
+          bridge_event_id: string
+          created_at: string
+          error: string | null
+          event_created_at: string | null
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+        }
+        Insert: {
+          bridge_event_id: string
+          created_at?: string
+          error?: string | null
+          event_created_at?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+        }
+        Update: {
+          bridge_event_id?: string
+          created_at?: string
+          error?: string | null
+          event_created_at?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+        }
+        Relationships: []
+      }
       canton_party_verifications: {
         Row: {
           canton_wallet_address: string
