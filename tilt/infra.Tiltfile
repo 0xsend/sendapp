@@ -1,6 +1,7 @@
 # -*- mode: python -*-
 
-load("./common.Tiltfile", "CI", "WORKSPACE_NAME", "ws_container")
+load("./common.Tiltfile", "CFG", "CI", "WORKSPACE_NAME", "ws_container")
+load("ext://color", "color")
 load("ext://uibutton", "cmd_button", "location")
 
 _prj_root = os.path.join(
@@ -27,11 +28,9 @@ _supabase_inbucket_port = os.getenv("SUPABASE_INBUCKET_PORT", "54324")
 _supabase_inbucket_smtp_port = os.getenv("SUPABASE_INBUCKET_SMTP_PORT", "54325")
 _supabase_inbucket_pop3_port = os.getenv("SUPABASE_INBUCKET_POP3_PORT", "54326")
 _nextjs_port = os.getenv("NEXTJS_PORT", "3000")
-_anvil_mainnet_port = os.getenv("ANVIL_MAINNET_PORT", "8545")
 _anvil_base_port = os.getenv("ANVIL_BASE_PORT", "8546")
 _bundler_port = os.getenv("BUNDLER_PORT", "3030")
 _shovel_port = os.getenv("SHOVEL_PORT", "8383")
-_otterscan_mainnet_port = os.getenv("OTTERSCAN_MAINNET_PORT", "5100")
 _otterscan_base_port = os.getenv("OTTERSCAN_BASE_PORT", "5101")
 _temporal_port = os.getenv("TEMPORAL_PORT", "7233")
 _temporal_ui_port = os.getenv("TEMPORAL_UI_PORT", "8233")
@@ -124,293 +123,150 @@ cmd_button(
     text = "snaplet restore",
 )
 
-local_resource(
-    "anvil:mainnet",
-    allow_parallel = True,
-    auto_init = False,
-    labels = labels,
-    readiness_probe = probe(
-        exec = exec_action(
-            command = [
-                "cast",
-                "bn",
-                "--rpc-url=127.0.0.1:" + _anvil_mainnet_port,
-            ],
-        ),
-        initial_delay_secs = 1,
-        period_secs = 2,
-        timeout_secs = 5,
-    ),
-    resource_deps = _infra_resource_deps + ["supabase"],
-    serve_cmd = [cmd for cmd in [
-        "anvil",
-        "--host=0.0.0.0",
-        "--port=" + _anvil_mainnet_port,
-        "--chain-id=" + os.getenv("NEXT_PUBLIC_MAINNET_CHAIN_ID", "1337"),
-        "--fork-url=" + os.getenv("ANVIL_MAINNET_FORK_URL", "https://eth-pokt.nodies.app"),
-        "--block-time=" + os.getenv("ANVIL_BLOCK_TIME", "5"),
-        "--no-storage-caching",
-        "--prune-history",
-        os.getenv("ANVIL_MAINNET_EXTRA_ARGS", "--silent"),
-    ] if cmd],
-    serve_dir = _prj_root,
-)
+# ===========================================
+# LOCALNET INFRASTRUCTURE (Docker Compose)
+# ===========================================
+# Provides connection-pooled anvil via nginx proxy to prevent
+# CLOSE_WAIT exhaustion from bundler, shovel, and E2E tests.
+#
+# Skipped when skip_docker_compose is True (e.g., lint:deps, unit-tests)
 
-local_resource(
-    "otterscan:mainnet",
-    allow_parallel = True,
-    auto_init = False,
-    labels = labels,
-    links = [link("http://localhost:" + _otterscan_mainnet_port + "/", "Otterscan Mainnet")],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = int(_otterscan_mainnet_port),
-        ),
-        period_secs = 15,
-        timeout_secs = 5,
-    ),
-    resource_deps = ["anvil:mainnet"],
-    serve_cmd = """
-    docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
-    docker run --rm \
-        --name {container_name} \
-        -p {otterscan_port}:80 \
-        --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
-        otterscan/otterscan:v2.3.0
-    """.format(
-        container_name = ws_container("otterscan-mainnet"),
-        otterscan_port = _otterscan_mainnet_port,
-        anvil_port = _anvil_mainnet_port,
-    ),
-    serve_dir = _prj_root,
-)
+if not CFG.skip_docker_compose:
+    # Ensure .localnet.env exists (copy from template if not)
+    if not os.path.exists("../.localnet.env"):
+        local("cp .localnet.env.template .localnet.env", dir="..")
+        print(color.green("📝 Created .localnet.env from template"))
 
-local_resource(
-    "anvil:base",
-    allow_parallel = True,
-    labels = labels,
-    readiness_probe = probe(
-        exec = exec_action(
-            command = [
-                "cast",
-                "bn",
-                "--rpc-url=127.0.0.1:" + _anvil_base_port,
-            ],
-        ),
-        initial_delay_secs = 1,
-        period_secs = 2,
-        timeout_secs = 5,
-    ),
-    resource_deps = _infra_resource_deps + ["supabase"],
-    serve_cmd = "ANVIL_BASE_PORT=" + _anvil_base_port + " yarn contracts dev:anvil-base-node",
-    serve_dir = _prj_root,
-)
+    # Fetch fork block height if not already set (current block - 30 to avoid reorgs)
+    _anvil_fork_url = os.getenv("ANVIL_BASE_FORK_URL", "")
+    if _anvil_fork_url and not os.getenv("ANVIL_BASE_FORK_BLOCK"):
+        _current_block = int(str(local("cast bn --rpc-url " + _anvil_fork_url, quiet=True)).strip())
+        _fork_block = str(_current_block - 30)
+        os.putenv("ANVIL_BASE_FORK_BLOCK", _fork_block)
 
-local_resource(
-    "anvil:anvil-add-send-merkle-drop-fixtures",
-    "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
-    auto_init = False,
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-    trigger_mode = TRIGGER_MODE_MANUAL,
-)
+    docker_compose(
+        configPaths = ["../compose.localnet.yaml"],
+        env_file = "../.localnet.env",
+        project_name = WORKSPACE_NAME,
+    )
 
-local_resource(
-    "anvil:anvil-token-paymaster-deposit",
-    "yarn contracts dev:anvil-token-paymaster-deposit",
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-)
+    # Map compose services to Tilt resources
+    # anvil-base: Internal anvil node (not directly accessible)
+    # Note: Docker Compose resources don't depend on yarn:install since they run in containers
+    dc_resource(
+        "anvil-base",
+        labels = labels,
+        new_name = "anvil:base-node",
+        resource_deps = [],  # No deps - anvil container is self-contained
+    )
 
-local_resource(
-    "anvil:anvil-deploy-verifying-paymaster-fixtures",
-    "yarn contracts dev:anvil-deploy-verifying-paymaster-fixtures",
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-)
+    # anvil-proxy: Nginx reverse proxy with connection pooling
+    # This is what clients (bundler, shovel, E2E tests) connect to
+    dc_resource(
+        "anvil-proxy",
+        labels = labels,
+        links = [link("http://localhost:" + _anvil_base_port + "/", "Anvil Base RPC")],
+        new_name = "anvil:base",
+        resource_deps = ["anvil:base-node"],
+    )
 
-local_resource(
-    "anvil:anvil-add-send-check-fixtures",
-    "yarn contracts dev:anvil-add-send-check-fixtures",
-    auto_init = False,
-    dir = _prj_root,
-    labels = labels,
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "contracts:build",
-    ],
-)
+    # aa-bundler: ERC-4337 bundler
+    # Depends on anvil:fixtures to ensure paymaster is funded before bundler starts
+    dc_resource(
+        "aa-bundler",
+        labels = labels,
+        links = [link("http://localhost:" + _bundler_port + "/", "AA Bundler")],
+        new_name = "aa_bundler:base",
+        resource_deps = ["anvil:fixtures"],
+    )
 
-local_resource(
-    "anvil:fixtures",
-    "echo 🥳",
-    labels = labels,
-    resource_deps = [
-        "anvil:base",
+    # shovel: Blockchain indexer
+    # Depends on supabase for database and anvil for RPC
+    # Config is pre-generated and mounted from packages/shovel/etc/config.json
+    dc_resource(
+        "shovel",
+        labels = labels,
+        links = [link("http://localhost:" + _shovel_port + "/", "Shovel")],
+        resource_deps = ["anvil:base", "supabase"],  # Needs both anvil proxy and database
+    )
+
+    # otterscan-base: Block explorer (optional profile in compose, not started by default)
+    # To enable: docker compose -f compose.localnet.yaml --profile explorer up
+    # The dc_resource is not defined here because otterscan uses the "explorer" profile
+    # and is not included in the default compose services.
+
+    local_resource(
+        "anvil:anvil-add-send-merkle-drop-fixtures",
+        "yarn contracts dev:anvil-add-send-merkle-drop-fixtures",
+        auto_init = False,
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+        trigger_mode = TRIGGER_MODE_MANUAL,
+    )
+
+    local_resource(
         "anvil:anvil-token-paymaster-deposit",
+        "yarn contracts dev:anvil-token-paymaster-deposit",
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+    )
+
+    local_resource(
         "anvil:anvil-deploy-verifying-paymaster-fixtures",
-    ],
-)
+        "yarn contracts dev:anvil-deploy-verifying-paymaster-fixtures",
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+    )
 
-local_resource(
-    "aa_bundler:base",
-    allow_parallel = True,
-    labels = labels,
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = int(_bundler_port),
-        ),
-    ),
-    resource_deps = [
-        "anvil:base",
-    ],
-    serve_cmd = """
-    # Wait for Anvil to be ready before starting bundler
-    echo "Waiting for Anvil at localhost:{anvil_port}..."
-    until curl -sf -X POST -H "Content-Type: application/json" \
-        --data '{{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}}' \
-        http://localhost:{anvil_port} > /dev/null 2>&1; do
-        echo "Anvil not ready, retrying in 2s..."
-        sleep 2
-    done
-    echo "Anvil is ready!"
+    local_resource(
+        "anvil:anvil-add-send-check-fixtures",
+        "yarn contracts dev:anvil-add-send-check-fixtures",
+        auto_init = False,
+        dir = _prj_root,
+        labels = labels,
+        resource_deps = _infra_resource_deps + [
+            "anvil:base",
+            "contracts:build",
+        ],
+    )
 
-    docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
-    docker run --rm \
-        --name {container_name} \
-        --add-host=host.docker.internal:host-gateway \
-        -p 0.0.0.0:{bundler_port}:{bundler_port} \
-        -v ./keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266:/app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        -v ./apps/aabundler/etc:/app/etc/aabundler \
-        -e "DEBUG={bundler_debug}" \
-        -e "DEBUG_COLORS=true" \
-        -m 500m \
-        --pull always \
-        docker.io/0xbigboss/bundler:latest \
-        --port {bundler_port} \
-        --config /app/etc/aabundler/aabundler.config.json \
-        --mnemonic /app/keys/0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        --network http://host.docker.internal:{anvil_port} \
-        --entryPoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
-        --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 \
-        --unsafe
-""".format(
-        container_name = ws_container("aa-bundler"),
-        bundler_debug = os.getenv("BUNDLER_DEBUG", "aa.rpc"),
-        bundler_port = _bundler_port,
-        anvil_port = _anvil_base_port,
-    ),
-    serve_dir = _prj_root,
-)
+    local_resource(
+        "anvil:fixtures",
+        "echo 🥳",
+        labels = labels,
+        resource_deps = [
+            "anvil:base",
+            "anvil:anvil-token-paymaster-deposit",
+            "anvil:anvil-deploy-verifying-paymaster-fixtures",
+        ],
+    )
 
-local_resource(
-    "shovel",
-    allow_parallel = True,
-    labels = labels,
-    links = ["http://localhost:" + _shovel_port + "/"],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/diag",
-            port = int(_shovel_port),
-        ),
-    ),
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-        "shovel:generate-config",
-    ],
-    serve_cmd = """
-    # Wait for Anvil to be ready before starting shovel
-    echo "Waiting for Anvil at localhost:{anvil_port}..."
-    until curl -sf -X POST -H "Content-Type: application/json" \
-        --data '{{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}}' \
-        http://localhost:{anvil_port} > /dev/null 2>&1; do
-        echo "Anvil not ready, retrying in 2s..."
-        sleep 2
-    done
-    echo "Anvil is ready!"
-
-    SHOVEL_PORT={shovel_port} yarn run shovel:tilt
-    """.format(
-        anvil_port = _anvil_base_port,
-        shovel_port = _shovel_port,
-    ),
-    serve_dir = os.path.join(
-        config.main_dir,
-        "packages/shovel",
-    ),
-    deps = [
-        os.path.join(
-            config.main_dir,
-            "packages/shovel/bin/shovel.tilt.ts",
-        ),
-        os.path.join(
-            config.main_dir,
-            "packages/shovel/etc/config.json",
-        ),
-    ],
-)
-
-cmd_button(
-    "shovel:empty",
-    argv = [
-        "/bin/sh",
-        "-c",
-        "yarn workspace @my/shovel run empty",
-    ],
-    dir = _prj_root,
-    icon_name = "delete_forever",
-    location = location.RESOURCE,
-    resource = "shovel",
-    text = "shovel:empty",
-)
-
-local_resource(
-    "otterscan:base",
-    allow_parallel = True,
-    auto_init = not CI,
-    labels = labels,
-    links = [link("http://localhost:" + _otterscan_base_port + "/", "Otterscan Base")],
-    readiness_probe = probe(
-        http_get = http_get_action(
-            path = "/",
-            port = int(_otterscan_base_port),
-        ),
-        period_secs = 15,
-        timeout_secs = 5,
-    ),
-    resource_deps = _infra_resource_deps + [
-        "anvil:base",
-    ],
-    serve_cmd = """
-    docker ps -a | grep {container_name} | awk '{{print $1}}' | xargs -r docker rm -f
-    docker run --rm \
-        --name {container_name} \
-        -p {otterscan_port}:80 \
-        --add-host=host.docker.internal:host-gateway \
-        --env ERIGON_URL="http://host.docker.internal:{anvil_port}" \
-        otterscan/otterscan:v2.3.0
-    """.format(
-        container_name = ws_container("otterscan-base"),
-        otterscan_port = _otterscan_base_port,
-        anvil_port = _anvil_base_port,
-    ),
-    serve_dir = _prj_root,
-)
+    # Shovel empty button (clears indexed data)
+    cmd_button(
+        "shovel:empty",
+        argv = [
+            "/bin/sh",
+            "-c",
+            "yarn workspace @my/shovel run empty",
+        ],
+        dir = _prj_root,
+        icon_name = "delete_forever",
+        location = location.RESOURCE,
+        resource = "shovel",
+        text = "shovel:empty",
+    )
 
 local_resource(
     name = "temporal",
