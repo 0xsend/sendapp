@@ -12,7 +12,7 @@ const projectRoot = __dirname
 const workspaceRoot = path.resolve(__dirname, '../..')
 
 // Load environment variables from root env files (same order as Tiltfile - last wins)
-const envFiles = ['.env', '.env.development', '.env.local', '.localnet.env']
+const envFiles = ['.env.local', '.localnet.env']
 const envVars = {}
 
 for (const envFile of envFiles) {

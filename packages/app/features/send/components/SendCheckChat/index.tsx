@@ -154,12 +154,12 @@ export const SendCheckChat = memo(
         } as ViewProps)
       : {}
 
+    // Taller on small screens where expiration buttons wrap
     const sectionHeight = useMemo(() => {
       if (activeSection === 'success') return 600
       if (activeSection === 'reviewAndSend') return 480
-      // enterAmount: 500 (like SendChat) + ~60 for expiration selector
-      return 560
-    }, [activeSection])
+      return gtLg ? 550 : 575
+    }, [activeSection, gtLg])
 
     return (
       <>
