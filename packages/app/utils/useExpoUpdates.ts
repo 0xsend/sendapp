@@ -1,6 +1,7 @@
 import * as Updates from 'expo-updates'
 import { useCallback, useEffect, useState } from 'react'
 import { AppState, type AppStateStatus } from 'react-native'
+import { analytics } from 'app/analytics'
 
 interface UseExpoUpdatesResult {
   isUpdateAvailable: boolean
@@ -49,6 +50,14 @@ export function useExpoUpdates(options: UseExpoUpdatesOptions = {}): UseExpoUpda
       const update = await Updates.checkForUpdateAsync()
       if (update.isAvailable) {
         setIsUpdateAvailable(true)
+        // Track update available event
+        analytics.capture({
+          name: 'ota_update_available',
+          properties: {
+            runtime_version: Updates.runtimeVersion ?? undefined,
+            update_id: update.manifest?.id,
+          },
+        })
       }
     } catch (e) {
       setError(e instanceof Error ? e : new Error('Failed to check for updates'))
@@ -63,10 +72,37 @@ export function useExpoUpdates(options: UseExpoUpdatesOptions = {}): UseExpoUpda
     try {
       setIsDownloading(true)
       setError(null)
+
+      // Track download started
+      analytics.capture({
+        name: 'ota_update_download_started',
+        properties: {
+          runtime_version: Updates.runtimeVersion ?? undefined,
+        },
+      })
+
       await Updates.fetchUpdateAsync()
       setIsDownloaded(true)
+
+      // Track download completed
+      analytics.capture({
+        name: 'ota_update_download_completed',
+        properties: {
+          runtime_version: Updates.runtimeVersion ?? undefined,
+        },
+      })
     } catch (e) {
-      setError(e instanceof Error ? e : new Error('Failed to download update'))
+      const downloadError = e instanceof Error ? e : new Error('Failed to download update')
+      setError(downloadError)
+
+      // Track download failed
+      analytics.capture({
+        name: 'ota_update_download_failed',
+        properties: {
+          runtime_version: Updates.runtimeVersion ?? undefined,
+          error_type: 'network',
+        },
+      })
     } finally {
       setIsDownloading(false)
     }

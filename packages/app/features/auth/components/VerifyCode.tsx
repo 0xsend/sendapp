@@ -14,6 +14,7 @@ import { SchemaForm, formFields } from 'app/utils/SchemaForm'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { useAnalytics } from 'app/provider/analytics'
 
 const ConfirmSchema = z.object({
   token: formFields.text,
@@ -27,6 +28,7 @@ export type VerifyCodeProps = {
 
 export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) => {
   const supabase = useSupabase()
+  const analytics = useAnalytics()
   const form = useForm<z.infer<typeof ConfirmSchema>>()
   async function confirmCode({ token }: z.infer<typeof ConfirmSchema>) {
     const { error, data } = await supabase.auth.verifyOtp({
@@ -39,6 +41,10 @@ export const VerifyCode = ({ phone, onSuccess, type = 'sms' }: VerifyCodeProps) 
       const errorMessage = error?.message.toLowerCase()
       form.setError('token', { type: 'custom', message: errorMessage })
     } else {
+      analytics.capture({
+        name: 'phone_otp_verified',
+        properties: {},
+      })
       onSuccess(data)
     }
   }

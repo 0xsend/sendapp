@@ -25,6 +25,7 @@ import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { ActivityRowLayout } from 'app/components/ActivityRowLayout'
 import type { PgBytea } from '@my/supabase/database.types'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { useAnalytics } from 'app/provider/analytics'
 import debug from 'debug'
 
 const log = debug('app:features:check')
@@ -331,6 +332,7 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
   const toast = useAppToast()
   const hoverStyles = useHoverStyles()
   const { data: sendAccount } = useSendAccount()
+  const analytics = useAnalytics()
   const [isConfirming, setIsConfirming] = useState(false)
 
   // Determine if user is the sender or receiver
@@ -388,16 +390,47 @@ const CheckCard = memo(function CheckCard({ check, isFirst, isLast }: CheckCardP
       return
     }
 
+    const revokeProps = {
+      token_count: check.tokens?.length ?? 0,
+      total_amount: tokenItems.map((t) => t.formatted).join(', '),
+    }
+
     try {
       await revokeCheck({ webauthnCreds })
+
+      // Track check revoked
+      analytics.capture({
+        name: 'send_check_revoked',
+        properties: revokeProps,
+      })
+
       toast.show(t('check.manage.cancelSuccess'))
     } catch (error) {
       log('Failed to cancel check:', error)
+
+      // Track check revoke failed
+      analytics.capture({
+        name: 'send_check_failed',
+        properties: {
+          step: 'revoke',
+          error_type: 'unknown',
+        },
+      })
+
       toast.error(error instanceof Error ? error.message : t('check.manage.cancelError'))
     } finally {
       setIsConfirming(false)
     }
-  }, [isConfirming, revokeCheck, webauthnCreds, toast, t])
+  }, [
+    isConfirming,
+    revokeCheck,
+    webauthnCreds,
+    toast,
+    t,
+    analytics,
+    check.tokens?.length,
+    tokenItems,
+  ])
 
   const handleCancelConfirm = useCallback(() => {
     setIsConfirming(false)
