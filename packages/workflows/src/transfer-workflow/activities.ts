@@ -1,4 +1,5 @@
 import { bootstrap, isRetryableDBError } from '@my/workflows/utils'
+import { baseMainnetClient } from '@my/wagmi'
 import { ApplicationFailure, log } from '@temporalio/activity'
 import { allCoins } from 'app/data/coins'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
@@ -7,9 +8,18 @@ import type { Address } from 'viem'
 import {
   updateTemporalSendAccountTransfer,
   upsertTemporalSendAccountTransfer,
+  upsertTransferIntent,
+  updateTransferIntent,
+  upsertTransferReconciliation,
   type TemporalTransfer,
   type TemporalTransferInsert,
   type TemporalTransferUpdate,
+  type TransferIntent,
+  type TransferIntentInsert,
+  type TransferIntentUpdate,
+  type TransferIntentStatus,
+  type TransferReconciliationInsert,
+  type TransferReconciliation,
 } from './supabase'
 import { isAddressInTopic, isReceiveTopic, isTransferTopic } from './wagmi'
 
@@ -42,7 +52,17 @@ type TransferActivities = {
   }) => Promise<{
     eventName: string
     eventId: string
+    logIdx: number
   }>
+  // Intent-based activities
+  getChainIdActivity: () => Promise<number>
+  upsertTransferIntentActivity: (params: TransferIntentInsert) => Promise<TransferIntent>
+  updateTransferIntentActivity: (
+    params: TransferIntentUpdate & { workflow_id: string }
+  ) => Promise<TransferIntent>
+  upsertTransferReconciliationActivity: (
+    params: TransferReconciliationInsert
+  ) => Promise<TransferReconciliation>
 }
 
 export const createTransferActivities = (
@@ -211,14 +231,80 @@ export const createTransferActivities = (
         )
       }
 
-      const log_idx = matchingLog.logIndex.toString()
+      const log_idx = matchingLog.logIndex
       const eventName = token ? 'send_account_transfers' : 'send_account_receives'
       const eventId = `${eventName}/base_logs/${block_num}/${tx_idx}/${log_idx}`
 
       return {
         eventName,
         eventId,
+        logIdx: log_idx,
       }
+    },
+    // =========================================================================
+    // Intent-based activities
+    // =========================================================================
+    async getChainIdActivity() {
+      return baseMainnetClient.chain.id
+    },
+    async upsertTransferIntentActivity(params) {
+      const { workflow_id } = params
+      const { data: intentData, error } = await upsertTransferIntent(params)
+
+      if (error) {
+        if (isRetryableDBError(error)) {
+          throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
+            error,
+            workflow_id,
+          })
+        }
+
+        throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
+          error,
+          workflow_id,
+        })
+      }
+
+      return intentData
+    },
+    async updateTransferIntentActivity(params) {
+      const { workflow_id } = params
+      const { data: intentData, error } = await updateTransferIntent(params)
+
+      if (error) {
+        if (isRetryableDBError(error)) {
+          throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
+            error,
+            workflow_id,
+          })
+        }
+
+        throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
+          error,
+          workflow_id,
+        })
+      }
+
+      return intentData
+    },
+    async upsertTransferReconciliationActivity(params) {
+      const { data: reconciliationData, error } = await upsertTransferReconciliation(params)
+
+      if (error) {
+        if (isRetryableDBError(error)) {
+          throw ApplicationFailure.retryable('Database connection error, retrying...', error.code, {
+            error,
+            intent_id: params.intent_id,
+          })
+        }
+
+        throw ApplicationFailure.nonRetryable('Database error occurred', error.code, {
+          error,
+          intent_id: params.intent_id,
+        })
+      }
+
+      return reconciliationData
     },
   }
 }
