@@ -189,6 +189,7 @@ export const SendChat = memo(
               <AnimatePresence>
                 {(open || !gtLg) && (
                   <View
+                    testID="SendChat"
                     w={700}
                     mih="100%"
                     maw="95%"
@@ -479,6 +480,7 @@ const SendChatInput = Input.styleable((props) => {
       <YStack w="100%" zi={1}>
         <XStack py="$4" px="$4">
           <View
+            testID="SendChatEnterAmountTrigger"
             animation="responsive"
             animateOnly={['height', 'transform']}
             h={activeSection === 'chat' ? 47 : 80}
@@ -531,6 +533,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const themeName = useThemeName()
 
   const { recipient, idType } = sendParams
+
   const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
 
   const { isLoading: isLoadingCoins } = useCoins()
@@ -1014,6 +1017,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
                         name="amount"
                         render={({ field: { value, onBlur } }) => (
                           <Input
+                            testID="SendChatAmountInput"
                             unstyled
                             ref={setAmountInputRef}
                             value={value}
@@ -1115,6 +1119,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           </View>
         </YStack>
         <Button
+          testID={activeSection === 'reviewAndSend' ? 'SendChatSendButton' : 'SendChatReviewButton'}
+          aria-label={activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
           bg="$neon7"
           br="$4"
           animation="responsive"
