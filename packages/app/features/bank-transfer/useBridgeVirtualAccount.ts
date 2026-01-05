@@ -4,10 +4,39 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { BRIDGE_CUSTOMER_QUERY_KEY } from './useBridgeCustomer'
 import getBaseUrl from 'app/utils/getBaseUrl'
+import type { SourceDepositInstructions } from '@my/bridge'
 
 const log = debug('app:features:bank-transfer:useBridgeVirtualAccount')
 
 export const BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY = 'bridge_virtual_account' as const
+
+type BankDetails = {
+  bankName: string | null
+  routingNumber: string | null
+  accountNumber: string | null
+  beneficiaryName: string | null
+  beneficiaryAddress: string | null
+  paymentRails: string[]
+}
+
+function getBankDetailsFromInstructions(
+  instructions: SourceDepositInstructions | null | undefined
+): BankDetails {
+  const paymentRails = instructions?.payment_rails?.length
+    ? instructions.payment_rails
+    : instructions?.payment_rail
+      ? [instructions.payment_rail]
+      : []
+
+  return {
+    bankName: instructions?.bank_name ?? null,
+    routingNumber: instructions?.bank_routing_number ?? null,
+    accountNumber: instructions?.bank_account_number ?? null,
+    beneficiaryName: instructions?.bank_beneficiary_name ?? null,
+    beneficiaryAddress: instructions?.bank_beneficiary_address ?? null,
+    paymentRails,
+  }
+}
 
 /**
  * Helper to create auth headers for API requests (supports native clients)
@@ -84,7 +113,7 @@ export function useCreateVirtualAccount() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || 'Failed to create virtual account')
+        throw new Error(error.error || error.message || 'Failed to create virtual account')
       }
 
       return response.json()
@@ -111,17 +140,13 @@ export function useBankAccountDetails() {
     }
   }
 
+  const sourceInstructions = (virtualAccount.source_deposit_instructions ??
+    null) as SourceDepositInstructions | null
+
   return {
     isLoading: false,
     error: null,
     hasVirtualAccount: true,
-    bankDetails: {
-      bankName: virtualAccount.bank_name,
-      routingNumber: virtualAccount.bank_routing_number,
-      accountNumber: virtualAccount.bank_account_number,
-      beneficiaryName: virtualAccount.bank_beneficiary_name,
-      beneficiaryAddress: virtualAccount.bank_beneficiary_address,
-      paymentRails: virtualAccount.payment_rails,
-    },
+    bankDetails: getBankDetailsFromInstructions(sourceInstructions),
   }
 }

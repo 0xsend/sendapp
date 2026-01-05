@@ -3,10 +3,39 @@ import type { Database } from '@my/supabase/database.types'
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { createBridgeClient, BridgeApiError } from '@my/bridge'
+import type { SourceDepositInstructions } from '@my/bridge'
 import { createClient } from '@supabase/supabase-js'
 import debug from 'debug'
 
 const log = debug('api:bridge:virtual-account:create')
+
+type BankDetails = {
+  bankName: string | null
+  routingNumber: string | null
+  accountNumber: string | null
+  beneficiaryName: string | null
+  beneficiaryAddress: string | null
+  paymentRails: string[]
+}
+
+function getBankDetailsFromInstructions(
+  instructions: SourceDepositInstructions | null | undefined
+): BankDetails {
+  const paymentRails = instructions?.payment_rails?.length
+    ? instructions.payment_rails
+    : instructions?.payment_rail
+      ? [instructions.payment_rail]
+      : []
+
+  return {
+    bankName: instructions?.bank_name ?? null,
+    routingNumber: instructions?.bank_routing_number ?? null,
+    accountNumber: instructions?.bank_account_number ?? null,
+    beneficiaryName: instructions?.bank_beneficiary_name ?? null,
+    beneficiaryAddress: instructions?.bank_beneficiary_address ?? null,
+    paymentRails,
+  }
+}
 
 /**
  * Get user session from either cookies or Authorization header (for native clients)
@@ -118,15 +147,11 @@ export default async function handler(
 
     if (existingAccount) {
       log('user already has active virtual account')
+      const existingInstructions = (existingAccount.source_deposit_instructions ??
+        null) as SourceDepositInstructions | null
       return res.status(200).json({
-        virtualAccountId: existingAccount.id,
-        bankDetails: {
-          bankName: existingAccount.bank_name,
-          routingNumber: existingAccount.bank_routing_number,
-          accountNumber: existingAccount.bank_account_number,
-          beneficiaryName: existingAccount.bank_beneficiary_name,
-          paymentRails: existingAccount.payment_rails,
-        },
+        virtualAccountId: existingAccount.bridge_virtual_account_id,
+        bankDetails: getBankDetailsFromInstructions(existingInstructions),
       })
     }
 
@@ -135,10 +160,14 @@ export default async function handler(
     const vaResponse = await bridgeClient.createVirtualAccount(
       customer.bridge_customer_id,
       {
-        source_currency: 'usd',
-        destination_currency: 'usdc',
-        destination_payment_rail: 'base',
-        destination_address: destinationAddress,
+        source: {
+          currency: 'usd',
+        },
+        destination: {
+          currency: 'usdc',
+          payment_rail: 'base',
+          address: destinationAddress,
+        },
       },
       { idempotencyKey: `va-${customer.bridge_customer_id}` }
     )
@@ -150,15 +179,10 @@ export default async function handler(
     const { error: insertError } = await adminClient.from('bridge_virtual_accounts').insert({
       bridge_customer_id: customer.id,
       bridge_virtual_account_id: vaResponse.id,
-      destination_address: destinationAddress,
-      destination_currency: vaResponse.destination_currency,
-      destination_payment_rail: vaResponse.destination_payment_rail,
-      bank_name: sourceInstructions.bank_name,
-      bank_routing_number: sourceInstructions.bank_routing_number,
-      bank_account_number: sourceInstructions.bank_account_number,
-      bank_beneficiary_name: sourceInstructions.bank_beneficiary_name,
-      bank_beneficiary_address: sourceInstructions.bank_beneficiary_address,
-      payment_rails: sourceInstructions.payment_rails,
+      source_currency: sourceInstructions.currency,
+      destination_currency: vaResponse.destination.currency,
+      destination_payment_rail: vaResponse.destination.payment_rail,
+      destination_address: vaResponse.destination.address,
       source_deposit_instructions: sourceInstructions,
     })
 
@@ -169,13 +193,7 @@ export default async function handler(
 
     return res.status(200).json({
       virtualAccountId: vaResponse.id,
-      bankDetails: {
-        bankName: sourceInstructions.bank_name,
-        routingNumber: sourceInstructions.bank_routing_number,
-        accountNumber: sourceInstructions.bank_account_number,
-        beneficiaryName: sourceInstructions.bank_beneficiary_name,
-        paymentRails: sourceInstructions.payment_rails,
-      },
+      bankDetails: getBankDetailsFromInstructions(sourceInstructions),
     })
   } catch (error) {
     log('error creating virtual account', error)

@@ -46,7 +46,7 @@ async function handleKycEvent(event: WebhookEvent): Promise<void> {
     customer_id?: string | null
     kyc_status?: string | null
     tos_status?: string | null
-    rejection_reasons?: string[] | null
+    rejection_reasons?: Array<Record<string, unknown>> | string[] | null
   }
 
   if (!kycStatus && !tosStatus) {
@@ -107,6 +107,7 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
     type: string
     amount: string
     currency: string
+    subtotal_amount?: string
     destination_tx_hash?: string | null
     source?: {
       payment_rail?: string
@@ -151,17 +152,18 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
     receipt.developer_fee ?? data.developer_fee_amount,
     receipt.exchange_fee ?? data.exchange_fee_amount,
     receipt.gas_fee ?? data.gas_fee,
-  ].filter((value) => value !== undefined)
+  ].filter((value) => value != null)
   const feeAmount = feePieces.length
     ? feePieces.reduce((sum, value) => sum + Number(value), 0)
     : null
   const netAmount = receipt.final_amount ? Number(receipt.final_amount) : null
+  const grossAmount = data.subtotal_amount ?? data.amount
 
   log(
     'processing deposit event: depositId=%s status=%s amount=%s',
     depositId,
     depositStatus,
-    data.amount
+    grossAmount
   )
 
   const supabase = createSupabaseAdminClient()
@@ -189,7 +191,7 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
       virtual_account_id: virtualAccount.id,
       status: depositStatus,
       payment_rail: paymentRail,
-      amount: Number(data.amount),
+      amount: Number(grossAmount),
       currency: data.currency,
       sender_name: senderName,
       sender_routing_number: senderRoutingNumber,
@@ -275,7 +277,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .from('bridge_webhook_events')
     .select('id')
     .eq('bridge_event_id', event.event_id)
-    .single()
+    .maybeSingle()
 
   if (existingEvent) {
     log('duplicate event, skipping: eventId=%s', event.event_id)

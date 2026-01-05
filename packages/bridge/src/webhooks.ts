@@ -147,6 +147,8 @@ export function extractDepositStatusFromEvent(event: WebhookEvent): DepositStatu
   switch (data.type) {
     case 'funds_received':
       return 'funds_received'
+    case 'funds_scheduled':
+      return 'funds_scheduled'
     case 'in_review':
       return 'in_review'
     case 'payment_submitted':

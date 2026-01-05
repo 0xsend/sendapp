@@ -1,5 +1,5 @@
--- Bridge virtual accounts table: stores virtual bank account details for deposits
--- Created after KYC approval, provides routing/account numbers for ACH/Wire deposits
+-- Bridge virtual accounts table: stores virtual account metadata and deposit instructions
+-- Created after KYC approval; deposit instructions are stored as JSONB
 
 CREATE TABLE IF NOT EXISTS "public"."bridge_virtual_accounts" (
     "id" "uuid" PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -9,12 +9,6 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_virtual_accounts" (
     "destination_currency" "text" NOT NULL DEFAULT 'usdc',
     "destination_payment_rail" "text" NOT NULL DEFAULT 'base',
     "destination_address" "text" NOT NULL,
-    "bank_name" "text",
-    "bank_routing_number" "text",
-    "bank_account_number" "text",
-    "bank_beneficiary_name" "text",
-    "bank_beneficiary_address" "text",
-    "payment_rails" "text"[] NOT NULL DEFAULT '{}'::text[],
     "source_deposit_instructions" "jsonb",
     "status" "text" NOT NULL DEFAULT 'active',
     "created_at" timestamp with time zone NOT NULL DEFAULT now(),

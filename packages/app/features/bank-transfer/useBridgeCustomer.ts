@@ -73,7 +73,7 @@ export function useInitiateKyc() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || 'Failed to initiate KYC')
+        throw new Error(error.error || error.message || 'Failed to initiate KYC')
       }
 
       return response.json() as Promise<{ kycLink: string; tosLink: string }>

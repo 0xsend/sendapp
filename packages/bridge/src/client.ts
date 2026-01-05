@@ -21,6 +21,10 @@ interface RequestOptions {
   idempotencyKey?: string
 }
 
+interface CreateWebhookOptions extends RequestOptions {
+  eventEpoch?: 'webhook_creation' | 'beginning_of_time'
+}
+
 /**
  * Bridge XYZ API client for KYC and virtual account operations
  */
@@ -132,10 +136,17 @@ export class BridgeClient {
    */
   async createWebhook(
     url: string,
-    events: string[],
-    options?: RequestOptions
+    eventCategories: string[],
+    options?: CreateWebhookOptions
   ): Promise<WebhookResponse> {
-    return this.request('POST', '/webhooks', { url, enabled_events: events }, options)
+    const eventEpoch = options?.eventEpoch ?? 'webhook_creation'
+    const requestOptions = { idempotencyKey: options?.idempotencyKey }
+    return this.request(
+      'POST',
+      '/webhooks',
+      { url, event_categories: eventCategories, event_epoch: eventEpoch },
+      requestOptions
+    )
   }
 }
 

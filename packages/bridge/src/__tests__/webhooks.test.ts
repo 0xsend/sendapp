@@ -306,6 +306,20 @@ describe('extractDepositStatusFromEvent', () => {
     expect(extractDepositStatusFromEvent(event)).toBe('funds_received')
   })
 
+  it('extracts funds_scheduled status', () => {
+    const event: WebhookEvent = {
+      api_version: '2024-01-01',
+      event_id: 'evt_123',
+      event_category: 'virtual_account.activity',
+      event_type: 'virtual_account.funds_scheduled',
+      event_object_id: 'va_456',
+      event_object: { type: 'funds_scheduled' },
+      event_created_at: '2024-01-01T00:00:00Z',
+    }
+
+    expect(extractDepositStatusFromEvent(event)).toBe('funds_scheduled')
+  })
+
   it('extracts in_review status', () => {
     const event: WebhookEvent = {
       api_version: '2024-01-01',

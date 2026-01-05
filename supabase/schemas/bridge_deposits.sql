@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_deposits" (
     "updated_at" timestamp with time zone NOT NULL DEFAULT now(),
 
     CONSTRAINT "bridge_deposits_status_check" CHECK (
-        "status" IN ('funds_received', 'in_review', 'payment_submitted', 'payment_processed', 'refund')
+        "status" IN ('funds_received', 'funds_scheduled', 'in_review', 'payment_submitted', 'payment_processed', 'refund')
     ),
     CONSTRAINT "bridge_deposits_payment_rail_check" CHECK (
         "payment_rail" IN ('ach_push', 'wire')

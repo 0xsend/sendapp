@@ -29,6 +29,7 @@ export type PaymentRail = z.infer<typeof PaymentRail>
 // Deposit status
 export const DepositStatus = z.enum([
   'funds_received',
+  'funds_scheduled',
   'in_review',
   'payment_submitted',
   'payment_processed',
@@ -37,7 +38,7 @@ export const DepositStatus = z.enum([
 export type DepositStatus = z.infer<typeof DepositStatus>
 
 // Virtual account status
-export const VirtualAccountStatus = z.enum(['active', 'inactive', 'closed'])
+export const VirtualAccountStatus = z.enum(['activated', 'deactivated'])
 export type VirtualAccountStatus = z.infer<typeof VirtualAccountStatus>
 
 // KYC Link Request
@@ -61,7 +62,20 @@ export const KycLinkResponseSchema = z.object({
   kyc_status: KycStatus,
   tos_status: TosStatus,
   customer_id: z.string().nullable(),
-  rejection_reasons: z.array(z.string()).nullable(),
+  rejection_reasons: z
+    .array(
+      z.union([
+        z.string(),
+        z
+          .object({
+            developer_reason: z.string().optional(),
+            reason: z.string().optional(),
+            sub_reasons: z.array(z.string()).optional(),
+          })
+          .passthrough(),
+      ])
+    )
+    .nullable(),
   created_at: z.string(),
 })
 export type KycLinkResponse = z.infer<typeof KycLinkResponseSchema>
@@ -70,31 +84,43 @@ export type KycLinkResponse = z.infer<typeof KycLinkResponseSchema>
 export const SourceDepositInstructionsSchema = z.object({
   currency: z.string(),
   bank_name: z.string(),
+  bank_address: z.string().optional(),
   bank_routing_number: z.string(),
   bank_account_number: z.string(),
   bank_beneficiary_name: z.string(),
   bank_beneficiary_address: z.string().optional(),
+  payment_rail: PaymentRail.optional(),
   payment_rails: z.array(PaymentRail),
 })
 export type SourceDepositInstructions = z.infer<typeof SourceDepositInstructionsSchema>
 
 // Virtual Account Request
 export const VirtualAccountRequestSchema = z.object({
-  source_currency: z.literal('usd'),
-  destination_currency: z.literal('usdc'),
-  destination_payment_rail: z.literal('base'),
-  destination_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
+  source: z.object({
+    currency: z.literal('usd'),
+  }),
+  destination: z.object({
+    currency: z.literal('usdc'),
+    payment_rail: z.literal('base'),
+    address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
+  }),
+  developer_fee_percent: z.union([z.number(), z.string()]).optional(),
 })
 export type VirtualAccountRequest = z.infer<typeof VirtualAccountRequestSchema>
 
 // Virtual Account Response
 export const VirtualAccountResponseSchema = z.object({
   id: z.string(),
+  status: VirtualAccountStatus,
   customer_id: z.string(),
+  created_at: z.string(),
   source_deposit_instructions: SourceDepositInstructionsSchema,
-  destination_currency: z.string(),
-  destination_payment_rail: z.string(),
-  destination_address: z.string(),
+  destination: z.object({
+    currency: z.string(),
+    payment_rail: z.string(),
+    address: z.string(),
+  }),
+  developer_fee_percent: z.union([z.number(), z.string()]).optional(),
 })
 export type VirtualAccountResponse = z.infer<typeof VirtualAccountResponseSchema>
 
@@ -130,8 +156,10 @@ export type WebhookEvent = z.infer<typeof WebhookEventSchema>
 // Webhook Response
 export const WebhookResponseSchema = z.object({
   id: z.string(),
+  status: z.string(),
   url: z.string().url(),
-  enabled_events: z.array(z.string()),
+  event_categories: z.array(z.string()),
+  public_key: z.string(),
   created_at: z.string(),
 })
 export type WebhookResponse = z.infer<typeof WebhookResponseSchema>

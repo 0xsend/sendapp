@@ -104,7 +104,10 @@ export function useDepositsSummary() {
 
   const pendingCount = deposits.filter(
     (d) =>
-      d.status === 'funds_received' || d.status === 'in_review' || d.status === 'payment_submitted'
+      d.status === 'funds_received' ||
+      d.status === 'funds_scheduled' ||
+      d.status === 'in_review' ||
+      d.status === 'payment_submitted'
   ).length
 
   const completedCount = deposits.filter((d) => d.status === 'payment_processed').length
