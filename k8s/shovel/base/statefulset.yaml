@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: shovel
+  labels:
+    app.kubernetes.io/name: shovel
+    app.kubernetes.io/part-of: sendapp
+    app.kubernetes.io/component: indexer
+spec:
+  serviceName: shovel
+  replicas: 1
+  podManagementPolicy: OrderedReady
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shovel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shovel
+        app.kubernetes.io/part-of: sendapp
+        app.kubernetes.io/component: indexer
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 900
+        runAsGroup: 900
+        fsGroup: 900
+        seccompProfile:
+          type: RuntimeDefault
+      imagePullSecrets:
+        - name: github-ghcr
+      containers:
+        - name: shovel
+          image: ghcr.io/0xsend/sendapp-shovel:dev-latest
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 900
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: DATABASE_URL
+            - name: DASHBOARD_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: DASHBOARD_ROOT_PASSWORD
+            - name: BASE_RPC_URL_PRIMARY
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_RPC_URL_PRIMARY
+            - name: BASE_RPC_URL_BACKUP1
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_RPC_URL_BACKUP1
+            - name: BASE_RPC_URL_BACKUP2
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_RPC_URL_BACKUP2
+            - name: BASE_RPC_URL_BACKUP3
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_RPC_URL_BACKUP3
+            - name: BASE_CHAIN_ID
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_CHAIN_ID
+            - name: BASE_WS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_WS_URL
+            - name: BASE_BLOCK_START
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_BLOCK_START
+            - name: BASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: shovel-secrets
+                  key: BASE_NAME
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: config
+              mountPath: /etc/shovel
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: shovel-config
+        - name: tmp
+          emptyDir: {}
