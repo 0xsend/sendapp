@@ -288,6 +288,41 @@ dev (base)
 
 ---
 
+### Investigation Guidelines
+
+**Avoid context overflow** - Always run targeted specs during investigation:
+
+```bash
+# Run a single test by name
+yarn playwright test -g "can deposit USDC into Platform SendEarn"
+
+# Run a single spec file
+yarn playwright test earn.onboarded.spec.ts
+
+# Run with debug mode (headed browser, pauses on failure)
+yarn playwright test earn.onboarded.spec.ts --debug
+
+# Run with trace for post-mortem analysis
+yarn playwright test earn.onboarded.spec.ts --trace on
+
+# Run specific test with verbose output
+yarn playwright test -g "test name" --reporter=list
+```
+
+**Investigation workflow:**
+1. Pick ONE failing test to investigate
+2. Run it in isolation with `--debug` or `--trace on`
+3. Capture findings (screenshots, logs, root cause)
+4. Fix and verify before moving to next test
+5. Batch similar fixes into focused commits
+
+**Do NOT:**
+- Run full test suite during investigation (too slow, too much output)
+- Investigate multiple unrelated failures simultaneously
+- Make broad changes without verifying on targeted tests first
+
+---
+
 ### Phase 0: Infrastructure Blockers (MUST FIX)
 
 **Scope**: Localnet infrastructure bugs that cause widespread test failures
