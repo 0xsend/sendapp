@@ -58,7 +58,10 @@ spec:
                   name: oauth2-proxy
                   key: client-secret
             - name: OAUTH2_PROXY_COOKIE_SECRET
-              value: kN1TxKlZcWOrOCoTDmVhvQdxRHELXL/z
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy
+                  key: cookie-secret
           ports:
             - containerPort: 4180
               protocol: TCP
