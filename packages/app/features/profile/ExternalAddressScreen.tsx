@@ -463,11 +463,11 @@ const ActivityRow = ({
         py="$2"
       >
         <XStack gap="$3" ai="center">
-          <XStack w={40} h={40} br="$10" bc={sent ? '$red3' : '$green3'} ai="center" jc="center">
+          <XStack w={40} h={40} br="$10" bc={sent ? '$color3' : '$green3'} ai="center" jc="center">
             <IconArrowRight
               size="$1"
               rotate={sent ? '-90deg' : '90deg'}
-              color={sent ? '$red10' : '$green10'}
+              color={sent ? '$color10' : '$green10'}
             />
           </XStack>
           <YStack>
