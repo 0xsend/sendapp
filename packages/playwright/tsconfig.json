@@ -13,7 +13,7 @@
     "../temporal/src",
     "../workflows/src"
   ],
-  "exclude": ["../wagmi/wagmi.config.ts", "../app/**/*.test.ts"],
+  "exclude": ["../wagmi/wagmi.config.ts"],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,

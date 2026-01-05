@@ -1,3 +1,4 @@
+import { describe, expect, it } from '@jest/globals'
 import { sanitizePath, sanitizeUrl, sanitizeProperties } from './sanitizeUrl'
 
 const CLAIM_CODE = 'X7VY-H2EW-F64Z-TFZB-DRFU-K2RS-WOHJ-B6FF-XGPN-CVLH-53Y5-TJP6-2CYQ'
