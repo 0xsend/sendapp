@@ -207,6 +207,12 @@ jobs:
       ANVIL_BASE_FORK_URL: ${{ secrets.CI_ANVIL_BASE_FORK_URL }}
       YARN_ENABLE_HARDENED_MODE: 0
       SUPABASE_PROJECT_ID: sendapp
+      # Local env vars for Next.js build (matches .env.development)
+      NEXT_PUBLIC_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+      NEXT_PUBLIC_MAINNET_CHAIN_ID: 1337
+      NEXT_PUBLIC_BASE_CHAIN_ID: 845337
 
     # for writing PR comments
     permissions:
