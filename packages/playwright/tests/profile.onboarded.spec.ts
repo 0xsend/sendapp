@@ -28,13 +28,21 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).toBeVisible()
   await profilePage.sendButton.click()
-  await page.waitForURL(/\/send/)
-  let url = new URL(page.url())
-  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-    recipient: tag.name,
-    idType: 'tag',
-  })
-  await expect(page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
+
+  // Send flow now opens as a dialog on the profile page instead of navigating to /send
+  await expect(page.getByTestId('SendChat')).toBeVisible()
+
+  // Verify URL has send params (stays on profile page with query params)
+  await expect(() => {
+    const url = new URL(page.url())
+    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+      recipient: profile?.send_id?.toString(),
+      idType: 'sendid',
+    })
+  }).toPass({ timeout: 5000 })
+
+  // Verify send dialog content is visible
+  await expect(page.getByText("You're Sending")).toBeVisible()
 
   // visit another user but without a sendtag
   const plan2 = await createUserWithTagsAndAccounts(seed, { tagCount: 0 })
@@ -48,13 +56,21 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   await page.goto(`/profile/${profile2.send_id}`)
   await expect(profilePage2.sendButton).toBeVisible()
   await profilePage2.sendButton.click()
-  await page.waitForURL(/\/send/)
-  url = new URL(page.url())
-  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-    recipient: profile2?.send_id.toString(),
-    idType: 'sendid',
-  })
-  await expect(page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
+
+  // Send flow now opens as a dialog on the profile page
+  await expect(page.getByTestId('SendChat')).toBeVisible()
+
+  // Verify URL has send params
+  await expect(() => {
+    const url = new URL(page.url())
+    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+      recipient: profile2?.send_id?.toString(),
+      idType: 'sendid',
+    })
+  }).toPass({ timeout: 5000 })
+
+  // Verify send dialog content is visible
+  await expect(page.getByText("You're Sending")).toBeVisible()
 
   // can visit profile without the @ prefix
   await page.goto(`/${tag.name}`)

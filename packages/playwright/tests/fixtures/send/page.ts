@@ -23,13 +23,10 @@ export class SendPage {
   constructor(page: Page, expect: Expect) {
     this.page = page
     this.expect = expect
-    // The amount input in SendChat uses placeholder "0" - use getByRole for more reliable matching
-    this.amountInput = page.locator('input[placeholder="0"]')
-    // The clickable wrapper is a View with tabindex="0" containing the Input
-    // Target the focusable parent, not the Input which has pointerEvents: none
-    this.enterAmountTrigger = page.locator('[tabindex="0"]').filter({
-      has: page.locator('input[placeholder*="Type amount"]'),
-    })
+    // The amount input in SendChat has testID="SendChatAmountInput"
+    this.amountInput = page.getByTestId('SendChatAmountInput')
+    // The clickable wrapper that triggers enterAmount section
+    this.enterAmountTrigger = page.getByTestId('SendChatEnterAmountTrigger')
     // Review button transitions to reviewAndSend section
     this.reviewButton = page.getByRole('button', { name: 'Review and Send' })
     // Alias for backward compatibility with tests using continueButton
@@ -41,9 +38,12 @@ export class SendPage {
 
   /**
    * Enter the amount entry section from the chat section.
-   * After page reload, the modal resets to 'chat' section.
+   * After page reload, the modal should auto-open if URL has send params.
    */
   async enterAmountSection() {
+    // First, ensure the SendChat modal is visible (it auto-opens if URL has send params)
+    await this.expect(this.page.getByTestId('SendChat')).toBeVisible({ timeout: 10_000 })
+
     await this.expect(async () => {
       // Check if already in enterAmount section (amount input visible)
       if (await this.amountInput.isVisible()) {
@@ -57,7 +57,7 @@ export class SendPage {
         return
       }
 
-      // Click the focusable View wrapper to trigger onPress -> setActiveSection('enterAmount')
+      // Click the trigger to transition from chat to enterAmount section
       if (await this.enterAmountTrigger.isVisible()) {
         await this.enterAmountTrigger.click()
       }
@@ -75,14 +75,29 @@ export class SendPage {
     await this.expect(async () => {
       await this.expect(this.tokenSelect).toBeVisible()
       await this.tokenSelect.click()
-      const tokenOption = this.page.getByLabel(tokenSymbol)
+      // Use getByRole('listbox') to scope to the dropdown, then find the token option
+      const tokenOption = this.page.getByRole('listbox').getByLabel(tokenSymbol).first()
+      await this.expect(tokenOption).toBeVisible()
       await tokenOption.click()
-      if (await tokenOption.isVisible()) {
-        await tokenOption.click() // sometimes firefox needs a double click
-      }
-      await this.expect(tokenOption).toBeHidden()
+      // Wait for dropdown to close
+      await this.expect(this.page.getByRole('listbox')).toBeHidden({ timeout: 5000 })
     }).toPass({
       timeout: 10_000,
+    })
+
+    // Wait for balance to be loaded (needed before we can submit)
+    // The balance display has testID="SendFormBalance" and shows e.g., "Balance: 100 USDC"
+    await this.expect(async () => {
+      // Wait for the balance to show a non-zero value (not just "Balance: --")
+      const balanceEl = this.page.getByTestId('SendFormBalance')
+      await this.expect(balanceEl).toBeVisible()
+      const balanceText = await balanceEl.textContent()
+      // Balance format: "Balance: 1,234.5678" or "Balance: --" when loading
+      if (!balanceText || balanceText.includes('--')) {
+        throw new Error(`Balance not loaded yet: ${balanceText}`)
+      }
+    }).toPass({
+      timeout: 15_000,
     })
   }
 
@@ -98,17 +113,19 @@ export class SendPage {
       await this.expect(this.reviewButton).toBeVisible()
       await this.expect(this.reviewButton).toBeEnabled()
       await this.reviewButton.click()
+      // Wait for transition to reviewAndSend section - button text changes to "Send"
+      await this.expect(this.sendButton).toBeVisible()
     }).toPass({
-      timeout: 10_000,
+      timeout: 15_000,
     })
 
-    // Click final Send button
+    // Click final Send button - wait for it to be enabled (data loaded)
+    // This can take time as the app needs to estimate gas fees and verify balance
     await this.expect(async () => {
-      await this.expect(this.sendButton).toBeVisible()
       await this.expect(this.sendButton).toBeEnabled()
       await this.sendButton.click()
     }).toPass({
-      timeout: 10_000,
+      timeout: 30_000,
     })
   }
 

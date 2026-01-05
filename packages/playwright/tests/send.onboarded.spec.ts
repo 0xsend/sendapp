@@ -43,12 +43,17 @@ for (const token of [...coins, ethCoin]) {
     await expect(profilePage.sendButton).toBeVisible()
     await profilePage.sendButton.click()
 
-    await expect(page).toHaveURL(/\/send/)
-    const url = new URL(page.url())
-    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-      recipient: profile.send_id?.toString(),
-      idType: 'sendid',
-    })
+    // Send flow now opens as a dialog on the profile page instead of navigating to /send
+    await expect(page.getByTestId('SendChat')).toBeVisible()
+
+    // Verify URL has send params (stays on profile page with query params)
+    await expect(() => {
+      const url = new URL(page.url())
+      expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+        recipient: profile.send_id?.toString(),
+        idType: 'sendid',
+      })
+    }).toPass({ timeout: 5000 })
 
     const counterparty = `/${tag.name}`
     await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
@@ -129,8 +134,10 @@ for (const token of [...coins, ethCoin]) {
         await confirmButton.click()
       }
 
-      await expect(page).toHaveURL(/\/send/)
+      // Send flow now opens as a dialog - wait for SendChat to be visible
+      await expect(page.getByTestId('SendChat')).toBeVisible()
 
+      // Verify URL has send params
       await expect(() => {
         const url = new URL(page.url())
         expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
@@ -350,7 +357,8 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
   await expect(searchResult).toBeVisible()
   await searchResult.click()
 
-  await expect(page).toHaveURL(/\/send/)
+  // Send flow now opens as a dialog - wait for SendChat to be visible
+  await expect(page.getByTestId('SendChat')).toBeVisible()
 
   // Wait for URL parameters to be set
   await expect(() => {
