@@ -1,28 +1,26 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
-  Anchor,
   Button,
-  Card,
   Fade,
-  H3,
   H4,
-  Link,
+  LazyMount,
   Paragraph,
   Spinner,
   Stack,
-  Text,
-  useMedia,
   useThemeName,
+  View,
   XStack,
   YStack,
   useAppToast,
 } from '@my/ui'
-import { Check, Copy, ExternalLink } from '@tamagui/lucide-icons'
+import { Check, Copy, Pencil, UserPlus } from '@tamagui/lucide-icons'
 import * as Clipboard from 'expo-clipboard'
 import type { Address } from 'viem'
 import { FlatList } from 'react-native'
-import { IconArrowUp, IconArrowRight } from 'app/components/icons'
+import { IconArrowUp, IconArrowRight, IconHeart, IconHeartOutline } from 'app/components/icons'
 import { useUser } from 'app/utils/useUser'
+import { useSendScreenParams } from 'app/routers/params'
+import { SendChat } from 'app/features/send/components/SendChat'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { throwIf } from 'app/utils/throwIf'
@@ -35,19 +33,94 @@ import {
 } from 'app/utils/zod/activity/TemporalTransfersEventSchema'
 import { useActivityDetails } from 'app/provider/activity-details'
 import { ActivityDetails } from 'app/features/activity/ActivityDetails'
+import { useContactByExternalAddress } from 'app/features/contacts/hooks/useContactByExternalAddress'
+import {
+  useAddExternalContact,
+  useToggleContactFavorite,
+} from 'app/features/contacts/hooks/useContactMutation'
+import { ContactDetailSheet } from 'app/features/contacts/components/ContactDetailSheet'
 
 interface ExternalAddressScreenProps {
   address: Address
 }
 
 export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
-  const media = useMedia()
   const toast = useAppToast()
   const isDark = useThemeName()?.startsWith('dark')
   const [hasCopied, setHasCopied] = useState(false)
+  const [contactSheetOpen, setContactSheetOpen] = useState(false)
+  const [sendChatOpen, setSendChatOpen] = useState(false)
+  const [sendParams, setSendParams] = useSendScreenParams()
   const { user } = useUser()
+
+  // Open SendChat when params are set
+  useEffect(() => {
+    if (sendParams.idType && sendParams.recipient) {
+      setSendChatOpen(true)
+    }
+  }, [sendParams.idType, sendParams.recipient])
+
+  // Clear params when SendChat closes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
+  useEffect(() => {
+    if (!sendChatOpen) {
+      setSendParams({
+        idType: undefined,
+        recipient: undefined,
+        note: undefined,
+        amount: sendParams.amount,
+        sendToken: sendParams.sendToken,
+      })
+    }
+  }, [sendChatOpen])
   const supabase = useSupabase()
   const { selectActivity, isOpen } = useActivityDetails()
+
+  // Contact state
+  const { data: existingContact, refetch: refetchContact } = useContactByExternalAddress(address)
+  const isContact = !!existingContact
+  const isFavorite = existingContact?.is_favorite ?? false
+
+  // Contact mutations
+  const { mutate: addExternalContact, isPending: isAddingContact } = useAddExternalContact()
+  const { mutate: toggleFavorite, isPending: isTogglingFavorite } = useToggleContactFavorite()
+
+  // Handle add contact button
+  const handleAddContact = useCallback(() => {
+    addExternalContact(
+      {
+        externalAddress: address,
+        chainId: 'eip155:8453', // Base mainnet
+      },
+      {
+        onSuccess: () => {
+          toast.show('Contact added')
+          refetchContact()
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      }
+    )
+  }, [address, addExternalContact, toast, refetchContact])
+
+  // Handle favorite button
+  const handleToggleFavorite = useCallback(() => {
+    if (!existingContact?.contact_id) return
+
+    toggleFavorite(
+      { contactId: existingContact.contact_id },
+      {
+        onSuccess: () => {
+          toast.show(isFavorite ? 'Removed from favorites' : 'Added to favorites')
+          refetchContact()
+        },
+        onError: (err) => {
+          toast.error(err.message)
+        },
+      }
+    )
+  }, [existingContact, isFavorite, toggleFavorite, toast, refetchContact])
 
   // Truncate address for display
   const truncatedAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -99,9 +172,6 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
     setTimeout(() => setHasCopied(false), 2000)
   }
 
-  // Block explorer URL for Base chain
-  const blockExplorerUrl = `https://basescan.org/address/${address}`
-
   // Determine if an activity was sent by the current user or received from the external address
   const isSent = (activity: Activity) => {
     const toAddress = activity.data.t
@@ -111,14 +181,24 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
     return false
   }
 
+  // Display name: use contact custom_name if available, otherwise "External Address"
+  const displayName = existingContact?.custom_name || 'External Address'
+
   return (
-    <YStack gap="$4" ai="center" w="100%" maw={1024} p="$4" f={1}>
-      <Card gap="$4" size={media.gtMd ? '$7' : '$5'} padded elevation={1} w="100%">
-        {/* Address Display */}
-        <YStack gap="$3" ai="center">
-          <H3 lineHeight={32} color="$color12" testID="externalAddress">
-            External Address
-          </H3>
+    <XStack w="100%" gap="$5" f={1}>
+      <YStack
+        f={1}
+        display={isOpen ? 'none' : 'flex'}
+        $gtLg={{
+          display: 'flex',
+          maxWidth: '50%',
+        }}
+      >
+        {/* Profile Header */}
+        <YStack gap="$3" mb="$5">
+          <H4 size="$7" fontWeight="400" color="$color12" testID="externalAddress">
+            {displayName}
+          </H4>
 
           {/* Address with Copy Button */}
           <Button
@@ -132,11 +212,12 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
             focusStyle={{ backgroundColor: 'transparent' }}
             p={0}
             height="auto"
+            als="flex-start"
             onPress={copyToClipboard}
             testID="copyAddressButton"
           >
             <XStack gap="$2" ai="center">
-              <Paragraph fontSize="$6" fontFamily="$mono" color="$color12">
+              <Paragraph fontSize="$5" fontFamily="$mono" color="$color11">
                 {truncatedAddress}
               </Paragraph>
               {hasCopied ? (
@@ -152,22 +233,24 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
             </XStack>
           </Button>
 
-          <Paragraph fontSize="$2" color="$color10" fontFamily="$mono">
-            {address}
-          </Paragraph>
-        </YStack>
-
-        {/* Action Buttons */}
-        <XStack w="100%" gap="$4">
-          {/* Send Button */}
-          <Link href={`/send?recipient=${address}&idType=address`} asChild f={1}>
+          {/* Action Buttons */}
+          <XStack gap="$3" mt="$2">
+            {/* Send Button */}
             <Button
+              onPress={() => {
+                setSendParams({
+                  ...sendParams,
+                  recipient: address,
+                  idType: 'address',
+                })
+                setSendChatOpen(true)
+              }}
               borderRadius="$4"
               jc="center"
               ai="center"
               bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
-              f={1}
               testID="externalAddressSendButton"
+              px="$4"
             >
               <Button.Icon>
                 <IconArrowUp size="$1" color={isDark ? '$primary' : '$color12'} />
@@ -176,55 +259,111 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
                 Send
               </Button.Text>
             </Button>
-          </Link>
-        </XStack>
+            {/* Add contact / favorite / edit buttons (only show when logged in) */}
+            {user &&
+              (isContact ? (
+                <>
+                  <Button
+                    testID="externalAddressToggleFavoriteButton"
+                    aspectRatio={1}
+                    p={0}
+                    br="$4"
+                    bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                    onPress={handleToggleFavorite}
+                    disabled={isTogglingFavorite}
+                    icon={
+                      isTogglingFavorite ? (
+                        <Spinner size="small" />
+                      ) : isFavorite ? (
+                        <IconHeart size="$1" color="$red9" />
+                      ) : (
+                        <IconHeartOutline size="$1" color="$color12" />
+                      )
+                    }
+                  />
+                  <Button
+                    testID="externalAddressEditContactButton"
+                    aspectRatio={1}
+                    p={0}
+                    br="$4"
+                    bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                    onPress={() => setContactSheetOpen(true)}
+                    icon={<Pencil size="$1" color="$color12" />}
+                  />
+                </>
+              ) : (
+                <Button
+                  testID="externalAddressAddContactButton"
+                  aspectRatio={1}
+                  p={0}
+                  br="$4"
+                  bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
+                  onPress={handleAddContact}
+                  disabled={isAddingContact}
+                  icon={
+                    isAddingContact ? (
+                      <Spinner size="small" />
+                    ) : (
+                      <UserPlus size="$1" color="$color12" />
+                    )
+                  }
+                />
+              ))}
+          </XStack>
+        </YStack>
 
         {/* Activity Feed Section */}
-        <YStack gap="$3" w="100%" minHeight={200}>
-          <H4 size="$5" color="$color12" fontWeight="500">
+        <YStack f={1}>
+          <H4 size="$7" fontWeight="400" py="$3.5" color="$gray11">
             Activity
           </H4>
 
           {!user ? (
-            <YStack gap="$3" ai="center" p="$4">
+            <View bc="$color1" br="$4" p="$4">
               <Paragraph color="$color10" fontSize="$4" textAlign="center">
                 Sign in to view your activity with this address.
               </Paragraph>
-            </YStack>
+            </View>
           ) : isLoading ? (
             <Stack ai="center" jc="center" p="$4">
               <Spinner size="large" color="$primary" />
             </Stack>
           ) : error ? (
-            <YStack gap="$3" ai="center" p="$4">
+            <View bc="$color1" br="$4" p="$4">
               <Paragraph color="$color10" fontSize="$4" textAlign="center" theme="red">
                 Error loading activity.
               </Paragraph>
-            </YStack>
+            </View>
           ) : activities.length === 0 ? (
-            <YStack gap="$2" ai="center" p="$4">
-              <Paragraph color="$color10" fontSize="$4" textAlign="center">
-                No transaction history
-              </Paragraph>
-              <Paragraph color="$color10" fontSize="$3" textAlign="center">
-                Send to this address to start tracking activity.
-              </Paragraph>
-            </YStack>
+            <View bc="$color1" br="$4" p="$4">
+              <YStack gap="$2" ai="center">
+                <Paragraph color="$color10" fontSize="$4" textAlign="center">
+                  No transaction history
+                </Paragraph>
+                <Paragraph color="$color10" fontSize="$3" textAlign="center">
+                  Send to this address to start tracking activity.
+                </Paragraph>
+              </YStack>
+            </View>
           ) : (
-            <YStack gap="$2" maxHeight={400}>
+            <View br="$4" ov="hidden">
               <FlatList<Activity>
                 testID="ExternalAddressActivityFeed"
                 style={{ flex: 1 }}
                 data={activities}
                 keyExtractor={(activity) => activity.event_id}
-                renderItem={({ item: activity }) => {
+                renderItem={({ item: activity, index }) => {
                   const sent = isSent(activity)
+                  const isFirst = index === 0
+                  const isLast = index === activities.length - 1
                   return (
                     <Fade>
                       <ActivityRow
                         activity={activity}
                         sent={sent}
                         onPress={() => selectActivity(activity)}
+                        isFirst={isFirst}
+                        isLast={isLast}
                       />
                     </Fade>
                   )
@@ -239,64 +378,58 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
                 }
                 showsVerticalScrollIndicator={false}
               />
-            </YStack>
+            </View>
           )}
         </YStack>
+      </YStack>
 
-        {/* Links */}
-        <XStack w="100%" gap="$4" jc="center">
-          {/* History Link */}
-          <Link
-            href={`/profile/${address}/history`}
-            textDecorationLine="underline"
-            fontSize="$4"
-            color="$color10"
-          >
-            View Full History
-          </Link>
-
-          {/* Block Explorer Link */}
-          <Anchor
-            href={blockExplorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            textDecorationLine="underline"
-            fontSize="$4"
-            color="$color10"
-          >
-            <XStack gap="$1" ai="center">
-              <Text color="$color10">Basescan</Text>
-              <ExternalLink size={14} color="$color10" />
-            </XStack>
-          </Anchor>
-        </XStack>
-      </Card>
-
-      {/* Activity Details Modal */}
+      {/* Activity Details Side Panel (desktop) */}
       {isOpen && (
-        <YStack
-          $gtLg={{
-            display: 'flex',
-            maxWidth: '50%',
-            pb: '$3.5',
+        <ActivityDetails
+          w={'100%'}
+          $platform-web={{
+            height: 'fit-content',
+            position: 'sticky',
+            top: 10,
           }}
-        >
-          <ActivityDetails />
-        </YStack>
+          $gtLg={{
+            maxWidth: '47%',
+          }}
+        />
       )}
-    </YStack>
+
+      {/* Contact Detail Sheet for editing */}
+      {existingContact && (
+        <ContactDetailSheet
+          contact={existingContact}
+          open={contactSheetOpen}
+          onOpenChange={setContactSheetOpen}
+          onUpdate={refetchContact}
+          hideNavButtons
+        />
+      )}
+
+      {/* SendChat panel */}
+      <LazyMount when={sendChatOpen}>
+        <SendChat open={sendChatOpen} onOpenChange={setSendChatOpen} />
+      </LazyMount>
+    </XStack>
   )
 }
 
-// Simplified activity row for the inline feed
+// Simplified activity row for the inline feed (styled like RecentActivityFeed)
 const ActivityRow = ({
   activity,
   sent,
   onPress,
+  isFirst,
+  isLast,
 }: {
   activity: Activity
   sent: boolean
   onPress: () => void
+  isFirst: boolean
+  isLast: boolean
 }) => {
   const amount = amountFromActivity(activity)
   const date = activity.created_at.toLocaleDateString(undefined, {
@@ -316,45 +449,55 @@ const ActivityRow = ({
     (activity.data.status === 'failed' || activity.data.status === 'cancelled')
 
   return (
-    <XStack
-      testID="activityRow"
-      p="$3"
+    <YStack
       bc="$color1"
-      br="$3"
-      my="$1"
-      jc="space-between"
-      ai="center"
-      onPress={onPress}
-      cursor="pointer"
-      hoverStyle={{ opacity: 0.8 }}
-      pressStyle={{ opacity: 0.7 }}
+      p="$3"
+      {...(isFirst && {
+        borderTopLeftRadius: '$4',
+        borderTopRightRadius: '$4',
+      })}
+      {...(isLast && {
+        borderBottomLeftRadius: '$4',
+        borderBottomRightRadius: '$4',
+      })}
     >
-      <XStack gap="$2" ai="center">
-        <XStack w={32} h={32} br="$10" bc={sent ? '$red3' : '$green3'} ai="center" jc="center">
-          <IconArrowRight
-            size="$0.75"
-            rotate={sent ? '-90deg' : '90deg'}
-            color={sent ? '$red10' : '$green10'}
-          />
+      <XStack
+        testID="activityRow"
+        jc="space-between"
+        ai="center"
+        onPress={onPress}
+        cursor="pointer"
+        hoverStyle={{ opacity: 0.8 }}
+        pressStyle={{ opacity: 0.7 }}
+        py="$2"
+      >
+        <XStack gap="$3" ai="center">
+          <XStack w={40} h={40} br="$10" bc={sent ? '$red3' : '$green3'} ai="center" jc="center">
+            <IconArrowRight
+              size="$1"
+              rotate={sent ? '-90deg' : '90deg'}
+              color={sent ? '$red10' : '$green10'}
+            />
+          </XStack>
+          <YStack>
+            <Paragraph size="$4" color="$color12" fontWeight="500">
+              {sent ? 'Sent' : 'Received'}
+            </Paragraph>
+            <Paragraph size="$3" color="$color10">
+              {isPending ? (
+                <Spinner size="small" color="$color10" />
+              ) : isFailed ? (
+                'Failed'
+              ) : (
+                `${date} ${time}`
+              )}
+            </Paragraph>
+          </YStack>
         </XStack>
-        <YStack>
-          <Paragraph size="$3" color="$color12" fontWeight="500">
-            {sent ? 'Sent' : 'Received'}
-          </Paragraph>
-          <Paragraph size="$2" color="$color10">
-            {isPending ? (
-              <Spinner size="small" color="$color10" />
-            ) : isFailed ? (
-              'Failed'
-            ) : (
-              `${date} ${time}`
-            )}
-          </Paragraph>
-        </YStack>
+        <Paragraph size="$5" color="$color12" fontWeight="500">
+          {amount}
+        </Paragraph>
       </XStack>
-      <Paragraph size="$4" color="$color12" fontWeight="500">
-        {amount}
-      </Paragraph>
-    </XStack>
+    </YStack>
   )
 }

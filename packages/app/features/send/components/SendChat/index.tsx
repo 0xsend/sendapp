@@ -9,6 +9,7 @@ import {
   memo,
 } from 'react'
 import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
+import { useContactByExternalAddress } from 'app/features/contacts/hooks/useContactByExternalAddress'
 import { getContactDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
 import {
   AnimatePresence,
@@ -74,7 +75,6 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
-import { useRouter } from 'solito/router'
 
 import debug from 'debug'
 import { signUserOp } from 'app/utils/signUserOp'
@@ -287,7 +287,16 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
   const { data: contact } = useContactBySendId(profile?.sendid ?? undefined)
 
   const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
-  const href = !isExternalAddress && profile ? `/profile/${profile?.sendid}` : ''
+
+  // Look up external address contact for custom_name
+  const { data: externalContact } = useContactByExternalAddress(
+    isExternalAddress ? recipient : undefined
+  )
+  const href = isExternalAddress
+    ? `/profile/${recipient}`
+    : profile
+      ? `/profile/${profile?.sendid}`
+      : ''
 
   const tagName = isExternalAddress
     ? shorten(recipient, 5, 4)
@@ -297,7 +306,10 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
 
   // Display name priority: custom_name > profile_name > sendtag > send_id > address
   const displayName = useMemo(() => {
-    if (isExternalAddress) return tagName
+    if (isExternalAddress) {
+      // Use external contact's custom_name if available, otherwise shortened address
+      return externalContact?.custom_name || tagName
+    }
     if (contact) {
       return getContactDisplayName({
         custom_name: contact.custom_name,
@@ -309,7 +321,7 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
     }
     // No contact - use profile name or tag
     return profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'
-  }, [contact, profile, tagName, isExternalAddress])
+  }, [contact, profile, tagName, isExternalAddress, externalContact])
 
   return (
     <XStack
@@ -558,8 +570,6 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   )
 
   const [amountInputRef, setAmountInputRef] = useState<InputOG | null>(null)
-
-  const router = useRouter()
 
   const noteValidationError = form.formState.errors.note
 
@@ -886,12 +896,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
               exact: false,
             })
 
-            // Navigate to activity page for external addresses
-            if (isExternalAddress) {
-              router.replace({ pathname: '/activity' })
-            } else {
-              setActiveSection('chat')
-            }
+            // Stay on chat to show transaction history
+            setActiveSection('chat')
           }
         } catch (transferError) {
           void queryClient.resetQueries({

@@ -43,11 +43,9 @@ test.describe('External Address Profile - Anonymous User', () => {
     // Should show send button
     await expect(page.getByTestId('externalAddressSendButton')).toBeVisible()
 
-    // Should show Basescan link
-    await expect(page.getByText('Basescan')).toBeVisible()
-
-    // Should show View Full History link
-    await expect(page.getByText('View Full History')).toBeVisible()
+    // Activity history is shown directly on the page (no extra links needed)
+    // Should show sign in prompt for anonymous user
+    await expect(page.getByText('Sign in to view your activity with this address.')).toBeVisible()
   })
 
   test('redirects to canonical URL when address has public Send account', async ({
