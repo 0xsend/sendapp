@@ -22,6 +22,8 @@ type BalanceOfResult =
     }
   | undefined
 
+const ZERO_BIGINT = 0n
+
 export const useSendAccountBalances = () => {
   const { query: pricesQuery } = useTokenPrices()
   const { data: sendAccount } = useSendAccount()
@@ -128,7 +130,8 @@ export const useSendAccountBalances = () => {
         const balance = coin.token === 'eth' ? ethBalance?.value : balances[coin.token]
         // Always use $1 for USDC regardless of market price
         const price = coin.symbol === 'USDC' ? 1 : tokenPrices[coin.token]
-        values[coin.token] = convertBalanceToFiat({ ...coin, balance: balance ?? 0n }, price) ?? 0
+        values[coin.token] =
+          convertBalanceToFiat({ ...coin, balance: balance ?? ZERO_BIGINT }, price) ?? 0
 
         return values
       },

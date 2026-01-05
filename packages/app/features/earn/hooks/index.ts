@@ -522,6 +522,8 @@ export function useMyAffiliateVault(): UseQueryReturnType<AffiliateVault | null>
  * @link https://github.com/0xsend/send-earn-contracts/blob/6b2a1225008903f2ba4cb745369d2d7c32837533/src/SendEarnAffiliate.sol#L61-L64
  * @returns The user's affiliate earn rewards, including the balance and vault information
  */
+
+const BIGINT_ZERO = 0n
 export function useMyAffiliateRewards(): UseQueryReturnType<
   { shares: bigint; assets: bigint; vault: AffiliateVault } | null | undefined
 > {
@@ -530,16 +532,16 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
   const balance: UseQueryReturnType<bigint | null | undefined> = useMyAffiliateRewardsBalance()
   const split: UseQueryReturnType<bigint | null | undefined> = useReadSendEarnUsdcFactorySplit()
   // vault shares are the balance of the send earn affiliate contract minus the split
+  const sendEarnVault = myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn
   const vaultShares = useMemo(() => {
     if (!balance.data || !split.data) return { shares: undefined, vaults: undefined }
-    if (!myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn)
-      return { shares: undefined, vaults: undefined }
-    const affiliateShares = wMulDown(balance.data ?? 0n, WAD - (split.data ?? 0n))
+    if (!sendEarnVault) return { shares: undefined, vaults: undefined }
+    const affiliateShares = wMulDown(balance.data ?? BIGINT_ZERO, WAD - (split.data ?? BIGINT_ZERO))
     return {
       shares: [affiliateShares],
-      vaults: [myAffiliateVault.data.send_earn_affiliate_vault.send_earn],
+      vaults: [sendEarnVault],
     }
-  }, [myAffiliateVault.data?.send_earn_affiliate_vault?.send_earn, balance.data, split.data])
+  }, [sendEarnVault, balance.data, split.data])
 
   const { query: assets } = useVaultConvertSharesToAssets(vaultShares)
   log('useMyAffiliateRewards', { balance, myAffiliateVault, split, vaultShares, assets })
@@ -578,8 +580,8 @@ export function useMyAffiliateRewards(): UseQueryReturnType<
       if (!vaultShares.shares) return null
 
       return {
-        shares: vaultShares.shares[0] ?? 0n,
-        assets: assets.data[0] ?? 0n,
+        shares: vaultShares.shares[0] ?? BIGINT_ZERO,
+        assets: assets.data[0] ?? BIGINT_ZERO,
         vault: myAffiliateVault.data,
       }
     },

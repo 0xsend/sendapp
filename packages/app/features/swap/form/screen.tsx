@@ -48,6 +48,7 @@ const SwapFormSchema = z.object({
   slippage: formFields.number.min(0, 'errors.slippageMin').max(2000, 'errors.slippageMax'),
 })
 
+const BIGINT_0 = 0n
 export const SwapFormScreen = () => {
   const form = useForm<z.infer<typeof SwapFormSchema>>()
   const router = useRouter()
@@ -64,7 +65,7 @@ export const SwapFormScreen = () => {
 
   // Compute if user is verified
   const isVerified = useMemo(
-    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
+    () => Boolean(distributionShares[0] && distributionShares[0].amount > BIGINT_0),
     [distributionShares]
   )
 
@@ -657,7 +658,9 @@ export const SwapFormScreen = () => {
                               onPress={() => {
                                 form.setValue(
                                   'inAmount',
-                                  localizeAmount(formatUnits(inCoin.balance ?? 0n, inCoin.decimals))
+                                  localizeAmount(
+                                    formatUnits(inCoin.balance ?? BIGINT_0, inCoin.decimals)
+                                  )
                                 )
                               }}
                               $theme-light={{ borderBottomColor: '$color12' }}
