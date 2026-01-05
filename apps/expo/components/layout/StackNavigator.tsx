@@ -5,6 +5,7 @@ import { Platform, Pressable } from 'react-native'
 import { IconArrowLeft } from 'app/components/icons'
 import { useEffect, useMemo, useRef } from 'react'
 import { analytics } from 'app/analytics'
+import { sanitizePath } from 'app/analytics/sanitizeUrl'
 
 export default function StackNavigator() {
   const theme = useTheme()
@@ -18,7 +19,7 @@ export default function StackNavigator() {
     if (!pathname) return
     if (pathname === previousPathname.current) return
 
-    analytics.screen(pathname)
+    analytics.screen(sanitizePath(pathname))
     previousPathname.current = pathname
   }, [pathname])
 
