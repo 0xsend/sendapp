@@ -1,6 +1,6 @@
 import debug from 'debug'
 import posthog from 'posthog-js'
-import { sanitizeUrl } from './sanitizeUrl'
+import { sanitizeProperties } from './sanitizeUrl'
 import type {
   AnalyticsEvent,
   AnalyticsService,
@@ -52,14 +52,9 @@ export const analytics: AnalyticsService = {
           }
         }
 
-        // Sanitize sensitive URLs from pageview events
-        if (event.event === '$pageview' && event.properties) {
-          if (event.properties.$current_url) {
-            event.properties.$current_url = sanitizeUrl(event.properties.$current_url)
-          }
-          if (event.properties.$pathname) {
-            event.properties.$pathname = sanitizeUrl(event.properties.$pathname)
-          }
+        // Sanitize sensitive check codes from all event properties
+        if (event.properties) {
+          event.properties = sanitizeProperties(event.properties)
         }
 
         return event
@@ -98,10 +93,13 @@ export const analytics: AnalyticsService = {
       return
     }
 
-    posthog.captureException(error, {
-      source: properties?.source,
-      handled: properties?.handled ?? true,
-      ...properties?.context,
-    })
+    posthog.captureException(
+      error,
+      sanitizeProperties({
+        source: properties?.source,
+        handled: properties?.handled ?? true,
+        ...properties?.context,
+      })
+    )
   },
 }
