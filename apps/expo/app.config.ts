@@ -35,6 +35,7 @@ module.exports = {
   version: '1.1.1',
   experiments: {
     reactCanary: true,
+    reactCompiler: true,
   },
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
