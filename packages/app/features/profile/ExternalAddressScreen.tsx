@@ -21,12 +21,8 @@ import { IconArrowUp, IconArrowRight, IconHeart, IconHeartOutline } from 'app/co
 import { useUser } from 'app/utils/useUser'
 import { useSendScreenParams } from 'app/routers/params'
 import { SendChat } from 'app/features/send/components/SendChat'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { throwIf } from 'app/utils/throwIf'
-import { EventArraySchema, Events, type Activity } from 'app/utils/zod/activity'
+import type { Activity } from 'app/utils/zod/activity'
 import { amountFromActivity } from 'app/utils/activity'
-import { hexToBytea } from 'app/utils/hexToBytea'
 import {
   isTemporalEthTransfersEvent,
   isTemporalTokenTransfersEvent,
@@ -39,6 +35,7 @@ import {
   useToggleContactFavorite,
 } from 'app/features/contacts/hooks/useContactMutation'
 import { ContactDetailSheet } from 'app/features/contacts/components/ContactDetailSheet'
+import { useInterUserActivityFeed } from './utils/useInterUserActivityFeed'
 
 interface ExternalAddressScreenProps {
   address: Address
@@ -73,7 +70,6 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
       })
     }
   }, [sendChatOpen])
-  const supabase = useSupabase()
   const { selectActivity, isOpen } = useActivityDetails()
 
   // Contact state
@@ -137,42 +133,12 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   // Truncate address for display
   const truncatedAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
 
-  // Convert address to bytea format for querying
-  const addressBytea = useMemo(() => hexToBytea(address), [address])
-
-  // Fetch activity involving this address from the user's activity feed
+  // Fetch activity involving this address using the shared hook
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery<Activity[], Error>({
-      queryKey: ['external_address_activity', address, addressBytea, user?.id],
-      initialPageParam: 0,
-      getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-        if (!lastPage || lastPage.length < 20) return undefined
-        return (lastPageParam as number) + 1
-      },
-      queryFn: async ({ pageParam }): Promise<Activity[]> => {
-        const page = pageParam as number
-        const from = page * 20
-        const to = (page + 1) * 20 - 1
-
-        // Query activity_feed for activities where the external address appears in data.f, data.t, or data.sender
-        const { data: activities, error } = await supabase
-          .from('activity_feed')
-          .select('*')
-          .or(
-            `data->>f.eq.${addressBytea},data->>t.eq.${addressBytea},data->>sender.eq.${addressBytea}`
-          )
-          .in('event_name', [
-            Events.SendAccountTransfers,
-            Events.SendAccountReceive,
-            Events.TemporalSendAccountTransfers,
-          ])
-          .order('created_at', { ascending: false })
-          .range(from, to)
-
-        throwIf(error)
-        return EventArraySchema.parse(activities)
-      },
-      enabled: !!user, // Only query if user is logged in
+    useInterUserActivityFeed({
+      externalAddress: address,
+      currentUserId: user?.id,
+      pageSize: 20,
     })
 
   const activities = useMemo(() => data?.pages?.flat() ?? [], [data])

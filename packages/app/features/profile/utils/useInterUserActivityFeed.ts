@@ -28,7 +28,7 @@ const MAX_PENDING_TIME = 30_000 // 30 seconds - stop aggressive polling after th
 export function useInterUserActivityFeed(params: {
   pageSize?: number
   refetchInterval?: number
-  currentUserId?: number
+  currentUserId?: string | number
   otherUserId?: number
   externalAddress?: Address
   ascending?: boolean
