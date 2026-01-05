@@ -1,5 +1,6 @@
 import debug from 'debug'
 import posthog from 'posthog-js'
+import { sanitizeUrl } from './sanitizeUrl'
 import type {
   AnalyticsEvent,
   AnalyticsService,
@@ -41,6 +42,8 @@ export const analytics: AnalyticsService = {
       },
       before_send: (event) => {
         if (!event) return null
+
+        // Filter ignored exceptions
         if (event.event === '$exception') {
           const exceptionList = event.properties?.$exception_list
           const message = Array.isArray(exceptionList) ? exceptionList[0]?.value : undefined
@@ -48,6 +51,17 @@ export const analytics: AnalyticsService = {
             return null
           }
         }
+
+        // Sanitize sensitive URLs from pageview events
+        if (event.event === '$pageview' && event.properties) {
+          if (event.properties.$current_url) {
+            event.properties.$current_url = sanitizeUrl(event.properties.$current_url)
+          }
+          if (event.properties.$pathname) {
+            event.properties.$pathname = sanitizeUrl(event.properties.$pathname)
+          }
+        }
+
         return event
       },
     })
