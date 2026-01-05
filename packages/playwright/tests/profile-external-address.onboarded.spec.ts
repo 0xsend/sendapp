@@ -63,12 +63,14 @@ test.describe('External Address Profile - Logged In User', () => {
       timeout: 10000,
     })
 
-    // Verify URL params are set correctly for the recipient
-    const url = new URL(page.url())
-    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-      recipient: externalAddress,
-      idType: 'address',
-    })
+    // Wait for URL params to be set (async state update)
+    await expect(async () => {
+      const url = new URL(page.url())
+      expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+        recipient: externalAddress,
+        idType: 'address',
+      })
+    }).toPass({ timeout: 5000 })
   })
 
   test('can add external address as contact', async ({ page }) => {

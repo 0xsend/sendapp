@@ -85,10 +85,13 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   const isContact = !!existingContact
   const isFavorite = existingContact?.is_favorite ?? false
 
-  // Log contact lookup errors for debugging
-  if (contactError) {
-    console.error('Failed to lookup contact for address:', address, contactError)
-  }
+  // Show user-facing error for contact lookup failures
+  useEffect(() => {
+    if (contactError) {
+      console.error('Failed to lookup contact for address:', address, contactError)
+      toast.error('Unable to load contact info')
+    }
+  }, [contactError, address, toast])
 
   // Contact mutations
   const { mutate: addExternalContact, isPending: isAddingContact } = useAddExternalContact()
@@ -140,7 +143,7 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   // Fetch activity involving this address from the user's activity feed
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery<Activity[], Error>({
-      queryKey: ['external_address_activity', address, user?.id],
+      queryKey: ['external_address_activity', address, addressBytea, user?.id],
       initialPageParam: 0,
       getNextPageParam: (lastPage, _allPages, lastPageParam) => {
         if (!lastPage || lastPage.length < 20) return undefined

@@ -23,6 +23,7 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   })
   const tag = tags[0]
   assert(!!tag?.name, 'tag not found')
+  assert(!!profile?.send_id, 'profile send_id not found')
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })

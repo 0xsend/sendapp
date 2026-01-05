@@ -54,7 +54,7 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
   // Fetch activity involving this address from the user's activity feed
   const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery<Activity[], Error>({
-      queryKey: ['external_address_activity', address, user?.id],
+      queryKey: ['external_address_activity', address, addressBytea, user?.id],
       initialPageParam: 0,
       getNextPageParam: (lastPage, _allPages, lastPageParam) => {
         if (!lastPage || lastPage.length < 10) return undefined
