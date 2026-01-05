@@ -2,11 +2,12 @@ import { IconArrowUp, IconClock, IconCompass, IconHome } from 'app/components/ic
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import { useSegments } from 'expo-router'
 import { Animated } from 'react-native'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 import { BottomNavBarContent } from 'app/components/BottomTabBar/BottomNavBarContent'
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { useTranslation } from 'react-i18next'
+import { CurrentRouteProvider } from './contexts'
 
 const TABS = [
   {
@@ -38,7 +39,7 @@ const TABS = [
 function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   const segments = useSegments()
   const { direction } = useScrollDirection()
-  const translateY = useRef(new Animated.Value(0)).current
+  const [translateY] = useState(() => new Animated.Value(0))
   const prevDirectionRef = useRef(direction)
   const prevRouteRef = useRef(currentRoute)
   const { height } = useTabBarSize()
@@ -100,7 +101,9 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
         transform: [{ translateY }],
       }}
     >
-      <BottomNavBarContent tabs={translatedTabs} currentRoute={currentRoute} />
+      <CurrentRouteProvider currentRoute={currentRoute}>
+        <BottomNavBarContent tabs={translatedTabs} />
+      </CurrentRouteProvider>
     </Animated.View>
   )
 }
