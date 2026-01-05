@@ -30,8 +30,9 @@ test('logged in user needs onboarding before visiting profile', async ({ page, s
 
   await page.goto(`/profile/${profile.send_id}`)
   await page.waitForURL(`/profile/${profile.send_id}`)
+  // Profile title is dynamic: shows "Send | {name}" when user has a name
   await expect(async () => {
-    expect(await page.title()).toBe('Send | Profile')
+    expect(await page.title()).toBe(`Send | ${profile.name}`)
   }).toPass()
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await expect(page.getByText(profile.name)).toBeVisible()

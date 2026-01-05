@@ -145,8 +145,8 @@ export class SwapFormPage {
         (response) =>
           response.url().includes('/api/trpc/swap.fetchSwapRoute') && response.status() === 200
       )
-      // response need to be set saved in cache before clicking, playwright is too fast
-      await this.page.waitForTimeout(1000)
+      // Wait for the quote to be reflected in the UI (React Query cache -> state -> render)
+      await expect(this.outAmountInput).not.toHaveValue('')
     }).toPass({ timeout: 15_000 })
   }
 
@@ -171,8 +171,11 @@ export class SwapFormPage {
   }) {
     await expect(async () => {
       await this.selectInToken(inToken)
-      // need to wait till param is populated to url before changing out token, couldn't make any other more distinguished wait code to work
-      await this.page.waitForTimeout(1_000)
+      // Wait for URL to include inToken param before selecting outToken
+      await this.page.waitForURL((url) => {
+        const param = url.searchParams.get('inToken')
+        return param !== null && param !== ''
+      })
       await this.selectOutToken(outToken)
       await this.fillInAmount(inAmount)
       await this.fillCustomSlippage(customSlippage)

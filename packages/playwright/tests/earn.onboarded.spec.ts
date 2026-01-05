@@ -997,9 +997,6 @@ for (const coin of [usdcCoin]) {
       })
 
       // 2. Make a second deposit with different parameters
-      // Wait some time or perform other actions in between
-      await page.page.waitForTimeout(2000)
-
       // Use a different amount
       const amount2 = formatUnits(randomAmount2, coin.decimals)
       await page.goto(coin)

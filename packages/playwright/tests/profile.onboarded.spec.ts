@@ -56,12 +56,13 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   })
   await expect(page.locator('h2', { hasText: 'Enter Amount' })).toBeVisible()
 
-  // can visit profile withouth the @ prefix
+  // can visit profile without the @ prefix
   await page.goto(`/${tag.name}`)
   await page.waitForURL(`/${tag.name}`)
+  // Profile title is dynamic: shows hostname/tag for tag-based profiles
   await expect(async () => {
     const title = await page.title()
-    expect(title).toBe('Send | Profile')
+    expect(title).toBe(`localhost/${tag.name}`)
   }).toPass()
   await expect(page.getByText(profile.name)).toBeVisible()
 })
