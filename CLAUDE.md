@@ -463,3 +463,15 @@ ALWAYS prefer editing an existing file to creating a new one.
 ALWAYS proactively create or update documentation files (*.md) or README files.
 ALWAYS ask before removing files or code.
 ALWAYS remove unnecessary files.
+
+## CRITICAL: Secrets Handling (Public Repo)
+
+This is a PUBLIC repository. Never commit secrets.
+
+- **NEVER hardcode secrets, tokens, passwords, API keys, or cookie secrets in any file**
+- All Kubernetes secrets MUST come from ExternalSecrets referencing 1Password
+- If a secret doesn't exist in 1Password, STOP and ask the user to add it first
+- Never generate secrets inline - always use external secret stores
+- Use `git add <specific-files>` not `git add -A` to avoid staging unintended changes
+- Always PR changes for review before merging to dev/main
+- Environment variables with sensitive values must use `valueFrom.secretKeyRef`, never `value:`
