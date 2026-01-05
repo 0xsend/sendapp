@@ -12,8 +12,8 @@ import { hexToBytea } from 'app/utils/hexToBytea'
 import type { Address } from 'viem'
 import { useMemo } from 'react'
 
-const PENDING_TRANSFERS_INTERVAL = 3_000 // 1 second
-const MAX_PENDING_TIME = 30_000 // 2 minutes - stop aggressive polling after this
+const PENDING_TRANSFERS_INTERVAL = 3_000 // 3 seconds
+const MAX_PENDING_TIME = 30_000 // 30 seconds - stop aggressive polling after this
 
 /**
  * Infinite query to fetch ERC-20 token activity feed between the current user and another profile.

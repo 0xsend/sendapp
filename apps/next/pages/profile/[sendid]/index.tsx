@@ -13,18 +13,16 @@ import { isAddress, type Address } from 'viem'
 
 import { ProfileTopNav } from 'app/components/ProfileTopNav'
 
-interface PageProps {
-  sendid?: number
-  address?: Address
-  isExternalAddress?: boolean
-  seo: ReturnType<typeof buildSeo>
-}
+// Discriminated union for type-safe page props
+type PageProps =
+  | { type: 'sendAccount'; sendid: number; seo: ReturnType<typeof buildSeo> }
+  | { type: 'externalAddress'; address: Address; seo: ReturnType<typeof buildSeo> }
 
-export const Page: NextPageWithLayout<PageProps> = ({ sendid, address, isExternalAddress }) => {
-  if (isExternalAddress && address) {
-    return <ExternalAddressScreen address={address} />
+export const Page: NextPageWithLayout<PageProps> = (props) => {
+  if (props.type === 'externalAddress') {
+    return <ExternalAddressScreen address={props.address} />
   }
-  return <ProfileScreen sendid={sendid} />
+  return <ProfileScreen sendid={props.sendid} />
 }
 
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
@@ -97,8 +95,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
     return {
       props: {
+        type: 'externalAddress',
         address: identifier,
-        isExternalAddress: true,
         seo,
       },
     }
@@ -176,6 +174,7 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
 
   return {
     props: {
+      type: 'sendAccount',
       sendid,
       seo,
     },

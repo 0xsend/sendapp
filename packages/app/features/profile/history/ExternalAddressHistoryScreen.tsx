@@ -91,10 +91,15 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
   const activities = useMemo(() => data?.pages?.flat() ?? [], [data])
 
   const copyToClipboard = async () => {
-    await Clipboard.setStringAsync(address).catch(() => toast.error('Failed to copy address'))
-    setHasCopied(true)
-    toast.show('Address copied')
-    setTimeout(() => setHasCopied(false), 2000)
+    try {
+      await Clipboard.setStringAsync(address)
+      setHasCopied(true)
+      toast.show('Address copied')
+      setTimeout(() => setHasCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy address to clipboard:', err)
+      toast.error('Failed to copy address')
+    }
   }
 
   // Block explorer URL for Base chain
@@ -170,11 +175,17 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
               <Spinner size="large" color="$primary" />
             </Stack>
           ) : error ? (
-            <YStack gap="$3" ai="center" p="$6">
-              <Paragraph color="$color10" fontSize="$5" textAlign="center" theme="red">
-                Error loading activity.
-              </Paragraph>
-            </YStack>
+            <>
+              {console.error('External address history error:', error)}
+              <YStack gap="$3" ai="center" p="$6">
+                <Paragraph color="$color10" fontSize="$5" textAlign="center" theme="red">
+                  Failed to load activity
+                </Paragraph>
+                <Paragraph color="$color10" fontSize="$4" textAlign="center">
+                  Please check your connection and try again.
+                </Paragraph>
+              </YStack>
+            </>
           ) : activities.length === 0 ? (
             <YStack gap="$3" ai="center" p="$6">
               <Paragraph color="$color10" fontSize="$5" textAlign="center">
@@ -205,7 +216,10 @@ export function ExternalAddressHistoryScreen({ address }: ExternalAddressHistory
                   </>
                 )
               }}
-              onEndReached={() => fetchNextPage()}
+              onEndReached={() => {
+                if (hasNextPage && !isFetchingNextPage) fetchNextPage()
+              }}
+              onEndReachedThreshold={0.5}
               ListFooterComponent={
                 hasNextPage || isFetchingNextPage ? (
                   <Spinner size="small" color="$color12" my="$4" />

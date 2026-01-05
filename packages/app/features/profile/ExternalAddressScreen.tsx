@@ -77,9 +77,18 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   const { selectActivity, isOpen } = useActivityDetails()
 
   // Contact state
-  const { data: existingContact, refetch: refetchContact } = useContactByExternalAddress(address)
+  const {
+    data: existingContact,
+    refetch: refetchContact,
+    error: contactError,
+  } = useContactByExternalAddress(address)
   const isContact = !!existingContact
   const isFavorite = existingContact?.is_favorite ?? false
+
+  // Log contact lookup errors for debugging
+  if (contactError) {
+    console.error('Failed to lookup contact for address:', address, contactError)
+  }
 
   // Contact mutations
   const { mutate: addExternalContact, isPending: isAddingContact } = useAddExternalContact()
@@ -166,10 +175,15 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   const activities = useMemo(() => data?.pages?.flat() ?? [], [data])
 
   const copyToClipboard = async () => {
-    await Clipboard.setStringAsync(address).catch(() => toast.error('Failed to copy address'))
-    setHasCopied(true)
-    toast.show('Address copied')
-    setTimeout(() => setHasCopied(false), 2000)
+    try {
+      await Clipboard.setStringAsync(address)
+      setHasCopied(true)
+      toast.show('Address copied')
+      setTimeout(() => setHasCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy address to clipboard:', err)
+      toast.error('Failed to copy address')
+    }
   }
 
   // Determine if an activity was sent by the current user or received from the external address
@@ -329,11 +343,19 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
               <Spinner size="large" color="$primary" />
             </Stack>
           ) : error ? (
-            <View bc="$color1" br="$4" p="$4">
-              <Paragraph color="$color10" fontSize="$4" textAlign="center" theme="red">
-                Error loading activity.
-              </Paragraph>
-            </View>
+            <>
+              {console.error('External address activity feed error:', error)}
+              <View bc="$color1" br="$4" p="$4">
+                <YStack gap="$2" ai="center">
+                  <Paragraph color="$color10" fontSize="$4" textAlign="center" theme="red">
+                    Failed to load activity
+                  </Paragraph>
+                  <Paragraph color="$color10" fontSize="$3" textAlign="center">
+                    Please check your connection and try again.
+                  </Paragraph>
+                </YStack>
+              </View>
+            </>
           ) : activities.length === 0 ? (
             <View bc="$color1" br="$4" p="$4">
               <YStack gap="$2" ai="center">

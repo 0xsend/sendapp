@@ -11,19 +11,17 @@ import { ExternalAddressHistoryScreen } from 'app/features/profile/history/Exter
 import { TopNav } from 'app/components/TopNav'
 import { isAddress, type Address } from 'viem'
 
-interface PageProps {
-  address?: Address
-  isExternalAddress?: boolean
-}
+// Discriminated union for type-safe page props
+type PageProps = { type: 'sendAccount' } | { type: 'externalAddress'; address: Address }
 
-export const Page: NextPageWithLayout<PageProps> = ({ address, isExternalAddress }) => {
-  if (isExternalAddress && address) {
+export const Page: NextPageWithLayout<PageProps> = (props) => {
+  if (props.type === 'externalAddress') {
     return (
       <>
         <Head>
           <title>Send | Address History</title>
         </Head>
-        <ExternalAddressHistoryScreen address={address} />
+        <ExternalAddressHistoryScreen address={props.address} />
       </>
     )
   }
@@ -83,8 +81,8 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     // No Send account - render external address history view
     return {
       props: {
+        type: 'externalAddress',
         address: identifier,
-        isExternalAddress: true,
       },
     }
   }
@@ -122,7 +120,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   return {
-    props: {},
+    props: {
+      type: 'sendAccount',
+    },
   }
 }) satisfies GetServerSideProps
 
