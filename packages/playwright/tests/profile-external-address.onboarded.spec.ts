@@ -204,7 +204,7 @@ test.describe('External Address History - Logged In User', () => {
 
     // Should show truncated address
     const truncatedAddress = `${externalAddress.slice(0, 6)}...${externalAddress.slice(-4)}`
-    await expect(page.getByText(truncatedAddress)).toBeVisible()
+    await expect(page.getByTestId('copyAddressButton').getByText(truncatedAddress)).toBeVisible()
 
     // Should show send button
     await expect(page.getByTestId('externalAddressSendButton')).toBeVisible()

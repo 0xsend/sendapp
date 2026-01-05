@@ -32,7 +32,7 @@ test.describe('External Address Profile - Anonymous User', () => {
     // Should show truncated address with copy button
     const truncatedAddress = `${externalAddress.slice(0, 6)}...${externalAddress.slice(-4)}`
     await expect(page.getByTestId('copyAddressButton')).toBeVisible()
-    await expect(page.getByText(truncatedAddress)).toBeVisible()
+    await expect(page.getByTestId('copyAddressButton').getByText(truncatedAddress)).toBeVisible()
 
     // Should NOT show on-chain balances section (hidden per spec)
     await expect(page.getByText('On-chain Balances (Base)')).not.toBeVisible()
@@ -169,7 +169,7 @@ test.describe('External Address History - Anonymous User', () => {
 
     // Should show truncated address
     const truncatedAddress = `${externalAddress.slice(0, 6)}...${externalAddress.slice(-4)}`
-    await expect(page.getByText(truncatedAddress)).toBeVisible()
+    await expect(page.getByTestId('copyAddressButton').getByText(truncatedAddress)).toBeVisible()
 
     // Should prompt to sign in to view activity (since we're anonymous)
     await expect(page.getByText('Sign in to view your activity with this address.')).toBeVisible()
