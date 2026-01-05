@@ -5,6 +5,7 @@ import {
   Paragraph,
   Shimmer,
   ThemeableStack,
+  useEvent,
   XStack,
   type XStackProps,
 } from '@my/ui'
@@ -15,21 +16,34 @@ import { useFriends } from '../affiliate/utils/useFriends'
 import { IconAccount } from 'app/components/icons'
 import { HomeBodyCard } from './screen'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Platform } from 'react-native'
+import { type NativeTouchEvent, type NativeSyntheticEvent, Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useReferrer } from 'app/utils/useReferrer'
+import { useMemo } from 'react'
 
 export const FRIENDS_CARD_HREF = '/account/affiliate'
 
 export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
   const linkProps = useLink({ href: FRIENDS_CARD_HREF })
-  const limit = 3
-  const { data, isLoading } = useFriends(limit)
+  const onPress = useEvent((e: NativeSyntheticEvent<NativeTouchEvent>) => {
+    linkProps.onPress(e)
+  })
+
+  return (
+    <HomeBodyCard {...linkProps} onPress={onPress} {...props}>
+      <FriendsCardContent />
+    </HomeBodyCard>
+  )
+}
+
+const LIMIT = 3
+const FriendsCardContent = () => {
+  const { data, isLoading } = useFriends(LIMIT)
   const { data: referrer, isLoading: isReferrerLoading } = useReferrer()
   const hoverStyles = useHoverStyles()
   const { t } = useTranslation('home')
 
-  const displayFriends = (() => {
+  const displayFriends = useMemo(() => {
     const friends = data?.friends || []
     if (referrer && friends.length < 3) {
       return [
@@ -41,10 +55,10 @@ export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
       ].slice(0, 3)
     }
     return friends
-  })()
+  }, [data?.friends, referrer])
 
   return (
-    <HomeBodyCard {...linkProps} {...props}>
+    <>
       <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
         <Paragraph
           fontSize={'$5'}
@@ -84,7 +98,7 @@ export const FriendsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
           </XStack>
         )}
       </Card.Footer>
-    </HomeBodyCard>
+    </>
   )
 }
 

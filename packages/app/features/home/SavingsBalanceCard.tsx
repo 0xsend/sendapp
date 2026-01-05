@@ -14,6 +14,7 @@ import { Platform } from 'react-native'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useTranslation } from 'react-i18next'
 
+const BIG_ZERO = 0n
 export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
   const { data: sendAccount } = useSendAccount()
@@ -23,10 +24,10 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
 
   // Use the SendEarnProvider pattern
   const {
-    totalAssets: { totalCurrentValue, vaults, currentAssetsQueryEnabled },
+    totalAssets: { totalCurrentValue, vaults },
   } = useSendEarnCoin(usdcCoin)
 
-  const hasExistingDeposit = totalCurrentValue > 0n
+  const hasExistingDeposit = totalCurrentValue > BIG_ZERO
 
   // Determine navigation target based on deposit status
   const href = useMemo(
@@ -54,7 +55,7 @@ export const SavingsBalanceCard = (props: Omit<CardProps, 'children'>) => {
   })
 
   const totalAssets = useMemo(() => {
-    if (!hasExistingDeposit) return formatUSDCValue(0n)
+    if (!hasExistingDeposit) return formatUSDCValue(BIG_ZERO)
     return formatUSDCValue(totalCurrentValue)
   }, [hasExistingDeposit, totalCurrentValue])
 

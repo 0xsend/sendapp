@@ -1,5 +1,5 @@
 import { Paragraph, XStack, YStack, Spinner, Card, H3, Input, Button, useAppToast } from '@my/ui'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useRouter } from 'solito/router'
 import { createParam } from 'solito'
 import {
@@ -10,6 +10,7 @@ import { formatUnits } from 'viem'
 import { useCoin } from 'app/provider/coins'
 import formatAmount from 'app/utils/formatAmount'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 type BuyTicketsScreenParams = {
   numberOfTickets?: string
@@ -24,6 +25,22 @@ export function BuyTicketsScreen() {
   const [isInputFocused, setIsInputFocused] = useState(false)
   const [queryTickets] = useParam('numberOfTickets')
   const { t } = useTranslation('sendpot')
+  const analytics = useAnalytics()
+  const hasTrackedStarted = useRef(false)
+
+  // Track buy tickets flow started on mount
+  useEffect(() => {
+    if (!hasTrackedStarted.current) {
+      const initialTicketCount = Number.parseInt(queryTickets || ticketCount || '1', 10)
+      analytics.capture({
+        name: 'sendpot_buy_tickets_started',
+        properties: {
+          ticket_count: Number.isNaN(initialTicketCount) ? 1 : initialTicketCount,
+        },
+      })
+      hasTrackedStarted.current = true
+    }
+  }, [analytics, queryTickets, ticketCount])
 
   useEffect(() => {
     if (typeof queryTickets === 'string' && /^\d+$/.test(queryTickets)) {

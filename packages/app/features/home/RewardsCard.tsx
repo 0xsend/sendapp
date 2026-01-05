@@ -1,4 +1,12 @@
-import { Card, type CardProps, Paragraph, Shimmer, View, XStack } from '@my/ui'
+import {
+  Card,
+  type CardProps,
+  Paragraph,
+  Shimmer,
+  useEvent,
+  XStack,
+  type YStackProps,
+} from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 import { ChevronRight } from '@tamagui/lucide-icons'
 import { useMemo } from 'react'
@@ -22,12 +30,25 @@ import { type MerkleDropClaimParams, useSendMerkleDropsAreClaimed } from 'app/ut
 import { byteaToHex } from 'app/utils/byteaToHex'
 import { usePrefetch } from '@my/ui'
 import { useTranslation } from 'react-i18next'
+import type { NativeTouchEvent, NativeSyntheticEvent } from 'react-native'
 
 export const REWARDS_CARD_HREF = '/rewards'
 
-export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
-  const linkProps = useLink({ href: REWARDS_CARD_HREF })
+const BIGINT_ZERO = 0n
+const BIGINT_10 = 10n
+const BIGINT_16 = 16n
+const BIGINT_MINUS_ONE = -1n
+const RESULT_OF_BIGINT_POWER = BIGINT_10 ** BIGINT_16
 
+const RewardsCardWrapper = (props: YStackProps) => {
+  const linkProps = useLink({ href: REWARDS_CARD_HREF })
+  const onPress = useEvent((e: NativeSyntheticEvent<NativeTouchEvent>) => {
+    linkProps.onPress(e)
+  })
+  return <HomeBodyCard {...linkProps} onPress={onPress} {...props} />
+}
+
+export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
   usePrefetch(REWARDS_CARD_HREF)
 
   const { isPriceHidden, isPriceHiddenLoading } = useIsPriceHidden()
@@ -37,7 +58,6 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
     enabled: isPricesEnabled,
   } = useTokenPrices()
   const { data: distributions, isLoading: isDistributionLoading } = useDistributionShares()
-  const { t } = useTranslation('home')
 
   const [currentDistribution, pastDistributions] = useMemo(() => {
     if (!distributions) return [null, []]
@@ -54,7 +74,7 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
           return {
             chainId: distribution.chain_id as keyof typeof sendMerkleDropAddress,
             tranche: BigInt(distribution.tranche_id),
-            index: BigInt(share?.index ?? -1n),
+            index: BigInt(share?.index ?? BIGINT_MINUS_ONE),
             address: distribution.merkle_drop_addr
               ? byteaToHex(distribution.merkle_drop_addr as `\\x${string}`)
               : zeroAddress,
@@ -68,11 +88,11 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
     query: { data: dropsIsClaimedResults, isLoading: isDropsClaimedLoading },
   } = useSendMerkleDropsAreClaimed(merkleDrops)
 
-  const currentShares = BigInt(currentDistribution?.distribution_shares?.[0]?.amount ?? 0n)
+  const currentShares = BigInt(currentDistribution?.distribution_shares?.[0]?.amount ?? BIGINT_ZERO)
 
   // Calculate total unclaimed rewards from past distributions
   const unclaimedShares = useMemo(() => {
-    if (!distributions) return 0n
+    if (!distributions) return BIGINT_ZERO
 
     return pastDistributions.reduce((total, distribution, index) => {
       const share = distribution.distribution_shares[0]
@@ -83,13 +103,13 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
       const isSendV0 = tokenAddress === sendTokenV0Address[baseMainnetClient.chain.id]
       if (isClaimed !== undefined && !isClaimed && share?.amount) {
         if (isSendV0) {
-          const convertedAmount = BigInt(share.amount) * 10n ** 16n
+          const convertedAmount = BigInt(share.amount) * RESULT_OF_BIGINT_POWER
           return total + convertedAmount
         }
         return total + BigInt(share.amount)
       }
       return total
-    }, 0n)
+    }, BIGINT_ZERO)
   }, [distributions, dropsIsClaimedResults, pastDistributions])
 
   const sendPrice = prices?.[sendTokenAddress[baseMainnetClient.chain.id]] ?? 0
@@ -110,38 +130,43 @@ export const RewardsCard = ({ ...props }: Omit<CardProps, 'children'>) => {
     !isPricesEnabled
 
   return (
-    <HomeBodyCard {...linkProps} {...props}>
-      <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
-        <Paragraph
-          fontSize={'$5'}
-          fontWeight="400"
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          {t('cards.rewards.title')}
-        </Paragraph>
-        <XStack flex={1} />
-        <ChevronRight
-          size={'$1'}
-          color={'$lightGrayTextField'}
-          $theme-light={{ color: '$darkGrayTextField' }}
-        />
-      </Card.Header>
+    <RewardsCardWrapper {...props}>
+      <RewardsCardHeader />
       <Card.Footer padded pt={0} fd="column">
         <Paragraph color={'$color12'} fontWeight={600} size={'$9'} lineHeight={34}>
-          {(() => {
-            switch (true) {
-              case isLoading:
-                return <Shimmer w={80} h={34} br={5} />
-              case isPriceHidden:
-                return '******'
-              default:
-                return `$${totalRewardsValue}`
-            }
-          })()}
+          {isLoading ? (
+            <Shimmer w={80} h={34} br={5} />
+          ) : isPriceHidden ? (
+            '******'
+          ) : (
+            `$${totalRewardsValue}`
+          )}
         </Paragraph>
       </Card.Footer>
-    </HomeBodyCard>
+    </RewardsCardWrapper>
+  )
+}
+
+const RewardsCardHeader = () => {
+  const { t } = useTranslation('home')
+
+  return (
+    <Card.Header padded pb={0} fd="row" ai="center" jc="space-between">
+      <Paragraph
+        fontSize={'$5'}
+        fontWeight="400"
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
+      >
+        {t('cards.rewards.title')}
+      </Paragraph>
+      <XStack flex={1} />
+      <ChevronRight
+        size={'$1'}
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
+      />
+    </Card.Header>
   )
 }
 

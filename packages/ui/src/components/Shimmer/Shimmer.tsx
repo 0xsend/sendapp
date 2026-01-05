@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useState } from 'react'
+import { memo, useCallback, useDeferredValue, useEffect, useState } from 'react'
 import { StyleSheet, type ViewStyle, type LayoutChangeEvent } from 'react-native'
 import { styled, useWindowDimensions, View } from 'tamagui'
 import Animated, { Easing, useAnimatedStyle, type EasingFunction } from 'react-native-reanimated'
@@ -53,7 +53,7 @@ const ShimmerFrame = styled(View, {
   },
 })
 
-export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
+export const ShimmerImpl = ShimmerFrame.styleable<ShimmerProps>(
   ({
     linearGradients = LINEAR_GRADIENTS_WHITE,
     gradientStart = DEFAULT_GRADIENT_START,
@@ -149,3 +149,6 @@ export const Shimmer = ShimmerFrame.styleable<ShimmerProps>(
     )
   }
 )
+
+export const Shimmer = memo(ShimmerImpl)
+Shimmer.displayName = 'Shimmer'

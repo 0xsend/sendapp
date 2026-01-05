@@ -13,10 +13,11 @@ import {
 import { Check } from '@tamagui/lucide-icons'
 import { useDidUserSwap } from 'app/features/swap/hooks/useDidUserSwap'
 import { toNiceError } from 'app/utils/toNiceError'
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useState, useRef } from 'react'
 import { Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 const SwapRiskDialog = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false)
@@ -26,8 +27,15 @@ const SwapRiskDialog = () => {
   const router = useRouter()
   const id = useId()
   const { t } = useTranslation('trade')
+  const analytics = useAnalytics()
+  const hasTrackedView = useRef(false)
 
   const handleConfirm = () => {
+    // Track disclaimer accepted
+    analytics.capture({
+      name: 'swap_disclaimer_accepted',
+      properties: {},
+    })
     setIsOpen(false)
     setIsConfirmed(true)
   }
@@ -48,6 +56,14 @@ const SwapRiskDialog = () => {
     // 2. User hasn't swapped before (data === false) OR there's an error
     if (!isConfirmed && (didUserSwap.data === false || didUserSwap.error)) {
       setIsOpen(true)
+      // Track disclaimer viewed (only once per session)
+      if (!hasTrackedView.current) {
+        analytics.capture({
+          name: 'swap_disclaimer_viewed',
+          properties: {},
+        })
+        hasTrackedView.current = true
+      }
     }
     // Close dialog if user has swapped before (even if they confirmed in this session)
     if (didUserSwap.data === true) {
@@ -59,6 +75,7 @@ const SwapRiskDialog = () => {
     didUserSwap.isLoading,
     didUserSwap.isFetching,
     isConfirmed,
+    analytics,
   ])
 
   // Shared content component to avoid duplication

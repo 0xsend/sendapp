@@ -5,8 +5,10 @@ import {
   Card,
   type CardProps,
   LinkableButton,
-  Paragraph,
+  Paragraph as NotMemoizedParagraph,
+  type ParagraphProps,
   Shimmer,
+  useEvent,
   useMedia,
   View,
   withStaticProperties,
@@ -14,19 +16,27 @@ import {
 } from '@my/ui'
 import formatAmount from 'app/utils/formatAmount'
 
-import { ChevronRight } from '@tamagui/lucide-icons'
+import { ChevronRight as NotMemoizedChevronRight } from '@tamagui/lucide-icons'
 import { useIsPriceHidden } from 'app/features/home/utils/useIsPriceHidden'
 import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
-import { stableCoins, usdcCoin } from 'app/data/coins'
+import { useUSDCBalance } from 'app/utils/useUSDCBalance'
+import { stableCoins } from 'app/data/coins'
 import { useRootScreenParams } from 'app/routers/params'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { useThemeSetting } from 'app/provider/theme'
-import { Platform } from 'react-native'
+import { type NativeTouchEvent, type NativeSyntheticEvent, Platform } from 'react-native'
 import { useRouter } from 'solito/router'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import type { PropsWithChildren } from 'react'
+import { memo, useMemo, type PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
+
+const ChevronRight = memo(NotMemoizedChevronRight)
+ChevronRight.displayName = 'ChevronRight'
+
+const Paragraph = (props: ParagraphProps) => {
+  return <NotMemoizedParagraph {...props} />
+}
+Paragraph.displayName = 'WrappedParagraph'
 
 const StablesBalanceCardHomeScreenHeader = () => {
   const [queryParams] = useRootScreenParams()
@@ -38,6 +48,13 @@ const StablesBalanceCardHomeScreenHeader = () => {
   const isStablesScreen = queryParams.token === 'stables'
 
   const isChevronLeft = isStableCoin || isStablesScreen
+
+  const chevronRightProps = useMemo(() => {
+    return {
+      '$theme-light': { color: isChevronLeft ? '$color12' : '$darkGrayTextField' },
+      $lg: { display: isChevronLeft ? 'none' : 'flex' },
+    } as const
+  }, [isChevronLeft])
 
   return (
     <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
@@ -54,8 +71,7 @@ const StablesBalanceCardHomeScreenHeader = () => {
         <ChevronRight
           size="$1"
           color={isChevronLeft ? '$primary' : '$lightGrayTextField'}
-          $theme-light={{ color: isChevronLeft ? '$color12' : '$darkGrayTextField' }}
-          $lg={{ display: isChevronLeft ? 'none' : 'flex' }}
+          {...chevronRightProps}
         />
       </View>
     </Card.Header>
@@ -64,6 +80,7 @@ const StablesBalanceCardHomeScreenHeader = () => {
 
 const StablesBalanceCardStablesScreenHeader = () => {
   const { t } = useTranslation('home')
+
   return (
     <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
       <Paragraph
@@ -90,12 +107,20 @@ const StablesBalanceCardBalance = () => {
   const { isPriceHidden, isPriceHiddenLoading, toggleIsPriceHidden } = useIsPriceHidden()
 
   const { dollarBalances, isLoading } = useSendAccountBalances()
-  const dollarTotal = Object.entries(dollarBalances ?? {})
-    .filter(([address]) =>
-      stableCoins.some((coin) => coin.token.toLowerCase() === address.toLowerCase())
-    )
-    .reduce((total, [, balance]) => total + balance, 0)
-  const formattedBalance = formatAmount(dollarTotal, 9, 0)
+
+  const onPress = useEvent((e) => {
+    e.stopPropagation()
+    toggleIsPriceHidden()
+  })
+
+  const formattedBalance = useMemo(() => {
+    const total = Object.entries(dollarBalances ?? {})
+      .filter(([address]) =>
+        stableCoins.some((coin) => coin.token.toLowerCase() === address.toLowerCase())
+      )
+      .reduce((sum, [, balance]) => sum + balance, 0)
+    return formatAmount(total, 9, 0)
+  }, [dollarBalances])
 
   if (isPriceHidden && !isPriceHiddenLoading) {
     return (
@@ -105,10 +130,7 @@ const StablesBalanceCardBalance = () => {
         color="$aztec11"
         zIndex={1}
         fontSize={'$11'}
-        onPress={(e) => {
-          e.stopPropagation()
-          toggleIsPriceHidden()
-        }}
+        onPress={onPress}
       >
         ******
       </BigHeading>
@@ -116,45 +138,46 @@ const StablesBalanceCardBalance = () => {
   }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isLoading ? (
         <View w={80} h={64} o={1} zi={1}>
           <Shimmer br={5} />
         </View>
       ) : (
-        <BigHeading
-          animateOnly={['opacity']}
-          animation="fast"
-          enterStyle={{ opacity: 0.6 }}
-          $platform-web={{ width: 'fit-content' }}
-          color={'$color12'}
-          fontSize={'$11'}
-          fontWeight={600}
-          zIndex={1}
-          onPress={(e) => {
-            e.stopPropagation()
-            toggleIsPriceHidden()
-          }}
-          cursor="pointer"
-        >
-          ${formattedBalance}
-        </BigHeading>
+        <BalanceValue onPress={onPress} formattedBalance={formattedBalance} />
       )}
     </AnimatePresence>
+  )
+}
+
+type BalanceValueProps = {
+  onPress: (e: NativeSyntheticEvent<NativeTouchEvent>) => void
+  formattedBalance: string
+}
+
+const BalanceValue = ({ onPress, formattedBalance }: BalanceValueProps) => {
+  return (
+    <BigHeading
+      animateOnly={['opacity']}
+      animation="fast"
+      enterStyle={{ opacity: 0.6 }}
+      $platform-web={{ width: 'fit-content' }}
+      color={'$color12'}
+      fontSize={'$11'}
+      fontWeight={600}
+      zIndex={1}
+      onPress={onPress}
+      cursor="pointer"
+    >
+      ${formattedBalance}
+    </BigHeading>
   )
 }
 
 const StablesBalanceCardActions = () => {
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
-  const hoverStyles = useHoverStyles()
-  const [queryParams] = useRootScreenParams()
   const { t } = useTranslation('home')
-
-  const { dollarBalances } = useSendAccountBalances()
-
-  const usdcBalance = dollarBalances?.[usdcCoin.token] ?? 0
-  const shouldShowSendButton = usdcBalance >= 0.5
 
   return (
     <XStack gap="$2.5" w="100%">
@@ -167,7 +190,6 @@ const StablesBalanceCardActions = () => {
         w="100%"
         overflow={'hidden'}
         borderRadius="$4"
-        hoverStyle={hoverStyles}
         bc={isDarkTheme ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
       >
         <XStack gap="$1.5" ai="center">
@@ -178,29 +200,41 @@ const StablesBalanceCardActions = () => {
         </XStack>
         <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
       </LinkableButton>
-      {shouldShowSendButton && (
-        <LinkableButton
-          prefetch
-          href={`/send?sendToken=${queryParams.token ?? usdcAddress[baseMainnet.id]}`}
-          jc="center"
-          ai="center"
-          overflow={'hidden'}
-          f={1}
-          w="100%"
-          borderRadius="$4"
-          hoverStyle={hoverStyles}
-          bc={isDarkTheme ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
-        >
-          <XStack gap="$1.5" ai="center">
-            <LinkableButton.Icon>
-              <IconArrowUp size={'$1'} color={isDarkTheme ? '$primary' : '$color12'} />
-            </LinkableButton.Icon>
-            <LinkableButton.Text size={'$5'}>{t('actions.send')}</LinkableButton.Text>
-          </XStack>
-          <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
-        </LinkableButton>
-      )}
+      <SendButton />
     </XStack>
+  )
+}
+
+const SendButton = () => {
+  const { resolvedTheme } = useThemeSetting()
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
+  const [queryParams] = useRootScreenParams()
+  const { balance: usdcBalance } = useUSDCBalance()
+  const { t } = useTranslation('home')
+
+  const shouldShowSendButton = usdcBalance >= 0.5
+  return (
+    shouldShowSendButton && (
+      <LinkableButton
+        prefetch
+        href={`/send?sendToken=${queryParams.token ?? usdcAddress[baseMainnet.id]}`}
+        jc="center"
+        ai="center"
+        overflow={'hidden'}
+        f={1}
+        w="100%"
+        borderRadius="$4"
+        bc={isDarkTheme ? 'rgba(255, 255, 255, 0.10)' : 'rgba(0, 0, 0, 0.10)'}
+      >
+        <XStack gap="$1.5" ai="center">
+          <LinkableButton.Icon>
+            <IconArrowUp size={'$1'} color={isDarkTheme ? '$primary' : '$color12'} />
+          </LinkableButton.Icon>
+          <LinkableButton.Text size={'$5'}>{t('actions.send')}</LinkableButton.Text>
+        </XStack>
+        <BlurStack fullscreen intensity={10} zIndex={-1} br={'$3'} />
+      </LinkableButton>
+    )
   )
 }
 
@@ -209,7 +243,7 @@ export const StablesBalanceCardContent = (props: CardProps) => {
   const router = useRouter()
   const { gtMd } = useMedia()
 
-  const toggleSubScreen = () => {
+  const toggleSubScreen = useEvent(() => {
     if (Platform.OS === 'web') {
       setParams(
         {
@@ -222,12 +256,15 @@ export const StablesBalanceCardContent = (props: CardProps) => {
     }
 
     router.push('/stables')
-  }
+  })
 
+  return <StablesBalanceCardInner onPress={toggleSubScreen} {...props} />
+}
+
+const StablesBalanceCardInnerImpl = (props: CardProps) => {
   return (
     <Card
       w="100%"
-      onPress={toggleSubScreen}
       size={'$5'}
       br="$7"
       p={'$1.5'}
@@ -238,6 +275,10 @@ export const StablesBalanceCardContent = (props: CardProps) => {
     </Card>
   )
 }
+
+const StablesBalanceCardInner = memo(StablesBalanceCardInnerImpl)
+
+StablesBalanceCardInner.displayName = 'StablesBalanceCardInner'
 
 export const StablesBalanceCard = withStaticProperties(StablesBalanceCardContent, {
   HomeScreenHeader: StablesBalanceCardHomeScreenHeader,
