@@ -30,5 +30,6 @@
     "../wagmi/src",
     "../../globals.d.ts",
     "../../environment.d.ts"
-  ]
+  ],
+  "exclude": ["../app/**/*.test.ts"]
 }

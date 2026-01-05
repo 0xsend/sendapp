@@ -9,6 +9,7 @@
     "../workflows/src",
     "../temporal/src"
   ],
+  "exclude": ["../app/**/*.test.ts"],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,

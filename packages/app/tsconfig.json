@@ -28,7 +28,7 @@
     "../temporal/src",
     "../workflows/src"
   ],
-  "exclude": ["coverage"],
+  "exclude": ["coverage", "**/*.test.ts"],
   "compilerOptions": {
     "noEmit": true,
     "composite": true,

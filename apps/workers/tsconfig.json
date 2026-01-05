@@ -38,5 +38,6 @@
     "../../globals.d.ts",
     "../../environment.d.ts",
     "../../packages/ui/src"
-  ]
+  ],
+  "exclude": ["../../packages/app/**/*.test.ts"]
 }
