@@ -28,11 +28,11 @@ export class SendPage {
     // The clickable wrapper that triggers enterAmount section
     this.enterAmountTrigger = page.getByTestId('SendChatEnterAmountTrigger')
     // Review button transitions to reviewAndSend section
-    this.reviewButton = page.getByRole('button', { name: 'Review and Send' })
+    this.reviewButton = page.getByTestId('SendChatReviewButton')
     // Alias for backward compatibility with tests using continueButton
     this.continueButton = this.reviewButton
     // Final send button in reviewAndSend section
-    this.sendButton = page.getByRole('button', { name: 'Send', exact: true })
+    this.sendButton = page.getByTestId('SendChatSendButton')
     this.tokenSelect = page.getByTestId('SelectCoinTrigger')
   }
 

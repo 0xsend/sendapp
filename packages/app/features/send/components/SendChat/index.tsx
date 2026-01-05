@@ -533,6 +533,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const themeName = useThemeName()
 
   const { recipient, idType } = sendParams
+
   const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
 
   const { isLoading: isLoadingCoins } = useCoins()
@@ -1118,6 +1119,8 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           </View>
         </YStack>
         <Button
+          testID={activeSection === 'reviewAndSend' ? 'SendChatSendButton' : 'SendChatReviewButton'}
+          aria-label={activeSection === 'reviewAndSend' ? 'Send' : 'Review and Send'}
           bg="$neon7"
           br="$4"
           animation="responsive"

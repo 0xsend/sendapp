@@ -240,9 +240,9 @@ async function handleTokenTransfer({
   await sendPage.waitForSendingCompletion()
   await sendPage.expectNoSendError()
 
+  // After send, the dialog returns to 'chat' section (no URL navigation)
+  // Verify the transfer was indexed in the database
   await expect(async () => {
-    await page.waitForURL(`/profile/${profile?.send_id}/history`, { timeout: 10_000 })
-
     if (isETH) {
       // just ensure balance is updated, since the send_account_receives event is not emitted
       expect(
@@ -251,7 +251,7 @@ async function handleTokenTransfer({
         })
       ).toBe(transferAmount)
     } else {
-      // 1. Check if the indexed event exists in the database
+      // Check if the indexed event exists in the database
       await expect(supabase).toHaveEventInActivityFeed({
         event_name: 'send_account_transfers',
         ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
@@ -262,8 +262,8 @@ async function handleTokenTransfer({
       })
     }
   }).toPass({
-    // Increased timeout to allow for indexing and UI update
-    timeout: 15000,
+    // Increased timeout to allow for indexing
+    timeout: 30_000,
   })
 
   if (isETH) return // nothing else to check with eth because it won't show up in activity
