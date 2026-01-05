@@ -7,6 +7,13 @@ import { EarnDepositPage } from './EarnDepositPage'
 import { EarnWithdrawPage } from './EarnWithdrawPage'
 
 /**
+ * Timeout for waiting on Shovel indexer to process blockchain events.
+ * Blockchain events need to be mined and then indexed by Shovel before
+ * they appear in the database and UI.
+ */
+export const SHOVEL_INDEX_TIMEOUT_MS = 15_000
+
+/**
  * Helper function to navigate directly to the main /earn page.
  * @param page Playwright Page object
  */
