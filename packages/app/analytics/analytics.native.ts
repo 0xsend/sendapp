@@ -1,6 +1,7 @@
 import type { PostHogEventProperties } from '@posthog/core'
 import debug from 'debug'
 import PostHog from 'posthog-react-native'
+import { sanitizeProperties } from './sanitizeUrl'
 import type {
   AnalyticsEvent,
   AnalyticsService,
@@ -60,11 +61,11 @@ export const analytics: AnalyticsService = {
   },
 
   capture<E extends AnalyticsEvent>(event: E) {
-    client?.capture(event.name, event.properties as PostHogEventProperties)
+    client?.capture(event.name, sanitizeProperties(event.properties) as PostHogEventProperties)
   },
 
   screen(name: string, properties?: Record<string, unknown>) {
-    client?.screen(name, properties as PostHogEventProperties)
+    client?.screen(name, sanitizeProperties(properties) as PostHogEventProperties)
   },
 
   reset() {
@@ -87,10 +88,13 @@ export const analytics: AnalyticsService = {
       return
     }
 
-    client.captureException(error, {
-      ...(properties?.source && { source: properties.source }),
-      handled: properties?.handled ?? true,
-      ...properties?.context,
-    })
+    client.captureException(
+      error,
+      sanitizeProperties({
+        ...(properties?.source && { source: properties.source }),
+        handled: properties?.handled ?? true,
+        ...properties?.context,
+      })
+    )
   },
 }
