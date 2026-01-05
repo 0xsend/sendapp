@@ -7,7 +7,10 @@ resources:
   - ../../base
   - externalsecret.yaml
   - ghcr-externalsecret.yaml
-  # No ingress - shovel dashboard not publicly exposed
+  # OAuth2 proxy for authenticated access to shovel dashboard
+  - oauth2-proxy.yaml
+  - oauth2-proxy-externalsecret.yaml
+  - ingress.yaml
 
 patches:
   - path: configmap-patch.yaml
