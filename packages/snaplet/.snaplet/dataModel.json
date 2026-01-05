@@ -1101,6 +1101,553 @@
         }
       ]
     },
+    "contact_label_assignments": {
+      "id": "public.contact_label_assignments",
+      "schemaName": "public",
+      "tableName": "contact_label_assignments",
+      "fields": [
+        {
+          "id": "public.contact_label_assignments.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"contact_label_assignments_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_label_assignments.contact_id",
+          "name": "contact_id",
+          "columnName": "contact_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_label_assignments.label_id",
+          "name": "label_id",
+          "columnName": "label_id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_label_assignments.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "contact_labels",
+          "type": "contact_labels",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "contact_label_assignmentsTocontact_labels",
+          "relationFromFields": [
+            "label_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "contacts",
+          "type": "contacts",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "contact_label_assignmentsTocontacts",
+          "relationFromFields": [
+            "contact_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "contact_label_assignments_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "contact_label_assignments_unique",
+          "fields": [
+            "contact_id",
+            "label_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "contact_labels": {
+      "id": "public.contact_labels",
+      "schemaName": "public",
+      "tableName": "contact_labels",
+      "fields": [
+        {
+          "id": "public.contact_labels.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"contact_labels_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_labels.owner_id",
+          "name": "owner_id",
+          "columnName": "owner_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_labels.name",
+          "name": "name",
+          "columnName": "name",
+          "type": "citext",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_labels.color",
+          "name": "color",
+          "columnName": "color",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_labels.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contact_labels.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "users",
+          "type": "users",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "contact_labelsTousers",
+          "relationFromFields": [
+            "owner_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "contact_label_assignments",
+          "type": "contact_label_assignments",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "contact_label_assignmentsTocontact_labels",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "contact_labels_owner_name_unique",
+          "fields": [
+            "name",
+            "owner_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "contact_labels_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "contacts": {
+      "id": "public.contacts",
+      "schemaName": "public",
+      "tableName": "contacts",
+      "fields": [
+        {
+          "id": "public.contacts.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "int8",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": {
+            "identifier": "\"public\".\"contacts_id_seq\"",
+            "increment": 1,
+            "start": 1
+          },
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.owner_id",
+          "name": "owner_id",
+          "columnName": "owner_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.contact_user_id",
+          "name": "contact_user_id",
+          "columnName": "contact_user_id",
+          "type": "uuid",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.external_address",
+          "name": "external_address",
+          "columnName": "external_address",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.chain_id",
+          "name": "chain_id",
+          "columnName": "chain_id",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.custom_name",
+          "name": "custom_name",
+          "columnName": "custom_name",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.notes",
+          "name": "notes",
+          "columnName": "notes",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.is_favorite",
+          "name": "is_favorite",
+          "columnName": "is_favorite",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.source",
+          "name": "source",
+          "columnName": "source",
+          "type": "contact_source_enum",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.last_interacted_at",
+          "name": "last_interacted_at",
+          "columnName": "last_interacted_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.archived_at",
+          "name": "archived_at",
+          "columnName": "archived_at",
+          "type": "timestamptz",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.contacts.normalized_external_address",
+          "name": "normalized_external_address",
+          "columnName": "normalized_external_address",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": true,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "users_contacts_contact_user_idTousers",
+          "type": "users",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "contacts_contact_user_idTousers",
+          "relationFromFields": [
+            "contact_user_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "users_contacts_owner_idTousers",
+          "type": "users",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "contacts_owner_idTousers",
+          "relationFromFields": [
+            "owner_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "contact_label_assignments",
+          "type": "contact_label_assignments",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "contact_label_assignmentsTocontacts",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "contacts_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "contacts_owner_external_unique_idx",
+          "fields": [
+            "chain_id",
+            "normalized_external_address",
+            "owner_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "contacts_owner_user_unique_idx",
+          "fields": [
+            "contact_user_id",
+            "owner_id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
     "distribution_shares": {
       "id": "public.distribution_shares",
       "schemaName": "public",
@@ -5593,6 +6140,20 @@
           "isGenerated": false,
           "sequence": false,
           "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.profiles.sync_referrals_to_contacts",
+          "name": "sync_referrals_to_contacts",
+          "columnName": "sync_referrals_to_contacts",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
           "isId": false,
           "maxLength": null
         },
@@ -14613,6 +15174,48 @@
           "hasDefaultValue": false
         },
         {
+          "name": "contact_labels",
+          "type": "contact_labels",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "contact_labelsTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "contacts_contacts_contact_user_idTousers",
+          "type": "contacts",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "contacts_contact_user_idTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "contacts_contacts_owner_idTousers",
+          "type": "contacts",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "contacts_owner_idTousers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "distribution_shares",
           "type": "distribution_shares",
           "isRequired": false,
@@ -15166,6 +15769,23 @@
         },
         {
           "name": "passcheck"
+        }
+      ]
+    },
+    "contact_source_enum": {
+      "schemaName": "public",
+      "values": [
+        {
+          "name": "activity"
+        },
+        {
+          "name": "external"
+        },
+        {
+          "name": "manual"
+        },
+        {
+          "name": "referral"
         }
       ]
     },

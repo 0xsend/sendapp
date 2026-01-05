@@ -445,3 +445,32 @@ const useDepositScreenParamsBase = () => {
 }
 
 export const useDepositScreenParams = withRootParams(useDepositScreenParamsBase)
+
+// Contacts Screen Params
+export type ContactsScreenParams = {
+  /** Label ID to filter contacts by */
+  label?: string
+}
+
+const { useParam: useContactsParam, useParams: useContactsParams } =
+  createParam<ContactsScreenParams>()
+
+const useLabelFilter = () => {
+  const [label, setLabel] = useContactsParam('label')
+
+  return [label, setLabel] as const
+}
+
+const useContactsScreenParamsBase = () => {
+  const { setParams } = useContactsParams()
+  const [label] = useLabelFilter()
+
+  return [
+    {
+      label,
+    },
+    setParams,
+  ] as const
+}
+
+export const useContactsScreenParams = withRootParams(useContactsScreenParamsBase)

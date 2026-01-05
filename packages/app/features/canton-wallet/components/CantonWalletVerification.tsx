@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Anchor,
   Button,
@@ -49,6 +49,7 @@ import { usdcCoin } from 'app/data/coins'
 import formatAmount from 'app/utils/formatAmount'
 import type { Tables } from '@my/supabase/database.types'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
+import { useAnalytics } from 'app/provider/analytics'
 
 // Configuration for Canton Wallet verification requirements
 // Enable/disable requirements and set minimum amounts here
@@ -640,6 +641,7 @@ function CantonWalletFormCard() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const hoverStyles = useHoverStyles()
   const { t } = useTranslation('cantonWallet')
+  const analytics = useAnalytics()
 
   const form = useForm<CantonWalletFormData>({
     defaultValues: { address: '' },
@@ -709,10 +711,27 @@ function CantonWalletFormCard() {
       toast.show(t('toasts.verifySuccess'))
       form.reset()
       void queryClient.invalidateQueries({ queryKey: ['profile'] })
+
+      // Track canton verification completed
+      analytics.capture({
+        name: 'canton_verification_completed',
+        properties: {
+          verification_type: 'canton_wallet',
+        },
+      })
     },
     onError: (error) => {
       console.error('Verification failed:', error)
       toast.error(t('toasts.verifyError'))
+
+      // Track canton verification failed
+      analytics.capture({
+        name: 'canton_verification_failed',
+        properties: {
+          verification_type: 'canton_wallet',
+          error_type: 'unknown',
+        },
+      })
     },
   })
 

@@ -4,6 +4,7 @@
     "secretShop": "秘密商店"
   },
   "stack": {
+    "contacts": "联系人",
     "account": {
       "language": "语言",
       "linkInBio": "个人主页链接",
@@ -72,6 +73,9 @@
     },
     "savings": {
       "root": "储蓄"
+    },
+    "secretShop": {
+      "root": "秘密商店"
     }
   },
   "tabs": {

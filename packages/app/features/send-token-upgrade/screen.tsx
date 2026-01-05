@@ -18,6 +18,7 @@ import {
   sendBaseMainnetBundlerClient,
   baseMainnetClient,
   entryPointAddress,
+  sendTokenAddress,
   sendTokenV0Address,
   sendTokenV0LockboxAbi,
   sendTokenV0LockboxAddress,
@@ -38,6 +39,7 @@ import { useSendAccountBalances } from 'app/utils/useSendAccountBalances'
 import { useMemo, useState } from 'react'
 import { encodeFunctionData, erc20Abi, withRetry } from 'viem'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 interface TokenBalanceRowProps {
   label: string
@@ -175,6 +177,7 @@ function UpgradeTokenButton() {
   const { tokensQuery } = useSendAccountBalances()
   const [userOpStateKey, setUserOpStateKey] = useState<string | null>(null)
   const { t } = useTranslation('sendTokenUpgrade')
+  const analytics = useAnalytics()
 
   const calls = useMemo(
     () => [
@@ -201,7 +204,18 @@ function UpgradeTokenButton() {
   )
 
   const paymasterSign = api.sendAccount.paymasterSign.useMutation({
-    onMutate: () => setUserOpStateKey('requesting'),
+    onMutate: () => {
+      setUserOpStateKey('requesting')
+      // Track token upgrade started
+      analytics.capture({
+        name: 'token_upgrade_started',
+        properties: {
+          from_token_address: sendTokenV0Address[chainId],
+          to_token_address: sendTokenAddress[chainId],
+          amount: sendTokenV0Bal.data?.toString(),
+        },
+      })
+    },
     onSuccess: async (data) => {
       assert(uop.isSuccess, 'uop is not success')
 
@@ -238,7 +252,37 @@ function UpgradeTokenButton() {
 
       assert(receipt.success, 'receipt status is not success')
 
+      // Track token upgrade completed
+      analytics.capture({
+        name: 'token_upgrade_completed',
+        properties: {
+          from_token_address: sendTokenV0Address[chainId],
+          to_token_address: sendTokenAddress[chainId],
+          amount: sendTokenV0Bal.data?.toString(),
+          tx: {
+            chain_id: chainId,
+            tx_hash: receipt.receipt.transactionHash,
+            userop_hash: userOpHash,
+            gas_sponsored: true,
+            gas_payer: 'paymaster',
+            paymaster_flow: 'send',
+          },
+        },
+      })
+
       toast.show(t('toast.success'))
+    },
+    onError: (error) => {
+      // Track token upgrade failed
+      analytics.capture({
+        name: 'token_upgrade_failed',
+        properties: {
+          from_token_address: sendTokenV0Address[chainId],
+          to_token_address: sendTokenAddress[chainId],
+          amount: sendTokenV0Bal.data?.toString(),
+          error_type: 'unknown',
+        },
+      })
     },
     onSettled() {
       queryClient.invalidateQueries({ queryKey: tokensQuery.queryKey })

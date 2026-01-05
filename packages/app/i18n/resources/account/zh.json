@@ -33,6 +33,8 @@
   },
   "links": {
     "items": {
+      "contacts": "联系人",
+      "checks": "Checks",
       "deleteAccount": "删除账户",
       "language": "语言",
       "learnMore": "了解更多关于 Send 的信息",
@@ -43,6 +45,7 @@
       "profile": "个人资料",
       "referrals": "推荐",
       "rewards": "奖励",
+      "secretShop": "秘密商店",
       "sendtags": "Sendtags"
     },
     "sections": {

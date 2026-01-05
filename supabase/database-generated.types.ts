@@ -137,6 +137,120 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_label_assignments: {
+        Row: {
+          contact_id: number
+          created_at: string
+          id: number
+          label_id: number
+        }
+        Insert: {
+          contact_id: number
+          created_at?: string
+          id?: number
+          label_id: number
+        }
+        Update: {
+          contact_id?: number
+          created_at?: string
+          id?: number
+          label_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_label_assignments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_label_assignments_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "contact_labels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_labels: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: number
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: number
+          name: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: number
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          archived_at: string | null
+          chain_id: string | null
+          contact_user_id: string | null
+          created_at: string
+          custom_name: string | null
+          external_address: string | null
+          id: number
+          is_favorite: boolean
+          last_interacted_at: string | null
+          normalized_external_address: string | null
+          notes: string | null
+          owner_id: string
+          source: Database["public"]["Enums"]["contact_source_enum"]
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          chain_id?: string | null
+          contact_user_id?: string | null
+          created_at?: string
+          custom_name?: string | null
+          external_address?: string | null
+          id?: number
+          is_favorite?: boolean
+          last_interacted_at?: string | null
+          normalized_external_address?: string | null
+          notes?: string | null
+          owner_id?: string
+          source?: Database["public"]["Enums"]["contact_source_enum"]
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          chain_id?: string | null
+          contact_user_id?: string | null
+          created_at?: string
+          custom_name?: string | null
+          external_address?: string | null
+          id?: number
+          is_favorite?: boolean
+          last_interacted_at?: string | null
+          normalized_external_address?: string | null
+          notes?: string | null
+          owner_id?: string
+          source?: Database["public"]["Enums"]["contact_source_enum"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       distribution_shares: {
         Row: {
           address: string
@@ -440,6 +554,7 @@ export type Database = {
           name: string | null
           referral_code: string | null
           send_id: number
+          sync_referrals_to_contacts: boolean
           verified_at: string | null
           x_username: string | null
           canton_party_verifications: {
@@ -499,6 +614,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          sync_referrals_to_contacts?: boolean
           verified_at?: string | null
           x_username?: string | null
         }
@@ -512,6 +628,7 @@ export type Database = {
           name?: string | null
           referral_code?: string | null
           send_id?: number
+          sync_referrals_to_contacts?: boolean
           verified_at?: string | null
           x_username?: string | null
         }
@@ -2022,6 +2139,38 @@ export type Database = {
       }
     }
     Functions: {
+      add_contact: {
+        Args: {
+          p_contact_user_id: string
+          p_custom_name?: string
+          p_is_favorite?: boolean
+          p_notes?: string
+          p_owner_id: string
+          p_source?: Database["public"]["Enums"]["contact_source_enum"]
+        }
+        Returns: number
+      }
+      add_contact_by_lookup: {
+        Args: {
+          p_custom_name?: string
+          p_identifier: string
+          p_is_favorite?: boolean
+          p_label_ids?: number[]
+          p_lookup_type: Database["public"]["Enums"]["lookup_type_enum"]
+          p_notes?: string
+        }
+        Returns: number
+      }
+      add_external_contact: {
+        Args: {
+          p_chain_id: string
+          p_custom_name?: string
+          p_external_address: string
+          p_is_favorite?: boolean
+          p_notes?: string
+        }
+        Returns: number
+      }
       calculate_and_insert_send_ceiling_verification: {
         Args: { distribution_number: number }
         Returns: undefined
@@ -2079,6 +2228,45 @@ export type Database = {
           tag_names: string[]
         }
         Returns: undefined
+      }
+      contact_by_send_id: {
+        Args: { p_send_id: number }
+        Returns: Database["public"]["CompositeTypes"]["contact_search_result"]
+        SetofOptions: {
+          from: "*"
+          to: "contact_search_result"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      contact_favorites: {
+        Args: { p_page_number?: number; p_page_size?: number }
+        Returns: Database["public"]["CompositeTypes"]["activity_feed_user"][]
+        SetofOptions: {
+          from: "*"
+          to: "activity_feed_user"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      contact_search: {
+        Args: {
+          p_favorites_only?: boolean
+          p_include_archived?: boolean
+          p_label_ids?: number[]
+          p_limit_val?: number
+          p_offset_val?: number
+          p_query?: string
+          p_sort_by_recency_only?: boolean
+          p_source_filter?: Database["public"]["Enums"]["contact_source_enum"][]
+        }
+        Returns: Database["public"]["CompositeTypes"]["contact_search_result"][]
+        SetofOptions: {
+          from: "*"
+          to: "contact_search_result"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       create_send_account: {
         Args: {
@@ -2489,6 +2677,8 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      sync_contacts_from_activity: { Args: never; Returns: number }
+      sync_contacts_from_referrals: { Args: never; Returns: number }
       tag_search: {
         Args: { limit_val: number; offset_val: number; query: string }
         Returns: {
@@ -2523,6 +2713,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      toggle_contact_favorite: {
+        Args: { p_contact_id: number }
+        Returns: boolean
       }
       top_senders: {
         Args: { page_number?: number; page_size?: number }
@@ -2578,6 +2772,7 @@ export type Database = {
       }
     }
     Enums: {
+      contact_source_enum: "activity" | "manual" | "external" | "referral"
       key_type_enum: "ES256"
       link_in_bio_domain_names:
         | "X"
@@ -2639,6 +2834,28 @@ export type Database = {
         main_tag_name: string | null
         tags: string[] | null
         canton_wallet_address: string | null
+      }
+      contact_search_result: {
+        contact_id: number | null
+        owner_id: string | null
+        custom_name: string | null
+        notes: string | null
+        is_favorite: boolean | null
+        source: Database["public"]["Enums"]["contact_source_enum"] | null
+        last_interacted_at: string | null
+        created_at: string | null
+        updated_at: string | null
+        archived_at: string | null
+        external_address: string | null
+        chain_id: string | null
+        profile_name: string | null
+        avatar_url: string | null
+        send_id: number | null
+        main_tag_id: number | null
+        main_tag_name: string | null
+        tags: string[] | null
+        is_verified: boolean | null
+        label_ids: number[] | null
       }
       profile_lookup_result: {
         id: string | null
@@ -2896,6 +3113,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      contact_source_enum: ["activity", "manual", "external", "referral"],
       key_type_enum: ["ES256"],
       link_in_bio_domain_names: [
         "X",

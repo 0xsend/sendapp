@@ -1,10 +1,12 @@
 import { AccountNavLink } from './AccountNavLink'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { Button, type ColorTokens, Paragraph, type SizeTokens, YGroup, YStack } from '@my/ui'
+import { baseMainnet } from '@my/wagmi/chains'
 import {
   IconAccount,
   IconDollar,
   IconFingerprint,
+  IconGroup,
   IconIdCard,
   IconInfoCircle,
   IconLogout,
@@ -15,6 +17,7 @@ import {
   IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
+import { FileSignature, Lock } from '@tamagui/lucide-icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo, useState } from 'react'
@@ -22,6 +25,7 @@ import { useTranslation } from 'react-i18next'
 import { Platform } from 'react-native'
 import * as Application from 'expo-application'
 import { AccountDeletionFlow } from './AccountDeletionFlow'
+import { useAnalytics } from 'app/provider/analytics'
 
 const iconProps = {
   size: '$1.5' as SizeTokens,
@@ -48,10 +52,18 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
   const { openChat } = useIntercom()
   const { t } = useTranslation('account')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const analytics = useAnalytics()
 
   const handleSignOut = useCallback(() => {
+    // Track logout event before signing out
+    analytics.capture({
+      name: 'user_logged_out',
+      properties: {},
+    })
     void supabase.auth.signOut()
-  }, [supabase.auth])
+  }, [supabase.auth, analytics])
+
+  const showSecretShop = __DEV__ || baseMainnet.id === 84532
 
   const icons = useMemo(
     () => ({
@@ -60,12 +72,15 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       xLogo: <IconXLogo {...iconProps} />,
       fingerprint: <IconFingerprint {...iconProps} />,
       slash: <IconSlash {...iconProps} />,
+      group: <IconGroup {...iconProps} />,
+      fileSignature: <FileSignature {...iconProps} />,
       starOutline: <IconStarOutline {...iconProps} />,
       worldSearch: <IconWorldSearch {...iconProps} />,
       dollar: <IconDollar {...iconProps} scale={1.2} />,
       trash: <IconTrash {...iconProps} />,
       infoCircle: <IconInfoCircle {...iconProps} />,
       questionCircle: <IconQuestionCircle {...iconProps} />,
+      lock: <Lock {...iconProps} />,
     }),
     []
   )
@@ -116,6 +131,16 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
             />
           </YGroup.Item>
           <YGroup.Item>
+            <AccountNavLink text={t('links.items.contacts')} href="/contacts" icon={icons.group} />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.checks')}
+              href="/check"
+              icon={icons.fileSignature}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
             <AccountNavLink
               text={t('links.items.referrals')}
               href="/account/affiliate"
@@ -129,6 +154,15 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               icon={icons.starOutline}
             />
           </YGroup.Item>
+          {showSecretShop && (
+            <YGroup.Item>
+              <AccountNavLink
+                text={t('links.items.secretShop')}
+                href="/secret-shop"
+                icon={icons.lock}
+              />
+            </YGroup.Item>
+          )}
         </YGroup>
       </YStack>
       <YStack gap={'$3.5'}>

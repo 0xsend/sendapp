@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "remove-xcode-env-local-file": "rm ios/.xcode.env.local",
-    "lint": "eslint ./app",
-    "lint:fix": "eslint ./app --fix",
+    "lint": "eslint ./app --cache --cache-location .cache/eslint",
+    "lint:fix": "eslint ./app --fix --cache --cache-location .cache/eslint",
     "start": "yarn prebuild && yarn expo start --dev-client",
     "prebuild": "expo prebuild --skip-dependency-update react-native,react",
     "android": "expo run:android",
@@ -65,6 +65,7 @@
     "expo-updates": "~29.0.15",
     "expo-web-browser": "~15.0.8",
     "intl-pluralrules": "^2.0.1",
+    "posthog-react-native": "^4.14.0",
     "react": "19.1.2",
     "react-dom": "19.1.2",
     "react-native": "0.81.5",
