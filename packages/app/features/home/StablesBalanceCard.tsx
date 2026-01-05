@@ -62,7 +62,7 @@ const StablesBalanceCardHomeScreenHeader = () => {
         fontSize={'$5'}
         fontWeight={300}
         color={'$lightGrayTextField'}
-        // $theme-light={{ color: '$darkGrayTextField' }}
+        $theme-light={{ color: '$darkGrayTextField' }}
       >
         {t('cards.stables.title')}
       </Paragraph>
@@ -80,14 +80,15 @@ const StablesBalanceCardHomeScreenHeader = () => {
 
 const StablesBalanceCardStablesScreenHeader = () => {
   const { t } = useTranslation('home')
-  const paragraphProps = useMemo(() => {
-    return {
-      '$theme-light': { color: '$darkGrayTextField' },
-    } as const
-  }, [])
+
   return (
     <Card.Header padded size="$4" pb={0} jc="space-between" fd="row">
-      <Paragraph fontSize={'$5'} fontWeight={300} color={'$lightGrayTextField'} {...paragraphProps}>
+      <Paragraph
+        fontSize={'$5'}
+        fontWeight={300}
+        color={'$lightGrayTextField'}
+        $theme-light={{ color: '$darkGrayTextField' }}
+      >
         {t('cards.stables.totalTitle')}
       </Paragraph>
     </Card.Header>
