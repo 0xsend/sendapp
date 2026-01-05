@@ -401,27 +401,10 @@ export const SwapFormScreen = () => {
           props={{
             inAmount: {
               testID: 'inAmountInput',
-              fontSize: (() => {
-                switch (true) {
-                  case formInAmount?.length > 16:
-                    return '$7'
-                  case formInAmount?.length > 8:
-                    return '$8'
-                  default:
-                    return '$9'
-                }
-              })(),
+              fontSize: formInAmount?.length > 16 ? '$7' : formInAmount?.length > 8 ? '$8' : '$9',
               $gtSm: {
-                fontSize: (() => {
-                  switch (true) {
-                    case formInAmount?.length <= 9:
-                      return '$10'
-                    case formInAmount?.length > 16:
-                      return '$8'
-                    default:
-                      return '$10'
-                  }
-                })(),
+                fontSize:
+                  formInAmount?.length <= 9 ? '$10' : formInAmount?.length > 16 ? '$8' : '$10',
               },
               color: '$color12',
               fontWeight: '500',
@@ -449,27 +432,10 @@ export const SwapFormScreen = () => {
             },
             outAmount: {
               testID: 'outAmountInput',
-              fontSize: (() => {
-                switch (true) {
-                  case formOutAmount?.length > 16:
-                    return '$7'
-                  case formOutAmount?.length > 8:
-                    return '$8'
-                  default:
-                    return '$9'
-                }
-              })(),
+              fontSize: formOutAmount?.length > 16 ? '$7' : formOutAmount?.length > 8 ? '$8' : '$9',
               $gtSm: {
-                fontSize: (() => {
-                  switch (true) {
-                    case formOutAmount?.length <= 9:
-                      return '$10'
-                    case formOutAmount?.length > 16:
-                      return '$8'
-                    default:
-                      return '$10'
-                  }
-                })(),
+                fontSize:
+                  formOutAmount?.length <= 9 ? '$10' : formOutAmount?.length > 16 ? '$8' : '$10',
               },
               color: '$color12',
               fontWeight: '500',
@@ -575,74 +541,56 @@ export const SwapFormScreen = () => {
                         />
                       </XStack>
                       <XStack ai={'center'} jc={'space-between'}>
-                        {(() => {
-                          switch (true) {
-                            case isLoadingCoins:
-                              return <Spinner color="$color11" />
-                            case !inCoin || !parsedInAmount:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  $0
-                                </Paragraph>
-                              )
-                            case inCoin?.symbol === 'USDC':
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  ${formInAmount}
-                                </Paragraph>
-                              )
-                            default:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  {inAmountUsd ? `$${inAmountUsd}` : '$0'}
-                                </Paragraph>
-                              )
-                          }
-                        })()}
+                        {isLoadingCoins ? (
+                          <Spinner color="$color11" />
+                        ) : !inCoin || !parsedInAmount ? (
+                          <Paragraph
+                            size={'$5'}
+                            color={'$lightGrayTextField'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            $0
+                          </Paragraph>
+                        ) : inCoin?.symbol === 'USDC' ? (
+                          <Paragraph
+                            size={'$5'}
+                            color={'$lightGrayTextField'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            ${formInAmount}
+                          </Paragraph>
+                        ) : (
+                          <Paragraph
+                            size={'$5'}
+                            color={'$lightGrayTextField'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            {inAmountUsd ? `$${inAmountUsd}` : '$0'}
+                          </Paragraph>
+                        )}
                         <XStack gap={'$3.5'} ai={'center'}>
-                          {(() => {
-                            switch (true) {
-                              case isLoadingCoins:
-                                return <Spinner color="$color11" />
-                              case !isLoadingCoins && !inCoin:
-                                return (
-                                  <Paragraph color="$error">{t('form.errors.balance')}</Paragraph>
-                                )
-                              case !inCoin?.balance:
-                                return (
-                                  <Paragraph size={'$5'} fontWeight={'500'}>
-                                    -
-                                  </Paragraph>
-                                )
-                              default:
-                                return (
-                                  <Paragraph
-                                    size={'$5'}
-                                    fontWeight={'400'}
-                                    color={insufficientAmount ? '$error' : '$color12'}
-                                  >
-                                    {formatAmount(
-                                      formatUnits(inCoin?.balance, inCoin?.decimals),
-                                      12,
-                                      inCoin?.formatDecimals
-                                    )}{' '}
-                                    {inCoin?.symbol}
-                                  </Paragraph>
-                                )
-                            }
-                          })()}
+                          {isLoadingCoins ? (
+                            <Spinner color="$color11" />
+                          ) : !isLoadingCoins && !inCoin ? (
+                            <Paragraph color="$error">{t('form.errors.balance')}</Paragraph>
+                          ) : !inCoin?.balance ? (
+                            <Paragraph size={'$5'} fontWeight={'500'}>
+                              -
+                            </Paragraph>
+                          ) : (
+                            <Paragraph
+                              size={'$5'}
+                              fontWeight={'400'}
+                              color={insufficientAmount ? '$error' : '$color12'}
+                            >
+                              {formatAmount(
+                                formatUnits(inCoin?.balance, inCoin?.decimals),
+                                12,
+                                inCoin?.formatDecimals
+                              )}{' '}
+                              {inCoin?.symbol}
+                            </Paragraph>
+                          )}
                           {inCoin !== undefined && inCoin.symbol !== usdcCoin.symbol && (
                             <Button
                               // @ts-expect-error tamagui is tripping here
@@ -722,43 +670,26 @@ export const SwapFormScreen = () => {
                       <YStack gap="$1.5">
                         <XStack ai={'center'} jc={'space-between'} flexWrap="wrap" gap="$2">
                           <XStack height={'$2'} ai={'center'}>
-                            {(() => {
-                              switch (true) {
-                                case (quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
-                                  isLoadingCoins:
-                                  return <Spinner color="$color11" />
-                                case !outCoin || !outAmountUsd:
-                                  return (
-                                    <Paragraph
-                                      size={'$5'}
-                                      color={'$lightGrayTextField'}
-                                      $theme-light={{ color: '$darkGrayTextField' }}
-                                    >
-                                      $0
-                                    </Paragraph>
-                                  )
-                                case outCoin?.symbol === 'USDC':
-                                  return (
-                                    <Paragraph
-                                      size={'$5'}
-                                      color={'$lightGrayTextField'}
-                                      $theme-light={{ color: '$darkGrayTextField' }}
-                                    >
-                                      {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                    </Paragraph>
-                                  )
-                                default:
-                                  return (
-                                    <Paragraph
-                                      size={'$5'}
-                                      color={'$lightGrayTextField'}
-                                      $theme-light={{ color: '$darkGrayTextField' }}
-                                    >
-                                      {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                    </Paragraph>
-                                  )
-                              }
-                            })()}
+                            {(quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
+                            isLoadingCoins ? (
+                              <Spinner color="$color11" />
+                            ) : !outCoin || !outAmountUsd ? (
+                              <Paragraph
+                                size={'$5'}
+                                color={'$lightGrayTextField'}
+                                $theme-light={{ color: '$darkGrayTextField' }}
+                              >
+                                $0
+                              </Paragraph>
+                            ) : (
+                              <Paragraph
+                                size={'$5'}
+                                color={'$lightGrayTextField'}
+                                $theme-light={{ color: '$darkGrayTextField' }}
+                              >
+                                {outAmountUsd ? `$${outAmountUsd}` : '$0'}
+                              </Paragraph>
+                            )}
                           </XStack>
                           {priceImpact && (
                             <XStack ai={'center'} gap="$1.5">
@@ -807,21 +738,30 @@ export const SwapFormScreen = () => {
                         }}
                       >
                         <YStack
-                          bc={'$color0'}
+                          boc={'$aztec1'}
+                          bw={2}
                           borderRadius={9999}
                           pointerEvents={'auto'}
                           // @ts-expect-error need this detailed calc here
                           transform={[{ translateY: 'calc(-50% - 12px)' }]}
+                          elevation={24}
+                          shadowOpacity={0.4}
+                          animation="responsive"
+                          hoverStyle={{
+                            scale: 1.05,
+                          }}
+                          pressStyle={{
+                            scale: 0.99,
+                          }}
+                          className="will-change-transform"
                         >
                           <Button
                             // @ts-expect-error tamagui is tripping here
                             type={'button'}
                             testID={'flipTokensButton'}
-                            bc={'$color0'}
                             circular={true}
                             size={'$5'}
                             borderWidth={0}
-                            hoverStyle={hoverStyles}
                             onPress={handleFlipTokens}
                           >
                             <Button.Icon>
@@ -838,16 +778,11 @@ export const SwapFormScreen = () => {
                 </FadeCard>
               </YStack>
               <Paragraph color="$error">
-                {(() => {
-                  switch (true) {
-                    case !!form.formState.errors?.slippage:
-                      return t(form.formState.errors.slippage.message as string)
-                    case !!estimateError:
-                      return estimateError.message
-                    default:
-                      return ''
-                  }
-                })()}
+                {form.formState.errors?.slippage
+                  ? t(form.formState.errors.slippage.message as string)
+                  : estimateError
+                    ? estimateError.message
+                    : ''}
               </Paragraph>
             </YStack>
           )}
