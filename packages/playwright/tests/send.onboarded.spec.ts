@@ -375,10 +375,7 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
   await expect(sendPage.amountInput).toBeVisible()
   await sendPage.amountInput.fill('0.5')
 
-  // Wait for validation to process
-  await page.waitForTimeout(500)
-
-  // Verify error message is displayed
+  // Verify error message is displayed (web-first assertion waits for visibility)
   const minimumError = page.getByTestId('SendFormMinimumError')
   await expect(minimumError).toBeVisible()
   await expect(minimumError).toHaveText(/Minimum: 1 SEND/)
@@ -389,9 +386,8 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
 
   // Now send exactly minimum amount (1 SEND) - should work
   await sendPage.amountInput.fill('1')
-  await page.waitForTimeout(500)
 
-  // Error message should disappear
+  // Error message should disappear (web-first assertion waits for state change)
   await expect(minimumError).toBeHidden()
 
   // Continue button should be enabled

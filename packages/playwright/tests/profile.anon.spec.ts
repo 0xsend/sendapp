@@ -28,9 +28,10 @@ test('anon user can visit public profile', async ({ page, seed, pg }) => {
   assert(!!profile.about, 'profile about not found')
 
   await visitProfile({ page, tag: tag.name })
+  // Profile title is dynamic: shows hostname/tag for tag-based profiles
   await expect(async () => {
     const title = await page.title()
-    expect(title).toBe('Send | Profile')
+    expect(title).toBe(`localhost/${tag.name}`)
   }).toPass()
   await expect(page.getByText(profile.name)).toBeVisible()
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
