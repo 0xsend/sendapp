@@ -4,6 +4,7 @@
     "secretShop": "Geheimer Shop"
   },
   "stack": {
+    "contacts": "Kontakte",
     "account": {
       "language": "Sprache",
       "linkInBio": "Link in Bio",
@@ -72,6 +73,9 @@
     },
     "savings": {
       "root": "Sparen"
+    },
+    "secretShop": {
+      "root": "Geheimer Shop"
     }
   },
   "tabs": {

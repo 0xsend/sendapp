@@ -4,6 +4,7 @@
     "secretShop": "Boutique secrète"
   },
   "stack": {
+    "contacts": "Contacts",
     "account": {
       "language": "Langue",
       "linkInBio": "Lien dans la bio",
@@ -72,6 +73,9 @@
     },
     "savings": {
       "root": "Épargne"
+    },
+    "secretShop": {
+      "root": "Boutique secrète"
     }
   },
   "tabs": {

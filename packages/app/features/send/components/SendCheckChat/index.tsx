@@ -53,6 +53,7 @@ import { baseMainnet, usdcAddress } from '@my/wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { SendModalContainer, ReviewSendAmountBox, ReviewSendDetailsRow, NoteInput } from '../shared'
 import { useTranslation } from 'react-i18next'
+import { useAnalytics } from 'app/provider/analytics'
 
 import debug from 'debug'
 
@@ -154,12 +155,12 @@ export const SendCheckChat = memo(
         } as ViewProps)
       : {}
 
+    // Taller on small screens where expiration buttons wrap
     const sectionHeight = useMemo(() => {
       if (activeSection === 'success') return 600
       if (activeSection === 'reviewAndSend') return 480
-      // enterAmount: 500 (like SendChat) + ~60 for expiration selector
-      return 560
-    }, [activeSection])
+      return gtLg ? 550 : 575
+    }, [activeSection, gtLg])
 
     return (
       <>
@@ -349,6 +350,7 @@ const SendCheckContent = ({
   const { t } = useTranslation('send')
   const toast = useAppToast()
   const supabase = useSupabase()
+  const analytics = useAnalytics()
 
   const { isLoading: isLoadingCoins } = useCoins()
   const { data: sendAccount } = useSendAccount()
@@ -422,9 +424,18 @@ const SendCheckContent = ({
     await Clipboard.setStringAsync(checkCreated.claimUrl)
     setCopiedLink(true)
     setHasCopiedLink(true)
+
+    // Track check shared event
+    analytics.capture({
+      name: 'send_check_shared',
+      properties: {
+        share_channel: 'copy_link',
+      },
+    })
+
     toast.show(t('check.linkCopied', 'Link copied!'))
     setTimeout(() => setCopiedLink(false), 2000)
-  }, [checkCreated?.claimUrl, toast, t, setHasCopiedLink])
+  }, [checkCreated?.claimUrl, toast, t, setHasCopiedLink, analytics])
 
   // Helper function to poll for check creation via Supabase
   const pollForCheckCreation = useCallback(
@@ -486,6 +497,18 @@ const SendCheckContent = ({
           symbol: coin?.symbol ?? coinInfo?.symbol ?? 'tokens',
           note: trimmedNote,
         })
+
+        // Track check created event
+        analytics.capture({
+          name: 'send_check_created',
+          properties: {
+            token_count: 1,
+            total_amount: values.amount,
+            has_note: !!trimmedNote,
+            expires_in_days: expiresInDays,
+          },
+        })
+
         setActiveSection('success')
       } catch (error) {
         log('Failed to create check:', error)
@@ -538,10 +561,31 @@ const SendCheckContent = ({
             symbol: coin?.symbol ?? coinInfo?.symbol ?? 'tokens',
             note: trimmedNote,
           })
+
+          // Track check created event (recovered from error)
+          analytics.capture({
+            name: 'send_check_created',
+            properties: {
+              token_count: 1,
+              total_amount: values.amount,
+              has_note: !!trimmedNote,
+              expires_in_days: expiresInDays,
+            },
+          })
+
           setActiveSection('success')
           setLoadingSend(false)
         } else {
           // Check not found on-chain after polling, show the error
+          // Track check failed event
+          analytics.capture({
+            name: 'send_check_failed',
+            properties: {
+              step: 'create',
+              error_type: 'unknown',
+            },
+          })
+
           toast.error(error instanceof Error ? error.message : 'Failed to create check')
           setLoadingSend(false)
         }

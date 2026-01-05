@@ -1,5 +1,7 @@
 import { copycat } from '@snaplet/copycat'
 import type {
+  contactsInputs,
+  contact_labelsInputs,
   leaderboard_referrals_all_timeInputs,
   SeedClient,
   SeedClientOptions,
@@ -10,6 +12,19 @@ import crypto from 'node:crypto'
 import { hexToBytes } from 'viem'
 import { generatePrivateKey, privateKeyToAddress } from 'viem/accounts'
 import { pravatar, tagName } from './utils'
+
+// Contact source types (must match contact_source_enum in database)
+export type ContactSource = 'manual' | 'activity' | 'referral' | 'external'
+
+// Chain types for external contacts
+export type ChainType = 'evm' | 'solana' | 'canton'
+
+// Chain ID prefixes
+const CHAIN_PREFIXES = {
+  evm: 'eip155:',
+  solana: 'solana:',
+  canton: 'canton:',
+} as const
 
 // Store for generating consistent address and address_bytes pairs
 let lastGeneratedAddress: string | null = null
@@ -39,6 +54,8 @@ export const models: SeedClientOptions['models'] = {
   },
   tags: {
     data: {
+      // Use high ID range to avoid conflicts with app-generated tags
+      id: (ctx) => copycat.int(ctx.seed, { min: 1_000_000, max: 9_999_999 }),
       name: (ctx) => {
         // Generate a valid tag name (alphanumeric + underscore, max 20 chars)
         // Use nano timestamp + random suffix to ensure uniqueness
@@ -73,6 +90,8 @@ export const models: SeedClientOptions['models'] = {
   },
   send_account_tags: {
     data: {
+      // Use high ID range to avoid conflicts with app-generated send_account_tags
+      id: (ctx) => copycat.int(ctx.seed, { min: 1_000_000, max: 9_999_999 }),
       tag_id: (ctx) => {
         // Get the first (and only) tag for this user
         const tags = ctx.store.tags
@@ -91,6 +110,38 @@ export const models: SeedClientOptions['models'] = {
   chain_addresses: {
     data: {
       address: () => privateKeyToAddress(generatePrivateKey()),
+    },
+  },
+  contacts: {
+    data: {
+      // Note: contact_user_id, external_address, chain_id are NOT set here
+      // to allow factory functions to provide them. Snaplet would otherwise
+      // override input values with these defaults.
+      custom_name: (ctx) => copycat.fullName(ctx.seed).slice(0, 80),
+      notes: (ctx) => copycat.sentence(ctx.seed).slice(0, 500),
+      is_favorite: (ctx) => copycat.bool(ctx.seed, { probability: 0.2 }),
+      source: 'manual',
+      last_interacted_at: () => new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+    },
+  },
+  contact_labels: {
+    data: {
+      name: (ctx) => {
+        const word = copycat.word(ctx.seed)
+        const nanoTime = process.hrtime.bigint().toString(36).slice(-4)
+        return `${word}_${nanoTime}`.slice(0, 32)
+      },
+      color: (ctx) =>
+        copycat.oneOfString(ctx.seed, [
+          '#FF6B6B',
+          '#4ECDC4',
+          '#45B7D1',
+          '#96CEB4',
+          '#FFEAA7',
+          '#DDA0DD',
+          '#98D8C8',
+          '#F7DC6F',
+        ]),
     },
   },
   public_send_account_transfers: {
@@ -584,5 +635,569 @@ export const createUserWithoutTags = async (
     sendAccount: plan.send_accounts[0],
     sendAccountTags: plan.send_account_tags, // Will be empty
     chainAddresses: plan.chain_addresses,
+  }
+}
+
+// =============================================================================
+// Contact Factory Functions
+// =============================================================================
+
+/**
+ * Generates a deterministic hex string from a seed
+ */
+function deterministicHex(seed: string, length: number): string {
+  const hexChars = '0123456789abcdef'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += hexChars[copycat.int(`${seed}-hex-${i}`, { min: 0, max: 15 })]
+  }
+  return result
+}
+
+/**
+ * Generates a valid external address for a given chain type
+ * All addresses are deterministic based on the seed
+ */
+export function generateExternalAddress(
+  seed: string,
+  chainType: ChainType
+): { address: string; chainId: string } {
+  switch (chainType) {
+    case 'evm': {
+      // EVM: 0x + 40 hex chars (deterministic)
+      const hexPart = deterministicHex(`${seed}-evm`, 40)
+      const chainNum = copycat.int(seed, { min: 1, max: 8453 })
+      return { address: `0x${hexPart}`, chainId: `${CHAIN_PREFIXES.evm}${chainNum}` }
+    }
+    case 'solana': {
+      // Solana: 32-44 base58 chars (alphanumeric, no 0, O, I, l)
+      const base58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+      const length = copycat.int(`${seed}-len`, { min: 32, max: 44 })
+      let address = ''
+      for (let i = 0; i < length; i++) {
+        address += base58Chars[copycat.int(`${seed}-${i}`, { min: 0, max: base58Chars.length - 1 })]
+      }
+      return { address, chainId: `${CHAIN_PREFIXES.solana}mainnet` }
+    }
+    case 'canton': {
+      // Canton: party::hex format (at least 64 hex chars, deterministic)
+      const partyName = copycat.word(seed).replace(/[^a-zA-Z0-9-]/g, '') || 'party'
+      const hexPart = deterministicHex(`${seed}-canton`, 64)
+      return { address: `${partyName}::${hexPart}`, chainId: `${CHAIN_PREFIXES.canton}global` }
+    }
+  }
+}
+
+/**
+ * Options for creating a contact between Send users
+ */
+export interface CreateSendContactOptions {
+  ownerId: string
+  contactUserId: string
+  source?: Exclude<ContactSource, 'external'>
+  customName?: string | null
+  notes?: string | null
+  isFavorite?: boolean
+  lastInteractedAt?: Date | null
+  archivedAt?: Date | null
+}
+
+/**
+ * Creates a contact input for a Send-to-Send user contact
+ * Validates inputs to fail fast on constraint violations
+ */
+export function createSendContactInput(options: CreateSendContactOptions): contactsInputs {
+  const {
+    ownerId,
+    contactUserId,
+    source = 'manual',
+    customName,
+    notes,
+    isFavorite = false,
+    lastInteractedAt,
+    archivedAt,
+  } = options
+
+  // Fail fast validations
+  if (ownerId === contactUserId) {
+    throw new Error('Cannot create self-contact: owner_id and contact_user_id must differ')
+  }
+  // Runtime validation for source (TypeScript enforces at compile time, but validate at runtime too)
+  if ((source as string) === 'external') {
+    throw new Error('Send user contacts cannot have source "external"')
+  }
+  if (customName && customName.length > 80) {
+    throw new Error(`custom_name exceeds 80 chars: ${customName.length}`)
+  }
+  if (notes && notes.length > 500) {
+    throw new Error(`notes exceeds 500 chars: ${notes.length}`)
+  }
+
+  return {
+    owner_id: ownerId,
+    contact_user_id: contactUserId,
+    // Explicitly null external fields to prevent Snaplet auto-generation
+    external_address: null,
+    chain_id: null,
+    source,
+    custom_name: customName ?? null,
+    notes: notes ?? null,
+    is_favorite: isFavorite,
+    last_interacted_at: lastInteractedAt ?? null,
+    archived_at: archivedAt ?? null,
+  }
+}
+
+/**
+ * Options for creating an external address contact
+ */
+export interface CreateExternalContactOptions {
+  ownerId: string
+  address: string
+  chainId: string
+  customName?: string | null
+  notes?: string | null
+  isFavorite?: boolean
+  lastInteractedAt?: Date | null
+  archivedAt?: Date | null
+}
+
+/**
+ * Creates a contact input for an external blockchain address
+ * Validates address format based on chain type
+ */
+export function createExternalContactInput(options: CreateExternalContactOptions): contactsInputs {
+  const {
+    ownerId,
+    address,
+    chainId,
+    customName,
+    notes,
+    isFavorite = false,
+    lastInteractedAt,
+    archivedAt,
+  } = options
+
+  // Fail fast validations
+  if (customName && customName.length > 80) {
+    throw new Error(`custom_name exceeds 80 chars: ${customName.length}`)
+  }
+  if (notes && notes.length > 500) {
+    throw new Error(`notes exceeds 500 chars: ${notes.length}`)
+  }
+
+  // Validate chain_id and address format
+  if (chainId.startsWith(CHAIN_PREFIXES.evm)) {
+    if (!/^eip155:\d+$/.test(chainId)) {
+      throw new Error(`Invalid EVM chain_id format: ${chainId}`)
+    }
+    if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      throw new Error(`Invalid EVM address format: ${address}`)
+    }
+  } else if (chainId.startsWith(CHAIN_PREFIXES.solana)) {
+    if (!/^solana:[A-Za-z0-9]+$/.test(chainId)) {
+      throw new Error(`Invalid Solana chain_id format: ${chainId}`)
+    }
+    if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(address)) {
+      throw new Error(`Invalid Solana address format: ${address}`)
+    }
+  } else if (chainId.startsWith(CHAIN_PREFIXES.canton)) {
+    if (!/^canton:[A-Za-z0-9-]+$/.test(chainId)) {
+      throw new Error(`Invalid Canton chain_id format: ${chainId}`)
+    }
+    if (!/^[a-zA-Z0-9-]+::[0-9a-fA-F]{64,}$/.test(address)) {
+      throw new Error(`Invalid Canton address format: ${address}`)
+    }
+  } else {
+    throw new Error(`Unknown chain_id prefix: ${chainId}`)
+  }
+
+  return {
+    owner_id: ownerId,
+    // Explicitly null contact_user_id to prevent Snaplet auto-generation
+    contact_user_id: null,
+    external_address: address,
+    chain_id: chainId,
+    source: 'external',
+    custom_name: customName ?? null,
+    notes: notes ?? null,
+    is_favorite: isFavorite,
+    last_interacted_at: lastInteractedAt ?? null,
+    archived_at: archivedAt ?? null,
+  }
+}
+
+/**
+ * Options for creating a contact label
+ */
+export interface CreateContactLabelOptions {
+  ownerId: string
+  name: string
+  color?: string | null
+}
+
+/**
+ * Creates a contact label input
+ * Validates name length constraints
+ */
+export function createContactLabelInput(options: CreateContactLabelOptions): contact_labelsInputs {
+  const { ownerId, name, color } = options
+
+  // Fail fast validations
+  if (name.length < 1) {
+    throw new Error('Label name must be at least 1 character')
+  }
+  if (name.length > 32) {
+    throw new Error(`Label name exceeds 32 chars: ${name.length}`)
+  }
+
+  return {
+    owner_id: ownerId,
+    name,
+    color: color ?? null,
+  }
+}
+
+/**
+ * Configuration for seeding a contact network
+ */
+export interface SeedContactNetworkConfig {
+  /** Distribution per user category */
+  perUser: {
+    /** Users with zero contacts */
+    zero: number
+    /** Users with 1-2 contacts (light) */
+    light: number
+    /** Users with 5-10 contacts (medium) */
+    medium: number
+    /** Users with 15-25 contacts (heavy) */
+    heavy: number
+  }
+  /** Rate of external vs Send-user contacts (0-1) */
+  externalRate: number
+  /** Rate of favorites among contacts (0-1) */
+  favoritesRate: number
+  /** Rate of archived contacts (0-1) */
+  archivedRate: number
+  /** Distribution of sources for Send-user contacts */
+  sources: {
+    manual: number
+    activity: number
+    referral: number
+  }
+  /** Distribution of chain types for external contacts */
+  chainDistribution: {
+    evm: number
+    solana: number
+    canton: number
+  }
+  /** Number of labels to create per user (range) */
+  labelsPerUser: { min: number; max: number }
+  /** Rate of contacts that have labels assigned */
+  labelAssignmentRate: number
+  /** Base timestamp for deterministic date generation (defaults to Date.now()) */
+  baseTime?: number
+}
+
+/**
+ * Default configuration for seeding contact network
+ * Based on recommendations: 80/20 Send-user vs external, 90/8/2 EVM/Solana/Canton
+ */
+export const DEFAULT_CONTACT_NETWORK_CONFIG: SeedContactNetworkConfig = {
+  perUser: {
+    zero: 10, // 10 users with no contacts
+    light: 30, // 30 users with 1-2 contacts
+    medium: 40, // 40 users with 5-10 contacts
+    heavy: 23, // 23 users with 15-25 contacts (total 103)
+  },
+  externalRate: 0.2, // 20% external contacts
+  favoritesRate: 0.15, // 15% favorites
+  archivedRate: 0.05, // 5% archived
+  sources: {
+    manual: 0.6,
+    activity: 0.3,
+    referral: 0.1,
+  },
+  chainDistribution: {
+    evm: 0.9,
+    solana: 0.08,
+    canton: 0.02,
+  },
+  labelsPerUser: { min: 0, max: 5 },
+  labelAssignmentRate: 0.3,
+}
+
+/**
+ * Generates contact network data for seeding
+ * Returns arrays of contact inputs and label inputs ready for database insertion
+ */
+export function generateContactNetworkData(
+  users: Array<{ id: string }>,
+  config: SeedContactNetworkConfig = DEFAULT_CONTACT_NETWORK_CONFIG
+): {
+  contacts: contactsInputs[]
+  labels: contact_labelsInputs[]
+  labelAssignments: Array<{ contactIndex: number; labelIndex: number }>
+} {
+  const contacts: contactsInputs[] = []
+  const labels: contact_labelsInputs[] = []
+  const labelAssignments: Array<{ contactIndex: number; labelIndex: number }> = []
+
+  // Use provided baseTime for deterministic timestamps, or fall back to Date.now()
+  const baseTime = config.baseTime ?? Date.now()
+
+  // Validate perUser counts against available users
+  const { zero, light, medium, heavy } = config.perUser
+  const totalRequested = zero + light + medium + heavy
+  if (totalRequested > users.length) {
+    console.warn(
+      `perUser config requests ${totalRequested} users but only ${users.length} available. Categories will be truncated.`
+    )
+  }
+
+  // Shuffle users for random assignment to categories
+  const shuffledUsers = [...users].sort(
+    (a, b) => copycat.int(a.id, { min: 0, max: 1000 }) - copycat.int(b.id, { min: 0, max: 1000 })
+  )
+
+  // Assign users to categories (clamped to available users)
+  const zeroUsers = shuffledUsers.slice(0, Math.min(zero, shuffledUsers.length))
+  const lightUsers = shuffledUsers.slice(
+    zeroUsers.length,
+    Math.min(zeroUsers.length + light, shuffledUsers.length)
+  )
+  const mediumUsers = shuffledUsers.slice(
+    zeroUsers.length + lightUsers.length,
+    Math.min(zeroUsers.length + lightUsers.length + medium, shuffledUsers.length)
+  )
+  const heavyUsers = shuffledUsers.slice(
+    zeroUsers.length + lightUsers.length + mediumUsers.length,
+    Math.min(
+      zeroUsers.length + lightUsers.length + mediumUsers.length + heavy,
+      shuffledUsers.length
+    )
+  )
+
+  // Track labels per user for assignment
+  const userLabelRanges: Map<string, { start: number; count: number }> = new Map()
+
+  // Create labels for each user (except zero-contact users)
+  const usersWithContacts = [...lightUsers, ...mediumUsers, ...heavyUsers]
+  for (const user of usersWithContacts) {
+    const labelCount = copycat.int(`${user.id}-labels`, {
+      min: config.labelsPerUser.min,
+      max: config.labelsPerUser.max,
+    })
+
+    const labelStart = labels.length
+    for (let i = 0; i < labelCount; i++) {
+      const labelSeed = `${user.id}-label-${i}`
+      labels.push(
+        createContactLabelInput({
+          ownerId: user.id,
+          name: `${copycat.word(labelSeed)}_${i}`.slice(0, 32),
+          color: copycat.oneOfString(labelSeed, [
+            '#FF6B6B',
+            '#4ECDC4',
+            '#45B7D1',
+            '#96CEB4',
+            '#FFEAA7',
+            '#DDA0DD',
+          ]),
+        })
+      )
+    }
+    userLabelRanges.set(user.id, { start: labelStart, count: labelCount })
+  }
+
+  // Helper to pick a weighted random source
+  const pickSource = (seed: string): Exclude<ContactSource, 'external'> => {
+    const rand = copycat.float(seed, { min: 0, max: 1 })
+    if (rand < config.sources.manual) return 'manual'
+    if (rand < config.sources.manual + config.sources.activity) return 'activity'
+    return 'referral'
+  }
+
+  // Helper to pick a weighted random chain type
+  const pickChainType = (seed: string): ChainType => {
+    const rand = copycat.float(seed, { min: 0, max: 1 })
+    if (rand < config.chainDistribution.evm) return 'evm'
+    if (rand < config.chainDistribution.evm + config.chainDistribution.solana) return 'solana'
+    return 'canton'
+  }
+
+  // Helper to create contacts for a user
+  const createContactsForUser = (owner: { id: string }, contactCount: number) => {
+    // Get potential contact targets (all other users), shuffled deterministically
+    const potentialTargets = users
+      .filter((u) => u.id !== owner.id)
+      .sort(
+        (a, b) =>
+          copycat.int(`${owner.id}-shuffle-${a.id}`, { min: 0, max: 10000 }) -
+          copycat.int(`${owner.id}-shuffle-${b.id}`, { min: 0, max: 10000 })
+      )
+
+    // Track used Send-user targets to prevent duplicates (external addresses are always unique)
+    const usedTargets = new Set<string>()
+    let targetIdx = 0
+
+    for (let i = 0; i < contactCount; i++) {
+      const contactSeed = `${owner.id}-contact-${i}`
+      const isExternal = copycat.float(contactSeed, { min: 0, max: 1 }) < config.externalRate
+      const isFavorite =
+        copycat.float(`${contactSeed}-fav`, { min: 0, max: 1 }) < config.favoritesRate
+      const isArchived =
+        copycat.float(`${contactSeed}-arch`, { min: 0, max: 1 }) < config.archivedRate
+
+      const contactIndex = contacts.length
+
+      if (isExternal) {
+        const chainType = pickChainType(`${contactSeed}-chain`)
+        const { address, chainId } = generateExternalAddress(`${contactSeed}-addr`, chainType)
+        contacts.push(
+          createExternalContactInput({
+            ownerId: owner.id,
+            address,
+            chainId,
+            customName: copycat.bool(`${contactSeed}-name`, { probability: 0.7 })
+              ? copycat.fullName(`${contactSeed}-name`).slice(0, 80)
+              : null,
+            notes: copycat.bool(`${contactSeed}-notes`, { probability: 0.3 })
+              ? copycat.sentence(`${contactSeed}-notes`).slice(0, 500)
+              : null,
+            isFavorite,
+            lastInteractedAt: copycat.bool(`${contactSeed}-interact`, { probability: 0.6 })
+              ? new Date(
+                  baseTime -
+                    copycat.int(`${contactSeed}-time`, { min: 0, max: 30 * 24 * 60 * 60 * 1000 })
+                )
+              : null,
+            archivedAt: isArchived ? new Date(baseTime) : null,
+          })
+        )
+      } else {
+        // Pick next unused target from shuffled list
+        let currentTarget = potentialTargets[targetIdx]
+        while (
+          targetIdx < potentialTargets.length &&
+          currentTarget &&
+          usedTargets.has(currentTarget.id)
+        ) {
+          targetIdx++
+          currentTarget = potentialTargets[targetIdx]
+        }
+        if (targetIdx >= potentialTargets.length || !currentTarget) {
+          // No more unique targets available, skip this contact
+          continue
+        }
+
+        const target = currentTarget
+        usedTargets.add(target.id)
+        targetIdx++
+
+        contacts.push(
+          createSendContactInput({
+            ownerId: owner.id,
+            contactUserId: target.id,
+            source: pickSource(`${contactSeed}-source`),
+            customName: copycat.bool(`${contactSeed}-name`, { probability: 0.5 })
+              ? copycat.fullName(`${contactSeed}-name`).slice(0, 80)
+              : null,
+            notes: copycat.bool(`${contactSeed}-notes`, { probability: 0.2 })
+              ? copycat.sentence(`${contactSeed}-notes`).slice(0, 500)
+              : null,
+            isFavorite,
+            lastInteractedAt: copycat.bool(`${contactSeed}-interact`, { probability: 0.8 })
+              ? new Date(
+                  baseTime -
+                    copycat.int(`${contactSeed}-time`, { min: 0, max: 30 * 24 * 60 * 60 * 1000 })
+                )
+              : null,
+            archivedAt: isArchived ? new Date(baseTime) : null,
+          })
+        )
+      }
+
+      // Maybe assign labels to this contact
+      const labelRange = userLabelRanges.get(owner.id)
+      if (labelRange && labelRange.count > 0) {
+        const shouldAssignLabel =
+          copycat.float(`${contactSeed}-assign`, { min: 0, max: 1 }) < config.labelAssignmentRate
+        if (shouldAssignLabel) {
+          // Assign 1-3 labels
+          const numLabels = copycat.int(`${contactSeed}-numlabels`, {
+            min: 1,
+            max: Math.min(3, labelRange.count),
+          })
+          const assignedLabels = new Set<number>()
+          for (let j = 0; j < numLabels; j++) {
+            const labelOffset = copycat.int(`${contactSeed}-label-${j}`, {
+              min: 0,
+              max: labelRange.count - 1,
+            })
+            const labelIndex = labelRange.start + labelOffset
+            if (!assignedLabels.has(labelIndex)) {
+              assignedLabels.add(labelIndex)
+              labelAssignments.push({ contactIndex, labelIndex })
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Create contacts for each category
+  // Light users: 1-2 contacts
+  for (const user of lightUsers) {
+    const count = copycat.int(`${user.id}-count`, { min: 1, max: 2 })
+    createContactsForUser(user, count)
+  }
+
+  // Medium users: 5-10 contacts
+  for (const user of mediumUsers) {
+    const count = copycat.int(`${user.id}-count`, { min: 5, max: 10 })
+    createContactsForUser(user, count)
+  }
+
+  // Heavy users: 15-25 contacts
+  for (const user of heavyUsers) {
+    const count = copycat.int(`${user.id}-count`, { min: 15, max: 25 })
+    createContactsForUser(user, count)
+  }
+
+  return { contacts, labels, labelAssignments }
+}
+
+/**
+ * Seeds the contact network into the database
+ * Creates contacts and labels. Label assignments are NOT inserted by this function
+ * since they require the actual IDs from seeded records.
+ *
+ * @returns contactCount and labelCount reflect inserted records.
+ *          labelAssignments is returned for the caller to insert via raw SQL
+ *          using the actual IDs from the seeded records.
+ */
+export async function seedContactNetwork(
+  seed: SeedClient,
+  users: Array<{ id: string }>,
+  config: SeedContactNetworkConfig = DEFAULT_CONTACT_NETWORK_CONFIG
+): Promise<{
+  contactCount: number
+  labelCount: number
+  labelAssignments: Array<{ contactIndex: number; labelIndex: number }>
+}> {
+  const { contacts, labels, labelAssignments } = generateContactNetworkData(users, config)
+
+  // Seed labels first (they're referenced by assignments)
+  const seededLabels =
+    labels.length > 0 ? await seed.contact_labels(labels) : { contact_labels: [] }
+
+  // Seed contacts
+  const seededContacts = contacts.length > 0 ? await seed.contacts(contacts) : { contacts: [] }
+
+  return {
+    contactCount: seededContacts.contacts.length,
+    labelCount: seededLabels.contact_labels.length,
+    labelAssignments,
   }
 }

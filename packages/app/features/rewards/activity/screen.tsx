@@ -75,6 +75,7 @@ export function ActivityRewardsScreen() {
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
   const distribution = queryParams.distribution
   const { data: distributions, isLoading } = useMonthlyDistributions()
+
   const selectedDistributionIndex =
     distribution !== undefined && distributions !== undefined
       ? Math.max(

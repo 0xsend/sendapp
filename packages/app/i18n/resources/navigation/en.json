@@ -17,6 +17,7 @@
     }
   },
   "stack": {
+    "contacts": "Contacts",
     "account": {
       "root": "Account",
       "profile": "Profile",
@@ -90,6 +91,9 @@
     },
     "savings": {
       "root": "Savings"
+    },
+    "secretShop": {
+      "root": "Secret shop"
     }
   }
 }

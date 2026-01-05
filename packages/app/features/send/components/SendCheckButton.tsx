@@ -1,4 +1,4 @@
-import { Card, Paragraph, useMedia, XStack, YStack } from '@my/ui'
+import { Card, Paragraph, useMedia, useThemeName, XStack, YStack } from '@my/ui'
 import { FileSignature, ListChecks } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useRouter } from 'solito/router'
@@ -11,12 +11,14 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
   const { t } = useTranslation('send')
   const router = useRouter()
   const { xs } = useMedia()
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
 
   const sendButtonText = xs ? t('check.buttonShort') : t('check.button')
   const manageButtonText = xs ? t('check.manageButtonShort') : t('check.manageButton')
 
   return (
-    <XStack gap="$3" maw={600} $sm={{ maw: '100%' }}>
+    <XStack gap="$3" maw={600} ai="stretch" $sm={{ maw: '100%' }}>
       <Card
         size="$4"
         padded
@@ -27,8 +29,7 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
         pressStyle={{ scale: 0.98 }}
         animation="100ms"
         onPress={onPress}
-        bc="$aztec4"
-        $theme-light={{ bc: '$white' }}
+        bc={isDark ? '$aztec4' : '$white'}
         f={1}
         fb={0}
       >
@@ -39,12 +40,12 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
             br="$4"
             ai="center"
             jc="center"
-            bc="$aztec6"
-            $theme-light={{ bc: '$gray3' }}
+            bc={isDark ? '$aztec6' : '$gray3'}
+            flexShrink={0}
           >
             <FileSignature size="$1.5" color="$neon9" />
           </XStack>
-          <YStack f={1} gap="$1" miw={0}>
+          <YStack f={1} gap="$1" flexShrink={1}>
             {!xs && (
               <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
                 {t('check.button')}
@@ -67,8 +68,7 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
         pressStyle={{ scale: 0.98 }}
         animation="100ms"
         onPress={() => router.push('/check')}
-        bc="$aztec4"
-        $theme-light={{ bc: '$white' }}
+        bc={isDark ? '$aztec4' : '$white'}
         f={1}
         fb={0}
       >
@@ -79,12 +79,12 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
             br="$4"
             ai="center"
             jc="center"
-            bc="$aztec6"
-            $theme-light={{ bc: '$gray3' }}
+            bc={isDark ? '$aztec6' : '$gray3'}
+            flexShrink={0}
           >
             <ListChecks size="$1.5" color="$neon9" />
           </XStack>
-          <YStack f={1} gap="$1" miw={0}>
+          <YStack f={1} gap="$1" flexShrink={1}>
             {!xs && (
               <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
                 {t('check.manageButton')}

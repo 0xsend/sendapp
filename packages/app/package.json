@@ -8,8 +8,10 @@
     "*.css"
   ],
   "scripts": {
-    "lint": "tsc --noEmit && eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "tsc --noEmit && eslint . --cache --cache-location .cache/eslint",
+    "lint:fast": "eslint . --config .eslintrc.fast.cjs --cache --cache-location .cache/eslint-fast",
+    "lint:fix": "eslint . --fix --cache --cache-location .cache/eslint",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -f .tsconfig.tsbuildinfo && rm -rf coverage && rm -rf .turbo",
     "test": "jest"
   },
@@ -67,6 +69,7 @@
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.10.58",
     "permissionless": "^0.1.49",
+    "posthog-react-native": "^4.14.0",
     "react-hook-form": "^7.48.2",
     "react-i18next": "^15.4.0",
     "react-native": "0.81.5",

@@ -33,6 +33,8 @@
   },
   "links": {
     "items": {
+      "contacts": "Kontakte",
+      "checks": "Checks",
       "deleteAccount": "Konto löschen",
       "language": "Sprache",
       "learnMore": "Mehr über Send erfahren",
@@ -43,6 +45,7 @@
       "profile": "Profil",
       "referrals": "Empfehlungen",
       "rewards": "Belohnungen",
+      "secretShop": "Geheimer Shop",
       "sendtags": "Sendtags"
     },
     "sections": {

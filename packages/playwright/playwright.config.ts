@@ -8,6 +8,8 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') })
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env.local') })
+// Load .localnet.env last with override so dynamic Tilt ports take precedence
+dotenv.config({ path: path.join(__dirname, '..', '..', '.localnet.env'), override: true })
 
 const cpus = os.cpus().length
 // never scheduler more than 4 workers or up to 50% of the available cores
@@ -29,6 +31,9 @@ NEXT_PUBLIC_SUPABASE_URL is ${process.env.NEXT_PUBLIC_SUPABASE_URL}. Please upda
 }
 
 const baseURL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
+
+// Detect if running under Tilt (TILT_HOST is set in .localnet.env)
+const isRunningUnderTilt = !!process.env.TILT_HOST
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -116,19 +121,23 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: process.env.CI
-      ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
-        ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
-        : 'yarn workspace next-app run serve --port 3000'
-      : 'yarn workspace next-app run dev',
-    url: baseURL,
-    // reuseExistingServer: !process.env.CI,
-    reuseExistingServer: true,
-    stderr: 'pipe',
-    stdout: 'pipe',
-    ignoreHTTPSErrors: false,
-  },
+  // When running under Tilt, the Next.js server is already managed by Tilt,
+  // so we skip starting a new one to avoid port conflicts
+  webServer: isRunningUnderTilt
+    ? undefined
+    : {
+        command: process.env.CI
+          ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+            ? process.env.PLAYWRIGHT_WEB_SERVER_COMMAND
+            : 'yarn workspace next-app run serve --port 3000'
+          : `yarn workspace next-app run dev --port ${new URL(baseURL).port}`,
+        url: baseURL,
+        reuseExistingServer: true,
+        timeout: 120_000,
+        stderr: 'pipe',
+        stdout: 'pipe',
+        ignoreHTTPSErrors: false,
+      },
 
   /**
    * **Make Visual Tests More Forgiving**

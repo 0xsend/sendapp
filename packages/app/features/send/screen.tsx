@@ -23,12 +23,15 @@ import Search from './components/SearchBarSend'
 import { TagSearchProvider, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams, useSendScreenParams } from 'app/routers/params'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { startTransition, useDeferredValue, useEffect, useState } from 'react'
+import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
+import { SendContactsSection } from 'app/features/contacts/send-integration'
+import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
+import { getContactDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
 import { SendCheckButton } from './components/SendCheckButton'
 import { Keyboard, Platform } from 'react-native'
 import { SendChat } from './components/SendChat'
@@ -112,6 +115,7 @@ export const SendScreen = () => {
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
         </YStack>
         {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
+        {!search && <SendContactsSection />}
         {!search && <SendSuggestions />}
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />
@@ -168,6 +172,27 @@ export function SendRecipient({ ...props }: YStackProps) {
   const href = profile ? `/profile/${profile?.sendid}` : ''
   const { t } = useTranslation('send')
 
+  // Look up contact to get custom_name if it exists
+  const { data: contact } = useContactBySendId(profile?.sendid ?? undefined)
+
+  // Display name priority: custom_name > profile_name > sendtag > send_id > address
+  const displayName = useMemo(() => {
+    if (contact) {
+      return getContactDisplayName({
+        custom_name: contact.custom_name,
+        profile_name: contact.profile_name,
+        main_tag_name: contact.main_tag_name,
+        send_id: contact.send_id,
+        external_address: null,
+      })
+    }
+    // No contact - use profile name or tag
+    if (profile?.name) return profile.name
+    if (profile?.tag) return `/${profile.tag}`
+    if (idType === 'address' && recipient) return shorten(recipient, 5, 4)
+    return profile?.sendid ? `#${profile.sendid}` : '---'
+  }, [contact, profile, idType, recipient])
+
   if (isLoading) return <Spinner size="large" />
   if (error) throw new Error(error.message)
 
@@ -220,7 +245,7 @@ export function SendRecipient({ ...props }: YStackProps) {
         </LinkableAvatar>
         <YStack gap="$1.5">
           <Paragraph fontSize="$4" fontWeight="500" color="$color12">
-            {profile?.name}
+            {displayName}
           </Paragraph>
           <Paragraph
             fontFamily="$mono"

@@ -5,6 +5,8 @@ load("./utils.Tiltfile", "ts_files")
 
 labels = ["apps"]
 
+_temporal_addr = os.getenv("TEMPORAL_ADDR", "localhost:7233")
+
 next_app_resource_deps = [
     "yarn:install",
     "supabase",
@@ -75,7 +77,10 @@ else:
         resource_deps = next_app_resource_deps,
         serve_cmd =
             "" if CI else "yarn next-app dev -p $NEXTJS_PORT",  # In CI, playwright tests start the web server
-        serve_env = {"NEXTJS_PORT": os.getenv("NEXTJS_PORT", "3000")},
+        serve_env = {
+            "NEXTJS_PORT": os.getenv("NEXTJS_PORT", "3000"),
+            "TEMPORAL_ADDR": _temporal_addr,
+        },
     )
 
 local_resource(
@@ -120,6 +125,7 @@ local_resource(
         "workflows:build",
     ],
     serve_cmd = "yarn workspace workers start",
+    serve_env = {"TEMPORAL_ADDR": _temporal_addr},
     deps = ts_files(
         config.main_dir + "/packages/workflows/src",
         config.main_dir + "/apps/workers",
