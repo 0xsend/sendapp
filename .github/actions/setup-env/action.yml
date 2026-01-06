@@ -70,13 +70,12 @@ runs:
           echo "Removing lost+found directory from Sticky Disk mount"
           sudo rm -rf ./node_modules/lost+found
         fi
-    - name: Install Python setuptools for node-gyp
-      shell: bash
-      run: |
-        # Python 3.12 removed distutils, but node-gyp requires it for native modules
-        # Install setuptools which provides distutils as a fallback
-        # Always install regardless of yarn-install flag since Tilt may also run yarn install
-        sudo apt-get update && sudo apt-get install -y python3-setuptools
+    - name: Setup Python 3.11 for node-gyp
+      uses: actions/setup-python@v5
+      with:
+        # Python 3.12 removed distutils which node-gyp requires for native modules
+        # Use Python 3.11 which still has distutils in stdlib
+        python-version: '3.11'
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash

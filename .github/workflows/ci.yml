@@ -238,11 +238,11 @@ jobs:
         # yarn-install is now handled below
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - name: Install Python setuptools for node-gyp
-        shell: bash
-        run: |
-          # Python 3.12 removed distutils, but node-gyp requires it for native modules
-          sudo apt-get update && sudo apt-get install -y python3-setuptools
+      - name: Setup Python 3.11 for node-gyp
+        uses: actions/setup-python@v5
+        with:
+          # Python 3.12 removed distutils which node-gyp requires for native modules
+          python-version: '3.11'
       - name: Yarn Install
         shell: bash
         run: yarn install --immutable
