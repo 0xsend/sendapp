@@ -57,7 +57,7 @@ export class CheckoutPage {
         }
         return false
       },
-      timeout: 10_000,
+      timeout: 20_000, // blockchain transactions can take longer
     })
 
     const signTransactionButton = this.page.getByRole('button', { name: 'complete purchase' })

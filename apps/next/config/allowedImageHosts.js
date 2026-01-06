@@ -7,4 +7,5 @@ export const allowedImageHosts = [
   'ghassets.send.app',
   'localhost',
   'github.com',
+  'i.pravatar.cc', // Used by snaplet for test user avatars
 ]

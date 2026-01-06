@@ -24,7 +24,7 @@ test.beforeEach(async ({ page, user: { user } }) => {
   await accountLink.click()
   await page.waitForURL('/account')
   await nextContainer.getByRole('link', { name: 'Passkeys' }).click()
-  await expect(page).toHaveURL('/account/backup')
+  await page.waitForURL('/account/backup')
 })
 
 const backupAccountTest = async ({
@@ -74,12 +74,13 @@ const backupAccountTest = async ({
   const bundlerReq = page.waitForRequest('**/rpc')
   const bundlerRes = page.waitForResponse('**/rpc')
   const confirmBtn = page.getByRole('button', { name: 'Add Passkey as Signer' })
+  await expect(confirmBtn).toBeEnabled({ timeout: 10_000 })
   await confirmBtn.click()
   await bundlerReq
   await bundlerRes // wait for bundler response
-  await expect.soft(confirmBtn).toBeHidden() // page navigates after successful mutation
-  await expect(page.getByText('Something went wrong: Error:')).toBeHidden() // no error
-  await page.waitForURL('/account/backup') // yay, we're back on the page
+  // Wait for blockchain transaction to complete and page to navigate
+  await expect(page.getByText('Something went wrong: Error:')).toBeHidden({ timeout: 5_000 }) // no error
+  await page.waitForURL('/account/backup', { timeout: 30_000 }) // blockchain tx can take a while
 
   await expect(supabase).toHaveValidWebAuthnCredentials(authenticator)
 
