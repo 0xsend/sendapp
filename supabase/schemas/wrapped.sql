@@ -15,7 +15,7 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 BEGIN
-    RETURN QUERY
+RETURN QUERY
     WITH user_transactions AS (
         SELECT
             created_at,
@@ -26,14 +26,16 @@ BEGIN
             END AS counterparty_id
         FROM activity
         WHERE
-            -- Filter for 2025 transactions (Jan 1 - Dec 16)
+            -- Filter for 2025 transactions (Jan 1 - Dec 19)
             created_at >= '2025-01-01'::timestamptz
-            AND created_at < '2025-12-17'::timestamptz
+            AND created_at < '2025-12-20'::timestamptz
             -- Include transactions where user is either sender or recipient
             AND (from_user_id = (SELECT auth.uid() AS uid) OR to_user_id = (SELECT auth.uid() AS uid))
             -- Only include transfers between users (both IDs must exist)
             AND from_user_id IS NOT NULL
             AND to_user_id IS NOT NULL
+            -- Exclude self-transactions
+            AND from_user_id != to_user_id
     ),
     counterparty_counts AS (
         SELECT
@@ -43,16 +45,16 @@ BEGIN
         WHERE counterparty_id IS NOT NULL
         GROUP BY counterparty_id
     )
-    SELECT
-        p.name,
-        p.avatar_url,
-        p.send_id,
-        t.name::text AS tag_name
-    FROM counterparty_counts cc
-    JOIN profiles p ON p.id = cc.counterparty_id AND p.is_public = TRUE
-    LEFT JOIN send_accounts sa ON sa.user_id = p.id
-    LEFT JOIN tags t ON t.id = sa.main_tag_id AND t.status = 'confirmed'
-    ORDER BY cc.transaction_count DESC
+SELECT
+    p.name,
+    p.avatar_url,
+    p.send_id,
+    t.name::text AS tag_name
+FROM counterparty_counts cc
+         JOIN profiles p ON p.id = cc.counterparty_id AND p.is_public = TRUE
+         LEFT JOIN send_accounts sa ON sa.user_id = p.id
+         LEFT JOIN tags t ON t.id = sa.main_tag_id AND t.status = 'confirmed'
+ORDER BY cc.transaction_count DESC
     LIMIT 5;
 END;
 $function$;
@@ -69,13 +71,14 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 BEGIN
-    RETURN QUERY
-    SELECT COUNT(DISTINCT to_user_id) AS count
-    FROM activity
-    WHERE from_user_id = (SELECT auth.uid() AS uid)
-        AND to_user_id IS NOT NULL
-        AND created_at >= '2025-01-01'::timestamptz
-        AND created_at < '2025-12-17'::timestamptz;
+RETURN QUERY
+SELECT COUNT(DISTINCT to_user_id) AS count
+FROM activity
+WHERE from_user_id = (SELECT auth.uid() AS uid)
+  AND to_user_id IS NOT NULL
+  AND from_user_id != to_user_id
+  AND created_at >= '2025-01-01'::timestamptz
+  AND created_at < '2025-12-20'::timestamptz;
 END;
 $function$;
 
@@ -91,13 +94,14 @@ SECURITY DEFINER
 SET search_path TO 'public'
 AS $function$
 BEGIN
-    RETURN QUERY
-    SELECT COUNT(*) AS count
-    FROM activity
-    WHERE from_user_id = (SELECT auth.uid() AS uid)
-        AND to_user_id IS NOT NULL
-        AND created_at >= '2025-01-01'::timestamptz
-        AND created_at < '2025-12-17'::timestamptz;
+RETURN QUERY
+SELECT COUNT(*) AS count
+FROM activity
+WHERE from_user_id = (SELECT auth.uid() AS uid)
+  AND to_user_id IS NOT NULL
+  AND from_user_id != to_user_id
+  AND created_at >= '2025-01-01'::timestamptz
+  AND created_at < '2025-12-20'::timestamptz;
 END;
 $function$;
 
@@ -113,12 +117,12 @@ SECURITY DEFINER
 SET search_path TO 'public', 'private'
 AS $function$
 BEGIN
-    RETURN QUERY
+RETURN QUERY
     WITH distributions_2025 AS (
         SELECT id
         FROM distributions
         WHERE qualification_start >= '2025-01-01'::timestamptz
-            AND qualification_start < '2025-12-17'::timestamptz
+            AND qualification_start < '2025-12-20'::timestamptz
     ),
     user_scores AS (
         SELECT
@@ -135,10 +139,10 @@ BEGIN
             ROW_NUMBER() OVER (ORDER BY score_sum DESC) AS user_rank
         FROM user_scores
     )
-    SELECT
-        ru.user_rank AS rank
-    FROM ranked_users ru
-    WHERE ru.user_id = (SELECT auth.uid() AS uid)
+SELECT
+    ru.user_rank AS rank
+FROM ranked_users ru
+WHERE ru.user_id = (SELECT auth.uid() AS uid)
     LIMIT 1;
 END;
 $function$;
