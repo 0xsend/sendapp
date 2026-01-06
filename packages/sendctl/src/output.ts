@@ -74,7 +74,7 @@ function formatSubChecks(sub_checks: Record<string, CheckResult>): string[] {
     const time =
       result.status === 'failed' && result.error ? result.error : formatDuration(result.duration_ms)
 
-    lines.push(`${prefix}${name.padEnd(8)}${symbol} ${statusText.padEnd(5)}${time}`)
+    lines.push(`${prefix}${name.padEnd(10)}${symbol} ${statusText.padEnd(5)}${time}`)
   })
 
   return lines

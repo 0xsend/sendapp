@@ -38,10 +38,8 @@ export class ConfigError extends Error {
  * Throws ConfigError if required vars are missing
  */
 export function loadEnvironment(timeout: number): Environment {
+  // anonKey is optional here - the supabase check validates it when needed
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!anonKey) {
-    throw new ConfigError('NEXT_PUBLIC_SUPABASE_ANON_KEY is required')
-  }
 
   const supabase: SupabaseCheckConfig = {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321',

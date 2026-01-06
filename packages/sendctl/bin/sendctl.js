@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S npx tsx
 
-// Use tsx to run TypeScript directly (development tool)
-import('../src/index.ts')
+// CLI entry point - uses tsx to run TypeScript directly
+import '../src/index.ts'

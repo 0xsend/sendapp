@@ -55,8 +55,8 @@ export interface GrpcCheckConfig {
  * Configuration for Supabase health checks
  */
 export interface SupabaseCheckConfig extends HttpCheckConfig {
-  /** Required for auth header */
-  anonKey: string
+  /** Required for auth header - may be undefined if not configured */
+  anonKey?: string
 }
 
 /**

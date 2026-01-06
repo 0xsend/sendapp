@@ -1,5 +1,5 @@
 import { runCheck } from '../checks/index.js'
-import { ConfigError, getTimeout, loadEnvironment } from '../config.js'
+import { getTimeout, loadEnvironment } from '../config.js'
 import { formatSingleCheckHuman, formatSingleCheckJson } from '../output.js'
 import { SERVICE_NAMES, type ServiceName, type SingleCheckResult } from '../types.js'
 
@@ -36,22 +36,7 @@ export async function check(service: string, options: CheckOptions): Promise<voi
   }
 
   const timeout = getTimeout(options.timeout)
-
-  let env: ReturnType<typeof loadEnvironment>
-  try {
-    env = loadEnvironment(timeout)
-  } catch (err) {
-    if (err instanceof ConfigError) {
-      if (options.json) {
-        console.log(JSON.stringify({ error: err.message, type: 'config_error' }))
-      } else {
-        console.error(`Configuration error: ${err.message}`)
-      }
-      process.exit(2)
-    }
-    throw err
-  }
-
+  const env = loadEnvironment(timeout)
   const checkResult = await runCheck(service, env)
 
   const result: SingleCheckResult = {

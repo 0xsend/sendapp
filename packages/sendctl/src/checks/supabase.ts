@@ -9,6 +9,15 @@ import type { CheckResult, SupabaseCheckConfig } from '../types.js'
 export async function checkSupabase(config: SupabaseCheckConfig): Promise<CheckResult> {
   const start = Date.now()
 
+  // Check for required anonKey - this is a config error specific to supabase check
+  if (!config.anonKey) {
+    return {
+      status: 'failed',
+      duration_ms: 0,
+      error: 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required for supabase check',
+    }
+  }
+
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), config.timeout)
