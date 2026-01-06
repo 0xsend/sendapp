@@ -70,17 +70,20 @@ runs:
           echo "Removing lost+found directory from Sticky Disk mount"
           sudo rm -rf ./node_modules/lost+found
         fi
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
     - name: Setup Python 3.11 for node-gyp
       shell: bash
       run: |
         # Python 3.12 removed distutils which node-gyp requires for native modules
-        # Install Python 3.11 (distutils is included in stdlib for 3.11)
-        sudo apt-get update && sudo apt-get install -y python3.11
-        # Update alternatives to make python3 point to python3.11
-        sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-        sudo update-alternatives --set python3 /usr/bin/python3.11
-        # Also set python for node-gyp
-        sudo ln -sf /usr/bin/python3.11 /usr/bin/python
+        # Use uv to install Python 3.11 (faster than apt, includes distutils)
+        uv python install 3.11
+        PYTHON_PATH=$(uv python find 3.11)
+        echo "Installed Python 3.11 at: $PYTHON_PATH"
+        # Make it the system default so node-gyp and Tilt subprocesses can find it
+        sudo update-alternatives --install /usr/bin/python3 python3 "$PYTHON_PATH" 10
+        sudo update-alternatives --set python3 "$PYTHON_PATH"
+        sudo ln -sf "$PYTHON_PATH" /usr/bin/python
         python3 --version
         python3 -c "import distutils; print('distutils OK')"
     - name: Yarn Install
