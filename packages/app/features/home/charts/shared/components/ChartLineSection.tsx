@@ -61,7 +61,7 @@ export function ChartLineSection({
             stroke={stroke}
             fill="none"
             selectedStrokeWidth={5}
-            strokeWidth={3.5}
+            strokeWidth={2.5}
             panGestureHandlerProps={mergedPanProps}
             onScrub={
               typeof onScrub === 'function'

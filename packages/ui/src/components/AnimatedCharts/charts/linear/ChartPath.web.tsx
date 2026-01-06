@@ -351,6 +351,7 @@ export const ChartPath = React.memo(
               stroke={finalStroke}
               strokeWidth={focused ? (strokeWidth ?? 1) + 1 : strokeWidth}
               strokeLinecap="round"
+              strokeLinejoin="round"
               fill="none"
               {...rest}
             />
