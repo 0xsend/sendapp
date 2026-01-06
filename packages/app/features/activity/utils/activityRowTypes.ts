@@ -53,6 +53,9 @@ export interface EarnRow extends BaseActivityRow {
 export interface ExternalRow extends BaseActivityRow {
   kind: 'external'
   avatarUrl: string
+  coinSymbol: string
+  isWithdraw: boolean
+  isDeposit: boolean
 }
 
 // SEND token upgrade (v0 to v1)

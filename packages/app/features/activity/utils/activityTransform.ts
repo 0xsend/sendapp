@@ -471,15 +471,20 @@ export function transformActivity(
   // External transfer (to/from non-Send addresses)
   let title: string
   let subtitle: string
+  let isWithdraw = false
+  let isDeposit = false
   const { addressBook } = ctx
+  const coinSymbol = activityData?.coin?.symbol ?? ''
 
   if (isSendAccountTransfersEvent(activity)) {
     if (to_user?.send_id === undefined && from_user?.id) {
       title = t('events.withdraw', { defaultValue: 'Withdraw' })
       subtitle = labelAddress(activityData.t ?? '', addressBook)
+      isWithdraw = true
     } else if (from_user === null && to_user?.id) {
       title = t('events.deposit', { defaultValue: 'Deposit' })
       subtitle = labelAddress(activityData.f ?? '', addressBook)
+      isDeposit = true
     } else {
       title = from_user?.id
         ? t('events.sent', { defaultValue: 'Sent' })
@@ -489,6 +494,7 @@ export function transformActivity(
   } else if (isSendAccountReceiveEvent(activity)) {
     if (from_user === null && to_user?.id) {
       title = t('events.deposit', { defaultValue: 'Deposit' })
+      isDeposit = true
     } else {
       title = t('events.received', { defaultValue: 'Received' })
     }
@@ -514,6 +520,9 @@ export function transformActivity(
     title,
     subtitle,
     avatarUrl: subtitle ? generateAvatarUrl(subtitle) : generateAvatarUrl('?'),
+    coinSymbol,
+    isWithdraw,
+    isDeposit,
   } satisfies ExternalRow
 }
 

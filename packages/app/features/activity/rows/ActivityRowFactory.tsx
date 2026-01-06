@@ -10,7 +10,7 @@ import { isWeb } from '@tamagui/constants'
 import { FastImage } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
-import { IconUpgrade, IconBadgeCheckSolid2 } from 'app/components/icons'
+import { IconUpgrade, IconBadgeCheckSolid2, IconKey } from 'app/components/icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
 import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
@@ -295,8 +295,7 @@ const AvatarWithVerifiedBadge = memo(({ avatarUrl, isVerified, isDark }: AvatarW
     {isVerified && (
       <View style={styles.verifiedBadgeWrapper}>
         <IconBadgeCheckSolid2
-          size="$1"
-          scale={0.7}
+          size={16}
           // @ts-expect-error - not using tamagui token this time
           color={isDark ? darkColors.neon7 : lightColors.neon7}
           checkColor={isDark ? darkColors.badgeCheckColor : lightColors.badgeCheckColor}
@@ -428,9 +427,28 @@ const EarnRowComponent = memo(({ row, colors }: { row: EarnRow } & RowBaseProps)
 })
 EarnRowComponent.displayName = 'EarnRow'
 
-const ExternalRowComponent = memo(({ row, colors }: { row: ExternalRow } & RowBaseProps) => (
-  <RowLayout row={row} colors={colors} avatar={<SimpleAvatar avatarUrl={row.avatarUrl} />} />
-))
+const ExternalRowComponent = memo(({ row, colors }: { row: ExternalRow } & RowBaseProps) => {
+  // Show coin icon with direction badge for withdraw/deposit
+  if ((row.isWithdraw || row.isDeposit) && row.coinSymbol) {
+    return (
+      <RowLayout
+        row={row}
+        colors={colors}
+        avatar={
+          <IconWithBadge
+            symbol={row.coinSymbol}
+            BadgeIcon={row.isWithdraw ? ArrowUp : ArrowDown}
+            isPositive={row.isDeposit}
+            badgePosition="bottom"
+            colors={colors}
+          />
+        }
+      />
+    )
+  }
+  // Fallback to simple avatar for other external transfers
+  return <RowLayout row={row} colors={colors} avatar={<SimpleAvatar avatarUrl={row.avatarUrl} />} />
+})
 ExternalRowComponent.displayName = 'ExternalRow'
 
 const UpgradeRowComponent = memo(({ row, colors }: { row: UpgradeRow } & RowBaseProps) => (
@@ -461,7 +479,16 @@ const ReferralRowComponent = memo(
 ReferralRowComponent.displayName = 'ReferralRow'
 
 const SigningKeyRowComponent = memo(({ row, colors }: { row: SigningKeyRow } & RowBaseProps) => (
-  <RowLayout row={row} colors={colors} avatar={<PlaceholderAvatar />} />
+  <RowLayout
+    row={row}
+    colors={colors}
+    avatar={
+      <View style={[styles.sendpotIconBase, { backgroundColor: colors.olive }]}>
+        {/* @ts-expect-error - not using tamagui token */}
+        <IconKey color={darkColors.color2} size={24} />
+      </View>
+    }
+  />
 ))
 SigningKeyRowComponent.displayName = 'SigningKeyRow'
 
