@@ -65,6 +65,14 @@ local_resource(
     resource_deps = _infra_resource_deps,
     serve_cmd = "while true; do docker logs -f -n 1 supabase_db_" + WORKSPACE_NAME + "; sleep 1; done",
     serve_dir = _prj_root,
+    serve_env = {
+        "SUPABASE_API_PORT": _supabase_api_port,
+        "SUPABASE_DB_PORT": _supabase_db_port,
+        "SUPABASE_STUDIO_PORT": _supabase_studio_port,
+        "SUPABASE_INBUCKET_PORT": _supabase_inbucket_port,
+        "SUPABASE_INBUCKET_SMTP_PORT": _supabase_inbucket_smtp_port,
+        "SUPABASE_INBUCKET_POP3_PORT": _supabase_inbucket_pop3_port,
+    },
 )
 
 cmd_button(

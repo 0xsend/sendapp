@@ -17,21 +17,21 @@
     }
   },
   "scripts": {
-    "_with-env": "dotenv -e ../.env -c -- ",
+    "_with-env": "dotenv -e ../.localnet.env -e ../.env -c -- ",
     "_link-project": "npx supabase link --project-ref $NEXT_PUBLIC_SUPABASE_PROJECT_ID --workdir ../",
     "link-project": "yarn _with-env yarn _link-project",
     "_generate:remote": "npx supabase gen types typescript --project-id $NEXT_PUBLIC_SUPABASE_PROJECT_ID --schema public,temporal > ./database-generated.types.ts",
     "generate:remote": "yarn _with-env yarn _generate:remote",
-    "generate": "npx supabase gen types typescript --local --schema public,temporal > ./database-generated.types.ts",
+    "generate": "yarn _with-env npx supabase gen types typescript --local --schema public,temporal > ./database-generated.types.ts",
     "g": "yarn generate",
-    "migration:diff": "npx supabase db diff -f",
-    "start": "npx supabase start",
-    "stop": "npx supabase stop",
-    "reset": "npx supabase db reset && npx supabase start",
-    "status": "npx supabase status",
+    "migration:diff": "yarn _with-env npx supabase db diff -f",
+    "start": "yarn _with-env npx supabase start",
+    "stop": "yarn _with-env npx supabase stop",
+    "reset": "yarn _with-env sh -c 'npx supabase db reset && npx supabase start'",
+    "status": "yarn _with-env npx supabase status",
     "_deploy": "yarn link-project && npx supabase db push",
     "deploy": "yarn _with-env yarn _deploy",
-    "test": "npx supabase test db"
+    "test": "yarn _with-env npx supabase test db"
   },
   "devDependencies": {
     "dotenv-cli": "^7.3.0",

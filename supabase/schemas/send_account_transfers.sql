@@ -41,12 +41,43 @@ begin
        (NEW.t is not null and NEW.t = ANY (ignored_addresses)) then
         return NEW;
     end if;
-    delete from public.activity a
-    using temporal.send_account_transfers t_sat
-    where a.event_name = 'temporal_send_account_transfers'
-      and a.event_id = t_sat.workflow_id
-      and t_sat.created_at_block_num <= NEW.block_num
-      and t_sat.status IN ('initialized', 'submitted', 'sent', 'confirmed', 'cancelled');
+    
+    -- Delete pending temporal activities by activity_id (direct FK reference)
+    -- Match the specific temporal transfer by user_op_hash or addresses+value
+    delete from public.activity
+    where id IN (
+        SELECT activity_id
+        FROM temporal.send_account_transfers
+        WHERE activity_id IS NOT NULL
+          AND created_at_block_num <= NEW.block_num
+          AND status IN ('initialized', 'submitted', 'sent')
+          AND (
+            -- Match by user_op_hash (most reliable - exact tx match)
+            (data ? 'user_op_hash' AND (data->>'user_op_hash')::bytea = NEW.tx_hash)
+            OR
+            -- Fallback: match by addresses + value (for cases without user_op_hash)
+            (
+              (
+                (data ? 'f' AND (data->>'f')::bytea = NEW.f) 
+                OR 
+                (data ? 'sender' AND (data->>'sender')::bytea = NEW.f)
+              )
+              AND
+              (
+                (data ? 't' AND (data->>'t')::bytea = NEW.t)
+                OR
+                (data ? 'log_addr' AND (data->>'log_addr')::bytea = NEW.t)
+              )
+              AND
+              (
+                (data ? 'v' AND (data->>'v')::numeric = NEW.v)
+                OR
+                (data ? 'value' AND (data->>'value')::numeric = NEW.v)
+              )
+            )
+          )
+    );
+    
     return NEW;
 end;
 $function$

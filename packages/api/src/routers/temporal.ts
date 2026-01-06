@@ -147,9 +147,32 @@ async function lookupTransferReceipt(userOpHash: Hex, startTime: Date): Promise<
   return true
 }
 
+/**
+ * Looks up a transfer intent by workflow_id to verify the workflow has progressed.
+ * First tries transfer_intents (intent-first approach), then falls back to activity table (legacy).
+ */
 async function lookupInitializedWorkflow(workflowId: string, startTime: Date): Promise<boolean> {
   const supabaseAdmin = createSupabaseAdminClient()
-  const { data, error } = await supabaseAdmin
+
+  // First, try to find in transfer_intents (intent-first approach)
+  const { data: intentData, error: intentError } = await supabaseAdmin
+    .from('transfer_intents')
+    .select('status')
+    .eq('workflow_id', workflowId)
+    .gte('created_at', startTime.toISOString())
+    .single()
+
+  // If found in transfer_intents, check status
+  if (intentData && !intentError) {
+    // Status must be at least 'submitted' (not 'pending') for the workflow to be considered started
+    const validStatuses = ['submitted', 'confirmed', 'failed']
+    assert(validStatuses.includes(intentData.status), 'Transfer not yet submitted')
+    log(`Intent-first: ${intentData.status} transfer found: ${workflowId}`)
+    return true
+  }
+
+  // Fall back to activity table (legacy approach)
+  const { data: activityData, error: activityError } = await supabaseAdmin
     .from('activity')
     .select('data->>status')
     .eq('event_id', workflowId)
@@ -157,8 +180,8 @@ async function lookupInitializedWorkflow(workflowId: string, startTime: Date): P
     .gte('created_at', startTime.toISOString())
     .single()
 
-  throwIf(error)
-  assert(!!data && data.status !== 'initialized', 'Transfer not yet submitted')
-  log(`${data.status} transfer found: ${workflowId}`)
+  throwIf(activityError)
+  assert(!!activityData && activityData.status !== 'initialized', 'Transfer not yet submitted')
+  log(`Legacy: ${activityData.status} transfer found: ${workflowId}`)
   return true
 }
