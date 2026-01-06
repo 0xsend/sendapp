@@ -7,6 +7,7 @@ import {
   Stack,
   SubmitButton,
   useDebounce,
+  View,
   XStack,
   YStack,
 } from '@my/ui'
@@ -31,7 +32,15 @@ import { api } from 'app/utils/api'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -57,7 +66,6 @@ export const SwapFormScreen = () => {
   const { outToken, inToken, inAmount, slippage } = swapParams
   const { coin: inCoin } = useCoin(inToken)
   const { coin: outCoin } = useCoin(outToken)
-  const hoverStyles = useHoverStyles()
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
   const { distributionShares } = useUser()
@@ -510,7 +518,11 @@ export const SwapFormScreen = () => {
               <YStack gap="$5">
                 <YStack gap="$5">
                   <YStack gap="$5">
-                    <FadeCard borderColor={insufficientAmount ? '$error' : 'transparent'} bw={1}>
+                    <FadeCard
+                      br="$7"
+                      borderColor={insufficientAmount ? '$error' : 'transparent'}
+                      bw={1}
+                    >
                       <XStack ai="center" gap="$2">
                         <ArrowUp
                           size={'$1'}
@@ -637,7 +649,7 @@ export const SwapFormScreen = () => {
                         </XStack>
                       </XStack>
                     </FadeCard>
-                    <FadeCard position={'relative'}>
+                    <FadeCard br="$7" position={'relative'}>
                       <XStack ai="center" gap="$2">
                         <ArrowDown
                           size={'$1'}
@@ -725,55 +737,11 @@ export const SwapFormScreen = () => {
                           </XStack>
                         )}
                       </YStack>
-                      <YStack
-                        position={'absolute'}
-                        top={0}
-                        left={0}
-                        right={0}
-                        bottom={0}
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        style={{
-                          pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
-                        }}
-                      >
-                        <YStack
-                          boc={'$aztec1'}
-                          bw={2}
-                          borderRadius={9999}
-                          pointerEvents={'auto'}
-                          // @ts-expect-error need this detailed calc here
-                          transform={[{ translateY: 'calc(-50% - 12px)' }]}
-                          elevation={24}
-                          shadowOpacity={0.4}
-                          animation="responsive"
-                          hoverStyle={{
-                            scale: 1.05,
-                          }}
-                          pressStyle={{
-                            scale: 0.99,
-                          }}
-                          className="will-change-transform"
-                        >
-                          <Button
-                            // @ts-expect-error tamagui is tripping here
-                            type={'button'}
-                            testID={'flipTokensButton'}
-                            circular={true}
-                            size={'$5'}
-                            borderWidth={0}
-                            onPress={handleFlipTokens}
-                          >
-                            <Button.Icon>
-                              <IconSwap size={'$1'} />
-                            </Button.Icon>
-                          </Button>
-                        </YStack>
-                      </YStack>
+                      <FlipTokensButton onPress={handleFlipTokens} />
                     </FadeCard>
                   </YStack>
                 </YStack>
-                <FadeCard>
+                <FadeCard br="$7">
                   <Slippage slippage={formSlippage} onChange={handleSlippageChange} />
                 </FadeCard>
               </YStack>
@@ -789,6 +757,60 @@ export const SwapFormScreen = () => {
         </SchemaForm>
       </FormProvider>
       <SwapRiskDialog />
+    </YStack>
+  )
+}
+
+interface SwapCoinsButtonProps {
+  onPress: () => void
+}
+
+const FlipTokensButton = ({ onPress }: SwapCoinsButtonProps) => {
+  return (
+    <YStack
+      position={'absolute'}
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      justifyContent="flex-start"
+      alignItems="center"
+      style={{
+        pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
+      }}
+    >
+      <YStack
+        boc={'$aztec1'}
+        bw={2}
+        borderRadius={9999}
+        pointerEvents={'auto'}
+        // @ts-expect-error need this detailed calc here
+        transform={[{ translateY: 'calc(-50% - 12px)' }]}
+        elevation={24}
+        shadowOpacity={0.4}
+        animation="responsive"
+        hoverStyle={{
+          scale: 1.05,
+        }}
+        pressStyle={{
+          scale: 0.99,
+        }}
+        className="will-change-transform"
+      >
+        <Button
+          // @ts-expect-error tamagui is tripping here
+          type={'button'}
+          testID={'flipTokensButton'}
+          circular={true}
+          size={'$5'}
+          borderWidth={0}
+          onPress={onPress}
+        >
+          <Button.Icon>
+            <IconSwap size={'$1'} />
+          </Button.Icon>
+        </Button>
+      </YStack>
     </YStack>
   )
 }
@@ -841,7 +863,12 @@ export const Slippage = ({
 
   return (
     <YStack gap={'$3.5'}>
-      <XStack ai={'center'} jc={'space-between'}>
+      <XStack
+        cur="pointer"
+        onPress={() => setIsOpen((prevState) => !prevState)}
+        ai={'center'}
+        jc={'space-between'}
+      >
         <Paragraph
           size={'$5'}
           color={'$lightGrayTextField'}
@@ -869,15 +896,12 @@ export const Slippage = ({
             p={0}
             bw={0}
             height={'auto'}
-            onPress={() => setIsOpen((prevState) => !prevState)}
           >
-            <Button.Icon>
-              {isOpen ? (
+            <View animation="responsive" rotate={isOpen ? '0deg' : '180deg'}>
+              <Button.Icon>
                 <ChevronUp size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-              ) : (
-                <ChevronDown size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-              )}
-            </Button.Icon>
+              </Button.Icon>
+            </View>
           </Button>
         </XStack>
       </XStack>
@@ -885,15 +909,14 @@ export const Slippage = ({
         <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'}>
           {SLIPPAGE_OPTIONS.map((slippageOption) => (
             <Button
+              size="$3"
               // @ts-expect-error tamagui is tripping here
               type={'button'}
               key={`slippage-${slippageOption}`}
               onPress={() => handleOnPress(slippageOption)}
               hoverStyle={hoverStyles}
               bw={0}
-              p={'$2'}
-              width={'$6'}
-              br={'$4'}
+              br={'$6'}
               bc={slippageOption === slippage ? hoverStyles.backgroundColor : '$color1'}
             >
               <Button.Text>{slippageOption / 100}%</Button.Text>
@@ -910,7 +933,7 @@ export const Slippage = ({
               w={100}
               br={'$4'}
               placeholder={isFocused ? '' : t('form.slippage.customPlaceholder')}
-              placeholderTextColor={'$color12'}
+              placeholderTextColor={'$gray10'}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               value={customSlippage || ''}
