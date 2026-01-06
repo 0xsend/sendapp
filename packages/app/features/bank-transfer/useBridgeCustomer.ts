@@ -34,7 +34,7 @@ export function useBridgeCustomer() {
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: [BRIDGE_CUSTOMER_QUERY_KEY],
+    queryKey: [BRIDGE_CUSTOMER_QUERY_KEY, user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       log('fetching bridge customer for user', user?.id)

@@ -16,7 +16,7 @@ export function useBridgeDeposits(options?: { limit?: number }) {
   const limit = options?.limit ?? 50
 
   return useQuery({
-    queryKey: [BRIDGE_DEPOSITS_QUERY_KEY, { limit }],
+    queryKey: [BRIDGE_DEPOSITS_QUERY_KEY, user?.id, { limit }],
     enabled: !!user?.id,
     queryFn: async () => {
       log('fetching bridge deposits for user', user?.id)

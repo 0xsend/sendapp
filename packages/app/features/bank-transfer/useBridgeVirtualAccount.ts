@@ -64,7 +64,7 @@ export function useBridgeVirtualAccount() {
   const supabase = useSupabase()
 
   return useQuery({
-    queryKey: [BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY],
+    queryKey: [BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY, user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       log('fetching bridge virtual account for user', user?.id)
