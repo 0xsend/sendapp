@@ -242,7 +242,7 @@ jobs:
         shell: bash
         run: |
           # Python 3.12 removed distutils which node-gyp requires for native modules
-          sudo apt-get update && sudo apt-get install -y python3.11 python3.11-distutils
+          sudo apt-get update && sudo apt-get install -y python3.11
           sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
           sudo update-alternatives --set python3 /usr/bin/python3.11
           sudo ln -sf /usr/bin/python3.11 /usr/bin/python

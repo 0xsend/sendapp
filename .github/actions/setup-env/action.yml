@@ -74,14 +74,15 @@ runs:
       shell: bash
       run: |
         # Python 3.12 removed distutils which node-gyp requires for native modules
-        # Install Python 3.11 and set it as the default for gyp to find
-        sudo apt-get update && sudo apt-get install -y python3.11 python3.11-distutils
+        # Install Python 3.11 (distutils is included in stdlib for 3.11)
+        sudo apt-get update && sudo apt-get install -y python3.11
         # Update alternatives to make python3 point to python3.11
         sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
         sudo update-alternatives --set python3 /usr/bin/python3.11
         # Also set python for node-gyp
         sudo ln -sf /usr/bin/python3.11 /usr/bin/python
         python3 --version
+        python3 -c "import distutils; print('distutils OK')"
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
