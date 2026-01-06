@@ -1,53 +1,125 @@
 import * as grpc from '@grpc/grpc-js'
+import * as protoLoader from '@grpc/proto-loader'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import type { CheckResult, GrpcCheckConfig } from '../types.js'
 
-interface HealthResponse {
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+// Standard gRPC health check proto embedded as a string
+// From: https://github.com/grpc/grpc/blob/master/src/proto/grpc/health/v1/health.proto
+const HEALTH_PROTO = `
+syntax = "proto3";
+
+package grpc.health.v1;
+
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+    SERVICE_UNKNOWN = 3;
+  }
+  ServingStatus status = 1;
+}
+
+service Health {
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc Watch(HealthCheckRequest) returns (stream HealthCheckResponse);
+}
+`
+
+// Write proto to temp file for proto-loader
+import { writeFileSync, mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+
+interface HealthCheckRequest {
+  service: string
+}
+
+interface HealthCheckResponse {
   status: number
+}
+
+interface HealthClient extends grpc.Client {
+  check(
+    request: HealthCheckRequest,
+    options: grpc.CallOptions,
+    callback: (error: grpc.ServiceError | null, response?: HealthCheckResponse) => void
+  ): void
+}
+
+interface HealthServiceDefinition {
+  Health: grpc.ServiceClientConstructor
+}
+
+let healthClient: new (address: string, credentials: grpc.ChannelCredentials) => HealthClient
+
+/**
+ * Load the health proto definition using proto-loader
+ */
+async function getHealthClient(): Promise<
+  new (
+    address: string,
+    credentials: grpc.ChannelCredentials
+  ) => HealthClient
+> {
+  if (healthClient) return healthClient
+
+  // Write proto to temp file since proto-loader needs a file path
+  const tempDir = mkdtempSync(join(tmpdir(), 'sendctl-'))
+  const protoPath = join(tempDir, 'health.proto')
+
+  try {
+    writeFileSync(protoPath, HEALTH_PROTO)
+
+    const packageDefinition = await protoLoader.load(protoPath, {
+      keepCase: true,
+      longs: String,
+      enums: Number,
+      defaults: true,
+      oneofs: true,
+    })
+
+    const proto = grpc.loadPackageDefinition(packageDefinition) as unknown as {
+      grpc: { health: { v1: HealthServiceDefinition } }
+    }
+
+    healthClient = proto.grpc.health.v1.Health as unknown as new (
+      address: string,
+      credentials: grpc.ChannelCredentials
+    ) => HealthClient
+    return healthClient
+  } finally {
+    // Clean up temp file
+    try {
+      rmSync(tempDir, { recursive: true })
+    } catch {
+      // Ignore cleanup errors
+    }
+  }
 }
 
 /**
  * Check Temporal workflow engine health via gRPC
- * Uses standard grpc.health.v1.Health/Check protocol
+ * Uses standard grpc.health.v1.Health/Check protocol loaded via proto-loader
  * Service name: empty string for overall server health
  */
 export async function checkTemporal(config: GrpcCheckConfig): Promise<CheckResult> {
   const start = Date.now()
 
-  return new Promise((resolve) => {
-    const deadline = Date.now() + config.timeout
+  try {
+    const HealthClient = await getHealthClient()
+    const client = new HealthClient(config.address, grpc.credentials.createInsecure())
 
-    // Create client with insecure credentials (local dev only)
-    const client = new grpc.Client(config.address, grpc.credentials.createInsecure())
+    const deadline = new Date(Date.now() + config.timeout)
 
-    // Set deadline for the call
-    const callOptions: grpc.CallOptions = {
-      deadline: new Date(deadline),
-    }
-
-    // Manually encode the health check request
-    // HealthCheckRequest { service = "" } is just an empty message for overall health
-    const requestBuffer = Buffer.alloc(0) // Empty service name = overall health
-
-    // Define serialize and deserialize functions with proper return types
-    const serialize = (_arg: Record<string, never>): Buffer => requestBuffer
-
-    const deserialize = (buffer: Buffer): HealthResponse => {
-      // Decode HealthCheckResponse
-      // Field 1 (status) is a varint, tag = 0x08
-      if (buffer.length >= 2 && buffer[0] === 0x08) {
-        return { status: buffer[1] as number }
-      }
-      // If response is empty or malformed, assume UNKNOWN (0)
-      return { status: 0 }
-    }
-
-    client.makeUnaryRequest<Record<string, never>, HealthResponse>(
-      '/grpc.health.v1.Health/Check',
-      serialize,
-      deserialize,
-      {},
-      callOptions,
-      (error: grpc.ServiceError | null, response?: HealthResponse) => {
+    return new Promise((resolve) => {
+      client.check({ service: '' }, { deadline }, (error, response) => {
         const duration_ms = Date.now() - start
 
         if (error) {
@@ -64,6 +136,7 @@ export async function checkTemporal(config: GrpcCheckConfig): Promise<CheckResul
             duration_ms,
             error: errorMessage,
           })
+          client.close()
           return
         }
 
@@ -81,7 +154,15 @@ export async function checkTemporal(config: GrpcCheckConfig): Promise<CheckResul
         }
 
         client.close()
-      }
-    )
-  })
+      })
+    })
+  } catch (err) {
+    const duration_ms = Date.now() - start
+    const error = err instanceof Error ? err.message : String(err)
+    return {
+      status: 'failed',
+      duration_ms,
+      error,
+    }
+  }
 }

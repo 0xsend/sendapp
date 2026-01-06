@@ -1,3 +1,4 @@
+import { ConfigError } from '../config.js'
 import type { CheckResult, SupabaseCheckConfig } from '../types.js'
 
 /**
@@ -5,17 +6,14 @@ import type { CheckResult, SupabaseCheckConfig } from '../types.js'
  * Endpoint: GET /rest/v1/
  * Headers: apikey, Authorization
  * Success: HTTP 200
+ * Throws: ConfigError if NEXT_PUBLIC_SUPABASE_ANON_KEY is missing
  */
 export async function checkSupabase(config: SupabaseCheckConfig): Promise<CheckResult> {
   const start = Date.now()
 
-  // Check for required anonKey - this is a config error specific to supabase check
+  // Check for required anonKey - this is a config error per spec (exit code 2)
   if (!config.anonKey) {
-    return {
-      status: 'failed',
-      duration_ms: 0,
-      error: 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required for supabase check',
-    }
+    throw new ConfigError('NEXT_PUBLIC_SUPABASE_ANON_KEY is required')
   }
 
   try {
