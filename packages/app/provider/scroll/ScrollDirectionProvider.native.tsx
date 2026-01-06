@@ -18,8 +18,8 @@ const ScrollDirectionProvider = ({ children }: { children: ReactNode }) => {
   // Refs for performance-critical values
   const contentOffsetRef = useRef(0)
 
-  // State for UI updates
-  const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
+  // State for UI updates - start with 'up' so first scroll down triggers nav bar hide
+  const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>('up')
   const contentHeight = useRef<Record<string, number>>({})
   const [isAtEnd, setIsAtEnd] = useState(false)
   const pathname = usePathname()

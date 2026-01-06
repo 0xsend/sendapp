@@ -25,6 +25,10 @@
       "deposit": "Send Earn Einzahlung",
       "withdraw": "Send Earn Auszahlung"
     },
+    "sendCheck": {
+      "create": "Check gesendet",
+      "claim": "Check eingelöst"
+    },
     "sendTokenUpgrade": "Send Token Upgrade",
     "sendpot": {
       "ticketPurchase": "Gekauft",

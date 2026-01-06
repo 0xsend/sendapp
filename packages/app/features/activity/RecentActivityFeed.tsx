@@ -1,8 +1,10 @@
-import { isServer, type InfiniteData, type UseInfiniteQueryResult } from '@tanstack/react-query'
+/**
+ * Activity Feed component using idle-time processing and factory pattern.
+ * All computation happens in background via requestIdleCallback.
+ * Rendering is just a simple switch on pre-computed typed rows.
+ */
+
 import { isWeb } from '@tamagui/constants'
-import type { Activity } from 'app/utils/zod/activity'
-import type { PostgrestError } from '@supabase/postgrest-js'
-import type { ZodError } from 'zod'
 import {
   memo,
   type PropsWithChildren,
@@ -11,28 +13,36 @@ import {
   useMemo,
   useRef,
   useState,
-  startTransition,
-  useDeferredValue,
 } from 'react'
-import { H4, LazyMount, Paragraph, Shimmer, useEvent, View, YStack } from '@my/ui'
+import { H4, LazyMount, Paragraph, Shimmer, useThemeName, View, YStack } from '@my/ui'
+import { Pressable } from 'react-native'
 import { FlashList } from '@shopify/flash-list'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRowV2'
 import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
 import { useSendScreenParams } from 'app/routers/params'
-import { useUser } from 'app/utils/useUser'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
-import { useProfileLookup } from 'app/utils/useProfileLookup'
-import { Keyboard } from 'react-native'
+import {
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  StyleSheet as RNStyleSheet,
+} from 'react-native'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useAddressBook } from 'app/utils/useAddressBook'
+import {
+  type ActivityRow,
+  isHeaderRow,
+  useProcessedActivityFeed,
+  type UserTransferRow,
+  type ReferralRow,
+} from './utils/useProcessedActivityFeed'
+import { ActivityRowFactory, getColors } from './rows/ActivityRowFactory'
 
-export default function ActivityFeed({
-  activityFeedQuery,
-  onActivityPress,
-}: {
-  activityFeedQuery: UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError>
-  onActivityPress: (activity: Activity) => void
-}) {
+// Item heights
+const HEADER_HEIGHT = 56
+const ACTIVITY_ITEM_HEIGHT = 122
+
+export default function ActivityFeed() {
   const { t, i18n } = useTranslation('activity')
   const { onScroll: onScrollHandler, onContentSizeChange: onContentSizeChangeHandler } =
     useScrollDirection()
@@ -43,16 +53,6 @@ export default function ActivityFeed({
 
   const sendParamsRef = useRef(sendParamsAndSet)
   sendParamsRef.current = sendParamsAndSet
-
-  const {
-    data: profile,
-    isLoading: isLoadingRecipient,
-    error: errorProfileLookup,
-  } = useProfileLookup(sendParams.idType ?? 'tag', sendParams.recipient ?? '')
-
-  // to avoid flickering
-  const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
-  const finalIsLoading = isLoadingRecipient && deferredIsLoadingRecipient
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
@@ -70,24 +70,33 @@ export default function ActivityFeed({
   }, [sendChatOpen])
 
   useEffect(() => {
-    if (!errorProfileLookup && profile?.address && sendParams.idType && sendParams.recipient) {
-      Keyboard.dismiss()
-      startTransition(() => {
-        setSendChatOpen(true)
-      })
-    } else {
-      setSendChatOpen(false)
+    if (sendParams.idType && sendParams.recipient) {
+      setSendChatOpen(true)
     }
-  }, [profile, sendParams.idType, sendParams.recipient, errorProfileLookup])
+  }, [sendParams.idType, sendParams.recipient])
 
+  // Get swap/pool data for preprocessing
+  const { data: swapRouters } = useSwapRouters()
+  const { data: liquidityPools } = useLiquidityPools()
+  const { data: addressBook } = useAddressBook()
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
+
+  // Use the processed activity feed hook - all computation happens via requestIdleCallback
   const {
-    data,
+    processedData,
+    isProcessing,
     isLoading: isLoadingActivities,
     error: activitiesError,
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
     hasNextPage,
-  } = activityFeedQuery
+  } = useProcessedActivityFeed({
+    t,
+    locale,
+    swapRouters,
+    liquidityPools,
+    addressBook,
+  })
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPageActivities) {
@@ -95,59 +104,26 @@ export default function ActivityFeed({
     }
   }, [hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
-  const pages = data?.pages
-  const locale = i18n.resolvedLanguage ?? i18n.language
-
-  const { flattenedData } = useMemo(() => {
-    if (!pages) return { flattenedData: [], stickyIndices: [] }
-
-    const activities = pages.flat()
-
-    // Remove duplicates
-    const seenEventIds = new Set<string>()
-    const uniqueActivities = activities.filter((activity) => {
-      if (seenEventIds.has(activity.event_id)) {
-        return false
-      }
-      seenEventIds.add(activity.event_id)
-      return true
-    })
-
-    const groups = uniqueActivities.reduce<Record<string, Activity[]>>((acc, activity) => {
-      const isToday = activity.created_at.toDateString() === new Date().toDateString()
-      const dateKey = isToday
-        ? t('sections.today')
-        : activity.created_at.toLocaleDateString(locale || undefined, {
-            day: 'numeric',
-            month: 'long',
+  const onActivityPress = useCallback(
+    (item: ActivityRow) => {
+      // For user transfers and referrals, open send chat with counterpart
+      if (item.kind === 'user-transfer' || item.kind === 'referral') {
+        const row = item as UserTransferRow | ReferralRow
+        if (row.counterpartSendId !== null) {
+          setSendParams({
+            ...sendParams,
+            recipient: row.counterpartSendId.toString(),
+            idType: 'sendid',
           })
-
-      if (!acc[dateKey]) {
-        acc[dateKey] = []
+        }
       }
+    },
+    [sendParams, setSendParams]
+  )
 
-      acc[dateKey].push(activity)
-      return acc
-    }, {})
-
-    const result: ListItem[] = []
-    const headerIndices: number[] = []
-
-    Object.entries(groups).forEach(([title, sectionData], sectionIndex) => {
-      headerIndices.push(result.length)
-      result.push({
-        type: 'header',
-        title,
-        sectionIndex,
-      })
-
-      result.push(...sectionData.map((activity) => ({ ...activity, sectionIndex })))
-    })
-
-    return { flattenedData: result, stickyIndices: headerIndices }
-  }, [pages, t, locale])
-
-  if (isLoadingActivities) {
+  // Only show full shimmer on initial load (no data yet)
+  // When fetching next page, we keep showing existing data with footer shimmer
+  if ((isLoadingActivities || isProcessing) && processedData.length === 0) {
     return <ListLoadingShimmer />
   }
 
@@ -159,7 +135,7 @@ export default function ActivityFeed({
     )
   }
 
-  if (!flattenedData.length) {
+  if (!processedData.length) {
     return <RowLabel>{t('empty.noActivities')}</RowLabel>
   }
 
@@ -172,28 +148,13 @@ export default function ActivityFeed({
       h="100%"
       zIndex={10}
       y={-20}
-      pe={isLoadingRecipient ? 'none' : 'auto'}
-      o={finalIsLoading ? 0.5 : 1}
-      $gtLg={{
-        y: 20,
-      }}
-      $platform-native={{
-        h: '150%',
-        y: 0,
-        animation: '200ms',
-        animateOnly: ['opacity'],
-      }}
-      $platform-web={{
-        transition: 'opacity 200ms linear',
-      }}
+      $gtLg={{ y: 20 }}
+      $platform-native={{ h: '150%', y: 0 }}
     >
       <MyList
-        data={flattenedData}
-        // stickyIndices={stickyIndices}
+        data={processedData}
         onActivityPress={onActivityPress}
-        isLoadingActivities={isLoadingActivities}
-        isFetchingNextPageActivities={isFetchingNextPageActivities}
-        sendParamsRef={sendParamsRef}
+        isFetchingNextPage={isFetchingNextPageActivities || isProcessing}
         onEndReached={onEndReached}
         hasNextPage={hasNextPage}
         onScrollHandler={onScrollHandler}
@@ -206,363 +167,131 @@ export default function ActivityFeed({
   )
 }
 
-type ListItem =
-  | (Activity & { sectionIndex: number })
-  | { type: 'header'; title: string; sectionIndex: number }
-
-type ComputedValues = {
-  amount: ReactNode
-  date: ReactNode
-  eventName: string
-  subtext: string | null
-  subtextAddress: `0x${string}` | null
-  isUserTransfer: boolean
-}
-
-type ComputedListItem =
-  | (Activity & { sectionIndex: number; computed: ComputedValues })
-  | { type: 'header'; title: string; sectionIndex: number }
-
+// Simplified MyList - just renders via factory, no computation
 interface MyListProps {
-  data: ListItem[]
-  stickyIndices?: number[]
-  onActivityPress: (activity: Activity) => void
-  isLoadingActivities: boolean
-  isFetchingNextPageActivities: boolean
-  sendParamsRef: React.RefObject<ReturnType<typeof useSendScreenParams>>
+  data: ActivityRow[]
   onEndReached: () => void
   hasNextPage: boolean
+  isFetchingNextPage: boolean
   onScrollHandler: (e: NativeSyntheticEvent<NativeScrollEvent>, threshold?: number) => void
   onContentSizeChangeHandler?: (w: number, h: number) => void
+  onActivityPress: (item: ActivityRow) => void
 }
 
-const getItemType = (item: ComputedListItem) => {
-  return 'type' in item && item.type === 'header' ? 'header' : 'activity'
+const getItemType = (item: ActivityRow) => item.kind
+
+const keyExtractor = (item: ActivityRow): string => {
+  if (isHeaderRow(item)) return `header-${item.sectionIndex}-${item.title}`
+  return item.eventId
 }
 
-const keyExtractor = (item: ComputedListItem, index: number): string => {
-  if ('type' in item && item.type === 'header') {
-    return `header-${item.sectionIndex}-${item.title}-${index}`
-  }
-  const activity = item as Activity & { sectionIndex: number; computed: ComputedValues }
-  return activity.event_id
-}
-import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { useLiquidityPools } from 'app/utils/useLiquidityPools'
-import { useAddressBook } from 'app/utils/useAddressBook'
-import { useHoverStyles } from 'app/utils/useHoverStyles'
-import {
-  amountFromActivity,
-  eventNameFromActivity,
-  subtextFromActivity,
-  subtextAddressFromActivity,
-} from 'app/utils/activity'
-import { CommentsTime } from 'app/utils/dateHelper'
-import { Spinner } from '@my/ui'
-import {
-  isTemporalEthTransfersEvent,
-  isTemporalTokenTransfersEvent,
-} from 'app/utils/zod/activity/TemporalTransfersEventSchema'
-import {
-  isSendEarnEvent,
-  isSendEarnDepositEvent,
-  isTemporalSendEarnDepositEvent,
-} from 'app/utils/zod/activity'
-import { isSendAccountTransfersEvent } from 'app/utils/zod/activity/SendAccountTransfersEventSchema'
-import { isSendAccountReceiveEvent } from 'app/utils/zod/activity/SendAccountReceiveEventSchema'
-import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
-import { ContractLabels } from 'app/data/contract-labels'
-import type { ReactNode } from 'react'
-
-function isiOSPWA() {
-  if (typeof window === 'undefined') return false
-  const userAgent = navigator.userAgent
-  if (/iPhone|iPad|iPod/.test(userAgent)) {
-    //@ts-expect-error window.navigator is not defined in the browser
-    const isStandalone = window?.navigator.standalone
-    if (isStandalone) {
-      return true
-    }
-    return false
-  }
-  return false
+// Memoized row wrapper to avoid creating new onPress functions per render
+interface ActivityRowWrapperProps {
+  item: Exclude<ActivityRow, { kind: 'header' }>
+  colors: ReturnType<typeof getColors>
+  isDark: boolean
+  onPress: (item: ActivityRow) => void
 }
 
-const IS_IOS_PWA = !isServer && isWeb && isiOSPWA()
+const ActivityRowWrapper = memo(({ item, colors, isDark, onPress }: ActivityRowWrapperProps) => {
+  const handlePress = useCallback(() => onPress(item), [onPress, item])
+
+  return (
+    <Pressable onPress={handlePress}>
+      <YStack
+        bc="$color1"
+        p={10}
+        h={122}
+        mah={122}
+        {...(item.isFirst && {
+          borderTopLeftRadius: '$4',
+          borderTopRightRadius: '$4',
+        })}
+        {...(item.isLast && {
+          borderBottomLeftRadius: '$4',
+          borderBottomRightRadius: '$4',
+        })}
+      >
+        <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
+      </YStack>
+    </Pressable>
+  )
+})
+ActivityRowWrapper.displayName = 'ActivityRowWrapper'
 
 const MyList = memo(
   ({
     data,
-    stickyIndices: _stickyIndices,
-    onActivityPress,
-    isLoadingActivities: _isLoadingActivities,
-    isFetchingNextPageActivities: _isFetchingNextPageActivities,
-    sendParamsRef,
     onEndReached,
     hasNextPage,
+    isFetchingNextPage,
     onScrollHandler,
     onContentSizeChangeHandler,
+    onActivityPress,
   }: MyListProps) => {
-    const { profile } = useUser()
+    const theme = useThemeName()
+    const isDark = theme.includes('dark')
 
-    const { data: swapRouters } = useSwapRouters()
-    const { data: liquidityPools } = useLiquidityPools()
-    const addressBook = useAddressBook()
-    const { t, i18n } = useTranslation('activity')
-    const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
+    // Compute colors once for all rows
+    const colors = useMemo(() => getColors(isDark), [isDark])
 
-    const hoverStyles = useHoverStyles()
+    const handleScroll = useCallback(
+      (e: NativeSyntheticEvent<NativeScrollEvent>) => onScrollHandler(e),
+      [onScrollHandler]
+    )
 
-    const computedData = useMemo(() => {
-      const translator = (key: string, defaultValue?: string, options?: Record<string, unknown>) =>
-        t(key, { defaultValue, ...options })
+    const overrideItemLayout = useCallback(
+      (layout: { span?: number; size?: number }, item: ActivityRow) => {
+        layout.size = isHeaderRow(item) ? HEADER_HEIGHT : ACTIVITY_ITEM_HEIGHT
+      },
+      []
+    )
 
-      const result: ComputedListItem[] = []
-      let currentHeader: { type: 'header'; title: string; sectionIndex: number } | null = null
-
-      for (const item of data) {
-        if ('type' in item && item.type === 'header') {
-          currentHeader = item
-          continue
+    const renderItem = useCallback(
+      ({ item }: { item: ActivityRow }) => {
+        if (isHeaderRow(item)) {
+          return <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
         }
 
-        const activity = item as Activity & { sectionIndex: number }
-
-        const isERC20Transfer = isSendAccountTransfersEvent(activity)
-        const isETHReceive = isSendAccountReceiveEvent(activity)
-        const isTemporalTransfer =
-          isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
-        const isUserTransfer =
-          (isERC20Transfer || isETHReceive || isTemporalTransfer) &&
-          Boolean(activity.to_user?.send_id) &&
-          Boolean(activity.from_user?.send_id)
-
-        let eventName: string
-        if (
-          isSendEarnDepositEvent(activity) &&
-          addressBook.data?.[activity.data.sender] === ContractLabels.SendEarnAffiliate
-        ) {
-          eventName = translator('events.rewards', 'Rewards')
-        } else if (
-          isERC20Transfer &&
-          addressBook.data?.[activity.data.t] === ContractLabels.SendEarn
-        ) {
-          eventName = translator('events.deposit', 'Deposit')
-        } else if (
-          isERC20Transfer &&
-          addressBook.data?.[activity.data.f] === ContractLabels.SendEarn
-        ) {
-          eventName = translator('events.withdraw', 'Withdraw')
-        } else {
-          eventName = eventNameFromActivity({
-            activity,
-            swapRouters: swapRouters || [],
-            liquidityPools: liquidityPools || [],
-            t: translator,
-          })
-        }
-
-        let subtext: string | null
-        const sendEarnLabel = translator('subtext.sendEarn', 'Send Earn')
-        if (isTemporalSendEarnDepositEvent(activity)) {
-          if (activity.data.status === 'failed') {
-            subtext = activity.data.error_message || sendEarnLabel
-          } else {
-            subtext = sendEarnLabel
-          }
-        } else if (isSendEarnEvent(activity)) {
-          subtext = sendEarnLabel
-        } else if (isERC20Transfer) {
-          if (addressBook.data?.[activity.data.t] === ContractLabels.SendEarn) {
-            subtext = sendEarnLabel
-          } else if (addressBook.data?.[activity.data.f] === ContractLabels.SendEarn) {
-            subtext = sendEarnLabel
-          } else {
-            subtext = subtextFromActivity({
-              activity,
-              swapRouters: swapRouters || [],
-              liquidityPools: liquidityPools || [],
-              t: translator,
-            })
-          }
-        } else {
-          subtext = subtextFromActivity({
-            activity,
-            swapRouters: swapRouters || [],
-            liquidityPools: liquidityPools || [],
-            t: translator,
-          })
-        }
-
-        let amount: ReactNode
-        if (isSendEarnEvent(activity)) {
-          amount = <SendEarnAmount activity={activity} />
-        } else {
-          amount = amountFromActivity(activity, swapRouters || [], liquidityPools || [])
-        }
-
-        let date: ReactNode
-        const isTemporalTransferForDate =
-          isTemporalEthTransfersEvent(activity) || isTemporalTokenTransfersEvent(activity)
-        if (isTemporalTransferForDate) {
-          switch (activity.data.status) {
-            case 'failed':
-              date = translator('status.failed', 'Failed')
-              break
-            case 'cancelled':
-              date = translator('status.cancelled', 'Cancelled')
-              break
-            case 'confirmed':
-              date = CommentsTime(new Date(activity.created_at), locale)
-              break
-            default:
-              date = <Spinner size="small" color={'$color11'} />
-          }
-        } else {
-          date = CommentsTime(new Date(activity.created_at), locale)
-        }
-
-        // Get the external address for linking if subtext is an address
-        const subtextAddress = subtextAddressFromActivity({
-          activity,
-          swapRouters: swapRouters || [],
-          liquidityPools: liquidityPools || [],
-        })
-
-        const computed: ComputedValues = {
-          amount,
-          date,
-          eventName,
-          subtext,
-          subtextAddress,
-          isUserTransfer,
-        }
-
-        if (currentHeader) {
-          result.push(currentHeader)
-          currentHeader = null
-        }
-
-        result.push({
-          ...activity,
-          computed,
-        })
-      }
-
-      return result
-    }, [data, swapRouters, liquidityPools, addressBook.data, t, locale])
-
-    const sectionDataMap = useMemo(() => {
-      const map = new Map<number, { firstIndex: number; lastIndex: number }>()
-      let currentSectionIndex = -1
-      let firstIndexInSection = -1
-
-      computedData.forEach((item, index) => {
-        if ('type' in item && item.type === 'header') {
-          if (currentSectionIndex >= 0) {
-            const prevSection = map.get(currentSectionIndex)
-            if (prevSection) {
-              prevSection.lastIndex = index - 1
-            }
-          }
-          currentSectionIndex = item.sectionIndex
-          firstIndexInSection = index + 1
-          map.set(currentSectionIndex, { firstIndex: firstIndexInSection, lastIndex: -1 })
-        }
-      })
-
-      if (currentSectionIndex >= 0) {
-        const lastSection = map.get(currentSectionIndex)
-        if (lastSection) {
-          lastSection.lastIndex = computedData.length - 1
-        }
-      }
-
-      return map
-    }, [computedData])
-
-    const renderItem = useEvent(({ item, index }: { item: ComputedListItem; index: number }) => {
-      if ('type' in item && item.type === 'header') {
-        return <RowLabel>{item.title}</RowLabel>
-      }
-
-      const sectionInfo = sectionDataMap.get(item.sectionIndex)
-
-      const isFirst = sectionInfo?.firstIndex === index
-      const isLast = sectionInfo?.lastIndex === index
-
-      const activity = item as Activity & { computed: ComputedValues }
-      const { computed } = activity
-
-      return (
-        <YStack
-          bc="$color1"
-          p={10}
-          h={122}
-          mah={122}
-          {...(isFirst && {
-            borderTopLeftRadius: '$4',
-            borderTopRightRadius: '$4',
-          })}
-          {...(isLast && {
-            borderBottomLeftRadius: '$4',
-            borderBottomRightRadius: '$4',
-          })}
-        >
-          <TokenActivityRow
-            swapRouters={swapRouters}
-            liquidityPools={liquidityPools}
-            profile={profile}
-            activity={activity}
+        return (
+          <ActivityRowWrapper
+            item={item}
+            colors={colors}
+            isDark={isDark}
             onPress={onActivityPress}
-            sendParamsRef={sendParamsRef}
-            addressBook={addressBook}
-            hoverStyle={hoverStyles}
-            computedAmount={computed.amount}
-            computedDate={computed.date}
-            computedEventName={computed.eventName}
-            computedSubtext={computed.subtext}
-            computedSubtextAddress={computed.subtextAddress}
-            computedIsUserTransfer={computed.isUserTransfer}
           />
-        </YStack>
-      )
-    })
+        )
+      },
+      [isDark, colors, onActivityPress]
+    )
 
     return (
-      <View className="hide-scroll" display="contents">
-        <FlashList
-          data={computedData}
-          style={styles.flashListStyle}
-          testID={'RecentActivity'}
-          keyExtractor={keyExtractor}
-          showsVerticalScrollIndicator={false}
-          getItemType={getItemType}
-          onEndReached={onEndReached}
-          renderItem={renderItem}
-          contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
-          ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
-          onScroll={
-            IS_IOS_PWA
-              ? undefined
-              : (e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)
-          }
-          onContentSizeChange={onContentSizeChangeHandler}
-          scrollEventThrottle={16}
-        />
-      </View>
+      <FlashList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        getItemType={getItemType}
+        overrideItemLayout={overrideItemLayout}
+        onEndReached={onEndReached}
+        onScroll={handleScroll}
+        onContentSizeChange={onContentSizeChangeHandler}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        drawDistance={500}
+        contentContainerStyle={styles.contentContainer}
+        ListFooterComponent={hasNextPage || isFetchingNextPage ? <ListFooterComponent /> : null}
+      />
     )
   }
 )
 
-const styles = {
-  flashListContentContainer: {
-    paddingBottom: !isWeb ? 300 : 200,
+MyList.displayName = 'MyList'
+
+const styles = RNStyleSheet.create({
+  contentContainer: {
+    paddingBottom: isWeb ? 0 : 240,
   },
-  flashListStyle: {
-    flex: 1,
-  },
-} as const
+})
 
 function ListFooterComponent() {
   return (
@@ -572,10 +301,11 @@ function ListFooterComponent() {
       componentName="Card"
       $theme-light={{ bg: '$background' }}
       w="100%"
-      h={122}
+      h={isWeb ? 122 : 60}
     />
   )
 }
+
 function ListLoadingShimmer() {
   return (
     <YStack w="100%" gap={25}>
@@ -584,8 +314,6 @@ function ListLoadingShimmer() {
     </YStack>
   )
 }
-
-MyList.displayName = 'MyList'
 
 function RowLabel({ children }: PropsWithChildren) {
   return (

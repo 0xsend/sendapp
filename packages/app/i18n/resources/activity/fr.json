@@ -25,6 +25,10 @@
       "deposit": "Dépôt Send Earn",
       "withdraw": "Retrait Send Earn"
     },
+    "sendCheck": {
+      "create": "Chèque envoyé",
+      "claim": "Chèque réclamé"
+    },
     "sendTokenUpgrade": "Mise à niveau du jeton Send",
     "sendpot": {
       "ticketPurchase": "Acheté",
