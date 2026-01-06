@@ -1,19 +1,19 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest'
 import { REVENUE_ADDRESSES } from './config'
 import type { MerklRewardsResponse } from './types'
 
 // Mock modules before other imports
-jest.mock('@my/wagmi', () => ({
+vi.mock('@my/wagmi', () => ({
   baseMainnetClient: {
-    getBlock: jest.fn().mockImplementation(() => Promise.resolve({ timestamp: 1700000000n })),
-    waitForTransactionReceipt: jest.fn().mockImplementation(() =>
+    getBlock: vi.fn().mockImplementation(() => Promise.resolve({ timestamp: 1700000000n })),
+    waitForTransactionReceipt: vi.fn().mockImplementation(() =>
       Promise.resolve({
         status: 'success',
         transactionHash: '0xabc123',
         blockNumber: 12345n,
       })
     ),
-    readContract: jest.fn().mockImplementation((args: unknown) => {
+    readContract: vi.fn().mockImplementation((args: unknown) => {
       const { functionName } = args as { functionName: string }
       if (functionName === 'collections') {
         return Promise.resolve('0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4')
@@ -33,27 +33,27 @@ jest.mock('@my/wagmi', () => ({
   },
   erc20Abi: [],
 }))
-jest.mock('app/utils/supabase/admin')
-jest.mock('@my/workflows/utils', () => ({
-  bootstrap: jest.fn(),
-  isRetryableDBError: jest.fn().mockReturnValue(false),
+vi.mock('app/utils/supabase/admin')
+vi.mock('@my/workflows/utils', () => ({
+  bootstrap: vi.fn(),
+  isRetryableDBError: vi.fn().mockReturnValue(false),
 }))
-jest.mock('@temporalio/activity', () => ({
+vi.mock('@temporalio/activity', () => ({
   log: {
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
-  sleep: jest.fn().mockImplementation(() => Promise.resolve()),
+  sleep: vi.fn().mockImplementation(() => Promise.resolve()),
   ApplicationFailure: {
-    retryable: jest.fn((msg: string, code: string, details: unknown) => {
+    retryable: vi.fn((msg: string, code: string, details: unknown) => {
       const error = new Error(msg) as Error & { code: string; details: unknown }
       error.code = code
       error.details = details
       return error
     }),
-    nonRetryable: jest.fn((msg: string, code: string, details?: unknown) => {
+    nonRetryable: vi.fn((msg: string, code: string, details?: unknown) => {
       const error = new Error(msg) as Error & { code: string; details: unknown }
       error.code = code
       error.details = details
@@ -61,26 +61,24 @@ jest.mock('@temporalio/activity', () => ({
     }),
   },
 }))
-jest.mock('./supabase', () => ({
-  getActiveVaults: jest.fn(),
-  insertHarvestRecords: jest.fn(),
-  insertSweepRecords: jest.fn(),
+vi.mock('./supabase', () => ({
+  getActiveVaults: vi.fn(),
+  insertHarvestRecords: vi.fn(),
+  insertSweepRecords: vi.fn(),
 }))
 
 // Mock fetch globally
-const mockFetch = jest.fn<() => Promise<Response>>()
+const mockFetch = vi.fn<() => Promise<Response>>()
 global.fetch = mockFetch as unknown as typeof fetch
 
 import { createRevenueCollectionActivities } from './activities'
 import { getActiveVaults, insertHarvestRecords, insertSweepRecords } from './supabase'
 
-const mockedGetActiveVaults = getActiveVaults as jest.MockedFunction<typeof getActiveVaults>
-const mockedInsertHarvestRecords = insertHarvestRecords as jest.MockedFunction<
+const mockedGetActiveVaults = getActiveVaults as MockedFunction<typeof getActiveVaults>
+const mockedInsertHarvestRecords = insertHarvestRecords as MockedFunction<
   typeof insertHarvestRecords
 >
-const mockedInsertSweepRecords = insertSweepRecords as jest.MockedFunction<
-  typeof insertSweepRecords
->
+const mockedInsertSweepRecords = insertSweepRecords as MockedFunction<typeof insertSweepRecords>
 
 describe('revenue collection activities', () => {
   const testEnv = {
@@ -92,7 +90,7 @@ describe('revenue collection activities', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockFetch.mockReset()
   })
 

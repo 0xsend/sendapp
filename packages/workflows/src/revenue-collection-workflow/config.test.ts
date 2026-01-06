@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it } from 'vitest'
 import { parseUnits } from 'viem'
 import { getRevenueConfig, REVENUE_ADDRESSES } from './config'
 

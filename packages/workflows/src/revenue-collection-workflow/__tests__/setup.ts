@@ -4,13 +4,12 @@
  * Uses @morpho-org/test to spawn Anvil instances that fork Base mainnet.
  */
 import { createViemTest } from '@morpho-org/test/vitest'
+import { expect } from 'vitest'
 import { base } from 'viem/chains'
 
 // Fork URL - use env var or default to public Base RPC
 const ANVIL_FORK_URL =
-  process.env.ANVIL_FORK_URL ||
-  process.env.ANVIL_BASE_FORK_URL ||
-  'https://mainnet.base.org'
+  process.env.ANVIL_FORK_URL || process.env.ANVIL_BASE_FORK_URL || 'https://mainnet.base.org'
 
 /**
  * Extended Vitest test instance with Anvil fork client.
@@ -25,7 +24,7 @@ export const test = createViemTest(base, {
   forkBlockNumber: 25_000_000n,
 })
 
-export { expect } from 'vitest'
+export { expect }
 
 /**
  * Test addresses used in revenue collection tests.
