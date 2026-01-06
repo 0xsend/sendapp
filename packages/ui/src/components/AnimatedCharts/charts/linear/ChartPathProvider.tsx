@@ -115,13 +115,62 @@ function createPath({ data, width, height, yRange }: CallbackType): PathData {
     })
   }
 
-  // Build a simple linear path (M x,y L x,y ...)
+  // Build a smooth curved path using cubic bezier curves
   let path = ''
-  for (let i = 0; i < sortedPoints.length; i++) {
-    const p = sortedPoints[i]
-    if (!p) continue
-    const cmd = i === 0 ? 'M' : 'L'
-    path += `${cmd}${scaleX(p.x)},${scaleY(p.y)} `
+  if (sortedPoints.length === 1) {
+    const p = sortedPoints[0]
+    if (p) {
+      path = `M${scaleX(p.x)},${scaleY(p.y)}`
+    }
+  } else if (sortedPoints.length === 2) {
+    // For 2 points, use a simple line
+    const p0 = sortedPoints[0]
+    const p1 = sortedPoints[1]
+    if (p0 && p1) {
+      path = `M${scaleX(p0.x)},${scaleY(p0.y)} L${scaleX(p1.x)},${scaleY(p1.y)}`
+    }
+  } else {
+    // For 3+ points, use smooth cubic bezier curves
+    // Start with move to first point
+    const first = sortedPoints[0]
+    if (first) {
+      path = `M${scaleX(first.x)},${scaleY(first.y)} `
+    }
+
+    // Generate smooth curves using Catmull-Rom spline approach
+    for (let i = 0; i < sortedPoints.length - 1; i++) {
+      const p0 = sortedPoints[Math.max(0, i - 1)]
+      const p1 = sortedPoints[i]
+      const p2 = sortedPoints[i + 1]
+      const p3 = sortedPoints[Math.min(sortedPoints.length - 1, i + 2)]
+
+      if (!p1 || !p2) continue
+
+      const x0 = p0 ? scaleX(p0.x) : scaleX(p1.x)
+      const y0 = p0 ? scaleY(p0.y) : scaleY(p1.y)
+      const x1 = scaleX(p1.x)
+      const y1 = scaleY(p1.y)
+      const x2 = scaleX(p2.x)
+      const y2 = scaleY(p2.y)
+      const x3 = p3 ? scaleX(p3.x) : scaleX(p2.x)
+      const y3 = p3 ? scaleY(p3.y) : scaleY(p2.y)
+
+      // Calculate control points for smooth cubic bezier
+      // Using Catmull-Rom to Bezier conversion
+      const tension = 0.5 // Controls curve tightness (0 = tight, 1 = loose)
+      const cp1x = x1 + ((x2 - x0) / 6) * tension
+      const cp1y = y1 + ((y2 - y0) / 6) * tension
+      const cp2x = x2 - ((x3 - x1) / 6) * tension
+      const cp2y = y2 - ((y3 - y1) / 6) * tension
+
+      if (i === 0) {
+        // First curve: use first point as start
+        path += `C${cp1x},${cp1y} ${cp2x},${cp2y} ${x2},${y2} `
+      } else {
+        // Subsequent curves: continue from previous end point
+        path += `S${cp2x},${cp2y} ${x2},${y2} `
+      }
+    }
   }
   path = path.trim()
 

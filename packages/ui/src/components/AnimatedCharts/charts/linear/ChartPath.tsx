@@ -486,6 +486,7 @@ const ChartPathInner = React.memo(
             <AnimatedPath
               animatedProps={animatedProps}
               strokeLinecap="round"
+              strokeLinejoin="round"
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...props}
             />
