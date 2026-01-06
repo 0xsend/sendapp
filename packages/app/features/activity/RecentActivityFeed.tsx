@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
 import { useSendScreenParams } from 'app/routers/params'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import { useActivityDetails } from 'app/provider/activity-details'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
@@ -46,6 +47,7 @@ export default function ActivityFeed() {
   const { t, i18n } = useTranslation('activity')
   const { onScroll: onScrollHandler, onContentSizeChange: onContentSizeChangeHandler } =
     useScrollDirection()
+  const { selectActivity } = useActivityDetails()
 
   const [sendChatOpen, setSendChatOpen] = useState(false)
   const sendParamsAndSet = useSendScreenParams()
@@ -90,6 +92,7 @@ export default function ActivityFeed() {
     isFetchingNextPage: isFetchingNextPageActivities,
     fetchNextPage,
     hasNextPage,
+    data,
   } = useProcessedActivityFeed({
     t,
     locale,
@@ -97,6 +100,18 @@ export default function ActivityFeed() {
     liquidityPools,
     addressBook,
   })
+
+  // Build activity lookup map for selectActivity (needed for ActivityDetails)
+  const activityMap = useMemo(() => {
+    const map = new Map<string, NonNullable<typeof data>['pages'][number][number]>()
+    if (!data?.pages) return map
+    for (const page of data.pages) {
+      for (const activity of page) {
+        map.set(activity.event_id, activity)
+      }
+    }
+    return map
+  }, [data?.pages])
 
   const onEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPageActivities) {
@@ -115,10 +130,18 @@ export default function ActivityFeed() {
             recipient: row.counterpartSendId.toString(),
             idType: 'sendid',
           })
+          return
+        }
+      }
+      // For all other activities, show activity details
+      if (item.kind !== 'header') {
+        const activity = activityMap.get(item.eventId)
+        if (activity) {
+          selectActivity(activity)
         }
       }
     },
-    [sendParams, setSendParams]
+    [sendParams, setSendParams, activityMap, selectActivity]
   )
 
   // Only show full shimmer on initial load (no data yet)

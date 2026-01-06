@@ -182,17 +182,14 @@ const styles = StyleSheet.create({
   badgeBase: {
     position: 'absolute',
     borderRadius: 999,
-    borderWidth: 3,
   },
   badgeTop: {
-    top: -2,
-    right: -2,
-    transform: [{ scale: 0.9 }],
+    top: 0,
+    right: 0,
   },
   badgeBottom: {
-    bottom: -2,
-    right: -2,
-    transform: [{ scale: 0.9 }],
+    bottom: 0,
+    right: 0,
   },
   // Verified badge
   verifiedBadgeWrapper: {
