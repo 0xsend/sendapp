@@ -1,4 +1,5 @@
 import type { CheckResult, HttpCheckConfig } from '../types.js'
+import { ChainIdResponseSchema, JsonRpcErrorResponseSchema } from '../schemas.js'
 
 /** Expected chain ID for localnet (Base Localhost: 845337 = 0xce619) */
 const EXPECTED_CHAIN_ID = '0xce619'
@@ -41,21 +42,33 @@ export async function checkBundler(config: HttpCheckConfig): Promise<CheckResult
       }
     }
 
-    const data = (await response.json()) as { result?: string; error?: { message: string } }
+    const rawData = await response.json()
 
-    if (data.error) {
+    // Try parsing as error response first
+    const errorResult = JsonRpcErrorResponseSchema.safeParse(rawData)
+    if (errorResult.success) {
       return {
         status: 'failed',
         duration_ms,
-        error: `JSON-RPC error: ${data.error.message}`,
+        error: `JSON-RPC error: ${errorResult.data.error.message}`,
       }
     }
 
-    if (data.result !== EXPECTED_CHAIN_ID) {
+    // Parse as success response with chain ID validation
+    const successResult = ChainIdResponseSchema.safeParse(rawData)
+    if (!successResult.success) {
       return {
         status: 'failed',
         duration_ms,
-        error: `Chain ID mismatch: expected ${EXPECTED_CHAIN_ID}, got ${data.result}`,
+        error: `Invalid JSON-RPC response: ${successResult.error.message}`,
+      }
+    }
+
+    if (successResult.data.result !== EXPECTED_CHAIN_ID) {
+      return {
+        status: 'failed',
+        duration_ms,
+        error: `Chain ID mismatch: expected ${EXPECTED_CHAIN_ID}, got ${successResult.data.result}`,
       }
     }
 

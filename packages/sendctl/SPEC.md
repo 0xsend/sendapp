@@ -394,7 +394,7 @@ interface Environment {
     "@grpc/proto-loader": "^0.7.0",
     "@my/wagmi": "workspace:*",
     "commander": "^12.0.0",
-    "viem": "^2.0.0"
+    "viem": "^2.27.2"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

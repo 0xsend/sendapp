@@ -9362,6 +9362,7 @@ __metadata:
     tsx: "npm:^4.21.0"
     typescript: "npm:~5.9.2"
     viem: "npm:^2.27.2"
+    zod: "npm:^3.23.8"
   bin:
     sendctl: ./bin/sendctl.js
   languageName: unknown

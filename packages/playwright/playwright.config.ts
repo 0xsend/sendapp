@@ -39,6 +39,7 @@ const isRunningUnderTilt = !!process.env.TILT_HOST
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  globalSetup: './globalSetup.ts',
   /* Useful for debugging */
   // timeout: 0,
   // globalTimeout: 0,
