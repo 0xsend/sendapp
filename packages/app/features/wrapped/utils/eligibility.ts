@@ -4,10 +4,12 @@ import type { WrappedData } from '../types'
  * Checks if a user is eligible for Send Wrapped 2025
  * @param sendId - The user's Send ID
  * @returns true if the user is eligible, false otherwise
+ *
+ * NOTE: Feature disabled for 2025. Set to return false to stop showing
+ * the wrapped feature to users. Code is preserved for potential reuse.
  */
-export function isEligibleForWrapped(sendId: number | undefined | null): boolean {
-  if (!sendId) return false
-  return true
+export function isEligibleForWrapped(_sendId: number | undefined | null): boolean {
+  return false
 }
 
 /**

@@ -4,11 +4,13 @@ import { fetchWrappedData } from '../utils/api'
 import { loadWrappedData, saveWrappedData } from '../utils/storage'
 import type { WrappedDataState } from '../types'
 import { useUser } from 'app/utils/useUser'
+import { isEligibleForWrapped } from '../utils/eligibility'
 
 /**
  * React hook to manage wrapped data with storage caching
  *
  * Features:
+ * - Checks eligibility before fetching any data
  * - Checks storage first before making API calls (localStorage on web, AsyncStorage on native)
  * - Automatically fetches and caches data on mount
  * - Handles loading and error states
@@ -25,11 +27,14 @@ export function useWrappedData(): WrappedDataState {
   })
 
   useEffect(() => {
-    if (!profile?.send_id) {
+    const sendId = profile?.send_id
+
+    // Check eligibility first - if not eligible, skip all data fetching
+    if (!isEligibleForWrapped(sendId)) {
       setState({
         data: null,
         loading: false,
-        error: new Error('User not authenticated'),
+        error: null,
       })
       return
     }
