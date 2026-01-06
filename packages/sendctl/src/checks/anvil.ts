@@ -39,6 +39,13 @@ async function rpcCall(
  * 2. Factory Contract: eth_getCode confirms SendAccountFactory deployed
  * 3. Paymaster Contract: eth_getCode confirms TokenPaymaster deployed
  * 4. Factory Funding: eth_getBalance confirms factory account has ETH (> 0)
+ *
+ * TODO: Tilt sets up additional fixtures that provide more accurate readiness signals:
+ * - anvil:anvil-deploy-verifying-paymaster-fixtures: deploys verifying paymaster
+ * - anvil:anvil-token-paymaster-deposit: funds the token paymaster
+ * The paymaster contract is already deployed in the Base fork; these fixtures configure
+ * and fund it. Consider checking paymaster deposit balance or querying Tilt resource
+ * status for more precise readiness detection.
  */
 export async function checkAnvil(config: HttpCheckConfig): Promise<CheckResult> {
   const start = Date.now()
@@ -123,6 +130,11 @@ export async function checkAnvil(config: HttpCheckConfig): Promise<CheckResult> 
     }
 
     // Sub-check 3: Paymaster Contract
+    // TODO: This checks if the contract exists, but in the Base fork the paymaster is already
+    // deployed. A more accurate check would verify the Tilt fixtures have run:
+    // - anvil:anvil-deploy-verifying-paymaster-fixtures (sets up verifying paymaster)
+    // - anvil:anvil-token-paymaster-deposit (funds the token paymaster)
+    // Consider checking the paymaster's deposit balance instead of just bytecode presence.
     const paymasterStart = Date.now()
     const paymasterAddress = tokenPaymasterAddress[CHAIN_ID_NUMBER]
     try {
