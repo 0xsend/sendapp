@@ -83,7 +83,8 @@ Configuration via environment variables with sensible defaults:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | (required) | Supabase anon key for API auth |
 | `NEXT_PUBLIC_BASE_RPC_URL` | `http://localhost:8546` | Anvil RPC URL |
 | `NEXT_PUBLIC_BUNDLER_RPC_URL` | `http://localhost:4337` | AA Bundler URL |
-| `SHOVEL_URL` | `http://localhost:8383` | Shovel API URL |
+| `SHOVEL_URL` | (see below) | Shovel API URL |
+| `SHOVEL_PORT` | `8383` | Shovel port (used if SHOVEL_URL not set) |
 | `TEMPORAL_ADDR` | `localhost:7233` | Temporal gRPC address |
 | `SENDCTL_TIMEOUT` | `10000` | Default check timeout in milliseconds |
 
@@ -107,19 +108,19 @@ Configuration via environment variables with sensible defaults:
 
 ### Anvil (`anvil`)
 Multi-step verification:
-1. **RPC Health:** `eth_chainId` returns `0x14a34` (84532, Base Sepolia localnet chain ID)
+1. **RPC Health:** `eth_chainId` returns `0xce619` (845337, Base Localhost chain ID)
 2. **Factory Contract:** `eth_getCode` confirms SendAccountFactory deployed
 3. **Paymaster Contract:** `eth_getCode` confirms TokenPaymaster deployed
-4. **Factory Funding:** `eth_getBalance` confirms factory account has ETH (> 0)
+4. **Factory Funding:** `eth_getBalance` checks factory account ETH balance (informational only, does not fail check)
 
 Contract addresses imported from `@my/wagmi` package at runtime.
 
 **Dependencies:** The `bundler` check depends on `anvil`. If anvil fails, bundler is skipped.
 
 ### AA Bundler (`bundler`)
-- **Endpoint:** `POST /rpc` with `eth_chainId` JSON-RPC
-- **Expected Chain ID:** `0x14a34` (84532, same as Anvil)
-- **Success:** Valid JSON-RPC response with chain ID matching `0x14a34`
+- **Endpoint:** `POST` to `NEXT_PUBLIC_BUNDLER_RPC_URL` with `eth_chainId` JSON-RPC
+- **Expected Chain ID:** `0xce619` (845337, same as Anvil)
+- **Success:** Valid JSON-RPC response with chain ID matching `0xce619`
 - **Failure:** Connection refused, invalid response, chain ID mismatch
 - **Depends on:** `anvil` (skipped if anvil fails in `doctor` command)
 

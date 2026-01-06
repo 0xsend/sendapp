@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "baseUrl": "./src"
+  },
+  "include": ["src", "../../globals.d.ts", "../../environment.d.ts"]
+}

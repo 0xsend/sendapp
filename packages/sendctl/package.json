@@ -1,0 +1,27 @@
+{
+  "name": "@send/sendctl",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/index.ts",
+  "bin": "./bin/sendctl.js",
+  "files": [
+    "src",
+    "bin",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "@grpc/proto-loader": "^0.7.0",
+    "@my/wagmi": "workspace:*",
+    "commander": "^12.0.0",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.2"
+  }
+}
