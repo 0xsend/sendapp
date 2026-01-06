@@ -1,3 +1,8 @@
+---
+name: sendctl
+description: Verifies Send App development environment health. Use when checking if services are running, debugging connectivity issues, preparing environment before tests, or running "sendctl doctor".
+---
+
 # sendctl - Send App Environment Toolkit
 
 ## When to Use
