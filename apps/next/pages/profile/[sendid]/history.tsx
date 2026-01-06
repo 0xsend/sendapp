@@ -7,9 +7,25 @@ import type { Database } from '@my/supabase/database.types'
 import { userOnboarded } from 'utils/userOnboarded'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { ProfileHistoryScreen } from 'app/features/profile/history/screen'
+import { ExternalAddressHistoryScreen } from 'app/features/profile/history/ExternalAddressHistoryScreen'
 import { TopNav } from 'app/components/TopNav'
+import { isAddress, type Address } from 'viem'
 
-export const Page: NextPageWithLayout = () => {
+// Discriminated union for type-safe page props
+type PageProps = { type: 'sendAccount' } | { type: 'externalAddress'; address: Address }
+
+export const Page: NextPageWithLayout<PageProps> = (props) => {
+  if (props.type === 'externalAddress') {
+    return (
+      <>
+        <Head>
+          <title>Send | Address History</title>
+        </Head>
+        <ExternalAddressHistoryScreen address={props.address} />
+      </>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -23,13 +39,7 @@ export const Page: NextPageWithLayout = () => {
 // Profile page is not protected, but we need to look up the user profile by tag in case we have to show a 404
 export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   const { sendid: sendidParam } = ctx.params ?? {}
-  const sendid = Number(sendidParam)
-
-  if (Number.isNaN(sendid)) {
-    return {
-      notFound: true,
-    }
-  }
+  const identifier = sendidParam as string
 
   const supabase = createPagesServerClient<Database>(ctx)
   const {
@@ -43,8 +53,55 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
     if (needsOnboarding) return needsOnboarding
   }
 
-  // check if profile exists
   const supabaseAdmin = createSupabaseAdminClient()
+
+  // Detect if identifier is an Ethereum address (0x + 40 hex characters)
+  if (isAddress(identifier)) {
+    // Look up by address to check if this address has a Send account
+    const { data: profile, error } = await supabaseAdmin
+      .rpc('profile_lookup', { lookup_type: 'address', identifier })
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error fetching profile from address', error)
+      throw error
+    }
+
+    if (profile) {
+      // Check if profile is public or user is logged in before redirecting
+      if (!profile.is_public && !session) {
+        // Private profile and anonymous user - return 404 to avoid leaking account existence
+        return { notFound: true }
+      }
+      // Address has a Send account - redirect to canonical history URL
+      const redirectUrl = `/profile/${profile.sendid}/history`
+      return { redirect: { destination: redirectUrl, permanent: false } }
+    }
+
+    // No Send account - render external address history view
+    return {
+      props: {
+        type: 'externalAddress',
+        address: identifier,
+      },
+    }
+  }
+
+  // Invalid 0x-prefixed identifiers that aren't valid addresses should 404
+  if (identifier.startsWith('0x')) {
+    return { notFound: true }
+  }
+
+  // Handle numeric sendid lookup (existing behavior)
+  const sendid = Number(identifier)
+
+  if (Number.isNaN(sendid)) {
+    return {
+      notFound: true,
+    }
+  }
+
+  // check if profile exists
   const { data: profile, error } = await supabaseAdmin
     .rpc('profile_lookup', { lookup_type: 'sendid', identifier: sendid.toString() })
     .maybeSingle()
@@ -63,7 +120,9 @@ export const getServerSideProps = (async (ctx: GetServerSidePropsContext) => {
   }
 
   return {
-    props: {},
+    props: {
+      type: 'sendAccount',
+    },
   }
 }) satisfies GetServerSideProps
 

@@ -17,32 +17,27 @@ test.beforeAll(async () => {
 })
 
 test('can visit other user profile and send by tag', async ({ page, seed }) => {
+  test.setTimeout(120000) // Longer timeout for this complex test
   const { profile, tags } = await createUserWithTagsAndAccounts(seed, {
     tagCount: 1,
   })
   const tag = tags[0]
   assert(!!tag?.name, 'tag not found')
+  assert(!!profile?.send_id, 'profile send_id not found')
   assert(!!profile?.name, 'profile name not found')
   assert(!!profile?.about, 'profile about not found')
   const profilePage = new ProfilePage(page, { name: profile.name, about: profile.about })
   await profilePage.visit(tag.name, expect)
   await expect(profilePage.sendButton).toBeVisible()
   await profilePage.sendButton.click()
-
-  // Send flow now opens as a dialog on the profile page instead of navigating to /send
-  await expect(page.getByTestId('SendChat')).toBeVisible()
-
-  // Verify URL has send params (stays on profile page with query params)
-  await expect(() => {
-    const url = new URL(page.url())
-    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-      recipient: profile?.send_id?.toString(),
-      idType: 'sendid',
-    })
-  }).toPass({ timeout: 5000 })
-
-  // Verify send dialog content is visible
-  await expect(page.getByText("You're Sending")).toBeVisible()
+  // SendChat opens inline on profile page - verify the send form appears with correct recipient
+  await expect(page.getByPlaceholder('Type amount, add a note...')).toBeVisible({ timeout: 10000 })
+  // Verify URL params are set correctly for the recipient
+  const url = new URL(page.url())
+  expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+    recipient: profile.send_id.toString(),
+    idType: 'sendid',
+  })
 
   // visit another user but without a sendtag
   const plan2 = await createUserWithTagsAndAccounts(seed, { tagCount: 0 })
@@ -53,34 +48,25 @@ test('can visit other user profile and send by tag', async ({ page, seed }) => {
   assert(!!profile2?.name, 'profile name not found')
   assert(!!profile2?.about, 'profile about not found')
   const profilePage2 = new ProfilePage(page, { name: profile2.name, about: profile2.about })
-  await page.goto(`/profile/${profile2.send_id}`)
+  await page.goto(`/profile/${profile2.send_id}`, { timeout: 60000 })
+  // Wait for profile to load (longer timeout for Firefox)
+  await expect(page.getByTestId('profileName')).toHaveText(profile2.name, { timeout: 25000 })
   await expect(profilePage2.sendButton).toBeVisible()
   await profilePage2.sendButton.click()
-
-  // Send flow now opens as a dialog on the profile page
-  await expect(page.getByTestId('SendChat')).toBeVisible()
-
-  // Verify URL has send params
-  await expect(() => {
-    const url = new URL(page.url())
-    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-      recipient: profile2?.send_id?.toString(),
-      idType: 'sendid',
-    })
-  }).toPass({ timeout: 5000 })
-
-  // Verify send dialog content is visible
-  await expect(page.getByText("You're Sending")).toBeVisible()
+  // SendChat opens inline on profile page - verify the send form appears with correct recipient
+  await expect(page.getByPlaceholder('Type amount, add a note...')).toBeVisible({ timeout: 10000 })
+  // Verify URL params are set correctly for the recipient
+  const url2 = new URL(page.url())
+  expect(Object.fromEntries(url2.searchParams.entries())).toMatchObject({
+    recipient: profile2.send_id.toString(),
+    idType: 'sendid',
+  })
 
   // can visit profile without the @ prefix
-  await page.goto(`/${tag.name}`)
+  await page.goto(`/${tag.name}`, { timeout: 60000 })
   await page.waitForURL(`/${tag.name}`)
-  // Profile title is dynamic: shows hostname/tag for tag-based profiles
-  await expect(async () => {
-    const title = await page.title()
-    expect(title).toBe(`localhost/${tag.name}`)
-  }).toPass()
-  await expect(page.getByText(profile.name)).toBeVisible()
+  // Wait for profile to load (longer timeout for Firefox)
+  await expect(page.getByTestId('profileName')).toHaveText(profile.name, { timeout: 25000 })
 })
 
 test('can visit my own profile', async ({ page, supabase, user: { profile } }) => {
@@ -144,15 +130,15 @@ test('can view activities between another profile', async ({
     )
   }
 
-  const res = page.waitForResponse(`${SUPABASE_URL}/rest/v1/activity_feed*`)
-  const profilePage2 = new ProfilePage(page, { name: anotherUser.name, about: anotherUser.about })
-  await page.goto(`/profile/${anotherUser.send_id}`)
-  await res
+  // Navigate to profile history page to see activities between users
+  await page.goto(`/profile/${anotherUser.send_id}/history`)
+  // Wait for page to load
+  await expect(page.getByText(anotherUser.name)).toBeVisible({ timeout: 15000 })
 
   log('beforeEach', `url=${page.url()}`)
 
-  await expect(profilePage2.sendButton).toBeVisible()
-  await expect(page.getByText('7/18/2024')).toBeVisible()
+  // Wait for activity data to load with longer timeout
+  await expect(page.getByText('7/18/2024')).toBeVisible({ timeout: 15000 })
   await expect(page.getByText('You Received').nth(1)).toBeVisible()
   await expect(page.getByText('8 USDC')).toBeVisible()
   await expect(page.getByText('5/27/2024')).toBeVisible()

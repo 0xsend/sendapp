@@ -13,6 +13,7 @@ import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { useParams } from 'next/navigation'
 import AvatarMenuButton from './AvatarMenuButton/AvatarMenuButton'
 import { useUser } from 'app/utils/useUser'
+import { isAddress } from 'viem'
 
 export function ProfileTopNav() {
   const media = useMedia()
@@ -20,14 +21,27 @@ export function ProfileTopNav() {
   const params = useParams<{ tag?: string; sendid?: string }>()
 
   // Use the appropriate lookup based on the route params
-  const lookupType = params.tag ? 'tag' : 'sendid'
   const identifier = params.tag || params.sendid || ''
-  const { data: otherUserProfile, isLoading } = useProfileLookup(lookupType, identifier)
+  // External addresses (0x...) don't need a profile lookup
+  const isExternalAddress = isAddress(identifier)
+  const lookupType = params.tag ? 'tag' : 'sendid'
+  const { data: otherUserProfile, isLoading } = useProfileLookup(
+    lookupType,
+    isExternalAddress ? '' : identifier
+  )
   const { profile } = useUser()
 
   const handleBack = () => {
     back()
   }
+
+  // For external addresses, show no title (just back arrow)
+  // For Send accounts, show name, tag, or sendid
+  const headerTitle = isExternalAddress
+    ? null
+    : otherUserProfile?.name ||
+      otherUserProfile?.main_tag_name ||
+      (otherUserProfile?.sendid ? `#${otherUserProfile.sendid}` : null)
 
   return (
     <Header w="100%" $lg={{ py: '$3' }}>
@@ -48,14 +62,11 @@ export function ProfileTopNav() {
               />
             </ButtonOg.Icon>
           </Button>
-          {isLoading ? null : (
+          {isLoading ? null : headerTitle ? (
             <Paragraph size={'$8'} col={'$color12'} fontWeight={'500'}>
-              {otherUserProfile?.name ||
-                otherUserProfile?.main_tag_name ||
-                `#${otherUserProfile?.sendid}` ||
-                ''}
+              {headerTitle}
             </Paragraph>
-          )}
+          ) : null}
         </XStack>
         {media.gtLg ? null : (
           <XStack ai="center">

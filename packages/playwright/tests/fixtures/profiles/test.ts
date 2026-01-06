@@ -19,6 +19,9 @@ export class ProfilePage {
       const title = await this.page.title()
       expect?.(title).toBe(`localhost/${tag}`)
     }).toPass()
-    await expect?.(this.page.getByTestId('profileName')).toHaveText(this.profile.name)
+    // Wait for profile to load (spinner to disappear) before checking profileName
+    await expect?.(this.page.getByTestId('profileName')).toHaveText(this.profile.name, {
+      timeout: 15000,
+    })
   }
 }

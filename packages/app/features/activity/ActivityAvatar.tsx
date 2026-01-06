@@ -3,12 +3,15 @@ import {
   LinkableAvatar,
   type LinkableAvatarProps,
   Spinner,
+  styled,
   useThemeName,
   XStack,
 } from '@my/ui'
+import { Link as SolitoLink } from 'solito/link'
 import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
-import { AvatarSendEarnDeposit } from 'app/components/avatars'
+import { AddressAvatar, AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
+import { isAddress } from 'viem'
 import { IconUpgrade, IconBadgeCheckSolid2 } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
@@ -34,6 +37,8 @@ import {
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity'
 import { Platform } from 'react-native'
+
+const Link = styled(SolitoLink)
 
 export function ActivityAvatar({
   activity,
@@ -165,18 +170,30 @@ export function ActivityAvatar({
       )
     }
 
+    // Link to external address profile for unknown addresses
+    const isValidAddress = isAddress(address)
+
+    if (isValidAddress) {
+      return (
+        <XStack
+          onPress={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          <Link href={`/profile/${address}`} br="$10">
+            <AddressAvatar address={address} size="$4.5" br="$10" {...props} />
+          </Link>
+        </XStack>
+      )
+    }
+
+    // Fallback for non-address names (contract labels, etc.)
     return (
       <Avatar size="$4.5" br="$4" gap="$2" {...props}>
         <Avatar.Image
           src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
         />
-        <Avatar.Fallback jc="center" bc="$olive">
-          <Avatar size="$4.5" br="$4" {...props}>
-            <Avatar.Image
-              src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
-            />
-          </Avatar>
-        </Avatar.Fallback>
+        <Avatar.Fallback jc="center" bc="$olive" />
       </Avatar>
     )
   }

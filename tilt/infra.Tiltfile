@@ -144,6 +144,17 @@ if not CFG.skip_docker_compose:
         _fork_block = str(_current_block - 30)
         os.putenv("ANVIL_BASE_FORK_BLOCK", _fork_block)
 
+    # Create Docker network early to avoid race conditions with supabase startup
+    # The compose.localnet.yaml declares supabase_network as external, so it must exist
+    # before any docker compose services can start.
+    _network_name = "supabase_network_" + WORKSPACE_NAME
+    local_resource(
+        "docker:network",
+        "docker network inspect " + _network_name + " >/dev/null 2>&1 || docker network create " + _network_name,
+        labels = labels,
+        resource_deps = [],
+    )
+
     docker_compose(
         configPaths = ["../compose.localnet.yaml"],
         env_file = "../.localnet.env",
@@ -157,7 +168,7 @@ if not CFG.skip_docker_compose:
         "anvil-base",
         labels = labels,
         new_name = "anvil:base-node",
-        resource_deps = [],  # No deps - anvil container is self-contained
+        resource_deps = ["docker:network"],  # Ensure network exists before starting
     )
 
     # anvil-proxy: Nginx reverse proxy with connection pooling
