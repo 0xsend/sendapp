@@ -1,10 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true,
-    "composite": true
+    "noEmit": true
   },
-  "include": ["src", "../../globals.d.ts", "../../environment.d.ts"]
+  "include": ["src", "tests", "../../globals.d.ts", "../../environment.d.ts"]
 }
