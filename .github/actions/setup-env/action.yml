@@ -71,11 +71,11 @@ runs:
           sudo rm -rf ./node_modules/lost+found
         fi
     - name: Install Python setuptools for node-gyp
-      if: ${{ inputs.yarn-install == 'true' }}
       shell: bash
       run: |
         # Python 3.12 removed distutils, but node-gyp requires it for native modules
         # Install setuptools which provides distutils as a fallback
+        # Always install regardless of yarn-install flag since Tilt may also run yarn install
         sudo apt-get update && sudo apt-get install -y python3-setuptools
     - name: Yarn Install
       if: ${{ inputs.yarn-install == 'true' }}
