@@ -7,6 +7,7 @@ import {
   Stack,
   SubmitButton,
   useDebounce,
+  View,
   XStack,
   YStack,
 } from '@my/ui'
@@ -31,7 +32,15 @@ import { api } from 'app/utils/api'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -48,6 +57,7 @@ const SwapFormSchema = z.object({
   slippage: formFields.number.min(0, 'errors.slippageMin').max(2000, 'errors.slippageMax'),
 })
 
+const BIGINT_0 = 0n
 export const SwapFormScreen = () => {
   const form = useForm<z.infer<typeof SwapFormSchema>>()
   const router = useRouter()
@@ -56,7 +66,6 @@ export const SwapFormScreen = () => {
   const { outToken, inToken, inAmount, slippage } = swapParams
   const { coin: inCoin } = useCoin(inToken)
   const { coin: outCoin } = useCoin(outToken)
-  const hoverStyles = useHoverStyles()
   const { resolvedTheme } = useThemeSetting()
   const queryClient = useQueryClient()
   const { distributionShares } = useUser()
@@ -64,7 +73,7 @@ export const SwapFormScreen = () => {
 
   // Compute if user is verified
   const isVerified = useMemo(
-    () => Boolean(distributionShares[0] && distributionShares[0].amount > 0n),
+    () => Boolean(distributionShares[0] && distributionShares[0].amount > BIGINT_0),
     [distributionShares]
   )
 
@@ -400,27 +409,10 @@ export const SwapFormScreen = () => {
           props={{
             inAmount: {
               testID: 'inAmountInput',
-              fontSize: (() => {
-                switch (true) {
-                  case formInAmount?.length > 16:
-                    return '$7'
-                  case formInAmount?.length > 8:
-                    return '$8'
-                  default:
-                    return '$9'
-                }
-              })(),
+              fontSize: formInAmount?.length > 16 ? '$7' : formInAmount?.length > 8 ? '$8' : '$9',
               $gtSm: {
-                fontSize: (() => {
-                  switch (true) {
-                    case formInAmount?.length <= 9:
-                      return '$10'
-                    case formInAmount?.length > 16:
-                      return '$8'
-                    default:
-                      return '$10'
-                  }
-                })(),
+                fontSize:
+                  formInAmount?.length <= 9 ? '$10' : formInAmount?.length > 16 ? '$8' : '$10',
               },
               color: '$color12',
               fontWeight: '500',
@@ -448,27 +440,10 @@ export const SwapFormScreen = () => {
             },
             outAmount: {
               testID: 'outAmountInput',
-              fontSize: (() => {
-                switch (true) {
-                  case formOutAmount?.length > 16:
-                    return '$7'
-                  case formOutAmount?.length > 8:
-                    return '$8'
-                  default:
-                    return '$9'
-                }
-              })(),
+              fontSize: formOutAmount?.length > 16 ? '$7' : formOutAmount?.length > 8 ? '$8' : '$9',
               $gtSm: {
-                fontSize: (() => {
-                  switch (true) {
-                    case formOutAmount?.length <= 9:
-                      return '$10'
-                    case formOutAmount?.length > 16:
-                      return '$8'
-                    default:
-                      return '$10'
-                  }
-                })(),
+                fontSize:
+                  formOutAmount?.length <= 9 ? '$10' : formOutAmount?.length > 16 ? '$8' : '$10',
               },
               color: '$color12',
               fontWeight: '500',
@@ -543,7 +518,11 @@ export const SwapFormScreen = () => {
               <YStack gap="$5">
                 <YStack gap="$5">
                   <YStack gap="$5">
-                    <FadeCard borderColor={insufficientAmount ? '$error' : 'transparent'} bw={1}>
+                    <FadeCard
+                      br="$7"
+                      borderColor={insufficientAmount ? '$error' : 'transparent'}
+                      bw={1}
+                    >
                       <XStack ai="center" gap="$2">
                         <ArrowUp
                           size={'$1'}
@@ -574,74 +553,56 @@ export const SwapFormScreen = () => {
                         />
                       </XStack>
                       <XStack ai={'center'} jc={'space-between'}>
-                        {(() => {
-                          switch (true) {
-                            case isLoadingCoins:
-                              return <Spinner color="$color11" />
-                            case !inCoin || !parsedInAmount:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  $0
-                                </Paragraph>
-                              )
-                            case inCoin?.symbol === 'USDC':
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  ${formInAmount}
-                                </Paragraph>
-                              )
-                            default:
-                              return (
-                                <Paragraph
-                                  size={'$5'}
-                                  color={'$lightGrayTextField'}
-                                  $theme-light={{ color: '$darkGrayTextField' }}
-                                >
-                                  {inAmountUsd ? `$${inAmountUsd}` : '$0'}
-                                </Paragraph>
-                              )
-                          }
-                        })()}
+                        {isLoadingCoins ? (
+                          <Spinner color="$color11" />
+                        ) : !inCoin || !parsedInAmount ? (
+                          <Paragraph
+                            size={'$5'}
+                            color={'$lightGrayTextField'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            $0
+                          </Paragraph>
+                        ) : inCoin?.symbol === 'USDC' ? (
+                          <Paragraph
+                            size={'$5'}
+                            color={'$lightGrayTextField'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            ${formInAmount}
+                          </Paragraph>
+                        ) : (
+                          <Paragraph
+                            size={'$5'}
+                            color={'$lightGrayTextField'}
+                            $theme-light={{ color: '$darkGrayTextField' }}
+                          >
+                            {inAmountUsd ? `$${inAmountUsd}` : '$0'}
+                          </Paragraph>
+                        )}
                         <XStack gap={'$3.5'} ai={'center'}>
-                          {(() => {
-                            switch (true) {
-                              case isLoadingCoins:
-                                return <Spinner color="$color11" />
-                              case !isLoadingCoins && !inCoin:
-                                return (
-                                  <Paragraph color="$error">{t('form.errors.balance')}</Paragraph>
-                                )
-                              case !inCoin?.balance:
-                                return (
-                                  <Paragraph size={'$5'} fontWeight={'500'}>
-                                    -
-                                  </Paragraph>
-                                )
-                              default:
-                                return (
-                                  <Paragraph
-                                    size={'$5'}
-                                    fontWeight={'400'}
-                                    color={insufficientAmount ? '$error' : '$color12'}
-                                  >
-                                    {formatAmount(
-                                      formatUnits(inCoin?.balance, inCoin?.decimals),
-                                      12,
-                                      inCoin?.formatDecimals
-                                    )}{' '}
-                                    {inCoin?.symbol}
-                                  </Paragraph>
-                                )
-                            }
-                          })()}
+                          {isLoadingCoins ? (
+                            <Spinner color="$color11" />
+                          ) : !isLoadingCoins && !inCoin ? (
+                            <Paragraph color="$error">{t('form.errors.balance')}</Paragraph>
+                          ) : !inCoin?.balance ? (
+                            <Paragraph size={'$5'} fontWeight={'500'}>
+                              -
+                            </Paragraph>
+                          ) : (
+                            <Paragraph
+                              size={'$5'}
+                              fontWeight={'400'}
+                              color={insufficientAmount ? '$error' : '$color12'}
+                            >
+                              {formatAmount(
+                                formatUnits(inCoin?.balance, inCoin?.decimals),
+                                12,
+                                inCoin?.formatDecimals
+                              )}{' '}
+                              {inCoin?.symbol}
+                            </Paragraph>
+                          )}
                           {inCoin !== undefined && inCoin.symbol !== usdcCoin.symbol && (
                             <Button
                               // @ts-expect-error tamagui is tripping here
@@ -657,7 +618,9 @@ export const SwapFormScreen = () => {
                               onPress={() => {
                                 form.setValue(
                                   'inAmount',
-                                  localizeAmount(formatUnits(inCoin.balance ?? 0n, inCoin.decimals))
+                                  localizeAmount(
+                                    formatUnits(inCoin.balance ?? BIGINT_0, inCoin.decimals)
+                                  )
                                 )
                               }}
                               $theme-light={{ borderBottomColor: '$color12' }}
@@ -686,7 +649,7 @@ export const SwapFormScreen = () => {
                         </XStack>
                       </XStack>
                     </FadeCard>
-                    <FadeCard position={'relative'}>
+                    <FadeCard br="$7" position={'relative'}>
                       <XStack ai="center" gap="$2">
                         <ArrowDown
                           size={'$1'}
@@ -719,43 +682,26 @@ export const SwapFormScreen = () => {
                       <YStack gap="$1.5">
                         <XStack ai={'center'} jc={'space-between'} flexWrap="wrap" gap="$2">
                           <XStack height={'$2'} ai={'center'}>
-                            {(() => {
-                              switch (true) {
-                                case (quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
-                                  isLoadingCoins:
-                                  return <Spinner color="$color11" />
-                                case !outCoin || !outAmountUsd:
-                                  return (
-                                    <Paragraph
-                                      size={'$5'}
-                                      color={'$lightGrayTextField'}
-                                      $theme-light={{ color: '$darkGrayTextField' }}
-                                    >
-                                      $0
-                                    </Paragraph>
-                                  )
-                                case outCoin?.symbol === 'USDC':
-                                  return (
-                                    <Paragraph
-                                      size={'$5'}
-                                      color={'$lightGrayTextField'}
-                                      $theme-light={{ color: '$darkGrayTextField' }}
-                                    >
-                                      {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                    </Paragraph>
-                                  )
-                                default:
-                                  return (
-                                    <Paragraph
-                                      size={'$5'}
-                                      color={'$lightGrayTextField'}
-                                      $theme-light={{ color: '$darkGrayTextField' }}
-                                    >
-                                      {outAmountUsd ? `$${outAmountUsd}` : '$0'}
-                                    </Paragraph>
-                                  )
-                              }
-                            })()}
+                            {(quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
+                            isLoadingCoins ? (
+                              <Spinner color="$color11" />
+                            ) : !outCoin || !outAmountUsd ? (
+                              <Paragraph
+                                size={'$5'}
+                                color={'$lightGrayTextField'}
+                                $theme-light={{ color: '$darkGrayTextField' }}
+                              >
+                                $0
+                              </Paragraph>
+                            ) : (
+                              <Paragraph
+                                size={'$5'}
+                                color={'$lightGrayTextField'}
+                                $theme-light={{ color: '$darkGrayTextField' }}
+                              >
+                                {outAmountUsd ? `$${outAmountUsd}` : '$0'}
+                              </Paragraph>
+                            )}
                           </XStack>
                           {priceImpact && (
                             <XStack ai={'center'} gap="$1.5">
@@ -791,66 +737,80 @@ export const SwapFormScreen = () => {
                           </XStack>
                         )}
                       </YStack>
-                      <YStack
-                        position={'absolute'}
-                        top={0}
-                        left={0}
-                        right={0}
-                        bottom={0}
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        style={{
-                          pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
-                        }}
-                      >
-                        <YStack
-                          bc={'$color0'}
-                          borderRadius={9999}
-                          pointerEvents={'auto'}
-                          // @ts-expect-error need this detailed calc here
-                          transform={[{ translateY: 'calc(-50% - 12px)' }]}
-                        >
-                          <Button
-                            // @ts-expect-error tamagui is tripping here
-                            type={'button'}
-                            testID={'flipTokensButton'}
-                            bc={'$color0'}
-                            circular={true}
-                            size={'$5'}
-                            borderWidth={0}
-                            hoverStyle={hoverStyles}
-                            onPress={handleFlipTokens}
-                          >
-                            <Button.Icon>
-                              <IconSwap size={'$1'} />
-                            </Button.Icon>
-                          </Button>
-                        </YStack>
-                      </YStack>
+                      <FlipTokensButton onPress={handleFlipTokens} />
                     </FadeCard>
                   </YStack>
                 </YStack>
-                <FadeCard>
+                <FadeCard br="$7">
                   <Slippage slippage={formSlippage} onChange={handleSlippageChange} />
                 </FadeCard>
               </YStack>
               <Paragraph color="$error">
-                {(() => {
-                  switch (true) {
-                    case !!form.formState.errors?.slippage:
-                      return t(form.formState.errors.slippage.message as string)
-                    case !!estimateError:
-                      return estimateError.message
-                    default:
-                      return ''
-                  }
-                })()}
+                {form.formState.errors?.slippage
+                  ? t(form.formState.errors.slippage.message as string)
+                  : estimateError
+                    ? estimateError.message
+                    : ''}
               </Paragraph>
             </YStack>
           )}
         </SchemaForm>
       </FormProvider>
       <SwapRiskDialog />
+    </YStack>
+  )
+}
+
+interface SwapCoinsButtonProps {
+  onPress: () => void
+}
+
+const FlipTokensButton = ({ onPress }: SwapCoinsButtonProps) => {
+  return (
+    <YStack
+      position={'absolute'}
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      justifyContent="flex-start"
+      alignItems="center"
+      style={{
+        pointerEvents: Platform.OS === 'web' ? 'none' : 'box-none',
+      }}
+    >
+      <YStack
+        boc={'$aztec1'}
+        bw={2}
+        borderRadius={9999}
+        pointerEvents={'auto'}
+        // @ts-expect-error need this detailed calc here
+        transform={[{ translateY: 'calc(-50% - 12px)' }]}
+        elevation={24}
+        shadowOpacity={0.4}
+        animation="responsive"
+        hoverStyle={{
+          scale: 1.05,
+        }}
+        pressStyle={{
+          scale: 0.99,
+        }}
+        className="will-change-transform"
+      >
+        <Button
+          // @ts-expect-error tamagui is tripping here
+          type={'button'}
+          testID={'flipTokensButton'}
+          circular={true}
+          size={'$5'}
+          borderWidth={0}
+          onPress={onPress}
+        >
+          <Button.Icon>
+            <IconSwap size={'$1'} />
+          </Button.Icon>
+        </Button>
+      </YStack>
     </YStack>
   )
 }
@@ -903,7 +863,12 @@ export const Slippage = ({
 
   return (
     <YStack gap={'$3.5'}>
-      <XStack ai={'center'} jc={'space-between'}>
+      <XStack
+        cur="pointer"
+        onPress={() => setIsOpen((prevState) => !prevState)}
+        ai={'center'}
+        jc={'space-between'}
+      >
         <Paragraph
           size={'$5'}
           color={'$lightGrayTextField'}
@@ -931,15 +896,12 @@ export const Slippage = ({
             p={0}
             bw={0}
             height={'auto'}
-            onPress={() => setIsOpen((prevState) => !prevState)}
           >
-            <Button.Icon>
-              {isOpen ? (
+            <View animation="responsive" rotate={isOpen ? '0deg' : '180deg'}>
+              <Button.Icon>
                 <ChevronUp size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-              ) : (
-                <ChevronDown size={'$1'} color={'$primary'} $theme-light={{ color: '$color12' }} />
-              )}
-            </Button.Icon>
+              </Button.Icon>
+            </View>
           </Button>
         </XStack>
       </XStack>
@@ -947,15 +909,14 @@ export const Slippage = ({
         <XStack gap={'$2'} columnGap={'$2'} flexWrap={'wrap'}>
           {SLIPPAGE_OPTIONS.map((slippageOption) => (
             <Button
+              size="$3"
               // @ts-expect-error tamagui is tripping here
               type={'button'}
               key={`slippage-${slippageOption}`}
               onPress={() => handleOnPress(slippageOption)}
               hoverStyle={hoverStyles}
               bw={0}
-              p={'$2'}
-              width={'$6'}
-              br={'$4'}
+              br={'$6'}
               bc={slippageOption === slippage ? hoverStyles.backgroundColor : '$color1'}
             >
               <Button.Text>{slippageOption / 100}%</Button.Text>
@@ -972,7 +933,7 @@ export const Slippage = ({
               w={100}
               br={'$4'}
               placeholder={isFocused ? '' : t('form.slippage.customPlaceholder')}
-              placeholderTextColor={'$color12'}
+              placeholderTextColor={'$gray10'}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               value={customSlippage || ''}

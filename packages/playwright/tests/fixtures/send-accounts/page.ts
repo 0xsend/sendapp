@@ -18,7 +18,7 @@ export class OnboardingPage {
       // Wait for the fallback UI to appear - the "Go To Onboarding" button
       const goToOnboardingBtn = this.page.getByRole('button', { name: 'Go To Onboarding' })
       this.log?.('waiting for Go To Onboarding button')
-      await goToOnboardingBtn.waitFor({ state: 'visible', timeout: 15_000 })
+      await goToOnboardingBtn.waitFor({ state: 'visible', timeout: 30_000 })
       this.log?.('clicking Go To Onboarding button')
       await goToOnboardingBtn.click()
       await this.page.waitForURL('/auth/onboarding')

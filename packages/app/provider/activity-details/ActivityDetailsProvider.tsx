@@ -1,4 +1,4 @@
-import { useState, useCallback, type ReactNode } from 'react'
+import { useState, type ReactNode, useMemo } from 'react'
 import { ActivityDetailsContext, type ActivityDetailsContextValue } from './ActivityDetailsContext'
 import { useRootScreenParams } from 'app/routers/params'
 import { useEvent } from '@my/ui'
@@ -33,19 +33,22 @@ export const ActivityDetailsProvider = ({ children }: ActivityDetailsProviderPro
     setSelectedActivity(activity)
   })
 
-  const closeActivityDetails = useCallback(() => {
+  const closeActivityDetails = useEvent(() => {
     setParams({ ...queryParams, activity: undefined }, { webBehavior: 'replace' })
     setSelectedActivity(null)
-  }, [queryParams, setParams])
+  })
 
   const isOpen = Boolean(selectedActivity && queryParams.activity && Platform.OS === 'web')
 
-  const contextValue: ActivityDetailsContextValue = {
-    selectedActivity,
-    isOpen,
-    selectActivity,
-    closeActivityDetails,
-  }
+  const contextValue: ActivityDetailsContextValue = useMemo(
+    () => ({
+      selectedActivity,
+      isOpen,
+      selectActivity,
+      closeActivityDetails,
+    }),
+    [selectedActivity, isOpen, selectActivity, closeActivityDetails]
+  )
 
   return (
     <ActivityDetailsContext.Provider value={contextValue}>

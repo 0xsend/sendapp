@@ -1,7 +1,8 @@
-import { Card, H4, Spinner, YStack } from '@my/ui'
+import { Card, H4, YStack } from '@my/ui'
 import type { Timeframe } from '../timeframes'
 import { useTokenChartData } from '../useTokenChartData'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
+import { LoadingChartSinWave } from './LoadingChartSinWave'
 
 export function ChartCardSection({
   tf,
@@ -19,8 +20,8 @@ export function ChartCardSection({
       <H4 fontWeight={600} size={'$7'}>
         {title}
       </H4>
-      <Card padded size={'$5'} w={'100%'} elevation={1}>
-        <YStack gap={'$3'} position="relative">
+      <Card padded size={'$5'} w={'100%'} elevation={1} h={344}>
+        <YStack f={1} jc="space-between" ov="hidden" gap={'$3'} position="relative">
           {children}
           {isLoading ? (
             <YStack
@@ -33,7 +34,7 @@ export function ChartCardSection({
               jc="center"
               pointerEvents="none"
             >
-              <Spinner size="large" color={'$color12'} />
+              <LoadingChartSinWave />
             </YStack>
           ) : null}
         </YStack>

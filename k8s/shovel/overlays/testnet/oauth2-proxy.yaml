@@ -1,0 +1,119 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy-shovel
+  labels:
+    app: oauth2-proxy-shovel
+    component: authentication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth2-proxy-shovel
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy-shovel
+        component: authentication
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+      containers:
+        - name: oauth2-proxy
+          image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --provider=google
+            - --email-domain=send.it
+            - --upstream=http://shovel:8080
+            - --http-address=0.0.0.0:4180
+            - --redirect-url=https://shovel-testnet.send.it/oauth2/callback
+            - --cookie-secure=true
+            - --cookie-domain=.send.it
+            - --whitelist-domain=.send.it
+            - --cookie-refresh=1h
+            - --cookie-expire=24h
+            - --cookie-name=_oauth2_proxy_shovel_testnet
+            - --reverse-proxy=true
+            - --pass-basic-auth=false
+            - --pass-access-token=false
+            - --pass-user-headers=true
+            - --set-xauthrequest=true
+            - --pass-host-header=true
+            - --silence-ping-logging=true
+            - --skip-provider-button=true
+          env:
+            - name: OAUTH2_PROXY_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy
+                  key: client-id
+            - name: OAUTH2_PROXY_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy
+                  key: client-secret
+            - name: OAUTH2_PROXY_COOKIE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oauth2-proxy
+                  key: cookie-secret
+          ports:
+            - containerPort: 4180
+              protocol: TCP
+              name: http
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 65532
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 4180
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 4180
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 5
+      terminationGracePeriodSeconds: 30
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oauth2-proxy-shovel
+  labels:
+    app: oauth2-proxy-shovel
+    component: authentication
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4180
+      protocol: TCP
+      targetPort: 4180
+      name: http
+  selector:
+    app: oauth2-proxy-shovel

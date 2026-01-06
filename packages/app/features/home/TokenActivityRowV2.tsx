@@ -1,12 +1,12 @@
 // optimized version of TokenActivityRow for the RecentActivityFeed.tsx
-import { Text, XStack, YStack } from '@my/ui'
+import { Link, Text, XStack, YStack } from '@my/ui'
 import { Paragraph, useEvent } from 'tamagui'
 import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from '../activity/ActivityAvatarV2'
 
 import type { useUser } from 'app/utils/useUser'
 import type { ReactNode } from 'react'
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import type { useSendScreenParams } from 'app/routers/params'
 import type { useSwapRouters } from 'app/utils/useSwapRouters'
 import type { useLiquidityPools } from 'app/utils/useLiquidityPools'
@@ -26,6 +26,7 @@ interface TokenActivityRowV2Props {
   computedDate: ReactNode
   computedEventName: string
   computedSubtext: string | null
+  computedSubtextAddress: `0x${string}` | null
   computedIsUserTransfer: boolean
 }
 
@@ -42,6 +43,7 @@ export const TokenActivityRow = ({
   computedDate,
   computedEventName,
   computedSubtext,
+  computedSubtextAddress,
   computedIsUserTransfer,
 }: TokenActivityRowV2Props) => {
   const { from_user, to_user } = activity
@@ -71,6 +73,7 @@ export const TokenActivityRow = ({
       date={computedDate}
       eventName={computedEventName}
       subtext={computedSubtext}
+      subtextAddress={computedSubtextAddress}
       isUserTransfer={computedIsUserTransfer}
       activity={activity}
       onPress={onPress ? handlePress : undefined}
@@ -90,6 +93,7 @@ const TokenActivityRowContent = memo(
     date,
     eventName,
     subtext,
+    subtextAddress,
     isUserTransfer,
     activity,
     onPress,
@@ -102,6 +106,7 @@ const TokenActivityRowContent = memo(
     date: ReactNode
     eventName: string
     subtext: string | null
+    subtextAddress: `0x${string}` | null
     isUserTransfer: boolean
     activity: Activity
     onPress?: () => void
@@ -110,6 +115,32 @@ const TokenActivityRowContent = memo(
     addressBook: ReturnType<typeof useAddressBook>
     hoverStyle: ReturnType<typeof useHoverStyles>
   }) => {
+    // Stop propagation when clicking the address link
+    const handleLinkPress = useCallback((e: { stopPropagation: () => void }) => {
+      e.stopPropagation()
+    }, [])
+
+    // Render subtext - if it's an external address, make it a link
+    const renderSubtext = () => {
+      const textToRender = isUserTransfer ? eventName : subtext
+      const addressToLink = isUserTransfer ? null : subtextAddress
+
+      if (addressToLink && textToRender) {
+        return (
+          <Link
+            href={`/profile/${addressToLink}`}
+            onPress={handleLinkPress}
+            color="$color10"
+            textDecorationLine="underline"
+            hoverStyle={{ opacity: 0.8 }}
+          >
+            {textToRender}
+          </Link>
+        )
+      }
+      return textToRender
+    }
+
     return (
       <XStack
         width="100%"
@@ -152,7 +183,7 @@ const TokenActivityRowContent = memo(
               numberOfLines={2}
               lineHeight={18}
             >
-              {isUserTransfer ? eventName : subtext}
+              {renderSubtext()}
             </Paragraph>
             <Paragraph color="$color10" size="$3" flexShrink={0} display="flex" opacity={0.6}>
               {date}

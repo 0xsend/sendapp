@@ -1,4 +1,4 @@
-import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { isServer, type InfiniteData, type UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isWeb } from '@tamagui/constants'
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
@@ -11,6 +11,8 @@ import {
   useMemo,
   useRef,
   useState,
+  startTransition,
+  useDeferredValue,
 } from 'react'
 import { H4, LazyMount, Paragraph, Shimmer, useEvent, View, YStack } from '@my/ui'
 import { FlashList } from '@shopify/flash-list'
@@ -21,6 +23,8 @@ import { useSendScreenParams } from 'app/routers/params'
 import { useUser } from 'app/utils/useUser'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { Keyboard } from 'react-native'
 
 export default function ActivityFeed({
   activityFeedQuery,
@@ -40,6 +44,16 @@ export default function ActivityFeed({
   const sendParamsRef = useRef(sendParamsAndSet)
   sendParamsRef.current = sendParamsAndSet
 
+  const {
+    data: profile,
+    isLoading: isLoadingRecipient,
+    error: errorProfileLookup,
+  } = useProfileLookup(sendParams.idType ?? 'tag', sendParams.recipient ?? '')
+
+  // to avoid flickering
+  const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
+  const finalIsLoading = isLoadingRecipient && deferredIsLoadingRecipient
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
     if (!sendChatOpen) {
@@ -56,10 +70,15 @@ export default function ActivityFeed({
   }, [sendChatOpen])
 
   useEffect(() => {
-    if (sendParams.idType && sendParams.recipient) {
-      setSendChatOpen(true)
+    if (!errorProfileLookup && profile?.address && sendParams.idType && sendParams.recipient) {
+      Keyboard.dismiss()
+      startTransition(() => {
+        setSendChatOpen(true)
+      })
+    } else {
+      setSendChatOpen(false)
     }
-  }, [sendParams.idType, sendParams.recipient])
+  }, [profile, sendParams.idType, sendParams.recipient, errorProfileLookup])
 
   const {
     data,
@@ -153,12 +172,19 @@ export default function ActivityFeed({
       h="100%"
       zIndex={10}
       y={-20}
+      pe={isLoadingRecipient ? 'none' : 'auto'}
+      o={finalIsLoading ? 0.5 : 1}
       $gtLg={{
         y: 20,
       }}
       $platform-native={{
         h: '150%',
         y: 0,
+        animation: '200ms',
+        animateOnly: ['opacity'],
+      }}
+      $platform-web={{
+        transition: 'opacity 200ms linear',
       }}
     >
       <MyList
@@ -189,6 +215,7 @@ type ComputedValues = {
   date: ReactNode
   eventName: string
   subtext: string | null
+  subtextAddress: `0x${string}` | null
   isUserTransfer: boolean
 }
 
@@ -224,7 +251,12 @@ import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { amountFromActivity, eventNameFromActivity, subtextFromActivity } from 'app/utils/activity'
+import {
+  amountFromActivity,
+  eventNameFromActivity,
+  subtextFromActivity,
+  subtextAddressFromActivity,
+} from 'app/utils/activity'
 import { CommentsTime } from 'app/utils/dateHelper'
 import { Spinner } from '@my/ui'
 import {
@@ -241,6 +273,22 @@ import { isSendAccountReceiveEvent } from 'app/utils/zod/activity/SendAccountRec
 import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
 import { ContractLabels } from 'app/data/contract-labels'
 import type { ReactNode } from 'react'
+
+function isiOSPWA() {
+  if (typeof window === 'undefined') return false
+  const userAgent = navigator.userAgent
+  if (/iPhone|iPad|iPod/.test(userAgent)) {
+    //@ts-expect-error window.navigator is not defined in the browser
+    const isStandalone = window?.navigator.standalone
+    if (isStandalone) {
+      return true
+    }
+    return false
+  }
+  return false
+}
+
+const IS_IOS_PWA = !isServer && isWeb && isiOSPWA()
 
 const MyList = memo(
   ({
@@ -374,11 +422,19 @@ const MyList = memo(
           date = CommentsTime(new Date(activity.created_at), locale)
         }
 
+        // Get the external address for linking if subtext is an address
+        const subtextAddress = subtextAddressFromActivity({
+          activity,
+          swapRouters: swapRouters || [],
+          liquidityPools: liquidityPools || [],
+        })
+
         const computed: ComputedValues = {
           amount,
           date,
           eventName,
           subtext,
+          subtextAddress,
           isUserTransfer,
         }
 
@@ -466,6 +522,7 @@ const MyList = memo(
             computedDate={computed.date}
             computedEventName={computed.eventName}
             computedSubtext={computed.subtext}
+            computedSubtextAddress={computed.subtextAddress}
             computedIsUserTransfer={computed.isUserTransfer}
           />
         </YStack>
@@ -485,7 +542,11 @@ const MyList = memo(
           renderItem={renderItem}
           contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
-          onScroll={(e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)}
+          onScroll={
+            IS_IOS_PWA
+              ? undefined
+              : (e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)
+          }
           onContentSizeChange={onContentSizeChangeHandler}
           scrollEventThrottle={16}
         />

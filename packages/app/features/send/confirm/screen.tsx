@@ -1,5 +1,6 @@
 import {
   FadeCard,
+  Link,
   Paragraph,
   type ParagraphProps,
   PrimaryButton,
@@ -112,7 +113,12 @@ export function SendConfirm() {
   const isContact = !!recipientContact
   const isFavorite = recipientContact?.is_favorite ?? false
 
-  const href = profile ? `/profile/${profile?.sendid}` : ''
+  // Link to profile page: use sendid for Send accounts, or the address for external addresses
+  const href = profile
+    ? `/profile/${profile?.sendid}`
+    : idType === 'address' && recipient && isAddress(recipient)
+      ? `/profile/${recipient}`
+      : ''
 
   const webauthnCreds =
     sendAccount?.send_account_credentials
@@ -350,33 +356,65 @@ export function SendConfirm() {
           }}
         >
           <XStack gap={'$4'} ai={'center'}>
-            <ConfirmScreenAvatar profile={profile} href={href} />
-            <Paragraph
-              nativeID="profileName"
-              size={'$6'}
-              color={'$silverChalice'}
-              fontWeight={'500'}
-              $theme-light={{
-                color: '$darkGrayTextField',
-              }}
-            >
-              {(() => {
-                switch (true) {
-                  case idType === 'address':
-                    return shorten(recipient, 5, 4)
-                  case !!profile?.name:
-                    return profile?.name
-                  case !!profile?.main_tag_name:
-                    return `/${profile.main_tag_name}`
-                  case !!profile?.all_tags?.[0]:
-                    return `/${profile.all_tags[0]}`
-                  case !!profile?.sendid:
-                    return `#${profile?.sendid}`
-                  default:
-                    return ''
-                }
-              })()}
-            </Paragraph>
+            <ConfirmScreenAvatar profile={profile} href={href} address={recipient} />
+            {href ? (
+              <Link href={href}>
+                <Paragraph
+                  nativeID="profileName"
+                  size={'$6'}
+                  color={'$silverChalice'}
+                  fontWeight={'500'}
+                  $theme-light={{
+                    color: '$darkGrayTextField',
+                  }}
+                  textDecorationLine="underline"
+                >
+                  {(() => {
+                    switch (true) {
+                      case idType === 'address':
+                        return shorten(recipient, 5, 4)
+                      case !!profile?.name:
+                        return profile?.name
+                      case !!profile?.main_tag_name:
+                        return `/${profile.main_tag_name}`
+                      case !!profile?.all_tags?.[0]:
+                        return `/${profile.all_tags[0]}`
+                      case !!profile?.sendid:
+                        return `#${profile?.sendid}`
+                      default:
+                        return ''
+                    }
+                  })()}
+                </Paragraph>
+              </Link>
+            ) : (
+              <Paragraph
+                nativeID="profileName"
+                size={'$6'}
+                color={'$silverChalice'}
+                fontWeight={'500'}
+                $theme-light={{
+                  color: '$darkGrayTextField',
+                }}
+              >
+                {(() => {
+                  switch (true) {
+                    case idType === 'address':
+                      return shorten(recipient, 5, 4)
+                    case !!profile?.name:
+                      return profile?.name
+                    case !!profile?.main_tag_name:
+                      return `/${profile.main_tag_name}`
+                    case !!profile?.all_tags?.[0]:
+                      return `/${profile.all_tags[0]}`
+                    case !!profile?.sendid:
+                      return `#${profile?.sendid}`
+                    default:
+                      return ''
+                  }
+                })()}
+              </Paragraph>
+            )}
           </XStack>
           <XStack w="100%" jc="space-between" ai="flex-end" flexWrap={'wrap'}>
             <YStack gap={'$2'}>

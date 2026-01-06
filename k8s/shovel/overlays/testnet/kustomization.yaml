@@ -1,0 +1,35 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: shovel-testnet
+
+resources:
+  - ../../base
+  - externalsecret.yaml
+  - ghcr-externalsecret.yaml
+  # OAuth2 proxy for authenticated access to shovel dashboard
+  - oauth2-proxy.yaml
+  - oauth2-proxy-externalsecret.yaml
+  - ingress.yaml
+
+patches:
+  - path: configmap-patch.yaml
+  - target:
+      kind: StatefulSet
+      name: shovel
+    patch: |-
+      - op: add
+        path: /metadata/labels/app.kubernetes.io~1instance
+        value: shovel-testnet
+      - op: add
+        path: /metadata/labels/environment
+        value: testnet
+      - op: add
+        path: /spec/template/metadata/labels/app.kubernetes.io~1instance
+        value: shovel-testnet
+      - op: add
+        path: /spec/template/metadata/labels/environment
+        value: testnet
+      - op: add
+        path: /spec/selector/matchLabels/app.kubernetes.io~1instance
+        value: shovel-testnet

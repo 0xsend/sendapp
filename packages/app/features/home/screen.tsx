@@ -18,6 +18,7 @@ import {
   XStack,
   type XStackProps,
   YStack,
+  type YStackProps,
 } from '@my/ui'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useCoinFromTokenParam } from 'app/utils/useCoinFromTokenParam'
@@ -36,7 +37,7 @@ import { StablesBalanceList } from './StablesBalanceList'
 import { RewardsCard } from './RewardsCard'
 import { FriendsCard } from './FriendsCard'
 import { useCoins } from 'app/provider/coins'
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, type PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { coin } from 'app/data/coins'
 import { investmentCoins, cantonCoin } from 'app/data/coins'
@@ -49,48 +50,53 @@ import { calculatePercentageChange } from './utils/calculatePercentageChange'
 import { localizeAmount } from 'app/utils/formatAmount'
 import { IconX } from 'app/components/icons'
 import { dynamic } from 'app/utils/dynamic'
-import { ActivityRewardsScreenLazy } from 'app/features/rewards/activity/screen'
 import { useTranslation } from 'react-i18next'
 
-export function HomeScreen() {
-  const router = useRouter()
-  const supabase = useSupabase()
+function HomeScreenImpl() {
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { t } = useTranslation('home')
 
   return (
     <YStack f={1}>
       <AnimatePresence>
-        {(() => {
-          switch (true) {
-            case !sendAccount && !isSendAccountLoading:
-              return (
-                <Stack f={1} h={'100%'} ai={'center'} jc={'center'} gap="$4">
-                  <H1 theme="red">{t('fallback.missingAccount.title')}</H1>
-                  <Paragraph>{t('fallback.missingAccount.description')}</Paragraph>
-                  <Button
-                    onPress={() => {
-                      router.push('/_sitemap')
-                    }}
-                  >
-                    {t('fallback.missingAccount.sitemap')}
-                  </Button>
-                  <Button onPress={() => router.push('/auth/onboarding')}>
-                    {t('fallback.missingAccount.onboarding')}
-                  </Button>
-                  <Button onPress={() => supabase.auth.signOut()}>
-                    {t('fallback.missingAccount.signOut')}
-                  </Button>
-                </Stack>
-              )
-            default:
-              return <HomeBody key="home-body" />
-          }
-        })()}
+        {!sendAccount && !isSendAccountLoading ? (
+          <HomeScreenNoAccount />
+        ) : (
+          <HomeBody key="home-body" />
+        )}
       </AnimatePresence>
     </YStack>
   )
 }
+
+const HomeScreenNoAccount = () => {
+  const router = useRouter()
+  const supabase = useSupabase()
+
+  const { t } = useTranslation('home')
+  return (
+    <Stack f={1} h={'100%'} ai={'center'} jc={'center'} gap="$4">
+      <H1 theme="red">{t('fallback.missingAccount.title')}</H1>
+      <Paragraph>{t('fallback.missingAccount.description')}</Paragraph>
+      <Button
+        onPress={() => {
+          router.push('/_sitemap')
+        }}
+      >
+        {t('fallback.missingAccount.sitemap')}
+      </Button>
+      <Button onPress={() => router.push('/auth/onboarding')}>
+        {t('fallback.missingAccount.onboarding')}
+      </Button>
+      <Button onPress={() => supabase.auth.signOut()}>
+        {t('fallback.missingAccount.signOut')}
+      </Button>
+    </Stack>
+  )
+}
+
+export const HomeScreen = memo(HomeScreenImpl)
+
+HomeScreen.displayName = 'HomeScreen'
 
 /**
  * RightPanelPage mimics Next.js/Solito router syntax for consistency
@@ -167,9 +173,7 @@ const HomeRightPanelProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-function HomeBody(props: XStackProps) {
-  const [queryParams] = useRootScreenParams()
-
+function HomeBodyImpl(props: XStackProps) {
   return (
     <HomeRightPanelProvider>
       <IsPriceHiddenProvider>
@@ -180,13 +184,7 @@ function HomeBody(props: XStackProps) {
           minHeight={'100%'}
           {...props}
         >
-          <YStack
-            $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
-            width="100%"
-            display={!queryParams.token || !isWeb ? 'flex' : 'none'}
-            gap="$3"
-            ai={'center'}
-          >
+          <HomeBodyAWrapper>
             <StablesBalanceCard>
               <StablesBalanceCard.HomeScreenHeader />
               <StablesBalanceCard.Footer>
@@ -212,11 +210,29 @@ function HomeBody(props: XStackProps) {
               <RewardsCard w="55%" f={1} />
               <FriendsCard f={1} />
             </HomeBodyCardRow>
-          </YStack>
+          </HomeBodyAWrapper>
           <RightPanel />
         </XStack>
       </IsPriceHiddenProvider>
     </HomeRightPanelProvider>
+  )
+}
+
+const HomeBody = memo(HomeBodyImpl)
+HomeBody.displayName = 'HomeBody'
+
+const HomeBodyAWrapper = (props: YStackProps) => {
+  const [queryParams] = useRootScreenParams()
+
+  return (
+    <YStack
+      $gtLg={{ display: 'flex', w: '45%', pb: 0 }}
+      width="100%"
+      display={!queryParams.token || !isWeb ? 'flex' : 'none'}
+      gap="$3"
+      ai={'center'}
+      {...props}
+    />
   )
 }
 
@@ -693,13 +709,16 @@ export const StablesBody = YStack.styleable((props) => {
 
 StablesBody.displayName = 'StablesBody'
 
-export const HomeBodyCard = styled(Card, {
+const HomeBodyCardImpl = styled(Card, {
   size: '$5',
   br: '$7',
   mah: 150,
   p: '$1.5',
   materialInteractive: process.env.TAMAGUI_TARGET === 'web',
 })
+
+export const HomeBodyCard = memo(HomeBodyCardImpl)
+HomeBodyCard.displayName = 'HomeBodyCard'
 
 export const HomeBodyCardRow = styled(XStack, {
   gap: '$3',

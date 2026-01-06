@@ -40,6 +40,7 @@
     "shovel": "yarn workspace @my/shovel",
     "workflows": "yarn workspace @my/workflows",
     "bridge-webhook": "yarn workspace bridge-webhook",
+    "sendctl": "npx tsx ./packages/sendctl/bin/sendctl.js",
     "clean": "yarn workspaces foreach --all -pi run clean",
     "i18n:sync": "node packages/app/scripts/i18n-sync.cjs",
     "i18n:check": "yarn i18n:sync --check",

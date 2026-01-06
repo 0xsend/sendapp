@@ -1,4 +1,8 @@
+import { memo } from 'react'
 import { H1, type HeadingProps } from 'tamagui'
+
+const H1Memoized = memo(H1)
+H1Memoized.displayName = 'H1'
 
 export const BigHeading = ({
   fontSize = 64,

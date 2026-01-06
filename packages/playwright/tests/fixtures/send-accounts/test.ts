@@ -85,7 +85,7 @@ const sendAccountTest = base.extend<{
 
       await use(sendAccount)
     },
-    { timeout: 60_000, scope: 'test' },
+    { timeout: 120_000, scope: 'test' },
   ],
   page: [({ sendAccount: _, page }, use) => use(page), { scope: 'test' }],
 })

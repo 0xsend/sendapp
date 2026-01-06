@@ -34,14 +34,18 @@ test('can visit account page', async ({ page, user: { profile } }) => {
 
 test('can update profile', async ({ page, supabase }) => {
   await page.getByRole('link', { name: 'profile' }).click()
+  await page.waitForURL('/account/edit-profile')
   await expect(page).toHaveTitle('Send | Edit Profile')
 
   await page.getByRole('button', { name: 'edit profile' }).click()
-  await page.getByLabel('Name').fill('LeO')
-  await page.getByLabel('Bio').fill('Sender')
+  // Wait for form fields to be ready (form renders after clicking edit)
+  const nameField = page.getByRole('textbox', { name: 'Name' })
+  await expect(nameField).toBeVisible({ timeout: 5_000 })
+  await nameField.fill('LeO')
+  await page.getByRole('textbox', { name: 'About' }).fill('Sender')
   await page.getByRole('checkbox').setChecked(true)
 
-  await page.getByRole('button', { name: 'Save' }).click()
+  await page.getByRole('button', { name: 'SAVE CHANGES' }).click()
 
   await expect(page.getByText('Notification Successfully updated')).toBeVisible()
 

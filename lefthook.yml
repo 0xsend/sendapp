@@ -2,6 +2,12 @@ pre-commit:
   commands:
     check:
       run: npx @biomejs/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files} && git update-index --again
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: ./scripts/pre-commit-typecheck.sh
+    deps:
+      glob: "**/package.json"
+      run: yarn check-deps
 pre-push:
   commands:
     check:

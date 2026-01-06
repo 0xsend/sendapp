@@ -66,6 +66,8 @@ type SendEarnContextType = {
   invalidateQueries: () => void
 }
 
+const BIGINT_ZERO = 0n
+
 const SendEarnContext = createContext<SendEarnContextType | undefined>(undefined)
 
 export function SendEarnProvider({ children }: { children: ReactNode }) {
@@ -77,7 +79,7 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
 
   // Get all vaults with balances for asset conversion
   const balancesWithShares = useMemo(() => {
-    return allBalances?.data?.filter((b) => b.shares > 0n) ?? []
+    return allBalances?.data?.filter((b) => b.shares > BIGINT_ZERO) ?? []
   }, [allBalances.data])
 
   const vaultsWithBalance = useMemo(() => {
@@ -104,7 +106,7 @@ export function SendEarnProvider({ children }: { children: ReactNode }) {
 
   // Calculate total current value across all vaults
   const totalCurrentValue = useMemo(() => {
-    return allCurrentAssets.data?.reduce((sum, assets) => sum + assets, 0n) ?? 0n
+    return allCurrentAssets.data?.reduce((sum, assets) => sum + assets, BIGINT_ZERO) ?? BIGINT_ZERO
   }, [allCurrentAssets.data])
 
   // Function to get balances for a specific coin

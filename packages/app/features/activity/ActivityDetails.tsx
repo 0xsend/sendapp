@@ -1,6 +1,7 @@
 import {
   Fade,
   H4,
+  Link,
   Paragraph,
   Separator,
   Stack,
@@ -16,6 +17,7 @@ import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
   isActivitySwapTransfer,
   noteFromActivity,
+  subtextAddressFromActivity,
   useDateDetailsFromActivity,
   useEventNameFromActivity,
   usePhraseFromActivity,
@@ -52,6 +54,11 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
   const activityEventName = useEventNameFromActivity({ activity, swapRouters, liquidityPools })
   const activityPhrase = usePhraseFromActivity({ activity, swapRouters, liquidityPools })
   const subText = useSubtextFromActivity({ activity, swapRouters, liquidityPools })
+  const subtextAddress = subtextAddressFromActivity({
+    activity,
+    swapRouters: swapRouters || [],
+    liquidityPools: liquidityPools || [],
+  })
   const amount = useAmountFromActivity(activity)
   const date = useDateDetailsFromActivity({ activity })
   const note = noteFromActivity(activity)
@@ -99,6 +106,18 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
                       case isActivitySwapTransfer(activity, swapRouters, liquidityPools):
                         return <Text>{activityPhrase}</Text>
                       default:
+                        // If subText is an external address, make it a clickable link
+                        if (subtextAddress && subText) {
+                          return (
+                            <Link
+                              href={`/profile/${subtextAddress}`}
+                              textDecorationLine="underline"
+                              hoverStyle={{ opacity: 0.8 }}
+                            >
+                              {subText}
+                            </Link>
+                          )
+                        }
                         return <Text>{subText}</Text>
                     }
                   })()}

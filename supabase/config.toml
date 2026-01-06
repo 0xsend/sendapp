@@ -39,6 +39,13 @@ schema_paths = [
   "./schemas/referrals.sql",
   "./schemas/distributions.sql",
   "./schemas/send_earn.sql",
+
+  # Send check tables (must be before send_scores and send_checks functions)
+  "./schemas/send_check_created.sql",
+  "./schemas/send_check_claimed.sql",
+  "./schemas/send_check_notes.sql",
+  "./schemas/send_checks.sql",
+
   "./schemas/send_scores.sql",
 
   # Send account related tables
