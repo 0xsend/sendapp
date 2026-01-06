@@ -6,7 +6,7 @@ const EXPECTED_CHAIN_ID = '0xce619'
 /**
  * Check AA Bundler health
  * Endpoint: POST /rpc with eth_chainId JSON-RPC
- * Success: Valid JSON-RPC response with chain ID matching 0x14a34
+ * Success: Valid JSON-RPC response with chain ID matching 0xce619 (845337)
  */
 export async function checkBundler(config: HttpCheckConfig): Promise<CheckResult> {
   const start = Date.now()

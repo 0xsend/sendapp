@@ -35,7 +35,7 @@ async function rpcCall(
 
 /**
  * Check Anvil (Base fork) health with multi-step verification:
- * 1. RPC Health: eth_chainId returns 0x14a34
+ * 1. RPC Health: eth_chainId returns 0xce619 (845337)
  * 2. Factory Contract: eth_getCode confirms SendAccountFactory deployed
  * 3. Paymaster Contract: eth_getCode confirms TokenPaymaster deployed
  * 4. Factory Funding: eth_getBalance confirms factory account has ETH (> 0)
