@@ -45,10 +45,7 @@ describe('sweep activity integration tests', () => {
       // For standard ERC20, balanceOf mapping is typically at slot 0
       // Storage slot = keccak256(abi.encode(address, slot))
       const balanceSlot = keccak256(
-        encodeAbiParameters(
-          [{ type: 'address' }, { type: 'uint256' }],
-          [testAddress, 0n]
-        )
+        encodeAbiParameters([{ type: 'address' }, { type: 'uint256' }], [testAddress, 0n])
       )
 
       await client.setStorageAt({

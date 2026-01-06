@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import { beforeEach, describe, expect, it, vi, type Mock, type Mocked } from 'vitest'
 import type {
   PostgrestError,
   PostgrestMaybeSingleResponse,
@@ -19,13 +19,13 @@ import {
 } from './supabase'
 
 // Mock the modules FIRST
-jest.mock('app/utils/supabase/admin')
-jest.mock('@temporalio/activity', () => ({
+vi.mock('app/utils/supabase/admin')
+vi.mock('@temporalio/activity', () => ({
   log: {
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
 }))
 
@@ -42,22 +42,22 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 // --- Mock Setup ---
 // Create the mock client instance first
 const mockedSupabaseAdmin = {
-  schema: jest.fn(),
+  schema: vi.fn(),
   // Add other top-level methods if needed, though schema is usually the entry point
-} as unknown as jest.Mocked<SupabaseClient>
+} as unknown as Mocked<SupabaseClient>
 
 // Mock the module, making the factory function return our mock instance
-jest.mock('app/utils/supabase/admin', () => ({
-  createSupabaseAdminClient: jest.fn(() => mockedSupabaseAdmin),
+vi.mock('app/utils/supabase/admin', () => ({
+  createSupabaseAdminClient: vi.fn(() => mockedSupabaseAdmin),
 }))
 
 // Mock the temporal activity log
-jest.mock('@temporalio/activity', () => ({
+vi.mock('@temporalio/activity', () => ({
   log: {
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
 }))
 
@@ -71,40 +71,40 @@ const createMockPostgrestError = (message: string): PostgrestError => ({
 })
 
 // Define reusable mock functions for the chain (to be attached to mockedSupabaseAdmin)
-const mockMaybeSingle = jest.fn<() => Promise<PostgrestMaybeSingleResponse<unknown>>>()
-const mockSingle = jest.fn<() => Promise<PostgrestSingleResponse<unknown>>>()
-const mockEq = jest.fn().mockImplementation(() => ({
+const mockMaybeSingle = vi.fn<() => Promise<PostgrestMaybeSingleResponse<unknown>>>()
+const mockSingle = vi.fn<() => Promise<PostgrestSingleResponse<unknown>>>()
+const mockEq = vi.fn().mockImplementation(() => ({
   single: mockSingle,
   maybeSingle: mockMaybeSingle,
   select: mockSelect, // Ensure select after eq leads to the select mock
 }))
-const mockSelect = jest.fn().mockImplementation(() => ({
+const mockSelect = vi.fn().mockImplementation(() => ({
   eq: mockEq,
   single: mockSingle,
   maybeSingle: mockMaybeSingle,
 }))
-const mockUpdate = jest.fn().mockImplementation(() => ({
+const mockUpdate = vi.fn().mockImplementation(() => ({
   eq: mockEq,
 }))
 // Upsert should return an object that allows chaining .select()
-const mockUpsert = jest.fn().mockImplementation(() => ({
+const mockUpsert = vi.fn().mockImplementation(() => ({
   select: mockSelect,
 }))
-const mockFrom = jest.fn().mockImplementation(() => ({
+const mockFrom = vi.fn().mockImplementation(() => ({
   select: mockSelect,
   update: mockUpdate,
   upsert: mockUpsert,
 }))
-const mockSchema = jest.fn().mockImplementation(() => ({
+const mockSchema = vi.fn().mockImplementation(() => ({
   from: mockFrom,
 }))
 
 beforeEach(() => {
   // Clear mocks including the factory mock call count
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   // Re-assign the mock implementation to the mocked client's schema method
   // This ensures the chained mocks are reset for each test
-  ;(mockedSupabaseAdmin.schema as jest.Mock).mockImplementation(mockSchema)
+  ;(mockedSupabaseAdmin.schema as Mock).mockImplementation(mockSchema)
   // Also reset the chained mocks themselves
   mockSchema.mockClear()
   mockFrom.mockClear()
