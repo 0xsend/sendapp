@@ -274,12 +274,13 @@ test.describe('Contact Favorites', () => {
     await expect(starButton).toHaveAttribute('aria-pressed', 'true', { timeout: 5_000 })
 
     // Verify toast
-    await expect(page.getByText(/added to favorites/i).first()).toBeVisible({ timeout: 5_000 })
+    const addedToast = page.getByText(/added to favorites/i).first()
+    await expect(addedToast).toBeVisible({ timeout: 5_000 })
 
     log('favorite added in dialog')
 
-    // Wait for toast to dismiss
-    await page.waitForTimeout(1000)
+    // Wait for toast to dismiss before clicking again
+    await expect(addedToast).toBeHidden({ timeout: 5_000 })
 
     // Click again to remove from favorites
     await starButton.click()
@@ -611,10 +612,7 @@ test.describe('Label Picker', () => {
     await expect(labelChip).toBeVisible()
     await labelChip.click()
 
-    // Wait for the label to be selected - the test will verify selection worked via the final label assignment
-    await page.waitForTimeout(300)
-
-    // Submit the form
+    // Submit the form (button enabled state indicates form is ready)
     const submitButton = page.getByTestId('addContactSubmitButton')
     await expect(submitButton).toBeVisible()
     await expect(submitButton).toBeEnabled()

@@ -107,10 +107,13 @@ services:
       --beneficiary 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
       --unsafe
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:${BUNDLER_PORT:-3030}/"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
+      # Timeout increased: bundler is single-threaded Node.js and can block
+      # when processing eth_getUserOperationReceipt (scans 1000 blocks in unsafe mode)
+      test: ["CMD", "curl", "-fsS", "--max-time", "10", "http://127.0.0.1:${BUNDLER_PORT:-3030}/"]
+      interval: 10s
+      timeout: 15s
+      retries: 10
+      start_period: 10s
 
   # ===========================================
   # SHOVEL - Blockchain Indexer

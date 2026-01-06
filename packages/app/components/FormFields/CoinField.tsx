@@ -15,11 +15,12 @@ import {
   Spinner,
   Theme,
   useThemeName,
+  View,
   XStack,
   YStack,
 } from '@my/ui'
 import { baseMainnet, usdcAddress } from '@my/wagmi'
-import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { Check, ChevronDown } from '@tamagui/lucide-icons'
 import { useTsController } from '@ts-react/form'
 import { IconX } from 'app/components/icons'
 import formatAmount from 'app/utils/formatAmount'
@@ -29,7 +30,7 @@ import type { CoinWithBalance } from 'app/data/coins'
 import { cantonCoin } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Platform, Dimensions } from 'react-native'
+import { Dimensions } from 'react-native'
 
 export const CoinField = ({
   native = false,
@@ -84,6 +85,7 @@ export const CoinField = ({
             onOpenChange={setIsOpen}
             defaultValue={usdcAddress[baseMainnet.id]}
             open={isOpen}
+            disablePreventBodyScroll
             {...props}
           >
             <Select.Trigger
@@ -100,11 +102,15 @@ export const CoinField = ({
               hoverStyle={hoverStyles}
               $gtSm={{ p: '$2.5' }}
               iconAfter={
-                isOpen ? (
-                  <ChevronUp color={'$primary'} $theme-light={{ color: '$color12' }} />
-                ) : (
+                <View
+                  x={-2}
+                  y={1}
+                  scale={0.9}
+                  animation="responsive"
+                  rotateZ={isOpen ? '180deg' : '0deg'}
+                >
                   <ChevronDown color="$primary" $theme-light={{ color: '$color12' }} />
-                )
+                </View>
               }
               $platform-web={{ width: 'fit-content' }}
             >
@@ -130,9 +136,9 @@ export const CoinField = ({
                 snapPoints={snapPoints}
                 snapPointsMode={snapPointsMode}
                 disableDrag={!useFitContent}
-                animation={'quick'}
+                animation="responsive"
               >
-                <Sheet.Frame maw={738} bc={'$color1'} px={'$3.5'} py={'$6'}>
+                <Sheet.Frame px="$2" maw="100%" bc={'$color1'} py={'$6'}>
                   <XStack ai="center" jc="space-between" w="100%" px="$4">
                     <Paragraph fontSize={'$5'} fontWeight={'700'} color={'$color12'}>
                       Select Currency
@@ -148,29 +154,43 @@ export const CoinField = ({
                     <Adapt.Contents />
                   </ScrollView>
                 </Sheet.Frame>
-                <Sheet.Overlay />
+                <Sheet.Overlay
+                  animation="200ms"
+                  enterStyle={{ opacity: 0 }}
+                  exitStyle={{ opacity: 0 }}
+                  animateOnly={['opacity']}
+                  opacity={0.4}
+                />
               </Sheet>
             </Adapt>
 
             <Select.Content zIndex={200000}>
               <Select.Viewport
+                animation="responsive"
+                animateOnly={['transform', 'opacity']}
+                transformOrigin="right top"
+                enterStyle={{ opacity: 0, y: 0, scale: 0.9 }}
+                exitStyle={{ opacity: 0, y: 0, scale: 0.9 }}
                 disableScroll
                 backgroundColor={'$color1'}
                 btrr={0}
                 boc="transparent"
                 x={'-50%'}
-                $gtLg={{
+                $lg={{
                   x: 0,
                 }}
                 br={'$6'}
                 overflow={'hidden'}
+                elevation="$3"
+                shadowOpacity={0.3}
+                opacity={0.95}
               >
                 <XStack
                   als="flex-start"
-                  w={320}
-                  $sm={{ w: isTouchable ? '100%' : 320 }}
+                  w="100%"
                   boc={'transparent'}
                   f={1}
+                  miw={300}
                   maxHeight={isTouchable ? 'unset' : 275}
                   // @ts-expect-error - overflowY is needed for Y-axis specific scroll behavior
                   overflowY={isTouchable ? 'hidden' : 'scroll'}
@@ -234,18 +254,14 @@ const CoinFieldItem = ({
       br={'$4'}
       bc={'transparent'}
       cursor={'pointer'}
-      focusStyle={{ backgroundColor: 'transparent' }}
-      hoverStyle={{ backgroundColor: 'transparent' }}
+      focusStyle={{ backgroundColor: '$aztec4' }}
+      hoverStyle={{ backgroundColor: '$aztec4' }}
+      px="$3"
+      py="$2"
     >
-      <XStack gap={'$2'} $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
-        <IconCoin symbol={coin.symbol} />
-        <Select.ItemText
-          fontSize={'$7'}
-          fontWeight={Platform.OS === 'web' ? '500' : '600'}
-          textTransform={'uppercase'}
-          color={'$color12'}
-          lineHeight={36}
-        >
+      <XStack gap="$2.5" $gtLg={{ gap: '$3.5' }} ai={'center'} jc={'space-between'}>
+        <IconCoin size="$1.5" symbol={coin.symbol} />
+        <Select.ItemText fontSize="$5" color="$gray11" lineHeight={36}>
           {coin.symbol}
         </Select.ItemText>
         {active && <Check size="$1" color={'$primary'} $theme-light={{ color: '$color12' }} />}
@@ -267,11 +283,7 @@ const TokenBalance = ({ coin: { balance, decimals } }: { coin: CoinWithBalance }
     return <></>
   }
   return (
-    <Paragraph
-      fontSize={'$7'}
-      fontWeight={Platform.OS === 'web' ? '500' : '600'}
-      color={'$color12'}
-    >
+    <Paragraph fontSize="$5" color="$gray12">
       {formatAmount((Number(balance) / 10 ** decimals).toString())}
     </Paragraph>
   )

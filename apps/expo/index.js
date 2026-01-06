@@ -15,7 +15,11 @@ React.AnimatedComponent = ({ children }) => <>{children}</>
 // Must be exported or Fast Refresh won't update the context
 export function App() {
   const ctx = require.context('./app')
-  return <ExpoRoot context={ctx} />
+  return (
+    <React.StrictMode>
+      <ExpoRoot context={ctx} />
+    </React.StrictMode>
+  )
 }
 
 registerRootComponent(App)

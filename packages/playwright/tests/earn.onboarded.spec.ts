@@ -33,7 +33,12 @@ import {
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 import { readContract } from 'viem/actions'
-import { coinToParam, test as earnTest, type EarnWithdrawPage } from './fixtures/earn'
+import {
+  coinToParam,
+  SHOVEL_INDEX_TIMEOUT_MS,
+  test as earnTest,
+  type EarnWithdrawPage,
+} from './fixtures/earn'
 import { checkReferralCodeHidden, checkReferralCodeVisibility } from './fixtures/referrals'
 import { fund, testBaseClient } from './fixtures/viem'
 import { createBaseWalletClient } from './fixtures/viem/base'
@@ -992,9 +997,6 @@ for (const coin of [usdcCoin]) {
       })
 
       // 2. Make a second deposit with different parameters
-      // Wait some time or perform other actions in between
-      await page.page.waitForTimeout(2000)
-
       // Use a different amount
       const amount2 = formatUnits(randomAmount2, coin.decimals)
       await page.goto(coin)
@@ -1064,15 +1066,17 @@ async function verifyActivity({
   event: string
 }) {
   await page.goto('/activity')
+  // Increased timeout to allow for Shovel indexing of blockchain events
+  // Note: Text format is "Event Amount SYMBOL" (no hyphen) as rendered by TokenActivityRow
   await expect(
     page.getByText(
-      `${event} - ${formatAmount(
+      `${event} ${formatAmount(
         formatUnits(BigInt(assets), coin.decimals),
         5,
         coin.formatDecimals
       )} ${coin.symbol}`
     )
-  ).toBeVisible()
+  ).toBeVisible({ timeout: SHOVEL_INDEX_TIMEOUT_MS })
 }
 
 async function verifyEarnings({

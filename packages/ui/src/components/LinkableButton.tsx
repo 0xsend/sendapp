@@ -1,5 +1,13 @@
-import { forwardRef } from 'react'
-import { styled, ButtonText, ButtonIcon, ButtonContext, Button, type ButtonProps } from 'tamagui'
+import { forwardRef, memo } from 'react'
+import {
+  styled,
+  ButtonText,
+  ButtonIcon,
+  ButtonContext,
+  Button,
+  type ButtonProps,
+  useEvent,
+} from 'tamagui'
 import { withStaticProperties } from '@tamagui/helpers'
 import { useLink, type LinkProps } from 'solito/link'
 import type { TamaguiElement } from '@tamagui/core'
@@ -87,27 +95,30 @@ const LinkableButtonFrame = styled(Button, {
   },
 })
 
+const LinkableButtonFrameMemoized = memo(LinkableButtonFrame)
+LinkableButtonFrameMemoized.displayName = 'LinkableButtonFrameMemoized'
+
 const LinkableButton_ = forwardRef<TamaguiElement, LinkableButtonProps>(
   ({ href, prefetch, ...props }, ref) => {
     const { onPress: linkOnPress, ...linkProps } = useLink({ href })
     usePrefetch(prefetch ? href?.toString() : undefined)
-    return (
-      <LinkableButtonFrame
-        ref={ref}
-        onPress={(e) => {
-          e.stopPropagation()
-          linkOnPress(e)
-        }}
-        {...props}
-        {...linkProps}
-      />
-    )
+
+    const handlePress = useEvent((e) => {
+      e.stopPropagation()
+      linkOnPress(e)
+    })
+
+    return <LinkableButtonFrameMemoized ref={ref} onPress={handlePress} {...props} {...linkProps} />
   }
 )
 
 export const LinkableButton = withStaticProperties(LinkableButton_, {
-  Text: ButtonText,
-  Icon: ButtonIcon,
+  Text: memo(ButtonText),
+  Icon: memo(ButtonIcon),
 })
+LinkableButton.Icon.displayName = 'LinkableButton.Icon'
+LinkableButton.Text.displayName = 'LinkableButton.Text'
+
+LinkableButton.displayName = 'LinkableButton'
 
 export type LinkableButtonProps = Omit<ButtonProps, 'href'> & LinkProps

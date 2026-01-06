@@ -146,3 +146,76 @@ When making fingerprint-affecting changes:
 1. Update version in `apps/expo/package.json`
 2. Update version in `apps/expo/app.config.ts` (must match)
 3. Commit both files together with your native changes
+
+## Installing Builds on Devices
+
+### Device Registration (iOS)
+
+iOS devices must be registered with EAS before installing internal distribution builds:
+
+```bash
+cd apps/expo
+
+# Register your iOS device
+eas device:create
+```
+
+This generates a provisioning profile link. Open it on your iOS device to complete registration.
+
+**Note**: Android devices don't require registration - just enable "Install from unknown sources" in settings.
+
+### Accessing Builds
+
+#### Option 1: Expo Dashboard (Recommended)
+
+1. Go to [expo.dev](https://expo.dev) and sign in
+2. Navigate to the Send project
+3. Select **Builds** from the sidebar
+4. Filter by profile (staging, preview, production)
+5. Tap **Install** or scan the QR code on your device
+
+#### Option 2: EAS CLI
+
+```bash
+cd apps/expo
+
+# List available builds
+eas build:list
+
+# Run a specific build on connected device/simulator
+eas build:run --platform ios --profile staging
+eas build:run --platform android --profile staging
+```
+
+#### Option 3: Direct Install Links
+
+After each build completes, EAS provides a direct install URL in the build logs and dashboard. Share this link with team members for quick installation.
+
+### App Variants
+
+Each build profile installs as a **separate app** with unique bundle identifiers:
+
+| Profile | iOS Bundle ID | Android Package | App Name |
+|---------|---------------|-----------------|----------|
+| development | `send.app` | `app.send` | Send |
+| preview | `send.app.preview` | `app.send.preview` | Send (Preview) |
+| staging | `send.app.staging` | `app.send.staging` | Send (Staging) |
+| production | `send.app` | `app.send` | Send |
+
+This allows multiple variants to be installed simultaneously for testing.
+
+### Production Builds
+
+Production builds are distributed through app stores:
+
+- **iOS**: TestFlight (beta) or App Store (release)
+- **Android**: Google Play internal/beta/production tracks
+
+Submit builds using:
+
+```bash
+cd apps/expo
+
+# Submit iOS build to App Store Connect
+yarn eas:submit:ios
+```

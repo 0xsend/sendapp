@@ -225,7 +225,7 @@ const TransactionEntry = ({
                 <Paragraph size={'$3'} color={'$color8'} theme={sent ? 'red' : 'green'}>
                   You {sent ? 'Sent' : 'Received'}
                 </Paragraph>
-                {sent && <IconArrowRight size={'$0.9'} rotate={'-90deg'} color={'$red10Dark'} />}
+                {sent && <IconArrowRight size={'$0.9'} rotate={'-90deg'} color={'$color10'} />}
               </XStack>
               <Paragraph size={'$7'}>{amount}</Paragraph>
             </YStack>

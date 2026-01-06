@@ -16,7 +16,7 @@ export const LinkableAvatar = memo(
   }: { children: React.ReactNode } & LinkProps & AvatarProps) => {
     const linkProps = useLink({ href, replace, scroll, shallow })
     return (
-      <Link {...linkProps}>
+      <Link href={linkProps.href} role={linkProps.accessibilityRole}>
         <Avatar {...props}>{children}</Avatar>
       </Link>
     )

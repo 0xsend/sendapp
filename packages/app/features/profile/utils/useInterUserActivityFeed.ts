@@ -8,9 +8,12 @@ import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { throwIf } from 'app/utils/throwIf'
 import { type Activity, EventArraySchema, Events } from 'app/utils/zod/activity'
 import type { ZodError } from 'zod'
+import { hexToBytea } from 'app/utils/hexToBytea'
+import type { Address } from 'viem'
+import { useMemo } from 'react'
 
-const PENDING_TRANSFERS_INTERVAL = 3_000 // 1 second
-const MAX_PENDING_TIME = 30_000 // 2 minutes - stop aggressive polling after this
+const PENDING_TRANSFERS_INTERVAL = 3_000 // 3 seconds
+const MAX_PENDING_TIME = 30_000 // 30 seconds - stop aggressive polling after this
 
 /**
  * Infinite query to fetch ERC-20 token activity feed between the current user and another profile.
@@ -19,13 +22,15 @@ const MAX_PENDING_TIME = 30_000 // 2 minutes - stop aggressive polling after thi
  * @param refetchInterval - Interval in milliseconds to automatically refetch the data.
  * @param currentUserId - The ID of the current logged in user. If undefined, the query will not be enabled.
  * @param otherUserId - The ID of the other user. If undefined, the query will not be enabled.
+ * @param externalAddress - Optional external address to query activity for. If provided, otherUserId is ignored.
  */
 
 export function useInterUserActivityFeed(params: {
   pageSize?: number
   refetchInterval?: number
-  currentUserId?: number
+  currentUserId?: string | number
   otherUserId?: number
+  externalAddress?: Address
   ascending?: boolean
 }): UseInfiniteQueryResult<InfiniteData<Activity[]>, PostgrestError | ZodError> {
   const {
@@ -33,10 +38,17 @@ export function useInterUserActivityFeed(params: {
     refetchInterval = 30_000,
     otherUserId,
     currentUserId,
+    externalAddress,
     ascending = false,
   } = params
 
   const supabase = useSupabase()
+
+  // Convert address to bytea format for querying
+  const addressBytea = useMemo(
+    () => (externalAddress ? hexToBytea(externalAddress) : null),
+    [externalAddress]
+  )
 
   async function fetchInterUserActivityFeed({
     pageParam,
@@ -45,12 +57,23 @@ export function useInterUserActivityFeed(params: {
   }): Promise<Activity[]> {
     const from = pageParam * pageSize
     const to = (pageParam + 1) * pageSize - 1
-    const request = supabase
-      .from('activity_feed')
-      .select('*')
-      .or(
+
+    // Build different queries for external addresses vs user-to-user
+    let request = supabase.from('activity_feed').select('*')
+
+    if (addressBytea) {
+      // Query for external address: find activities where address appears in data.f, data.t, or data.sender
+      request = request.or(
+        `data->>f.eq.${addressBytea},data->>t.eq.${addressBytea},data->>sender.eq.${addressBytea}`
+      )
+    } else {
+      // User-to-user query
+      request = request.or(
         `and(from_user->send_id.eq.${currentUserId},to_user->send_id.eq.${otherUserId}), and(from_user->send_id.eq.${otherUserId},to_user->send_id.eq.${currentUserId})`
       )
+    }
+
+    request = request
       .in('event_name', [
         Events.SendAccountTransfers,
         Events.SendAccountReceive,
@@ -58,13 +81,16 @@ export function useInterUserActivityFeed(params: {
       ])
       .order('created_at', { ascending })
       .range(from, to)
+
     const { data, error } = await request
     throwIf(error)
     return EventArraySchema.parse(data)
   }
 
   return useInfiniteQuery({
-    queryKey: ['inter_user_activity_feed', otherUserId, currentUserId],
+    queryKey: externalAddress
+      ? ['inter_user_activity_feed', 'external', externalAddress, currentUserId]
+      : ['inter_user_activity_feed', otherUserId, currentUserId],
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (lastPage !== null && lastPage.length < pageSize) return undefined
@@ -104,6 +130,7 @@ export function useInterUserActivityFeed(params: {
       // Poll aggressively only if there's a fresh pending transfer
       return hasFreshPendingTransfer ? PENDING_TRANSFERS_INTERVAL : refetchInterval
     },
-    enabled: !!currentUserId && !!otherUserId,
+    // Enable for external address OR for user-to-user queries
+    enabled: !!currentUserId && (!!externalAddress || !!otherUserId),
   })
 }

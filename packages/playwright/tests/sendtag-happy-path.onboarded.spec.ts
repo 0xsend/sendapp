@@ -222,8 +222,7 @@ test('sendtag complete happy path - create, confirm, and change main tag', async
 
   // Verify UI has updated - the second tag element should now show as Main
   await expect(secondTagElement).toBeVisible()
-  // Wait for the UI to update and check that the second tag now shows as Main
-  await page.waitForTimeout(1000) // Give the UI a moment to update
+  // Web-first assertion waits for the UI to update
   await expect(page.getByTestId('sendtags-list').getByText('Main')).toBeVisible()
 
   // Step 8: Final verification - check all tags and their status
@@ -350,25 +349,36 @@ test.skip('sendtag main tag succession - auto-assigns new main when current is d
   log('Removed main tag association')
 
   // The database trigger should automatically assign the next confirmed tag as main
-  // Give the trigger a moment to execute
-  await page.waitForTimeout(1000)
-
-  const { data: updatedAccount } = await supabase
-    .from('send_accounts')
-    .select('main_tag_id')
-    .single()
+  // Poll the database until the trigger has executed
+  let updatedAccount: { main_tag_id: number | null } | null = null
+  await expect
+    .poll(
+      async () => {
+        const { data } = await supabase.from('send_accounts').select('main_tag_id').single()
+        updatedAccount = data
+        return (
+          updatedAccount?.main_tag_id !== onboardingTag.id && updatedAccount?.main_tag_id !== null
+        )
+      },
+      {
+        timeout: 5000,
+        message: 'Expected main_tag_id to change after removing main tag association',
+      }
+    )
+    .toBe(true)
 
   // The main tag should have changed
   assert(!!updatedAccount, 'updated account should exist')
-  expect(updatedAccount.main_tag_id).not.toBe(onboardingTag.id)
-  expect(updatedAccount.main_tag_id).toBeTruthy()
-  assert(!!updatedAccount.main_tag_id, 'updated account should have main tag id')
+  const accountAfterDelete = updatedAccount as { main_tag_id: number | null }
+  expect(accountAfterDelete.main_tag_id).not.toBe(onboardingTag.id)
+  expect(accountAfterDelete.main_tag_id).toBeTruthy()
+  assert(!!accountAfterDelete.main_tag_id, 'updated account should have main tag id')
 
   // Get the new main tag details
   const { data: newMainTag } = await supabase
     .from('tags')
     .select('*')
-    .eq('id', updatedAccount.main_tag_id)
+    .eq('id', accountAfterDelete.main_tag_id)
     .single()
 
   expect(newMainTag).toBeTruthy()

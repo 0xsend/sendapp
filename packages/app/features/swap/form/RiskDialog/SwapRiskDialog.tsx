@@ -7,6 +7,7 @@ import {
   Label,
   Paragraph,
   Sheet,
+  Spacer,
   XStack,
   YStack,
 } from '@my/ui'
@@ -89,7 +90,7 @@ const SwapRiskDialog = () => {
       ) : (
         <YStack gap="$4" testID={'swapRiskDialogContent'}>
           <H2>{t('risk.title')}</H2>
-          <Paragraph>
+          <Paragraph color="$gray11" size="$6">
             {t('risk.description')}{' '}
             <Anchor
               target="_blank"
@@ -100,6 +101,7 @@ const SwapRiskDialog = () => {
               {t('risk.learnMore')}
             </Anchor>
           </Paragraph>
+          <Spacer />
           <XStack ai={'center'} gap={'$2'}>
             <Checkbox
               id={id}
@@ -108,31 +110,32 @@ const SwapRiskDialog = () => {
               onCheckedChange={(checked) => {
                 setIsChecked(checked === true)
               }}
-              borderWidth={0}
               backgroundColor={isChecked ? '$primary' : '$color1'}
               circular={true}
               focusStyle={{ outlineWidth: 0 }}
-              elevation={3}
+              bw={2}
+              boc="$aztec6"
+              size="$2"
             >
               <Checkbox.Indicator>
                 <Check color={'$black'} />
               </Checkbox.Indicator>
             </Checkbox>
-            <Label htmlFor={id} cursor={'pointer'} lineHeight={20}>
+            <Label size="$6" htmlFor={id} cursor={'pointer'} lineHeight={20}>
               {t('risk.checkbox')}
             </Label>
           </XStack>
           <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
             {Platform.OS === 'web' && (
               <Dialog.Close asChild>
-                <Button theme="red_active" testID={'swapRiskDialogCancelButton'} br={'$2'}>
+                <Button testID={'swapRiskDialogCancelButton'} br={'$2'}>
                   <Button.Text>{t('risk.buttons.cancel')}</Button.Text>
                 </Button>
               </Dialog.Close>
             )}
             <Button
+              themeInverse
               testID={'swapRiskDialogContinueButton'}
-              theme="green"
               onPress={handleConfirm}
               br={'$2'}
               disabled={!isChecked}
@@ -156,8 +159,11 @@ const SwapRiskDialog = () => {
           <Dialog.Content
             key="swap-risk-dialog"
             gap="$4"
+            w={600}
             maxWidth={'90%'}
             $gtMd={{ maxWidth: '40%' }}
+            bg="$aztec1"
+            p="$6"
           >
             {dialogContent}
           </Dialog.Content>

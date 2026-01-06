@@ -43,12 +43,17 @@ for (const token of [...coins, ethCoin]) {
     await expect(profilePage.sendButton).toBeVisible()
     await profilePage.sendButton.click()
 
-    await expect(page).toHaveURL(/\/send/)
-    const url = new URL(page.url())
-    expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
-      recipient: profile.send_id?.toString(),
-      idType: 'sendid',
-    })
+    // Send flow now opens as a dialog on the profile page instead of navigating to /send
+    await expect(page.getByTestId('SendChat')).toBeVisible()
+
+    // Verify URL has send params (stays on profile page with query params)
+    await expect(() => {
+      const url = new URL(page.url())
+      expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
+        recipient: profile.send_id?.toString(),
+        idType: 'sendid',
+      })
+    }).toPass({ timeout: 5000 })
 
     const counterparty = `/${tag.name}`
     await handleTokenTransfer({ token, supabase, page, counterparty, recvAccount, profile })
@@ -129,8 +134,10 @@ for (const token of [...coins, ethCoin]) {
         await confirmButton.click()
       }
 
-      await expect(page).toHaveURL(/\/send/)
+      // Send flow now opens as a dialog - wait for SendChat to be visible
+      await expect(page.getByTestId('SendChat')).toBeVisible()
 
+      // Verify URL has send params
       await expect(() => {
         const url = new URL(page.url())
         expect(Object.fromEntries(url.searchParams.entries())).toMatchObject({
@@ -233,9 +240,9 @@ async function handleTokenTransfer({
   await sendPage.waitForSendingCompletion()
   await sendPage.expectNoSendError()
 
+  // After send, the dialog returns to 'chat' section (no URL navigation)
+  // Verify the transfer was indexed in the database
   await expect(async () => {
-    await page.waitForURL(`/profile/${profile?.send_id}/history`, { timeout: 10_000 })
-
     if (isETH) {
       // just ensure balance is updated, since the send_account_receives event is not emitted
       expect(
@@ -244,7 +251,7 @@ async function handleTokenTransfer({
         })
       ).toBe(transferAmount)
     } else {
-      // 1. Check if the indexed event exists in the database
+      // Check if the indexed event exists in the database
       await expect(supabase).toHaveEventInActivityFeed({
         event_name: 'send_account_transfers',
         ...(profile ? { to_user: { id: profile.id, send_id: profile.send_id } } : {}),
@@ -255,8 +262,8 @@ async function handleTokenTransfer({
       })
     }
   }).toPass({
-    // Increased timeout to allow for indexing and UI update
-    timeout: 15000,
+    // Increased timeout to allow for indexing
+    timeout: 30_000,
   })
 
   if (isETH) return // nothing else to check with eth because it won't show up in activity
@@ -350,7 +357,8 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
   await expect(searchResult).toBeVisible()
   await searchResult.click()
 
-  await expect(page).toHaveURL(/\/send/)
+  // Send flow now opens as a dialog - wait for SendChat to be visible
+  await expect(page.getByTestId('SendChat')).toBeVisible()
 
   // Wait for URL parameters to be set
   await expect(() => {
@@ -375,10 +383,7 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
   await expect(sendPage.amountInput).toBeVisible()
   await sendPage.amountInput.fill('0.5')
 
-  // Wait for validation to process
-  await page.waitForTimeout(500)
-
-  // Verify error message is displayed
+  // Verify error message is displayed (web-first assertion waits for visibility)
   const minimumError = page.getByTestId('SendFormMinimumError')
   await expect(minimumError).toBeVisible()
   await expect(minimumError).toHaveText(/Minimum: 1 SEND/)
@@ -389,9 +394,8 @@ test('cannot send below minimum amount for SEND token', async ({ page, seed, sup
 
   // Now send exactly minimum amount (1 SEND) - should work
   await sendPage.amountInput.fill('1')
-  await page.waitForTimeout(500)
 
-  // Error message should disappear
+  // Error message should disappear (web-first assertion waits for state change)
   await expect(minimumError).toBeHidden()
 
   // Continue button should be enabled

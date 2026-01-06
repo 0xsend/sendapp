@@ -1,0 +1,8 @@
+# Placeholder - actual config is in overlays due to environment-specific contract addresses
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shovel-config
+data:
+  config.json: |
+    {}

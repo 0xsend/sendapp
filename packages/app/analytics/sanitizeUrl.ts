@@ -37,3 +37,31 @@ export function sanitizeUrl(url: string): string {
     return sanitizePath(url)
   }
 }
+
+/**
+ * Recursively sanitize all string values in an object that contain check codes
+ */
+export function sanitizeProperties<T>(obj: T): T {
+  if (obj === null || obj === undefined) {
+    return obj
+  }
+
+  if (typeof obj === 'string') {
+    return sanitizePath(obj) as T
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => sanitizeProperties(item)) as T
+  }
+
+  if (typeof obj === 'object') {
+    const result: Record<string, unknown> = {}
+    for (const key of Object.keys(obj)) {
+      result[key] = sanitizeProperties((obj as Record<string, unknown>)[key])
+    }
+    return result as T
+  }
+
+  // Primitives (number, boolean, etc.) pass through unchanged
+  return obj
+}

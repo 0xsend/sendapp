@@ -172,8 +172,9 @@ test('can refer a tag', async ({
 }) => {
   const { referrer, referrerSendAccount, referrerTags } = ref
 
+  // Generate 1-4 tags (not 5) since users already have 1 onboarding tag
   const tagsToRegister = Array.from(
-    { length: Math.floor(Math.random() * 5) + 1 },
+    { length: Math.floor(Math.random() * 4) + 1 },
     () => `${faker.lorem.word()}_${test.info().parallelIndex}`
   ).sort((a, b) => a.localeCompare(b))
 

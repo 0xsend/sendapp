@@ -60,6 +60,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
   const [{ sendid: paramSendid }] = useProfileScreenParams()
   const [sendParams, setSendParams] = useSendScreenParams()
   const [sendChatOpen, setSendChatOpen] = useState(false)
+  const prevSendChatOpenRef = useRef(sendChatOpen)
 
   useEffect(() => {
     if (sendParams.idType && sendParams.recipient) {
@@ -67,9 +68,14 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     }
   }, [sendParams.idType, sendParams.recipient])
 
+  // Clear params only when modal is actively closed (transition from open to closed)
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
-    if (!sendChatOpen) {
+    const wasOpen = prevSendChatOpenRef.current
+    prevSendChatOpenRef.current = sendChatOpen
+
+    // Only clear params when transitioning from open to closed, not on initial mount
+    if (wasOpen && !sendChatOpen) {
       setSendParams({
         idType: undefined,
         recipient: undefined,

@@ -5,6 +5,7 @@ import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 import { BottomNavBarContent } from 'app/components/BottomTabBar/BottomNavBarContent'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { CurrentRouteProvider } from './contexts'
 
 export const TABS = [
   {
@@ -69,7 +70,9 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
         animateOnly={['bottom']}
         $gtLg={{ display: 'none' }}
       >
-        <BottomNavBarContent tabs={translatedTabs} currentRoute={currentRoute} />
+        <CurrentRouteProvider currentRoute={currentRoute}>
+          <BottomNavBarContent tabs={translatedTabs} />
+        </CurrentRouteProvider>
       </XStack>
     </Portal>
   )

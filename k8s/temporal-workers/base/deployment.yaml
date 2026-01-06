@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temporal-workers
+  labels:
+    app: temporal-workers
+    app.kubernetes.io/name: temporal-workers
+    app.kubernetes.io/part-of: sendapp
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: temporal-workers
+  template:
+    metadata:
+      labels:
+        app: temporal-workers
+        app.kubernetes.io/name: temporal-workers
+        app.kubernetes.io/part-of: sendapp
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - temporal-workers
+                topologyKey: kubernetes.io/hostname
+      imagePullSecrets:
+        - name: github-ghcr
+      containers:
+        - name: worker
+          image: ghcr.io/0xsend/sendapp-workers:dev-latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: temporal-worker-secrets
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          livenessProbe:
+            exec:
+              command:
+                - node
+                - -e
+                - process.exit(0)
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - node
+                - -e
+                - process.exit(0)
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      terminationGracePeriodSeconds: 30
