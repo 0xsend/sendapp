@@ -1,18 +1,18 @@
 // optimized version of ActivityAvatar for the TokenActivityRowV2.tsx
 import {
   Avatar,
+  FastImage,
   type LinkableAvatarProps,
   Spinner,
   styled,
+  useTheme,
   useThemeName,
   XStack,
-  FastImage,
-  useTheme,
 } from '@my/ui'
-import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
+import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
-import { IconUpgrade, IconBadgeCheckSolid2 } from 'app/components/icons'
+import { IconBadgeCheckSolid2, IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import { allCoinsDict } from 'app/data/coins'
 import { ContractLabels } from 'app/data/contract-labels'
@@ -20,11 +20,11 @@ import { Link as SolitoLink } from 'solito/link'
 
 import { isAndroid } from '@tamagui/constants'
 
+import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
 import {
   counterpart,
   isActivitySwapTransfer,
   isSendCheckClaim,
-  isSendCheckCreate,
   isSendCheckTransfer,
   isSendPotTicketPurchase,
   isSendPotWin,
@@ -33,7 +33,6 @@ import {
 import type { useAddressBook } from 'app/utils/useAddressBook'
 import type { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
-import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
 import {
   type Activity,
   isSendAccountReceiveEvent,
@@ -43,8 +42,9 @@ import {
   isSendEarnWithdrawEvent,
   isSendTokenUpgradeEvent,
 } from 'app/utils/zod/activity'
-import type { ImageStyle, StyleProp } from 'react-native'
 import { memo, useMemo } from 'react'
+import type { ImageStyle, StyleProp } from 'react-native'
+import { isAddress } from 'viem'
 
 interface ActivityAvatarProps extends Omit<LinkableAvatarProps, 'children' | 'href'> {
   activity: Activity
@@ -172,7 +172,7 @@ export const ActivityAvatar = memo(
       }
 
       // Link to external address profile for unknown addresses
-      const isValidAddress = address?.startsWith('0x') && address.length === 42
+      const isValidAddress = isAddress(address)
       const avatarContent = (
         <Avatar size="$4.5" br="$4" gap="$2" {...props}>
           <Avatar.Image
