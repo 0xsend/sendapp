@@ -356,7 +356,7 @@ export function SendConfirm() {
           }}
         >
           <XStack gap={'$4'} ai={'center'}>
-            <ConfirmScreenAvatar profile={profile} href={href} />
+            <ConfirmScreenAvatar profile={profile} href={href} address={recipient} />
             {href ? (
               <Link href={href}>
                 <Paragraph

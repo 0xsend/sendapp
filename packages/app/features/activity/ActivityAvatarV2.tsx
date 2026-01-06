@@ -10,7 +10,7 @@ import {
   XStack,
 } from '@my/ui'
 import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
-import { AvatarSendEarnDeposit } from 'app/components/avatars'
+import { AddressAvatar, AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
 import { IconBadgeCheckSolid2, IconUpgrade } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -173,20 +173,6 @@ export const ActivityAvatar = memo(
 
       // Link to external address profile for unknown addresses
       const isValidAddress = isAddress(address)
-      const avatarContent = (
-        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
-          <Avatar.Image
-            src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
-          />
-          <Avatar.Fallback jc="center" bc="$olive">
-            <Avatar size="$4.5" br="$4" {...props}>
-              <Avatar.Image
-                src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
-              />
-            </Avatar>
-          </Avatar.Fallback>
-        </Avatar>
-      )
 
       if (isValidAddress) {
         return (
@@ -195,14 +181,22 @@ export const ActivityAvatar = memo(
               e.stopPropagation()
             }}
           >
-            <Link href={`/profile/${address}`} br={1000_000}>
-              {avatarContent}
+            <Link href={`/profile/${address}`} br="$10">
+              <AddressAvatar address={address} size="$4.5" br="$10" {...props} />
             </Link>
           </XStack>
         )
       }
 
-      return avatarContent
+      // Fallback for non-address names (contract labels, etc.)
+      return (
+        <Avatar size="$4.5" br="$4" gap="$2" {...props}>
+          <Avatar.Image
+            src={`https://ui-avatars.com/api/?name=${name}&size=256&format=png&background=86ad7f`}
+          />
+          <Avatar.Fallback jc="center" bc="$olive" />
+        </Avatar>
+      )
     }
 
     // @todo make this an icon instead of a fallback TODO

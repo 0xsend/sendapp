@@ -50,6 +50,7 @@ import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
 import { IconBadgeCheckSolid2, IconCoin, IconAccount, IconHeart } from 'app/components/icons'
+import { AddressAvatar } from 'app/components/avatars'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { AlertCircle, CheckCheck, Clock4, History, X } from '@tamagui/lucide-icons'
 import { useSendScreenParams } from 'app/routers/params'
@@ -342,18 +343,27 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
             pressStyle={{ scale: 0.95 }}
             href={href}
           >
-            <Avatar circular size="$4.5" elevation="$0.75">
-              {isAndroid && !profile?.avatar_url ? (
-                <IconAccount size={'$4'} color="$olive" />
-              ) : (
-                <>
-                  <Avatar.Image src={profile?.avatar_url ?? ''} />
-                  <Avatar.Fallback jc="center">
-                    <IconAccount size={'$4'} color="$olive" />
-                  </Avatar.Fallback>
-                </>
-              )}
-            </Avatar>
+            {isExternalAddress && !profile?.avatar_url && recipient ? (
+              <AddressAvatar
+                address={recipient as `0x${string}`}
+                size="$4.5"
+                br="$10"
+                elevation="$0.75"
+              />
+            ) : (
+              <Avatar circular size="$4.5" elevation="$0.75">
+                {isAndroid && !profile?.avatar_url ? (
+                  <IconAccount size={'$4'} color="$olive" />
+                ) : (
+                  <>
+                    <Avatar.Image src={profile?.avatar_url ?? ''} />
+                    <Avatar.Fallback jc="center">
+                      <IconAccount size={'$4'} color="$olive" />
+                    </Avatar.Fallback>
+                  </>
+                )}
+              </Avatar>
+            )}
           </Link>
         ) : (
           <Avatar circular size="$4.5" elevation="$0.75">

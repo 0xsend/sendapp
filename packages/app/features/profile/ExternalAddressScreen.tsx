@@ -18,6 +18,7 @@ import * as Clipboard from 'expo-clipboard'
 import type { Address } from 'viem'
 import { FlatList } from 'react-native'
 import { IconArrowUp, IconArrowRight, IconHeart, IconHeartOutline } from 'app/components/icons'
+import { AddressAvatar } from 'app/components/avatars'
 import { useUser } from 'app/utils/useUser'
 import { useSendScreenParams } from 'app/routers/params'
 import { SendChat } from 'app/features/send/components/SendChat'
@@ -179,9 +180,12 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
       >
         {/* Profile Header */}
         <YStack gap="$3" mb="$5">
-          <H4 size="$7" fontWeight="400" color="$color12" testID="externalAddress">
-            {displayName}
-          </H4>
+          <XStack gap="$4" ai="center">
+            <AddressAvatar address={address} size="$8" />
+            <H4 size="$7" fontWeight="400" color="$color12" testID="externalAddress">
+              {displayName}
+            </H4>
+          </XStack>
 
           {/* Address with Copy Button */}
           <Button
