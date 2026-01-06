@@ -3,7 +3,7 @@
  * All computation happens in background via requestIdleCallback.
  * Rendering is just a simple switch on pre-computed typed rows.
  */
-
+import { isServer } from '@tanstack/react-query'
 import { isWeb } from '@tamagui/constants'
 import {
   memo,
@@ -15,26 +15,26 @@ import {
   useState,
 } from 'react'
 import { H4, LazyMount, Paragraph, Shimmer, useThemeName, View, YStack } from '@my/ui'
-import { Pressable } from 'react-native'
+import {
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  Pressable,
+  StyleSheet as RNStyleSheet,
+} from 'react-native'
 import { FlashList } from '@shopify/flash-list'
 import { useTranslation } from 'react-i18next'
 import { SendChat } from 'app/features/send/components/SendChat'
 import { useSendScreenParams } from 'app/routers/params'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
-import {
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  StyleSheet as RNStyleSheet,
-} from 'react-native'
 import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAddressBook } from 'app/utils/useAddressBook'
 import {
   type ActivityRow,
   isHeaderRow,
+  type ReferralRow,
   useProcessedActivityFeed,
   type UserTransferRow,
-  type ReferralRow,
 } from './utils/useProcessedActivityFeed'
 import { ActivityRowFactory, getColors } from './rows/ActivityRowFactory'
 
@@ -219,6 +219,22 @@ const ActivityRowWrapper = memo(({ item, colors, isDark, onPress }: ActivityRowW
 })
 ActivityRowWrapper.displayName = 'ActivityRowWrapper'
 
+function isiOSPWA() {
+  if (typeof window === 'undefined') return false
+  const userAgent = navigator.userAgent
+  if (/iPhone|iPad|iPod/.test(userAgent)) {
+    //@ts-expect-error window.navigator is not defined in the browser
+    const isStandalone = window?.navigator.standalone
+    if (isStandalone) {
+      return true
+    }
+    return false
+  }
+  return false
+}
+
+const IS_IOS_PWA = !isServer && isWeb && isiOSPWA()
+
 const MyList = memo(
   ({
     data,
@@ -236,7 +252,10 @@ const MyList = memo(
     const colors = useMemo(() => getColors(isDark), [isDark])
 
     const handleScroll = useCallback(
-      (e: NativeSyntheticEvent<NativeScrollEvent>) => onScrollHandler(e),
+      (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        if (IS_IOS_PWA) return
+        onScrollHandler(e)
+      },
       [onScrollHandler]
     )
 
