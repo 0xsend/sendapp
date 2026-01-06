@@ -38,12 +38,15 @@
   "scripts": {
     "lint": "tsc",
     "test": "jest",
+    "test:anvil": "PATH=\"$HOME/.foundry/bin:$PATH\" vitest run --config vitest.anvil.config.ts",
+    "test:anvil:watch": "PATH=\"$HOME/.foundry/bin:$PATH\" vitest --config vitest.anvil.config.ts",
     "build": "yarn bundle",
     "clean": "rm -rf dist",
     "bundle": "node --loader ts-node/esm src/scripts/build-workflow-bundle.ts"
   },
   "devDependencies": {
     "@jest/globals": "^29",
+    "@morpho-org/test": "^2.6.6",
     "@temporalio/nyc-test-coverage": "^1.11.7",
     "@temporalio/testing": "^1.11.7",
     "@types/source-map-support": "^0",
@@ -54,7 +57,8 @@
     "source-map-support": "^0.5.21",
     "ts-jest": "^29",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "typescript": "~5.9.2"
