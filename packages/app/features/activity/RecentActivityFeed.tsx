@@ -1,4 +1,4 @@
-import type { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query'
+import { isServer, type InfiniteData, type UseInfiniteQueryResult } from '@tanstack/react-query'
 import { isWeb } from '@tamagui/constants'
 import type { Activity } from 'app/utils/zod/activity'
 import type { PostgrestError } from '@supabase/postgrest-js'
@@ -241,6 +241,22 @@ import { isSendAccountReceiveEvent } from 'app/utils/zod/activity/SendAccountRec
 import { SendEarnAmount } from 'app/features/earn/components/SendEarnAmount'
 import { ContractLabels } from 'app/data/contract-labels'
 import type { ReactNode } from 'react'
+
+function isiOSPWA() {
+  if (typeof window === 'undefined') return false
+  const userAgent = navigator.userAgent
+  if (/iPhone|iPad|iPod/.test(userAgent)) {
+    //@ts-expect-error window.navigator is not defined in the browser
+    const isStandalone = window?.navigator.standalone
+    if (isStandalone) {
+      return true
+    }
+    return false
+  }
+  return false
+}
+
+const IS_IOS_PWA = !isServer && isWeb && isiOSPWA()
 
 const MyList = memo(
   ({
@@ -485,7 +501,11 @@ const MyList = memo(
           renderItem={renderItem}
           contentContainerStyle={!hasNextPage ? styles.flashListContentContainer : undefined}
           ListFooterComponent={hasNextPage ? <ListFooterComponent /> : null}
-          onScroll={(e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)}
+          onScroll={
+            IS_IOS_PWA
+              ? undefined
+              : (e) => onScrollHandler(e as NativeSyntheticEvent<NativeScrollEvent>)
+          }
           onContentSizeChange={onContentSizeChangeHandler}
           scrollEventThrottle={16}
         />
