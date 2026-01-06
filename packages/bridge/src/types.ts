@@ -43,7 +43,7 @@ export type VirtualAccountStatus = z.infer<typeof VirtualAccountStatus>
 
 // KYC Link Request
 export const KycLinkRequestSchema = z.object({
-  full_name: z.string().min(1),
+  full_name: z.string().min(1).optional(),
   email: z.string().email(),
   type: CustomerType.default('individual'),
   redirect_uri: z.string().url().optional(),

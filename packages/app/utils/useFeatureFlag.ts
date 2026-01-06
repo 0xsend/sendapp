@@ -5,14 +5,14 @@
  *   const isBankTransferEnabled = useFeatureFlag('BANK_TRANSFER')
  *
  * Environment variables:
- *   NEXT_PUBLIC_FEATURE_BANK_TRANSFER=1  (enabled)
- *   NEXT_PUBLIC_FEATURE_BANK_TRANSFER=0  (disabled, default)
+ *   NEXT_PUBLIC_FEATURE_VIRTUAL_BANK_ACCOUNTS=1  (enabled)
+ *   NEXT_PUBLIC_FEATURE_VIRTUAL_BANK_ACCOUNTS=0  (disabled, default)
  */
 
 type FeatureFlag = 'BANK_TRANSFER'
 
 const featureFlags: Record<FeatureFlag, boolean> = {
-  BANK_TRANSFER: process.env.NEXT_PUBLIC_FEATURE_BANK_TRANSFER === '1',
+  BANK_TRANSFER: process.env.NEXT_PUBLIC_FEATURE_VIRTUAL_BANK_ACCOUNTS === '1',
 }
 
 /**

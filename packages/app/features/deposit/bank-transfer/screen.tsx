@@ -1,5 +1,5 @@
-import { YStack, Paragraph, Spinner, Button } from '@my/ui'
-import { useCallback, useState } from 'react'
+import { YStack, Paragraph, Spinner, Button, Input } from '@my/ui'
+import { useCallback, useEffect, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
 import { KycStatusCard } from './KycStatusCard'
@@ -20,15 +20,35 @@ export function BankTransferScreen() {
   const initiateKyc = useInitiateKyc()
   const createVirtualAccount = useCreateVirtualAccount()
   const [kycUrl, setKycUrl] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [emailTouched, setEmailTouched] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!emailTouched && !email && user?.email) {
+      setEmail(user.email)
+    }
+  }, [email, emailTouched, user?.email])
+
+  const trimmedEmail = email.trim()
+  const canStartKyc = Boolean(trimmedEmail)
+  const shouldCollectKycDetails = !customer
 
   const handleStartKyc = useCallback(async () => {
-    if (!user?.email) return
+    const resolvedEmail = email.trim()
+
+    if (shouldCollectKycDetails) {
+      if (!resolvedEmail) {
+        setFormError('Enter your email to continue.')
+        return
+      }
+    }
 
     try {
-      const result = await initiateKyc.mutateAsync({
-        fullName: user.user_metadata?.full_name || user.email.split('@')[0],
-        email: user.email,
-      })
+      setFormError(null)
+      const result = await initiateKyc.mutateAsync(
+        shouldCollectKycDetails ? { email: resolvedEmail } : {}
+      )
       // Open KYC link in browser (platform-safe)
       if (result.kycLink) {
         await Linking.openURL(result.kycLink)
@@ -37,7 +57,7 @@ export function BankTransferScreen() {
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
     }
-  }, [user, initiateKyc])
+  }, [email, initiateKyc, shouldCollectKycDetails])
 
   const handleCreateVirtualAccount = useCallback(async () => {
     if (!sendAccount?.address) return
@@ -62,10 +82,42 @@ export function BankTransferScreen() {
   if (!isApproved) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
+        {shouldCollectKycDetails && (
+          <YStack gap="$3">
+            <Paragraph fontSize="$4" color="$lightGrayTextField">
+              Enter the email you want to use for identity verification.
+            </Paragraph>
+            <YStack gap="$2">
+              <Paragraph fontSize="$3" color="$lightGrayTextField">
+                Email
+              </Paragraph>
+              <Input
+                size="$4"
+                value={email}
+                onChangeText={(text) => {
+                  setEmailTouched(true)
+                  setEmail(text)
+                  if (formError) setFormError(null)
+                }}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                placeholder="Email"
+                placeholderTextColor="$color4"
+              />
+            </YStack>
+            {formError && (
+              <Paragraph fontSize="$3" color="$red10">
+                {formError}
+              </Paragraph>
+            )}
+          </YStack>
+        )}
         <KycStatusCard
           kycStatus={kycStatus}
           onStartKyc={handleStartKyc}
           isLoading={initiateKyc.isPending}
+          startDisabled={shouldCollectKycDetails ? !canStartKyc : undefined}
         />
 
         {kycUrl && (

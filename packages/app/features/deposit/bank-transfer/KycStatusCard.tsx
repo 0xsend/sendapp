@@ -6,6 +6,7 @@ interface KycStatusCardProps {
   kycStatus: string
   onStartKyc?: () => void
   isLoading?: boolean
+  startDisabled?: boolean
 }
 
 function StatusIcon({ status }: { status: string }) {
@@ -60,7 +61,12 @@ function getStatusDescription(status: string): string {
   }
 }
 
-export function KycStatusCard({ kycStatus, onStartKyc, isLoading }: KycStatusCardProps) {
+export function KycStatusCard({
+  kycStatus,
+  onStartKyc,
+  isLoading,
+  startDisabled,
+}: KycStatusCardProps) {
   const showStartButton = kycStatus === 'not_started' || kycStatus === 'incomplete'
 
   return (
@@ -86,7 +92,7 @@ export function KycStatusCard({ kycStatus, onStartKyc, isLoading }: KycStatusCar
             size="$4"
             theme="green"
             onPress={onStartKyc}
-            disabled={isLoading}
+            disabled={isLoading || startDisabled}
             icon={isLoading ? <Spinner size="small" /> : undefined}
           >
             {kycStatus === 'incomplete' ? 'Continue Verification' : 'Start Verification'}

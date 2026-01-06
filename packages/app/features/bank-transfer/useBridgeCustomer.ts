@@ -61,7 +61,7 @@ export function useInitiateKyc() {
   const supabase = useSupabase()
 
   return useMutation({
-    mutationFn: async (data: { fullName: string; email: string }) => {
+    mutationFn: async (data: { email?: string }) => {
       log('initiating KYC', data)
 
       const headers = await getAuthHeaders(supabase)

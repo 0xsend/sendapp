@@ -51,8 +51,7 @@ async function getSession(req: NextApiRequest, res: NextApiResponse) {
 }
 
 interface InitiateKycRequest {
-  fullName: string
-  email: string
+  email?: string
 }
 
 interface InitiateKycResponse {
@@ -84,11 +83,6 @@ export default async function handler(
     }
 
     const userId = session.user.id
-    const { fullName, email } = req.body as InitiateKycRequest
-
-    if (!fullName || !email) {
-      return res.status(400).json({ error: 'fullName and email are required' })
-    }
 
     log('initiating KYC for user', userId)
 
@@ -119,12 +113,18 @@ export default async function handler(
       })
     }
 
+    const { email } = req.body as InitiateKycRequest
+    const resolvedEmail = email?.trim() || session.user.email?.trim()
+
+    if (!resolvedEmail) {
+      return res.status(400).json({ error: 'email is required' })
+    }
+
     // Create new KYC link with Bridge
     const bridgeClient = createBridgeClient()
     const kycLinkResponse = await bridgeClient.createKycLink(
       {
-        full_name: fullName,
-        email,
+        email: resolvedEmail,
         type: 'individual',
       },
       { idempotencyKey: `kyc-${userId}` }
@@ -136,8 +136,7 @@ export default async function handler(
     const { error: insertError } = await adminClient.from('bridge_customers').insert({
       user_id: userId,
       kyc_link_id: kycLinkResponse.id,
-      full_name: fullName,
-      email,
+      email: resolvedEmail,
       kyc_status: kycLinkResponse.kyc_status,
       tos_status: kycLinkResponse.tos_status,
       bridge_customer_id: kycLinkResponse.customer_id,
