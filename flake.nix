@@ -84,11 +84,17 @@
               echo "Welcome to the Send.app development environment!"
             ''
             + (pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
-              # On macOS, we unset the macOS SDK env vars that Nix sets up because
-              # we rely on a system installation. Nix only provides a macOS SDK
-              # and we need iOS too.
-              unset SDKROOT
-              unset DEVELOPER_DIR
+              # On macOS, we unset Nix's compiler/linker wrappers because they
+              # conflict with Xcode 26's new linker. iOS builds need system Xcode.
+              unset NIX_LDFLAGS
+              unset NIX_CFLAGS_COMPILE
+              unset NIX_CC
+              unset NIX_BINTOOLS
+              unset CC
+              unset CXX
+              unset LD
+              export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+              export SDKROOT=$(xcrun --show-sdk-path)
               # We need to add the system Xcode tools to the PATH so that expo works correctly
               export PATH=/usr/bin:$PATH
             '')
