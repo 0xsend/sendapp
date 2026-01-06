@@ -184,14 +184,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   badgeTop: {
-    top: -5,
-    right: -5,
-    transform: [{ scale: 0.85 }],
+    top: -2,
+    right: -2,
+    transform: [{ scale: 0.9 }],
   },
   badgeBottom: {
-    bottom: -5,
-    right: -5,
-    transform: [{ scale: 0.85 }],
+    bottom: -2,
+    right: -2,
+    transform: [{ scale: 0.9 }],
   },
   // Verified badge
   verifiedBadgeWrapper: {
@@ -331,24 +331,25 @@ interface IconWithBadgeProps {
   BadgeIcon: typeof Plus | typeof Minus | typeof ArrowDown | typeof ArrowUp
   isPositive: boolean
   badgePosition: 'top' | 'bottom'
+  colors: ThemeColors
 }
 
 const IconWithBadge = memo(
-  ({ symbol, BadgeIcon, isPositive, badgePosition }: IconWithBadgeProps) => (
+  ({ symbol, BadgeIcon, isPositive, badgePosition, colors }: IconWithBadgeProps) => (
     <View style={styles.iconContainer}>
       <IconCoin symbol={symbol} size="$5" />
       <View
         style={[
           styles.badgeBase,
-          { borderColor: darkColors.color1 },
+          { borderColor: colors.color1 },
           badgePosition === 'top' ? styles.badgeTop : styles.badgeBottom,
-          { backgroundColor: isPositive ? darkColors.olive : darkColors.error },
+          { backgroundColor: isPositive ? colors.olive : colors.error },
         ]}
       >
         <BadgeIcon
           size={16}
           // @ts-expect-error - not using tamagui token this time
-          color={darkColors.white}
+          color={colors.white}
         />
       </View>
     </View>
@@ -384,6 +385,7 @@ const SwapRowComponent = memo(({ row, colors }: { row: SwapRow } & RowBaseProps)
         BadgeIcon={row.isBuy ? Plus : Minus}
         isPositive={row.isBuy}
         badgePosition="top"
+        colors={colors}
       />
     }
   />
@@ -413,6 +415,7 @@ const SendcheckRowComponent = memo(({ row, colors }: { row: SendcheckRow } & Row
         BadgeIcon={row.isClaim ? ArrowDown : ArrowUp}
         isPositive={row.isClaim}
         badgePosition="bottom"
+        colors={colors}
       />
     }
   />
