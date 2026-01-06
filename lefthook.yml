@@ -5,6 +5,9 @@ pre-commit:
     typecheck:
       glob: "*.{ts,tsx}"
       run: ./scripts/pre-commit-typecheck.sh
+    deps:
+      glob: "**/package.json"
+      run: yarn check-deps
 pre-push:
   commands:
     check:
