@@ -71,11 +71,12 @@ async function main(): Promise<void> {
     process.exit(1)
   }
 
-  // Parse vault filter (can be repeated)
+  // Parse vault filter (can be repeated) - normalize to lowercase and deduplicate
   let vaultFilter: `0x${string}`[] | undefined
   if (argv.vault) {
     const vaults = Array.isArray(argv.vault) ? argv.vault : [argv.vault]
-    vaultFilter = vaults.map((v: string) => v as `0x${string}`)
+    const normalized = vaults.map((v: string) => v.toLowerCase() as `0x${string}`)
+    vaultFilter = [...new Set(normalized)]
   }
 
   // Parse minimum thresholds
