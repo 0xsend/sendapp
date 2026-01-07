@@ -1,6 +1,6 @@
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import { log } from '@temporalio/activity'
-import type { HarvestRecord, SweepRecord } from './types'
+import type { HarvestRecord, SweepRecord } from '@my/send-earn'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Type for harvest table row
