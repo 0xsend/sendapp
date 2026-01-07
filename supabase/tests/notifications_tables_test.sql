@@ -1,7 +1,7 @@
 BEGIN;
 
 -- Plan the number of tests to run
-SELECT plan(23);
+SELECT plan(25);
 
 CREATE EXTENSION "basejump-supabase_test_helpers";
 
@@ -49,6 +49,18 @@ SELECT lives_ok(
     WHERE user_id = tests.get_supabase_uid('notif_user')
     $$,
     'User can update their own notifications'
+);
+
+-- SECURITY: user cannot reassign notification ownership via UPDATE
+SELECT throws_ok(
+    $$
+    UPDATE public.notifications
+    SET user_id = tests.get_supabase_uid('notif_user_other')
+    WHERE user_id = tests.get_supabase_uid('notif_user')
+      AND title = 'You received a transfer'
+    $$,
+    'new row violates row-level security policy for table "notifications"',
+    'User cannot reassign notification user_id via UPDATE'
 );
 
 -- Test deleting own notification
@@ -152,6 +164,18 @@ SELECT lives_ok(
       AND platform = 'expo'
     $$,
     'User can update their own push tokens'
+);
+
+-- SECURITY: user cannot reassign push token ownership via UPDATE
+SELECT throws_ok(
+    $$
+    UPDATE public.push_tokens
+    SET user_id = tests.get_supabase_uid('notif_user_other')
+    WHERE user_id = tests.get_supabase_uid('notif_user')
+      AND platform = 'expo'
+    $$,
+    'new row violates row-level security policy for table "push_tokens"',
+    'User cannot reassign push token user_id via UPDATE'
 );
 
 -- Test deleting own push token
