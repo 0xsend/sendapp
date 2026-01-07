@@ -1,38 +1,19 @@
 import { beforeEach, describe, expect, it, vi, type MockedFunction } from 'vitest'
-import { REVENUE_ADDRESSES } from './config'
-import type { MerklRewardsResponse } from './types'
+import type { VaultRevenue, VaultBalances, HarvestResult, SweepResult } from '@my/send-earn'
 
-// Mock modules before other imports
-vi.mock('@my/wagmi', () => ({
-  baseMainnetClient: {
-    getBlock: vi.fn().mockImplementation(() => Promise.resolve({ timestamp: 1700000000n })),
-    waitForTransactionReceipt: vi.fn().mockImplementation(() =>
-      Promise.resolve({
-        status: 'success',
-        transactionHash: '0xabc123',
-        blockNumber: 12345n,
-      })
-    ),
-    readContract: vi.fn().mockImplementation((args: unknown) => {
-      const { functionName } = args as { functionName: string }
-      if (functionName === 'collections') {
-        return Promise.resolve('0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4')
-      }
-      if (functionName === 'balanceOf') {
-        return Promise.resolve(1000000000000000000n)
-      }
-      return Promise.resolve(0n)
-    }),
-  },
-  merklDistributorAddress: {
-    8453: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
-  },
-  sendEarnAbi: [],
-  sendEarnRevenueSafeAddress: {
-    8453: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4',
-  },
-  erc20Abi: [],
-}))
+// Mock @my/send-earn library functions
+vi.mock('@my/send-earn', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@my/send-earn')>()
+  return {
+    ...original,
+    getActiveVaults: vi.fn(),
+    fetchHarvestableRevenue: vi.fn(),
+    getVaultBalances: vi.fn(),
+    executeHarvest: vi.fn(),
+    executeSweep: vi.fn(),
+  }
+})
+
 vi.mock('app/utils/supabase/admin')
 vi.mock('@my/workflows/utils', () => ({
   bootstrap: vi.fn(),
@@ -45,7 +26,6 @@ vi.mock('@temporalio/activity', () => ({
     info: vi.fn(),
     debug: vi.fn(),
   },
-  sleep: vi.fn().mockImplementation(() => Promise.resolve()),
   ApplicationFailure: {
     retryable: vi.fn((msg: string, code: string, details: unknown) => {
       const error = new Error(msg) as Error & { code: string; details: unknown }
@@ -67,31 +47,42 @@ vi.mock('./supabase', () => ({
   insertSweepRecords: vi.fn(),
 }))
 
-// Mock fetch globally
-const mockFetch = vi.fn<() => Promise<Response>>()
-global.fetch = mockFetch as unknown as typeof fetch
-
 import { createRevenueCollectionActivities } from './activities'
-import { getActiveVaults, insertHarvestRecords, insertSweepRecords } from './supabase'
+import { insertHarvestRecords, insertSweepRecords } from './supabase'
+import {
+  REVENUE_ADDRESSES,
+  getActiveVaults,
+  fetchHarvestableRevenue,
+  getVaultBalances,
+  executeHarvest,
+  executeSweep,
+} from '@my/send-earn'
 
-const mockedGetActiveVaults = getActiveVaults as MockedFunction<typeof getActiveVaults>
 const mockedInsertHarvestRecords = insertHarvestRecords as MockedFunction<
   typeof insertHarvestRecords
 >
 const mockedInsertSweepRecords = insertSweepRecords as MockedFunction<typeof insertSweepRecords>
+const mockGetActiveVaults = getActiveVaults as MockedFunction<typeof getActiveVaults>
+const mockFetchHarvestableRevenue = fetchHarvestableRevenue as MockedFunction<
+  typeof fetchHarvestableRevenue
+>
+const mockGetVaultBalances = getVaultBalances as MockedFunction<typeof getVaultBalances>
+const mockExecuteHarvest = executeHarvest as MockedFunction<typeof executeHarvest>
+const mockExecuteSweep = executeSweep as MockedFunction<typeof executeSweep>
 
 describe('revenue collection activities', () => {
   const testEnv = {
+    SUPABASE_DB_URL: 'postgresql://test:test@localhost:5432/test',
+    BASE_RPC_URL: 'https://mainnet.base.org',
     REVENUE_COLLECTOR_PRIVATE_KEY:
       '0x0000000000000000000000000000000000000000000000000000000000000001',
     MIN_MORPHO_HARVEST: '1',
     MIN_WELL_HARVEST: '10',
-    MERKL_API_DELAY_MS: '10', // Short delay for tests
+    MERKL_API_DELAY_MS: '10',
   }
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockFetch.mockReset()
   })
 
   describe('createRevenueCollectionActivities', () => {
@@ -109,22 +100,22 @@ describe('revenue collection activities', () => {
   })
 
   describe('getActiveVaultsActivity', () => {
-    it('returns vaults from database', async () => {
+    it('returns vaults from @my/send-earn getActiveVaults', async () => {
       const mockVaults: `0x${string}`[] = [
         '0x1234567890123456789012345678901234567890',
         '0xabcdef0123456789abcdef0123456789abcdef01',
       ]
-      mockedGetActiveVaults.mockResolvedValue(mockVaults)
+      mockGetActiveVaults.mockResolvedValue(mockVaults)
 
       const activities = createRevenueCollectionActivities(testEnv)
       const result = await activities.getActiveVaultsActivity()
 
       expect(result).toEqual(mockVaults)
-      expect(mockedGetActiveVaults).toHaveBeenCalledTimes(1)
+      expect(mockGetActiveVaults).toHaveBeenCalledWith(testEnv.SUPABASE_DB_URL)
     })
 
     it('returns empty array when no vaults found', async () => {
-      mockedGetActiveVaults.mockResolvedValue([])
+      mockGetActiveVaults.mockResolvedValue([])
 
       const activities = createRevenueCollectionActivities(testEnv)
       const result = await activities.getActiveVaultsActivity()
@@ -135,142 +126,152 @@ describe('revenue collection activities', () => {
 
   describe('fetchHarvestableRevenueActivity', () => {
     const vault1 = '0x1234567890123456789012345678901234567890' as `0x${string}`
-    const vault2 = '0xabcdef0123456789abcdef0123456789abcdef01' as `0x${string}`
 
-    it('fetches and filters revenue above threshold', async () => {
-      const mockResponse: MerklRewardsResponse = {
-        [REVENUE_ADDRESSES.MORPHO_TOKEN.toLowerCase()]: {
-          amount: '2000000000000000000', // 2 MORPHO
-          claimed: '0',
-          pending: '0',
-          proofs: ['0xproof1', '0xproof2'],
-          breakdowns: [],
+    it('delegates to @my/send-earn fetchHarvestableRevenue', async () => {
+      const mockRevenue: VaultRevenue[] = [
+        {
+          vault: vault1,
+          morphoAmount: 2000000000000000000n,
+          wellAmount: 15000000000000000000n,
+          morphoProof: ['0xproof1' as `0x${string}`],
+          wellProof: ['0xproof2' as `0x${string}`],
+          hasHarvestableRevenue: true,
         },
-        [REVENUE_ADDRESSES.WELL_TOKEN.toLowerCase()]: {
-          amount: '15000000000000000000', // 15 WELL
-          claimed: '0',
-          pending: '0',
-          proofs: ['0xproof3'],
-          breakdowns: [],
-        },
-      }
-
-      mockFetch.mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(mockResponse),
-      } as Response)
+      ]
+      mockFetchHarvestableRevenue.mockResolvedValue(mockRevenue)
 
       const activities = createRevenueCollectionActivities(testEnv)
       const result = await activities.fetchHarvestableRevenueActivity({ vaults: [vault1] })
 
-      expect(result).toHaveLength(1)
-      expect(result[0]?.vault).toBe(vault1)
-      expect(result[0]?.morphoAmount).toBe(2000000000000000000n)
-      expect(result[0]?.wellAmount).toBe(15000000000000000000n)
-      expect(result[0]?.hasHarvestableRevenue).toBe(true)
+      expect(result).toEqual(mockRevenue)
+      expect(mockFetchHarvestableRevenue).toHaveBeenCalledWith(
+        expect.objectContaining({ dbUrl: testEnv.SUPABASE_DB_URL }),
+        [vault1]
+      )
     })
+  })
 
-    it('filters out revenue below threshold', async () => {
-      const mockResponse: MerklRewardsResponse = {
-        [REVENUE_ADDRESSES.MORPHO_TOKEN.toLowerCase()]: {
-          amount: '500000000000000000', // 0.5 MORPHO (below 1 threshold)
-          claimed: '0',
-          pending: '0',
-          proofs: ['0xproof1'],
-          breakdowns: [],
+  describe('getVaultBalancesActivity', () => {
+    const vault1 = '0x1234567890123456789012345678901234567890' as `0x${string}`
+
+    it('delegates to @my/send-earn getVaultBalances', async () => {
+      const mockBalances: VaultBalances[] = [
+        {
+          vault: vault1,
+          morphoBalance: 1000000000000000000n,
+          wellBalance: 5000000000000000000n,
         },
-        [REVENUE_ADDRESSES.WELL_TOKEN.toLowerCase()]: {
-          amount: '5000000000000000000', // 5 WELL (below 10 threshold)
-          claimed: '0',
-          pending: '0',
-          proofs: ['0xproof2'],
-          breakdowns: [],
+      ]
+      mockGetVaultBalances.mockResolvedValue(mockBalances)
+
+      const activities = createRevenueCollectionActivities(testEnv)
+      const result = await activities.getVaultBalancesActivity({ vaults: [vault1] })
+
+      expect(result).toEqual(mockBalances)
+      expect(mockGetVaultBalances).toHaveBeenCalledWith(
+        expect.objectContaining({ dbUrl: testEnv.SUPABASE_DB_URL }),
+        [vault1]
+      )
+    })
+  })
+
+  describe('harvestRevenueActivity', () => {
+    const vault1 = '0x1234567890123456789012345678901234567890' as `0x${string}`
+
+    it('delegates to @my/send-earn executeHarvest', async () => {
+      const mockVaultRevenue: VaultRevenue[] = [
+        {
+          vault: vault1,
+          morphoAmount: 2000000000000000000n,
+          wellAmount: 0n,
+          morphoProof: ['0xproof1' as `0x${string}`],
+          wellProof: [],
+          hasHarvestableRevenue: true,
         },
+      ]
+      const mockHarvestResult: HarvestResult = {
+        harvested: { morpho: 2000000000000000000n, well: 0n },
+        transactions: [
+          {
+            vault: vault1,
+            token: REVENUE_ADDRESSES.MORPHO_TOKEN as `0x${string}`,
+            amount: 2000000000000000000n,
+            txHash: '0xabc123' as `0x${string}`,
+            blockNum: 12345n,
+            blockTime: 1700000000n,
+          },
+        ],
+        errors: [],
       }
-
-      mockFetch.mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(mockResponse),
-      } as Response)
+      mockExecuteHarvest.mockResolvedValue(mockHarvestResult)
 
       const activities = createRevenueCollectionActivities(testEnv)
-      const result = await activities.fetchHarvestableRevenueActivity({ vaults: [vault1] })
+      const result = await activities.harvestRevenueActivity({ vaultRevenue: mockVaultRevenue })
 
-      expect(result).toHaveLength(1)
-      expect(result[0]?.morphoAmount).toBe(0n)
-      expect(result[0]?.wellAmount).toBe(0n)
-      expect(result[0]?.hasHarvestableRevenue).toBe(false)
+      expect(result.transactions).toContain('0xabc123')
+      expect(result.totals.morpho).toBe(2000000000000000000n)
+      expect(result.successful).toHaveLength(1)
+      expect(mockExecuteHarvest).toHaveBeenCalledWith(
+        expect.objectContaining({ collectorPrivateKey: testEnv.REVENUE_COLLECTOR_PRIVATE_KEY }),
+        mockVaultRevenue
+      )
     })
 
-    it('handles API errors gracefully', async () => {
-      mockFetch.mockResolvedValue({
-        ok: false,
-        status: 500,
-      } as Response)
-
-      const activities = createRevenueCollectionActivities(testEnv)
-      const result = await activities.fetchHarvestableRevenueActivity({ vaults: [vault1] })
-
-      // Should return empty results for failed vault
-      expect(result).toHaveLength(0)
-    })
-
-    it('handles empty API response', async () => {
-      mockFetch.mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve({}),
-      } as Response)
-
-      const activities = createRevenueCollectionActivities(testEnv)
-      const result = await activities.fetchHarvestableRevenueActivity({ vaults: [vault1] })
-
-      expect(result).toHaveLength(1)
-      expect(result[0]?.morphoAmount).toBe(0n)
-      expect(result[0]?.wellAmount).toBe(0n)
-      expect(result[0]?.hasHarvestableRevenue).toBe(false)
-    })
-
-    it('handles multiple vaults', async () => {
-      const mockResponse1: MerklRewardsResponse = {
-        [REVENUE_ADDRESSES.MORPHO_TOKEN.toLowerCase()]: {
-          amount: '2000000000000000000',
-          claimed: '0',
-          pending: '0',
-          proofs: ['0xproof1'],
-          breakdowns: [],
+    it('returns empty result when no harvestable vaults', async () => {
+      const mockVaultRevenue: VaultRevenue[] = [
+        {
+          vault: vault1,
+          morphoAmount: 0n,
+          wellAmount: 0n,
+          morphoProof: [],
+          wellProof: [],
+          hasHarvestableRevenue: false,
         },
-      }
-      const mockResponse2: MerklRewardsResponse = {
-        [REVENUE_ADDRESSES.WELL_TOKEN.toLowerCase()]: {
-          amount: '20000000000000000000',
-          claimed: '0',
-          pending: '0',
-          proofs: ['0xproof2'],
-          breakdowns: [],
-        },
-      }
-
-      mockFetch
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          json: () => Promise.resolve(mockResponse1),
-        } as Response)
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          json: () => Promise.resolve(mockResponse2),
-        } as Response)
+      ]
 
       const activities = createRevenueCollectionActivities(testEnv)
-      const result = await activities.fetchHarvestableRevenueActivity({ vaults: [vault1, vault2] })
+      const result = await activities.harvestRevenueActivity({ vaultRevenue: mockVaultRevenue })
 
-      expect(result).toHaveLength(2)
-      expect(result[0]?.vault).toBe(vault1)
-      expect(result[1]?.vault).toBe(vault2)
+      expect(result.transactions).toHaveLength(0)
+      expect(result.totals.morpho).toBe(0n)
+      expect(mockExecuteHarvest).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('sweepToRevenueActivity', () => {
+    const vault1 = '0x1234567890123456789012345678901234567890' as `0x${string}`
+
+    it('delegates to @my/send-earn executeSweep', async () => {
+      const mockSweepResult: SweepResult = {
+        swept: { morpho: 1000000000000000000n, well: 0n },
+        transactions: [
+          {
+            vault: vault1,
+            token: REVENUE_ADDRESSES.MORPHO_TOKEN as `0x${string}`,
+            amount: 1000000000000000000n,
+            txHash: '0xdef456' as `0x${string}`,
+            blockNum: 12346n,
+            blockTime: 1700000100n,
+          },
+        ],
+        skipped: [],
+        errors: [],
+      }
+      mockExecuteSweep.mockResolvedValue(mockSweepResult)
+
+      const activities = createRevenueCollectionActivities(testEnv)
+      const result = await activities.sweepToRevenueActivity({
+        vaults: [vault1],
+        tokens: [REVENUE_ADDRESSES.MORPHO_TOKEN as `0x${string}`],
+      })
+
+      expect(result.transactions).toContain('0xdef456')
+      expect(result.totals.morpho).toBe(1000000000000000000n)
+      expect(result.successful).toHaveLength(1)
+      expect(mockExecuteSweep).toHaveBeenCalledWith(
+        expect.objectContaining({ collectorPrivateKey: testEnv.REVENUE_COLLECTOR_PRIVATE_KEY }),
+        [vault1]
+      )
     })
   })
 

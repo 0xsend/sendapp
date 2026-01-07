@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { parseUnits } from 'viem'
-import { getRevenueConfig, REVENUE_ADDRESSES } from './config'
+import { REVENUE_ADDRESSES, getRevenueConfig } from './config'
+
+// Test env with required values
+const baseEnv = {
+  SUPABASE_DB_URL: 'postgresql://test:test@localhost:5432/test',
+  BASE_RPC_URL: 'https://mainnet.base.org',
+}
 
 describe('revenue config', () => {
   describe('REVENUE_ADDRESSES', () => {
@@ -22,12 +27,18 @@ describe('revenue config', () => {
   })
 
   describe('getRevenueConfig', () => {
-    it('returns default values when env is empty', () => {
-      const config = getRevenueConfig({})
+    it('throws when SUPABASE_DB_URL is missing', () => {
+      expect(() => getRevenueConfig({})).toThrow('SUPABASE_DB_URL environment variable is required')
+    })
 
+    it('returns config with required values and defaults', () => {
+      const config = getRevenueConfig(baseEnv)
+
+      expect(config.dbUrl).toBe(baseEnv.SUPABASE_DB_URL)
+      expect(config.rpcUrl).toBe(baseEnv.BASE_RPC_URL)
       expect(config.collectorPrivateKey).toBeUndefined()
-      expect(config.minMorphoHarvest).toBe(parseUnits('1', 18))
-      expect(config.minWellHarvest).toBe(parseUnits('10', 18))
+      expect(config.minMorphoHarvest).toBe(1000000000000000000n) // 1e18
+      expect(config.minWellHarvest).toBe(10000000000000000000n) // 10e18
       expect(config.merklApiDelayMs).toBe(100)
       expect(config.merklApiBaseUrl).toBe('https://api.merkl.xyz/v4')
       expect(config.chainId).toBe(8453)
@@ -35,6 +46,7 @@ describe('revenue config', () => {
 
     it('uses provided env values', () => {
       const config = getRevenueConfig({
+        ...baseEnv,
         REVENUE_COLLECTOR_PRIVATE_KEY: '0xabc123',
         MIN_MORPHO_HARVEST: '5',
         MIN_WELL_HARVEST: '50',
@@ -44,8 +56,8 @@ describe('revenue config', () => {
       })
 
       expect(config.collectorPrivateKey).toBe('0xabc123')
-      expect(config.minMorphoHarvest).toBe(parseUnits('5', 18))
-      expect(config.minWellHarvest).toBe(parseUnits('50', 18))
+      expect(config.minMorphoHarvest).toBe(5000000000000000000n) // 5e18
+      expect(config.minWellHarvest).toBe(50000000000000000000n) // 50e18
       expect(config.merklApiDelayMs).toBe(200)
       expect(config.merklApiBaseUrl).toBe('https://custom-api.merkl.xyz')
       expect(config.chainId).toBe(84531)
@@ -53,6 +65,7 @@ describe('revenue config', () => {
 
     it('handles string to number conversion for delay', () => {
       const config = getRevenueConfig({
+        ...baseEnv,
         MERKL_API_DELAY_MS: '500',
       })
 
