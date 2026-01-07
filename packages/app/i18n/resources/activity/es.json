@@ -27,6 +27,10 @@
       "deposit": "Depósito en Send Earn",
       "withdraw": "Retiro de Send Earn"
     },
+    "sendCheck": {
+      "create": "Cheque enviado",
+      "claim": "Cheque reclamado"
+    },
     "revenueShare": "Participación de ingresos",
     "sendTokenUpgrade": "Actualización de Send Token",
     "trade": "Intercambio",

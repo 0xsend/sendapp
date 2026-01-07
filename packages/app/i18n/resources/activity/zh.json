@@ -25,6 +25,10 @@
       "deposit": "Send Earn 存款",
       "withdraw": "Send Earn 取款"
     },
+    "sendCheck": {
+      "create": "已发送支票",
+      "claim": "已领取支票"
+    },
     "sendTokenUpgrade": "Send 代币升级",
     "sendpot": {
       "ticketPurchase": "已购买",
