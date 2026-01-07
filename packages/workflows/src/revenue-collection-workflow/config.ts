@@ -1,8 +1,8 @@
-import { type RevenueConfig, createConfig, REVENUE_ADDRESSES } from '@my/send-earn'
+import { type RevenueConfig, createConfig } from '@my/send-earn'
 import { base } from 'viem/chains'
 
-// Re-export from @my/send-earn for convenience
-export { REVENUE_ADDRESSES }
+// Re-export REVENUE_ADDRESSES from types.ts (workflow-safe)
+export { REVENUE_ADDRESSES } from './types'
 export type { RevenueConfig }
 
 /**

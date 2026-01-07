@@ -10,6 +10,19 @@ export type {
 } from '@my/send-earn'
 
 /**
+ * Static addresses for revenue tokens and contracts on Base chain.
+ * Duplicated here to avoid importing runtime code from @my/send-earn
+ * which would break Temporal workflow determinism.
+ */
+export const REVENUE_ADDRESSES = {
+  MORPHO_TOKEN: '0xbaa5cc21fd487b8fcc2f632f3f4e8d37262a0842' as const,
+  WELL_TOKEN: '0xA88594D404727625A9437C3f886C7643872296AE' as const,
+  MERKL_DISTRIBUTOR: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae' as const,
+  /** Send Foundation revenue safe */
+  REVENUE_SAFE: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4' as const,
+}
+
+/**
  * Result of executing harvest transactions.
  * Workflow-specific: includes transaction hashes as strings for serialization.
  */

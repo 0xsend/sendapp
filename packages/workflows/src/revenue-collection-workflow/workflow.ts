@@ -1,12 +1,12 @@
 import { proxyActivities } from '@temporalio/workflow'
 import type { RevenueCollectionActivities } from './activities'
-import { REVENUE_ADDRESSES } from './config'
-import type {
-  DryRunData,
-  RevenueCollectionInput,
-  RevenueCollectionResult,
-  VaultBalances,
-  VaultRevenue,
+import {
+  REVENUE_ADDRESSES,
+  type DryRunData,
+  type RevenueCollectionInput,
+  type RevenueCollectionResult,
+  type VaultBalances,
+  type VaultRevenue,
 } from './types'
 
 /**
