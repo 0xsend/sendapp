@@ -433,13 +433,18 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   const messageType = ALLOWED_MESSAGE_TYPES[0] // 'PUSH_SUBSCRIPTION_CHANGED'
 
   event.waitUntil(
-    self.clients.matchAll().then((clients) => {
-      for (const client of clients) {
-        client.postMessage({
-          type: messageType,
-          // Don't include arbitrary data in messages
-        })
-      }
-    })
+    self.clients
+      .matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      })
+      .then((clients) => {
+        for (const client of clients) {
+          client.postMessage({
+            type: messageType,
+            // Don't include arbitrary data in messages
+          })
+        }
+      })
   )
 })
