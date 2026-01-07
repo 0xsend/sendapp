@@ -16313,14 +16313,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@npm:8.5.0":
-  version: 8.5.0
-  resolution: "better-sqlite3@npm:8.5.0"
+"better-sqlite3@npm:11.5.0":
+  version: 11.5.0
+  resolution: "better-sqlite3@npm:11.5.0"
   dependencies:
     bindings: "npm:^1.5.0"
     node-gyp: "npm:latest"
-    prebuild-install: "npm:^7.1.0"
-  checksum: 10/e459ecf916419f2a3b3c642698f73c80613175f87ed1274066357f48012f726da68e210c6c72a8456dd96067237f923bdcde92dca76077f4967be725388b39a9
+    prebuild-install: "npm:^7.1.1"
+  checksum: 10/c76f450f6313b47317270dae9a641c41ca95b2be7b08024741298d019f0c453ebb0ac0707a33af558fcb41373026944dc8409871ee010c7ed08cab869a116371
   languageName: node
   linkType: hard
 
@@ -30842,7 +30842,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prebuild-install@npm:^7.1.0, prebuild-install@npm:^7.1.1":
+"prebuild-install@npm:^7.1.1":
   version: 7.1.1
   resolution: "prebuild-install@npm:7.1.1"
   dependencies:
