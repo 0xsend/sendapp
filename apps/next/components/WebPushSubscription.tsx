@@ -148,6 +148,58 @@ export function useWebPush(): UseWebPushResult {
 
   const isSupported = checkWebPushSupport()
 
+  /**
+   * Best-effort sync of a PushSubscription to the backend.
+   *
+   * This is intentionally silent (no user-facing error state) because it is used
+   * for background repair flows like subscription rotation.
+   */
+  const syncSubscriptionToBackend = useCallback(
+    async (
+      subscription: PushSubscription,
+      source: 'init' | 'subscriptionchange'
+    ): Promise<void> => {
+      const userId = session?.user?.id
+      if (!userId) return
+
+      try {
+        const response = await fetch('/api/notifications/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify({
+            subscription: subscription.toJSON(),
+          }),
+        })
+
+        if (!response.ok) {
+          // Avoid logging any sensitive payload (endpoints/keys). Log only status and a safe error string.
+          let safeError: string | undefined
+          try {
+            const data: unknown = await response.json()
+            if (isPlainObject(data) && typeof data.error === 'string') {
+              safeError = data.error
+            }
+          } catch {
+            // ignore
+          }
+
+          log('Failed to sync subscription to backend', {
+            source,
+            status: response.status,
+            error: safeError,
+          })
+        }
+      } catch (err) {
+        log('Error syncing subscription to backend', { source, err })
+      }
+    },
+    [session?.user?.id]
+  )
+
   // Check initial permission state and existing subscription
   useEffect(() => {
     if (!isSupported) {
@@ -199,31 +251,6 @@ export function useWebPush(): UseWebPushResult {
         const existingSubscription = await reg.pushManager.getSubscription()
         setIsSubscribed(!!existingSubscription)
         log('Existing subscription:', existingSubscription ? 'yes' : 'no')
-
-        // Auto-sync existing subscription to backend if user is logged in
-        if (existingSubscription && session?.user) {
-          log('Syncing existing subscription to backend...')
-          try {
-            const response = await fetch('/api/notifications/subscribe', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                subscription: existingSubscription.toJSON(),
-              }),
-            })
-
-            if (response.ok) {
-              log('Successfully synced existing subscription to backend')
-            } else {
-              log('Failed to sync existing subscription:', await response.text())
-            }
-          } catch (err) {
-            log('Error syncing existing subscription:', err)
-            // Don't set error state - this is a background sync
-          }
-        }
       } catch (err) {
         log('Service worker registration failed:', err)
         setError('Failed to register service worker')
@@ -233,7 +260,24 @@ export function useWebPush(): UseWebPushResult {
     }
 
     void initServiceWorker()
-  }, [isSupported, session?.user])
+  }, [isSupported])
+
+  // When a user logs in, best-effort sync any existing subscription to the backend.
+  useEffect(() => {
+    if (!session?.user?.id) return
+    if (!registration) return
+
+    void (async () => {
+      try {
+        const subscription = await registration.pushManager.getSubscription()
+        if (subscription) {
+          await syncSubscriptionToBackend(subscription, 'init')
+        }
+      } catch (err) {
+        log('Error syncing existing subscription after login:', err)
+      }
+    })()
+  }, [session?.user?.id, registration, syncSubscriptionToBackend])
 
   // Listen for permission changes via PermissionStatus API (when available)
   // This is more efficient than polling and is the standard approach
@@ -278,6 +322,43 @@ export function useWebPush(): UseWebPushResult {
     }
   }, [isSupported])
 
+  const checkSubscriptionStatus = useCallback(
+    async ({ syncToBackend = false }: { syncToBackend?: boolean } = {}): Promise<void> => {
+      // Prefer a ready/active registration when possible.
+      let reg: ServiceWorkerRegistration | null = registration
+
+      if (!reg) {
+        try {
+          reg = await navigator.serviceWorker.getRegistration(SERVICE_WORKER_SCOPE)
+        } catch {
+          // ignore
+        }
+      }
+
+      if (!reg) {
+        try {
+          reg = await navigator.serviceWorker.ready
+        } catch {
+          // ignore
+        }
+      }
+
+      if (!reg) return
+
+      try {
+        const subscription = await reg.pushManager.getSubscription()
+        setIsSubscribed(!!subscription)
+
+        if (subscription && syncToBackend) {
+          await syncSubscriptionToBackend(subscription, 'subscriptionchange')
+        }
+      } catch (err) {
+        log('Error checking subscription status:', err)
+      }
+    },
+    [registration, syncSubscriptionToBackend]
+  )
+
   // Listen for subscription change messages from service worker
   // With strict message validation
   useEffect(() => {
@@ -290,26 +371,15 @@ export function useWebPush(): UseWebPushResult {
       const validatedType = validateServiceWorkerMessage(event)
 
       if (validatedType === 'PUSH_SUBSCRIPTION_CHANGED') {
-        log('Push subscription changed, checking status...')
-        void checkSubscriptionStatus()
+        log('Push subscription changed, refreshing subscription status...')
+        void checkSubscriptionStatus({ syncToBackend: true })
       }
       // Silently ignore other message types (already logged in validator)
     }
 
     navigator.serviceWorker.addEventListener('message', handleMessage)
     return () => navigator.serviceWorker.removeEventListener('message', handleMessage)
-  }, [isSupported])
-
-  const checkSubscriptionStatus = useCallback(async () => {
-    if (!registration) return
-
-    try {
-      const subscription = await registration.pushManager.getSubscription()
-      setIsSubscribed(!!subscription)
-    } catch (err) {
-      log('Error checking subscription status:', err)
-    }
-  }, [registration])
+  }, [isSupported, checkSubscriptionStatus])
 
   /**
    * Request notification permission from the user
@@ -374,7 +444,11 @@ export function useWebPush(): UseWebPushResult {
 
       // Create push subscription
       log('Creating push subscription...')
-      const subscription = await registration.pushManager.subscribe({
+      const readyRegistration = registration.active
+        ? registration
+        : await navigator.serviceWorker.ready
+
+      const subscription = await readyRegistration.pushManager.subscribe({
         userVisibleOnly: true, // Required: ensures notifications are visible
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       })
@@ -387,6 +461,8 @@ export function useWebPush(): UseWebPushResult {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'same-origin',
+        cache: 'no-store',
         body: JSON.stringify({
           subscription: subscription.toJSON(),
         }),
@@ -422,7 +498,11 @@ export function useWebPush(): UseWebPushResult {
     setError(null)
 
     try {
-      const subscription = await registration.pushManager.getSubscription()
+      const readyRegistration = registration.active
+        ? registration
+        : await navigator.serviceWorker.ready
+
+      const subscription = await readyRegistration.pushManager.getSubscription()
 
       if (!subscription) {
         setIsSubscribed(false)
@@ -438,6 +518,8 @@ export function useWebPush(): UseWebPushResult {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'same-origin',
+        cache: 'no-store',
         body: JSON.stringify({
           endpoint: subscription.endpoint,
         }),

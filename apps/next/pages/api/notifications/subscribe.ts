@@ -2,6 +2,17 @@ import { createPagesServerClient } from '@supabase/auth-helpers-nextjs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Database } from '@my/supabase/database.types'
 
+// Keep the body parser limit aligned with our own MAX_BODY_SIZE guard.
+// (This is the *first* line of defense; validateRequestBody is defense-in-depth.)
+export const config = {
+  api: {
+    bodyParser: {
+      // Slightly above MAX_BODY_SIZE to account for JSON overhead.
+      sizeLimit: '12kb',
+    },
+  },
+}
+
 // ============================================================================
 // Constants for validation
 // ============================================================================
@@ -124,13 +135,18 @@ function validateEndpoint(endpoint: unknown): {
     return { valid: false, error: 'Endpoint must be a string' }
   }
 
-  if (endpoint.length > MAX_ENDPOINT_LENGTH) {
+  const trimmed = endpoint.trim()
+  if (!trimmed) {
+    return { valid: false, error: 'Endpoint must not be empty' }
+  }
+
+  if (trimmed.length > MAX_ENDPOINT_LENGTH) {
     return { valid: false, error: 'Endpoint too long' }
   }
 
   let url: URL
   try {
-    url = new URL(endpoint)
+    url = new URL(trimmed)
   } catch {
     return { valid: false, error: 'Invalid endpoint URL' }
   }
@@ -149,7 +165,7 @@ function validateEndpoint(endpoint: unknown): {
     return { valid: false, error: 'Unknown push service domain' }
   }
 
-  return { valid: true, sanitized: endpoint }
+  return { valid: true, sanitized: trimmed }
 }
 
 /**
@@ -166,17 +182,22 @@ function validateKey(
     return { valid: false, error: `${keyName} must be a string` }
   }
 
-  if (key.length > maxLength) {
+  const trimmed = key.trim()
+  if (!trimmed) {
+    return { valid: false, error: `${keyName} must not be empty` }
+  }
+
+  if (trimmed.length > maxLength) {
     return { valid: false, error: `${keyName} too long` }
   }
 
   // Base64url validation (allowing standard base64 too)
   const base64Regex = /^[A-Za-z0-9+/_-]+=*$/
-  if (!base64Regex.test(key)) {
+  if (!base64Regex.test(trimmed)) {
     return { valid: false, error: `${keyName} contains invalid characters` }
   }
 
-  return { valid: true, sanitized: key }
+  return { valid: true, sanitized: trimmed }
 }
 
 /**
@@ -193,7 +214,13 @@ function validateSameOrigin(req: NextApiRequest): boolean {
   if (origin) {
     try {
       const originUrl = new URL(origin)
-      // Compare hostname (ignore port differences for development)
+      if (originUrl.protocol !== 'https:' && originUrl.protocol !== 'http:') {
+        return false
+      }
+
+      // Prefer strict host match; fall back to hostname-only match to avoid
+      // surprising failures in local dev when ports differ.
+      if (originUrl.host === host) return true
       return originUrl.hostname === host.split(':')[0]
     } catch {
       return false
@@ -205,6 +232,11 @@ function validateSameOrigin(req: NextApiRequest): boolean {
   if (referer) {
     try {
       const refererUrl = new URL(referer)
+      if (refererUrl.protocol !== 'https:' && refererUrl.protocol !== 'http:') {
+        return false
+      }
+
+      if (refererUrl.host === host) return true
       return refererUrl.hostname === host.split(':')[0]
     } catch {
       return false
@@ -263,6 +295,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse>
 ): Promise<void> {
+  // Avoid caching any subscription responses.
+  res.setHeader('Cache-Control', 'no-store')
+
   // Method check first (fail fast)
   if (req.method !== 'POST' && req.method !== 'DELETE') {
     res.setHeader('Allow', ['POST', 'DELETE'])
