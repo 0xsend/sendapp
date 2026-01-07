@@ -1,7 +1,6 @@
 import {
   Fade,
   H4,
-  Link,
   Paragraph,
   Separator,
   Stack,
@@ -36,6 +35,7 @@ import {
 import { useActivityDetails } from 'app/provider/activity-details'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useRouter } from 'solito/router'
 
 export const ActivityDetails = (props: StackProps) => {
   const { selectedActivity } = useActivityDetails()
@@ -69,6 +69,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
   const isERC20TransferFromSendEarn =
     isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
   const { t } = useTranslation('activity')
+  const router = useRouter()
 
   return (
     <Fade {...props}>
@@ -109,13 +110,14 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
                         // If subText is an external address, make it a clickable link
                         if (subtextAddress && subText) {
                           return (
-                            <Link
-                              href={`/profile/${subtextAddress}`}
+                            <Text
                               textDecorationLine="underline"
                               hoverStyle={{ opacity: 0.8 }}
+                              cursor="pointer"
+                              onPress={() => router.push(`/profile/${subtextAddress}`)}
                             >
                               {subText}
-                            </Link>
+                            </Text>
                           )
                         }
                         return <Text>{subText}</Text>
