@@ -88,7 +88,7 @@ export function useInitiateKyc() {
  * Check if user has completed KYC
  */
 export function useKycStatus() {
-  const { data: customer, isLoading, error } = useBridgeCustomer()
+  const { data: customer, isLoading, error, refetch } = useBridgeCustomer()
 
   return {
     isLoading,
@@ -98,5 +98,6 @@ export function useKycStatus() {
     isRejected: customer?.kyc_status === 'rejected',
     isPending: customer?.kyc_status === 'under_review' || customer?.kyc_status === 'incomplete',
     customer,
+    refetch,
   }
 }

@@ -1,4 +1,4 @@
-import { YStack, Paragraph, Spinner } from '@my/ui'
+import { YStack, Paragraph, Spinner, Anchor, FadeCard } from '@my/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
@@ -10,14 +10,18 @@ import {
   useCreateVirtualAccount,
 } from 'app/features/bank-transfer'
 import { useSendAccount } from 'app/utils/send-accounts'
+import { useThemeSetting } from '@tamagui/next-theme'
 
 export function BankTransferScreen() {
   const { data: sendAccount } = useSendAccount()
-  const { kycStatus, isApproved, isLoading: kycLoading } = useKycStatus()
+  const { kycStatus, isApproved, isLoading: kycLoading, refetch } = useKycStatus()
   const { hasVirtualAccount, bankDetails, isLoading: vaLoading } = useBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createVirtualAccount = useCreateVirtualAccount()
   const [kycUrl, setKycUrl] = useState<string | null>(null)
+  const [isWaitingForVerification, setIsWaitingForVerification] = useState(false)
+  const { resolvedTheme } = useThemeSetting()
+  const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   const handleStartKyc = useCallback(async () => {
     try {
@@ -26,11 +30,36 @@ export function BankTransferScreen() {
       if (result.kycLink) {
         await Linking.openURL(result.kycLink)
         setKycUrl(result.kycLink)
+        setIsWaitingForVerification(true)
       }
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
     }
   }, [initiateKyc])
+
+  const handleOpenKycLink = useCallback(() => {
+    if (kycUrl) {
+      Linking.openURL(kycUrl)
+    }
+  }, [kycUrl])
+
+  // Poll for status updates when waiting for verification
+  useEffect(() => {
+    if (!isWaitingForVerification) return
+
+    const interval = setInterval(() => {
+      refetch()
+    }, 5000) // Poll every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [isWaitingForVerification, refetch])
+
+  // Stop waiting when status changes from not_started
+  useEffect(() => {
+    if (isWaitingForVerification && kycStatus !== 'not_started') {
+      setIsWaitingForVerification(false)
+    }
+  }, [kycStatus, isWaitingForVerification])
 
   // Auto-create virtual account once approved (hide this from user)
   useEffect(() => {
@@ -48,6 +77,39 @@ export function BankTransferScreen() {
     )
   }
 
+  // Waiting for verification to complete
+  if (isWaitingForVerification && kycStatus === 'not_started') {
+    return (
+      <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
+        <FadeCard ai="center">
+          <Spinner size="large" color={isDarkTheme ? '$primary' : '$color12'} />
+          <YStack ai="center" gap="$2">
+            <Paragraph size="$8" fontWeight={500} $gtLg={{ size: '$9' }} ta="center">
+              Hold tight...
+            </Paragraph>
+            <Paragraph
+              ta="center"
+              size="$5"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              Complete the verification in your browser window.
+            </Paragraph>
+          </YStack>
+          <Anchor
+            size="$4"
+            color="$primary"
+            onPress={handleOpenKycLink}
+            cursor="pointer"
+            hoverStyle={{ opacity: 0.8 }}
+          >
+            Open verification window again
+          </Anchor>
+        </FadeCard>
+      </YStack>
+    )
+  }
+
   // Not approved - show KYC status
   if (!isApproved) {
     return (
@@ -57,12 +119,6 @@ export function BankTransferScreen() {
           onStartKyc={handleStartKyc}
           isLoading={initiateKyc.isPending}
         />
-
-        {kycUrl && (
-          <Paragraph fontSize="$3" color="$lightGrayTextField" ta="center">
-            Verification window opened. Complete the process and return here.
-          </Paragraph>
-        )}
       </YStack>
     )
   }

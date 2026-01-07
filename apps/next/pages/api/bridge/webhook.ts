@@ -215,12 +215,75 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
 }
 
 /**
+ * Handle virtual account lifecycle events (deactivation/reactivation)
+ */
+async function handleVirtualAccountStatusEvent(
+  event: WebhookEvent,
+  nextStatus: 'active' | 'inactive'
+): Promise<void> {
+  const data = event.event_object as { virtual_account_id?: string | null }
+  const virtualAccountId = data.virtual_account_id ?? null
+
+  if (!virtualAccountId) {
+    log('missing virtual_account_id for virtual account status event: eventId=%s', event.event_id)
+    throw new Error('Missing virtual_account_id for virtual account status event')
+  }
+
+  const supabase = createSupabaseAdminClient()
+  const { error } = await supabase
+    .from('bridge_virtual_accounts')
+    .update({ status: nextStatus })
+    .eq('bridge_virtual_account_id', virtualAccountId)
+
+  if (error) {
+    log(
+      'failed to update virtual account status: bridgeVirtualAccountId=%s error=%O',
+      virtualAccountId,
+      error
+    )
+    throw error
+  }
+
+  log(
+    'updated virtual account status: bridgeVirtualAccountId=%s status=%s',
+    virtualAccountId,
+    nextStatus
+  )
+}
+
+function getVirtualAccountActivityType(event: WebhookEvent): string | null {
+  if (!isVirtualAccountActivityEvent(event)) return null
+  const data = event.event_object as { type?: string | null }
+  return data.type ?? null
+}
+
+/**
  * Route webhook event to appropriate handler
  */
 async function handleWebhookEvent(event: WebhookEvent): Promise<void> {
   if (isKycEvent(event)) {
     await handleKycEvent(event)
   } else if (isVirtualAccountActivityEvent(event)) {
+    const activityType = getVirtualAccountActivityType(event)
+    if (!activityType) {
+      throw new Error('Missing virtual account activity type')
+    }
+
+    if (activityType === 'deactivation') {
+      await handleVirtualAccountStatusEvent(event, 'inactive')
+      return
+    }
+
+    if (activityType === 'reactivation') {
+      await handleVirtualAccountStatusEvent(event, 'active')
+      return
+    }
+
+    if (activityType === 'account_update' || activityType === 'microdeposit') {
+      log('ignoring non-deposit virtual account activity: type=%s', activityType)
+      return
+    }
+
     await handleDepositEvent(event)
   } else {
     log('unknown event category: %s', event.event_category)
