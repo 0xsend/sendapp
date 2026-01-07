@@ -4,6 +4,7 @@ import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
 import { KycStatusCard } from './KycStatusCard'
 import {
+  useBridgeGeoBlock,
   useKycStatus,
   useInitiateKyc,
   useBankAccountDetails,
@@ -18,12 +19,16 @@ export function BankTransferScreen() {
   const { hasVirtualAccount, bankDetails, isLoading: vaLoading } = useBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createVirtualAccount = useCreateVirtualAccount()
+  const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [kycUrl, setKycUrl] = useState<string | null>(null)
   const [isWaitingForVerification, setIsWaitingForVerification] = useState(false)
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
 
   const handleStartKyc = useCallback(async () => {
+    if (isGeoBlocked) {
+      return
+    }
     try {
       const result = await initiateKyc.mutateAsync({})
       // Open KYC link in browser (platform-safe)
@@ -35,7 +40,7 @@ export function BankTransferScreen() {
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
     }
-  }, [initiateKyc])
+  }, [initiateKyc, isGeoBlocked])
 
   const handleOpenKycLink = useCallback(() => {
     if (kycUrl) {
@@ -63,16 +68,43 @@ export function BankTransferScreen() {
 
   // Auto-create virtual account once approved (hide this from user)
   useEffect(() => {
-    if (isApproved && !hasVirtualAccount && !vaLoading && sendAccount?.address) {
+    if (!isGeoBlocked && isApproved && !hasVirtualAccount && !vaLoading && sendAccount?.address) {
       createVirtualAccount.mutate(sendAccount.address)
     }
-  }, [isApproved, hasVirtualAccount, vaLoading, sendAccount?.address, createVirtualAccount])
+  }, [
+    isGeoBlocked,
+    isApproved,
+    hasVirtualAccount,
+    vaLoading,
+    sendAccount?.address,
+    createVirtualAccount,
+  ])
 
   // Loading state
-  if (kycLoading) {
+  if (kycLoading || isGeoBlockLoading) {
     return (
       <YStack f={1} ai="center" jc="center" py="$8">
         <Spinner size="large" color="$primary" />
+      </YStack>
+    )
+  }
+
+  if (isGeoBlocked) {
+    return (
+      <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
+        <FadeCard ai="center">
+          <Paragraph size="$6" fontWeight={600} ta="center">
+            Bank transfers aren't available in your region.
+          </Paragraph>
+          <Paragraph
+            ta="center"
+            size="$4"
+            color="$lightGrayTextField"
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            We can't offer ACH or wire transfers where you're located.
+          </Paragraph>
+        </FadeCard>
       </YStack>
     )
   }

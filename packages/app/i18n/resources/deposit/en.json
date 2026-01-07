@@ -6,11 +6,15 @@
     },
     "applePay": {
       "title": "Apple Pay",
-      "description": "Debit card only"
+      "description": "Debit card only • Up to $500/week"
     },
     "debitCard": {
       "title": "Debit Card",
-      "description": "Quick deposits up to $500/week"
+      "description": "Up to $500/week"
+    },
+    "bankTransfer": {
+      "title": "Bank Transfer",
+      "description": "Best for $500+/week • ACH or wire"
     }
   },
   "copyAddressDialog": {

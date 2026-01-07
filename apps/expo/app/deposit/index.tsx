@@ -10,7 +10,7 @@ export default function Screen() {
     <>
       <Stack.Screen
         options={{
-          title: t('stack.savings.root'),
+          title: t('stack.deposit.root'),
         }}
       />
       <ScreenContainer>

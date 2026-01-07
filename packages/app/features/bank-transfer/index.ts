@@ -13,6 +13,8 @@ export {
   BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY,
 } from './useBridgeVirtualAccount'
 
+export { useBridgeGeoBlock } from './useBridgeGeoBlock'
+
 export {
   useBridgeDeposits,
   useBridgeDeposit,

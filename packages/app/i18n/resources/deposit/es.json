@@ -6,11 +6,15 @@
     },
     "applePay": {
       "title": "Apple Pay",
-      "description": "Solo tarjeta de débito"
+      "description": "Solo tarjeta de débito • Hasta $500 por semana"
     },
     "debitCard": {
       "title": "Tarjeta de débito",
-      "description": "Depósitos rápidos de hasta $500 por semana"
+      "description": "Hasta $500 por semana"
+    },
+    "bankTransfer": {
+      "title": "Transferencia bancaria",
+      "description": "Mejor para más de $500 por semana • ACH o transferencia"
     }
   },
   "copyAddressDialog": {
