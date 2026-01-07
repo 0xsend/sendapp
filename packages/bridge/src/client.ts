@@ -1,5 +1,6 @@
 import debug from 'debug'
 import { BridgeApiError } from './errors'
+import { verifyWebhookSignature, parseWebhookEvent } from './webhooks'
 import type {
   CustomerResponse,
   KycLinkRequest,
@@ -7,6 +8,7 @@ import type {
   VirtualAccountRequest,
   VirtualAccountResponse,
   WebhookResponse,
+  WebhookEvent,
   BridgeApiErrorResponse,
 } from './types'
 
@@ -15,6 +17,7 @@ const log = debug('bridge:client')
 interface BridgeClientConfig {
   apiKey: string
   sandbox?: boolean
+  webhookPublicKey?: string
 }
 
 interface RequestOptions {
@@ -31,12 +34,15 @@ interface CreateWebhookOptions extends RequestOptions {
 export class BridgeClient {
   private readonly baseUrl: string
   private readonly apiKey: string
+  private readonly webhookPublicKey: string | null
 
   constructor(config: BridgeClientConfig) {
     this.apiKey = config.apiKey
     this.baseUrl = config.sandbox
       ? 'https://api.sandbox.bridge.xyz/v0'
       : 'https://api.bridge.xyz/v0'
+    // Convert escaped newlines to actual newlines (env vars store \n as literal)
+    this.webhookPublicKey = config.webhookPublicKey?.replace(/\\n/g, '\n') ?? null
     log('initialized client with baseUrl=%s sandbox=%s', this.baseUrl, !!config.sandbox)
   }
 
@@ -148,6 +154,21 @@ export class BridgeClient {
       requestOptions
     )
   }
+
+  // Webhook Verification
+
+  /**
+   * Verify and parse a webhook request
+   * @throws Error if webhookPublicKey was not configured
+   * @throws WebhookSignatureError if signature is invalid
+   */
+  verifyWebhook(rawBody: string, signatureHeader: string): WebhookEvent {
+    if (!this.webhookPublicKey) {
+      throw new Error('webhookPublicKey is required for webhook verification')
+    }
+    verifyWebhookSignature(rawBody, signatureHeader, this.webhookPublicKey)
+    return parseWebhookEvent(rawBody)
+  }
 }
 
 /**
@@ -160,5 +181,6 @@ export function createBridgeClient(): BridgeClient {
   }
 
   const sandbox = process.env.BRIDGE_SANDBOX === 'true'
-  return new BridgeClient({ apiKey, sandbox })
+  const webhookPublicKey = process.env.BRIDGE_WEBHOOK_PUBLIC_KEY
+  return new BridgeClient({ apiKey, sandbox, webhookPublicKey })
 }

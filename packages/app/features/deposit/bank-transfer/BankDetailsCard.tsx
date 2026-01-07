@@ -64,7 +64,7 @@ export function BankDetailsCard({
     <FadeCard>
       <YStack gap="$2">
         <Paragraph fontSize="$6" fontWeight={600} pb="$2">
-          Bank Account Details
+          Deposit Account
         </Paragraph>
 
         {bankName && (
@@ -115,7 +115,7 @@ export function BankDetailsCardSkeleton() {
       <YStack ai="center" jc="center" py="$8">
         <Spinner size="large" color="$primary" />
         <Paragraph pt="$4" color="$lightGrayTextField">
-          Loading bank details...
+          Loading deposit details...
         </Paragraph>
       </YStack>
     </FadeCard>

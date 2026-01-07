@@ -7,6 +7,7 @@ interface KycStatusCardProps {
   onStartKyc?: () => void
   isLoading?: boolean
   startDisabled?: boolean
+  children?: React.ReactNode
 }
 
 function StatusIcon({ status }: { status: string }) {
@@ -45,19 +46,19 @@ function getStatusText(status: string): string {
 function getStatusDescription(status: string): string {
   switch (status) {
     case 'approved':
-      return 'You can now receive bank transfers to your account.'
+      return 'You can now deposit funds from your bank.'
     case 'rejected':
       return 'Your identity verification was not successful. Please contact support.'
     case 'under_review':
       return 'Your verification is being reviewed. This usually takes 1-2 business days.'
     case 'incomplete':
-      return 'Please complete your identity verification to enable bank transfers.'
+      return 'Complete the verification process to start depositing from your bank.'
     case 'paused':
       return 'Your verification has been paused. Please contact support.'
     case 'offboarded':
       return 'Your account has been offboarded. Please contact support.'
     default:
-      return 'Complete identity verification to deposit via bank transfer.'
+      return 'To deposit from your bank, we need to verify your identity. This is a one-time process required by financial regulations.'
   }
 }
 
@@ -66,8 +67,37 @@ export function KycStatusCard({
   onStartKyc,
   isLoading,
   startDisabled,
+  children,
 }: KycStatusCardProps) {
   const showStartButton = kycStatus === 'not_started' || kycStatus === 'incomplete'
+  const isNewUser = kycStatus === 'not_started'
+
+  // Simplified card for new users - description, optional children (email form), and button
+  if (isNewUser && onStartKyc) {
+    return (
+      <FadeCard>
+        <YStack gap="$4">
+          <Paragraph
+            fontSize="$4"
+            color="$lightGrayTextField"
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            {getStatusDescription(kycStatus)}
+          </Paragraph>
+          {children}
+          <Button
+            size="$4"
+            theme="green"
+            onPress={onStartKyc}
+            disabled={isLoading || startDisabled}
+            icon={isLoading ? <Spinner size="small" /> : undefined}
+          >
+            Verify Identity
+          </Button>
+        </YStack>
+      </FadeCard>
+    )
+  }
 
   return (
     <FadeCard>
@@ -95,7 +125,7 @@ export function KycStatusCard({
             disabled={isLoading || startDisabled}
             icon={isLoading ? <Spinner size="small" /> : undefined}
           >
-            {kycStatus === 'incomplete' ? 'Continue Verification' : 'Start Verification'}
+            Continue Verification
           </Button>
         )}
       </YStack>

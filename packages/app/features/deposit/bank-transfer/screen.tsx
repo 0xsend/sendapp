@@ -1,4 +1,4 @@
-import { YStack, Paragraph, Spinner, Button, Input } from '@my/ui'
+import { YStack, Paragraph, Spinner } from '@my/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
@@ -10,45 +10,18 @@ import {
   useCreateVirtualAccount,
 } from 'app/features/bank-transfer'
 import { useSendAccount } from 'app/utils/send-accounts'
-import { useUser } from 'app/utils/useUser'
 
 export function BankTransferScreen() {
-  const { user } = useUser()
   const { data: sendAccount } = useSendAccount()
-  const { kycStatus, isApproved, isLoading: kycLoading, customer } = useKycStatus()
+  const { kycStatus, isApproved, isLoading: kycLoading } = useKycStatus()
   const { hasVirtualAccount, bankDetails, isLoading: vaLoading } = useBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createVirtualAccount = useCreateVirtualAccount()
   const [kycUrl, setKycUrl] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
-  const [emailTouched, setEmailTouched] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!emailTouched && !email && user?.email) {
-      setEmail(user.email)
-    }
-  }, [email, emailTouched, user?.email])
-
-  const trimmedEmail = email.trim()
-  const canStartKyc = Boolean(trimmedEmail)
-  const shouldCollectKycDetails = !customer
 
   const handleStartKyc = useCallback(async () => {
-    const resolvedEmail = email.trim()
-
-    if (shouldCollectKycDetails) {
-      if (!resolvedEmail) {
-        setFormError('Enter your email to continue.')
-        return
-      }
-    }
-
     try {
-      setFormError(null)
-      const result = await initiateKyc.mutateAsync(
-        shouldCollectKycDetails ? { email: resolvedEmail } : {}
-      )
+      const result = await initiateKyc.mutateAsync({})
       // Open KYC link in browser (platform-safe)
       if (result.kycLink) {
         await Linking.openURL(result.kycLink)
@@ -57,17 +30,14 @@ export function BankTransferScreen() {
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
     }
-  }, [email, initiateKyc, shouldCollectKycDetails])
+  }, [initiateKyc])
 
-  const handleCreateVirtualAccount = useCallback(async () => {
-    if (!sendAccount?.address) return
-
-    try {
-      await createVirtualAccount.mutateAsync(sendAccount.address)
-    } catch (error) {
-      console.error('Failed to create virtual account:', error)
+  // Auto-create virtual account once approved (hide this from user)
+  useEffect(() => {
+    if (isApproved && !hasVirtualAccount && !vaLoading && sendAccount?.address) {
+      createVirtualAccount.mutate(sendAccount.address)
     }
-  }, [sendAccount, createVirtualAccount])
+  }, [isApproved, hasVirtualAccount, vaLoading, sendAccount?.address, createVirtualAccount])
 
   // Loading state
   if (kycLoading) {
@@ -82,42 +52,10 @@ export function BankTransferScreen() {
   if (!isApproved) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
-        {shouldCollectKycDetails && (
-          <YStack gap="$3">
-            <Paragraph fontSize="$4" color="$lightGrayTextField">
-              Enter the email you want to use for identity verification.
-            </Paragraph>
-            <YStack gap="$2">
-              <Paragraph fontSize="$3" color="$lightGrayTextField">
-                Email
-              </Paragraph>
-              <Input
-                size="$4"
-                value={email}
-                onChangeText={(text) => {
-                  setEmailTouched(true)
-                  setEmail(text)
-                  if (formError) setFormError(null)
-                }}
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="email-address"
-                placeholder="Email"
-                placeholderTextColor="$color4"
-              />
-            </YStack>
-            {formError && (
-              <Paragraph fontSize="$3" color="$red10">
-                {formError}
-              </Paragraph>
-            )}
-          </YStack>
-        )}
         <KycStatusCard
           kycStatus={kycStatus}
           onStartKyc={handleStartKyc}
           isLoading={initiateKyc.isPending}
-          startDisabled={shouldCollectKycDetails ? !canStartKyc : undefined}
         />
 
         {kycUrl && (
@@ -129,25 +67,15 @@ export function BankTransferScreen() {
     )
   }
 
-  // Approved but no virtual account - offer to create one
+  // Approved but setting up deposit account (auto-creating in background)
   if (!hasVirtualAccount) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
-        <KycStatusCard kycStatus="approved" />
-
-        <YStack gap="$3">
-          <Paragraph fontSize="$5">
-            Your identity is verified. Create a virtual bank account to start receiving deposits.
+        <YStack ai="center" jc="center" py="$8" gap="$4">
+          <Spinner size="large" color="$primary" />
+          <Paragraph fontSize="$5" ta="center" color="$lightGrayTextField">
+            Setting up your deposit account...
           </Paragraph>
-          <Button
-            size="$4"
-            theme="green"
-            onPress={handleCreateVirtualAccount}
-            disabled={createVirtualAccount.isPending || !sendAccount?.address}
-            icon={createVirtualAccount.isPending ? <Spinner size="small" /> : undefined}
-          >
-            Create Bank Account
-          </Button>
         </YStack>
       </YStack>
     )
@@ -164,10 +92,15 @@ export function BankTransferScreen() {
 
   return (
     <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
-      <Paragraph fontSize="$5" color="$lightGrayTextField">
-        Send USD via ACH or wire transfer to this account. Funds will be converted to USDC and
-        deposited to your wallet.
-      </Paragraph>
+      <YStack gap="$2">
+        <Paragraph fontSize="$6" fontWeight={600}>
+          Deposit from Your Bank
+        </Paragraph>
+        <Paragraph fontSize="$4" color="$lightGrayTextField">
+          Transfer USD from your bank to the account below. Funds will appear in your Send wallet
+          automatically.
+        </Paragraph>
+      </YStack>
 
       <BankDetailsCard
         bankName={bankDetails.bankName}
@@ -178,7 +111,8 @@ export function BankTransferScreen() {
       />
 
       <Paragraph fontSize="$3" color="$lightGrayTextField" ta="center">
-        Deposits typically arrive within 1-3 business days.
+        ACH transfers typically arrive within 1-3 business days. Wire transfers are usually
+        same-day.
       </Paragraph>
     </YStack>
   )

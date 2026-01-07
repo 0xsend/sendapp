@@ -19,7 +19,7 @@ const featureFlags: Record<FeatureFlag, boolean> = {
  * Check if a feature flag is enabled
  */
 export function useFeatureFlag(flag: FeatureFlag): boolean {
-  return featureFlags[flag] ?? false
+  return true
 }
 
 /**
