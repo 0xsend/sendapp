@@ -40,6 +40,9 @@ export const TEST_ADDRESSES = {
   // Send Foundation revenue safe
   REVENUE_SAFE: '0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4' as const,
 
+  // SendEarn vault on Base (deployed at same address across chains)
+  SEND_EARN_VAULT: '0xe16890A61DCF8A11C5059E7cBc7D00B12405fd2E' as const,
+
   // Test private key (anvil default account 0)
   // DO NOT use in production - this is a well-known test key
   TEST_PRIVATE_KEY: '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80' as const,
@@ -85,5 +88,33 @@ export const SEND_EARN_ABI = [
     inputs: [{ name: 'token', type: 'address' }],
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * Merkl Distributor ABI subset for testing claim functionality.
+ */
+export const MERKL_DISTRIBUTOR_ABI = [
+  {
+    type: 'function',
+    name: 'claim',
+    inputs: [
+      { name: 'users', type: 'address[]' },
+      { name: 'tokens', type: 'address[]' },
+      { name: 'amounts', type: 'uint256[]' },
+      { name: 'proofs', type: 'bytes32[][]' },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'claimed',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'token', type: 'address' },
+    ],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
   },
 ] as const
