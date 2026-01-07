@@ -26,7 +26,11 @@ export async function getUserPushTokens(userId: string): Promise<PushToken[]> {
   }
 
   const supabaseAdmin = createSupabaseAdminClient()
-  const { data, error } = await supabaseAdmin.from('push_tokens').select('*').eq('user_id', userId)
+  const { data, error } = await supabaseAdmin
+    .from('push_tokens')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
 
   if (error) {
     log.error('Error fetching push tokens:', { userId: redactId(userId), error })

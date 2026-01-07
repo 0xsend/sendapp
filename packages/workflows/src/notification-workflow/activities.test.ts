@@ -176,24 +176,29 @@ describe('Notification Workflow Supabase Helpers', () => {
         },
       ]
 
-      mockEq.mockImplementationOnce(() => ({
-        data: mockTokens,
-        error: null,
-      }))
+      mockEq
+        .mockImplementationOnce(() => ({ eq: mockEq }))
+        .mockImplementationOnce(() => ({
+          data: mockTokens,
+          error: null,
+        }))
 
       const result = await getUserPushTokens(mockUserId)
       expect(result).toEqual(mockTokens)
       expect(mockFrom).toHaveBeenCalledWith('push_tokens')
       expect(mockSelect).toHaveBeenCalledWith('*')
-      expect(mockEq).toHaveBeenCalledWith('user_id', mockUserId)
+      expect(mockEq).toHaveBeenNthCalledWith(1, 'user_id', mockUserId)
+      expect(mockEq).toHaveBeenNthCalledWith(2, 'is_active', true)
     })
 
     it('should return empty array on database error', async () => {
       const mockError = createMockPostgrestError('DB error')
-      mockEq.mockImplementationOnce(() => ({
-        data: null,
-        error: mockError,
-      }))
+      mockEq
+        .mockImplementationOnce(() => ({ eq: mockEq }))
+        .mockImplementationOnce(() => ({
+          data: null,
+          error: mockError,
+        }))
 
       const result = await getUserPushTokens(mockUserId)
       expect(result).toEqual([])
