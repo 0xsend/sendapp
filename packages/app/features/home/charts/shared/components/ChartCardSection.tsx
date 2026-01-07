@@ -20,7 +20,7 @@ export function ChartCardSection({
       <H4 fontWeight={600} size={'$7'}>
         {title}
       </H4>
-      <Card padded size={'$5'} w={'100%'} elevation={1} h={344}>
+      <Card padded px={0} size={'$5'} w={'100%'} elevation={1} h={344}>
         <YStack f={1} jc="space-between" ov="hidden" gap={'$3'} position="relative">
           {children}
           {isLoading ? (
