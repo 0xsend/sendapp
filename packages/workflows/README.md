@@ -61,6 +61,7 @@ foundryup
 
 - Node.js 18+ with matching native module ABI
 - C++ build tools (`xcode-select --install` on macOS, `build-essential` on Linux)
+- Python with setuptools (`pip install setuptools`) - required for Python 3.12+ where `distutils` was removed
 
 Temporal runs tests in an in-memory environment. When testing workflows, you can use the `TestWorkflowEnvironment` to run tests against a local Temporal server. This is useful for testing workflows that interact with external services or databases. You can also mock activities. Do note, that if you miss an activity for a workflow, the test will fail with a timeout.
 
