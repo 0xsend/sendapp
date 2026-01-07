@@ -1,0 +1,24 @@
+{
+  "name": "@my/send-earn",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "main": "src/index.ts",
+  "bin": "./bin/send-earn.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pg": "^8.12.0",
+    "viem": "^2.27.2",
+    "zx": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8",
+    "typescript": "~5.9.2"
+  }
+}

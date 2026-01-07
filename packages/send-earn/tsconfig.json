@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": true,
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "baseUrl": ".",
+    "paths": {
+      "@my/send-earn": ["./src"],
+      "@my/send-earn/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "tsconfig.json",
+    "./src",
+    "./bin",
+    "../../globals.d.ts",
+    "../../environment.d.ts"
+  ]
+}

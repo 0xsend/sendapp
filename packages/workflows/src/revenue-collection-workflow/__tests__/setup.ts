@@ -17,12 +17,13 @@ const ANVIL_FORK_URL =
  * Each test gets an isolated fork of Base mainnet at a specific block.
  * The client is a Viem test client with public actions extended.
  */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const test = createViemTest(base, {
   forkUrl: ANVIL_FORK_URL,
   // Pin to a recent block for reproducibility
   // This should be updated periodically to test against recent state
   forkBlockNumber: 25_000_000n,
-})
+}) as ReturnType<typeof createViemTest>
 
 export { expect }
 
