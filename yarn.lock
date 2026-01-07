@@ -6961,7 +6961,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@my/send-earn@workspace:packages/send-earn":
+"@my/send-earn@workspace:*, @my/send-earn@workspace:packages/send-earn":
   version: 0.0.0-use.local
   resolution: "@my/send-earn@workspace:packages/send-earn"
   dependencies:
@@ -7100,6 +7100,7 @@ __metadata:
   resolution: "@my/workflows@workspace:packages/workflows"
   dependencies:
     "@morpho-org/test": "npm:^2.6.6"
+    "@my/send-earn": "workspace:*"
     "@my/supabase": "workspace:*"
     "@my/wagmi": "workspace:*"
     "@supabase/supabase-js": "npm:^2.49.8"

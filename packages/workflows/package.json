@@ -63,6 +63,7 @@
     "typescript": "~5.9.2"
   },
   "dependencies": {
+    "@my/send-earn": "workspace:*",
     "@my/supabase": "workspace:*",
     "@my/wagmi": "workspace:*",
     "@supabase/supabase-js": "^2.49.8",
