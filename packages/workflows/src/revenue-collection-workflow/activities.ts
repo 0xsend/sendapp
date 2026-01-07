@@ -128,7 +128,17 @@ async function fetchHarvestableRevenueActivity(
     while (retryCount < maxRetries) {
       try {
         const url = `${config.merklApiBaseUrl}/users/${vault}/rewards?chainId=${config.chainId}`
-        const response = await fetch(url)
+
+        // Create AbortController with timeout to prevent indefinite hangs
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), config.merklApiTimeoutMs)
+
+        let response: Response
+        try {
+          response = await fetch(url, { signal: controller.signal })
+        } finally {
+          clearTimeout(timeoutId)
+        }
 
         if (response.status === 429) {
           // Rate limited - exponential backoff and retry same vault

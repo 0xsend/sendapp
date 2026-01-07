@@ -23,6 +23,8 @@ export interface RevenueConfig {
   minWellHarvest: bigint
   /** Delay in ms between Merkl API requests (respects rate limits) */
   merklApiDelayMs: number
+  /** Timeout in ms for Merkl API requests (prevents indefinite hangs) */
+  merklApiTimeoutMs: number
   /** Base URL for Merkl API */
   merklApiBaseUrl: string
   /** Base chain ID */
@@ -38,6 +40,7 @@ export function getRevenueConfig(env: Record<string, string | undefined>): Reven
     minMorphoHarvest: parseUnits(env.MIN_MORPHO_HARVEST ?? '1', 18), // Default: 1 MORPHO
     minWellHarvest: parseUnits(env.MIN_WELL_HARVEST ?? '10', 18), // Default: 10 WELL
     merklApiDelayMs: Number(env.MERKL_API_DELAY_MS ?? '100'), // 10 req/s max
+    merklApiTimeoutMs: Number(env.MERKL_API_TIMEOUT_MS ?? '30000'), // Default: 30s timeout
     merklApiBaseUrl: env.MERKL_API_BASE_URL ?? 'https://api.merkl.xyz/v4',
     chainId: Number(env.CHAIN_ID ?? '8453'), // Base mainnet
   }
