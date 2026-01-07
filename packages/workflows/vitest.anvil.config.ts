@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { execSync } from 'node:child_process'
 
 // Add foundry bin to PATH for Anvil tests
 const foundryBin = join(homedir(), '.foundry', 'bin')
@@ -9,12 +8,9 @@ if (!process.env.PATH?.includes(foundryBin)) {
   process.env.PATH = `${foundryBin}:${process.env.PATH}`
 }
 
-// Kill any stale Anvil processes before running tests to avoid port conflicts
-try {
-  execSync('pkill -f "anvil.*fork" 2>/dev/null || true', { stdio: 'ignore' })
-} catch {
-  // Ignore errors - pkill returns non-zero if no processes found
-}
+// Note: @morpho-org/test manages Anvil lifecycle automatically.
+// If you encounter port conflicts from stale processes, manually run:
+// pkill -f "anvil.*25000000" (kills only anvil at our pinned block)
 
 export default defineConfig({
   test: {
