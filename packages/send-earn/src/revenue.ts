@@ -83,13 +83,14 @@ function calculateTotals(
  * Dry run: fetch harvestable amounts and vault balances without executing transactions.
  */
 export async function dryRun(config: RevenueConfig): Promise<DryRunResult> {
-  // Get active vaults from database
-  let vaults = await getActiveVaults(config.dbUrl)
-
-  // Apply vault filter if specified
+  // Use vault filter directly if specified, otherwise get from database
+  let vaults: `0x${string}`[]
   if (config.vaultFilter && config.vaultFilter.length > 0) {
-    const filterSet = new Set(config.vaultFilter.map((v) => v.toLowerCase()))
-    vaults = vaults.filter((v) => filterSet.has(v.toLowerCase()))
+    // Use provided vaults directly (skip database query)
+    vaults = config.vaultFilter
+  } else {
+    // Get active vaults from database
+    vaults = await getActiveVaults(config.dbUrl)
   }
 
   if (vaults.length === 0) {
@@ -120,13 +121,14 @@ export async function dryRun(config: RevenueConfig): Promise<DryRunResult> {
  * Execute harvest: claim rewards from Merkl distributor.
  */
 export async function harvest(config: RevenueConfig): Promise<HarvestResult> {
-  // Get active vaults from database
-  let vaults = await getActiveVaults(config.dbUrl)
-
-  // Apply vault filter if specified
+  // Use vault filter directly if specified, otherwise get from database
+  let vaults: `0x${string}`[]
   if (config.vaultFilter && config.vaultFilter.length > 0) {
-    const filterSet = new Set(config.vaultFilter.map((v) => v.toLowerCase()))
-    vaults = vaults.filter((v) => filterSet.has(v.toLowerCase()))
+    // Use provided vaults directly (skip database query)
+    vaults = config.vaultFilter
+  } else {
+    // Get active vaults from database
+    vaults = await getActiveVaults(config.dbUrl)
   }
 
   if (vaults.length === 0) {
@@ -152,13 +154,14 @@ export async function harvest(config: RevenueConfig): Promise<HarvestResult> {
  * Execute sweep: move tokens from vaults to revenue safe.
  */
 export async function sweep(config: RevenueConfig): Promise<SweepResult> {
-  // Get active vaults from database
-  let vaults = await getActiveVaults(config.dbUrl)
-
-  // Apply vault filter if specified
+  // Use vault filter directly if specified, otherwise get from database
+  let vaults: `0x${string}`[]
   if (config.vaultFilter && config.vaultFilter.length > 0) {
-    const filterSet = new Set(config.vaultFilter.map((v) => v.toLowerCase()))
-    vaults = vaults.filter((v) => filterSet.has(v.toLowerCase()))
+    // Use provided vaults directly (skip database query)
+    vaults = config.vaultFilter
+  } else {
+    // Get active vaults from database
+    vaults = await getActiveVaults(config.dbUrl)
   }
 
   if (vaults.length === 0) {
