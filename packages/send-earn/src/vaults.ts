@@ -115,7 +115,8 @@ export async function getVaultBalances(
 
 /**
  * Execute harvest transactions (Merkl.claim).
- * Attempts batch claim first, falls back to individual claims on failure.
+ * FAIL FAST: If batch claim fails (e.g., stale proofs), abort the entire batch.
+ * User must re-run with fresh proofs to complete remaining vaults.
  */
 export async function executeHarvest(
   config: RevenueConfig,
@@ -126,7 +127,6 @@ export async function executeHarvest(
   }
 
   const transactions: TransactionRecord[] = []
-  const errors: RevenueError[] = []
 
   const batchClaim = buildClaimArrays(vaultRevenue)
 
@@ -177,65 +177,27 @@ export async function executeHarvest(
     }
   }
 
-  // Attempt batch harvest first
-  try {
-    const txHash = await walletClient.writeContract({
-      address: REVENUE_ADDRESSES.MERKL_DISTRIBUTOR as `0x${string}`,
-      abi: merklDistributorAbi,
-      functionName: 'claim',
-      args: [batchClaim.users, batchClaim.tokens, batchClaim.amounts, batchClaim.proofs],
-    })
+  // Execute batch harvest - fail fast on any error (e.g., stale proofs)
+  const txHash = await walletClient.writeContract({
+    address: REVENUE_ADDRESSES.MERKL_DISTRIBUTOR as `0x${string}`,
+    abi: merklDistributorAbi,
+    functionName: 'claim',
+    args: [batchClaim.users, batchClaim.tokens, batchClaim.amounts, batchClaim.proofs],
+  })
 
-    console.log(`Batch harvest tx submitted: ${txHash}`)
+  console.log(`Batch harvest tx submitted: ${txHash}`)
 
-    const receipt = await client.waitForTransactionReceipt({ hash: txHash })
+  const receipt = await client.waitForTransactionReceipt({ hash: txHash })
 
-    if (receipt.status === 'success') {
-      await recordHarvests(vaultRevenue, txHash, receipt.blockNumber)
-      console.log(`Batch harvest successful: ${transactions.length} harvests`)
-    } else {
-      throw new Error('Batch harvest reverted')
-    }
-  } catch (batchError) {
-    console.warn(
-      'Batch harvest failed, falling back to individual:',
-      batchError instanceof Error ? batchError.message : batchError
+  if (receipt.status !== 'success') {
+    // Transaction reverted - fail fast with error
+    throw new Error(
+      `Harvest batch reverted (tx: ${txHash}). Proofs may be stale. Re-run with fresh proofs.`
     )
-
-    // Fallback: try each vault individually
-    for (const revenue of vaultRevenue) {
-      const individualClaim = buildClaimArrays([revenue])
-      if (individualClaim.users.length === 0) continue
-
-      try {
-        const txHash = await walletClient.writeContract({
-          address: REVENUE_ADDRESSES.MERKL_DISTRIBUTOR as `0x${string}`,
-          abi: merklDistributorAbi,
-          functionName: 'claim',
-          args: [
-            individualClaim.users,
-            individualClaim.tokens,
-            individualClaim.amounts,
-            individualClaim.proofs,
-          ],
-        })
-
-        console.log(`Individual harvest tx for ${revenue.vault}: ${txHash}`)
-
-        const receipt = await client.waitForTransactionReceipt({ hash: txHash })
-
-        if (receipt.status === 'success') {
-          await recordHarvests([revenue], txHash, receipt.blockNumber)
-        } else {
-          errors.push({ vault: revenue.vault, step: 'harvest', error: 'Transaction reverted' })
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        errors.push({ vault: revenue.vault, step: 'harvest', error: errorMessage })
-        console.error(`Individual harvest failed for ${revenue.vault}: ${errorMessage}`)
-      }
-    }
   }
+
+  await recordHarvests(vaultRevenue, txHash, receipt.blockNumber)
+  console.log(`Batch harvest successful: ${transactions.length} harvests`)
 
   const morphoTotal = transactions
     .filter((t) => t.token.toLowerCase() === REVENUE_ADDRESSES.MORPHO_TOKEN.toLowerCase())
@@ -247,7 +209,7 @@ export async function executeHarvest(
   return {
     harvested: { morpho: morphoTotal, well: wellTotal },
     transactions,
-    errors,
+    errors: [],
   }
 }
 
