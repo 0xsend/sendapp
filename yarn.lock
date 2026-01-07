@@ -6961,6 +6961,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@my/send-earn@workspace:packages/send-earn":
+  version: 0.0.0-use.local
+  resolution: "@my/send-earn@workspace:packages/send-earn"
+  dependencies:
+    "@types/pg": "npm:^8"
+    pg: "npm:^8.12.0"
+    typescript: "npm:~5.9.2"
+    viem: "npm:^2.27.2"
+    zx: "npm:^8.3.0"
+  bin:
+    send-earn: ./bin/send-earn.ts
+  languageName: unknown
+  linkType: soft
+
 "@my/shovel@workspace:packages/shovel":
   version: 0.0.0-use.local
   resolution: "@my/shovel@workspace:packages/shovel"
@@ -38558,5 +38572,14 @@ __metadata:
   bin:
     zx: build/cli.js
   checksum: 10/6e965bf651759ea778ad8b8ad56dfc7c072fc546563abc2f189de1be305994c82d3f228ed99aa9b4992d839f119158f2ddc0d7e00dc87a216ffc16ed87d57813
+  languageName: node
+  linkType: hard
+
+"zx@npm:^8.3.0":
+  version: 8.8.5
+  resolution: "zx@npm:8.8.5"
+  bin:
+    zx: build/cli.js
+  checksum: 10/29e68a7a2f37b58e1140404655ec5d2f1ab1ab93f385d97192b37929972de61826a106bbc12bbf1fbd29bc649e119cad897c0c1b1751d4e9e01bc7d7629dc86e
   languageName: node
   linkType: hard
