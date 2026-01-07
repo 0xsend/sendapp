@@ -13,6 +13,8 @@ import {
   useMemo,
   useRef,
   useState,
+  startTransition,
+  useDeferredValue,
 } from 'react'
 import { H4, LazyMount, Paragraph, Shimmer, useThemeName, View, YStack } from '@my/ui'
 import {
@@ -38,6 +40,8 @@ import {
   type UserTransferRow,
 } from './utils/useProcessedActivityFeed'
 import { ActivityRowFactory, getColors } from './rows/ActivityRowFactory'
+import { useProfileLookup } from 'app/utils/useProfileLookup'
+import { Keyboard } from 'react-native'
 
 // Item heights
 const HEADER_HEIGHT = 56
@@ -56,6 +60,16 @@ export default function ActivityFeed() {
   const sendParamsRef = useRef(sendParamsAndSet)
   sendParamsRef.current = sendParamsAndSet
 
+  const {
+    data: profile,
+    isLoading: isLoadingRecipient,
+    error: errorProfileLookup,
+  } = useProfileLookup(sendParams.idType ?? 'tag', sendParams.recipient ?? '')
+
+  // to avoid flickering
+  const deferredIsLoadingRecipient = useDeferredValue(isLoadingRecipient)
+  const finalIsLoading = isLoadingRecipient && deferredIsLoadingRecipient
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
     if (!sendChatOpen) {
@@ -72,10 +86,15 @@ export default function ActivityFeed() {
   }, [sendChatOpen])
 
   useEffect(() => {
-    if (sendParams.idType && sendParams.recipient) {
-      setSendChatOpen(true)
+    if (!errorProfileLookup && profile?.address && sendParams.idType && sendParams.recipient) {
+      Keyboard.dismiss()
+      startTransition(() => {
+        setSendChatOpen(true)
+      })
+    } else {
+      setSendChatOpen(false)
     }
-  }, [sendParams.idType, sendParams.recipient])
+  }, [profile, sendParams.idType, sendParams.recipient, errorProfileLookup])
 
   // Get swap/pool data for preprocessing
   const { data: swapRouters } = useSwapRouters()
@@ -171,8 +190,13 @@ export default function ActivityFeed() {
       h="100%"
       zIndex={10}
       y={-20}
+      pe={isLoadingRecipient ? 'none' : 'auto'}
+      o={finalIsLoading ? 0.5 : 1}
       $gtLg={{ y: 20 }}
-      $platform-native={{ h: '150%', y: 0 }}
+      $platform-native={{ h: '150%', y: 0, animation: '200ms', animateOnly: ['opacity'] }}
+      $platform-web={{
+        transition: 'opacity 200ms linear',
+      }}
     >
       <MyList
         data={processedData}
