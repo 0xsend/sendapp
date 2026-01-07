@@ -209,11 +209,9 @@ async function sendExpoNotifications(
           tokenId: token?.id !== undefined ? Number(token.id) : undefined,
         })
 
-        // Check for invalid token errors
-        if (
-          ticket.details?.error === 'DeviceNotRegistered' ||
-          ticket.details?.error === 'InvalidCredentials'
-        ) {
+        // Check for invalid token errors.
+        // Note: InvalidCredentials is generally a project/config issue, not a token-specific issue.
+        if (ticket.details?.error === 'DeviceNotRegistered') {
           if (token?.id !== undefined) {
             invalidTokenIds.push(Number(token.id))
           }
