@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
   },
   // Avatar
   avatarContainer: {
+    marginTop: 4,
     width: 52,
     height: 52,
     position: 'relative',
@@ -163,6 +164,7 @@ const styles = StyleSheet.create({
   },
   // Icon container
   iconContainer: {
+    marginTop: 4,
     width: 52, // $5
     height: 52, // $5
     borderRadius: 9, // $4
@@ -172,6 +174,7 @@ const styles = StyleSheet.create({
   },
   // Sendpot icon
   sendpotIconBase: {
+    marginTop: 4,
     width: 48, // $4.5
     height: 48, // $4.5
     borderRadius: 9, // $4
@@ -201,6 +204,7 @@ const styles = StyleSheet.create({
   },
   // Placeholder avatar
   placeholderAvatarBase: {
+    marginTop: 4,
     width: 48, // $4.5
     height: 48, // $4.5
     borderRadius: 9, // $4
