@@ -282,8 +282,8 @@ jobs:
         shell: bash
         run: |
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
-          # Use the skip_docker_compose flag to not manage docker compose in tilt
-          nohup tilt up playwright:deps -- --skip_docker_compose &
+          # Playwright needs docker compose services (anvil, shovel, bundler, temporal)
+          nohup tilt up playwright:deps &
           tilt_pid=$!
           echo "Tilt process started with PID: $tilt_pid"
           echo waiting for tilt to be ready
