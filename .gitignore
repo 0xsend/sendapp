@@ -84,3 +84,7 @@ coverage
 
 # ESLint cache
 .cache/
+
+# local Bridge webhook keys
+/scripts/bridge_webhook_private.pem
+/scripts/bridge_webhook_public.pem

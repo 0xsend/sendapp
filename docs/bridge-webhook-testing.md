@@ -23,7 +23,8 @@ Webhook handler requirements:
 Create a Bridge customer (if missing) and send KYC status updates:
 
 ```bash
-BRIDGE_WEBHOOK_PRIVATE_KEY="$(cat /path/to/private.pem)" \
+export BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$(cat scripts/bridge_webhook_private.pem)"
+BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY" \
 bun run bin/bridge-webhook-events.ts \
   --send-id 1234 \
   --flow kyc \
@@ -35,7 +36,8 @@ bun run bin/bridge-webhook-events.ts \
 Send a specific KYC status sequence:
 
 ```bash
-BRIDGE_WEBHOOK_PRIVATE_KEY="$(cat /path/to/private.pem)" \
+export BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$(cat scripts/bridge_webhook_private.pem)"
+BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY" \
 bun run bin/bridge-webhook-events.ts \
   --send-id 1234 \
   --flow kyc \
@@ -45,7 +47,8 @@ bun run bin/bridge-webhook-events.ts \
 Test a rejection flow:
 
 ```bash
-BRIDGE_WEBHOOK_PRIVATE_KEY="$(cat /path/to/private.pem)" \
+export BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$(cat scripts/bridge_webhook_private.pem)"
+BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY" \
 bun run bin/bridge-webhook-events.ts \
   --send-id 1234 \
   --flow kyc \
@@ -57,7 +60,8 @@ bun run bin/bridge-webhook-events.ts \
 Create a virtual account (if missing) and send deposit status updates:
 
 ```bash
-BRIDGE_WEBHOOK_PRIVATE_KEY="$(cat /path/to/private.pem)" \
+export BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$(cat scripts/bridge_webhook_private.pem)"
+BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY" \
 bun run bin/bridge-webhook-events.ts \
   --send-id 1234 \
   --flow deposit \
@@ -68,7 +72,8 @@ bun run bin/bridge-webhook-events.ts \
 Custom deposit status sequence:
 
 ```bash
-BRIDGE_WEBHOOK_PRIVATE_KEY="$(cat /path/to/private.pem)" \
+export BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$(cat scripts/bridge_webhook_private.pem)"
+BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY" \
 bun run bin/bridge-webhook-events.ts \
   --send-id 1234 \
   --flow deposit \
@@ -80,7 +85,8 @@ bun run bin/bridge-webhook-events.ts \
 Run KYC statuses then deposit statuses in order:
 
 ```bash
-BRIDGE_WEBHOOK_PRIVATE_KEY="$(cat /path/to/private.pem)" \
+export BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$(cat scripts/bridge_webhook_private.pem)"
+BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY="$BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY" \
 bun run bin/bridge-webhook-events.ts \
   --send-id 1234 \
   --flow all \
@@ -119,14 +125,14 @@ bun run bin/bridge-webhook-events.ts --send-id 1234 --flow all --dry-run
 ## Signature Key Setup
 
 If you do not have a private key yet:
-1) Run the CLI without `BRIDGE_WEBHOOK_PRIVATE_KEY`.
-2) It will generate and print a public key.
+1) Unset `BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY`.
+2) Run the CLI; it will generate and print a public key.
 3) Set that key in `BRIDGE_WEBHOOK_PUBLIC_KEY` for the webhook handler.
 
 Example:
 
 ```bash
-unset BRIDGE_WEBHOOK_PRIVATE_KEY
+unset BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY
 bun run bin/bridge-webhook-events.ts --send-id 1234 --flow kyc --dry-run
 ```
 
@@ -136,7 +142,7 @@ Then copy the printed public key into your env (server):
 export BRIDGE_WEBHOOK_PUBLIC_KEY="-----BEGIN RSA PUBLIC KEY-----\n...\n-----END RSA PUBLIC KEY-----"
 ```
 
-After that, re-run with `BRIDGE_WEBHOOK_PRIVATE_KEY` set and `--dry-run` removed.
+After that, set `BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY` and re-run without `--dry-run`.
 
 ## Notes
 

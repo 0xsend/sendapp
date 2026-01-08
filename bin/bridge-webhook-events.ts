@@ -47,7 +47,6 @@ Options:
   --amount <number>               Deposit amount (default: 100)
   --currency <code>               Deposit currency (default: usd)
   --webhook-url <url>             Webhook endpoint (default: ${DEFAULT_WEBHOOK_URL})
-  --private-key <path|pem>        RSA private key used to sign requests
   --create-customer               Create bridge_customers row if missing
   --create-virtual-account        Create bridge_virtual_accounts row if missing
   --destination-address <0x..>    Destination address for seeded virtual account
@@ -496,7 +495,6 @@ async function main() {
       amount: { type: 'string' },
       currency: { type: 'string' },
       webhookUrl: { type: 'string' },
-      privateKey: { type: 'string' },
       createCustomer: { type: 'boolean' },
       createVirtualAccount: { type: 'boolean' },
       destinationAddress: { type: 'string' },
@@ -541,7 +539,7 @@ async function main() {
   })
 
   const privateKey =
-    loadPrivateKey(values.privateKey ?? process.env.BRIDGE_WEBHOOK_PRIVATE_KEY) ??
+    loadPrivateKey(process.env.BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY) ??
     (process.env.BRIDGE_WEBHOOK_PUBLIC_KEY
       ? null
       : (() => {
@@ -557,7 +555,7 @@ async function main() {
 
   if (!privateKey && !values.dryRun) {
     throw new Error(
-      'Missing private key for webhook signing. Provide --private-key or set BRIDGE_WEBHOOK_PRIVATE_KEY.'
+      'Missing private key for webhook signing. Set BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY.'
     )
   }
 
