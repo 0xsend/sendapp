@@ -11,7 +11,8 @@ export type {
   DryRunResult,
   HarvestResult,
   SweepResult,
-  MerklTokenReward,
+  MerklTokenInfo,
+  MerklV4Reward,
   MerklRewardsResponse,
   OutputFormat,
 } from './types'

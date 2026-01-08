@@ -64,8 +64,21 @@ export async function fetchHarvestableRevenue(
 
         const data = (await response.json()) as MerklRewardsResponse
 
-        const morphoReward = data[REVENUE_ADDRESSES.MORPHO_TOKEN.toLowerCase()]
-        const wellReward = data[REVENUE_ADDRESSES.WELL_TOKEN.toLowerCase()]
+        // v4 API returns array of chain data with rewards array inside
+        // Find rewards for MORPHO and WELL tokens
+        let morphoReward: (typeof data)[0]['rewards'][0] | undefined
+        let wellReward: (typeof data)[0]['rewards'][0] | undefined
+
+        for (const chainData of data) {
+          for (const reward of chainData.rewards) {
+            const tokenAddress = reward.token.address.toLowerCase()
+            if (tokenAddress === REVENUE_ADDRESSES.MORPHO_TOKEN.toLowerCase()) {
+              morphoReward = reward
+            } else if (tokenAddress === REVENUE_ADDRESSES.WELL_TOKEN.toLowerCase()) {
+              wellReward = reward
+            }
+          }
+        }
 
         const morphoHarvestable = morphoReward
           ? BigInt(morphoReward.amount) - BigInt(morphoReward.claimed)

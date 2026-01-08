@@ -133,9 +133,26 @@ export interface SweepResult {
 }
 
 /**
- * Merkl API reward response structure for a single token.
+ * Merkl API v4 token info structure.
  */
-export interface MerklTokenReward {
+export interface MerklTokenInfo {
+  address: string
+  chainId: number
+  symbol: string
+  decimals: number
+  price?: number
+}
+
+/**
+ * Merkl API v4 reward structure for a single token.
+ */
+export interface MerklV4Reward {
+  /** Merkle root for claiming */
+  root: string
+  /** Chain ID where rewards can be claimed */
+  distributionChainId: number
+  /** User address receiving the reward */
+  recipient: string
   /** Total tokens credited onchain */
   amount: string
   /** Already-claimed tokens */
@@ -144,17 +161,32 @@ export interface MerklTokenReward {
   pending: string
   /** Merkle proofs for claiming */
   proofs: string[]
+  /** Token info */
+  token: MerklTokenInfo
   /** Campaign attribution */
   breakdowns: {
-    campaignId: string
+    root: string
+    distributionChainId: number
+    reason: string
     amount: string
+    claimed: string
+    pending: string
+    campaignId: string
+    subCampaignId?: string
   }[]
 }
 
 /**
- * Merkl API response structure.
+ * Merkl API v4 response structure (array of chain data with rewards).
  */
-export type MerklRewardsResponse = Record<string, MerklTokenReward>
+export type MerklRewardsResponse = {
+  chain: {
+    id: number
+    name: string
+    [key: string]: unknown
+  }
+  rewards: MerklV4Reward[]
+}[]
 
 /**
  * Output format options.
