@@ -202,13 +202,6 @@ const styles = StyleSheet.create({
     zIndex: 100,
     transform: [{ translateX: 2 }, { translateY: 2 }],
   },
-  // Placeholder avatar
-  placeholderAvatarBase: {
-    marginTop: 4,
-    width: 48, // $4.5
-    height: 48, // $4.5
-    borderRadius: 9, // $4
-  },
   // Header
   headerContainerBase: {
     height: 56,
@@ -359,11 +352,6 @@ const SimpleAvatar = memo(({ avatarUrl }: { avatarUrl: string }) => (
   </View>
 ))
 SimpleAvatar.displayName = 'SimpleAvatar'
-
-const PlaceholderAvatar = memo(() => (
-  <View style={[styles.placeholderAvatarBase, { backgroundColor: darkColors.olive }]} />
-))
-PlaceholderAvatar.displayName = 'PlaceholderAvatar'
 
 // Icon with badge component for Swap/Sendcheck
 interface IconWithBadgeProps {
@@ -520,7 +508,18 @@ UpgradeRowComponent.displayName = 'UpgradeRow'
 
 const TagReceiptRowComponent = memo(
   ({ row, isDark, colors }: { row: TagReceiptRow } & RowBaseProps) => (
-    <RowLayout row={row} colors={colors} isDark={isDark} avatar={<PlaceholderAvatar />} />
+    <RowLayout
+      row={row}
+      colors={colors}
+      isDark={isDark}
+      avatar={
+        <View style={[styles.sendpotIconBase, { backgroundColor: colors.olive }]}>
+          <Text style={{ color: darkColors.color2, fontSize: 28, fontFamily: fonts.medium }}>
+            /
+          </Text>
+        </View>
+      }
+    />
   )
 )
 TagReceiptRowComponent.displayName = 'TagReceiptRow'
