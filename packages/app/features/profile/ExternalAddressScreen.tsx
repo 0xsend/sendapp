@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
   Button,
   Fade,
@@ -50,6 +50,7 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   const [sendChatOpen, setSendChatOpen] = useState(false)
   const [sendParams, setSendParams] = useSendScreenParams()
   const { user } = useUser()
+  const prevSendChatOpenRef = useRef(sendChatOpen)
 
   // Open SendChat when params are set
   useEffect(() => {
@@ -58,17 +59,24 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
     }
   }, [sendParams.idType, sendParams.recipient])
 
-  // Clear params when SendChat closes
+  // Clear params only when modal is actively closed (transition from open to closed)
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
-    if (!sendChatOpen) {
-      setSendParams({
-        idType: undefined,
-        recipient: undefined,
-        note: undefined,
-        amount: sendParams.amount,
-        sendToken: sendParams.sendToken,
-      })
+    const wasOpen = prevSendChatOpenRef.current
+    prevSendChatOpenRef.current = sendChatOpen
+
+    // Only clear params when transitioning from open to closed, not on initial mount
+    if (wasOpen && !sendChatOpen) {
+      setSendParams(
+        {
+          idType: undefined,
+          recipient: undefined,
+          note: undefined,
+          amount: sendParams.amount,
+          sendToken: sendParams.sendToken,
+        },
+        { webBehavior: 'replace' }
+      )
     }
   }, [sendChatOpen])
   const { selectActivity, isOpen } = useActivityDetails()
@@ -225,11 +233,14 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
             {/* Send Button */}
             <Button
               onPress={() => {
-                setSendParams({
-                  ...sendParams,
-                  recipient: address,
-                  idType: 'address',
-                })
+                setSendParams(
+                  {
+                    ...sendParams,
+                    recipient: address,
+                    idType: 'address',
+                  },
+                  { webBehavior: 'replace' }
+                )
                 setSendChatOpen(true)
               }}
               borderRadius="$4"
