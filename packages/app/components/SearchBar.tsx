@@ -40,6 +40,7 @@ import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { useThemeName, type YStackProps } from 'tamagui'
 import { useScrollDirection } from 'app/provider/scroll/ScrollDirectionContext'
+import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
 import { ChevronRight, SearchX } from '@tamagui/lucide-icons'
 
 type SearchResultsType = Functions<'tag_search'>[number]
@@ -62,6 +63,7 @@ function SearchResults() {
   const [queryParams] = useRootScreenParams()
   const { search: query } = queryParams
   const { onScroll, onContentSizeChange } = useScrollDirection()
+  const { height: tabBarHeight } = useTabBarSize()
 
   const [resultsFilter, setResultsFilter] = useState<SearchResultsKeysType | null>(null)
   if (!results || error) {
@@ -115,16 +117,14 @@ function SearchResults() {
       key="searchResults"
       gap="$2.5"
       width="100%"
+      f={1}
       showsVerticalScrollIndicator={false}
-      overflow="visible"
+      overflow={Platform.OS === 'web' ? 'scroll' : 'visible'}
       overScrollMode={'never'}
-      {...(Platform.OS === 'web'
-        ? {}
-        : {
-            onScroll,
-            onContentSizeChange,
-            scrollEventThrottle: 128,
-          })}
+      onScroll={onScroll}
+      onContentSizeChange={onContentSizeChange}
+      scrollEventThrottle={128}
+      contentContainerStyle={{ paddingBottom: Platform.OS === 'web' ? tabBarHeight : 0 }}
     >
       {query && matchesCount > 1 && (
         <YStack mb={'$4'}>
