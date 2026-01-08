@@ -84,13 +84,14 @@ function ActivityBody() {
     <YStack
       als="center"
       pos="absolute"
-      b={0}
-      mih="100%"
+      t={20}
       w="100%"
+      h="100%"
       f={1}
       pt="$10"
       $platform-web={{
         y: '$6',
+        t: 0,
       }}
     >
       {isLoading && (
