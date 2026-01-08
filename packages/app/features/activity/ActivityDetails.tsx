@@ -4,10 +4,10 @@ import {
   Paragraph,
   Separator,
   Stack,
+  type StackProps,
   Text,
   XStack,
   YStack,
-  type StackProps,
 } from '@my/ui'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
@@ -15,6 +15,9 @@ import { ContractLabels } from 'app/data/contract-labels'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import {
   isActivitySwapTransfer,
+  isSendCheckTransfer,
+  isSendPotTicketPurchase,
+  isSendPotWin,
   noteFromActivity,
   subtextAddressFromActivity,
   useDateDetailsFromActivity,
@@ -70,6 +73,10 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
     isERC20Transfer && addressBook?.data?.[activity.data.f] === ContractLabels.SendEarn
   const { t } = useTranslation('activity')
   const router = useRouter()
+  const isSendEarn =
+    isSendEarnEvent(activity) || isERC20TransferToSendEarn || isERC20TransferFromSendEarn
+  const isSendpot = isSendPotTicketPurchase(activity) || isSendPotWin(activity)
+  const isSendCheck = isSendCheckTransfer(activity)
 
   return (
     <Fade {...props}>
@@ -108,7 +115,13 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
                         return <Text>{activityPhrase}</Text>
                       default:
                         // If subText is an external address, make it a clickable link
-                        if (subtextAddress && subText) {
+                        if (
+                          subtextAddress &&
+                          subText &&
+                          !isSendEarn &&
+                          !isSendpot &&
+                          !isSendCheck
+                        ) {
                           return (
                             <Text
                               textDecorationLine="underline"
