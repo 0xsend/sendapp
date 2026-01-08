@@ -7,6 +7,7 @@ interface KycStatusCardProps {
   onStartKyc?: () => void
   isLoading?: boolean
   startDisabled?: boolean
+  rejectionReasons?: string[]
   children?: React.ReactNode
 }
 
@@ -67,6 +68,7 @@ export function KycStatusCard({
   onStartKyc,
   isLoading,
   startDisabled,
+  rejectionReasons,
   children,
 }: KycStatusCardProps) {
   const showStartButton = kycStatus === 'not_started' || kycStatus === 'incomplete'
@@ -116,6 +118,19 @@ export function KycStatusCard({
         >
           {getStatusDescription(kycStatus)}
         </Paragraph>
+
+        {kycStatus === 'rejected' && rejectionReasons?.length ? (
+          <YStack gap="$2">
+            <Paragraph fontSize="$4" fontWeight={600}>
+              Reason
+            </Paragraph>
+            {rejectionReasons.map((reason) => (
+              <Paragraph key={reason} fontSize="$4">
+                {reason}
+              </Paragraph>
+            ))}
+          </YStack>
+        ) : null}
 
         {showStartButton && onStartKyc && (
           <Button

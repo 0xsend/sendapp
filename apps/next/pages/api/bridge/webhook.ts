@@ -296,7 +296,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const signatureHeader = req.headers['x-webhook-signature'] as string | undefined
-  const webhookPublicKey = process.env.BRIDGE_WEBHOOK_PUBLIC_KEY
+  const webhookPublicKey = process.env.BRIDGE_WEBHOOK_PUBLIC_KEY?.replace(/\\n/g, '\n')
 
   if (!webhookPublicKey) {
     log('BRIDGE_WEBHOOK_PUBLIC_KEY is not set')

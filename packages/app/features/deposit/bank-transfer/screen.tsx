@@ -15,7 +15,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 
 export function BankTransferScreen() {
   const { data: sendAccount } = useSendAccount()
-  const { kycStatus, isApproved, isLoading: kycLoading, refetch } = useKycStatus()
+  const { kycStatus, isApproved, rejectionReasons, isLoading: kycLoading, refetch } = useKycStatus()
   const { hasVirtualAccount, bankDetails, isLoading: vaLoading } = useBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createVirtualAccount = useCreateVirtualAccount()
@@ -148,6 +148,7 @@ export function BankTransferScreen() {
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <KycStatusCard
           kycStatus={kycStatus}
+          rejectionReasons={rejectionReasons}
           onStartKyc={handleStartKyc}
           isLoading={initiateKyc.isPending}
         />

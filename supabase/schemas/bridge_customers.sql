@@ -52,6 +52,4 @@ CREATE OR REPLACE TRIGGER "bridge_customers_updated_at"
     FOR EACH ROW EXECUTE FUNCTION "public"."set_current_timestamp_updated_at"();
 
 -- Grants
-GRANT ALL ON TABLE "public"."bridge_customers" TO "anon";
-GRANT ALL ON TABLE "public"."bridge_customers" TO "authenticated";
 GRANT ALL ON TABLE "public"."bridge_customers" TO "service_role";

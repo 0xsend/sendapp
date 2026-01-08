@@ -8,6 +8,31 @@ const log = debug('app:features:bank-transfer:useBridgeCustomer')
 
 export const BRIDGE_CUSTOMER_QUERY_KEY = 'bridge_customer' as const
 
+function extractCustomerRejectionReasons(input: unknown): string[] {
+  if (!Array.isArray(input)) return []
+
+  const reasons: string[] = []
+  for (const item of input) {
+    if (typeof item === 'string') {
+      reasons.push(item)
+      continue
+    }
+
+    if (item && typeof item === 'object') {
+      const record = item as Record<string, unknown>
+      const reason = typeof record.reason === 'string' ? record.reason : null
+      if (reason) reasons.push(reason)
+
+      const subReasons = Array.isArray(record.sub_reasons)
+        ? record.sub_reasons.filter((value) => typeof value === 'string')
+        : []
+      reasons.push(...(subReasons as string[]))
+    }
+  }
+
+  return Array.from(new Set(reasons))
+}
+
 /**
  * Helper to create auth headers for API requests (supports native clients)
  */
@@ -39,7 +64,7 @@ export function useBridgeCustomer() {
     queryFn: async () => {
       log('fetching bridge customer for user', user?.id)
 
-      const { data, error } = await supabase.from('bridge_customers').select('*').maybeSingle()
+      const { data, error } = await supabase.from('bridge_customers_safe').select('*').maybeSingle()
 
       if (error) {
         log('error fetching bridge customer', error)
@@ -89,6 +114,7 @@ export function useInitiateKyc() {
  */
 export function useKycStatus() {
   const { data: customer, isLoading, error, refetch } = useBridgeCustomer()
+  const rejectionReasons = extractCustomerRejectionReasons(customer?.rejection_reasons)
 
   return {
     isLoading,
@@ -98,6 +124,7 @@ export function useKycStatus() {
     isRejected: customer?.kyc_status === 'rejected',
     isPending: customer?.kyc_status === 'under_review' || customer?.kyc_status === 'incomplete',
     customer,
+    rejectionReasons,
     refetch,
   }
 }

@@ -2,9 +2,224 @@
 import { createSign, generateKeyPairSync, randomUUID } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { parseArgs } from 'node:util'
+import { createInterface } from 'node:readline/promises'
+import { stdin as input, stdout as output } from 'node:process'
 import { createSupabaseAdminClient } from '../packages/app/utils/supabase/admin'
 
 type FlowMode = 'kyc' | 'deposit' | 'all'
+
+type RejectionReason = {
+  developer_reason: string
+  reason: string
+}
+
+/**
+ * All Bridge KYC rejection reasons from:
+ * https://apidocs.bridge.xyz/platform/customers/customers/rejection_reasons
+ */
+const BRIDGE_REJECTION_REASONS: RejectionReason[] = [
+  {
+    developer_reason: 'ID cannot be verified against third-party databases',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Inconsistent or incomplete information',
+    reason: 'Inconsistent or incomplete information',
+  },
+  {
+    developer_reason: 'Cannot validate user age',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Missing or incomplete barcode on the ID',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'Inconsistent information in barcode',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Submission is blurry',
+    reason: 'Cannot validate ID - upload clear photo',
+  },
+  {
+    developer_reason: 'Inconsistent ID format',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Compromised ID detected',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'ID from disallowed country',
+    reason: 'Cannot accept provided ID',
+  },
+  {
+    developer_reason: 'Incorrect ID type selected',
+    reason: 'Incorrect ID type selected',
+  },
+  {
+    developer_reason: 'Same side submitted as both front and back',
+    reason: 'Same side submitted as both front and back',
+  },
+  {
+    developer_reason: 'Electronic replica detected',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'No government ID found in submission',
+    reason: 'No government ID found in submission',
+  },
+  {
+    developer_reason: 'ID is expired',
+    reason: 'ID is expired',
+  },
+  {
+    developer_reason: 'Missing required ID details',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'Inconsistent details in extraction',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Likely fabrication detected',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Glare detected in submission',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'Identity cannot be verified',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Inconsistent details with previous submission',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Inconsistent details between submissions',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Machine readable zone not detected',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'Inconsistent machine readable zone',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'ID number format inconsistency',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Paper copy detected',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'PO box address detected',
+    reason: 'PO box address detected',
+  },
+  {
+    developer_reason: 'Blurry face portrait',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'No face portrait found',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'Face portrait matches public figure',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Not a U.S. REAL ID',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'ID details and face match previous submission',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Different faces in ID and selfie',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Tampering detected',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Submission cannot be processed',
+    reason: 'Submission cannot be processed',
+  },
+  {
+    developer_reason: 'Dates on ID are invalid',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Identity cannot be verified against third-party databases',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Person is deceased',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Document could not be verified',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Unsupported country',
+    reason: 'Your region is not supported',
+  },
+  {
+    developer_reason: 'No government ID detected',
+    reason: 'Cannot validate ID — upload clear photo',
+  },
+  {
+    developer_reason: 'No database check was performed',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Prohibited state/province',
+    reason: 'Your region is not supported',
+  },
+  {
+    developer_reason: 'Prohibited country',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Potential elder abuse',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Potential PEP',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Customer information could not be verified',
+    reason: 'Your information could not be verified',
+  },
+  {
+    developer_reason: 'Unsupported state/province',
+    reason: 'Your region is not supported',
+  },
+  {
+    developer_reason: 'Missing or invalid proof of address',
+    reason: 'Missing or invalid proof of address',
+  },
+]
+
+/**
+ * Returns a random subset of rejection reasons (1-3 reasons)
+ */
+function getRandomRejectionReasons(): RejectionReason[] {
+  const count = Math.floor(Math.random() * 3) + 1 // 1-3 reasons
+  const shuffled = [...BRIDGE_REJECTION_REASONS].sort(() => Math.random() - 0.5)
+  return shuffled.slice(0, count)
+}
 
 type BridgeCustomer = {
   id: string
@@ -53,6 +268,7 @@ Options:
   --cleanup                       Delete bridge customer + virtual account + deposit rows
   --cleanup-webhooks              Delete bridge_webhook_events related to this user
   --cleanup-only                  Cleanup and exit without sending events
+  --interactive                   Guided prompt for local testing
   --delay-ms <number>             Delay between events (default: 0)
   --dry-run                       Print payloads without sending
   --help                          Show usage
@@ -282,6 +498,214 @@ async function cleanupBridgeUser(params: {
   console.log('Deleted bridge customer and related records.')
 }
 
+async function printBridgeStatus(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string
+) {
+  const bridgeCustomer = await getBridgeCustomerForUser(supabase, userId)
+  console.log('')
+  console.log('Current status:')
+
+  if (!bridgeCustomer) {
+    console.log('- bridge_customers: none')
+    return
+  }
+
+  console.log(
+    `- bridge_customers: kyc_status=${bridgeCustomer.kyc_status} tos_status=${bridgeCustomer.tos_status} kyc_link_id=${bridgeCustomer.kyc_link_id}`
+  )
+
+  const { data: virtualAccounts } = await supabase
+    .from('bridge_virtual_accounts')
+    .select('id, bridge_virtual_account_id, status, created_at')
+    .eq('bridge_customer_id', bridgeCustomer.id)
+
+  if (!virtualAccounts?.length) {
+    console.log('- bridge_virtual_accounts: none')
+  } else {
+    console.log(`- bridge_virtual_accounts: ${virtualAccounts.length}`)
+    for (const account of virtualAccounts) {
+      console.log(
+        `  - id=${account.bridge_virtual_account_id} status=${account.status} created_at=${account.created_at}`
+      )
+    }
+  }
+
+  if (virtualAccounts?.length) {
+    const { data: deposits } = await supabase
+      .from('bridge_deposits')
+      .select('bridge_transfer_id, status, amount, currency, created_at')
+      .in(
+        'virtual_account_id',
+        virtualAccounts.map((account) => account.id)
+      )
+
+    if (!deposits?.length) {
+      console.log('- bridge_deposits: none')
+    } else {
+      console.log(`- bridge_deposits: ${deposits.length}`)
+      for (const deposit of deposits) {
+        console.log(
+          `  - id=${deposit.bridge_transfer_id} status=${deposit.status} amount=${deposit.amount} ${deposit.currency} created_at=${deposit.created_at}`
+        )
+      }
+    }
+  }
+}
+
+async function promptInteractive() {
+  const rl = createInterface({ input, output })
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
+    const webhookUrl = `${baseUrl.replace(/\/$/, '')}/api/bridge/webhook`
+
+    const sendId = (await rl.question('Send ID: ')).trim()
+    if (!sendId) {
+      console.log('Send ID is required.')
+      return
+    }
+
+    const supabase = createSupabaseAdminClient()
+    const userId = await resolveUserId(supabase, undefined, sendId)
+
+    const privateKey =
+      loadPrivateKey(process.env.BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY) ??
+      (process.env.BRIDGE_WEBHOOK_PUBLIC_KEY
+        ? null
+        : (() => {
+            const { privateKey: generatedPrivate, publicKey } = generateKeyPairSync('rsa', {
+              modulusLength: 2048,
+            })
+            const publicKeyPem = publicKey.export({ type: 'pkcs1', format: 'pem' }).toString()
+            console.log('Generated key pair for webhook signing.')
+            console.log('Set BRIDGE_WEBHOOK_PUBLIC_KEY to:\n')
+            console.log(publicKeyPem)
+            return generatedPrivate.export({ type: 'pkcs1', format: 'pem' }).toString()
+          })())
+
+    if (!privateKey) {
+      console.log('Missing BRIDGE_WEBHOOK_PRIVATE_KEY_TESTING_ONLY.')
+      return
+    }
+
+    while (true) {
+      await printBridgeStatus(supabase, userId)
+      console.log('')
+      console.log('Choose an action:')
+      console.log('1) Create bridge customer (if missing)')
+      console.log('2) Send KYC status event')
+      console.log('3) Create virtual account (if missing)')
+      console.log('4) Send deposit status sequence')
+      console.log('5) Cleanup bridge data (customer + accounts + deposits)')
+      console.log('6) Cleanup bridge data + webhook events')
+      console.log('7) Exit')
+
+      const choice = (await rl.question('Select 1-7: ')).trim()
+      if (choice === '7') break
+
+      if (choice === '1') {
+        const email = (await rl.question('Email (required if missing): ')).trim() || undefined
+        await ensureBridgeCustomer(supabase, userId, { create: true, email })
+        console.log('Bridge customer ensured.')
+        continue
+      }
+
+      if (choice === '2') {
+        const status = (await rl.question('KYC status (e.g. approved, incomplete): ')).trim()
+        if (!status) {
+          console.log('KYC status required.')
+          continue
+        }
+        const bridgeCustomer = await ensureBridgeCustomer(supabase, userId, {
+          create: false,
+        })
+        const customerId = bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`
+        const tosStatus = status === 'approved' ? 'approved' : 'pending'
+        const event = buildKycEvent({
+          kycLinkId: bridgeCustomer.kyc_link_id,
+          customerId,
+          kycStatus: status,
+          tosStatus,
+        })
+        try {
+          await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
+        } catch (error) {
+          console.log(
+            `Failed to send webhook. Ensure the handler is running at ${webhookUrl} and reachable.`
+          )
+          throw error
+        }
+        console.log('Sent KYC webhook event.')
+        continue
+      }
+
+      if (choice === '3') {
+        const destinationAddress = (
+          await rl.question('Destination address (0x.. or blank): ')
+        ).trim()
+        await ensureVirtualAccount(
+          supabase,
+          await ensureBridgeCustomer(supabase, userId, {
+            create: false,
+          }),
+          {
+            create: true,
+            destinationAddress: destinationAddress || undefined,
+          }
+        )
+        console.log('Virtual account ensured.')
+        continue
+      }
+
+      if (choice === '4') {
+        const depositStatuses = DEFAULT_DEPOSIT_STATUSES
+        const bridgeCustomer = await ensureBridgeCustomer(supabase, userId, { create: false })
+        const virtualAccount = await ensureVirtualAccount(supabase, bridgeCustomer, {
+          create: false,
+        })
+        if (!virtualAccount) {
+          console.log('No virtual account found. Create one first.')
+          continue
+        }
+        const depositId = `dep_${randomUUID()}`
+        for (const status of depositStatuses) {
+          const event = buildDepositEvent({
+            depositId,
+            virtualAccountId: virtualAccount.bridge_virtual_account_id,
+            status,
+            amount: '100',
+            currency: 'usd',
+          })
+          try {
+            await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
+          } catch (error) {
+            console.log(
+              `Failed to send webhook. Ensure the handler is running at ${webhookUrl} and reachable.`
+            )
+            throw error
+          }
+        }
+        console.log('Sent deposit status sequence.')
+        continue
+      }
+
+      if (choice === '5') {
+        await cleanupBridgeUser({ supabase, userId, cleanupWebhooks: false })
+        continue
+      }
+
+      if (choice === '6') {
+        await cleanupBridgeUser({ supabase, userId, cleanupWebhooks: true })
+        continue
+      }
+
+      console.log('Unknown selection.')
+    }
+  } finally {
+    rl.close()
+  }
+}
+
 async function ensureBridgeCustomer(
   supabase: ReturnType<typeof createSupabaseAdminClient>,
   userId: string,
@@ -389,7 +813,7 @@ function buildKycEvent(params: {
   customerId: string
   kycStatus: string
   tosStatus: string
-  rejectionReasons?: Array<Record<string, unknown>> | string[]
+  rejectionReasons?: RejectionReason[]
 }) {
   return {
     api_version: '2024-01-01',
@@ -501,6 +925,7 @@ async function main() {
       cleanup: { type: 'boolean' },
       cleanupWebhooks: { type: 'boolean' },
       cleanupOnly: { type: 'boolean' },
+      interactive: { type: 'boolean' },
       delayMs: { type: 'string' },
       dryRun: { type: 'boolean' },
       help: { type: 'boolean' },
@@ -510,6 +935,11 @@ async function main() {
 
   if (values.help) {
     printUsage()
+    return
+  }
+
+  if (values.interactive) {
+    await promptInteractive()
     return
   }
 
@@ -573,10 +1003,7 @@ async function main() {
     const customerId = bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`
     for (const status of kycStatuses) {
       const tosStatus = status === 'approved' ? 'approved' : 'pending'
-      const rejectionReasons =
-        status === 'rejected'
-          ? [{ reason: 'document_invalid', developer_reason: 'Test rejection' }]
-          : undefined
+      const rejectionReasons = status === 'rejected' ? getRandomRejectionReasons() : undefined
       events.push(
         buildKycEvent({
           kycLinkId: bridgeCustomer.kyc_link_id,
