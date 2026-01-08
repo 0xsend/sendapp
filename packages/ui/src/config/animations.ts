@@ -60,14 +60,14 @@ export const animations = createAnimations({
   },
   responsive: {
     type: 'spring',
-    stiffness: 1000,
-    damping: 80,
+    stiffness: 1400,
+    damping: 120,
     mass: 0.9,
   },
   smoothResponsive: {
     type: 'spring',
-    stiffness: 700,
-    damping: 70,
+    stiffness: 1100,
+    damping: 100,
     mass: 1.1,
   },
 })
