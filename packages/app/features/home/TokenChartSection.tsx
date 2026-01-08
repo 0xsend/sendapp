@@ -120,7 +120,9 @@ function ChartSection({
       stroke={stroke}
       childrenBeforePath={
         isLoading ? null : isError ? (
-          <Paragraph color={'$color10'}>{t('token.chartError')}</Paragraph>
+          <Paragraph px="$5" color={'$color10'}>
+            {t('token.chartError')}
+          </Paragraph>
         ) : (
           <ChartScrubReadout
             fallbackPrice={last}
@@ -163,7 +165,7 @@ function ChartScrubReadout({
   })()
 
   return (
-    <YStack gap="$1" mb={'$5'}>
+    <YStack gap="$1" mb={'$5'} px="$5">
       <XStack ai="center" gap={'$2'}>
         <Paragraph size={'$5'} fontWeight={500} color={'$color12'}>
           {formattedPrice}

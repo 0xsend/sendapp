@@ -341,39 +341,35 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
               </YStack>
             </View>
           ) : (
-            <View br="$4" ov="hidden">
-              <FlatList<Activity>
-                testID="ExternalAddressActivityFeed"
-                style={{ flex: 1 }}
-                data={activities}
-                keyExtractor={(activity) => activity.event_id}
-                renderItem={({ item: activity, index }) => {
-                  const sent = isSent(activity)
-                  const isFirst = index === 0
-                  const isLast = index === activities.length - 1
-                  return (
-                    <Fade>
-                      <ActivityRow
-                        activity={activity}
-                        sent={sent}
-                        onPress={() => selectActivity(activity)}
-                        isFirst={isFirst}
-                        isLast={isLast}
-                      />
-                    </Fade>
-                  )
-                }}
-                onEndReached={() => {
-                  if (hasNextPage) fetchNextPage()
-                }}
-                ListFooterComponent={
-                  hasNextPage || isFetchingNextPage ? (
-                    <Spinner size="small" color="$color12" my="$2" />
-                  ) : null
-                }
-                showsVerticalScrollIndicator={false}
-              />
-            </View>
+            <FlatList<Activity>
+              testID="ExternalAddressActivityFeed"
+              style={{ flex: 1 }}
+              data={activities}
+              keyExtractor={(activity) => activity.event_id}
+              renderItem={({ item: activity, index }) => {
+                const sent = isSent(activity)
+                const isFirst = index === 0
+                const isLast = index === activities.length - 1
+                return (
+                  <ActivityRow
+                    activity={activity}
+                    sent={sent}
+                    onPress={() => selectActivity(activity)}
+                    isFirst={isFirst}
+                    isLast={isLast}
+                  />
+                )
+              }}
+              onEndReached={() => {
+                if (hasNextPage) fetchNextPage()
+              }}
+              ListFooterComponent={
+                hasNextPage || isFetchingNextPage ? (
+                  <Spinner size="small" color="$color12" my="$2" />
+                ) : null
+              }
+              showsVerticalScrollIndicator={false}
+            />
           )}
         </YStack>
       </YStack>

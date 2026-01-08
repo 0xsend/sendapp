@@ -279,8 +279,8 @@ test.describe('Contact Favorites', () => {
 
     log('favorite added in dialog')
 
-    // Wait for toast to dismiss before clicking again
-    await expect(addedToast).toBeHidden({ timeout: 5_000 })
+    // Wait for toast to dismiss before clicking again (toasts can take up to 10s to auto-dismiss)
+    await expect(addedToast).toBeHidden({ timeout: 10_000 })
 
     // Click again to remove from favorites
     await starButton.click()

@@ -235,12 +235,8 @@ jobs:
           submodules: recursive
       - name: Setup Environment
         uses: ./.github/actions/setup-env
-        # yarn-install is now handled below
         env:
           YARN_ENABLE_HARDENED_MODE: 0
-      - name: Yarn Install
-        shell: bash
-        run: yarn install --immutable
 
       - name: Build Next.js
         shell: bash

@@ -27,6 +27,10 @@
       "deposit": "Send Earn Deposit",
       "withdraw": "Send Earn Withdraw"
     },
+    "sendCheck": {
+      "create": "Sent Check",
+      "claim": "Claimed Check"
+    },
     "revenueShare": "Revenue Share",
     "sendTokenUpgrade": "Send Token Upgrade",
     "trade": "Trade",

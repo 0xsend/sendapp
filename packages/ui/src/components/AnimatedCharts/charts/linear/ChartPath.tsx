@@ -161,7 +161,6 @@ const ChartPathInner = React.memo(
     ...props
   }: ChartPathProps &
     Omit<ChartData, 'data' | 'dotScale' | 'color'> & { containerWidth: number }) => {
-    ChartPathInner.displayName = 'chartPathInner'
     const selectedStrokeProgress = useSharedValue(0)
     // Hold-to-activate (native): gate scrubbing with GH2 long press
     // Shared state for GH2 gestures
@@ -486,6 +485,7 @@ const ChartPathInner = React.memo(
             <AnimatedPath
               animatedProps={animatedProps}
               strokeLinecap="round"
+              strokeLinejoin="round"
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...props}
             />
@@ -495,6 +495,8 @@ const ChartPathInner = React.memo(
     )
   }
 )
+
+ChartPathInner.displayName = 'chartPathInner'
 
 export const ChartPath = React.memo(
   ({
