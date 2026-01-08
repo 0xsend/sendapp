@@ -89,7 +89,7 @@ bun run bin/bridge-webhook-events.ts \
 
 ## Cleanup (Reset User State)
 
-Delete the Bridge customer (cascades to virtual accounts + deposits):
+Delete the Bridge customer (cascades to virtual accounts + deposits) and related webhook events:
 
 ```bash
 bun run bin/bridge-webhook-events.ts --send-id 1234 --cleanup
@@ -98,13 +98,6 @@ bun run bin/bridge-webhook-events.ts --send-id 1234 --cleanup
 Cleanup and delete matching webhook events:
 
 ```bash
-bun run bin/bridge-webhook-events.ts --send-id 1234 --cleanup --cleanup-webhooks
-```
-
-Cleanup and exit without sending events:
-
-```bash
-bun run bin/bridge-webhook-events.ts --send-id 1234 --cleanup-only
 ```
 
 ## Dry Run (Print Payloads Only)

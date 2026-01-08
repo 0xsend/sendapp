@@ -52,6 +52,7 @@ async function getSession(req: NextApiRequest, res: NextApiResponse) {
 
 interface InitiateKycRequest {
   email?: string
+  redirectUri?: string
 }
 
 interface InitiateKycResponse {
@@ -102,18 +103,30 @@ export default async function handler(
         return res.status(400).json({ error: 'KYC already approved' })
       }
 
-      // Get existing KYC link from Bridge
+      // Get KYC link from Bridge
+      // Prefer kyc_link_id endpoint as it reliably returns the KYC link URL
       const bridgeClient = createBridgeClient()
-      const kycLink = await bridgeClient.getKycLink(existingCustomer.kyc_link_id)
 
-      return res.status(200).json({
-        kycLink: kycLink.kyc_link,
-        tosLink: kycLink.tos_link,
-        kycLinkId: kycLink.id,
-      })
+      if (existingCustomer.kyc_link_id) {
+        const kycLink = await bridgeClient.getKycLink(existingCustomer.kyc_link_id)
+        return res.status(200).json({
+          kycLink: kycLink.kyc_link,
+          tosLink: kycLink.tos_link,
+          kycLinkId: kycLink.id,
+        })
+      }
+
+      if (existingCustomer.bridge_customer_id) {
+        const kycLink = await bridgeClient.getCustomerKycLink(existingCustomer.bridge_customer_id)
+        return res.status(200).json({
+          kycLink: kycLink.kyc_link,
+          tosLink: '',
+          kycLinkId: existingCustomer.kyc_link_id ?? '',
+        })
+      }
     }
 
-    const { email } = req.body as InitiateKycRequest
+    const { email, redirectUri } = req.body as InitiateKycRequest
     const resolvedEmail = email?.trim() || session.user.email?.trim()
 
     if (!resolvedEmail) {
@@ -126,6 +139,7 @@ export default async function handler(
       {
         email: resolvedEmail,
         type: 'individual',
+        redirect_uri: redirectUri,
       },
       { idempotencyKey: `kyc-${userId}` }
     )

@@ -74,7 +74,8 @@ export function useBridgeCustomer() {
       log('bridge customer', data)
       return data
     },
-    staleTime: 30_000,
+    staleTime: 5_000,
+    refetchInterval: 5_000,
   })
 }
 
@@ -86,7 +87,7 @@ export function useInitiateKyc() {
   const supabase = useSupabase()
 
   return useMutation({
-    mutationFn: async (data: { email?: string }) => {
+    mutationFn: async (data: { email?: string; redirectUri?: string }) => {
       log('initiating KYC', data)
 
       const headers = await getAuthHeaders(supabase)
@@ -120,9 +121,15 @@ export function useKycStatus() {
     isLoading,
     error,
     kycStatus: customer?.kyc_status ?? 'not_started',
+    tosStatus: customer?.tos_status ?? 'pending',
+    isTosAccepted: customer?.tos_status === 'approved',
     isApproved: customer?.kyc_status === 'approved',
     isRejected: customer?.kyc_status === 'rejected',
-    isPending: customer?.kyc_status === 'under_review' || customer?.kyc_status === 'incomplete',
+    isPending:
+      customer?.kyc_status === 'under_review' ||
+      customer?.kyc_status === 'incomplete' ||
+      customer?.kyc_status === 'awaiting_questionnaire' ||
+      customer?.kyc_status === 'awaiting_ubo',
     customer,
     rejectionReasons,
     refetch,

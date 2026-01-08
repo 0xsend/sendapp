@@ -1,4 +1,4 @@
-import { YStack, Paragraph, Spinner, Anchor, FadeCard } from '@my/ui'
+import { YStack, Paragraph, Spinner, Anchor, FadeCard, Button } from '@my/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
@@ -12,64 +12,79 @@ import {
 } from 'app/features/bank-transfer'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useThemeSetting } from '@tamagui/next-theme'
+import { useRedirectUri } from 'app/utils/useRedirectUri'
 
 export function BankTransferScreen() {
   const { data: sendAccount } = useSendAccount()
-  const { kycStatus, isApproved, rejectionReasons, isLoading: kycLoading, refetch } = useKycStatus()
+  const {
+    kycStatus,
+    isTosAccepted,
+    isApproved,
+    rejectionReasons,
+    isLoading: kycLoading,
+  } = useKycStatus()
   const { hasVirtualAccount, bankDetails, isLoading: vaLoading } = useBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createVirtualAccount = useCreateVirtualAccount()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
-  const [kycUrl, setKycUrl] = useState<string | null>(null)
-  const [isWaitingForVerification, setIsWaitingForVerification] = useState(false)
+  const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
+  // Track which step we're waiting for: 'tos', 'kyc', or null
+  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(null)
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+  const redirectUri = useRedirectUri()
 
   const handleStartKyc = useCallback(async () => {
     if (isGeoBlocked) {
       return
     }
     try {
-      const result = await initiateKyc.mutateAsync({})
-      // Open KYC link in browser (platform-safe)
-      if (result.kycLink) {
-        await Linking.openURL(result.kycLink)
-        setKycUrl(result.kycLink)
-        setIsWaitingForVerification(true)
+      const result = await initiateKyc.mutateAsync({ redirectUri })
+      // If TOS is already accepted, go straight to KYC
+      // Otherwise, open TOS link first (Bridge requires TOS acceptance before KYC)
+      const urlToOpen = isTosAccepted ? result.kycLink : result.tosLink || result.kycLink
+      if (urlToOpen) {
+        await Linking.openURL(urlToOpen)
+        setVerificationUrl(result.kycLink)
+        setWaitingFor(isTosAccepted ? 'kyc' : 'tos')
       }
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
     }
-  }, [initiateKyc, isGeoBlocked])
+  }, [initiateKyc, isGeoBlocked, isTosAccepted, redirectUri])
 
-  const handleOpenKycLink = useCallback(() => {
-    if (kycUrl) {
-      Linking.openURL(kycUrl)
+  const handleOpenVerificationLink = useCallback(() => {
+    if (verificationUrl) {
+      Linking.openURL(verificationUrl)
     }
-  }, [kycUrl])
+  }, [verificationUrl])
 
-  // Poll for status updates when waiting for verification
+  // Stop waiting when the relevant status changes
   useEffect(() => {
-    if (!isWaitingForVerification) return
-
-    const interval = setInterval(() => {
-      refetch()
-    }, 5000) // Poll every 5 seconds
-
-    return () => clearInterval(interval)
-  }, [isWaitingForVerification, refetch])
-
-  // Stop waiting when status changes from not_started
-  useEffect(() => {
-    if (isWaitingForVerification && kycStatus !== 'not_started') {
-      setIsWaitingForVerification(false)
+    if (waitingFor === 'tos' && isTosAccepted) {
+      setWaitingFor(null)
+    } else if (waitingFor === 'kyc' && kycStatus !== 'not_started') {
+      setWaitingFor(null)
     }
-  }, [kycStatus, isWaitingForVerification])
+  }, [kycStatus, isTosAccepted, waitingFor])
 
-  // Auto-create virtual account once approved (hide this from user)
+  // Auto-create virtual account once approved
+  const {
+    mutate: createVa,
+    isPending: isVaCreating,
+    isError: vaCreationError,
+  } = createVirtualAccount
   useEffect(() => {
-    if (!isGeoBlocked && isApproved && !hasVirtualAccount && !vaLoading && sendAccount?.address) {
-      createVirtualAccount.mutate(sendAccount.address)
+    if (
+      !isGeoBlocked &&
+      isApproved &&
+      !hasVirtualAccount &&
+      !vaLoading &&
+      sendAccount?.address &&
+      !isVaCreating &&
+      !vaCreationError
+    ) {
+      createVa(sendAccount.address)
     }
   }, [
     isGeoBlocked,
@@ -77,8 +92,18 @@ export function BankTransferScreen() {
     hasVirtualAccount,
     vaLoading,
     sendAccount?.address,
-    createVirtualAccount,
+    isVaCreating,
+    vaCreationError,
+    createVa,
   ])
+
+  // Handler to retry virtual account creation
+  const handleRetryVaCreation = useCallback(() => {
+    if (sendAccount?.address) {
+      createVirtualAccount.reset()
+      createVirtualAccount.mutate(sendAccount.address)
+    }
+  }, [sendAccount?.address, createVirtualAccount])
 
   // Loading state
   if (kycLoading || isGeoBlockLoading) {
@@ -109,8 +134,8 @@ export function BankTransferScreen() {
     )
   }
 
-  // Waiting for verification to complete
-  if (isWaitingForVerification && kycStatus === 'not_started') {
+  // Waiting for TOS or KYC to complete
+  if (waitingFor) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <FadeCard ai="center">
@@ -125,17 +150,29 @@ export function BankTransferScreen() {
               color="$lightGrayTextField"
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              Complete the verification in your browser window.
+              {waitingFor === 'tos'
+                ? 'Accept the Terms of Service in your browser window.'
+                : 'Complete the verification in your browser window.'}
+            </Paragraph>
+            <Paragraph
+              ta="center"
+              size="$3"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              Already finished? It may take a few seconds to update.
             </Paragraph>
           </YStack>
           <Anchor
             size="$4"
             color="$primary"
-            onPress={handleOpenKycLink}
+            onPress={handleOpenVerificationLink}
             cursor="pointer"
             hoverStyle={{ opacity: 0.8 }}
           >
-            Open verification window again
+            {waitingFor === 'tos'
+              ? 'Open Terms of Service window again'
+              : 'Open verification window again'}
           </Anchor>
         </FadeCard>
       </YStack>
@@ -148,6 +185,7 @@ export function BankTransferScreen() {
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <KycStatusCard
           kycStatus={kycStatus}
+          isTosAccepted={isTosAccepted}
           rejectionReasons={rejectionReasons}
           onStartKyc={handleStartKyc}
           isLoading={initiateKyc.isPending}
@@ -160,12 +198,37 @@ export function BankTransferScreen() {
   if (!hasVirtualAccount) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
-        <YStack ai="center" jc="center" py="$8" gap="$4">
-          <Spinner size="large" color="$primary" />
-          <Paragraph fontSize="$5" ta="center" color="$lightGrayTextField">
-            Setting up your deposit account...
-          </Paragraph>
-        </YStack>
+        <FadeCard>
+          <YStack gap="$4">
+            <Paragraph fontSize="$6" fontWeight={600}>
+              {vaCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
+            </Paragraph>
+            <Paragraph
+              fontSize="$4"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              {vaCreationError
+                ? 'We encountered an issue creating your deposit account. Please try again.'
+                : "Your identity has been verified. We're now creating your deposit account."}
+            </Paragraph>
+            {isVaCreating && (
+              <YStack ai="center" py="$2">
+                <Spinner size="small" color="$primary" />
+              </YStack>
+            )}
+            {vaCreationError && (
+              <Button
+                size="$4"
+                theme="green"
+                onPress={handleRetryVaCreation}
+                disabled={isVaCreating}
+              >
+                Try Again
+              </Button>
+            )}
+          </YStack>
+        </FadeCard>
       </YStack>
     )
   }

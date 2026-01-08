@@ -1,28 +1,15 @@
-import { FadeCard, Paragraph, YStack, Button, Spinner, XStack } from '@my/ui'
-import { AlertCircle, CheckCircle, Clock, XCircle } from '@tamagui/lucide-icons'
+import { FadeCard, Paragraph, YStack, XStack, Button, Spinner } from '@my/ui'
+import { Check } from '@tamagui/lucide-icons'
 import type { KycStatus } from '@my/bridge'
 
 interface KycStatusCardProps {
   kycStatus: string
+  isTosAccepted?: boolean
   onStartKyc?: () => void
   isLoading?: boolean
   startDisabled?: boolean
   rejectionReasons?: string[]
   children?: React.ReactNode
-}
-
-function StatusIcon({ status }: { status: string }) {
-  switch (status) {
-    case 'approved':
-      return <CheckCircle size={24} color="$green10" />
-    case 'rejected':
-      return <XCircle size={24} color="$red10" />
-    case 'under_review':
-    case 'incomplete':
-      return <Clock size={24} color="$yellow10" />
-    default:
-      return <AlertCircle size={24} color="$lightGrayTextField" />
-  }
 }
 
 function getStatusText(status: string): string {
@@ -35,6 +22,10 @@ function getStatusText(status: string): string {
       return 'Under Review'
     case 'incomplete':
       return 'Verification Incomplete'
+    case 'awaiting_questionnaire':
+      return 'Awaiting Questionnaire'
+    case 'awaiting_ubo':
+      return 'Awaiting UBO Verification'
     case 'paused':
       return 'Verification Paused'
     case 'offboarded':
@@ -54,6 +45,10 @@ function getStatusDescription(status: string): string {
       return 'Your verification is being reviewed. This usually takes 1-2 business days.'
     case 'incomplete':
       return 'Complete the verification process to start depositing from your bank.'
+    case 'awaiting_questionnaire':
+      return 'We are awaiting for you to fill out the questionnaire. Open the verification link to complete it.'
+    case 'awaiting_ubo':
+      return 'Your business will remain in this state until all UBO individuals complete KYC. Open the verification link to complete your portion and ask other business partners to finish theirs.'
     case 'paused':
       return 'Your verification has been paused. Please contact support.'
     case 'offboarded':
@@ -63,18 +58,75 @@ function getStatusDescription(status: string): string {
   }
 }
 
+function StepIndicator({
+  step,
+  label,
+  isComplete,
+  isActive,
+}: {
+  step: number
+  label: string
+  isComplete: boolean
+  isActive: boolean
+}) {
+  return (
+    <XStack gap="$3" ai="center">
+      <YStack
+        w={24}
+        h={24}
+        br={12}
+        ai="center"
+        jc="center"
+        bg={isComplete || isActive ? '$primary' : '$gray6'}
+      >
+        {isComplete ? (
+          <Check size={14} color="white" />
+        ) : (
+          <Paragraph fontSize="$2" color="white" fontWeight={600}>
+            {step}
+          </Paragraph>
+        )}
+      </YStack>
+      <Paragraph
+        fontSize="$4"
+        color={isComplete || isActive ? '$color12' : '$gray10'}
+        fontWeight={isActive ? 600 : 400}
+      >
+        {label}
+      </Paragraph>
+    </XStack>
+  )
+}
+
 export function KycStatusCard({
   kycStatus,
+  isTosAccepted = false,
   onStartKyc,
   isLoading,
   startDisabled,
   rejectionReasons,
   children,
 }: KycStatusCardProps) {
-  const showStartButton = kycStatus === 'not_started' || kycStatus === 'incomplete'
+  const showStartButton =
+    kycStatus === 'not_started' ||
+    kycStatus === 'incomplete' ||
+    kycStatus === 'awaiting_questionnaire' ||
+    kycStatus === 'awaiting_ubo' ||
+    kycStatus === 'rejected'
   const isNewUser = kycStatus === 'not_started'
+  const needsTos = !isTosAccepted && (isNewUser || kycStatus === 'incomplete')
 
-  // Simplified card for new users - description, optional children (email form), and button
+  // Determine button label based on current step
+  let buttonLabel = 'Continue Verification'
+  if (kycStatus === 'rejected') {
+    buttonLabel = 'Try Again'
+  } else if (needsTos) {
+    buttonLabel = 'Accept Terms of Service'
+  } else if (isNewUser || kycStatus === 'incomplete') {
+    buttonLabel = 'Verify Identity'
+  }
+
+  // New user flow with step indicators
   if (isNewUser && onStartKyc) {
     return (
       <FadeCard>
@@ -86,6 +138,22 @@ export function KycStatusCard({
           >
             {getStatusDescription(kycStatus)}
           </Paragraph>
+
+          <YStack gap="$3" py="$2">
+            <StepIndicator
+              step={1}
+              label="Accept Terms of Service"
+              isComplete={isTosAccepted}
+              isActive={!isTosAccepted}
+            />
+            <StepIndicator
+              step={2}
+              label="Verify Your Identity"
+              isComplete={false}
+              isActive={isTosAccepted}
+            />
+          </YStack>
+
           {children}
           <Button
             size="$4"
@@ -94,7 +162,7 @@ export function KycStatusCard({
             disabled={isLoading || startDisabled}
             icon={isLoading ? <Spinner size="small" /> : undefined}
           >
-            Verify Identity
+            {buttonLabel}
           </Button>
         </YStack>
       </FadeCard>
@@ -104,12 +172,9 @@ export function KycStatusCard({
   return (
     <FadeCard>
       <YStack gap="$4">
-        <XStack ai="center" gap="$3">
-          <StatusIcon status={kycStatus} />
-          <Paragraph fontSize="$6" fontWeight={600}>
-            {getStatusText(kycStatus)}
-          </Paragraph>
-        </XStack>
+        <Paragraph fontSize="$6" fontWeight={600}>
+          {getStatusText(kycStatus)}
+        </Paragraph>
 
         <Paragraph
           fontSize="$4"
@@ -140,7 +205,7 @@ export function KycStatusCard({
             disabled={isLoading || startDisabled}
             icon={isLoading ? <Spinner size="small" /> : undefined}
           >
-            Continue Verification
+            {buttonLabel}
           </Button>
         )}
       </YStack>

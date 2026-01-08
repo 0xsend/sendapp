@@ -245,8 +245,16 @@ const DEFAULT_DEPOSIT_STATUSES = [
   'payment_submitted',
   'payment_processed',
 ]
+const DEFAULT_DEPOSIT_AMOUNT = '100'
+const DEFAULT_DEPOSIT_CURRENCY = 'usd'
 
 const DEFAULT_WEBHOOK_URL = 'http://localhost:3000/api/bridge/webhook'
+
+function resolveWebhookUrl(override?: string | null): string {
+  if (override) return override
+  const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
+  return `${baseUrl.replace(/\/$/, '')}/api/bridge/webhook`
+}
 
 function printUsage() {
   console.log(`Usage:
@@ -266,8 +274,6 @@ Options:
   --create-virtual-account        Create bridge_virtual_accounts row if missing
   --destination-address <0x..>    Destination address for seeded virtual account
   --cleanup                       Delete bridge customer + virtual account + deposit rows
-  --cleanup-webhooks              Delete bridge_webhook_events related to this user
-  --cleanup-only                  Cleanup and exit without sending events
   --interactive                   Guided prompt for local testing
   --delay-ms <number>             Delay between events (default: 0)
   --dry-run                       Print payloads without sending
@@ -438,9 +444,8 @@ async function cleanupWebhookEvents(params: {
 async function cleanupBridgeUser(params: {
   supabase: ReturnType<typeof createSupabaseAdminClient>
   userId: string
-  cleanupWebhooks: boolean
 }) {
-  const { supabase, userId, cleanupWebhooks: shouldCleanupWebhooks } = params
+  const { supabase, userId } = params
   const bridgeCustomer = await getBridgeCustomerForUser(supabase, userId)
 
   if (!bridgeCustomer) {
@@ -476,15 +481,13 @@ async function cleanupBridgeUser(params: {
       .filter((depositId): depositId is string => Boolean(depositId))
   }
 
-  if (shouldCleanupWebhooks) {
-    await cleanupWebhookEvents({
-      supabase,
-      kycLinkId: bridgeCustomer.kyc_link_id,
-      bridgeCustomerId: bridgeCustomer.bridge_customer_id,
-      virtualAccountIds: virtualAccountBridgeIds,
-      depositIds,
-    })
-  }
+  await cleanupWebhookEvents({
+    supabase,
+    kycLinkId: bridgeCustomer.kyc_link_id,
+    bridgeCustomerId: bridgeCustomer.bridge_customer_id,
+    virtualAccountIds: virtualAccountBridgeIds,
+    depositIds,
+  })
 
   const { error: deleteError } = await supabase
     .from('bridge_customers')
@@ -556,8 +559,7 @@ async function printBridgeStatus(
 async function promptInteractive() {
   const rl = createInterface({ input, output })
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
-    const webhookUrl = `${baseUrl.replace(/\/$/, '')}/api/bridge/webhook`
+    const webhookUrl = resolveWebhookUrl()
 
     const sendId = (await rl.question('Send ID: ')).trim()
     if (!sendId) {
@@ -593,10 +595,10 @@ async function promptInteractive() {
       console.log('')
       console.log('Choose an action:')
       console.log('1) Create bridge customer (if missing)')
-      console.log('2) Send KYC status event')
-      console.log('3) Create virtual account (if missing)')
-      console.log('4) Send deposit status sequence')
-      console.log('5) Cleanup bridge data (customer + accounts + deposits)')
+      console.log('2) Send TOS accepted event')
+      console.log('3) Send KYC status event')
+      console.log('4) Create virtual account (if missing)')
+      console.log('5) Send deposit status sequence')
       console.log('6) Cleanup bridge data + webhook events')
       console.log('7) Exit')
 
@@ -611,21 +613,53 @@ async function promptInteractive() {
       }
 
       if (choice === '2') {
-        const status = (await rl.question('KYC status (e.g. approved, incomplete): ')).trim()
-        if (!status) {
-          console.log('KYC status required.')
-          continue
-        }
         const bridgeCustomer = await ensureBridgeCustomer(supabase, userId, {
           create: false,
         })
         const customerId = bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`
-        const tosStatus = status === 'approved' ? 'approved' : 'pending'
+        // Send TOS accepted event - keeps current KYC status unchanged
+        const event = buildKycEvent({
+          kycLinkId: bridgeCustomer.kyc_link_id,
+          customerId,
+          kycStatus: bridgeCustomer.kyc_status ?? 'not_started',
+          tosStatus: 'approved',
+        })
+        try {
+          await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
+        } catch (error) {
+          console.log(
+            `Failed to send webhook. Ensure the handler is running at ${webhookUrl} and reachable.`
+          )
+          throw error
+        }
+        console.log('Sent TOS accepted webhook event.')
+        continue
+      }
+
+      if (choice === '3') {
+        console.log(
+          'KYC status options: not_started, incomplete, under_review, approved, rejected, paused, offboarded, awaiting_questionnaire, awaiting_ubo'
+        )
+        const status = (await rl.question('KYC status: ')).trim()
+        if (!status) {
+          console.log('KYC status required.')
+          continue
+        }
+        const tosInput = (
+          await rl.question('TOS status (pending/approved) [default: approved]: ')
+        ).trim()
+        const bridgeCustomer = await ensureBridgeCustomer(supabase, userId, {
+          create: false,
+        })
+        const customerId = bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`
+        const tosStatus = tosInput === 'pending' ? 'pending' : 'approved'
+        const rejectionReasons = status === 'rejected' ? getRandomRejectionReasons() : undefined
         const event = buildKycEvent({
           kycLinkId: bridgeCustomer.kyc_link_id,
           customerId,
           kycStatus: status,
           tosStatus,
+          rejectionReasons,
         })
         try {
           await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
@@ -639,7 +673,7 @@ async function promptInteractive() {
         continue
       }
 
-      if (choice === '3') {
+      if (choice === '4') {
         const destinationAddress = (
           await rl.question('Destination address (0x.. or blank): ')
         ).trim()
@@ -657,7 +691,8 @@ async function promptInteractive() {
         continue
       }
 
-      if (choice === '4') {
+      if (choice === '5') {
+        console.log(`Deposit status sequence: ${DEFAULT_DEPOSIT_STATUSES.join(', ')}`)
         const depositStatuses = DEFAULT_DEPOSIT_STATUSES
         const bridgeCustomer = await ensureBridgeCustomer(supabase, userId, { create: false })
         const virtualAccount = await ensureVirtualAccount(supabase, bridgeCustomer, {
@@ -673,8 +708,8 @@ async function promptInteractive() {
             depositId,
             virtualAccountId: virtualAccount.bridge_virtual_account_id,
             status,
-            amount: '100',
-            currency: 'usd',
+            amount: DEFAULT_DEPOSIT_AMOUNT,
+            currency: DEFAULT_DEPOSIT_CURRENCY,
           })
           try {
             await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
@@ -689,13 +724,8 @@ async function promptInteractive() {
         continue
       }
 
-      if (choice === '5') {
-        await cleanupBridgeUser({ supabase, userId, cleanupWebhooks: false })
-        continue
-      }
-
       if (choice === '6') {
-        await cleanupBridgeUser({ supabase, userId, cleanupWebhooks: true })
+        await cleanupBridgeUser({ supabase, userId })
         continue
       }
 
@@ -923,8 +953,6 @@ async function main() {
       createVirtualAccount: { type: 'boolean' },
       destinationAddress: { type: 'string' },
       cleanup: { type: 'boolean' },
-      cleanupWebhooks: { type: 'boolean' },
-      cleanupOnly: { type: 'boolean' },
       interactive: { type: 'boolean' },
       delayMs: { type: 'string' },
       dryRun: { type: 'boolean' },
@@ -951,15 +979,13 @@ async function main() {
   const supabase = createSupabaseAdminClient()
   const userId = await resolveUserId(supabase, values.userId, values.sendId)
 
-  if (values.cleanup || values.cleanupOnly) {
+  if (values.cleanup) {
     await cleanupBridgeUser({
       supabase,
       userId,
-      cleanupWebhooks: Boolean(values.cleanupWebhooks),
     })
   }
-
-  if (values.cleanupOnly) {
+  if (values.cleanup) {
     return
   }
 
@@ -989,10 +1015,10 @@ async function main() {
     )
   }
 
-  const webhookUrl = values.webhookUrl ?? DEFAULT_WEBHOOK_URL
+  const webhookUrl = resolveWebhookUrl(values.webhookUrl)
   const delayMs = Number(values.delayMs ?? '0')
-  const amount = String(values.amount ?? '100')
-  const currency = String(values.currency ?? 'usd')
+  const amount = String(values.amount ?? DEFAULT_DEPOSIT_AMOUNT)
+  const currency = String(values.currency ?? DEFAULT_DEPOSIT_CURRENCY)
 
   const kycStatuses = parseCsv(values.kycStatuses) ?? DEFAULT_KYC_STATUSES
   const depositStatuses = parseCsv(values.depositStatuses) ?? DEFAULT_DEPOSIT_STATUSES
@@ -1002,7 +1028,8 @@ async function main() {
   if (flow === 'kyc' || flow === 'all') {
     const customerId = bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`
     for (const status of kycStatuses) {
-      const tosStatus = status === 'approved' ? 'approved' : 'pending'
+      // TOS is typically accepted before KYC progresses, so default to approved
+      const tosStatus = 'approved'
       const rejectionReasons = status === 'rejected' ? getRandomRejectionReasons() : undefined
       events.push(
         buildKycEvent({
