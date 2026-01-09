@@ -45,6 +45,10 @@ export const BottomNavBarContent = ({
         $xxs={{
           gap: '$5',
         }}
+        $platform-ios={{
+          elevation: 5,
+          shadowOpacity: 0.1,
+        }}
       >
         {tabs.map((tab) => {
           return <EachButton key={tab.href} tab={tab} hoverStyles={hoverStyles} />
