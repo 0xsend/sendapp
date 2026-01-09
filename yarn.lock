@@ -6870,6 +6870,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@my/bridge@workspace:packages/bridge":
+  version: 0.0.0-use.local
+  resolution: "@my/bridge@workspace:packages/bridge"
+  dependencies:
+    "@supabase/supabase-js": "npm:^2.49.8"
+    "@types/debug": "npm:^4"
+    "@types/jest": "npm:^29.5.14"
+    debug: "npm:^4.4.1"
+    jest: "npm:^29"
+    ts-jest: "npm:^29"
+    typescript: "npm:~5.9.2"
+    zod: "npm:^3.23.8"
+  languageName: unknown
+  linkType: soft
+
 "@my/contracts@workspace:*, @my/contracts@workspace:packages/contracts":
   version: 0.0.0-use.local
   resolution: "@my/contracts@workspace:packages/contracts"
@@ -12813,6 +12828,16 @@ __metadata:
   dependencies:
     "@types/istanbul-lib-report": "npm:*"
   checksum: 10/f1ad54bc68f37f60b30c7915886b92f86b847033e597f9b34f2415acdbe5ed742fa559a0a40050d74cdba3b6a63c342cac1f3a64dba5b68b66a6941f4abd7903
+  languageName: node
+  linkType: hard
+
+"@types/jest@npm:^29.5.14":
+  version: 29.5.14
+  resolution: "@types/jest@npm:29.5.14"
+  dependencies:
+    expect: "npm:^29.0.0"
+    pretty-format: "npm:^29.0.0"
+  checksum: 10/59ec7a9c4688aae8ee529316c43853468b6034f453d08a2e1064b281af9c81234cec986be796288f1bbb29efe943bc950e70c8fa8faae1e460d50e3cf9760f9b
   languageName: node
   linkType: hard
 
@@ -21401,7 +21426,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expect@npm:^29.7.0":
+"expect@npm:^29.0.0, expect@npm:^29.7.0":
   version: 29.7.0
   resolution: "expect@npm:29.7.0"
   dependencies:
@@ -30971,6 +30996,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pretty-format@npm:^29.0.0, pretty-format@npm:^29.7.0":
+  version: 29.7.0
+  resolution: "pretty-format@npm:29.7.0"
+  dependencies:
+    "@jest/schemas": "npm:^29.6.3"
+    ansi-styles: "npm:^5.0.0"
+    react-is: "npm:^18.0.0"
+  checksum: 10/dea96bc83c83cd91b2bfc55757b6b2747edcaac45b568e46de29deee80742f17bc76fe8898135a70d904f4928eafd8bb693cd1da4896e8bdd3c5e82cadf1d2bb
+  languageName: node
+  linkType: hard
+
 "pretty-format@npm:^29.5.0":
   version: 29.5.0
   resolution: "pretty-format@npm:29.5.0"
@@ -30979,17 +31015,6 @@ __metadata:
     ansi-styles: "npm:^5.0.0"
     react-is: "npm:^18.0.0"
   checksum: 10/b025cb1d2bf27b8dc338792b208811b196828ccf590a87014d9ac9406eb809324ef56151ba41d489c8a67fed94cdacc94ca003380c2795233e117a5874b2566b
-  languageName: node
-  linkType: hard
-
-"pretty-format@npm:^29.7.0":
-  version: 29.7.0
-  resolution: "pretty-format@npm:29.7.0"
-  dependencies:
-    "@jest/schemas": "npm:^29.6.3"
-    ansi-styles: "npm:^5.0.0"
-    react-is: "npm:^18.0.0"
-  checksum: 10/dea96bc83c83cd91b2bfc55757b6b2747edcaac45b568e46de29deee80742f17bc76fe8898135a70d904f4928eafd8bb693cd1da4896e8bdd3c5e82cadf1d2bb
   languageName: node
   linkType: hard
 

@@ -125,12 +125,16 @@
     "form": {
       "about": "关于",
       "aboutPlaceholder": "介绍一下你自己",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "一旦设为企业资料，就无法切回个人资料。",
+      "personalToBusinessLockNotice": "该账户的 KYC 已完成，因此无法更改资料类型。",
       "makePublic": "公开个人资料",
       "name": "姓名"
     },
     "header": "个人资料",
     "overview": {
       "about": "关于",
+      "businessProfile": "Business Profile",
       "edit": "编辑个人资料",
       "name": "姓名",
       "visibility": {

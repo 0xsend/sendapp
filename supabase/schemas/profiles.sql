@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
     "banner_url" "text",
     "verified_at" timestamp with time zone DEFAULT NULL,
     "sync_referrals_to_contacts" boolean DEFAULT true NOT NULL,
+    "is_business" boolean DEFAULT false NOT NULL,
     CONSTRAINT "profiles_about_update" CHECK (("length"("about") < 255)),
     CONSTRAINT "profiles_name_update" CHECK (("length"("name") < 63)),
     CONSTRAINT "profiles_x_username_update" CHECK (("length"("x_username") <= 64))
@@ -126,6 +127,49 @@ REVOKE ALL ON FUNCTION "public"."stop_change_send_id"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "anon";
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."stop_change_send_id"() TO "service_role";
+
+CREATE OR REPLACE FUNCTION public.enforce_profile_business_kyc_rules()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.is_business IS NOT DISTINCT FROM OLD.is_business THEN
+    RETURN NEW;
+  END IF;
+
+  -- Once a profile is business, it cannot switch back to personal
+  IF OLD.is_business = true AND NEW.is_business = false THEN
+    RAISE EXCEPTION 'Business profiles cannot switch back to personal';
+  END IF;
+
+  -- Block any profile type change after KYC completion
+  IF EXISTS (
+    SELECT 1
+    FROM public.bridge_customers bc
+    WHERE bc.user_id = NEW.id
+      AND bc.kyc_status IN ('approved', 'rejected', 'paused', 'offboarded')
+  ) THEN
+    RAISE EXCEPTION 'Profile type cannot be changed after KYC completion';
+  END IF;
+
+  RETURN NEW;
+END;
+$function$
+;
+ALTER FUNCTION "public"."enforce_profile_business_kyc_rules"() OWNER TO "postgres";
+REVOKE ALL ON FUNCTION "public"."enforce_profile_business_kyc_rules"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."enforce_profile_business_kyc_rules"() TO "anon";
+GRANT ALL ON FUNCTION "public"."enforce_profile_business_kyc_rules"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."enforce_profile_business_kyc_rules"() TO "service_role";
+
+DROP TRIGGER IF EXISTS profiles_enforce_business_kyc ON public.profiles;
+
+CREATE TRIGGER profiles_enforce_business_kyc
+BEFORE UPDATE OF is_business ON public.profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.enforce_profile_business_kyc_rules();
 
 -- Functions for verified_at sync
 CREATE OR REPLACE FUNCTION public.update_profile_verified_at_on_share_insert()

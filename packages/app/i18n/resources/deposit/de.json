@@ -69,7 +69,7 @@
   },
   "options": {
     "applePay": {
-      "description": "Nur Debitkarte",
+      "description": "Nur Debitkarte • Bis zu 500 $/Woche",
       "title": "Apple Pay"
     },
     "crypto": {
@@ -77,8 +77,12 @@
       "title": "Krypto-Wallet"
     },
     "debitCard": {
-      "description": "Schnelle Einzahlungen bis zu 500 $/Woche",
+      "description": "Bis zu 500 $/Woche",
       "title": "Debitkarte"
+    },
+    "bankTransfer": {
+      "description": "Am besten über 500 $/Woche • ACH oder Überweisung",
+      "title": "Banküberweisung"
     }
   },
   "success": {

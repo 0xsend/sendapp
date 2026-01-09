@@ -69,7 +69,7 @@
   },
   "options": {
     "applePay": {
-      "description": "Carte de débit uniquement",
+      "description": "Carte de débit uniquement • Jusqu'à 500 $/semaine",
       "title": "Apple Pay"
     },
     "crypto": {
@@ -77,8 +77,12 @@
       "title": "Portefeuille Crypto"
     },
     "debitCard": {
-      "description": "Dépôts rapides jusqu'à 500 $/semaine",
+      "description": "Jusqu'à 500 $/semaine",
       "title": "Carte de débit"
+    },
+    "bankTransfer": {
+      "description": "Idéal au-delà de 500 $/semaine • ACH ou virement",
+      "title": "Virement bancaire"
     }
   },
   "success": {

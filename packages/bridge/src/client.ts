@@ -1,0 +1,197 @@
+import debug from 'debug'
+import { BridgeApiError } from './errors'
+import { verifyWebhookSignature, parseWebhookEvent } from './webhooks'
+import type {
+  CustomerResponse,
+  KycLinkRequest,
+  KycLinkResponse,
+  TransferRequest,
+  TransferResponse,
+  VirtualAccountRequest,
+  VirtualAccountResponse,
+  WebhookResponse,
+  WebhookEvent,
+  BridgeApiErrorResponse,
+} from './types'
+
+const log = debug('bridge:client')
+
+interface BridgeClientConfig {
+  apiKey: string
+  sandbox?: boolean
+  webhookPublicKey?: string
+}
+
+interface RequestOptions {
+  idempotencyKey?: string
+}
+
+interface CreateWebhookOptions extends RequestOptions {
+  eventEpoch?: 'webhook_creation' | 'beginning_of_time'
+}
+
+/**
+ * Bridge XYZ API client for KYC, virtual account, and transfer operations
+ */
+export class BridgeClient {
+  private readonly baseUrl: string
+  private readonly apiKey: string
+  private readonly webhookPublicKey: string | null
+
+  constructor(config: BridgeClientConfig) {
+    this.apiKey = config.apiKey
+    this.baseUrl = config.sandbox
+      ? 'https://api.sandbox.bridge.xyz/v0'
+      : 'https://api.bridge.xyz/v0'
+    // Convert escaped newlines to actual newlines (env vars store \n as literal)
+    this.webhookPublicKey = config.webhookPublicKey?.replace(/\\n/g, '\n') ?? null
+    log('initialized client with baseUrl=%s sandbox=%s', this.baseUrl, !!config.sandbox)
+  }
+
+  private async request<T>(
+    method: string,
+    path: string,
+    body?: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
+    const url = `${this.baseUrl}${path}`
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Api-Key': this.apiKey,
+    }
+
+    if (method === 'POST' && options?.idempotencyKey) {
+      headers['Idempotency-Key'] = options.idempotencyKey
+    } else if (method === 'POST') {
+      headers['Idempotency-Key'] = crypto.randomUUID()
+    }
+
+    log('%s %s', method, path)
+
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    })
+
+    if (!response.ok) {
+      const errorBody = (await response.json()) as BridgeApiErrorResponse
+      log('error response: %O', errorBody)
+      throw new BridgeApiError(response.status, errorBody)
+    }
+
+    const data = (await response.json()) as T
+    log('response: %O', data)
+    return data
+  }
+
+  // KYC Links
+
+  /**
+   * Create a new KYC link for onboarding a customer
+   */
+  async createKycLink(data: KycLinkRequest, options?: RequestOptions): Promise<KycLinkResponse> {
+    return this.request('POST', '/kyc_links', data, options)
+  }
+
+  /**
+   * Get KYC link details by ID
+   */
+  async getKycLink(id: string): Promise<KycLinkResponse> {
+    return this.request('GET', `/kyc_links/${id}`)
+  }
+
+  /**
+   * Get KYC link for an existing customer
+   */
+  async getCustomerKycLink(customerId: string): Promise<{ kyc_link: string }> {
+    return this.request('GET', `/customers/${customerId}/kyc_link`)
+  }
+
+  // Customers
+
+  /**
+   * Get customer details by ID
+   */
+  async getCustomer(id: string): Promise<CustomerResponse> {
+    return this.request('GET', `/customers/${id}`)
+  }
+
+  // Virtual Accounts
+
+  /**
+   * Create a virtual account for a customer
+   */
+  async createVirtualAccount(
+    customerId: string,
+    data: VirtualAccountRequest,
+    options?: RequestOptions
+  ): Promise<VirtualAccountResponse> {
+    return this.request('POST', `/customers/${customerId}/virtual_accounts`, data, options)
+  }
+
+  /**
+   * List virtual accounts for a customer
+   */
+  async listVirtualAccounts(customerId: string): Promise<VirtualAccountResponse[]> {
+    return this.request('GET', `/customers/${customerId}/virtual_accounts`)
+  }
+
+  // Transfers
+
+  /**
+   * Create a transfer (supports static templates)
+   */
+  async createTransfer(data: TransferRequest, options?: RequestOptions): Promise<TransferResponse> {
+    return this.request('POST', '/transfers', data, options)
+  }
+
+  // Webhooks
+
+  /**
+   * Create a webhook endpoint
+   */
+  async createWebhook(
+    url: string,
+    eventCategories: string[],
+    options?: CreateWebhookOptions
+  ): Promise<WebhookResponse> {
+    const eventEpoch = options?.eventEpoch ?? 'webhook_creation'
+    const requestOptions = { idempotencyKey: options?.idempotencyKey }
+    return this.request(
+      'POST',
+      '/webhooks',
+      { url, event_categories: eventCategories, event_epoch: eventEpoch },
+      requestOptions
+    )
+  }
+
+  // Webhook Verification
+
+  /**
+   * Verify and parse a webhook request
+   * @throws Error if webhookPublicKey was not configured
+   * @throws WebhookSignatureError if signature is invalid
+   */
+  verifyWebhook(rawBody: string, signatureHeader: string): WebhookEvent {
+    if (!this.webhookPublicKey) {
+      throw new Error('webhookPublicKey is required for webhook verification')
+    }
+    verifyWebhookSignature(rawBody, signatureHeader, this.webhookPublicKey)
+    return parseWebhookEvent(rawBody)
+  }
+}
+
+/**
+ * Create a Bridge client from environment variables
+ */
+export function createBridgeClient(): BridgeClient {
+  const apiKey = process.env.BRIDGE_API_KEY
+  if (!apiKey) {
+    throw new Error('BRIDGE_API_KEY environment variable is required')
+  }
+
+  const sandbox = process.env.BRIDGE_SANDBOX === 'true'
+  const webhookPublicKey = process.env.BRIDGE_WEBHOOK_PUBLIC_KEY
+  return new BridgeClient({ apiKey, sandbox, webhookPublicKey })
+}

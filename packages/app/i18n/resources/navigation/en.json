@@ -40,7 +40,7 @@
       "root": "Explore Canton Wallet"
     },
     "deposit": {
-      "root": "Savings",
+      "root": "Deposit",
       "applePay": "Apple Pay",
       "debitCard": "Debit Card",
       "onBase": "Deposit on Base",

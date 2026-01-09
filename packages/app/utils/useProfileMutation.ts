@@ -8,6 +8,7 @@ export const ProfileSchema = z.object({
   name: formFields.text,
   about: formFields.textarea,
   isPublic: formFields.boolean_checkbox,
+  isBusiness: formFields.boolean_checkbox,
 })
 
 export const useProfileMutation = (userID: string | undefined) => {
@@ -23,6 +24,7 @@ export const useProfileMutation = (userID: string | undefined) => {
           name: data.name,
           about: data.about,
           is_public: data.isPublic,
+          is_business: data.isBusiness,
         })
         .eq('id', userID ? userID : '')
       if (error) {

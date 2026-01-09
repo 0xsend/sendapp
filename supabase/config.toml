@@ -79,6 +79,13 @@ schema_paths = [
   "./schemas/swap_routers.sql",
   "./schemas/affiliate_stats.sql",
 
+  # Bridge virtual accounts (KYC, deposits)
+  "./schemas/bridge_customers.sql",
+  "./schemas/bridge_virtual_accounts.sql",
+  "./schemas/bridge_transfer_templates.sql",
+  "./schemas/bridge_webhook_events.sql",
+  "./schemas/bridge_deposits.sql",
+
   # Schema-specific tables
   "./schemas/shovel.sql",
   "./schemas/temporal.sql",

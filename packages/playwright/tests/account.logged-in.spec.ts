@@ -43,7 +43,7 @@ test('can update profile', async ({ page, supabase }) => {
   await expect(nameField).toBeVisible({ timeout: 5_000 })
   await nameField.fill('LeO')
   await page.getByRole('textbox', { name: 'About' }).fill('Sender')
-  await page.getByRole('checkbox').setChecked(true)
+  await page.getByRole('checkbox', { name: 'Make Profile Public' }).setChecked(true)
 
   await page.getByRole('button', { name: 'SAVE CHANGES' }).click()
 

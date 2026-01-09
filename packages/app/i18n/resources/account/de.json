@@ -126,12 +126,16 @@
     "form": {
       "about": "Über",
       "aboutPlaceholder": "Erzähl uns etwas über dich",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Einmal festgelegt, können Unternehmensprofile nicht wieder auf persönlich umgestellt werden.",
+      "personalToBusinessLockNotice": "Die KYC-Prüfung ist für dieses Konto bereits abgeschlossen, daher kann der Profiltyp nicht geändert werden.",
       "makePublic": "Profil öffentlich machen",
       "name": "Name"
     },
     "header": "Profil",
     "overview": {
       "about": "Über",
+      "businessProfile": "Business Profile",
       "edit": "Profil bearbeiten",
       "name": "Name",
       "visibility": {

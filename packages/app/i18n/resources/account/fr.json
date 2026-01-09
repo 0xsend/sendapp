@@ -126,12 +126,16 @@
     "form": {
       "about": "À propos",
       "aboutPlaceholder": "Parlez-nous de vous",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Une fois défini, un profil professionnel ne peut plus redevenir personnel.",
+      "personalToBusinessLockNotice": "La vérification KYC est déjà terminée pour ce compte, le type de profil ne peut donc pas être modifié.",
       "makePublic": "Rendre le profil public",
       "name": "Nom"
     },
     "header": "Profil",
     "overview": {
       "about": "À propos",
+      "businessProfile": "Business Profile",
       "edit": "modifier le profil",
       "name": "Nom",
       "visibility": {
