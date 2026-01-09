@@ -23,6 +23,10 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
         size="$4"
         padded
         elevation={1}
+        $platform-native={{
+          elevation: 1,
+          shadowOpacity: 0.1,
+        }}
         br="$5"
         cur="pointer"
         hoverStyle={{ opacity: 0.9, scale: 0.995 }}
@@ -62,6 +66,10 @@ export const SendCheckButton = ({ onPress }: SendCheckButtonProps) => {
         size="$4"
         padded
         elevation={1}
+        $platform-native={{
+          elevation: 1,
+          shadowOpacity: 0.1,
+        }}
         br="$5"
         cur="pointer"
         hoverStyle={{ opacity: 0.9, scale: 0.995 }}

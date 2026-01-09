@@ -62,6 +62,10 @@ function MetricTile({
       w="100%"
       jc="center"
       ai="center"
+      $platform-native={{
+        elevation: 1,
+        shadowOpacity: 0.1,
+      }}
     >
       <YStack gap={'$2'} jc="center" ai="center">
         <Paragraph color={'$color10'} size={'$4'}>
