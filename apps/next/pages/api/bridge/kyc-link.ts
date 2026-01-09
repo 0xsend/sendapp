@@ -51,8 +51,19 @@ async function getSession(req: NextApiRequest, res: NextApiResponse) {
 }
 
 interface InitiateKycRequest {
-  email?: string
   redirectUri?: string
+}
+
+// Allowed redirect URI patterns for KYC completion
+const ALLOWED_REDIRECT_PATTERNS = [
+  /^https:\/\/send\.app(\/.*)?$/, // Production web
+  /^https:\/\/dev\.send\.app(\/.*)?$/, // Staging/dev web
+  /^http:\/\/localhost(:\d+)?(\/.*)?$/, // Local development
+  /^send:\/\/.*$/, // Native app deep link
+]
+
+function isAllowedRedirectUri(uri: string): boolean {
+  return ALLOWED_REDIRECT_PATTERNS.some((pattern) => pattern.test(uri))
 }
 
 interface InitiateKycResponse {
@@ -126,20 +137,25 @@ export default async function handler(
       }
     }
 
-    const { email, redirectUri } = req.body as InitiateKycRequest
-    const resolvedEmail = email?.trim() || session.user.email?.trim()
+    // Use email from authenticated session - never trust user-provided email
+    const email = session.user.email?.trim()
 
-    if (!resolvedEmail) {
-      return res.status(400).json({ error: 'email is required' })
+    if (!email) {
+      return res.status(400).json({ error: 'User email is required' })
     }
+
+    // Validate redirectUri against allowlist
+    const { redirectUri } = req.body as InitiateKycRequest
+    const validatedRedirectUri =
+      redirectUri && isAllowedRedirectUri(redirectUri) ? redirectUri : undefined
 
     // Create new KYC link with Bridge
     const bridgeClient = createBridgeClient()
     const kycLinkResponse = await bridgeClient.createKycLink(
       {
-        email: resolvedEmail,
+        email,
         type: 'individual',
-        redirect_uri: redirectUri,
+        redirect_uri: validatedRedirectUri,
       },
       { idempotencyKey: `kyc-${userId}` }
     )
@@ -150,7 +166,7 @@ export default async function handler(
     const { error: insertError } = await adminClient.from('bridge_customers').insert({
       user_id: userId,
       kyc_link_id: kycLinkResponse.id,
-      email: resolvedEmail,
+      email,
       kyc_status: kycLinkResponse.kyc_status,
       tos_status: kycLinkResponse.tos_status,
       bridge_customer_id: kycLinkResponse.customer_id,

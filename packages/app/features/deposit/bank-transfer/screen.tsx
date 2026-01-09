@@ -10,12 +10,10 @@ import {
   useBankAccountDetails,
   useCreateVirtualAccount,
 } from 'app/features/bank-transfer'
-import { useSendAccount } from 'app/utils/send-accounts'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
 
 export function BankTransferScreen() {
-  const { data: sendAccount } = useSendAccount()
   const {
     kycStatus,
     isTosAccepted,
@@ -80,18 +78,16 @@ export function BankTransferScreen() {
       isApproved &&
       !hasVirtualAccount &&
       !vaLoading &&
-      sendAccount?.address &&
       !isVaCreating &&
       !vaCreationError
     ) {
-      createVa(sendAccount.address)
+      createVa()
     }
   }, [
     isGeoBlocked,
     isApproved,
     hasVirtualAccount,
     vaLoading,
-    sendAccount?.address,
     isVaCreating,
     vaCreationError,
     createVa,
@@ -99,11 +95,9 @@ export function BankTransferScreen() {
 
   // Handler to retry virtual account creation
   const handleRetryVaCreation = useCallback(() => {
-    if (sendAccount?.address) {
-      createVirtualAccount.reset()
-      createVirtualAccount.mutate(sendAccount.address)
-    }
-  }, [sendAccount?.address, createVirtualAccount])
+    createVirtualAccount.reset()
+    createVirtualAccount.mutate()
+  }, [createVirtualAccount])
 
   // Loading state
   if (kycLoading || isGeoBlockLoading) {

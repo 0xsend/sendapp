@@ -101,14 +101,13 @@ export function useCreateVirtualAccount() {
   const supabase = useSupabase()
 
   return useMutation({
-    mutationFn: async (destinationAddress: string) => {
-      log('creating virtual account for address', destinationAddress)
+    mutationFn: async () => {
+      log('creating virtual account')
 
       const headers = await getAuthHeaders(supabase)
       const response = await fetch(`${getBaseUrl()}/api/bridge/virtual-account/create`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ destinationAddress }),
       })
 
       if (!response.ok) {

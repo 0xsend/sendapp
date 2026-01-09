@@ -79,9 +79,7 @@ async function getSession(req: NextApiRequest, res: NextApiResponse) {
   return { session: null, error: new Error('No authentication provided') }
 }
 
-interface CreateVirtualAccountRequest {
-  destinationAddress: string
-}
+// No user-provided payload - destination address comes from user's send_account
 
 interface ErrorResponse {
   error: string
@@ -106,16 +104,27 @@ export default async function handler(
     }
 
     const userId = session.user.id
-    const { destinationAddress } = req.body as CreateVirtualAccountRequest
-
-    if (!destinationAddress || !/^0x[a-fA-F0-9]{40}$/.test(destinationAddress)) {
-      return res.status(400).json({ error: 'Valid Ethereum address is required' })
-    }
 
     log('creating virtual account for user', userId)
 
-    // Get user's bridge customer record
     const adminClient = createSupabaseAdminClient()
+
+    // Get user's send account (verified destination address)
+    const { data: sendAccount, error: sendAccountError } = await adminClient
+      .from('send_accounts')
+      .select('address')
+      .eq('user_id', userId)
+      .is('deleted_at', null)
+      .single()
+
+    if (sendAccountError || !sendAccount) {
+      log('send account not found', sendAccountError)
+      return res.status(400).json({ error: 'Send account required' })
+    }
+
+    const destinationAddress = sendAccount.address
+
+    // Get user's bridge customer record
     const { data: customer, error: customerError } = await adminClient
       .from('bridge_customers')
       .select('*')

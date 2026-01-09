@@ -87,14 +87,14 @@ export function useInitiateKyc() {
   const supabase = useSupabase()
 
   return useMutation({
-    mutationFn: async (data: { email?: string; redirectUri?: string }) => {
+    mutationFn: async (data?: { redirectUri?: string }) => {
       log('initiating KYC', data)
 
       const headers = await getAuthHeaders(supabase)
       const response = await fetch(`${getBaseUrl()}/api/bridge/kyc-link`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(data),
+        body: data ? JSON.stringify(data) : undefined,
       })
 
       if (!response.ok) {
