@@ -51,6 +51,5 @@ CREATE OR REPLACE TRIGGER "bridge_virtual_accounts_updated_at"
     FOR EACH ROW EXECUTE FUNCTION "public"."set_current_timestamp_updated_at"();
 
 -- Grants
-GRANT ALL ON TABLE "public"."bridge_virtual_accounts" TO "anon";
 GRANT ALL ON TABLE "public"."bridge_virtual_accounts" TO "authenticated";
 GRANT ALL ON TABLE "public"."bridge_virtual_accounts" TO "service_role";

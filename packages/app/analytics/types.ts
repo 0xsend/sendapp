@@ -372,6 +372,14 @@ export interface AnalyticsService {
   reset(): void
   isInitialized(): boolean
   /**
+   * Get a feature flag value for the current user.
+   */
+  getFeatureFlag?(key: string): boolean | string | undefined
+  /**
+   * Subscribe to feature flag updates. Returns an unsubscribe function if supported.
+   */
+  onFeatureFlags?(callback: () => void): () => void
+  /**
    * Capture exceptions and errors for error tracking.
    * Filters known/expected errors and sends to PostHog Error Tracking.
    */

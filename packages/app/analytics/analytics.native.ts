@@ -76,6 +76,15 @@ export const analytics: AnalyticsService = {
     return isReady
   },
 
+  getFeatureFlag(key: string) {
+    return client?.getFeatureFlag?.(key)
+  },
+
+  onFeatureFlags(callback: () => void) {
+    if (!client) return () => {}
+    return client.onFeatureFlags(callback)
+  },
+
   captureException(error: unknown, properties?: ExceptionProperties) {
     if (!client) {
       log('Not initialized, cannot capture exception')

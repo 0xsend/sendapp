@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_deposits" (
     "destination_tx_hash" "text",
     "fee_amount" numeric,
     "net_amount" numeric,
-    "event_data" "jsonb",
     "created_at" timestamp with time zone NOT NULL DEFAULT now(),
     "updated_at" timestamp with time zone NOT NULL DEFAULT now(),
 
@@ -60,6 +59,5 @@ CREATE OR REPLACE TRIGGER "bridge_deposits_updated_at"
     FOR EACH ROW EXECUTE FUNCTION "public"."set_current_timestamp_updated_at"();
 
 -- Grants
-GRANT ALL ON TABLE "public"."bridge_deposits" TO "anon";
 GRANT ALL ON TABLE "public"."bridge_deposits" TO "authenticated";
 GRANT ALL ON TABLE "public"."bridge_deposits" TO "service_role";

@@ -185,6 +185,7 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
   }
 
   // Upsert the deposit record
+  // Note: Full event data is stored in bridge_webhook_events for debugging
   const { error: depositError } = await supabase.from('bridge_deposits').upsert(
     {
       bridge_transfer_id: depositId,
@@ -201,7 +202,6 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
       net_amount: netAmount,
       last_event_id: event.event_id,
       last_event_type: event.event_type,
-      event_data: data,
     },
     { onConflict: 'bridge_transfer_id' }
   )

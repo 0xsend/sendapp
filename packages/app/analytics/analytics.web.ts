@@ -87,6 +87,16 @@ export const analytics: AnalyticsService = {
     return initialized
   },
 
+  getFeatureFlag(key: string) {
+    if (!initialized) return undefined
+    return posthog.getFeatureFlag(key)
+  },
+
+  onFeatureFlags(callback: () => void) {
+    if (!initialized) return () => {}
+    return posthog.onFeatureFlags(callback)
+  },
+
   captureException(error: unknown, properties?: ExceptionProperties) {
     if (!initialized) {
       log('Not initialized, cannot capture exception')
