@@ -5,8 +5,21 @@ import { useUser } from 'app/utils/useUser'
 import { BRIDGE_CUSTOMER_QUERY_KEY } from './useBridgeCustomer'
 import getBaseUrl from 'app/utils/getBaseUrl'
 import type { SourceDepositInstructions } from '@my/bridge'
+import { useAnalytics } from 'app/provider/analytics'
 
 const log = debug('app:features:bank-transfer:useBridgeTransferTemplate')
+
+const getErrorType = (error: unknown): 'network' | 'unknown' => {
+  const message = error instanceof Error ? error.message : String(error)
+  if (
+    message.includes('Network') ||
+    message.includes('network') ||
+    message.includes('Failed to fetch')
+  ) {
+    return 'network'
+  }
+  return 'unknown'
+}
 
 export const BRIDGE_TRANSFER_TEMPLATE_QUERY_KEY = 'bridge_transfer_template' as const
 
@@ -63,12 +76,13 @@ async function getAuthHeaders(
  * Hook to fetch the current user's transfer template
  */
 export function useBridgeTransferTemplate() {
-  const { user } = useUser()
+  const { user, profile } = useUser()
   const supabase = useSupabase()
+  const customerType = profile?.is_business ? 'business' : 'individual'
 
   return useQuery({
-    queryKey: [BRIDGE_TRANSFER_TEMPLATE_QUERY_KEY, user?.id],
-    enabled: !!user?.id,
+    queryKey: [BRIDGE_TRANSFER_TEMPLATE_QUERY_KEY, user?.id, customerType],
+    enabled: !!user?.id && !!profile,
     queryFn: async () => {
       log('fetching bridge transfer template for user', user?.id)
 
@@ -82,6 +96,7 @@ export function useBridgeTransferTemplate() {
         `
         )
         .eq('status', 'active')
+        .eq('bridge_customers.type', customerType)
         .maybeSingle()
 
       if (error) {
@@ -102,10 +117,17 @@ export function useBridgeTransferTemplate() {
 export function useCreateTransferTemplate() {
   const queryClient = useQueryClient()
   const supabase = useSupabase()
+  const analytics = useAnalytics()
 
   return useMutation({
     mutationFn: async () => {
       log('creating transfer template')
+      analytics.capture({
+        name: 'bank_transfer_account_setup_started',
+        properties: {
+          method: 'transfer_template',
+        },
+      })
 
       const headers = await getAuthHeaders(supabase)
       const response = await fetch(`${getBaseUrl()}/api/bridge/transfer-template/create`, {
@@ -121,8 +143,23 @@ export function useCreateTransferTemplate() {
       return response.json()
     },
     onSuccess: () => {
+      analytics.capture({
+        name: 'bank_transfer_account_setup_completed',
+        properties: {
+          method: 'transfer_template',
+        },
+      })
       queryClient.invalidateQueries({ queryKey: [BRIDGE_TRANSFER_TEMPLATE_QUERY_KEY] })
       queryClient.invalidateQueries({ queryKey: [BRIDGE_CUSTOMER_QUERY_KEY] })
+    },
+    onError: (error) => {
+      analytics.capture({
+        name: 'bank_transfer_account_setup_failed',
+        properties: {
+          method: 'transfer_template',
+          error_type: getErrorType(error),
+        },
+      })
     },
   })
 }

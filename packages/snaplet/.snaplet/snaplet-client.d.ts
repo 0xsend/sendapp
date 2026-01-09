@@ -486,6 +486,7 @@ type Override = {
       banner_url?: string;
       verified_at?: string;
       sync_referrals_to_contacts?: string;
+      is_business?: string;
       users?: string;
       affiliate_stats?: string;
       referrals_referrals_referred_idToprofiles?: string;

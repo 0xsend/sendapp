@@ -190,6 +190,38 @@ interface DepositFailedProps extends DepositProps {
   error_type: 'user_rejection' | 'network' | 'provider_error' | 'unknown'
 }
 
+interface BankTransferKycStartedProps {
+  kyc_status: string
+  has_tos_accepted: boolean
+}
+
+interface BankTransferKycLinkOpenedProps {
+  link_type: 'tos' | 'kyc'
+  kyc_status: string
+}
+
+interface BankTransferKycFailedProps {
+  error_type: 'network' | 'unknown'
+}
+
+interface BankTransferAccountSetupProps {
+  method: 'transfer_template' | 'virtual_account'
+}
+
+interface BankTransferAccountSetupFailedProps extends BankTransferAccountSetupProps {
+  error_type: 'network' | 'unknown'
+}
+
+interface BankTransferDetailsViewedProps {
+  account_source: 'transfer_template' | 'virtual_account'
+  has_ach: boolean
+  has_wire: boolean
+}
+
+interface BankTransferInfoViewedProps {
+  info_type: 'kyc' | 'bank_details'
+}
+
 interface MaintenanceViewedProps {
   reason?: string
 }
@@ -321,6 +353,15 @@ export type AnalyticsEvent =
   | { name: 'deposit_started'; properties: DepositProps }
   | { name: 'deposit_completed'; properties: DepositCompletedProps }
   | { name: 'deposit_failed'; properties: DepositFailedProps }
+  // Bank Transfer (Virtual Account)
+  | { name: 'bank_transfer_kyc_started'; properties: BankTransferKycStartedProps }
+  | { name: 'bank_transfer_kyc_link_opened'; properties: BankTransferKycLinkOpenedProps }
+  | { name: 'bank_transfer_kyc_failed'; properties: BankTransferKycFailedProps }
+  | { name: 'bank_transfer_account_setup_started'; properties: BankTransferAccountSetupProps }
+  | { name: 'bank_transfer_account_setup_completed'; properties: BankTransferAccountSetupProps }
+  | { name: 'bank_transfer_account_setup_failed'; properties: BankTransferAccountSetupFailedProps }
+  | { name: 'bank_transfer_details_viewed'; properties: BankTransferDetailsViewedProps }
+  | { name: 'bank_transfer_info_viewed'; properties: BankTransferInfoViewedProps }
   // Maintenance & Updates
   | { name: 'maintenance_viewed'; properties: MaintenanceViewedProps }
   | { name: 'ota_update_available'; properties: OtaUpdateProps }
@@ -346,6 +387,7 @@ export interface AnalyticsUserProperties {
   sendtag?: string
   has_referral?: boolean
   send_account_id?: string
+  profile_type?: 'business' | 'personal'
 }
 
 // Exception tracking properties

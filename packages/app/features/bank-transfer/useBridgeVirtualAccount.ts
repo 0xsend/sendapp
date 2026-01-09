@@ -5,8 +5,21 @@ import { useUser } from 'app/utils/useUser'
 import { BRIDGE_CUSTOMER_QUERY_KEY } from './useBridgeCustomer'
 import getBaseUrl from 'app/utils/getBaseUrl'
 import type { SourceDepositInstructions } from '@my/bridge'
+import { useAnalytics } from 'app/provider/analytics'
 
 const log = debug('app:features:bank-transfer:useBridgeVirtualAccount')
+
+const getErrorType = (error: unknown): 'network' | 'unknown' => {
+  const message = error instanceof Error ? error.message : String(error)
+  if (
+    message.includes('Network') ||
+    message.includes('network') ||
+    message.includes('Failed to fetch')
+  ) {
+    return 'network'
+  }
+  return 'unknown'
+}
 
 export const BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY = 'bridge_virtual_account' as const
 
@@ -60,12 +73,13 @@ async function getAuthHeaders(
  * Hook to fetch the current user's virtual account
  */
 export function useBridgeVirtualAccount() {
-  const { user } = useUser()
+  const { user, profile } = useUser()
   const supabase = useSupabase()
+  const customerType = profile?.is_business ? 'business' : 'individual'
 
   return useQuery({
-    queryKey: [BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY, user?.id],
-    enabled: !!user?.id,
+    queryKey: [BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY, user?.id, customerType],
+    enabled: !!user?.id && !!profile,
     queryFn: async () => {
       log('fetching bridge virtual account for user', user?.id)
 
@@ -79,6 +93,7 @@ export function useBridgeVirtualAccount() {
         `
         )
         .eq('status', 'active')
+        .eq('bridge_customers.type', customerType)
         .maybeSingle()
 
       if (error) {
@@ -99,10 +114,17 @@ export function useBridgeVirtualAccount() {
 export function useCreateVirtualAccount() {
   const queryClient = useQueryClient()
   const supabase = useSupabase()
+  const analytics = useAnalytics()
 
   return useMutation({
     mutationFn: async () => {
       log('creating virtual account')
+      analytics.capture({
+        name: 'bank_transfer_account_setup_started',
+        properties: {
+          method: 'virtual_account',
+        },
+      })
 
       const headers = await getAuthHeaders(supabase)
       const response = await fetch(`${getBaseUrl()}/api/bridge/virtual-account/create`, {
@@ -118,8 +140,23 @@ export function useCreateVirtualAccount() {
       return response.json()
     },
     onSuccess: () => {
+      analytics.capture({
+        name: 'bank_transfer_account_setup_completed',
+        properties: {
+          method: 'virtual_account',
+        },
+      })
       queryClient.invalidateQueries({ queryKey: [BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY] })
       queryClient.invalidateQueries({ queryKey: [BRIDGE_CUSTOMER_QUERY_KEY] })
+    },
+    onError: (error) => {
+      analytics.capture({
+        name: 'bank_transfer_account_setup_failed',
+        properties: {
+          method: 'virtual_account',
+          error_type: getErrorType(error),
+        },
+      })
     },
   })
 }

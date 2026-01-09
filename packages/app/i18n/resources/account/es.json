@@ -69,13 +69,16 @@
         "public": "Perfil público",
         "private": "Perfil privado"
       },
+      "businessProfile": "Business Profile",
       "edit": "editar perfil"
     },
     "form": {
       "name": "Nombre",
       "about": "Descripción",
       "aboutPlaceholder": "Cuéntanos sobre ti",
-      "makePublic": "Hacer perfil público"
+      "makePublic": "Hacer perfil público",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal."
     }
   },
   "personalInfo": {

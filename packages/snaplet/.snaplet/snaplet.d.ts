@@ -498,6 +498,7 @@ interface Table_public_profiles {
   banner_url: string | null;
   verified_at: string | null;
   sync_referrals_to_contacts: boolean;
+  is_business: boolean;
 }
 interface Table_public_receipts {
   hash: string | null;

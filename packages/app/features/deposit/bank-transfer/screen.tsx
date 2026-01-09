@@ -8,7 +8,7 @@ import {
   Button,
   AnimatePresence,
 } from '@my/ui'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
 import { KycStatusCard } from './KycStatusCard'
@@ -21,8 +21,25 @@ import {
 } from 'app/features/bank-transfer'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
+import { useAnalytics } from 'app/provider/analytics'
+import { useUser } from 'app/utils/useUser'
+import { Link } from 'solito/link'
+
+const getErrorType = (error: unknown): 'network' | 'unknown' => {
+  const message = error instanceof Error ? error.message : String(error)
+  if (
+    message.includes('Network') ||
+    message.includes('network') ||
+    message.includes('Failed to fetch')
+  ) {
+    return 'network'
+  }
+  return 'unknown'
+}
 
 export function BankTransferScreen() {
+  const analytics = useAnalytics()
+  const { profile } = useUser()
   const {
     kycStatus,
     isTosAccepted,
@@ -43,34 +60,66 @@ export function BankTransferScreen() {
   // Track which step we're waiting for: 'tos', 'kyc', or null
   const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(null)
   const [showInfo, setShowInfo] = useState(false)
+  const hasTrackedDetailsView = useRef(false)
+  const hasTrackedInfoView = useRef(false)
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const redirectUri = useRedirectUri()
+  const isBusinessProfile = !!profile?.is_business
+  const showBusinessProfileNotice = isBusinessProfile && kycStatus === 'not_started'
+  const verificationSubject = isBusinessProfile ? 'business' : 'identity'
 
   const handleStartKyc = useCallback(async () => {
     if (isGeoBlocked) {
       return
     }
     try {
+      analytics.capture({
+        name: 'bank_transfer_kyc_started',
+        properties: {
+          kyc_status: kycStatus,
+          has_tos_accepted: isTosAccepted,
+        },
+      })
       const result = await initiateKyc.mutateAsync({ redirectUri })
       // If TOS is already accepted, go straight to KYC
       // Otherwise, open TOS link first (Bridge requires TOS acceptance before KYC)
       const urlToOpen = isTosAccepted ? result.kycLink : result.tosLink || result.kycLink
       if (urlToOpen) {
+        analytics.capture({
+          name: 'bank_transfer_kyc_link_opened',
+          properties: {
+            link_type: !isTosAccepted && result.tosLink ? 'tos' : 'kyc',
+            kyc_status: kycStatus,
+          },
+        })
         await Linking.openURL(urlToOpen)
         setVerificationUrl(result.kycLink)
         setWaitingFor(isTosAccepted ? 'kyc' : 'tos')
       }
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
+      analytics.capture({
+        name: 'bank_transfer_kyc_failed',
+        properties: {
+          error_type: getErrorType(error),
+        },
+      })
     }
-  }, [initiateKyc, isGeoBlocked, isTosAccepted, redirectUri])
+  }, [analytics, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus, redirectUri])
 
   const handleOpenVerificationLink = useCallback(() => {
     if (verificationUrl) {
+      analytics.capture({
+        name: 'bank_transfer_kyc_link_opened',
+        properties: {
+          link_type: waitingFor === 'tos' ? 'tos' : 'kyc',
+          kyc_status: kycStatus,
+        },
+      })
       Linking.openURL(verificationUrl)
     }
-  }, [verificationUrl])
+  }, [analytics, kycStatus, verificationUrl, waitingFor])
 
   // Stop waiting when the relevant status changes
   useEffect(() => {
@@ -107,6 +156,39 @@ export function BankTransferScreen() {
     templateCreationError,
     createTemplate,
   ])
+
+  useEffect(() => {
+    if (showInfo && !hasTrackedInfoView.current) {
+      analytics.capture({
+        name: 'bank_transfer_info_viewed',
+        properties: {
+          info_type: hasTransferTemplate ? 'bank_details' : 'kyc',
+        },
+      })
+      hasTrackedInfoView.current = true
+    }
+
+    if (!showInfo) {
+      hasTrackedInfoView.current = false
+    }
+  }, [analytics, hasTransferTemplate, showInfo])
+
+  useEffect(() => {
+    if (!hasTrackedDetailsView.current && hasTransferTemplate && bankDetails && !templateLoading) {
+      const hasAch = bankDetails.paymentRails.includes('ach_push')
+      const hasWire = bankDetails.paymentRails.includes('wire')
+
+      analytics.capture({
+        name: 'bank_transfer_details_viewed',
+        properties: {
+          account_source: 'transfer_template',
+          has_ach: hasAch,
+          has_wire: hasWire,
+        },
+      })
+      hasTrackedDetailsView.current = true
+    }
+  }, [analytics, bankDetails, hasTransferTemplate, templateLoading])
 
   // Handler to retry transfer template creation
   const handleRetryTemplateCreation = useCallback(() => {
@@ -194,18 +276,49 @@ export function BankTransferScreen() {
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <AnimatePresence exitBeforeEnter>
           {showInfo ? (
-            <KycInfoCard key="info" onDismiss={() => setShowInfo(false)} />
+            <KycInfoCard
+              key="info"
+              onDismiss={() => setShowInfo(false)}
+              isBusinessProfile={isBusinessProfile}
+            />
           ) : (
             <KycStatusCard
               key="kyc"
               kycStatus={kycStatus}
+              isBusinessProfile={isBusinessProfile}
               isTosAccepted={isTosAccepted}
               rejectionReasons={rejectionReasons}
               isMaxAttemptsExceeded={isMaxAttemptsExceeded}
               onStartKyc={handleStartKyc}
               isLoading={initiateKyc.isPending}
               onInfoPress={() => setShowInfo(true)}
-            />
+            >
+              {showBusinessProfileNotice ? (
+                <YStack gap="$2.5">
+                  <Paragraph fontSize="$5" fontWeight={600}>
+                    Important
+                  </Paragraph>
+                  <Paragraph
+                    fontSize="$4"
+                    color="$lightGrayTextField"
+                    $theme-light={{ color: '$darkGrayTextField' }}
+                  >
+                    We detected this is a business profile. If this is a mistake, edit your profile
+                    before continuing. Business profiles require business documents.
+                  </Paragraph>
+                  <Link href="/account/edit-profile">
+                    <Paragraph
+                      fontSize="$4"
+                      color="$primary"
+                      textDecorationLine="underline"
+                      $theme-light={{ color: '$color12' }}
+                    >
+                      Change Profile Type
+                    </Paragraph>
+                  </Link>
+                </YStack>
+              ) : null}
+            </KycStatusCard>
           )}
         </AnimatePresence>
       </YStack>
@@ -228,7 +341,7 @@ export function BankTransferScreen() {
             >
               {templateCreationError
                 ? 'We encountered an issue creating your deposit account. Please try again.'
-                : "Your identity has been verified. We're now creating your deposit account."}
+                : `Your ${verificationSubject} has been verified. We're now creating your deposit account.`}
             </Paragraph>
             {isTemplateCreating && (
               <YStack ai="center" py="$2">
@@ -307,7 +420,13 @@ function StepItem({ step, children }: { step: number; children: React.ReactNode 
   )
 }
 
-function KycInfoCard({ onDismiss }: { onDismiss: () => void }) {
+function KycInfoCard({
+  onDismiss,
+  isBusinessProfile = false,
+}: {
+  onDismiss: () => void
+  isBusinessProfile?: boolean
+}) {
   return (
     <FadeCard
       animation="200ms"
@@ -326,22 +445,23 @@ function KycInfoCard({ onDismiss }: { onDismiss: () => void }) {
           color="$lightGrayTextField"
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          Bank transfers let you deposit USD directly from your bank account into your Send wallet,
+          Bank transfers let you deposit USD directly from your bank account into your Send account,
           where it's automatically converted to USDC. This method has the highest deposit limits on
           Send.
         </Paragraph>
 
         <YStack gap="$3" py="$2">
           <Paragraph fontSize="$5" fontWeight={600}>
-            Why verify your identity?
+            {isBusinessProfile ? 'Why verify your business?' : 'Why verify your identity?'}
           </Paragraph>
           <Paragraph
             fontSize="$4"
             color="$lightGrayTextField"
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            Financial regulations require us to verify your identity before processing bank
-            transfers. This is a one-time process that helps protect you and prevents fraud.
+            Financial regulations require us to verify your{' '}
+            {isBusinessProfile ? 'business' : 'identity'} before processing bank transfers. This is
+            a one-time process that helps protect you and prevents fraud.
           </Paragraph>
         </YStack>
 

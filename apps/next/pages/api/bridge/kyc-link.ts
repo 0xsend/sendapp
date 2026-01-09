@@ -100,12 +100,32 @@ export default async function handler(
 
     log('initiating KYC for user', userId)
 
-    // Check if user already has a bridge customer record
     const adminClient = createSupabaseAdminClient()
+
+    const { data: profile, error: profileError } = await adminClient
+      .from('profiles')
+      .select('is_business')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (profileError) {
+      log('failed to fetch profile for KYC type: userId=%s error=%O', userId, profileError)
+      return res.status(500).json({ error: 'Failed to load profile for KYC' })
+    }
+
+    if (!profile) {
+      log('no profile found for KYC type: userId=%s', userId)
+      return res.status(404).json({ error: 'Profile not found for KYC' })
+    }
+
+    const customerType = profile.is_business ? 'business' : 'individual'
+
+    // Check if user already has a bridge customer record for this profile type
     const { data: existingCustomer } = await adminClient
       .from('bridge_customers')
       .select('*')
       .eq('user_id', userId)
+      .eq('type', customerType)
       .maybeSingle()
 
     if (existingCustomer) {
@@ -188,10 +208,10 @@ export default async function handler(
     const kycLinkResponse = await bridgeClient.createKycLink(
       {
         email,
-        type: 'individual',
+        type: customerType,
         redirect_uri: validatedRedirectUri,
       },
-      { idempotencyKey: `kyc-${userId}` }
+      { idempotencyKey: `kyc-${userId}-${customerType}` }
     )
 
     log('created KYC link', kycLinkResponse.id)
@@ -204,6 +224,7 @@ export default async function handler(
       kyc_status: kycLinkResponse.kyc_status,
       tos_status: kycLinkResponse.tos_status,
       bridge_customer_id: kycLinkResponse.customer_id,
+      type: customerType,
     })
 
     if (insertError) {

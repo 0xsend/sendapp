@@ -1,9 +1,9 @@
 import { FadeCard, Paragraph, YStack, XStack, Button, Spinner } from '@my/ui'
 import { Check, HelpCircle } from '@tamagui/lucide-icons'
-import type { KycStatus } from '@my/bridge'
 
 interface KycStatusCardProps {
   kycStatus: string
+  isBusinessProfile?: boolean
   isTosAccepted?: boolean
   onStartKyc?: () => void
   isLoading?: boolean
@@ -14,10 +14,10 @@ interface KycStatusCardProps {
   children?: React.ReactNode
 }
 
-function getStatusText(status: string): string {
+function getStatusText(status: string, isBusinessProfile: boolean): string {
   switch (status) {
     case 'approved':
-      return 'Identity Verified'
+      return isBusinessProfile ? 'Business Verified' : 'Identity Verified'
     case 'rejected':
       return 'Verification Failed'
     case 'under_review':
@@ -37,12 +37,14 @@ function getStatusText(status: string): string {
   }
 }
 
-function getStatusDescription(status: string): string {
+function getStatusDescription(status: string, isBusinessProfile: boolean): string {
   switch (status) {
     case 'approved':
       return 'You can now deposit funds from your bank.'
     case 'rejected':
-      return 'Your identity verification was not successful.'
+      return isBusinessProfile
+        ? 'Your business verification was not successful.'
+        : 'Your identity verification was not successful.'
     case 'under_review':
       return 'Your verification is being reviewed. This usually takes 1-2 business days.'
     case 'incomplete':
@@ -56,7 +58,9 @@ function getStatusDescription(status: string): string {
     case 'offboarded':
       return 'Your account has been offboarded. Please contact support.'
     default:
-      return 'To deposit from your bank, we need to verify your identity. This is a one-time process required by financial regulations.'
+      return isBusinessProfile
+        ? 'To deposit from your bank, we need to verify your business. This is a one-time process required by financial regulations.'
+        : 'To deposit from your bank, we need to verify your identity. This is a one-time process required by financial regulations.'
   }
 }
 
@@ -102,6 +106,7 @@ function StepIndicator({
 
 export function KycStatusCard({
   kycStatus,
+  isBusinessProfile = false,
   isTosAccepted = false,
   onStartKyc,
   isLoading,
@@ -129,7 +134,7 @@ export function KycStatusCard({
   } else if (needsTos) {
     buttonLabel = 'Accept Terms of Service'
   } else if (isNewUser || kycStatus === 'incomplete') {
-    buttonLabel = 'Verify Identity'
+    buttonLabel = isBusinessProfile ? 'Verify Business' : 'Verify Identity'
   }
 
   // Show max attempts exceeded message
@@ -195,8 +200,10 @@ export function KycStatusCard({
             $theme-light={{ color: '$darkGrayTextField' }}
             pr={onInfoPress ? '$8' : '$2'}
           >
-            {getStatusDescription(kycStatus)}
+            {getStatusDescription(kycStatus, isBusinessProfile)}
           </Paragraph>
+
+          {children}
 
           <YStack gap="$3" py="$2">
             <StepIndicator
@@ -207,13 +214,12 @@ export function KycStatusCard({
             />
             <StepIndicator
               step={2}
-              label="Verify Your Identity"
+              label={isBusinessProfile ? 'Verify Your Business' : 'Verify Your Identity'}
               isComplete={false}
               isActive={isTosAccepted}
             />
           </YStack>
 
-          {children}
           <Button
             size="$4"
             theme="green"
@@ -249,7 +255,7 @@ export function KycStatusCard({
       )}
       <YStack gap="$4">
         <Paragraph fontSize="$6" fontWeight={600} pr={onInfoPress ? '$8' : undefined}>
-          {getStatusText(kycStatus)}
+          {getStatusText(kycStatus, isBusinessProfile)}
         </Paragraph>
 
         <Paragraph
@@ -257,7 +263,7 @@ export function KycStatusCard({
           color="$lightGrayTextField"
           $theme-light={{ color: '$darkGrayTextField' }}
         >
-          {getStatusDescription(kycStatus)}
+          {getStatusDescription(kycStatus, isBusinessProfile)}
         </Paragraph>
 
         {kycStatus === 'rejected' && rejectionReasons?.length ? (

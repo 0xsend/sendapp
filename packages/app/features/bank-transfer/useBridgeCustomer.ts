@@ -57,16 +57,21 @@ async function getAuthHeaders(
  * Hook to fetch the current user's Bridge customer record
  */
 export function useBridgeCustomer() {
-  const { user } = useUser()
+  const { user, profile, isLoadingProfile } = useUser()
   const supabase = useSupabase()
+  const customerType = profile?.is_business ? 'business' : 'individual'
 
-  return useQuery({
-    queryKey: [BRIDGE_CUSTOMER_QUERY_KEY, user?.id],
-    enabled: !!user?.id,
+  const query = useQuery({
+    queryKey: [BRIDGE_CUSTOMER_QUERY_KEY, user?.id, customerType],
+    enabled: !!user?.id && !isLoadingProfile,
     queryFn: async () => {
       log('fetching bridge customer for user', user?.id)
 
-      const { data, error } = await supabase.from('bridge_customers_safe').select('*').maybeSingle()
+      const { data, error } = await supabase
+        .from('bridge_customers_safe')
+        .select('*')
+        .eq('type', customerType)
+        .maybeSingle()
 
       if (error) {
         log('error fetching bridge customer', error)
@@ -79,6 +84,11 @@ export function useBridgeCustomer() {
     staleTime: 5_000,
     refetchInterval: 5_000,
   })
+
+  return {
+    ...query,
+    isLoading: query.isLoading || isLoadingProfile,
+  }
 }
 
 /**

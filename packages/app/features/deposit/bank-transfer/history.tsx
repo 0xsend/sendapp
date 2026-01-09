@@ -1,9 +1,20 @@
-import { Paragraph, Spinner, Text, View, XStack, YStack, H4 } from '@my/ui'
+import {
+  Paragraph,
+  Spinner,
+  Text,
+  View,
+  XStack,
+  YStack,
+  H4,
+  Button,
+  FadeCard,
+  AnimatePresence,
+} from '@my/ui'
 import { useBridgeDeposits } from 'app/features/bank-transfer'
-import { useCallback, useMemo, memo } from 'react'
+import { useCallback, useMemo, memo, useState } from 'react'
 import { FlashList } from '@shopify/flash-list'
 import { ActivityRowLayout } from 'app/components/ActivityRowLayout'
-import { Check, Clock, XCircle } from '@tamagui/lucide-icons'
+import { Check, Clock, XCircle, HelpCircle } from '@tamagui/lucide-icons'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import type { Tables } from '@my/supabase/database.types'
 
@@ -108,14 +119,143 @@ function TransferAvatar({ status }: { status?: string | null }) {
   )
 }
 
-function SectionHeader({ title }: { title: string }) {
-  const displayTitle = title === 'Pending' ? 'Pending (settles in 1-5 business days)' : title
+function SectionHeader({
+  title,
+  onInfoPress,
+}: {
+  title: string
+  onInfoPress?: () => void
+}) {
+  const showInfoButton = title === 'Pending' && onInfoPress
   return (
     <View h={56} w="100%">
-      <H4 size="$7" fontWeight="400" py="$3.5" bc="$background" col="$gray11">
-        {displayTitle}
-      </H4>
+      <XStack ai="center" jc="space-between" py="$3.5">
+        <H4 size="$7" fontWeight="400" bc="$background" col="$gray11">
+          {title}
+        </H4>
+        {showInfoButton && (
+          <Button
+            size="$2"
+            circular
+            animation="100ms"
+            animateOnly={['transform']}
+            boc="$aztec3"
+            hoverStyle={{ boc: '$aztec4' }}
+            pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+            onPress={onInfoPress}
+          >
+            <Button.Icon scaleIcon={1.2}>
+              <HelpCircle size={14} />
+            </Button.Icon>
+          </Button>
+        )}
+      </XStack>
     </View>
+  )
+}
+
+function PendingInfoCard({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <FadeCard
+      animation="200ms"
+      y={0}
+      opacity={1}
+      enterStyle={{ y: 20, opacity: 0 }}
+      exitStyle={{ y: 20, opacity: 0 }}
+    >
+      <YStack gap="$4">
+        <Paragraph fontSize="$6" fontWeight={600}>
+          Pending Transfer Status
+        </Paragraph>
+
+        <Paragraph
+          fontSize="$4"
+          color="$lightGrayTextField"
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Bank transfers go through several stages before completing. Here's what each status means:
+        </Paragraph>
+
+        <YStack gap="$3" py="$2">
+          <YStack gap="$1">
+            <Paragraph fontSize="$4" fontWeight={600}>
+              Awaiting funds
+            </Paragraph>
+            <Paragraph
+              fontSize="$3"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              We're waiting to receive your transfer from your bank.
+            </Paragraph>
+          </YStack>
+
+          <YStack gap="$1">
+            <Paragraph fontSize="$4" fontWeight={600}>
+              Funds received
+            </Paragraph>
+            <Paragraph
+              fontSize="$3"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              Your transfer has arrived and is being processed.
+            </Paragraph>
+          </YStack>
+
+          <YStack gap="$1">
+            <Paragraph fontSize="$4" fontWeight={600}>
+              Funds scheduled
+            </Paragraph>
+            <Paragraph
+              fontSize="$3"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              Your deposit is scheduled to be credited to your account.
+            </Paragraph>
+          </YStack>
+
+          <YStack gap="$1">
+            <Paragraph fontSize="$4" fontWeight={600}>
+              In review
+            </Paragraph>
+            <Paragraph
+              fontSize="$3"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              Your transfer is being reviewed. This is a routine check.
+            </Paragraph>
+          </YStack>
+
+          <YStack gap="$1">
+            <Paragraph fontSize="$4" fontWeight={600}>
+              Payment submitted
+            </Paragraph>
+            <Paragraph
+              fontSize="$3"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+            >
+              Your USDC is being sent to your wallet and will arrive shortly.
+            </Paragraph>
+          </YStack>
+        </YStack>
+
+        <Paragraph
+          fontSize="$3"
+          color="$lightGrayTextField"
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          ACH transfers typically take 1-3 business days. Wire transfers are usually same-day.
+        </Paragraph>
+
+        <Button size="$4" theme="green" onPress={onDismiss} mt="$2">
+          Got it
+        </Button>
+      </YStack>
+    </FadeCard>
   )
 }
 
@@ -176,6 +316,7 @@ const TransferRow = memo(function TransferRow({
 
 export function BankTransferHistoryScreen() {
   const { data: deposits, isLoading, error } = useBridgeDeposits()
+  const [showPendingInfo, setShowPendingInfo] = useState(false)
 
   const rows = useMemo(() => deposits ?? [], [deposits])
   const { flattenedData, sectionDataMap } = useMemo(() => {
@@ -233,10 +374,12 @@ export function BankTransferHistoryScreen() {
     return `deposit-${deposit.id}`
   }, [])
 
+  const handlePendingInfoPress = useCallback(() => setShowPendingInfo(true), [])
+
   const renderItem = useCallback(
     ({ item, index }: { item: ListItem; index: number }) => {
       if ('type' in item && item.type === 'header') {
-        return <SectionHeader title={item.title} />
+        return <SectionHeader title={item.title} onInfoPress={handlePendingInfoPress} />
       }
 
       const deposit = item as BridgeDeposit & { sectionIndex: number }
@@ -249,7 +392,7 @@ export function BankTransferHistoryScreen() {
         <TransferRow deposit={deposit} isFirst={isFirst} isLast={isLast} isPending={isPending} />
       )
     },
-    [sectionDataMap]
+    [sectionDataMap, handlePendingInfoPress]
   )
 
   if (isLoading) {
@@ -278,16 +421,22 @@ export function BankTransferHistoryScreen() {
 
   return (
     <YStack f={1} width="100%" maxWidth={600} pb="$3" pt="$3" gap="$6" $gtLg={{ pt: 0 }}>
-      <View className="hide-scroll" display="contents">
-        <FlashList
-          data={flattenedData}
-          keyExtractor={keyExtractor}
-          renderItem={renderItem}
-          getItemType={getItemType}
-          style={styles.flashListStyle}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+      <AnimatePresence exitBeforeEnter>
+        {showPendingInfo ? (
+          <PendingInfoCard key="pending-info" onDismiss={() => setShowPendingInfo(false)} />
+        ) : (
+          <View key="list" className="hide-scroll" display="contents" f={1}>
+            <FlashList
+              data={flattenedData}
+              keyExtractor={keyExtractor}
+              renderItem={renderItem}
+              getItemType={getItemType}
+              style={styles.flashListStyle}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        )}
+      </AnimatePresence>
     </YStack>
   )
 }

@@ -7301,6 +7301,20 @@
           "maxLength": null
         },
         {
+          "id": "public.profiles.is_business",
+          "name": "is_business",
+          "columnName": "is_business",
+          "type": "bool",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,

@@ -126,12 +126,15 @@
     "form": {
       "about": "Über",
       "aboutPlaceholder": "Erzähl uns etwas über dich",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal.",
       "makePublic": "Profil öffentlich machen",
       "name": "Name"
     },
     "header": "Profil",
     "overview": {
       "about": "Über",
+      "businessProfile": "Business Profile",
       "edit": "Profil bearbeiten",
       "name": "Name",
       "visibility": {

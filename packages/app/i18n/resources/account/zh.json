@@ -125,12 +125,15 @@
     "form": {
       "about": "关于",
       "aboutPlaceholder": "介绍一下你自己",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal.",
       "makePublic": "公开个人资料",
       "name": "姓名"
     },
     "header": "个人资料",
     "overview": {
       "about": "关于",
+      "businessProfile": "Business Profile",
       "edit": "编辑个人资料",
       "name": "姓名",
       "visibility": {

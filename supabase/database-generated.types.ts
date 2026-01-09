@@ -823,6 +823,7 @@ export type Database = {
           banner_url: string | null
           birthday: string | null
           id: string
+          is_business: boolean
           is_public: boolean | null
           name: string | null
           referral_code: string | null
@@ -883,6 +884,7 @@ export type Database = {
           banner_url?: string | null
           birthday?: string | null
           id: string
+          is_business?: boolean
           is_public?: boolean | null
           name?: string | null
           referral_code?: string | null
@@ -897,6 +899,7 @@ export type Database = {
           banner_url?: string | null
           birthday?: string | null
           id?: string
+          is_business?: boolean
           is_public?: boolean | null
           name?: string | null
           referral_code?: string | null

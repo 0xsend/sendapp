@@ -65,13 +65,14 @@ export const EditProfile = () => {
 }
 
 const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: () => void }) => {
-  const { name, about, is_public, avatar_url, banner_url } = profile
+  const { name, about, is_public, is_business, avatar_url, banner_url } = profile
   const avatarRef = useRef<UploadAvatarRefObject>(null)
   const bannerRef = useRef<UploadBannerRefObject>(null)
   const { t } = useTranslation('account')
   const visibilityLabel = is_public
     ? t('profile.overview.visibility.public')
     : t('profile.overview.visibility.private')
+  const businessProfileLabel = t('profile.overview.businessProfile')
 
   return (
     <YStack gap={'$5'}>
@@ -139,6 +140,20 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
             </Checkbox>
             <Paragraph size={'$5'}>{visibilityLabel}</Paragraph>
           </XStack>
+          <XStack gap={'$3'} ai={'center'}>
+            <Checkbox
+              disabled={true}
+              checked={!!is_business}
+              borderWidth={0}
+              backgroundColor={is_business ? '$primary' : '$background'}
+              circular={true}
+            >
+              <Checkbox.Indicator>
+                <Check color={'$black'} />
+              </Checkbox.Indicator>
+            </Checkbox>
+            <Paragraph size={'$5'}>{businessProfileLabel}</Paragraph>
+          </XStack>
         </Card>
       </Fade>
       <SubmitButton onPress={onPress}>
@@ -149,10 +164,12 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
 }
 
 function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onSave: () => void }) {
-  const { id, name, about, is_public } = profile
+  const { id, name, about, is_public, is_business } = profile
   const { mutateAsync, error } = useProfileMutation(id)
   const form = useForm<z.infer<typeof ProfileSchema>>()
   const { t } = useTranslation('account')
+  const isBusinessSelected = form.watch('isBusiness') ?? false
+  const showBusinessLockNotice = is_business || isBusinessSelected
 
   const handleSubmit = async () => {
     const values = form.getValues()
@@ -180,12 +197,19 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         },
         isPublic: {
           defaultChecked: is_public !== null ? is_public : true,
+          'aria-label': t('profile.form.makePublic'),
+        },
+        isBusiness: {
+          defaultChecked: is_business ?? false,
+          'aria-label': t('profile.form.businessProfile'),
+          disabled: is_business ?? false,
         },
       }}
       defaultValues={{
         name: name ? name : '',
         about: about ? about : '',
         isPublic: is_public !== null ? is_public : true,
+        isBusiness: is_business ?? false,
       }}
       formProps={{
         footerProps: { p: 0 },
@@ -200,7 +224,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
       }}
       onSubmit={handleSubmit}
     >
-      {({ name, about, isPublic }) => (
+      {({ name, about, isPublic, isBusiness }) => (
         <YStack gap={'$3.5'}>
           <FadeCard>
             <FieldWithLabel label={t('profile.form.name')} gap={'$2'}>
@@ -215,6 +239,15 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
               {isPublic}
               <Paragraph size={'$5'}>{t('profile.form.makePublic')}</Paragraph>
             </XStack>
+            <XStack gap={'$3'} ai={'center'}>
+              {isBusiness}
+              <Paragraph size={'$5'}>{t('profile.form.businessProfile')}</Paragraph>
+            </XStack>
+            {showBusinessLockNotice && (
+              <Paragraph size={'$3'} color="$color10">
+                {t('profile.form.businessProfileLockNotice')}
+              </Paragraph>
+            )}
           </FadeCard>
           <SubmitButton onPress={() => form.handleSubmit(handleSubmit)()}>
             <SubmitButton.Text>{t('common.saveChanges')}</SubmitButton.Text>

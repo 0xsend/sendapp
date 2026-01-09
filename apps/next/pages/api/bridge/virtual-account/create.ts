@@ -124,11 +124,30 @@ export default async function handler(
 
     const destinationAddress = sendAccount.address
 
+    const { data: profile, error: profileError } = await adminClient
+      .from('profiles')
+      .select('is_business')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (profileError) {
+      log('failed to fetch profile for virtual account: userId=%s error=%O', userId, profileError)
+      return res.status(500).json({ error: 'Failed to load profile' })
+    }
+
+    if (!profile) {
+      log('no profile found for virtual account: userId=%s', userId)
+      return res.status(404).json({ error: 'Profile not found' })
+    }
+
+    const customerType = profile.is_business ? 'business' : 'individual'
+
     // Get user's bridge customer record
     const { data: customer, error: customerError } = await adminClient
       .from('bridge_customers')
       .select('*')
       .eq('user_id', userId)
+      .eq('type', customerType)
       .single()
 
     if (customerError || !customer) {
