@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import debug from 'debug'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
-import getBaseUrl from 'app/utils/getBaseUrl'
+import { api } from 'app/utils/api'
 
 const log = debug('app:features:bank-transfer:useBridgeCustomer')
 
@@ -39,24 +40,6 @@ function extractCustomerRejectionReasons(input: unknown): string[] {
   }
 
   return Array.from(new Set(reasons))
-}
-
-/**
- * Helper to create auth headers for API requests (supports native clients)
- */
-async function getAuthHeaders(
-  supabase: ReturnType<typeof useSupabase>
-): Promise<Record<string, string>> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-
-  const { data } = await supabase.auth.getSession()
-  if (data.session?.access_token) {
-    headers.Authorization = `Bearer ${data.session.access_token}`
-  }
-
-  return headers
 }
 
 /**
@@ -136,26 +119,8 @@ export function useBridgeCustomerKycLock() {
  */
 export function useInitiateKyc() {
   const queryClient = useQueryClient()
-  const supabase = useSupabase()
 
-  return useMutation({
-    mutationFn: async (data?: { redirectUri?: string }) => {
-      log('initiating KYC', data)
-
-      const headers = await getAuthHeaders(supabase)
-      const response = await fetch(`${getBaseUrl()}/api/bridge/kyc-link`, {
-        method: 'POST',
-        headers,
-        body: data ? JSON.stringify(data) : undefined,
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || error.message || 'Failed to initiate KYC')
-      }
-
-      return response.json() as Promise<{ kycLink: string; tosLink: string }>
-    },
+  return api.bridge.createKycLink.useMutation({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [BRIDGE_CUSTOMER_QUERY_KEY] })
     },
@@ -189,5 +154,82 @@ export function useKycStatus() {
     rejectionAttempts,
     isMaxAttemptsExceeded,
     refetch,
+  }
+}
+
+/**
+ * Determines if KYC polling should stop based on status and attempts.
+ * Stops when: approved OR (rejected AND max attempts reached)
+ */
+function shouldStopPolling(kycStatus: string, rejectionAttempts: number): boolean {
+  if (kycStatus === 'approved') return true
+  if (kycStatus === 'rejected' && rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS) return true
+  return false
+}
+
+/**
+ * Hook to poll Bridge API directly for KYC status.
+ * More responsive than waiting for webhooks.
+ *
+ * Polling stops when:
+ * - KYC is approved
+ * - KYC is rejected AND max rejection attempts (3) reached
+ *
+ * @param kycLinkId - The KYC link ID to poll. Polling is disabled when undefined.
+ * @param options.enabled - Additional condition to enable polling (default: true)
+ * @param options.interval - Polling interval in ms (default: 2000)
+ */
+export function usePollKycStatus(
+  kycLinkId: string | undefined,
+  options?: { enabled?: boolean; interval?: number }
+) {
+  const { enabled = true, interval = 2_000 } = options ?? {}
+  const queryClient = useQueryClient()
+  const { user, profile } = useUser()
+  const customerType = profile?.is_business ? 'business' : 'individual'
+
+  const query = api.bridge.getKycStatus.useQuery(
+    { kycLinkId: kycLinkId ?? '' },
+    {
+      enabled: !!kycLinkId && enabled,
+      refetchInterval: (query) => {
+        const data = query.state.data
+        if (!data) return interval
+
+        // Stop polling if terminal state reached
+        if (shouldStopPolling(data.kycStatus, data.rejectionAttempts)) {
+          log('stopping KYC poll: status=%s attempts=%d', data.kycStatus, data.rejectionAttempts)
+          return false
+        }
+
+        return interval
+      },
+      staleTime: 0, // Always fetch fresh data
+    }
+  )
+
+  const data = query.data
+
+  // Invalidate bridge customer query when KYC status data changes
+  useEffect(() => {
+    if (data) {
+      queryClient.invalidateQueries({
+        queryKey: [BRIDGE_CUSTOMER_QUERY_KEY, user?.id, customerType],
+      })
+    }
+  }, [data, queryClient, user?.id, customerType])
+
+  const rejectionReasons = extractCustomerRejectionReasons(data?.rejectionReasons)
+
+  return {
+    ...query,
+    kycStatus: data?.kycStatus ?? 'not_started',
+    tosStatus: data?.tosStatus ?? 'pending',
+    rejectionReasons,
+    rejectionAttempts: data?.rejectionAttempts ?? 0,
+    isApproved: data?.kycStatus === 'approved',
+    isRejected: data?.kycStatus === 'rejected',
+    isMaxAttemptsExceeded: (data?.rejectionAttempts ?? 0) >= MAX_KYC_REJECTION_ATTEMPTS,
+    shouldStopPolling: data ? shouldStopPolling(data.kycStatus, data.rejectionAttempts) : false,
   }
 }

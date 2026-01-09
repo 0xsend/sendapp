@@ -7,8 +7,6 @@ SELECT
     kyc_link_id,
     kyc_status,
     tos_status,
-    full_name,
-    email,
     type,
     rejection_attempts,
     created_at,
