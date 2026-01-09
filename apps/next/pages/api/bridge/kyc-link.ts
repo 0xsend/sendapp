@@ -104,7 +104,7 @@ export default async function handler(
 
     const { data: profile, error: profileError } = await adminClient
       .from('profiles')
-      .select('is_business')
+      .select('is_business, send_id')
       .eq('id', userId)
       .maybeSingle()
 
@@ -116,6 +116,11 @@ export default async function handler(
     if (!profile) {
       log('no profile found for KYC type: userId=%s', userId)
       return res.status(404).json({ error: 'Profile not found for KYC' })
+    }
+
+    if (!profile.send_id) {
+      log('no send_id found for KYC: userId=%s', userId)
+      return res.status(400).json({ error: 'Profile send_id is required for KYC' })
     }
 
     const customerType = profile.is_business ? 'business' : 'individual'
@@ -191,12 +196,8 @@ export default async function handler(
       }
     }
 
-    // Use email from authenticated session - never trust user-provided email
-    const email = session.user.email?.trim()
-
-    if (!email) {
-      return res.status(400).json({ error: 'User email is required' })
-    }
+    // Use send_id for deterministic email - user emails are unreliable with passkey auth
+    const email = `${profile.send_id}@no-reply.users.send.app`
 
     // Validate redirectUri against allowlist
     const { redirectUri } = req.body as InitiateKycRequest
@@ -211,7 +212,7 @@ export default async function handler(
         type: customerType,
         redirect_uri: validatedRedirectUri,
       },
-      { idempotencyKey: `kyc-${userId}-${customerType}` }
+      { idempotencyKey: `kyc-${profile.send_id}-${customerType}` }
     )
 
     log('created KYC link', kycLinkResponse.id)
