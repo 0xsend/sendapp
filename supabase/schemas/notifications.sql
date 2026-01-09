@@ -132,55 +132,15 @@ ALTER TABLE ONLY "public"."push_tokens"
 ALTER TABLE "public"."notifications" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."push_tokens" ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view their own notifications"
-ON "public"."notifications"
-FOR SELECT
-TO "authenticated"
-USING (auth.uid() = "user_id");
+CREATE POLICY "Users can view their own notifications" ON "public"."notifications" FOR SELECT TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
+CREATE POLICY "Users can insert their own notifications" ON "public"."notifications" FOR INSERT TO "authenticated" WITH CHECK (((SELECT auth.uid()) = "user_id"));
+CREATE POLICY "Users can update their own notifications" ON "public"."notifications" FOR UPDATE TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
+CREATE POLICY "Users can delete their own notifications" ON "public"."notifications" FOR DELETE TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
 
-CREATE POLICY "Users can insert their own notifications"
-ON "public"."notifications"
-FOR INSERT
-TO "authenticated"
-WITH CHECK (auth.uid() = "user_id");
-
-CREATE POLICY "Users can update their own notifications"
-ON "public"."notifications"
-FOR UPDATE
-TO "authenticated"
-USING (auth.uid() = "user_id")
-WITH CHECK (auth.uid() = "user_id");
-
-CREATE POLICY "Users can delete their own notifications"
-ON "public"."notifications"
-FOR DELETE
-TO "authenticated"
-USING (auth.uid() = "user_id");
-
-CREATE POLICY "Users can view their own push tokens"
-ON "public"."push_tokens"
-FOR SELECT
-TO "authenticated"
-USING (auth.uid() = "user_id");
-
-CREATE POLICY "Users can insert their own push tokens"
-ON "public"."push_tokens"
-FOR INSERT
-TO "authenticated"
-WITH CHECK (auth.uid() = "user_id");
-
-CREATE POLICY "Users can update their own push tokens"
-ON "public"."push_tokens"
-FOR UPDATE
-TO "authenticated"
-USING (auth.uid() = "user_id")
-WITH CHECK (auth.uid() = "user_id");
-
-CREATE POLICY "Users can delete their own push tokens"
-ON "public"."push_tokens"
-FOR DELETE
-TO "authenticated"
-USING (auth.uid() = "user_id");
+CREATE POLICY "Users can view their own push tokens" ON "public"."push_tokens" FOR SELECT TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
+CREATE POLICY "Users can insert their own push tokens" ON "public"."push_tokens" FOR INSERT TO "authenticated" WITH CHECK (((SELECT auth.uid()) = "user_id"));
+CREATE POLICY "Users can update their own push tokens" ON "public"."push_tokens" FOR UPDATE TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
+CREATE POLICY "Users can delete their own push tokens" ON "public"."push_tokens" FOR DELETE TO "authenticated" USING (((SELECT auth.uid()) = "user_id"));
 
 -- Grants
 -- SECURITY: anon role has NO access to these tables
