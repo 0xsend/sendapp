@@ -89,7 +89,6 @@ interface Table_public_bridge_deposits {
   destination_tx_hash: string | null;
   fee_amount: number | null;
   net_amount: number | null;
-  event_data: Json | null;
   created_at: string;
   updated_at: string;
 }

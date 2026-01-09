@@ -123,7 +123,6 @@ export type Database = {
           created_at: string
           currency: string
           destination_tx_hash: string | null
-          event_data: Json | null
           fee_amount: number | null
           id: string
           last_event_id: string | null
@@ -143,7 +142,6 @@ export type Database = {
           created_at?: string
           currency?: string
           destination_tx_hash?: string | null
-          event_data?: Json | null
           fee_amount?: number | null
           id?: string
           last_event_id?: string | null
@@ -163,7 +161,6 @@ export type Database = {
           created_at?: string
           currency?: string
           destination_tx_hash?: string | null
-          event_data?: Json | null
           fee_amount?: number | null
           id?: string
           last_event_id?: string | null

@@ -62,7 +62,6 @@ type Override = {
       destination_tx_hash?: string;
       fee_amount?: string;
       net_amount?: string;
-      event_data?: string;
       created_at?: string;
       updated_at?: string;
       bridge_virtual_accounts?: string;
@@ -1122,7 +1121,6 @@ export interface Fingerprint {
     amount?: FingerprintNumberField;
     feeAmount?: FingerprintNumberField;
     netAmount?: FingerprintNumberField;
-    eventData?: FingerprintJsonField;
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     virtualAccount?: FingerprintRelationField;

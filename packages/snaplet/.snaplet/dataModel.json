@@ -938,20 +938,6 @@
           "maxLength": null
         },
         {
-          "id": "public.bridge_deposits.event_data",
-          "name": "event_data",
-          "columnName": "event_data",
-          "type": "jsonb",
-          "isRequired": false,
-          "kind": "scalar",
-          "isList": false,
-          "isGenerated": false,
-          "sequence": false,
-          "hasDefaultValue": false,
-          "isId": false,
-          "maxLength": null
-        },
-        {
           "id": "public.bridge_deposits.created_at",
           "name": "created_at",
           "columnName": "created_at",
