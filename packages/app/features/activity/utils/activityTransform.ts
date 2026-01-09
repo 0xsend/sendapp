@@ -89,7 +89,7 @@ interface AddressContext {
   sendTokenV0Addr: string | undefined
 }
 
-function createAddressContext(
+export function createAddressContext(
   swapRouters: SwapRouter[] | undefined,
   liquidityPools: LiquidityPool[] | undefined
 ): AddressContext {

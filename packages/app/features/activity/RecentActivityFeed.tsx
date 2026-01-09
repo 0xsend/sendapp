@@ -39,7 +39,7 @@ import {
   useProcessedActivityFeed,
   type UserTransferRow,
 } from './utils/useProcessedActivityFeed'
-import { ActivityRowFactory, getColors } from './rows/ActivityRowFactory'
+import { ActivityRowFactory, getColors, getAvatarColors } from './rows/ActivityRowFactory'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { Keyboard } from 'react-native'
 
@@ -236,34 +236,42 @@ const keyExtractor = (item: ActivityRow): string => {
 interface ActivityRowWrapperProps {
   item: Exclude<ActivityRow, { kind: 'header' }>
   colors: ReturnType<typeof getColors>
+  avatarColors: ReturnType<typeof getAvatarColors>
   isDark: boolean
   onPress: (item: ActivityRow) => void
 }
 
-const ActivityRowWrapper = memo(({ item, colors, isDark, onPress }: ActivityRowWrapperProps) => {
-  const handlePress = useCallback(() => onPress(item), [onPress, item])
+const ActivityRowWrapper = memo(
+  ({ item, colors, avatarColors, isDark, onPress }: ActivityRowWrapperProps) => {
+    const handlePress = useCallback(() => onPress(item), [onPress, item])
 
-  return (
-    <Pressable onPress={handlePress}>
-      <YStack
-        bc="$color1"
-        p={10}
-        h={122}
-        mah={122}
-        {...(item.isFirst && {
-          borderTopLeftRadius: '$4',
-          borderTopRightRadius: '$4',
-        })}
-        {...(item.isLast && {
-          borderBottomLeftRadius: '$4',
-          borderBottomRightRadius: '$4',
-        })}
-      >
-        <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
-      </YStack>
-    </Pressable>
-  )
-})
+    return (
+      <Pressable onPress={handlePress}>
+        <YStack
+          bc="$color1"
+          p={10}
+          h={122}
+          mah={122}
+          {...(item.isFirst && {
+            borderTopLeftRadius: '$4',
+            borderTopRightRadius: '$4',
+          })}
+          {...(item.isLast && {
+            borderBottomLeftRadius: '$4',
+            borderBottomRightRadius: '$4',
+          })}
+        >
+          <ActivityRowFactory
+            item={item}
+            colors={colors}
+            avatarColors={avatarColors}
+            isDark={isDark}
+          />
+        </YStack>
+      </Pressable>
+    )
+  }
+)
 ActivityRowWrapper.displayName = 'ActivityRowWrapper'
 
 function isiOSPWA() {
@@ -297,6 +305,7 @@ const MyList = memo(
 
     // Compute colors once for all rows
     const colors = useMemo(() => getColors(isDark), [isDark])
+    const avatarColors = useMemo(() => getAvatarColors(isDark), [isDark])
 
     const handleScroll = useCallback(
       (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -316,19 +325,27 @@ const MyList = memo(
     const renderItem = useCallback(
       ({ item }: { item: ActivityRow }) => {
         if (isHeaderRow(item)) {
-          return <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
+          return (
+            <ActivityRowFactory
+              item={item}
+              colors={colors}
+              avatarColors={avatarColors}
+              isDark={isDark}
+            />
+          )
         }
 
         return (
           <ActivityRowWrapper
             item={item}
             colors={colors}
+            avatarColors={avatarColors}
             isDark={isDark}
             onPress={onActivityPress}
           />
         )
       },
-      [isDark, colors, onActivityPress]
+      [isDark, colors, avatarColors, onActivityPress]
     )
 
     return (

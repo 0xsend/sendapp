@@ -51,7 +51,7 @@ const TransactionContent = ({
     <YStack bg="$color1" p="$4" py="$5" gap="$6" pb={bottom}>
       {!isFailed && (
         <XStack ai="center" gap="$3" f={isWeb ? 1 : undefined}>
-          <ActivityAvatar activity={transaction} size="$5" circular={true} />
+          <ActivityAvatar activity={transaction} />
           <YStack>
             <Paragraph size="$6" color="$color11">
               {username}

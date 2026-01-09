@@ -100,7 +100,7 @@ const ActivityDetailsContent = ({ activity, ...props }: { activity: Activity } &
         >
           <XStack ai={'center'} jc={'space-between'}>
             <XStack f={1} gap={'$3'} ai={'center'}>
-              <ActivityAvatar activity={activity} size={'$3.5'} br={'unset'} circular={true} />
+              <ActivityAvatar activity={activity} />
               <XStack f={1} gap={'$2'}>
                 <Paragraph
                   size={'$6'}
