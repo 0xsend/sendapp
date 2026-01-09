@@ -2,21 +2,21 @@
  * Factory component that renders the appropriate row based on ActivityRow kind.
  * Uses React Native StyleSheet for maximum performance.
  * Token values mapped from Tamagui theme.
- *
- * Performance optimization: Each row type has its own content component with
- * inlined avatar rendering, eliminating the ActivityAvatarFactory switch.
  */
 
 import { memo } from 'react'
 import { View, Text, StyleSheet, type TextStyle, ActivityIndicator } from 'react-native'
 import { isWeb } from '@tamagui/constants'
 import { View as TamaguiView } from 'tamagui'
-import { ArrowDown, ArrowUp, Minus, Plus } from '@tamagui/lucide-icons'
+import { FastImage } from '@my/ui'
+import { IconCoin } from 'app/components/icons/IconCoin'
+import { IconSendPotTicket } from 'app/components/icons/IconSendPotTicket'
+import { IconUpgrade, IconBadgeCheckSolid2, IconKey } from 'app/components/icons'
 import { AvatarSendEarnDeposit } from 'app/components/avatars'
 import { AvatarSendEarnWithdraw } from 'app/components/avatars/AvatarSendEarnWithdraw'
+import { Minus, Plus, ArrowDown, ArrowUp } from '@tamagui/lucide-icons'
 import type {
   ActivityRow,
-  HeaderRow,
   UserTransferRow,
   SwapRow,
   SendpotRow,
@@ -27,18 +27,8 @@ import type {
   TagReceiptRow,
   ReferralRow,
   SigningKeyRow,
+  HeaderRow,
 } from '../utils/activityRowTypes'
-import {
-  AvatarWithVerifiedBadge,
-  SimpleAvatar,
-  IconWithBadge,
-  SendpotAvatar,
-  TagReceiptAvatar,
-  SigningKeyAvatar,
-  UpgradeAvatar,
-  getAvatarColors,
-  type AvatarThemeColors,
-} from '../avatars/ActivityAvatarFactory'
 
 /**
  * Tamagui token mappings:
@@ -68,19 +58,37 @@ const fonts = isWeb
 // On web, we need fontWeight for medium; on native, weight is in font family name
 const mediumWeight: TextStyle = isWeb ? { fontWeight: '500' } : {}
 
-// Theme-aware color palettes for row text
+// Theme-aware color palettes
+// Dark theme: light text on dark background
+// Light theme: dark text on light background
 const darkColors = {
   color12: '#FFFFFF', // Primary text
   color10: '#A1A1A1', // Secondary text
+  color1: '#081619', // Background
+  color2: '#082B1B', // Dark green background
+  olive: '#86AE80',
+  error: '#DE4747',
+  white: '#FFFFFF',
   gray11: '#A1A1A1',
   background: '#081619',
+  neon7: '#3EF851', // Verified badge
+  neon8: '#5DFA6F',
+  badgeCheckColor: '#082B1B',
 }
 
 const lightColors = {
   color12: '#081619', // Primary text (dark on light)
   color10: '#666666', // Secondary text
+  color1: '#F7F7F7', // Background
+  color2: '#E6F4EA', // Light green background
+  olive: '#86AE80',
+  error: '#DE4747',
+  white: '#FFFFFF',
   gray11: '#666666',
   background: '#F7F7F7',
+  neon7: '#22c55e', // Verified badge
+  neon8: '#16a34a',
+  badgeCheckColor: '#FFFFFF',
 }
 
 type ThemeColors = typeof darkColors
@@ -88,7 +96,7 @@ type ThemeColors = typeof darkColors
 // Get colors based on theme
 const getColors = (isDark: boolean): ThemeColors => (isDark ? darkColors : lightColors)
 
-// Static layout styles
+// Static layout styles (no colors)
 const styles = StyleSheet.create({
   // Row container
   rowOuter: {
@@ -142,6 +150,58 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     marginTop: 4,
   },
+  // Avatar
+  avatarContainer: {
+    marginTop: 4,
+    width: 52,
+    height: 52,
+    position: 'relative',
+  },
+  avatarImage: {
+    width: 52,
+    height: 52,
+    borderRadius: 1000000,
+  },
+  // Icon container
+  iconContainer: {
+    marginTop: 4,
+    width: 52, // $5
+    height: 52, // $5
+    borderRadius: 9, // $4
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  // Sendpot icon
+  sendpotIconBase: {
+    marginTop: 4,
+    width: 48, // $4.5
+    height: 48, // $4.5
+    borderRadius: 9, // $4
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  // Badge
+  badgeBase: {
+    position: 'absolute',
+    borderRadius: 999,
+  },
+  badgeTop: {
+    top: 0,
+    right: 0,
+  },
+  badgeBottom: {
+    bottom: 0,
+    right: 0,
+  },
+  // Verified badge
+  verifiedBadgeWrapper: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    zIndex: 100,
+    transform: [{ translateX: 2 }, { translateY: 2 }],
+  },
   // Header
   headerContainerBase: {
     height: 56,
@@ -168,6 +228,20 @@ const styles = StyleSheet.create({
   },
 })
 
+interface RowBaseProps {
+  isDark?: boolean
+  colors: ThemeColors
+}
+
+// Base row data interface for RowLayout
+interface RowData {
+  title: string
+  subtitle: string
+  amount: string
+  date: string
+  isPending?: boolean
+}
+
 // Web hover styles (computed once, not per-render)
 const webHoverStyleDark = {
   backgroundColor: 'rgba(255,255,255, 0.1)' as const,
@@ -178,17 +252,54 @@ const webHoverStyleLight = {
   cursor: 'pointer' as const,
 }
 
-// ============================================================================
-// Row Layout - wraps content for web hover / native rendering
-// ============================================================================
+// Row content shared between web and native
+const RowContent = memo(
+  ({ avatar, row, colors }: { avatar: React.ReactNode; row: RowData; colors: ThemeColors }) => (
+    <View style={styles.rowInner}>
+      {avatar}
+      <View style={styles.textStack}>
+        <View style={styles.topRow}>
+          <Text
+            style={[styles.titleTextBase, mediumWeight, { color: colors.color12 }]}
+            numberOfLines={1}
+          >
+            {row.title}
+          </Text>
+          <View style={styles.spacer} />
+          <Text
+            style={[styles.amountTextBase, mediumWeight, { color: colors.color12 }]}
+            numberOfLines={1}
+          >
+            {row.amount}
+          </Text>
+        </View>
+        <Text style={[styles.subTextBase, { color: colors.color10 }]} numberOfLines={2}>
+          {row.subtitle}
+        </Text>
+        {row.isPending ? (
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="small" color={colors.color10} />
+          </View>
+        ) : (
+          <Text style={[styles.dateTextBase, { color: colors.color10 }]}>{row.date}</Text>
+        )}
+      </View>
+    </View>
+  )
+)
+RowContent.displayName = 'RowContent'
 
+// Shared layout component for all activity rows
 interface RowLayoutProps {
-  children: React.ReactNode
-  isDark: boolean
+  avatar: React.ReactNode
+  row: RowData
+  colors: ThemeColors
+  isDark?: boolean
 }
 
-const RowLayout = memo(({ children, isDark }: RowLayoutProps) => {
+const RowLayout = memo(({ avatar, row, colors, isDark = true }: RowLayoutProps) => {
   if (isWeb) {
+    // Web: Use Tamagui View for hover support
     return (
       <TamaguiView
         width="100%"
@@ -199,314 +310,270 @@ const RowLayout = memo(({ children, isDark }: RowLayoutProps) => {
         borderRadius={9}
         hoverStyle={isDark ? webHoverStyleDark : webHoverStyleLight}
       >
-        {children}
+        <RowContent avatar={avatar} row={row} colors={colors} />
       </TamaguiView>
     )
   }
 
-  return <View style={styles.rowOuter}>{children}</View>
+  // Native: Use RN View for maximum performance
+  return (
+    <View style={styles.rowOuter}>
+      <RowContent avatar={avatar} row={row} colors={colors} />
+    </View>
+  )
 })
 RowLayout.displayName = 'RowLayout'
 
-// ============================================================================
-// Text Stack - shared text content for all row types
-// ============================================================================
-
-interface TextStackProps {
-  title: string
-  subtitle: string
-  amount: string
-  date: string
-  isPending?: boolean
-  colors: ThemeColors
+// Reusable avatar components
+interface AvatarWithBadgeProps {
+  avatarUrl: string
+  isVerified?: boolean
+  isDark?: boolean
 }
 
-const TextStack = memo(({ title, subtitle, amount, date, isPending, colors }: TextStackProps) => (
-  <View style={styles.textStack}>
-    <View style={styles.topRow}>
-      <Text
-        style={[styles.titleTextBase, mediumWeight, { color: colors.color12 }]}
-        numberOfLines={1}
-      >
-        {title}
-      </Text>
-      <View style={styles.spacer} />
-      <Text
-        style={[styles.amountTextBase, mediumWeight, { color: colors.color12 }]}
-        numberOfLines={1}
-      >
-        {amount}
-      </Text>
-    </View>
-    <Text style={[styles.subTextBase, { color: colors.color10 }]} numberOfLines={2}>
-      {subtitle}
-    </Text>
-    {isPending ? (
-      <View style={styles.spinnerContainer}>
-        <ActivityIndicator size="small" color={colors.color10} />
+const AvatarWithVerifiedBadge = memo(({ avatarUrl, isVerified, isDark }: AvatarWithBadgeProps) => (
+  <View style={styles.avatarContainer}>
+    <FastImage
+      src={avatarUrl ? { uri: avatarUrl } : undefined}
+      width={52}
+      height={52}
+      borderRadius={1000000}
+      contentFit="cover"
+    />
+    {isVerified && (
+      <View style={styles.verifiedBadgeWrapper}>
+        <IconBadgeCheckSolid2
+          size={16}
+          // @ts-expect-error - not using tamagui token this time
+          color={isDark ? darkColors.neon7 : lightColors.neon7}
+          checkColor={isDark ? darkColors.badgeCheckColor : lightColors.badgeCheckColor}
+        />
       </View>
-    ) : (
-      <Text style={[styles.dateTextBase, { color: colors.color10 }]}>{date}</Text>
     )}
   </View>
 ))
-TextStack.displayName = 'TextStack'
+AvatarWithVerifiedBadge.displayName = 'AvatarWithVerifiedBadge'
 
-// ============================================================================
-// Type-Specific Row Content Components (with inlined avatars)
-// ============================================================================
+const SimpleAvatar = memo(({ avatarUrl }: { avatarUrl: string }) => (
+  <View style={styles.avatarContainer}>
+    <FastImage
+      src={avatarUrl ? { uri: avatarUrl } : undefined}
+      width={52}
+      height={52}
+      borderRadius={1000000}
+      contentFit="cover"
+    />
+  </View>
+))
+SimpleAvatar.displayName = 'SimpleAvatar'
 
-// User Transfer Row
-interface UserTransferRowContentProps {
-  item: UserTransferRow
+// Icon with badge component for Swap/Sendcheck
+interface IconWithBadgeProps {
+  symbol: string
+  BadgeIcon: typeof Plus | typeof Minus | typeof ArrowDown | typeof ArrowUp
+  isPositive: boolean
+  badgePosition: 'top' | 'bottom'
   colors: ThemeColors
-  isDark: boolean
 }
 
-const UserTransferRowContent = memo(({ item, colors, isDark }: UserTransferRowContentProps) => (
-  <View style={styles.rowInner}>
-    <AvatarWithVerifiedBadge
-      avatarUrl={item.avatarUrl}
-      isVerified={item.isVerified}
+const IconWithBadge = memo(
+  ({ symbol, BadgeIcon, isPositive, badgePosition, colors }: IconWithBadgeProps) => (
+    <View style={styles.iconContainer}>
+      <IconCoin symbol={symbol} size="$5" />
+      <View
+        style={[
+          styles.badgeBase,
+          { borderColor: colors.color1 },
+          badgePosition === 'top' ? styles.badgeTop : styles.badgeBottom,
+          { backgroundColor: isPositive ? colors.olive : colors.error },
+        ]}
+      >
+        <BadgeIcon
+          size={16}
+          // @ts-expect-error - not using tamagui token this time
+          color={colors.white}
+        />
+      </View>
+    </View>
+  )
+)
+IconWithBadge.displayName = 'IconWithBadge'
+
+// Row Components - now simplified to just provide their avatar
+const UserTransferRowComponent = memo(
+  ({ row, isDark, colors }: { row: UserTransferRow } & RowBaseProps) => (
+    <RowLayout
+      row={row}
+      colors={colors}
       isDark={isDark}
+      avatar={
+        <AvatarWithVerifiedBadge
+          avatarUrl={row.avatarUrl}
+          isVerified={row.isVerified}
+          isDark={isDark}
+        />
+      }
     />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
-))
-UserTransferRowContent.displayName = 'UserTransferRowContent'
+  )
+)
+UserTransferRowComponent.displayName = 'UserTransferRow'
 
-// Swap Row
-interface SwapRowContentProps {
-  item: SwapRow
-  colors: ThemeColors
-  avatarColors: AvatarThemeColors
-}
-
-const SwapRowContent = memo(({ item, colors, avatarColors }: SwapRowContentProps) => (
-  <View style={styles.rowInner}>
-    <IconWithBadge
-      symbol={item.coinSymbol}
-      BadgeIcon={item.isBuy ? Plus : Minus}
-      isPositive={item.isBuy}
-      badgePosition="top"
-      colors={avatarColors}
-    />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
-))
-SwapRowContent.displayName = 'SwapRowContent'
-
-// Sendpot Row
-interface SendpotRowContentProps {
-  item: SendpotRow
-  colors: ThemeColors
-}
-
-const SendpotRowContent = memo(({ item, colors }: SendpotRowContentProps) => (
-  <View style={styles.rowInner}>
-    <SendpotAvatar />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
-))
-SendpotRowContent.displayName = 'SendpotRowContent'
-
-// Sendcheck Row
-interface SendcheckRowContentProps {
-  item: SendcheckRow
-  colors: ThemeColors
-  avatarColors: AvatarThemeColors
-}
-
-const SendcheckRowContent = memo(({ item, colors, avatarColors }: SendcheckRowContentProps) => (
-  <View style={styles.rowInner}>
-    <IconWithBadge
-      symbol="SEND"
-      BadgeIcon={item.isClaim ? ArrowDown : ArrowUp}
-      isPositive={item.isClaim}
-      badgePosition="bottom"
-      colors={avatarColors}
-    />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
-))
-SendcheckRowContent.displayName = 'SendcheckRowContent'
-
-// Earn Row
-interface EarnRowContentProps {
-  item: EarnRow
-  colors: ThemeColors
-}
-
-const EarnRowContent = memo(({ item, colors }: EarnRowContentProps) => (
-  <View style={styles.rowInner}>
-    {item.isDeposit ? <AvatarSendEarnDeposit /> : <AvatarSendEarnWithdraw />}
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
-))
-EarnRowContent.displayName = 'EarnRowContent'
-
-// External Row
-interface ExternalRowContentProps {
-  item: ExternalRow
-  colors: ThemeColors
-  avatarColors: AvatarThemeColors
-}
-
-const ExternalRowContent = memo(({ item, colors, avatarColors }: ExternalRowContentProps) => (
-  <View style={styles.rowInner}>
-    {(item.isWithdraw || item.isDeposit) && item.coinSymbol ? (
+const SwapRowComponent = memo(({ row, isDark, colors }: { row: SwapRow } & RowBaseProps) => (
+  <RowLayout
+    row={row}
+    colors={colors}
+    isDark={isDark}
+    avatar={
       <IconWithBadge
-        symbol={item.coinSymbol}
-        BadgeIcon={item.isWithdraw ? ArrowUp : ArrowDown}
-        isPositive={item.isDeposit}
-        badgePosition="bottom"
-        colors={avatarColors}
+        symbol={row.coinSymbol}
+        BadgeIcon={row.isBuy ? Plus : Minus}
+        isPositive={row.isBuy}
+        badgePosition="top"
+        colors={colors}
       />
-    ) : (
-      <SimpleAvatar avatarUrl={item.avatarUrl} />
-    )}
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
+    }
+  />
 ))
-ExternalRowContent.displayName = 'ExternalRowContent'
+SwapRowComponent.displayName = 'SwapRow'
 
-// Upgrade Row
-interface UpgradeRowContentProps {
-  item: UpgradeRow
-  colors: ThemeColors
-}
-
-const UpgradeRowContent = memo(({ item, colors }: UpgradeRowContentProps) => (
-  <View style={styles.rowInner}>
-    <UpgradeAvatar />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
+const SendpotRowComponent = memo(({ row, isDark, colors }: { row: SendpotRow } & RowBaseProps) => (
+  <RowLayout
+    row={row}
+    colors={colors}
+    isDark={isDark}
+    avatar={
+      <View style={[styles.sendpotIconBase, { backgroundColor: darkColors.olive }]}>
+        <IconSendPotTicket color="$color2" />
+      </View>
+    }
+  />
 ))
-UpgradeRowContent.displayName = 'UpgradeRowContent'
+SendpotRowComponent.displayName = 'SendpotRow'
 
-// Tag Receipt Row
-interface TagReceiptRowContentProps {
-  item: TagReceiptRow
-  colors: ThemeColors
-  avatarColors: AvatarThemeColors
-}
-
-const TagReceiptRowContent = memo(({ item, colors, avatarColors }: TagReceiptRowContentProps) => (
-  <View style={styles.rowInner}>
-    <TagReceiptAvatar colors={avatarColors} />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
+const SendcheckRowComponent = memo(
+  ({ row, isDark, colors }: { row: SendcheckRow } & RowBaseProps) => (
+    <RowLayout
+      row={row}
       colors={colors}
-    />
-  </View>
-))
-TagReceiptRowContent.displayName = 'TagReceiptRowContent'
-
-// Referral Row
-interface ReferralRowContentProps {
-  item: ReferralRow
-  colors: ThemeColors
-  isDark: boolean
-}
-
-const ReferralRowContent = memo(({ item, colors, isDark }: ReferralRowContentProps) => (
-  <View style={styles.rowInner}>
-    <AvatarWithVerifiedBadge
-      avatarUrl={item.avatarUrl}
-      isVerified={item.isVerified}
       isDark={isDark}
+      avatar={
+        <IconWithBadge
+          symbol="SEND"
+          BadgeIcon={row.isClaim ? ArrowDown : ArrowUp}
+          isPositive={row.isClaim}
+          badgePosition="bottom"
+          colors={colors}
+        />
+      }
     />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
-      colors={colors}
-    />
-  </View>
+  )
+)
+SendcheckRowComponent.displayName = 'SendcheckRow'
+
+const EarnRowComponent = memo(({ row, isDark, colors }: { row: EarnRow } & RowBaseProps) => {
+  const EarnAvatar = row.isDeposit ? AvatarSendEarnDeposit : AvatarSendEarnWithdraw
+  return <RowLayout row={row} colors={colors} isDark={isDark} avatar={<EarnAvatar />} />
+})
+EarnRowComponent.displayName = 'EarnRow'
+
+const ExternalRowComponent = memo(
+  ({ row, isDark, colors }: { row: ExternalRow } & RowBaseProps) => {
+    // Show coin icon with direction badge for withdraw/deposit
+    if ((row.isWithdraw || row.isDeposit) && row.coinSymbol) {
+      return (
+        <RowLayout
+          row={row}
+          colors={colors}
+          isDark={isDark}
+          avatar={
+            <IconWithBadge
+              symbol={row.coinSymbol}
+              BadgeIcon={row.isWithdraw ? ArrowUp : ArrowDown}
+              isPositive={row.isDeposit}
+              badgePosition="bottom"
+              colors={colors}
+            />
+          }
+        />
+      )
+    }
+    // Fallback to simple avatar for other external transfers
+    return (
+      <RowLayout
+        row={row}
+        colors={colors}
+        isDark={isDark}
+        avatar={<SimpleAvatar avatarUrl={row.avatarUrl} />}
+      />
+    )
+  }
+)
+ExternalRowComponent.displayName = 'ExternalRow'
+
+const UpgradeRowComponent = memo(({ row, isDark, colors }: { row: UpgradeRow } & RowBaseProps) => (
+  <RowLayout
+    row={row}
+    colors={colors}
+    isDark={isDark}
+    avatar={<IconUpgrade size="$4.5" br="$4" />}
+  />
 ))
-ReferralRowContent.displayName = 'ReferralRowContent'
+UpgradeRowComponent.displayName = 'UpgradeRow'
 
-// Signing Key Row
-interface SigningKeyRowContentProps {
-  item: SigningKeyRow
-  colors: ThemeColors
-  avatarColors: AvatarThemeColors
-}
-
-const SigningKeyRowContent = memo(({ item, colors, avatarColors }: SigningKeyRowContentProps) => (
-  <View style={styles.rowInner}>
-    <SigningKeyAvatar colors={avatarColors} />
-    <TextStack
-      title={item.title}
-      subtitle={item.subtitle}
-      amount={item.amount}
-      date={item.date}
-      isPending={item.isPending}
+const TagReceiptRowComponent = memo(
+  ({ row, isDark, colors }: { row: TagReceiptRow } & RowBaseProps) => (
+    <RowLayout
+      row={row}
       colors={colors}
+      isDark={isDark}
+      avatar={
+        <View style={[styles.sendpotIconBase, { backgroundColor: colors.olive }]}>
+          <Text style={{ color: darkColors.color2, fontSize: 28, fontFamily: fonts.medium }}>
+            /
+          </Text>
+        </View>
+      }
     />
-  </View>
-))
-SigningKeyRowContent.displayName = 'SigningKeyRowContent'
+  )
+)
+TagReceiptRowComponent.displayName = 'TagReceiptRow'
 
-// ============================================================================
+const ReferralRowComponent = memo(
+  ({ row, isDark, colors }: { row: ReferralRow } & RowBaseProps) => (
+    <RowLayout
+      row={row}
+      colors={colors}
+      isDark={isDark}
+      avatar={
+        <AvatarWithVerifiedBadge
+          avatarUrl={row.avatarUrl}
+          isVerified={row.isVerified}
+          isDark={isDark}
+        />
+      }
+    />
+  )
+)
+ReferralRowComponent.displayName = 'ReferralRow'
+
+const SigningKeyRowComponent = memo(
+  ({ row, isDark, colors }: { row: SigningKeyRow } & RowBaseProps) => (
+    <RowLayout
+      row={row}
+      colors={colors}
+      isDark={isDark}
+      avatar={
+        <View style={[styles.sendpotIconBase, { backgroundColor: colors.olive }]}>
+          {/* @ts-expect-error - not using tamagui token */}
+          <IconKey color={darkColors.color2} size={24} />
+        </View>
+      }
+    />
+  )
+)
+SigningKeyRowComponent.displayName = 'SigningKeyRow'
+
 // Header Row
-// ============================================================================
-
 const HeaderRowComponent = memo(({ row, colors }: { row: HeaderRow; colors: ThemeColors }) => (
   <View style={[styles.headerContainerBase, { backgroundColor: colors.background }]}>
     <Text style={[styles.headerTextBase, { color: colors.gray11 }]}>{row.title}</Text>
@@ -514,82 +581,38 @@ const HeaderRowComponent = memo(({ row, colors }: { row: HeaderRow; colors: Them
 ))
 HeaderRowComponent.displayName = 'HeaderRow'
 
-// ============================================================================
-// Main Factory Component
-// ============================================================================
-
+// Factory Component - pure render, no state or callbacks
 interface ActivityRowFactoryProps {
   item: ActivityRow
   colors: ThemeColors
-  avatarColors: AvatarThemeColors
   isDark?: boolean
 }
 
 export const ActivityRowFactory = memo(
-  ({ item, colors, avatarColors, isDark = true }: ActivityRowFactoryProps) => {
+  ({ item, colors, isDark = true }: ActivityRowFactoryProps) => {
     switch (item.kind) {
       case 'header':
         return <HeaderRowComponent row={item} colors={colors} />
       case 'user-transfer':
-        return (
-          <RowLayout isDark={isDark}>
-            <UserTransferRowContent item={item} colors={colors} isDark={isDark} />
-          </RowLayout>
-        )
+        return <UserTransferRowComponent row={item} isDark={isDark} colors={colors} />
       case 'swap':
-        return (
-          <RowLayout isDark={isDark}>
-            <SwapRowContent item={item} colors={colors} avatarColors={avatarColors} />
-          </RowLayout>
-        )
+        return <SwapRowComponent row={item} isDark={isDark} colors={colors} />
       case 'sendpot':
-        return (
-          <RowLayout isDark={isDark}>
-            <SendpotRowContent item={item} colors={colors} />
-          </RowLayout>
-        )
+        return <SendpotRowComponent row={item} isDark={isDark} colors={colors} />
       case 'sendcheck':
-        return (
-          <RowLayout isDark={isDark}>
-            <SendcheckRowContent item={item} colors={colors} avatarColors={avatarColors} />
-          </RowLayout>
-        )
+        return <SendcheckRowComponent row={item} isDark={isDark} colors={colors} />
       case 'earn':
-        return (
-          <RowLayout isDark={isDark}>
-            <EarnRowContent item={item} colors={colors} />
-          </RowLayout>
-        )
+        return <EarnRowComponent row={item} isDark={isDark} colors={colors} />
       case 'external':
-        return (
-          <RowLayout isDark={isDark}>
-            <ExternalRowContent item={item} colors={colors} avatarColors={avatarColors} />
-          </RowLayout>
-        )
+        return <ExternalRowComponent row={item} isDark={isDark} colors={colors} />
       case 'upgrade':
-        return (
-          <RowLayout isDark={isDark}>
-            <UpgradeRowContent item={item} colors={colors} />
-          </RowLayout>
-        )
+        return <UpgradeRowComponent row={item} isDark={isDark} colors={colors} />
       case 'tag-receipt':
-        return (
-          <RowLayout isDark={isDark}>
-            <TagReceiptRowContent item={item} colors={colors} avatarColors={avatarColors} />
-          </RowLayout>
-        )
+        return <TagReceiptRowComponent row={item} isDark={isDark} colors={colors} />
       case 'referral':
-        return (
-          <RowLayout isDark={isDark}>
-            <ReferralRowContent item={item} colors={colors} isDark={isDark} />
-          </RowLayout>
-        )
+        return <ReferralRowComponent row={item} isDark={isDark} colors={colors} />
       case 'signing-key':
-        return (
-          <RowLayout isDark={isDark}>
-            <SigningKeyRowContent item={item} colors={colors} avatarColors={avatarColors} />
-          </RowLayout>
-        )
+        return <SigningKeyRowComponent row={item} isDark={isDark} colors={colors} />
       default:
         return null
     }
@@ -598,4 +621,4 @@ export const ActivityRowFactory = memo(
 ActivityRowFactory.displayName = 'ActivityRowFactory'
 
 // Export for parent to compute once
-export { getColors, getAvatarColors, type ThemeColors, type AvatarThemeColors }
+export { getColors, type ThemeColors }

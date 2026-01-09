@@ -15,11 +15,7 @@ import { sendBaseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
-import {
-  ActivityRowFactory,
-  getAvatarColors,
-  getColors,
-} from 'app/features/activity/rows/ActivityRowFactory'
+import { ActivityRowFactory, getColors } from 'app/features/activity/rows/ActivityRowFactory'
 import { isHeaderRow } from 'app/features/activity/utils/activityRowTypes'
 import { transformActivitiesToRows } from 'app/features/activity/utils/activityTransform'
 import { useSendEarn } from 'app/features/earn/providers/SendEarnProvider'
@@ -291,7 +287,6 @@ const RewardsFeed = () => {
 
   // Compute colors once
   const colors = useMemo(() => getColors(isDark), [isDark])
-  const avatarColors = useMemo(() => getAvatarColors(isDark), [isDark])
 
   // Handle reaching end of list for pagination
   const handleLoadMore = useMemo(() => {
@@ -315,7 +310,6 @@ const RewardsFeed = () => {
                 key={`header-${item.sectionIndex}-${item.title}`}
                 item={item}
                 colors={colors}
-                avatarColors={avatarColors}
                 isDark={isDark}
               />
             )
@@ -337,12 +331,7 @@ const RewardsFeed = () => {
                 borderBottomRightRadius: '$4',
               })}
             >
-              <ActivityRowFactory
-                item={item}
-                colors={colors}
-                avatarColors={avatarColors}
-                isDark={isDark}
-              />
+              <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
             </YStack>
           )
         })}

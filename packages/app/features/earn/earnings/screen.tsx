@@ -10,11 +10,7 @@ import {
   YStack,
 } from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import {
-  ActivityRowFactory,
-  getAvatarColors,
-  getColors,
-} from 'app/features/activity/rows/ActivityRowFactory'
+import { ActivityRowFactory, getColors } from 'app/features/activity/rows/ActivityRowFactory'
 import { isHeaderRow } from 'app/features/activity/utils/activityRowTypes'
 import { transformActivitiesToRows } from 'app/features/activity/utils/activityTransform'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
@@ -100,7 +96,6 @@ export const EarningsFeed = () => {
 
   // Compute colors once
   const colors = useMemo(() => getColors(isDark), [isDark])
-  const avatarColors = useMemo(() => getAvatarColors(isDark), [isDark])
 
   // Handle reaching end of list for pagination
   const handleScroll = useMemo(() => {
@@ -123,7 +118,6 @@ export const EarningsFeed = () => {
                 key={`header-${item.sectionIndex}-${item.title}`}
                 item={item}
                 colors={colors}
-                avatarColors={avatarColors}
                 isDark={isDark}
               />
             )
@@ -145,12 +139,7 @@ export const EarningsFeed = () => {
                 borderBottomRightRadius: '$4',
               })}
             >
-              <ActivityRowFactory
-                item={item}
-                colors={colors}
-                avatarColors={avatarColors}
-                isDark={isDark}
-              />
+              <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
             </YStack>
           )
         })}
