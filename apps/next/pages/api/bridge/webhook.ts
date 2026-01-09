@@ -9,6 +9,7 @@ import {
   extractDepositStatusFromEvent,
   isKycEvent,
   isVirtualAccountActivityEvent,
+  isTransferEvent,
 } from '@my/bridge'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
 import debug from 'debug'
@@ -54,6 +55,16 @@ async function handleKycEvent(event: WebhookEvent): Promise<void> {
     return
   }
 
+  const kycLinkId = data.id
+  const supabase = createSupabaseAdminClient()
+
+  // Fetch current status to determine if this is a new rejection
+  const { data: currentCustomer } = await supabase
+    .from('bridge_customers')
+    .select('kyc_status, rejection_attempts')
+    .eq('kyc_link_id', kycLinkId)
+    .maybeSingle()
+
   const updates: Record<string, unknown> = {
     bridge_customer_id: data.customer_id ?? null,
     rejection_reasons: data.rejection_reasons ?? null,
@@ -62,7 +73,16 @@ async function handleKycEvent(event: WebhookEvent): Promise<void> {
   if (kycStatus) updates.kyc_status = kycStatus
   if (tosStatus) updates.tos_status = tosStatus
 
-  const kycLinkId = data.id
+  // Increment rejection_attempts when transitioning TO rejected status
+  if (kycStatus === 'rejected' && currentCustomer?.kyc_status !== 'rejected') {
+    updates.rejection_attempts = (currentCustomer?.rejection_attempts ?? 0) + 1
+    log(
+      'incrementing rejection_attempts: kycLinkId=%s newCount=%d',
+      kycLinkId,
+      updates.rejection_attempts
+    )
+  }
+
   log(
     'processing KYC event: kycLinkId=%s kycStatus=%s tosStatus=%s customerId=%s',
     kycLinkId,
@@ -71,7 +91,6 @@ async function handleKycEvent(event: WebhookEvent): Promise<void> {
     data.customer_id
   )
 
-  const supabase = createSupabaseAdminClient()
   const { error } = await supabase
     .from('bridge_customers')
     .update(updates)
@@ -91,9 +110,9 @@ async function handleKycEvent(event: WebhookEvent): Promise<void> {
 }
 
 /**
- * Handle deposit-related webhook events
+ * Handle deposit-related webhook events for virtual accounts
  */
-async function handleDepositEvent(event: WebhookEvent): Promise<void> {
+async function handleVirtualAccountDepositEvent(event: WebhookEvent): Promise<void> {
   const depositStatus = extractDepositStatusFromEvent(event)
   if (!depositStatus) {
     log('could not extract deposit status from event type: %s', event.event_type)
@@ -215,6 +234,170 @@ async function handleDepositEvent(event: WebhookEvent): Promise<void> {
 }
 
 /**
+ * Handle deposit-related webhook events for transfers (static templates)
+ */
+async function handleTransferDepositEvent(event: WebhookEvent): Promise<void> {
+  const depositStatus = extractDepositStatusFromEvent(event)
+  if (!depositStatus) {
+    log('could not extract transfer status from event type: %s', event.event_type)
+    return
+  }
+
+  const data = event.event_object as {
+    id?: string
+    state?: string
+    on_behalf_of?: string | null
+    template_id?: string | null
+    currency?: string
+    amount?: string
+    destination_tx_hash?: string | null
+    features?: {
+      static_template?: boolean
+    }
+    source?: {
+      payment_rail?: string
+      currency?: string
+      sender_bank_routing_number?: string
+      bank_routing_number?: string
+      sender_name?: string
+      originator_name?: string
+      trace_number?: string
+      imad?: string
+    }
+    receipt?: {
+      developer_fee?: string
+      exchange_fee?: string
+      gas_fee?: string
+      final_amount?: string
+      destination_tx_hash?: string
+    }
+  }
+
+  const transferId = data.id ?? null
+  if (!transferId) {
+    log('missing transfer id in event data, skipping')
+    return
+  }
+
+  // Ignore events for the static template itself
+  if (data.features?.static_template) {
+    log('ignoring static template event: transferId=%s state=%s', transferId, data.state)
+    return
+  }
+
+  const bridgeCustomerId = data.on_behalf_of ?? null
+  if (!bridgeCustomerId) {
+    log('missing on_behalf_of for transfer event: transferId=%s', transferId)
+    return
+  }
+
+  const source = data.source ?? {}
+  const receipt = data.receipt ?? {}
+
+  const paymentRail = source.payment_rail ?? 'ach_push'
+  const senderRoutingNumber =
+    source.sender_bank_routing_number ?? source.bank_routing_number ?? null
+  const senderName = source.sender_name ?? source.originator_name ?? null
+  const traceNumber = source.trace_number ?? source.imad ?? null
+  const destinationTxHash = data.destination_tx_hash ?? receipt.destination_tx_hash ?? null
+
+  const feePieces = [receipt.developer_fee, receipt.exchange_fee, receipt.gas_fee].filter(
+    (value) => value != null
+  )
+  const feeAmount = feePieces.length
+    ? feePieces.reduce((sum, value) => sum + Number(value), 0)
+    : null
+  const netAmount = receipt.final_amount ? Number(receipt.final_amount) : null
+  const grossAmount = data.amount ?? receipt.final_amount ?? null
+
+  if (!grossAmount) {
+    log('missing amount for transfer event: transferId=%s', transferId)
+    return
+  }
+
+  const currency = data.currency ?? source.currency ?? 'usd'
+
+  log(
+    'processing transfer deposit event: transferId=%s status=%s amount=%s',
+    transferId,
+    depositStatus,
+    grossAmount
+  )
+
+  const supabase = createSupabaseAdminClient()
+
+  const { data: customer, error: customerError } = await supabase
+    .from('bridge_customers')
+    .select('id')
+    .eq('bridge_customer_id', bridgeCustomerId)
+    .single()
+
+  if (customerError || !customer) {
+    log(
+      'bridge customer not found for transfer: bridgeCustomerId=%s error=%O',
+      bridgeCustomerId,
+      customerError
+    )
+    throw customerError ?? new Error('Bridge customer not found')
+  }
+
+  let templateRecord: {
+    id: string
+  } | null = null
+
+  if (data.template_id) {
+    const { data: templateById } = await supabase
+      .from('bridge_transfer_templates')
+      .select('id')
+      .eq('bridge_transfer_template_id', data.template_id)
+      .maybeSingle()
+    templateRecord = templateById ?? null
+  }
+
+  if (!templateRecord) {
+    const { data: templateByCustomer } = await supabase
+      .from('bridge_transfer_templates')
+      .select('id')
+      .eq('bridge_customer_id', customer.id)
+      .eq('status', 'active')
+      .maybeSingle()
+    templateRecord = templateByCustomer ?? null
+  }
+
+  if (!templateRecord) {
+    log('transfer template not found: transferId=%s', transferId)
+    throw new Error('Transfer template not found')
+  }
+
+  const { error: depositError } = await supabase.from('bridge_deposits').upsert(
+    {
+      bridge_transfer_id: transferId,
+      transfer_template_id: templateRecord.id,
+      status: depositStatus,
+      payment_rail: paymentRail,
+      amount: Number(grossAmount),
+      currency,
+      sender_name: senderName,
+      sender_routing_number: senderRoutingNumber,
+      trace_number: traceNumber,
+      destination_tx_hash: destinationTxHash,
+      fee_amount: feeAmount,
+      net_amount: netAmount,
+      last_event_id: event.event_id,
+      last_event_type: event.event_type,
+    },
+    { onConflict: 'bridge_transfer_id' }
+  )
+
+  if (depositError) {
+    log('failed to upsert transfer deposit: transferId=%s error=%O', transferId, depositError)
+    throw depositError
+  }
+
+  log('updated transfer deposit status: transferId=%s status=%s', transferId, depositStatus)
+}
+
+/**
  * Handle virtual account lifecycle events (deactivation/reactivation)
  */
 async function handleVirtualAccountStatusEvent(
@@ -263,6 +446,8 @@ function getVirtualAccountActivityType(event: WebhookEvent): string | null {
 async function handleWebhookEvent(event: WebhookEvent): Promise<void> {
   if (isKycEvent(event)) {
     await handleKycEvent(event)
+  } else if (isTransferEvent(event)) {
+    await handleTransferDepositEvent(event)
   } else if (isVirtualAccountActivityEvent(event)) {
     const activityType = getVirtualAccountActivityType(event)
     if (!activityType) {
@@ -284,7 +469,7 @@ async function handleWebhookEvent(event: WebhookEvent): Promise<void> {
       return
     }
 
-    await handleDepositEvent(event)
+    await handleVirtualAccountDepositEvent(event)
   } else {
     log('unknown event category: %s', event.event_category)
   }

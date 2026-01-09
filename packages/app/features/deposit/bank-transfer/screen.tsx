@@ -7,8 +7,8 @@ import {
   useBridgeGeoBlock,
   useKycStatus,
   useInitiateKyc,
-  useBankAccountDetails,
-  useCreateVirtualAccount,
+  useCreateTransferTemplate,
+  useTransferTemplateBankAccountDetails,
 } from 'app/features/bank-transfer'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
@@ -19,11 +19,16 @@ export function BankTransferScreen() {
     isTosAccepted,
     isApproved,
     rejectionReasons,
+    isMaxAttemptsExceeded,
     isLoading: kycLoading,
   } = useKycStatus()
-  const { hasVirtualAccount, bankDetails, isLoading: vaLoading } = useBankAccountDetails()
+  const {
+    hasTransferTemplate,
+    bankDetails,
+    isLoading: templateLoading,
+  } = useTransferTemplateBankAccountDetails()
   const initiateKyc = useInitiateKyc()
-  const createVirtualAccount = useCreateVirtualAccount()
+  const createTransferTemplate = useCreateTransferTemplate()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
   // Track which step we're waiting for: 'tos', 'kyc', or null
@@ -66,38 +71,38 @@ export function BankTransferScreen() {
     }
   }, [kycStatus, isTosAccepted, waitingFor])
 
-  // Auto-create virtual account once approved
+  // Auto-create transfer template once approved
   const {
-    mutate: createVa,
-    isPending: isVaCreating,
-    isError: vaCreationError,
-  } = createVirtualAccount
+    mutate: createTemplate,
+    isPending: isTemplateCreating,
+    isError: templateCreationError,
+  } = createTransferTemplate
   useEffect(() => {
     if (
       !isGeoBlocked &&
       isApproved &&
-      !hasVirtualAccount &&
-      !vaLoading &&
-      !isVaCreating &&
-      !vaCreationError
+      !hasTransferTemplate &&
+      !templateLoading &&
+      !isTemplateCreating &&
+      !templateCreationError
     ) {
-      createVa()
+      createTemplate()
     }
   }, [
     isGeoBlocked,
     isApproved,
-    hasVirtualAccount,
-    vaLoading,
-    isVaCreating,
-    vaCreationError,
-    createVa,
+    hasTransferTemplate,
+    templateLoading,
+    isTemplateCreating,
+    templateCreationError,
+    createTemplate,
   ])
 
-  // Handler to retry virtual account creation
-  const handleRetryVaCreation = useCallback(() => {
-    createVirtualAccount.reset()
-    createVirtualAccount.mutate()
-  }, [createVirtualAccount])
+  // Handler to retry transfer template creation
+  const handleRetryTemplateCreation = useCallback(() => {
+    createTransferTemplate.reset()
+    createTransferTemplate.mutate()
+  }, [createTransferTemplate])
 
   // Loading state
   if (kycLoading || isGeoBlockLoading) {
@@ -181,6 +186,7 @@ export function BankTransferScreen() {
           kycStatus={kycStatus}
           isTosAccepted={isTosAccepted}
           rejectionReasons={rejectionReasons}
+          isMaxAttemptsExceeded={isMaxAttemptsExceeded}
           onStartKyc={handleStartKyc}
           isLoading={initiateKyc.isPending}
         />
@@ -189,34 +195,34 @@ export function BankTransferScreen() {
   }
 
   // Approved but setting up deposit account (auto-creating in background)
-  if (!hasVirtualAccount) {
+  if (!hasTransferTemplate) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <FadeCard>
           <YStack gap="$4">
             <Paragraph fontSize="$6" fontWeight={600}>
-              {vaCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
+              {templateCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
             </Paragraph>
             <Paragraph
               fontSize="$4"
               color="$lightGrayTextField"
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              {vaCreationError
+              {templateCreationError
                 ? 'We encountered an issue creating your deposit account. Please try again.'
                 : "Your identity has been verified. We're now creating your deposit account."}
             </Paragraph>
-            {isVaCreating && (
+            {isTemplateCreating && (
               <YStack ai="center" py="$2">
                 <Spinner size="small" color="$primary" />
               </YStack>
             )}
-            {vaCreationError && (
+            {templateCreationError && (
               <Button
                 size="$4"
                 theme="green"
-                onPress={handleRetryVaCreation}
-                disabled={isVaCreating}
+                onPress={handleRetryTemplateCreation}
+                disabled={isTemplateCreating}
               >
                 Try Again
               </Button>
@@ -227,8 +233,8 @@ export function BankTransferScreen() {
     )
   }
 
-  // Has virtual account - show bank details
-  if (vaLoading || !bankDetails) {
+  // Has transfer template - show bank details
+  if (templateLoading || !bankDetails) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <BankDetailsCardSkeleton />
@@ -238,28 +244,14 @@ export function BankTransferScreen() {
 
   return (
     <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
-      <YStack gap="$2">
-        <Paragraph fontSize="$6" fontWeight={600}>
-          Deposit from Your Bank
-        </Paragraph>
-        <Paragraph fontSize="$4" color="$lightGrayTextField">
-          Transfer USD from your bank to the account below. Funds will appear in your Send wallet
-          automatically.
-        </Paragraph>
-      </YStack>
-
       <BankDetailsCard
         bankName={bankDetails.bankName}
         routingNumber={bankDetails.routingNumber}
         accountNumber={bankDetails.accountNumber}
         beneficiaryName={bankDetails.beneficiaryName}
+        depositMessage={bankDetails.depositMessage}
         paymentRails={bankDetails.paymentRails}
       />
-
-      <Paragraph fontSize="$3" color="$lightGrayTextField" ta="center">
-        ACH transfers typically arrive within 1-3 business days. Wire transfers are usually
-        same-day.
-      </Paragraph>
     </YStack>
   )
 }

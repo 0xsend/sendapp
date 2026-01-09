@@ -9,5 +9,6 @@ export {
   extractDepositStatusFromEvent,
   isKycEvent,
   isVirtualAccountActivityEvent,
+  isTransferEvent,
 } from './webhooks'
 export * from './types'

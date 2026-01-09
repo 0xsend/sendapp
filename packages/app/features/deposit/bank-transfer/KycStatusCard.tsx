@@ -9,6 +9,7 @@ interface KycStatusCardProps {
   isLoading?: boolean
   startDisabled?: boolean
   rejectionReasons?: string[]
+  isMaxAttemptsExceeded?: boolean
   children?: React.ReactNode
 }
 
@@ -105,14 +106,17 @@ export function KycStatusCard({
   isLoading,
   startDisabled,
   rejectionReasons,
+  isMaxAttemptsExceeded = false,
   children,
 }: KycStatusCardProps) {
+  // Don't show button if max attempts exceeded
   const showStartButton =
-    kycStatus === 'not_started' ||
-    kycStatus === 'incomplete' ||
-    kycStatus === 'awaiting_questionnaire' ||
-    kycStatus === 'awaiting_ubo' ||
-    kycStatus === 'rejected'
+    !isMaxAttemptsExceeded &&
+    (kycStatus === 'not_started' ||
+      kycStatus === 'incomplete' ||
+      kycStatus === 'awaiting_questionnaire' ||
+      kycStatus === 'awaiting_ubo' ||
+      kycStatus === 'rejected')
   const isNewUser = kycStatus === 'not_started'
   const needsTos = !isTosAccepted && (isNewUser || kycStatus === 'incomplete')
 
@@ -124,6 +128,41 @@ export function KycStatusCard({
     buttonLabel = 'Accept Terms of Service'
   } else if (isNewUser || kycStatus === 'incomplete') {
     buttonLabel = 'Verify Identity'
+  }
+
+  // Show max attempts exceeded message
+  if (isMaxAttemptsExceeded && kycStatus === 'rejected') {
+    return (
+      <FadeCard>
+        <YStack gap="$4">
+          <Paragraph fontSize="$6" fontWeight={600}>
+            Verification Unavailable
+          </Paragraph>
+
+          <Paragraph
+            fontSize="$4"
+            color="$lightGrayTextField"
+            $theme-light={{ color: '$darkGrayTextField' }}
+          >
+            You have exceeded the maximum number of verification attempts. Please contact support
+            for assistance.
+          </Paragraph>
+
+          {rejectionReasons?.length ? (
+            <YStack gap="$2">
+              <Paragraph fontSize="$4" fontWeight={600}>
+                Last Rejection Reason
+              </Paragraph>
+              {rejectionReasons.map((reason) => (
+                <Paragraph key={reason} fontSize="$4">
+                  {reason}
+                </Paragraph>
+              ))}
+            </YStack>
+          ) : null}
+        </YStack>
+      </FadeCard>
+    )
   }
 
   // New user flow with step indicators

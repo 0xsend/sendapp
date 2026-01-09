@@ -28,14 +28,37 @@ export type PaymentRail = z.infer<typeof PaymentRail>
 
 // Deposit status
 export const DepositStatus = z.enum([
+  'awaiting_funds',
   'funds_received',
   'funds_scheduled',
   'in_review',
   'payment_submitted',
   'payment_processed',
+  'undeliverable',
+  'returned',
+  'missing_return_policy',
+  'refunded',
+  'canceled',
+  'error',
   'refund',
 ])
 export type DepositStatus = z.infer<typeof DepositStatus>
+
+// Transfer states (for orchestration transfers)
+export const TransferState = z.enum([
+  'awaiting_funds',
+  'in_review',
+  'funds_received',
+  'payment_submitted',
+  'payment_processed',
+  'undeliverable',
+  'returned',
+  'missing_return_policy',
+  'refunded',
+  'canceled',
+  'error',
+])
+export type TransferState = z.infer<typeof TransferState>
 
 // Virtual account status
 export const VirtualAccountStatus = z.enum(['activated', 'deactivated'])
@@ -82,15 +105,20 @@ export type KycLinkResponse = z.infer<typeof KycLinkResponseSchema>
 
 // Source Deposit Instructions
 export const SourceDepositInstructionsSchema = z.object({
+  amount: z.string().optional(),
   currency: z.string(),
-  bank_name: z.string(),
+  deposit_message: z.string().optional(),
+  bank_name: z.string().optional(),
   bank_address: z.string().optional(),
-  bank_routing_number: z.string(),
-  bank_account_number: z.string(),
-  bank_beneficiary_name: z.string(),
+  bank_routing_number: z.string().optional(),
+  bank_account_number: z.string().optional(),
+  bank_beneficiary_name: z.string().optional(),
   bank_beneficiary_address: z.string().optional(),
+  account_holder_name: z.string().optional(),
+  iban: z.string().optional(),
+  bic: z.string().optional(),
   payment_rail: PaymentRail.optional(),
-  payment_rails: z.array(PaymentRail),
+  payment_rails: z.array(PaymentRail).optional(),
 })
 export type SourceDepositInstructions = z.infer<typeof SourceDepositInstructionsSchema>
 
@@ -124,6 +152,64 @@ export const VirtualAccountResponseSchema = z.object({
 })
 export type VirtualAccountResponse = z.infer<typeof VirtualAccountResponseSchema>
 
+// Transfer Request (Bridge orchestration transfers)
+export const TransferRequestSchema = z.object({
+  amount: z.union([z.string(), z.number()]).optional(),
+  on_behalf_of: z.string().optional(),
+  source: z.object({
+    currency: z.string(),
+    payment_rail: z.string().optional(),
+    address: z.string().optional(),
+  }),
+  destination: z.object({
+    currency: z.string(),
+    payment_rail: z.string(),
+    to_address: z.string().optional(),
+  }),
+  developer_fee: z.union([z.string(), z.number()]).optional(),
+  developer_fee_percent: z.union([z.string(), z.number()]).optional(),
+  features: z
+    .object({
+      static_template: z.boolean().optional(),
+      flexible_amount: z.boolean().optional(),
+      allow_any_from_address: z.boolean().optional(),
+    })
+    .optional(),
+})
+export type TransferRequest = z.infer<typeof TransferRequestSchema>
+
+// Transfer Response
+export const TransferResponseSchema = z.object({
+  id: z.string(),
+  state: TransferState,
+  on_behalf_of: z.string().nullable().optional(),
+  source: z.object({
+    payment_rail: z.string().optional(),
+    currency: z.string().optional(),
+  }),
+  destination: z
+    .object({
+      payment_rail: z.string().optional(),
+      currency: z.string().optional(),
+      to_address: z.string().optional(),
+    })
+    .optional(),
+  source_deposit_instructions: SourceDepositInstructionsSchema.optional(),
+  receipt: z
+    .object({
+      developer_fee: z.string().optional(),
+      exchange_fee: z.string().optional(),
+      gas_fee: z.string().optional(),
+      final_amount: z.string().optional(),
+      destination_tx_hash: z.string().optional(),
+    })
+    .optional(),
+  template_id: z.string().nullable().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+})
+export type TransferResponse = z.infer<typeof TransferResponseSchema>
+
 // Customer Response
 export const CustomerResponseSchema = z.object({
   id: z.string(),
@@ -136,7 +222,7 @@ export const CustomerResponseSchema = z.object({
 export type CustomerResponse = z.infer<typeof CustomerResponseSchema>
 
 // Webhook Event Categories
-export const WebhookEventCategory = z.enum(['kyc_link', 'virtual_account.activity'])
+export const WebhookEventCategory = z.enum(['kyc_link', 'virtual_account.activity', 'transfer'])
 export type WebhookEventCategory = z.infer<typeof WebhookEventCategory>
 
 // Webhook Event (Bridge uses event_* payload format)

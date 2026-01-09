@@ -4,6 +4,7 @@ import {
   parseWebhookEvent,
   isKycEvent,
   isVirtualAccountActivityEvent,
+  isTransferEvent,
   extractKycStatusFromEvent,
   extractTosStatusFromEvent,
   extractDepositStatusFromEvent,
@@ -203,6 +204,36 @@ describe('isVirtualAccountActivityEvent', () => {
   })
 })
 
+describe('isTransferEvent', () => {
+  it('returns true for transfer events', () => {
+    const event: WebhookEvent = {
+      api_version: '2024-01-01',
+      event_id: 'evt_123',
+      event_category: 'transfer',
+      event_type: 'transfer.updated',
+      event_object_id: 'tr_456',
+      event_object: {},
+      event_created_at: '2024-01-01T00:00:00Z',
+    }
+
+    expect(isTransferEvent(event)).toBe(true)
+  })
+
+  it('returns false for non-transfer events', () => {
+    const event: WebhookEvent = {
+      api_version: '2024-01-01',
+      event_id: 'evt_123',
+      event_category: 'kyc_link',
+      event_type: 'kyc_link.kyc_status.approved',
+      event_object_id: 'kyc_456',
+      event_object: {},
+      event_created_at: '2024-01-01T00:00:00Z',
+    }
+
+    expect(isTransferEvent(event)).toBe(false)
+  })
+})
+
 describe('extractKycStatusFromEvent', () => {
   it('extracts kyc_status from KYC event', () => {
     const event: WebhookEvent = {
@@ -292,6 +323,34 @@ describe('extractTosStatusFromEvent', () => {
 })
 
 describe('extractDepositStatusFromEvent', () => {
+  it('extracts transfer awaiting_funds status', () => {
+    const event: WebhookEvent = {
+      api_version: '2024-01-01',
+      event_id: 'evt_123',
+      event_category: 'transfer',
+      event_type: 'transfer.updated',
+      event_object_id: 'tr_456',
+      event_object: { state: 'awaiting_funds' },
+      event_created_at: '2024-01-01T00:00:00Z',
+    }
+
+    expect(extractDepositStatusFromEvent(event)).toBe('awaiting_funds')
+  })
+
+  it('extracts transfer payment_processed status', () => {
+    const event: WebhookEvent = {
+      api_version: '2024-01-01',
+      event_id: 'evt_123',
+      event_category: 'transfer',
+      event_type: 'transfer.updated',
+      event_object_id: 'tr_456',
+      event_object: { state: 'payment_processed' },
+      event_created_at: '2024-01-01T00:00:00Z',
+    }
+
+    expect(extractDepositStatusFromEvent(event)).toBe('payment_processed')
+  })
+
   it('extracts funds_received status', () => {
     const event: WebhookEvent = {
       api_version: '2024-01-01',

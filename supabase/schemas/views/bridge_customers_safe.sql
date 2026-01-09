@@ -10,6 +10,7 @@ SELECT
     full_name,
     email,
     type,
+    rejection_attempts,
     created_at,
     updated_at,
     CASE

@@ -1,5 +1,5 @@
 -- Bridge customers table: stores Bridge XYZ customer data linked to Send users
--- Used for KYC verification and virtual account creation
+-- Used for KYC verification and deposit account setup
 
 CREATE TABLE IF NOT EXISTS "public"."bridge_customers" (
     "id" "uuid" PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_customers" (
     "email" "text" NOT NULL,
     "type" "text" NOT NULL DEFAULT 'individual',
     "rejection_reasons" "jsonb",
+    "rejection_attempts" integer NOT NULL DEFAULT 0,
     "created_at" timestamp with time zone NOT NULL DEFAULT now(),
     "updated_at" timestamp with time zone NOT NULL DEFAULT now(),
 

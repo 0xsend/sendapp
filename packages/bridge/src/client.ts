@@ -5,6 +5,8 @@ import type {
   CustomerResponse,
   KycLinkRequest,
   KycLinkResponse,
+  TransferRequest,
+  TransferResponse,
   VirtualAccountRequest,
   VirtualAccountResponse,
   WebhookResponse,
@@ -29,7 +31,7 @@ interface CreateWebhookOptions extends RequestOptions {
 }
 
 /**
- * Bridge XYZ API client for KYC and virtual account operations
+ * Bridge XYZ API client for KYC, virtual account, and transfer operations
  */
 export class BridgeClient {
   private readonly baseUrl: string
@@ -133,6 +135,15 @@ export class BridgeClient {
    */
   async listVirtualAccounts(customerId: string): Promise<VirtualAccountResponse[]> {
     return this.request('GET', `/customers/${customerId}/virtual_accounts`)
+  }
+
+  // Transfers
+
+  /**
+   * Create a transfer (supports static templates)
+   */
+  async createTransfer(data: TransferRequest, options?: RequestOptions): Promise<TransferResponse> {
+    return this.request('POST', '/transfers', data, options)
   }
 
   // Webhooks

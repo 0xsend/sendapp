@@ -13,6 +13,13 @@ export {
   BRIDGE_VIRTUAL_ACCOUNT_QUERY_KEY,
 } from './useBridgeVirtualAccount'
 
+export {
+  useBridgeTransferTemplate,
+  useCreateTransferTemplate,
+  useTransferTemplateBankAccountDetails,
+  BRIDGE_TRANSFER_TEMPLATE_QUERY_KEY,
+} from './useBridgeTransferTemplate'
+
 export { useBridgeGeoBlock } from './useBridgeGeoBlock'
 
 export {

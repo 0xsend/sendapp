@@ -6,6 +6,8 @@ import getBaseUrl from 'app/utils/getBaseUrl'
 
 const log = debug('app:features:bank-transfer:useBridgeCustomer')
 
+export const MAX_KYC_REJECTION_ATTEMPTS = 3
+
 export const BRIDGE_CUSTOMER_QUERY_KEY = 'bridge_customer' as const
 
 function extractCustomerRejectionReasons(input: unknown): string[] {
@@ -116,6 +118,8 @@ export function useInitiateKyc() {
 export function useKycStatus() {
   const { data: customer, isLoading, error, refetch } = useBridgeCustomer()
   const rejectionReasons = extractCustomerRejectionReasons(customer?.rejection_reasons)
+  const rejectionAttempts = customer?.rejection_attempts ?? 0
+  const isMaxAttemptsExceeded = rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS
 
   return {
     isLoading,
@@ -132,6 +136,8 @@ export function useKycStatus() {
       customer?.kyc_status === 'awaiting_ubo',
     customer,
     rejectionReasons,
+    rejectionAttempts,
+    isMaxAttemptsExceeded,
     refetch,
   }
 }

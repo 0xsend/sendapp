@@ -23,14 +23,7 @@ export function useBridgeDeposits(options?: { limit?: number }) {
 
       const { data, error } = await supabase
         .from('bridge_deposits')
-        .select(
-          `
-          *,
-          bridge_virtual_accounts!inner(
-            bridge_customers!inner(user_id)
-          )
-        `
-        )
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(limit)
 
@@ -64,14 +57,7 @@ export function useBridgeDeposit(depositId: string | undefined) {
 
       const { data, error } = await supabase
         .from('bridge_deposits')
-        .select(
-          `
-          *,
-          bridge_virtual_accounts!inner(
-            bridge_customers!inner(user_id)
-          )
-        `
-        )
+        .select('*')
         .eq('id', depositId)
         .single()
 
@@ -102,13 +88,14 @@ export function useDepositsSummary() {
     }
   }
 
-  const pendingCount = deposits.filter(
-    (d) =>
-      d.status === 'funds_received' ||
-      d.status === 'funds_scheduled' ||
-      d.status === 'in_review' ||
-      d.status === 'payment_submitted'
-  ).length
+  const pendingStatuses = new Set([
+    'awaiting_funds',
+    'funds_received',
+    'funds_scheduled',
+    'in_review',
+    'payment_submitted',
+  ])
+  const pendingCount = deposits.filter((d) => pendingStatuses.has(d.status)).length
 
   const completedCount = deposits.filter((d) => d.status === 'payment_processed').length
 

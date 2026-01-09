@@ -108,6 +108,13 @@ export function isVirtualAccountActivityEvent(event: WebhookEvent): boolean {
 }
 
 /**
+ * Check if this is a transfer-related webhook event
+ */
+export function isTransferEvent(event: WebhookEvent): boolean {
+  return event.event_category === 'transfer'
+}
+
+/**
  * Extract KYC status from webhook event
  *
  * @param event - The webhook event
@@ -140,24 +147,59 @@ export function extractTosStatusFromEvent(event: WebhookEvent): string | null {
  * @returns The deposit status or null if not a deposit event
  */
 export function extractDepositStatusFromEvent(event: WebhookEvent): DepositStatus | null {
-  if (!isVirtualAccountActivityEvent(event)) return null
+  if (isTransferEvent(event)) {
+    const data = event.event_object as { state?: string }
 
-  const data = event.event_object as { type?: string }
-
-  switch (data.type) {
-    case 'funds_received':
-      return 'funds_received'
-    case 'funds_scheduled':
-      return 'funds_scheduled'
-    case 'in_review':
-      return 'in_review'
-    case 'payment_submitted':
-      return 'payment_submitted'
-    case 'payment_processed':
-      return 'payment_processed'
-    case 'refunded':
-      return 'refund'
-    default:
-      return null
+    switch (data.state) {
+      case 'awaiting_funds':
+        return 'awaiting_funds'
+      case 'awaiting_source_deposit':
+        return 'awaiting_funds'
+      case 'funds_received':
+        return 'funds_received'
+      case 'in_review':
+        return 'in_review'
+      case 'payment_submitted':
+        return 'payment_submitted'
+      case 'payment_processed':
+        return 'payment_processed'
+      case 'undeliverable':
+        return 'undeliverable'
+      case 'returned':
+        return 'returned'
+      case 'missing_return_policy':
+        return 'missing_return_policy'
+      case 'refunded':
+        return 'refunded'
+      case 'canceled':
+        return 'canceled'
+      case 'error':
+        return 'error'
+      default:
+        return null
+    }
   }
+
+  if (isVirtualAccountActivityEvent(event)) {
+    const data = event.event_object as { type?: string }
+
+    switch (data.type) {
+      case 'funds_received':
+        return 'funds_received'
+      case 'funds_scheduled':
+        return 'funds_scheduled'
+      case 'in_review':
+        return 'in_review'
+      case 'payment_submitted':
+        return 'payment_submitted'
+      case 'payment_processed':
+        return 'payment_processed'
+      case 'refunded':
+        return 'refund'
+      default:
+        return null
+    }
+  }
+
+  return null
 }

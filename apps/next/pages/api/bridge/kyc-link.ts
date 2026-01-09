@@ -8,6 +8,8 @@ import debug from 'debug'
 
 const log = debug('api:bridge:kyc:initiate')
 
+const MAX_KYC_REJECTION_ATTEMPTS = 3
+
 /**
  * Get user session from either cookies or Authorization header (for native clients)
  */
@@ -112,6 +114,16 @@ export default async function handler(
       // If already approved, return error
       if (existingCustomer.kyc_status === 'approved') {
         return res.status(400).json({ error: 'KYC already approved' })
+      }
+
+      // If max rejection attempts exceeded, return error
+      const rejectionAttempts = existingCustomer.rejection_attempts ?? 0
+      if (rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS) {
+        log('max rejection attempts exceeded: userId=%s attempts=%d', userId, rejectionAttempts)
+        return res.status(403).json({
+          error: 'Maximum verification attempts exceeded. Please contact support.',
+          code: 'MAX_ATTEMPTS_EXCEEDED',
+        })
       }
 
       // Get KYC link from Bridge

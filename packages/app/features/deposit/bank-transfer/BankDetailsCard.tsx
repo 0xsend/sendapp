@@ -8,6 +8,7 @@ interface BankDetailsCardProps {
   routingNumber: string | null
   accountNumber: string | null
   beneficiaryName: string | null
+  depositMessage?: string | null
   paymentRails: string[]
 }
 
@@ -58,13 +59,26 @@ export function BankDetailsCard({
   routingNumber,
   accountNumber,
   beneficiaryName,
+  depositMessage,
   paymentRails,
 }: BankDetailsCardProps) {
   return (
     <FadeCard>
       <YStack gap="$2">
-        <Paragraph fontSize="$6" fontWeight={600} pb="$2">
-          Deposit Account
+        <Paragraph
+          fontSize="$4"
+          color="$lightGrayTextField"
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Send a USD bank transfer using the details below. Your deposit is matched using the memo.
+        </Paragraph>
+        <Paragraph
+          fontSize="$4"
+          color="$lightGrayTextField"
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          Important: include the memo exactly as shown. Missing or incorrect memos can delay your
+          deposit, cause it to be returned, or require manual support to recover funds.
         </Paragraph>
 
         {bankName && (
@@ -87,6 +101,7 @@ export function BankDetailsCard({
         <CopyableField label="Routing Number" value={routingNumber} />
         <CopyableField label="Account Number" value={accountNumber} />
         <CopyableField label="Beneficiary Name" value={beneficiaryName} />
+        <CopyableField label="Memo" value={depositMessage ?? null} />
 
         {paymentRails.length > 0 && (
           <XStack jc="space-between" ai="center" py="$2">
@@ -104,6 +119,11 @@ export function BankDetailsCard({
             </YStack>
           </XStack>
         )}
+
+        <Paragraph fontSize="$3" color="$lightGrayTextField" ta="center">
+          ACH transfers typically arrive within 1-3 business days. Wire transfers are usually
+          same-day.
+        </Paragraph>
       </YStack>
     </FadeCard>
   )

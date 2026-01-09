@@ -1,9 +1,10 @@
 -- Bridge deposits table: tracks deposit events and status from ACH/Wire transfers
--- Updated via webhooks as deposits progress through the Bridge pipeline
+-- Updated via webhooks as deposits progress through the Bridge pipeline (virtual accounts + transfers)
 
 CREATE TABLE IF NOT EXISTS "public"."bridge_deposits" (
     "id" "uuid" PRIMARY KEY DEFAULT gen_random_uuid(),
-    "virtual_account_id" "uuid" NOT NULL,
+    "virtual_account_id" "uuid",
+    "transfer_template_id" "uuid",
     "bridge_transfer_id" "text" UNIQUE NOT NULL,
     "last_event_id" "text",
     "last_event_type" "text",
@@ -20,8 +21,25 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_deposits" (
     "created_at" timestamp with time zone NOT NULL DEFAULT now(),
     "updated_at" timestamp with time zone NOT NULL DEFAULT now(),
 
+    CONSTRAINT "bridge_deposits_source_check" CHECK (
+        "virtual_account_id" IS NOT NULL OR "transfer_template_id" IS NOT NULL
+    ),
     CONSTRAINT "bridge_deposits_status_check" CHECK (
-        "status" IN ('funds_received', 'funds_scheduled', 'in_review', 'payment_submitted', 'payment_processed', 'refund')
+        "status" IN (
+            'awaiting_funds',
+            'funds_received',
+            'funds_scheduled',
+            'in_review',
+            'payment_submitted',
+            'payment_processed',
+            'undeliverable',
+            'returned',
+            'missing_return_policy',
+            'refunded',
+            'canceled',
+            'error',
+            'refund'
+        )
     ),
     CONSTRAINT "bridge_deposits_payment_rail_check" CHECK (
         "payment_rail" IN ('ach_push', 'wire')
@@ -32,12 +50,15 @@ ALTER TABLE "public"."bridge_deposits" OWNER TO "postgres";
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS "bridge_deposits_virtual_account_id_idx" ON "public"."bridge_deposits" ("virtual_account_id");
+CREATE INDEX IF NOT EXISTS "bridge_deposits_transfer_template_id_idx" ON "public"."bridge_deposits" ("transfer_template_id");
 CREATE INDEX IF NOT EXISTS "bridge_deposits_status_idx" ON "public"."bridge_deposits" ("status");
 CREATE INDEX IF NOT EXISTS "bridge_deposits_created_at_idx" ON "public"."bridge_deposits" ("created_at" DESC);
 
 -- Foreign Keys
 ALTER TABLE ONLY "public"."bridge_deposits"
     ADD CONSTRAINT "bridge_deposits_virtual_account_id_fkey" FOREIGN KEY ("virtual_account_id") REFERENCES "public"."bridge_virtual_accounts"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."bridge_deposits"
+    ADD CONSTRAINT "bridge_deposits_transfer_template_id_fkey" FOREIGN KEY ("transfer_template_id") REFERENCES "public"."bridge_transfer_templates"("id") ON DELETE CASCADE;
 
 -- RLS
 ALTER TABLE "public"."bridge_deposits" ENABLE ROW LEVEL SECURITY;
@@ -49,6 +70,12 @@ CREATE POLICY "Users can view own deposits"
             SELECT 1 FROM "public"."bridge_virtual_accounts" bva
             JOIN "public"."bridge_customers" bc ON bc."id" = bva."bridge_customer_id"
             WHERE bva."id" = "bridge_deposits"."virtual_account_id"
+            AND bc."user_id" = (SELECT auth.uid())
+        )
+        OR EXISTS (
+            SELECT 1 FROM "public"."bridge_transfer_templates" btt
+            JOIN "public"."bridge_customers" bc ON bc."id" = btt."bridge_customer_id"
+            WHERE btt."id" = "bridge_deposits"."transfer_template_id"
             AND bc."user_id" = (SELECT auth.uid())
         )
     );
