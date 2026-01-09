@@ -127,7 +127,8 @@
       "about": "Über",
       "aboutPlaceholder": "Erzähl uns etwas über dich",
       "businessProfile": "Business Profile",
-      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal.",
+      "businessProfileLockNotice": "Einmal festgelegt, können Unternehmensprofile nicht wieder auf persönlich umgestellt werden.",
+      "personalToBusinessLockNotice": "Die KYC-Prüfung ist für dieses Konto bereits abgeschlossen, daher kann der Profiltyp nicht geändert werden.",
       "makePublic": "Profil öffentlich machen",
       "name": "Name"
     },

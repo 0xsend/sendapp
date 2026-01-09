@@ -12,12 +12,12 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { SchemaForm } from 'app/utils/SchemaForm'
+import { SchemaForm, type formFields } from 'app/utils/SchemaForm'
 import { ProfileSchema, useProfileMutation } from 'app/utils/useProfileMutation'
 import { useUser } from 'app/utils/useUser'
 import { UploadAvatar, type UploadAvatarRefObject } from '../uploadProfileImage/screen'
 import { UploadBanner, type UploadBannerRefObject } from '../UploadProfileBanner'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Tables } from '@my/supabase/database.types'
 import { Check } from '@tamagui/lucide-icons'
 import { SettingsHeader } from 'app/features/account/components/SettingsHeader'
@@ -27,6 +27,7 @@ import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 import { Platform } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useBridgeCustomerKycLock } from 'app/features/bank-transfer/useBridgeCustomer'
 
 enum FormState {
   Overview = 'Overview',
@@ -166,10 +167,21 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
 function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onSave: () => void }) {
   const { id, name, about, is_public, is_business } = profile
   const { mutateAsync, error } = useProfileMutation(id)
+  const { isLocked: isKycProfileTypeLocked } = useBridgeCustomerKycLock()
   const form = useForm<z.infer<typeof ProfileSchema>>()
   const { t } = useTranslation('account')
   const isBusinessSelected = form.watch('isBusiness') ?? false
-  const showBusinessLockNotice = is_business || isBusinessSelected
+  const isKycPersonalToBusinessLocked = !(is_business ?? false) && isKycProfileTypeLocked
+  const isBusinessToggleDisabled = (is_business ?? false) || isKycPersonalToBusinessLocked
+  const showBusinessLockNotice = (is_business ?? false) || isBusinessSelected
+
+  useEffect(() => {
+    if (isKycPersonalToBusinessLocked) {
+      form.setValue('isBusiness', false as z.infer<typeof formFields.boolean_checkbox>, {
+        shouldDirty: false,
+      })
+    }
+  }, [isKycPersonalToBusinessLocked, form])
 
   const handleSubmit = async () => {
     const values = form.getValues()
@@ -202,7 +214,7 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
         isBusiness: {
           defaultChecked: is_business ?? false,
           'aria-label': t('profile.form.businessProfile'),
-          disabled: is_business ?? false,
+          disabled: isBusinessToggleDisabled,
         },
       }}
       defaultValues={{
@@ -243,7 +255,12 @@ function EditProfileForm({ profile, onSave }: { profile: Tables<'profiles'>; onS
               {isBusiness}
               <Paragraph size={'$5'}>{t('profile.form.businessProfile')}</Paragraph>
             </XStack>
-            {showBusinessLockNotice && (
+            {isKycPersonalToBusinessLocked && (
+              <Paragraph size={'$3'} color="$color10">
+                {t('profile.form.personalToBusinessLockNotice')}
+              </Paragraph>
+            )}
+            {!isKycPersonalToBusinessLocked && showBusinessLockNotice && (
               <Paragraph size={'$3'} color="$color10">
                 {t('profile.form.businessProfileLockNotice')}
               </Paragraph>

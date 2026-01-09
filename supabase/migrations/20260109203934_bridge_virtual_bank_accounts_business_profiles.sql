@@ -89,6 +89,8 @@ create table "public"."bridge_webhook_events" (
 
 alter table "public"."bridge_webhook_events" enable row level security;
 
+alter table "public"."profiles" add column "is_business" boolean not null default false;
+
 CREATE INDEX bridge_customers_bridge_customer_id_idx ON public.bridge_customers USING btree (bridge_customer_id);
 
 CREATE UNIQUE INDEX bridge_customers_bridge_customer_id_key ON public.bridge_customers USING btree (bridge_customer_id);
@@ -103,7 +105,7 @@ CREATE UNIQUE INDEX bridge_customers_pkey ON public.bridge_customers USING btree
 
 CREATE INDEX bridge_customers_user_id_idx ON public.bridge_customers USING btree (user_id);
 
-CREATE UNIQUE INDEX bridge_customers_user_id_unique ON public.bridge_customers USING btree (user_id);
+CREATE UNIQUE INDEX bridge_customers_user_id_type_unique ON public.bridge_customers USING btree (user_id, type);
 
 CREATE UNIQUE INDEX bridge_deposits_bridge_transfer_id_key ON public.bridge_deposits USING btree (bridge_transfer_id);
 
@@ -177,7 +179,7 @@ alter table "public"."bridge_customers" add constraint "bridge_customers_user_id
 
 alter table "public"."bridge_customers" validate constraint "bridge_customers_user_id_fkey";
 
-alter table "public"."bridge_customers" add constraint "bridge_customers_user_id_unique" UNIQUE using index "bridge_customers_user_id_unique";
+alter table "public"."bridge_customers" add constraint "bridge_customers_user_id_type_unique" UNIQUE using index "bridge_customers_user_id_type_unique";
 
 alter table "public"."bridge_deposits" add constraint "bridge_deposits_bridge_transfer_id_key" UNIQUE using index "bridge_deposits_bridge_transfer_id_key";
 
@@ -223,6 +225,8 @@ alter table "public"."bridge_virtual_accounts" validate constraint "bridge_virtu
 
 alter table "public"."bridge_webhook_events" add constraint "bridge_webhook_events_bridge_event_id_key" UNIQUE using index "bridge_webhook_events_bridge_event_id_key";
 
+set check_function_bodies = off;
+
 create or replace view "public"."bridge_customers_safe" as  SELECT bridge_customers.id,
     bridge_customers.user_id,
     bridge_customers.bridge_customer_id,
@@ -246,6 +250,37 @@ create or replace view "public"."bridge_customers_safe" as  SELECT bridge_custom
         END AS rejection_reasons
    FROM bridge_customers;
 
+
+CREATE OR REPLACE FUNCTION public.enforce_profile_business_kyc_rules()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+BEGIN
+  IF NEW.is_business IS NOT DISTINCT FROM OLD.is_business THEN
+    RETURN NEW;
+  END IF;
+
+  -- Once a profile is business, it cannot switch back to personal
+  IF OLD.is_business = true AND NEW.is_business = false THEN
+    RAISE EXCEPTION 'Business profiles cannot switch back to personal';
+  END IF;
+
+  -- Block any profile type change after KYC completion
+  IF EXISTS (
+    SELECT 1
+    FROM public.bridge_customers bc
+    WHERE bc.user_id = NEW.id
+      AND bc.kyc_status IN ('approved', 'rejected', 'paused', 'offboarded')
+  ) THEN
+    RAISE EXCEPTION 'Profile type cannot be changed after KYC completion';
+  END IF;
+
+  RETURN NEW;
+END;
+$function$
+;
 
 grant delete on table "public"."bridge_customers" to "anon";
 
@@ -506,5 +541,7 @@ CREATE TRIGGER bridge_deposits_updated_at BEFORE UPDATE ON public.bridge_deposit
 CREATE TRIGGER bridge_transfer_templates_updated_at BEFORE UPDATE ON public.bridge_transfer_templates FOR EACH ROW EXECUTE FUNCTION set_current_timestamp_updated_at();
 
 CREATE TRIGGER bridge_virtual_accounts_updated_at BEFORE UPDATE ON public.bridge_virtual_accounts FOR EACH ROW EXECUTE FUNCTION set_current_timestamp_updated_at();
+
+CREATE TRIGGER profiles_enforce_business_kyc BEFORE UPDATE OF is_business ON public.profiles FOR EACH ROW EXECUTE FUNCTION enforce_profile_business_kyc_rules();
 
 

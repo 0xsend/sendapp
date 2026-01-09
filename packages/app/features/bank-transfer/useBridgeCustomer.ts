@@ -9,6 +9,12 @@ const log = debug('app:features:bank-transfer:useBridgeCustomer')
 export const MAX_KYC_REJECTION_ATTEMPTS = 3
 
 export const BRIDGE_CUSTOMER_QUERY_KEY = 'bridge_customer' as const
+export const KYC_PROFILE_TYPE_LOCK_STATUSES = new Set([
+  'approved',
+  'rejected',
+  'paused',
+  'offboarded',
+])
 
 function extractCustomerRejectionReasons(input: unknown): string[] {
   if (!Array.isArray(input)) return []
@@ -88,6 +94,40 @@ export function useBridgeCustomer() {
   return {
     ...query,
     isLoading: query.isLoading || isLoadingProfile,
+  }
+}
+
+/**
+ * Hook to check if profile type changes are blocked by completed KYC
+ */
+export function useBridgeCustomerKycLock() {
+  const { user } = useUser()
+  const supabase = useSupabase()
+
+  const query = useQuery({
+    queryKey: [BRIDGE_CUSTOMER_QUERY_KEY, user?.id, 'kyc_lock'],
+    enabled: !!user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('bridge_customers_safe').select('kyc_status')
+
+      if (error) {
+        log('error fetching bridge customer kyc status', error)
+        throw new Error(error.message)
+      }
+
+      return (
+        data?.some((row) =>
+          row?.kyc_status ? KYC_PROFILE_TYPE_LOCK_STATUSES.has(row.kyc_status) : false
+        ) ?? false
+      )
+    },
+    staleTime: 5_000,
+    refetchInterval: 5_000,
+  })
+
+  return {
+    ...query,
+    isLocked: query.data ?? false,
   }
 }
 

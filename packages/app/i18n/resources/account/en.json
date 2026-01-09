@@ -78,7 +78,8 @@
       "aboutPlaceholder": "Tell us about yourself",
       "makePublic": "Make Profile Public",
       "businessProfile": "Business Profile",
-      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal."
+      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal.",
+      "personalToBusinessLockNotice": "KYC is already complete for this account, so the profile type can't be changed."
     }
   },
   "personalInfo": {
