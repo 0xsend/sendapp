@@ -121,7 +121,8 @@ export default async function handler(
       if (rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS) {
         log('max rejection attempts exceeded: userId=%s attempts=%d', userId, rejectionAttempts)
         return res.status(403).json({
-          error: 'Maximum verification attempts exceeded. Please contact support.',
+          error:
+            'Maximum verification attempts exceeded. If you believe this was a mistake, please contact support@send.app',
           code: 'MAX_ATTEMPTS_EXCEEDED',
         })
       }
@@ -132,6 +133,17 @@ export default async function handler(
 
       if (existingCustomer.kyc_link_id) {
         const kycLink = await bridgeClient.getKycLink(existingCustomer.kyc_link_id)
+
+        // If user is retrying after rejection, reset status to incomplete
+        // so the webhook can properly track the next rejection attempt
+        if (existingCustomer.kyc_status === 'rejected') {
+          await adminClient
+            .from('bridge_customers')
+            .update({ kyc_status: 'incomplete' })
+            .eq('user_id', userId)
+          log('reset kyc_status from rejected to incomplete for retry: userId=%s', userId)
+        }
+
         return res.status(200).json({
           kycLink: kycLink.kyc_link,
           tosLink: kycLink.tos_link,
@@ -141,6 +153,16 @@ export default async function handler(
 
       if (existingCustomer.bridge_customer_id) {
         const kycLink = await bridgeClient.getCustomerKycLink(existingCustomer.bridge_customer_id)
+
+        // If user is retrying after rejection, reset status to incomplete
+        if (existingCustomer.kyc_status === 'rejected') {
+          await adminClient
+            .from('bridge_customers')
+            .update({ kyc_status: 'incomplete' })
+            .eq('user_id', userId)
+          log('reset kyc_status from rejected to incomplete for retry: userId=%s', userId)
+        }
+
         return res.status(200).json({
           kycLink: kycLink.kyc_link,
           tosLink: '',

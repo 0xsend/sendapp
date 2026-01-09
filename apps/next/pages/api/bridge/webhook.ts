@@ -73,8 +73,9 @@ async function handleKycEvent(event: WebhookEvent): Promise<void> {
   if (kycStatus) updates.kyc_status = kycStatus
   if (tosStatus) updates.tos_status = tosStatus
 
-  // Increment rejection_attempts when transitioning TO rejected status
-  if (kycStatus === 'rejected' && currentCustomer?.kyc_status !== 'rejected') {
+  // Increment rejection_attempts on each rejection event
+  // Webhook deduplication by event_id prevents double-counting
+  if (kycStatus === 'rejected') {
     updates.rejection_attempts = (currentCustomer?.rejection_attempts ?? 0) + 1
     log(
       'incrementing rejection_attempts: kycLinkId=%s newCount=%d',

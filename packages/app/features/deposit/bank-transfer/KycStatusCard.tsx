@@ -42,7 +42,7 @@ function getStatusDescription(status: string): string {
     case 'approved':
       return 'You can now deposit funds from your bank.'
     case 'rejected':
-      return 'Your identity verification was not successful. Please contact support.'
+      return 'Your identity verification was not successful.'
     case 'under_review':
       return 'Your verification is being reviewed. This usually takes 1-2 business days.'
     case 'incomplete':
@@ -146,8 +146,8 @@ export function KycStatusCard({
             color="$lightGrayTextField"
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            You have exceeded the maximum number of verification attempts. Please contact support
-            for assistance.
+            You have exceeded the maximum number of verification attempts. If you believe this was a
+            mistake, please contact support@send.app
           </Paragraph>
 
           {rejectionReasons?.length ? (
@@ -170,32 +170,33 @@ export function KycStatusCard({
   // New user flow with step indicators
   if (isNewUser && onStartKyc) {
     return (
-      <FadeCard>
+      <FadeCard pos="relative">
+        {onInfoPress && (
+          <Button
+            size="$2"
+            circular
+            chromeless
+            onPress={onInfoPress}
+            pressStyle={{ scale: 0.9 }}
+            pos="absolute"
+            top="$4"
+            right="$4"
+            zi={1}
+          >
+            <Button.Icon>
+              <HelpCircle size={18} color="$gray10" />
+            </Button.Icon>
+          </Button>
+        )}
         <YStack gap="$4">
-          <XStack jc="space-between" ai="flex-start">
-            <Paragraph
-              fontSize="$4"
-              color="$lightGrayTextField"
-              $theme-light={{ color: '$darkGrayTextField' }}
-              f={1}
-              pr="$2"
-            >
-              {getStatusDescription(kycStatus)}
-            </Paragraph>
-            {onInfoPress && (
-              <Button
-                size="$2"
-                circular
-                chromeless
-                onPress={onInfoPress}
-                pressStyle={{ scale: 0.9 }}
-              >
-                <Button.Icon>
-                  <HelpCircle size={18} color="$gray10" />
-                </Button.Icon>
-              </Button>
-            )}
-          </XStack>
+          <Paragraph
+            fontSize="$4"
+            color="$lightGrayTextField"
+            $theme-light={{ color: '$darkGrayTextField' }}
+            pr={onInfoPress ? '$8' : '$2'}
+          >
+            {getStatusDescription(kycStatus)}
+          </Paragraph>
 
           <YStack gap="$3" py="$2">
             <StepIndicator
@@ -228,20 +229,28 @@ export function KycStatusCard({
   }
 
   return (
-    <FadeCard>
+    <FadeCard pos="relative">
+      {onInfoPress && (
+        <Button
+          size="$2"
+          circular
+          chromeless
+          onPress={onInfoPress}
+          pressStyle={{ scale: 0.9 }}
+          pos="absolute"
+          top="$4"
+          right="$4"
+          zi={1}
+        >
+          <Button.Icon>
+            <HelpCircle size={18} color="$gray10" />
+          </Button.Icon>
+        </Button>
+      )}
       <YStack gap="$4">
-        <XStack jc="space-between" ai="flex-start">
-          <Paragraph fontSize="$6" fontWeight={600} f={1}>
-            {getStatusText(kycStatus)}
-          </Paragraph>
-          {onInfoPress && (
-            <Button size="$2" circular chromeless onPress={onInfoPress} pressStyle={{ scale: 0.9 }}>
-              <Button.Icon>
-                <HelpCircle size={18} color="$gray10" />
-              </Button.Icon>
-            </Button>
-          )}
-        </XStack>
+        <Paragraph fontSize="$6" fontWeight={600} pr={onInfoPress ? '$8' : undefined}>
+          {getStatusText(kycStatus)}
+        </Paragraph>
 
         <Paragraph
           fontSize="$4"

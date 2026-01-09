@@ -71,35 +71,36 @@ export function BankDetailsCard({
     hasAch && hasWire ? 'ACH or wire transfer' : hasAch ? 'ACH transfer' : 'wire transfer'
 
   return (
-    <FadeCard>
+    <FadeCard pos="relative">
+      {onInfoPress && (
+        <Button
+          size="$3"
+          circular
+          animation="100ms"
+          animateOnly={['transform']}
+          boc="$aztec3"
+          hoverStyle={{ boc: '$aztec4' }}
+          pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+          onPress={onInfoPress}
+          pos="absolute"
+          top="$4"
+          right="$4"
+          zi={1}
+        >
+          <Button.Icon scaleIcon={1.2}>
+            <HelpCircle size={16} />
+          </Button.Icon>
+        </Button>
+      )}
       <YStack gap="$2">
-        <XStack jc="space-between" ai="flex-start">
-          <Paragraph
-            fontSize="$4"
-            color="$lightGrayTextField"
-            $theme-light={{ color: '$darkGrayTextField' }}
-            f={1}
-            pr="$2"
-          >
-            Use your bank's {transferType} feature to deposit USD to your Send account.
-          </Paragraph>
-          {onInfoPress && (
-            <Button
-              size="$3"
-              circular
-              animation="100ms"
-              animateOnly={['transform']}
-              boc="$aztec3"
-              hoverStyle={{ boc: '$aztec4' }}
-              pressStyle={{ boc: '$aztec4', scale: 0.9 }}
-              onPress={onInfoPress}
-            >
-              <Button.Icon scaleIcon={1.2}>
-                <HelpCircle size={16} />
-              </Button.Icon>
-            </Button>
-          )}
-        </XStack>
+        <Paragraph
+          fontSize="$4"
+          color="$lightGrayTextField"
+          $theme-light={{ color: '$darkGrayTextField' }}
+          pr={onInfoPress ? '$8' : '$2'}
+        >
+          Use your bank's {transferType} feature to deposit USD to your Send account.
+        </Paragraph>
 
         {bankName && (
           <XStack jc="space-between" ai="center" py="$2">
@@ -123,8 +124,8 @@ export function BankDetailsCard({
         <CopyableField label="Memo" value={depositMessage ?? null} />
         <CopyableField label="Beneficiary Name" value={beneficiaryName} />
 
-        <Paragraph fontSize="$3" color="$lightGrayTextField" py="$4">
-          <Paragraph fontSize="$3" fontWeight="bold" color="$lightGrayTextField">
+        <Paragraph fontSize="$3" color="$color12" py="$4">
+          <Paragraph fontSize="$3" fontWeight="bold" color="$color12">
             Important:
           </Paragraph>{' '}
           Include the memo exactly as shown. Missing or incorrect memos may result in delay and loss

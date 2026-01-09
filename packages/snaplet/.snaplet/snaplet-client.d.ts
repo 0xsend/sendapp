@@ -25,6 +25,101 @@ type Override = {
       profiles?: string;
     };
   }
+  bridge_customers?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      user_id?: string;
+      bridge_customer_id?: string;
+      kyc_link_id?: string;
+      kyc_status?: string;
+      tos_status?: string;
+      full_name?: string;
+      email?: string;
+      type?: string;
+      rejection_reasons?: string;
+      rejection_attempts?: string;
+      created_at?: string;
+      updated_at?: string;
+      users?: string;
+      bridge_transfer_templates?: string;
+      bridge_virtual_accounts?: string;
+    };
+  }
+  bridge_deposits?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      virtual_account_id?: string;
+      transfer_template_id?: string;
+      bridge_transfer_id?: string;
+      last_event_id?: string;
+      last_event_type?: string;
+      payment_rail?: string;
+      amount?: string;
+      currency?: string;
+      status?: string;
+      sender_name?: string;
+      sender_routing_number?: string;
+      trace_number?: string;
+      destination_tx_hash?: string;
+      fee_amount?: string;
+      net_amount?: string;
+      created_at?: string;
+      updated_at?: string;
+      bridge_transfer_templates?: string;
+      bridge_virtual_accounts?: string;
+    };
+  }
+  bridge_transfer_templates?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      bridge_customer_id?: string;
+      bridge_transfer_template_id?: string;
+      source_currency?: string;
+      destination_currency?: string;
+      destination_payment_rail?: string;
+      destination_address?: string;
+      source_deposit_instructions?: string;
+      status?: string;
+      created_at?: string;
+      updated_at?: string;
+      bridge_customers?: string;
+      bridge_deposits?: string;
+    };
+  }
+  bridge_virtual_accounts?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      bridge_customer_id?: string;
+      bridge_virtual_account_id?: string;
+      source_currency?: string;
+      destination_currency?: string;
+      destination_payment_rail?: string;
+      destination_address?: string;
+      source_deposit_instructions?: string;
+      status?: string;
+      created_at?: string;
+      updated_at?: string;
+      bridge_customers?: string;
+      bridge_deposits?: string;
+    };
+  }
+  bridge_webhook_events?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      bridge_event_id?: string;
+      event_type?: string;
+      event_created_at?: string;
+      payload?: string;
+      processed_at?: string;
+      error?: string;
+      created_at?: string;
+    };
+  }
   buckets?: {
     name?: string;
     fields?: {
@@ -973,6 +1068,7 @@ type Override = {
       oauth_authorizations?: string;
       oauth_consents?: string;
       leaderboard_referrals_all_time?: string;
+      bridge_customers?: string;
       canton_party_verifications?: string;
       chain_addresses?: string;
       contact_labels?: string;
@@ -1035,6 +1131,44 @@ export interface Fingerprint {
     updatedAt?: FingerprintDateField;
     sendPlusMinus?: FingerprintNumberField;
     user?: FingerprintRelationField;
+  }
+  bridgeCustomers?: {
+    rejectionReasons?: FingerprintJsonField;
+    rejectionAttempts?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    user?: FingerprintRelationField;
+    bridgeTransferTemplates?: FingerprintRelationField;
+    bridgeVirtualAccounts?: FingerprintRelationField;
+  }
+  bridgeDeposits?: {
+    amount?: FingerprintNumberField;
+    feeAmount?: FingerprintNumberField;
+    netAmount?: FingerprintNumberField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    transferTemplate?: FingerprintRelationField;
+    virtualAccount?: FingerprintRelationField;
+  }
+  bridgeTransferTemplates?: {
+    sourceDepositInstructions?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    bridgeCustomer?: FingerprintRelationField;
+    bridgeDepositsByTransferTemplateId?: FingerprintRelationField;
+  }
+  bridgeVirtualAccounts?: {
+    sourceDepositInstructions?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    bridgeCustomer?: FingerprintRelationField;
+    bridgeDepositsByVirtualAccountId?: FingerprintRelationField;
+  }
+  bridgeWebhookEvents?: {
+    eventCreatedAt?: FingerprintDateField;
+    payload?: FingerprintJsonField;
+    processedAt?: FingerprintDateField;
+    createdAt?: FingerprintDateField;
   }
   buckets?: {
     createdAt?: FingerprintDateField;
@@ -1529,6 +1663,7 @@ export interface Fingerprint {
     oauthAuthorizations?: FingerprintRelationField;
     oauthConsents?: FingerprintRelationField;
     leaderboardReferralsAllTimes?: FingerprintRelationField;
+    bridgeCustomers?: FingerprintRelationField;
     cantonPartyVerifications?: FingerprintRelationField;
     chainAddresses?: FingerprintRelationField;
     contactLabelsByOwnerId?: FingerprintRelationField;
