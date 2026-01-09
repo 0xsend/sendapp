@@ -5,7 +5,6 @@ export type {
   HarvestRecord,
   SweepRecord,
   RevenueError,
-  MerklTokenReward,
   MerklRewardsResponse,
 } from '@my/send-earn'
 
