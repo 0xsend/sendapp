@@ -410,6 +410,15 @@ jobs:
           retention-days: 14
       - name: Merge into JSON Report
         run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-report/report.json
+
+      - name: Upload JSON report
+        id: upload-json-report
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-report--attempt-${{ github.run_attempt }}
+          path: playwright-report/report.json
+          retention-days: 14
+
       - name: Playwright Markdown Report
         if: always() # Always run regardless of previous step outcome
         id: playwright-md-report
@@ -425,6 +434,8 @@ jobs:
           echo "------------------"
         env:
           PLAYWRIGHT_REPORT_PATH: playwright-report/report.json
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
 
       - uses: mshick/add-pr-comment@v2
         if: ${{ !cancelled() && github.event_name == 'pull_request' }} # Only comment on PRs
