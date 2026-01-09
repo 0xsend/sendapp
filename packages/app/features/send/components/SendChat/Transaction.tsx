@@ -4,8 +4,8 @@ import type { Activity } from 'app/utils/zod/activity'
 import { ActivityAvatar } from 'app/features/activity/ActivityAvatar'
 import { IconX } from 'app/components/icons'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { counterpart, userNameFromActivityUser, noteFromActivity } from 'app/utils/activity'
-import { useAmountFromActivity } from 'app/utils/activity-hooks'
+import { noteFromActivity } from 'app/utils/activity'
+import { useActivityRow } from 'app/features/activity/utils/useActivityRow'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { AlertCircle } from '@tamagui/lucide-icons'
 import { isWeb } from '@tamagui/constants'
@@ -23,17 +23,20 @@ const TransactionContent = ({
   transaction: Activity
   onClose: () => void
 }) => {
-  const amount = useAmountFromActivity(transaction)
-  const otherUser = counterpart(transaction)
-  const isReceived = !!transaction.to_user?.id
-  const username = otherUser ? userNameFromActivityUser(otherUser) : ''
+  const row = useActivityRow(transaction)
   const note = noteFromActivity(transaction)
-  const coinSymbol = transaction.data.coin?.symbol
 
-  const amountText = typeof amount === 'string' ? amount : String(amount || '')
+  // Parse amount and symbol from row data
+  const amountText = row?.amount ?? ''
   const amountMatch = amountText.match(/^[+-]?\s*([\d,]+\.?\d*)\s*(\w+)?/)
-  const numericAmount = amountMatch?.[1] || amountText
-  const symbol = amountMatch?.[2] || coinSymbol || ''
+  const numericAmount = amountMatch?.[1] ?? amountText
+  const symbol = amountMatch?.[2] ?? transaction.data.coin?.symbol ?? ''
+
+  // Determine if received based on row kind
+  const isReceived = row?.kind === 'user-transfer' ? row.isReceived : !!transaction.to_user?.id
+
+  // Get username from row title for user transfers
+  const username = row?.title ?? ''
 
   const { bottom } = useSafeAreaInsets()
 
@@ -42,7 +45,7 @@ const TransactionContent = ({
   } = useTokenPrices()
 
   const price = prices?.[transaction.data.coin?.token] ?? 0
-  const amountInUSD = price * Number(numericAmount)
+  const amountInUSD = price * Number(numericAmount.replace(/,/g, ''))
 
   const isFailed =
     transaction?.data?.status === 'failed' || transaction?.data?.status === 'cancelled'
