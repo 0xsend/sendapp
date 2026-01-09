@@ -295,6 +295,11 @@ export interface FeeDistributionDryRunResult {
 }
 
 /**
+ * Underlying vault type for TVL display.
+ */
+export type UnderlyingVaultType = 'Morpho' | 'Moonwell' | 'Unknown'
+
+/**
  * TVL data for a single vault.
  */
 export interface VaultTVL {
@@ -303,8 +308,10 @@ export interface VaultTVL {
   totalAssets: bigint
   /** Total vault shares */
   totalSupply: bigint
-  /** Underlying Morpho or Moonwell vault */
+  /** Underlying Morpho or Moonwell vault address */
   underlyingVault: `0x${string}`
+  /** Underlying vault type (Morpho, Moonwell, or Unknown) */
+  vaultType: UnderlyingVaultType
 }
 
 /**

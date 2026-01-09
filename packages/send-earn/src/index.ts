@@ -25,6 +25,7 @@ export type {
   FeeDistributionError,
   FeeDistributionDryRunResult,
   // TVL types
+  UnderlyingVaultType,
   VaultTVL,
   TVLResult,
 } from './types'

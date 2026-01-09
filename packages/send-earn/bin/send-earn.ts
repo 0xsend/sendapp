@@ -213,8 +213,14 @@ function formatUSDC(amount: bigint): string {
 }
 
 /**
- * Format TVL result.
+ * Pad string to specified length (for table formatting).
  */
+function pad(str: string, len: number, align: 'left' | 'right' = 'right'): string {
+  if (str.length >= len) return str.slice(0, len)
+  const padding = ' '.repeat(len - str.length)
+  return align === 'left' ? str + padding : padding + str
+}
+
 function formatTVL(result: TVLResult, format: OutputFormat): string {
   switch (format) {
     case 'json':
@@ -225,6 +231,7 @@ function formatTVL(result: TVLResult, format: OutputFormat): string {
             totalAssets: v.totalAssets.toString(),
             totalSupply: v.totalSupply.toString(),
             underlyingVault: v.underlyingVault,
+            vaultType: v.vaultType,
           })),
           totals: {
             totalAssets: result.totals.totalAssets.toString(),
@@ -237,10 +244,16 @@ function formatTVL(result: TVLResult, format: OutputFormat): string {
 
     case 'csv': {
       const lines: string[] = []
-      lines.push('vault,total_assets,total_supply,underlying_vault')
+      lines.push('vault,total_assets,total_supply,underlying_vault,vault_type')
       for (const v of result.vaults) {
         lines.push(
-          [v.vault, v.totalAssets.toString(), v.totalSupply.toString(), v.underlyingVault].join(',')
+          [
+            v.vault,
+            v.totalAssets.toString(),
+            v.totalSupply.toString(),
+            v.underlyingVault,
+            v.vaultType,
+          ].join(',')
         )
       }
       lines.push('')
@@ -258,7 +271,7 @@ function formatTVL(result: TVLResult, format: OutputFormat): string {
       lines.push('|-------|------------|------------|')
       for (const v of result.vaults) {
         lines.push(
-          `| ${truncateAddress(v.vault)} | ${formatUSDC(v.totalAssets)} | ${truncateAddress(v.underlyingVault)} |`
+          `| ${truncateAddress(v.vault)} | ${formatUSDC(v.totalAssets)} | ${v.vaultType} |`
         )
       }
       lines.push('')
@@ -269,26 +282,38 @@ function formatTVL(result: TVLResult, format: OutputFormat): string {
     }
 
     default: {
-      // 'table' format (default)
+      // 'table' format (default) - box-drawing table per spec
       const lines: string[] = []
 
-      lines.push(chalk.bold('\n=== Send Earn TVL ===\n'))
+      // Table header
+      lines.push(`┌${'─'.repeat(26)}┬${'─'.repeat(18)}┬${'─'.repeat(19)}┐`)
+      lines.push(`│${pad(' Send Earn TVL', 64, 'left')}│`)
+      lines.push(`├${'─'.repeat(26)}┬${'─'.repeat(18)}┬${'─'.repeat(19)}┤`)
+      lines.push(
+        `│ ${pad('Vault', 24, 'left')} │ ${pad('TVL (USDC)', 16, 'left')} │ ${pad('Underlying', 17, 'left')} │`
+      )
+      lines.push(`├${'─'.repeat(26)}┼${'─'.repeat(18)}┼${'─'.repeat(19)}┤`)
 
       if (result.vaults.length === 0) {
-        lines.push('  No vaults found')
+        lines.push(`│ ${pad('No vaults found', 24, 'left')} │ ${pad('-', 16)} │ ${pad('-', 17)} │`)
       } else {
         for (const v of result.vaults) {
-          lines.push(`  Vault: ${v.vault}`)
-          lines.push(`    TVL: ${formatUSDC(v.totalAssets)} USDC`)
-          lines.push(`    Shares: ${v.totalSupply.toString()}`)
-          lines.push(`    Underlying: ${v.underlyingVault}`)
-          lines.push('')
+          const vaultAddr = truncateAddress(v.vault)
+          const tvlStr = formatUSDC(v.totalAssets)
+          lines.push(
+            `│ ${pad(vaultAddr, 24, 'left')} │ ${pad(tvlStr, 16)} │ ${pad(v.vaultType, 17, 'left')} │`
+          )
         }
       }
 
-      lines.push(chalk.bold('Totals:'))
-      lines.push(`  Total TVL: ${formatUSDC(result.totals.totalAssets)} USDC`)
-      lines.push(`  Vaults: ${result.totals.vaultCount}`)
+      // Totals row
+      lines.push(`├${'─'.repeat(26)}┼${'─'.repeat(18)}┼${'─'.repeat(19)}┤`)
+      const totalTvl = formatUSDC(result.totals.totalAssets)
+      const vaultCountStr = `${result.totals.vaultCount} vaults`
+      lines.push(
+        `│ ${pad('Total', 24, 'left')} │ ${pad(totalTvl, 16)} │ ${pad(vaultCountStr, 17, 'left')} │`
+      )
+      lines.push(`└${'─'.repeat(26)}┴${'─'.repeat(18)}┴${'─'.repeat(19)}┘`)
 
       return lines.join('\n')
     }
