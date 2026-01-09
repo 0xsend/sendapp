@@ -24,6 +24,9 @@ export type {
   SkippedFeeRecipient,
   FeeDistributionError,
   FeeDistributionDryRunResult,
+  // TVL types
+  VaultTVL,
+  TVLResult,
 } from './types'
 
 export { REVENUE_ADDRESSES } from './types'
@@ -32,7 +35,7 @@ export { REVENUE_ADDRESSES } from './types'
 export { createConfig, DEFAULT_CONFIG } from './revenue'
 
 // High-level functions
-export { dryRun, harvest, sweep, distributeFees, feesDryRun } from './revenue'
+export { dryRun, harvest, sweep, distributeFees, feesDryRun, tvl } from './revenue'
 
 // Database
 export { getActiveVaults } from './db'
@@ -46,6 +49,7 @@ export {
   getFeeRecipientInfo,
   getFeeDistributionDryRun,
   executeFeeDistribution,
+  getVaultsTVL,
 } from './vaults'
 
 // Output formatting

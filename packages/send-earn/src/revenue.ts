@@ -7,6 +7,7 @@ import {
   executeSweep,
   getFeeDistributionDryRun,
   executeFeeDistribution,
+  getVaultsTVL,
 } from './vaults'
 import type {
   RevenueConfig,
@@ -17,6 +18,7 @@ import type {
   VaultBalances,
   FeeDistributionResult,
   FeeDistributionDryRunResult,
+  TVLResult,
 } from './types'
 
 /**
@@ -233,4 +235,26 @@ export async function distributeFees(config: RevenueConfig): Promise<FeeDistribu
   }
 
   return executeFeeDistribution(config, vaults)
+}
+
+/**
+ * Get TVL (Total Value Locked) for all Send Earn vaults.
+ */
+export async function tvl(config: RevenueConfig): Promise<TVLResult> {
+  // Use vault filter directly if specified, otherwise get from database
+  let vaults: `0x${string}`[]
+  if (config.vaultFilter && config.vaultFilter.length > 0) {
+    vaults = config.vaultFilter
+  } else {
+    vaults = await getActiveVaults(config.dbUrl)
+  }
+
+  if (vaults.length === 0) {
+    return {
+      vaults: [],
+      totals: { totalAssets: 0n, vaultCount: 0 },
+    }
+  }
+
+  return getVaultsTVL(config, vaults)
 }

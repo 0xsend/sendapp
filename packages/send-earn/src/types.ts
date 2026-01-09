@@ -293,3 +293,29 @@ export interface FeeDistributionDryRunResult {
     directShares: bigint
   }
 }
+
+/**
+ * TVL data for a single vault.
+ */
+export interface VaultTVL {
+  vault: `0x${string}`
+  /** Total USDC deposited (6 decimals) */
+  totalAssets: bigint
+  /** Total vault shares */
+  totalSupply: bigint
+  /** Underlying Morpho or Moonwell vault */
+  underlyingVault: `0x${string}`
+}
+
+/**
+ * Result of TVL query.
+ */
+export interface TVLResult {
+  vaults: VaultTVL[]
+  totals: {
+    /** Total USDC across all vaults (6 decimals) */
+    totalAssets: bigint
+    /** Number of active vaults */
+    vaultCount: number
+  }
+}

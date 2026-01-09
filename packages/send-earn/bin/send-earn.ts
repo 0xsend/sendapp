@@ -7,10 +7,11 @@ import {
   sweep,
   distributeFees,
   feesDryRun,
+  tvl,
   createConfig,
   formatOutput,
 } from '../src/index'
-import type { FeeDistributionDryRunResult } from '../src/types'
+import type { FeeDistributionDryRunResult, TVLResult } from '../src/types'
 import type { OutputFormat } from '../src/types'
 
 const argv = minimist(process.argv.slice(2), {
@@ -39,6 +40,7 @@ Commands:
   sweep            Execute vault sweep transactions to revenue safe
   fees-dry-run     Display pending fee shares for affiliate contracts (read-only)
   distribute-fees  Execute fee distribution on affiliate contracts
+  tvl              Display Total Value Locked across all vaults (read-only)
 
 Options:
   --db-url=<url>           PostgreSQL connection string (default: $DATABASE_URL)
@@ -61,6 +63,8 @@ Examples:
   send-earn sweep
   send-earn fees-dry-run
   send-earn distribute-fees
+  send-earn tvl
+  send-earn tvl --format=json
 `)
 }
 
@@ -197,6 +201,100 @@ function formatFeesDryRun(result: FeeDistributionDryRunResult, format: OutputFor
   }
 }
 
+/**
+ * Format USDC amount (6 decimals) to human-readable string with commas.
+ */
+function formatUSDC(amount: bigint): string {
+  const whole = amount / 1_000_000n
+  const fraction = amount % 1_000_000n
+  const wholeStr = whole.toLocaleString('en-US')
+  const fractionStr = fraction.toString().padStart(6, '0').slice(0, 2)
+  return `${wholeStr}.${fractionStr}`
+}
+
+/**
+ * Format TVL result.
+ */
+function formatTVL(result: TVLResult, format: OutputFormat): string {
+  switch (format) {
+    case 'json':
+      return JSON.stringify(
+        {
+          vaults: result.vaults.map((v) => ({
+            vault: v.vault,
+            totalAssets: v.totalAssets.toString(),
+            totalSupply: v.totalSupply.toString(),
+            underlyingVault: v.underlyingVault,
+          })),
+          totals: {
+            totalAssets: result.totals.totalAssets.toString(),
+            vaultCount: result.totals.vaultCount,
+          },
+        },
+        null,
+        2
+      )
+
+    case 'csv': {
+      const lines: string[] = []
+      lines.push('vault,total_assets,total_supply,underlying_vault')
+      for (const v of result.vaults) {
+        lines.push(
+          [v.vault, v.totalAssets.toString(), v.totalSupply.toString(), v.underlyingVault].join(',')
+        )
+      }
+      lines.push('')
+      lines.push('# Totals')
+      lines.push('total_assets,vault_count')
+      lines.push(`${result.totals.totalAssets.toString()},${result.totals.vaultCount}`)
+      return lines.join('\n')
+    }
+
+    case 'markdown': {
+      const lines: string[] = []
+      lines.push('## Send Earn TVL')
+      lines.push('')
+      lines.push('| Vault | TVL (USDC) | Underlying |')
+      lines.push('|-------|------------|------------|')
+      for (const v of result.vaults) {
+        lines.push(
+          `| ${truncateAddress(v.vault)} | ${formatUSDC(v.totalAssets)} | ${truncateAddress(v.underlyingVault)} |`
+        )
+      }
+      lines.push('')
+      lines.push(
+        `**Total:** ${formatUSDC(result.totals.totalAssets)} USDC across ${result.totals.vaultCount} vaults`
+      )
+      return lines.join('\n')
+    }
+
+    default: {
+      // 'table' format (default)
+      const lines: string[] = []
+
+      lines.push(chalk.bold('\n=== Send Earn TVL ===\n'))
+
+      if (result.vaults.length === 0) {
+        lines.push('  No vaults found')
+      } else {
+        for (const v of result.vaults) {
+          lines.push(`  Vault: ${v.vault}`)
+          lines.push(`    TVL: ${formatUSDC(v.totalAssets)} USDC`)
+          lines.push(`    Shares: ${v.totalSupply.toString()}`)
+          lines.push(`    Underlying: ${v.underlyingVault}`)
+          lines.push('')
+        }
+      }
+
+      lines.push(chalk.bold('Totals:'))
+      lines.push(`  Total TVL: ${formatUSDC(result.totals.totalAssets)} USDC`)
+      lines.push(`  Vaults: ${result.totals.vaultCount}`)
+
+      return lines.join('\n')
+    }
+  }
+}
+
 async function main(): Promise<void> {
   if (argv.help || !command) {
     showHelp()
@@ -323,6 +421,13 @@ async function main(): Promise<void> {
             console.log(`  ${err.vault}: ${err.error}`)
           }
         }
+        break
+      }
+
+      case 'tvl': {
+        console.log(chalk.blue('Fetching TVL data...'))
+        const result = await tvl(config)
+        console.log(formatTVL(result, format))
         break
       }
 

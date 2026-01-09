@@ -18,6 +18,8 @@ import type {
   FeeDistributionError,
   FeeDistributionDryRunResult,
   AffiliateDetails,
+  VaultTVL,
+  TVLResult,
 } from './types'
 import { REVENUE_ADDRESSES } from './types'
 import { buildClaimArrays } from './merkl'
@@ -74,7 +76,7 @@ const sendEarnFeeAbi = [
 ] as const
 
 /**
- * ERC4626 ABI subset for maxRedeem().
+ * ERC4626 ABI subset for maxRedeem(), totalAssets(), and totalSupply().
  */
 const erc4626Abi = [
   {
@@ -82,6 +84,33 @@ const erc4626Abi = [
     name: 'maxRedeem',
     inputs: [{ name: 'owner', type: 'address' }],
     outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalAssets',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalSupply',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * SendEarn ABI subset for VAULT() getter (underlying vault address).
+ */
+const sendEarnVaultAbi = [
+  {
+    type: 'function',
+    name: 'VAULT',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
     stateMutability: 'view',
   },
 ] as const
@@ -683,5 +712,56 @@ export async function executeFeeDistribution(
     transactions,
     skipped,
     errors,
+  }
+}
+
+/**
+ * Get TVL (Total Value Locked) for all Send Earn vaults.
+ * Calls vault.totalAssets() to get the total USDC deposited.
+ */
+export async function getVaultsTVL(
+  config: RevenueConfig,
+  vaults: `0x${string}`[]
+): Promise<TVLResult> {
+  const client = createReadClient(config.rpcUrl)
+  const results: VaultTVL[] = []
+
+  for (const vault of vaults) {
+    try {
+      const [totalAssets, totalSupply, underlyingVault] = await Promise.all([
+        client.readContract({
+          address: vault,
+          abi: erc4626Abi,
+          functionName: 'totalAssets',
+        }),
+        client.readContract({
+          address: vault,
+          abi: erc4626Abi,
+          functionName: 'totalSupply',
+        }),
+        client.readContract({
+          address: vault,
+          abi: sendEarnVaultAbi,
+          functionName: 'VAULT',
+        }),
+      ])
+
+      results.push({
+        vault,
+        totalAssets,
+        totalSupply,
+        underlyingVault: underlyingVault as `0x${string}`,
+      })
+    } catch (error) {
+      console.warn(`Failed to fetch TVL for vault ${vault}:`, error)
+    }
+  }
+
+  return {
+    vaults: results,
+    totals: {
+      totalAssets: results.reduce((sum, v) => sum + v.totalAssets, 0n),
+      vaultCount: results.length,
+    },
   }
 }
