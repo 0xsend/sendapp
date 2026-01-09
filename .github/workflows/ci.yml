@@ -357,6 +357,7 @@ jobs:
 
       - name: Playwright Tests
         id: playwright
+        continue-on-error: true # Don't fail the job on test failures, let reports be generated
         shell: bash
         run: yarn playwright test --shard=${{ matrix.shard }}/4
 
