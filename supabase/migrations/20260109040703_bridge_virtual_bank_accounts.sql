@@ -5,7 +5,7 @@ create table "public"."bridge_customers" (
     "kyc_link_id" text not null,
     "kyc_status" text not null default 'not_started'::text,
     "tos_status" text not null default 'pending'::text,
-    "full_name" text not null,
+    "full_name" text,
     "email" text not null,
     "type" text not null default 'individual'::text,
     "rejection_reasons" jsonb,
@@ -32,7 +32,6 @@ create table "public"."bridge_deposits" (
     "destination_tx_hash" text,
     "fee_amount" numeric,
     "net_amount" numeric,
-    "event_data" jsonb,
     "created_at" timestamp with time zone not null default now(),
     "updated_at" timestamp with time zone not null default now()
 );
@@ -172,6 +171,29 @@ alter table "public"."bridge_virtual_accounts" add constraint "bridge_virtual_ac
 alter table "public"."bridge_virtual_accounts" validate constraint "bridge_virtual_accounts_status_check";
 
 alter table "public"."bridge_webhook_events" add constraint "bridge_webhook_events_bridge_event_id_key" UNIQUE using index "bridge_webhook_events_bridge_event_id_key";
+
+create or replace view "public"."bridge_customers_safe" as  SELECT bridge_customers.id,
+    bridge_customers.user_id,
+    bridge_customers.bridge_customer_id,
+    bridge_customers.kyc_link_id,
+    bridge_customers.kyc_status,
+    bridge_customers.tos_status,
+    bridge_customers.full_name,
+    bridge_customers.email,
+    bridge_customers.type,
+    bridge_customers.created_at,
+    bridge_customers.updated_at,
+        CASE
+            WHEN (bridge_customers.rejection_reasons IS NULL) THEN NULL::jsonb
+            ELSE ( SELECT jsonb_agg(
+                    CASE
+                        WHEN (jsonb_typeof(value.value) = 'object'::text) THEN (value.value - 'developer_reason'::text)
+                        ELSE value.value
+                    END) AS jsonb_agg
+               FROM jsonb_array_elements(bridge_customers.rejection_reasons) value(value))
+        END AS rejection_reasons
+   FROM bridge_customers;
+
 
 grant delete on table "public"."bridge_customers" to "anon";
 
