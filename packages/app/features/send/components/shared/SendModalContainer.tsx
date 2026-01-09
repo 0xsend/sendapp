@@ -49,7 +49,8 @@ export const SendModalContainer = ({
         }}
         bottomInset={bottom || 10}
         topInset={top}
-        keyboardBehavior="interactive"
+        // @ts-expect-error - keyboardBehavior restore value is not typed properly
+        keyboardBehavior="restore"
       >
         <BottomSheetView
           style={{
