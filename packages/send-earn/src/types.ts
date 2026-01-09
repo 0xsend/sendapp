@@ -106,6 +106,8 @@ export interface SkippedVault {
 export interface DryRunResult {
   vaults: VaultRevenue[]
   balances: VaultBalances[]
+  /** Fee share data for affiliate contracts and direct recipients */
+  feeShares: FeeDistributionDryRunResult
   totals: {
     harvestable: { morpho: bigint; well: bigint }
     vaultBalances: { morpho: bigint; well: bigint }
@@ -192,3 +194,102 @@ export type MerklRewardsResponse = {
  * Output format options.
  */
 export type OutputFormat = 'table' | 'json' | 'csv' | 'markdown'
+
+/**
+ * Fee recipient type discriminator.
+ * - affiliate: SendEarnAffiliate contract that can be automated via pay()
+ * - direct: Revenue Safe receives shares directly (manual redemption)
+ */
+export type FeeRecipientType = 'affiliate' | 'direct'
+
+/**
+ * Information about a vault's fee recipient configuration.
+ */
+export interface FeeRecipientInfo {
+  vault: `0x${string}`
+  feeRecipient: `0x${string}`
+  type: FeeRecipientType
+  /** Vault shares held by the fee recipient (redeemable for USDC) */
+  redeemableShares: bigint
+  /** Only present for affiliate type */
+  affiliateDetails?: AffiliateDetails
+}
+
+/**
+ * Details for affiliate-type fee recipients.
+ */
+export interface AffiliateDetails {
+  /** Address that receives 25% split */
+  affiliate: `0x${string}`
+  /** Vault where platform's 75% is deposited */
+  platformVault: `0x${string}`
+  /** Vault where affiliate's 25% is deposited */
+  payVault: `0x${string}`
+  /** Platform address that owns platformVault shares */
+  platform: `0x${string}`
+}
+
+/**
+ * Result of fee distribution operation.
+ */
+export interface FeeDistributionResult {
+  distributed: {
+    /** Total vault shares redeemed across all transactions */
+    totalShares: bigint
+    /** Number of vaults successfully processed */
+    vaultCount: number
+  }
+  transactions: FeeDistributionRecord[]
+  skipped: SkippedFeeRecipient[]
+  errors: FeeDistributionError[]
+}
+
+/**
+ * Record of a single fee distribution transaction.
+ *
+ * Note: SendEarnAffiliate.pay() redeems vault shares for assets (USDC),
+ * then splits assets 75/25 and deposits into platformVault and payVault.
+ * We track input shares; actual asset amounts depend on vault exchange rate
+ * at execution time and can be derived from transaction events if needed.
+ */
+export interface FeeDistributionRecord {
+  vault: `0x${string}`
+  affiliateContract: `0x${string}`
+  /** Vault shares that were redeemed (input to pay()) */
+  sharesRedeemed: bigint
+  txHash: `0x${string}`
+  blockNum: bigint
+  blockTime: bigint
+}
+
+/**
+ * Fee recipient skipped during distribution.
+ */
+export interface SkippedFeeRecipient {
+  vault: `0x${string}`
+  feeRecipient: `0x${string}`
+  reason: string
+}
+
+/**
+ * Error during fee distribution.
+ */
+export interface FeeDistributionError {
+  vault: `0x${string}`
+  affiliateContract: `0x${string}`
+  error: string
+}
+
+/**
+ * Dry run result for fee distribution.
+ */
+export interface FeeDistributionDryRunResult {
+  affiliates: FeeRecipientInfo[]
+  directRecipients: FeeRecipientInfo[]
+  totals: {
+    /** Total shares held by affiliate contracts (automatable) */
+    affiliateShares: bigint
+    /** Total shares held directly by Revenue Safe (manual) */
+    directShares: bigint
+  }
+}

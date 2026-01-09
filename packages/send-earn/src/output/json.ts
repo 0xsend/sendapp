@@ -9,6 +9,22 @@ export interface JsonOutput {
     harvestable: { morpho: string; well: string }
     balance: { morpho: string; well: string }
   }[]
+  feeShares: {
+    affiliates: {
+      vault: string
+      feeRecipient: string
+      redeemableShares: string
+    }[]
+    directRecipients: {
+      vault: string
+      feeRecipient: string
+      redeemableShares: string
+    }[]
+    totals: {
+      affiliateShares: string
+      directShares: string
+    }
+  }
   totals: {
     harvestable: { morpho: string; well: string }
     vaultBalances: { morpho: string; well: string }
@@ -38,6 +54,22 @@ export function formatJson(result: DryRunResult): string {
         },
       }
     }),
+    feeShares: {
+      affiliates: result.feeShares.affiliates.map((a) => ({
+        vault: a.vault,
+        feeRecipient: a.feeRecipient,
+        redeemableShares: a.redeemableShares.toString(),
+      })),
+      directRecipients: result.feeShares.directRecipients.map((d) => ({
+        vault: d.vault,
+        feeRecipient: d.feeRecipient,
+        redeemableShares: d.redeemableShares.toString(),
+      })),
+      totals: {
+        affiliateShares: result.feeShares.totals.affiliateShares.toString(),
+        directShares: result.feeShares.totals.directShares.toString(),
+      },
+    },
     totals: {
       harvestable: {
         morpho: result.totals.harvestable.morpho.toString(),

@@ -15,6 +15,15 @@ export type {
   MerklV4Reward,
   MerklRewardsResponse,
   OutputFormat,
+  // Fee distribution types
+  FeeRecipientType,
+  FeeRecipientInfo,
+  AffiliateDetails,
+  FeeDistributionResult,
+  FeeDistributionRecord,
+  SkippedFeeRecipient,
+  FeeDistributionError,
+  FeeDistributionDryRunResult,
 } from './types'
 
 export { REVENUE_ADDRESSES } from './types'
@@ -23,14 +32,21 @@ export { REVENUE_ADDRESSES } from './types'
 export { createConfig, DEFAULT_CONFIG } from './revenue'
 
 // High-level functions
-export { dryRun, harvest, sweep } from './revenue'
+export { dryRun, harvest, sweep, distributeFees, feesDryRun } from './revenue'
 
 // Database
 export { getActiveVaults } from './db'
 
 // Lower-level functions for advanced use
 export { fetchHarvestableRevenue, buildClaimArrays } from './merkl'
-export { getVaultBalances, executeHarvest, executeSweep } from './vaults'
+export {
+  getVaultBalances,
+  executeHarvest,
+  executeSweep,
+  getFeeRecipientInfo,
+  getFeeDistributionDryRun,
+  executeFeeDistribution,
+} from './vaults'
 
 // Output formatting
 export {
