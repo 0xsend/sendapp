@@ -20,6 +20,7 @@ import type {
   AffiliateDetails,
   VaultTVL,
   TVLResult,
+  UnderlyingVaultType,
 } from './types'
 import { REVENUE_ADDRESSES } from './types'
 import { buildClaimArrays } from './merkl'
@@ -109,6 +110,20 @@ const sendEarnVaultAbi = [
   {
     type: 'function',
     name: 'VAULT',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * MetaMorpho ABI subset for detecting Morpho vaults.
+ * MetaMorpho vaults have a `MORPHO()` function that returns the Morpho contract address.
+ */
+const metaMorphoAbi = [
+  {
+    type: 'function',
+    name: 'MORPHO',
     inputs: [],
     outputs: [{ name: '', type: 'address' }],
     stateMutability: 'view',
@@ -716,6 +731,29 @@ export async function executeFeeDistribution(
 }
 
 /**
+ * Detect the underlying vault type (Morpho or Moonwell).
+ * MetaMorpho vaults have a MORPHO() function, Moonwell vaults don't.
+ */
+async function detectVaultType(
+  client: ReturnType<typeof createReadClient>,
+  underlyingVault: `0x${string}`
+): Promise<UnderlyingVaultType> {
+  try {
+    // MetaMorpho vaults have a MORPHO() function
+    await client.readContract({
+      address: underlyingVault,
+      abi: metaMorphoAbi,
+      functionName: 'MORPHO',
+    })
+    return 'Morpho'
+  } catch {
+    // If MORPHO() doesn't exist, assume Moonwell
+    // (Moonwell vaults don't have this function)
+    return 'Moonwell'
+  }
+}
+
+/**
  * Get TVL (Total Value Locked) for all Send Earn vaults.
  * Calls vault.totalAssets() to get the total USDC deposited.
  */
@@ -746,11 +784,15 @@ export async function getVaultsTVL(
         }),
       ])
 
+      // Detect the underlying vault type
+      const vaultType = await detectVaultType(client, underlyingVault as `0x${string}`)
+
       results.push({
         vault,
         totalAssets,
         totalSupply,
         underlyingVault: underlyingVault as `0x${string}`,
+        vaultType,
       })
     } catch (error) {
       console.warn(`Failed to fetch TVL for vault ${vault}:`, error)
