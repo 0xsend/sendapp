@@ -1,7 +1,13 @@
 import { parseUnits } from 'viem'
 import { getActiveVaults } from './db'
 import { fetchHarvestableRevenue } from './merkl'
-import { getVaultBalances, executeHarvest, executeSweep } from './vaults'
+import {
+  getVaultBalances,
+  executeHarvest,
+  executeSweep,
+  getFeeDistributionDryRun,
+  executeFeeDistribution,
+} from './vaults'
 import type {
   RevenueConfig,
   DryRunResult,
@@ -9,6 +15,8 @@ import type {
   SweepResult,
   VaultRevenue,
   VaultBalances,
+  FeeDistributionResult,
+  FeeDistributionDryRunResult,
 } from './types'
 
 /**
@@ -80,7 +88,7 @@ function calculateTotals(
 }
 
 /**
- * Dry run: fetch harvestable amounts and vault balances without executing transactions.
+ * Dry run: fetch harvestable amounts, vault balances, and fee shares without executing transactions.
  */
 export async function dryRun(config: RevenueConfig): Promise<DryRunResult> {
   // Use vault filter directly if specified, otherwise get from database
@@ -97,6 +105,11 @@ export async function dryRun(config: RevenueConfig): Promise<DryRunResult> {
     return {
       vaults: [],
       balances: [],
+      feeShares: {
+        affiliates: [],
+        directRecipients: [],
+        totals: { affiliateShares: 0n, directShares: 0n },
+      },
       totals: {
         harvestable: { morpho: 0n, well: 0n },
         vaultBalances: { morpho: 0n, well: 0n },
@@ -111,10 +124,13 @@ export async function dryRun(config: RevenueConfig): Promise<DryRunResult> {
   // Get current vault balances
   const balances = await getVaultBalances(config, vaults)
 
+  // Get fee share data for affiliate contracts
+  const feeShares = await getFeeDistributionDryRun(config, vaults)
+
   // Calculate totals
   const totals = calculateTotals(vaultRevenue, balances)
 
-  return { vaults: vaultRevenue, balances, totals }
+  return { vaults: vaultRevenue, balances, feeShares, totals }
 }
 
 /**
@@ -170,4 +186,51 @@ export async function sweep(config: RevenueConfig): Promise<SweepResult> {
 
   // Execute sweep transactions
   return executeSweep(config, vaults)
+}
+
+/**
+ * Dry run for fee distribution: show pending fee shares for affiliate contracts.
+ */
+export async function feesDryRun(config: RevenueConfig): Promise<FeeDistributionDryRunResult> {
+  // Use vault filter directly if specified, otherwise get from database
+  let vaults: `0x${string}`[]
+  if (config.vaultFilter && config.vaultFilter.length > 0) {
+    vaults = config.vaultFilter
+  } else {
+    vaults = await getActiveVaults(config.dbUrl)
+  }
+
+  if (vaults.length === 0) {
+    return {
+      affiliates: [],
+      directRecipients: [],
+      totals: { affiliateShares: 0n, directShares: 0n },
+    }
+  }
+
+  return getFeeDistributionDryRun(config, vaults)
+}
+
+/**
+ * Execute fee distribution: call pay() on affiliate contracts to distribute fee shares.
+ */
+export async function distributeFees(config: RevenueConfig): Promise<FeeDistributionResult> {
+  // Use vault filter directly if specified, otherwise get from database
+  let vaults: `0x${string}`[]
+  if (config.vaultFilter && config.vaultFilter.length > 0) {
+    vaults = config.vaultFilter
+  } else {
+    vaults = await getActiveVaults(config.dbUrl)
+  }
+
+  if (vaults.length === 0) {
+    return {
+      distributed: { totalShares: 0n, vaultCount: 0 },
+      transactions: [],
+      skipped: [],
+      errors: [],
+    }
+  }
+
+  return executeFeeDistribution(config, vaults)
 }

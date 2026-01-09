@@ -24,7 +24,10 @@ function formatAmount(amount: bigint, decimals = 18): string {
 export function formatMarkdown(result: DryRunResult): string {
   const lines: string[] = []
 
+  // Merkl rewards section
   lines.push('## Send Earn Revenue Dry Run')
+  lines.push('')
+  lines.push('### Merkl Rewards')
   lines.push('')
   lines.push('| Vault | MORPHO | WELL |')
   lines.push('|-------|--------|------|')
@@ -46,6 +49,41 @@ export function formatMarkdown(result: DryRunResult): string {
   lines.push(
     `- Sweepable: ${formatAmount(result.totals.sweepable.morpho)} MORPHO, ${formatAmount(result.totals.sweepable.well)} WELL`
   )
+
+  // Fee shares section
+  lines.push('')
+  lines.push('### Fee Shares')
+  lines.push('')
+
+  if (result.feeShares.affiliates.length > 0) {
+    lines.push('**Affiliate Contracts (automatable):**')
+    lines.push('')
+    lines.push('| Vault | Fee Recipient | Shares |')
+    lines.push('|-------|---------------|--------|')
+    for (const a of result.feeShares.affiliates) {
+      lines.push(
+        `| ${truncateAddress(a.vault)} | ${truncateAddress(a.feeRecipient)} | ${a.redeemableShares.toString()} |`
+      )
+    }
+    lines.push('')
+  }
+
+  if (result.feeShares.directRecipients.length > 0) {
+    lines.push('**Direct Recipients (manual):**')
+    lines.push('')
+    lines.push('| Vault | Fee Recipient | Shares |')
+    lines.push('|-------|---------------|--------|')
+    for (const d of result.feeShares.directRecipients) {
+      lines.push(
+        `| ${truncateAddress(d.vault)} | ${truncateAddress(d.feeRecipient)} | ${d.redeemableShares.toString()} |`
+      )
+    }
+    lines.push('')
+  }
+
+  lines.push('**Fee Share Totals:**')
+  lines.push(`- Affiliate Shares: ${result.feeShares.totals.affiliateShares.toString()}`)
+  lines.push(`- Direct Shares: ${result.feeShares.totals.directShares.toString()}`)
 
   return lines.join('\n')
 }

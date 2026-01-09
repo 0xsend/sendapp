@@ -11,6 +11,13 @@ import type {
   HarvestResult,
   TransactionRecord,
   VaultRevenue,
+  FeeRecipientInfo,
+  FeeDistributionResult,
+  FeeDistributionRecord,
+  SkippedFeeRecipient,
+  FeeDistributionError,
+  FeeDistributionDryRunResult,
+  AffiliateDetails,
 } from './types'
 import { REVENUE_ADDRESSES } from './types'
 import { buildClaimArrays } from './merkl'
@@ -50,6 +57,86 @@ const merklDistributorAbi = [
     ],
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * SendEarn ABI subset for feeRecipient().
+ */
+const sendEarnFeeAbi = [
+  {
+    type: 'function',
+    name: 'feeRecipient',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * ERC4626 ABI subset for maxRedeem().
+ */
+const erc4626Abi = [
+  {
+    type: 'function',
+    name: 'maxRedeem',
+    inputs: [{ name: 'owner', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const
+
+/**
+ * SendEarnAffiliate ABI subset for querying state and calling pay().
+ */
+const sendEarnAffiliateAbi = [
+  {
+    type: 'function',
+    name: 'affiliate',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'platformVault',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'payVault',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'splitConfig',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pay',
+    inputs: [{ name: 'vault', type: 'address' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * IPartnerSplitConfig ABI subset for platform().
+ */
+const splitConfigAbi = [
+  {
+    type: 'function',
+    name: 'platform',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
   },
 ] as const
 
@@ -326,6 +413,273 @@ export async function executeSweep(
 
   return {
     swept: { morpho: morphoTotal, well: wellTotal },
+    transactions,
+    skipped,
+    errors,
+  }
+}
+
+/**
+ * Check if an address is a contract (has code).
+ */
+async function isContract(
+  client: ReturnType<typeof createReadClient>,
+  address: `0x${string}`
+): Promise<boolean> {
+  const code = await client.getCode({ address })
+  return code !== undefined && code !== '0x'
+}
+
+/**
+ * Try to read affiliate contract details. Returns undefined if not a valid affiliate contract.
+ */
+async function tryGetAffiliateDetails(
+  client: ReturnType<typeof createReadClient>,
+  feeRecipient: `0x${string}`
+): Promise<AffiliateDetails | undefined> {
+  try {
+    const [affiliate, platformVault, payVault, splitConfig] = await Promise.all([
+      client.readContract({
+        address: feeRecipient,
+        abi: sendEarnAffiliateAbi,
+        functionName: 'affiliate',
+      }),
+      client.readContract({
+        address: feeRecipient,
+        abi: sendEarnAffiliateAbi,
+        functionName: 'platformVault',
+      }),
+      client.readContract({
+        address: feeRecipient,
+        abi: sendEarnAffiliateAbi,
+        functionName: 'payVault',
+      }),
+      client.readContract({
+        address: feeRecipient,
+        abi: sendEarnAffiliateAbi,
+        functionName: 'splitConfig',
+      }),
+    ])
+
+    // Get platform address from split config
+    const platform = await client.readContract({
+      address: splitConfig,
+      abi: splitConfigAbi,
+      functionName: 'platform',
+    })
+
+    return {
+      affiliate: affiliate as `0x${string}`,
+      platformVault: platformVault as `0x${string}`,
+      payVault: payVault as `0x${string}`,
+      platform: platform as `0x${string}`,
+    }
+  } catch {
+    // Not a valid affiliate contract
+    return undefined
+  }
+}
+
+/**
+ * Get fee recipient info for vaults.
+ * Identifies whether each vault's feeRecipient is an affiliate contract or direct recipient.
+ */
+export async function getFeeRecipientInfo(
+  config: RevenueConfig,
+  vaults: `0x${string}`[]
+): Promise<FeeRecipientInfo[]> {
+  const client = createReadClient(config.rpcUrl)
+  const results: FeeRecipientInfo[] = []
+  const revenueSafe = REVENUE_ADDRESSES.REVENUE_SAFE.toLowerCase()
+
+  for (const vault of vaults) {
+    try {
+      // Get fee recipient address
+      const feeRecipient = await client.readContract({
+        address: vault,
+        abi: sendEarnFeeAbi,
+        functionName: 'feeRecipient',
+      })
+
+      // Get redeemable shares (how many vault shares the fee recipient holds)
+      const redeemableShares = await client.readContract({
+        address: vault,
+        abi: erc4626Abi,
+        functionName: 'maxRedeem',
+        args: [feeRecipient],
+      })
+
+      // Determine if affiliate contract or direct recipient
+      // Per spec: non-Revenue Safe contracts are affiliates; Revenue Safe or EOAs are direct
+      if (feeRecipient.toLowerCase() === revenueSafe) {
+        // Direct to Revenue Safe
+        results.push({
+          vault,
+          feeRecipient: feeRecipient as `0x${string}`,
+          type: 'direct',
+          redeemableShares,
+        })
+      } else if (await isContract(client, feeRecipient as `0x${string}`)) {
+        // Non-Revenue Safe contract = affiliate (per spec)
+        // Affiliate details are optional metadata - failure to read them doesn't change classification
+        const affiliateDetails = await tryGetAffiliateDetails(client, feeRecipient as `0x${string}`)
+        if (!affiliateDetails) {
+          console.warn(
+            `Could not read affiliate details for ${feeRecipient} (vault ${vault}); treating as affiliate without metadata`
+          )
+        }
+        results.push({
+          vault,
+          feeRecipient: feeRecipient as `0x${string}`,
+          type: 'affiliate',
+          redeemableShares,
+          affiliateDetails, // May be undefined if metadata read failed
+        })
+      } else {
+        // EOA - treat as direct
+        results.push({
+          vault,
+          feeRecipient: feeRecipient as `0x${string}`,
+          type: 'direct',
+          redeemableShares,
+        })
+      }
+    } catch (error) {
+      console.warn(`Failed to get fee recipient for vault ${vault}:`, error)
+    }
+  }
+
+  return results
+}
+
+/**
+ * Get fee distribution dry run data.
+ * Shows pending fee shares for affiliate contracts and direct recipients.
+ */
+export async function getFeeDistributionDryRun(
+  config: RevenueConfig,
+  vaults: `0x${string}`[]
+): Promise<FeeDistributionDryRunResult> {
+  const feeRecipients = await getFeeRecipientInfo(config, vaults)
+
+  const affiliates = feeRecipients.filter((r) => r.type === 'affiliate')
+  const directRecipients = feeRecipients.filter((r) => r.type === 'direct')
+
+  const affiliateShares = affiliates.reduce((sum, r) => sum + r.redeemableShares, 0n)
+  const directShares = directRecipients.reduce((sum, r) => sum + r.redeemableShares, 0n)
+
+  return {
+    affiliates,
+    directRecipients,
+    totals: {
+      affiliateShares,
+      directShares,
+    },
+  }
+}
+
+/**
+ * Execute fee distribution by calling pay() on affiliate contracts.
+ * Only distributes for affiliate-type fee recipients with redeemable shares > 0.
+ */
+export async function executeFeeDistribution(
+  config: RevenueConfig,
+  vaults: `0x${string}`[]
+): Promise<FeeDistributionResult> {
+  if (!config.collectorPrivateKey) {
+    throw new Error('REVENUE_COLLECTOR_PRIVATE_KEY not configured')
+  }
+
+  const transactions: FeeDistributionRecord[] = []
+  const skipped: SkippedFeeRecipient[] = []
+  const errors: FeeDistributionError[] = []
+
+  const client = createReadClient(config.rpcUrl)
+  const { walletClient, account } = createWriteClient(config.rpcUrl, config.collectorPrivateKey)
+
+  // Get fee recipient info for all vaults
+  const feeRecipients = await getFeeRecipientInfo(config, vaults)
+
+  console.log(`Processing ${feeRecipients.length} vault fee recipients from ${account.address}`)
+
+  for (const recipient of feeRecipients) {
+    // Skip direct recipients (not automatable)
+    if (recipient.type === 'direct') {
+      skipped.push({
+        vault: recipient.vault,
+        feeRecipient: recipient.feeRecipient,
+        reason: 'Direct recipient (not an affiliate contract)',
+      })
+      continue
+    }
+
+    // Skip if no shares to distribute
+    if (recipient.redeemableShares === 0n) {
+      skipped.push({
+        vault: recipient.vault,
+        feeRecipient: recipient.feeRecipient,
+        reason: 'No redeemable shares',
+      })
+      continue
+    }
+
+    const affiliateContract = recipient.feeRecipient
+
+    try {
+      console.log(
+        `Distributing fees for vault ${recipient.vault}: ${recipient.redeemableShares.toString()} shares`
+      )
+
+      const txHash = await walletClient.writeContract({
+        address: affiliateContract,
+        abi: sendEarnAffiliateAbi,
+        functionName: 'pay',
+        args: [recipient.vault],
+      })
+
+      console.log(`Fee distribution tx: ${txHash}`)
+
+      const receipt = await client.waitForTransactionReceipt({ hash: txHash })
+
+      if (receipt.status === 'success') {
+        const block = await client.getBlock({ blockNumber: receipt.blockNumber })
+
+        transactions.push({
+          vault: recipient.vault,
+          affiliateContract,
+          sharesRedeemed: recipient.redeemableShares,
+          txHash: receipt.transactionHash,
+          blockNum: receipt.blockNumber,
+          blockTime: block.timestamp,
+        })
+
+        console.log(`Fee distribution successful for vault ${recipient.vault}`)
+      } else {
+        errors.push({
+          vault: recipient.vault,
+          affiliateContract,
+          error: 'Transaction reverted',
+        })
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      errors.push({
+        vault: recipient.vault,
+        affiliateContract,
+        error: errorMessage,
+      })
+      console.error(`Fee distribution failed for vault ${recipient.vault}: ${errorMessage}`)
+    }
+  }
+
+  // Calculate totals
+  const totalShares = transactions.reduce((sum, t) => sum + t.sharesRedeemed, 0n)
+
+  return {
+    distributed: {
+      totalShares,
+      vaultCount: transactions.length,
+    },
     transactions,
     skipped,
     errors,

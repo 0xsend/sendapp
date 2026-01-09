@@ -4,23 +4,45 @@ Design document for SEND-172: Harvest and Sweep Morpho and Moonwell Revenue
 
 ## Purpose
 
-Automate the collection of MORPHO and WELL tokens as **revenue for Send platform and Send foundation**. These tokens accrue to SendEarn vault addresses through the Merkl distribution system and must be harvested and swept to the foundation's revenue safe.
+Automate the collection of protocol revenue for Send platform and Send foundation:
 
-## Revenue Flow
+1. **Merkl Rewards**: MORPHO and WELL tokens distributed through Merkl to vault addresses
+2. **Performance Fees**: 8% of yield earned, paid as vault shares to fee recipients
+
+## Revenue Flows
+
+### Flow 1: Merkl Rewards (MORPHO/WELL)
 
 ```
 Morpho/Moonwell Markets
         │
         ▼
   Merkl Distribution ─────► SendEarn Vaults ─────► Revenue Safe
-  (revenue accrues)        (harvest)              (sweep)
+  (rewards accrue)          (harvest)              (sweep)
                                                       │
                                                       ▼
                                             0x65049C4B8e970F5bcCDAE8E141AA06346833CeC4
                                             (Send Foundation)
 ```
 
-**Key distinction**: This is NOT yield for depositors. These tokens are protocol revenue collected by Send.
+### Flow 2: Performance Fees (Vault Shares → USDC)
+
+```
+Yield Earned on Deposits
+        │
+        ▼ (8% fee)
+  Fee Shares Minted ──────► Affiliate Contract ────► Platform Vault
+  (to feeRecipient)         (pay())                  (75% as shares)
+                               │                          │
+                               │                          ▼
+                               │                    Revenue Safe
+                               │                    (owns vault shares)
+                               ▼
+                          Affiliate Vault
+                          (25% as shares)
+```
+
+**Note**: Revenue Safe accumulates vault shares from performance fees. Redemption to USDC is a separate manual process.
 
 ## Architecture
 
@@ -40,12 +62,13 @@ Morpho/Moonwell Markets
 │    Trigger            │   Tracking   │     │                      │    │
 │                       └──────────────┘     │  1. Harvest (Merkl)  │    │
 │                                            │  2. Sweep (Vaults)   │    │
+│                                            │  3. Distribute Fees  │    │
 │                                            └──────────────────────┘    │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Two-Step Collection Process
+## Three-Step Collection Process
 
 ### Step 1: Harvest (from Merkl)
 
@@ -80,6 +103,41 @@ function collect(address token) external {
 - Anyone can call (no auth required)
 - Transfers to pre-configured `collections` address
 - **Safety check**: Verify `collections == REVENUE_SAFE` before calling
+
+### Step 3: Distribute Performance Fees (from Affiliate Contracts)
+
+Call `SendEarnAffiliate.pay()` on each affiliate contract to distribute accrued fee shares.
+
+```solidity
+// SendEarnAffiliate contract
+function pay(IERC4626 vault) external {
+    // Redeem all vault shares owned by this contract
+    uint256 assets = vault.redeem(vault.maxRedeem(address(this)), address(this), address(this));
+
+    // Split between platform (75%) and affiliate (25%)
+    uint256 platformSplit = assets * split / SPLIT_TOTAL;
+    uint256 affiliateSplit = assets - platformSplit;
+
+    // Deposit platform's share into platformVault for Revenue Safe
+    platformVault.deposit(platformSplit, platform);
+
+    // Deposit affiliate's share into payVault for affiliate
+    payVault.deposit(affiliateSplit, affiliate);
+}
+```
+
+- Anyone can call (no auth required)
+- Redeems fee shares → splits USDC → deposits as vault shares
+- Platform receives 75% as platformVault shares (owned by Revenue Safe)
+- Affiliate receives 25% as payVault shares
+- **Note**: Revenue Safe accumulates vault shares, not USDC directly
+
+#### Fee Recipient Types
+
+| Type | feeRecipient | Action | Result |
+|------|--------------|--------|--------|
+| Affiliate Vault | SendEarnAffiliate contract | Call `pay(vault)` | Revenue Safe gets platformVault shares |
+| Platform Vault | Revenue Safe directly | Manual redemption | Revenue Safe must call `redeem()` |
 
 ## Components
 

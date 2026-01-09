@@ -84,5 +84,29 @@ export function formatTable(result: DryRunResult): string {
 
   lines.push(`└${'─'.repeat(26)}┴${'─'.repeat(14)}┴${'─'.repeat(22)}┘`)
 
+  // Fee Shares Section (vault shares held by fee recipients)
+  lines.push('')
+  lines.push(`┌${'─'.repeat(65)}┐`)
+  lines.push(`│${pad('Fee Shares (Vault Shares)', 65, 'left').slice(0, 65)}│`)
+  lines.push(`├${'─'.repeat(40)}┬${'─'.repeat(22)}┤`)
+  lines.push(`│${pad('Category', 40, 'left')}│${pad('Shares', 22)}│`)
+  lines.push(`├${'─'.repeat(40)}┼${'─'.repeat(22)}┤`)
+
+  const affiliateShares = result.feeShares.totals.affiliateShares.toString()
+  const directShares = result.feeShares.totals.directShares.toString()
+  const totalFeeShares = (
+    result.feeShares.totals.affiliateShares + result.feeShares.totals.directShares
+  ).toString()
+
+  lines.push(
+    `│ ${pad(`Affiliate Contracts (${result.feeShares.affiliates.length})`, 38, 'left')} │${pad(affiliateShares, 21)} │`
+  )
+  lines.push(
+    `│ ${pad(`Direct Recipients (${result.feeShares.directRecipients.length})`, 38, 'left')} │${pad(directShares, 21)} │`
+  )
+  lines.push(`├${'─'.repeat(40)}┼${'─'.repeat(22)}┤`)
+  lines.push(`│ ${pad('Total Fee Shares', 38, 'left')} │${pad(totalFeeShares, 21)} │`)
+  lines.push(`└${'─'.repeat(40)}┴${'─'.repeat(22)}┘`)
+
   return lines.join('\n')
 }

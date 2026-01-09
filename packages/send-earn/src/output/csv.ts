@@ -15,10 +15,10 @@ function formatAmount(amount: bigint, decimals = 18): string {
 export function formatCsv(result: DryRunResult): string {
   const lines: string[] = []
 
-  // Header
+  // Merkl rewards section
+  lines.push('# Merkl Rewards')
   lines.push('vault,morpho_harvestable,well_harvestable,morpho_balance,well_balance')
 
-  // Data rows
   for (const v of result.vaults) {
     const balance = result.balances.find(
       (b) => b.vault.toLowerCase() === v.vault.toLowerCase()
@@ -34,6 +34,26 @@ export function formatCsv(result: DryRunResult): string {
       ].join(',')
     )
   }
+
+  // Fee shares section
+  lines.push('')
+  lines.push('# Fee Shares')
+  lines.push('vault,fee_recipient,type,redeemable_shares')
+
+  for (const a of result.feeShares.affiliates) {
+    lines.push([a.vault, a.feeRecipient, 'affiliate', a.redeemableShares.toString()].join(','))
+  }
+
+  for (const d of result.feeShares.directRecipients) {
+    lines.push([d.vault, d.feeRecipient, 'direct', d.redeemableShares.toString()].join(','))
+  }
+
+  // Totals section
+  lines.push('')
+  lines.push('# Fee Share Totals')
+  lines.push('category,shares')
+  lines.push(`affiliate_shares,${result.feeShares.totals.affiliateShares.toString()}`)
+  lines.push(`direct_shares,${result.feeShares.totals.directShares.toString()}`)
 
   return lines.join('\n')
 }
