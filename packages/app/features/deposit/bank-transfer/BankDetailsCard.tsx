@@ -2,6 +2,7 @@ import { FadeCard, Paragraph, XStack, YStack, Button, Spinner } from '@my/ui'
 import { Copy, Check } from '@tamagui/lucide-icons'
 import { useState, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
+import { Link } from 'solito/link'
 
 interface BankDetailsCardProps {
   bankName: string | null
@@ -124,6 +125,12 @@ export function BankDetailsCard({
           ACH transfers typically arrive within 1-3 business days. Wire transfers are usually
           same-day.
         </Paragraph>
+
+        <Link href="/deposit/bank-transfer/history">
+          <Button size="$4" theme="green">
+            View Transfer History
+          </Button>
+        </Link>
       </YStack>
     </FadeCard>
   )
