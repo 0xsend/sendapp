@@ -50,7 +50,7 @@ import {
   sendtagCheckoutAddress,
   sendTokenV0Address,
 } from '@my/wagmi'
-import { sendCoin, sendV0Coin } from 'app/data/coins'
+import { sendCoin, sendV0Coin, usdcCoin } from 'app/data/coins'
 import { shorten } from 'app/utils/strings'
 import { ContractLabels } from 'app/data/contract-labels'
 
@@ -209,9 +209,19 @@ function computeAmount(
 
   if (isTemporalSendEarnDepositEvent(activity)) {
     const { assets, coin } = activityData
-    if (coin && assets !== undefined && assets !== null)
-      return `${formatAmount(formatUnits(assets, coin.decimals), 5, coin.formatDecimals)} ${coin.symbol}`
-    if (assets !== undefined && assets !== null) return formatAmount(`${assets}`, 5, 0)
+    // Use coin from data if available, otherwise fallback to USDC (earn vaults use USDC)
+    const earnCoin = coin || usdcCoin
+    if (earnCoin && assets !== undefined && assets !== null) {
+      return `${formatAmount(formatUnits(assets, earnCoin.decimals), 5, earnCoin.formatDecimals)} ${earnCoin.symbol}`
+    }
+  }
+
+  // Send Earn deposit/withdraw events - use USDC as the underlying asset
+  if (isSendEarnDepositEvent(activity) || isSendEarnWithdrawEvent(activity)) {
+    const { assets } = activityData
+    if (assets !== undefined && assets !== null && usdcCoin) {
+      return `${formatAmount(formatUnits(assets, usdcCoin.decimals), 5, usdcCoin.formatDecimals)} ${usdcCoin.symbol}`
+    }
   }
 
   if (isTagReceiptsEvent(activity) || isTagReceiptUSDCEvent(activity)) {
@@ -277,6 +287,21 @@ export function transformActivity(
   const isSendCheckClaim =
     isSendAccountTransfersEvent(activity) && sendCheckAddr && fromAddr === sendCheckAddr
 
+  // Detect pending state for temporal transfers
+  const isTemporalTransfer =
+    isTemporalTokenTransfersEvent(activity) || isTemporalEthTransfersEvent(activity)
+  const isTemporalEarnDeposit = isTemporalSendEarnDepositEvent(activity)
+  const temporalStatus = isTemporalTransfer
+    ? activityData.status
+    : isTemporalEarnDeposit
+      ? activityData.status
+      : null
+  const isPending =
+    temporalStatus !== null &&
+    temporalStatus !== 'confirmed' &&
+    temporalStatus !== 'failed' &&
+    temporalStatus !== 'cancelled'
+
   // Common fields
   const baseFields = {
     eventId: activity.event_id,
@@ -285,6 +310,7 @@ export function transformActivity(
     isFirst,
     isLast,
     sectionIndex,
+    ...(isPending && { isPending: true }),
   }
 
   // Sendpot

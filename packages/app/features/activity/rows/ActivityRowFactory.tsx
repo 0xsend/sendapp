@@ -5,7 +5,7 @@
  */
 
 import { memo } from 'react'
-import { View, Text, StyleSheet, type TextStyle } from 'react-native'
+import { View, Text, StyleSheet, type TextStyle, ActivityIndicator } from 'react-native'
 import { isWeb } from '@tamagui/constants'
 import { View as TamaguiView } from 'tamagui'
 import type { ActivityRow, HeaderRow } from '../utils/activityRowTypes'
@@ -134,6 +134,13 @@ const styles = StyleSheet.create({
   spacer: {
     width: 4,
   },
+  // Spinner container (matches dateTextBase layout)
+  spinnerContainer: {
+    marginTop: 4,
+    height: 16, // Match lineHeight of dateTextBase
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
 })
 
 // Web hover styles (computed once, not per-render)
@@ -176,7 +183,13 @@ const RowContent = memo(({ item, colors, avatarColors, isDark }: RowContentProps
       <Text style={[styles.subTextBase, { color: colors.color10 }]} numberOfLines={2}>
         {item.subtitle}
       </Text>
-      <Text style={[styles.dateTextBase, { color: colors.color10 }]}>{item.date}</Text>
+      {item.isPending ? (
+        <View style={styles.spinnerContainer}>
+          <ActivityIndicator size="small" color={colors.color10} />
+        </View>
+      ) : (
+        <Text style={[styles.dateTextBase, { color: colors.color10 }]}>{item.date}</Text>
+      )}
     </View>
   </View>
 ))
