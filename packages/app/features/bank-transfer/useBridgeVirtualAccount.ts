@@ -1,11 +1,11 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import debug from 'debug'
 import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
 import { BRIDGE_CUSTOMER_QUERY_KEY } from './useBridgeCustomer'
-import getBaseUrl from 'app/utils/getBaseUrl'
 import type { SourceDepositInstructions } from '@my/bridge'
 import { useAnalytics } from 'app/provider/analytics'
+import { api } from 'app/utils/api'
 
 const log = debug('app:features:bank-transfer:useBridgeVirtualAccount')
 
@@ -52,24 +52,6 @@ function getBankDetailsFromInstructions(
 }
 
 /**
- * Helper to create auth headers for API requests (supports native clients)
- */
-async function getAuthHeaders(
-  supabase: ReturnType<typeof useSupabase>
-): Promise<Record<string, string>> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-
-  const { data } = await supabase.auth.getSession()
-  if (data.session?.access_token) {
-    headers.Authorization = `Bearer ${data.session.access_token}`
-  }
-
-  return headers
-}
-
-/**
  * Hook to fetch the current user's virtual account
  */
 export function useBridgeVirtualAccount() {
@@ -113,11 +95,10 @@ export function useBridgeVirtualAccount() {
  */
 export function useCreateVirtualAccount() {
   const queryClient = useQueryClient()
-  const supabase = useSupabase()
   const analytics = useAnalytics()
 
-  return useMutation({
-    mutationFn: async () => {
+  return api.bridge.createVirtualAccount.useMutation({
+    onMutate: () => {
       log('creating virtual account')
       analytics.capture({
         name: 'bank_transfer_account_setup_started',
@@ -125,19 +106,6 @@ export function useCreateVirtualAccount() {
           method: 'virtual_account',
         },
       })
-
-      const headers = await getAuthHeaders(supabase)
-      const response = await fetch(`${getBaseUrl()}/api/bridge/virtual-account/create`, {
-        method: 'POST',
-        headers,
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || error.message || 'Failed to create virtual account')
-      }
-
-      return response.json()
     },
     onSuccess: () => {
       analytics.capture({

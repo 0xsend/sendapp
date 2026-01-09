@@ -5,7 +5,6 @@ import {
   WebhookSignatureError,
   type WebhookEvent,
   extractKycStatusFromEvent,
-  extractTosStatusFromEvent,
   extractDepositStatusFromEvent,
   isKycEvent,
   isVirtualAccountActivityEvent,
@@ -36,78 +35,52 @@ async function getRawBody(req: NextApiRequest): Promise<string> {
 }
 
 /**
- * Handle KYC-related webhook events
+ * Handle KYC rejection events - only tracks rejection_attempts.
+ *
+ * KYC status is NOT synced via webhooks. Instead, we poll the Bridge API
+ * directly (/api/bridge/kyc-status) to provide a more responsive onboarding
+ * experience. Webhooks can have delivery delays, but polling gives users
+ * immediate feedback when their KYC status changes.
+ *
+ * We still use webhooks to track rejection_attempts since they provide
+ * reliable, deduplicated rejection event notifications.
  */
-async function handleKycEvent(event: WebhookEvent): Promise<void> {
+async function handleKycRejectionEvent(event: WebhookEvent): Promise<void> {
   const kycStatus = extractKycStatusFromEvent(event)
-  const tosStatus = extractTosStatusFromEvent(event)
 
-  const data = event.event_object as {
-    id: string
-    customer_id?: string | null
-    kyc_status?: string | null
-    tos_status?: string | null
-    rejection_reasons?: Array<Record<string, unknown>> | string[] | null
-  }
-
-  if (!kycStatus && !tosStatus) {
-    log('no status to update from KYC event')
+  // Only process rejection events
+  if (kycStatus !== 'rejected') {
+    log('ignoring non-rejection KYC event: status=%s', kycStatus)
     return
   }
 
+  const data = event.event_object as { id: string }
   const kycLinkId = data.id
+
   const supabase = createSupabaseAdminClient()
 
-  // Fetch current status to determine if this is a new rejection
+  // Increment rejection_attempts
   const { data: currentCustomer } = await supabase
     .from('bridge_customers')
-    .select('kyc_status, rejection_attempts')
+    .select('rejection_attempts')
     .eq('kyc_link_id', kycLinkId)
     .maybeSingle()
 
-  const updates: Record<string, unknown> = {
-    bridge_customer_id: data.customer_id ?? null,
-    rejection_reasons: data.rejection_reasons ?? null,
-  }
+  const newAttempts = (currentCustomer?.rejection_attempts ?? 0) + 1
 
-  if (kycStatus) updates.kyc_status = kycStatus
-  if (tosStatus) updates.tos_status = tosStatus
-
-  // Increment rejection_attempts on each rejection event
-  // Webhook deduplication by event_id prevents double-counting
-  if (kycStatus === 'rejected') {
-    updates.rejection_attempts = (currentCustomer?.rejection_attempts ?? 0) + 1
-    log(
-      'incrementing rejection_attempts: kycLinkId=%s newCount=%d',
-      kycLinkId,
-      updates.rejection_attempts
-    )
-  }
-
-  log(
-    'processing KYC event: kycLinkId=%s kycStatus=%s tosStatus=%s customerId=%s',
-    kycLinkId,
-    kycStatus,
-    tosStatus,
-    data.customer_id
-  )
+  log('incrementing rejection_attempts: kycLinkId=%s newCount=%d', kycLinkId, newAttempts)
 
   const { error } = await supabase
     .from('bridge_customers')
-    .update(updates)
+    .update({ rejection_attempts: newAttempts })
     .eq('kyc_link_id', kycLinkId)
 
   if (error) {
-    log('failed to update bridge customer: %O', error)
+    log('failed to update rejection_attempts: %O', error)
     throw error
   }
 
-  log(
-    'updated bridge customer: kycLinkId=%s kycStatus=%s tosStatus=%s',
-    kycLinkId,
-    kycStatus,
-    tosStatus
-  )
+  log('updated rejection_attempts: kycLinkId=%s count=%d', kycLinkId, newAttempts)
 }
 
 /**
@@ -443,11 +416,18 @@ function getVirtualAccountActivityType(event: WebhookEvent): string | null {
 
 /**
  * Route webhook event to appropriate handler
+ *
+ * Note: KYC status is synced via direct Bridge API polling (/api/bridge/kyc-status).
+ * Webhooks only track rejection_attempts for KYC events.
  */
 async function handleWebhookEvent(event: WebhookEvent): Promise<void> {
   if (isKycEvent(event)) {
-    await handleKycEvent(event)
-  } else if (isTransferEvent(event)) {
+    // Only track rejection attempts from webhooks - status synced via polling
+    await handleKycRejectionEvent(event)
+    return
+  }
+
+  if (isTransferEvent(event)) {
     await handleTransferDepositEvent(event)
   } else if (isVirtualAccountActivityEvent(event)) {
     const activityType = getVirtualAccountActivityType(event)

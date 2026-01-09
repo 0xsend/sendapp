@@ -233,7 +233,7 @@ describe('Bridge webhook handler', () => {
       api_version: '2024-01-01',
       event_id: 'evt_1',
       event_category: 'transfer',
-      event_type: 'transfer.updated',
+      event_type: 'updated.status_transitioned',
       event_object_id: 'tr_1',
       event_object: {
         state: 'funds_received',
@@ -354,5 +354,70 @@ describe('Bridge webhook handler', () => {
 
     expect(res.statusCode).toBe(400)
     expect(res.body).toEqual({ error: 'Invalid signature' })
+  })
+
+  it('skips non-rejection KYC events (status handled via polling)', async () => {
+    const { supabase, tables } = createSupabaseMock()
+    ;(createSupabaseAdminClient as jest.Mock).mockReturnValue(supabase)
+    ;(verifyWebhookSignature as jest.Mock).mockReturnValue(true)
+
+    const rawBody = JSON.stringify({
+      api_version: '2024-01-01',
+      event_id: 'evt_kyc_1',
+      event_category: 'kyc_link',
+      event_type: 'kyc_link.updated',
+      event_object_id: 'kyc_link_1',
+      event_object: {
+        id: 'kyc_link_1',
+        kyc_status: 'approved',
+        tos_status: 'approved',
+        customer_id: 'cus_1',
+      },
+      event_created_at: '2024-01-01T00:00:00Z',
+    })
+
+    const req = createMockReq(rawBody, { 'x-webhook-signature': 't=1,v0=abc' })
+    const res = createMockRes()
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({ received: true, processed: true })
+    // Non-rejection KYC events should be stored but NOT update bridge_customers
+    expect(tables.bridge_webhook_events.insert).toHaveBeenCalled()
+    expect(tables.bridge_customers.update).not.toHaveBeenCalled()
+  })
+
+  it('tracks rejection_attempts on KYC rejection events', async () => {
+    const { supabase, tables, fns } = createSupabaseMock()
+    ;(createSupabaseAdminClient as jest.Mock).mockReturnValue(supabase)
+    ;(verifyWebhookSignature as jest.Mock).mockReturnValue(true)
+
+    const rawBody = JSON.stringify({
+      api_version: '2024-01-01',
+      event_id: 'evt_kyc_rejected',
+      event_category: 'kyc_link',
+      event_type: 'kyc_link.updated',
+      event_object_id: 'kyc_link_1',
+      event_object: {
+        id: 'kyc_link_1',
+        kyc_status: 'rejected',
+        tos_status: 'approved',
+        customer_id: 'cus_1',
+        rejection_reasons: [{ reason: 'Invalid document' }],
+      },
+      event_created_at: '2024-01-01T00:00:00Z',
+    })
+
+    const req = createMockReq(rawBody, { 'x-webhook-signature': 't=1,v0=abc' })
+    const res = createMockRes()
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({ received: true, processed: true })
+    // KYC rejection events should update rejection_attempts
+    expect(tables.bridge_webhook_events.insert).toHaveBeenCalled()
+    expect(tables.bridge_customers.update).toHaveBeenCalledWith({ rejection_attempts: 1 })
   })
 })
