@@ -4,7 +4,6 @@ import {
   Paragraph,
   ScrollView,
   Separator,
-  Shimmer,
   Spinner,
   useThemeName,
   XStack,
