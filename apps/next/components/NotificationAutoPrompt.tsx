@@ -11,6 +11,75 @@ import { useWebPush } from './WebPushSubscription'
 
 const log = debug('app:web-push:auto-sync')
 
+const RETRY_DELAYS_MS = [1000, 5000, 15000] as const
+const MAX_RETRIES = RETRY_DELAYS_MS.length // 3 retries, 4 total attempts
+
+/**
+ * Returns true if the error is a network failure (fetch threw) or HTTP 5xx.
+ * Does NOT retry on 4xx or 429.
+ */
+function isRetryableError(error: unknown, status?: number): boolean {
+  // Network failure (fetch threw)
+  if (error instanceof TypeError) return true
+  // HTTP 5xx
+  if (status !== undefined && status >= 500 && status < 600) return true
+  return false
+}
+
+/**
+ * Runs an async operation with exponential backoff delays.
+ * Retries only on network failures (fetch throws) and HTTP 5xx responses.
+ * Does not retry on 4xx or 429.
+ */
+async function syncWithRetry(
+  operation: () => Promise<Response>,
+  source: string
+): Promise<Response | null> {
+  let lastError: unknown = null
+  let lastStatus: number | undefined
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await operation()
+      lastStatus = response.status
+
+      // Success or non-retryable error (4xx, 429)
+      if (response.ok || (response.status >= 400 && response.status < 500)) {
+        if (!response.ok) {
+          log('Sync failed (not retrying)', { source, status: response.status, attempt })
+        }
+        return response
+      }
+
+      // 5xx - retryable
+      if (!isRetryableError(null, response.status)) {
+        return response
+      }
+
+      lastError = new Error(`HTTP ${response.status}`)
+    } catch (err) {
+      // Network failure
+      lastError = err
+      lastStatus = undefined
+    }
+
+    // Check if we should retry
+    if (attempt < MAX_RETRIES && isRetryableError(lastError, lastStatus)) {
+      const waitMs = RETRY_DELAYS_MS[attempt]
+      log('Sync retrying', { source, attempt: attempt + 1, waitMs, status: lastStatus })
+      await new Promise((resolve) => setTimeout(resolve, waitMs))
+    }
+  }
+
+  // All retries exhausted
+  log('Sync failed after retries', {
+    source,
+    attempts: MAX_RETRIES + 1,
+    status: lastStatus,
+  })
+  return null
+}
+
 // Must match apps/next/public/service_worker.js
 const ALLOWED_SW_MESSAGE_TYPES = Object.freeze(['PUSH_SUBSCRIPTION_CHANGED'] as const)
 type AllowedSwMessageType = (typeof ALLOWED_SW_MESSAGE_TYPES)[number]
@@ -91,24 +160,21 @@ export function NotificationAutoPrompt() {
         const subscription = await reg.pushManager.getSubscription()
         if (!subscription) return
 
-        const response = await fetch('/api/notifications/subscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'same-origin',
-          cache: 'no-store',
-          body: JSON.stringify({
-            subscription: subscription.toJSON(),
-          }),
-        })
-
-        if (!response.ok) {
-          // Avoid logging any sensitive payload (endpoints/keys).
-          log('Auto-sync failed', { source, status: response.status })
-        }
-      } catch (err) {
-        log('Auto-sync error', { source, err })
+        await syncWithRetry(
+          () =>
+            fetch('/api/notifications/subscribe', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'same-origin',
+              cache: 'no-store',
+              body: JSON.stringify({
+                subscription: subscription.toJSON(),
+              }),
+            }),
+          source
+        )
       } finally {
         syncInFlight.current = false
       }
