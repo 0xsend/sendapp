@@ -16,6 +16,7 @@ import {
   useBridgeGeoBlock,
   useKycStatus,
   useInitiateKyc,
+  useSyncKycStatus,
   useCreateTransferTemplate,
   useTransferTemplateBankAccountDetails,
 } from 'app/features/bank-transfer'
@@ -39,7 +40,9 @@ const getErrorType = (error: unknown): 'network' | 'unknown' => {
 export function BankTransferScreen() {
   const analytics = useAnalytics()
   const { profile } = useUser()
+
   const {
+    kycLinkId,
     kycStatus,
     isTosAccepted,
     isApproved,
@@ -47,6 +50,11 @@ export function BankTransferScreen() {
     isMaxAttemptsExceeded,
     isLoading: kycLoading,
   } = useKycStatus()
+
+  // Sync KYC status from Bridge API to DB for faster updates
+  // Sync when: has kycLinkId AND not approved AND not (rejected with max attempts)
+  const shouldSync = !!kycLinkId && !isApproved && !isMaxAttemptsExceeded
+  useSyncKycStatus(kycLinkId ?? undefined, { enabled: shouldSync })
   const {
     hasTransferTemplate,
     bankDetails,

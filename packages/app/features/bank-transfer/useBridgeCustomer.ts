@@ -42,10 +42,16 @@ function extractCustomerRejectionReasons(input: unknown): string[] {
   return Array.from(new Set(reasons))
 }
 
+type UseBridgeCustomerOptions = {
+  /** Polling interval in ms. Set to false to disable polling. Default: 5000 */
+  refetchInterval?: number | false
+}
+
 /**
  * Hook to fetch the current user's Bridge customer record
  */
-export function useBridgeCustomer() {
+export function useBridgeCustomer(options?: UseBridgeCustomerOptions) {
+  const { refetchInterval = 5_000 } = options ?? {}
   const { user, profile, isLoadingProfile } = useUser()
   const supabase = useSupabase()
   const customerType = profile?.is_business ? 'business' : 'individual'
@@ -71,7 +77,7 @@ export function useBridgeCustomer() {
       return data
     },
     staleTime: 5_000,
-    refetchInterval: 5_000,
+    refetchInterval,
   })
 
   return {
@@ -129,9 +135,12 @@ export function useInitiateKyc() {
 
 /**
  * Check if user has completed KYC
+ *
+ * @param options.refetchInterval - Polling interval in ms. Set to false to disable
+ *   polling (e.g., when useSyncKycStatus is active). Default: 5000
  */
-export function useKycStatus() {
-  const { data: customer, isLoading, error, refetch } = useBridgeCustomer()
+export function useKycStatus(options?: UseBridgeCustomerOptions) {
+  const { data: customer, isLoading, error, refetch } = useBridgeCustomer(options)
   const rejectionReasons = extractCustomerRejectionReasons(customer?.rejection_reasons)
   const rejectionAttempts = customer?.rejection_attempts ?? 0
   const isMaxAttemptsExceeded = rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS
@@ -139,6 +148,7 @@ export function useKycStatus() {
   return {
     isLoading,
     error,
+    kycLinkId: customer?.kyc_link_id ?? null,
     kycStatus: customer?.kyc_status ?? 'not_started',
     tosStatus: customer?.tos_status ?? 'pending',
     isTosAccepted: customer?.tos_status === 'approved',
@@ -168,18 +178,18 @@ function shouldStopPolling(kycStatus: string, rejectionAttempts: number): boolea
 }
 
 /**
- * Hook to poll Bridge API directly for KYC status.
- * More responsive than waiting for webhooks.
+ * Hook to sync KYC status from Bridge API to DB.
+ * Polls the Bridge API and updates the DB, providing faster updates than webhooks.
  *
- * Polling stops when:
+ * Syncing stops when:
  * - KYC is approved
  * - KYC is rejected AND max rejection attempts (3) reached
  *
- * @param kycLinkId - The KYC link ID to poll. Polling is disabled when undefined.
- * @param options.enabled - Additional condition to enable polling (default: true)
- * @param options.interval - Polling interval in ms (default: 2000)
+ * @param kycLinkId - The KYC link ID to sync. Syncing is disabled when undefined.
+ * @param options.enabled - Additional condition to enable syncing (default: true)
+ * @param options.interval - Sync interval in ms (default: 2000)
  */
-export function usePollKycStatus(
+export function useSyncKycStatus(
   kycLinkId: string | undefined,
   options?: { enabled?: boolean; interval?: number }
 ) {
@@ -196,9 +206,9 @@ export function usePollKycStatus(
         const data = query.state.data
         if (!data) return interval
 
-        // Stop polling if terminal state reached
+        // Stop syncing if terminal state reached
         if (shouldStopPolling(data.kycStatus, data.rejectionAttempts)) {
-          log('stopping KYC poll: status=%s attempts=%d', data.kycStatus, data.rejectionAttempts)
+          log('stopping KYC sync: status=%s attempts=%d', data.kycStatus, data.rejectionAttempts)
           return false
         }
 

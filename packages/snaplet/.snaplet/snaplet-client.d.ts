@@ -34,8 +34,6 @@ type Override = {
       kyc_link_id?: string;
       kyc_status?: string;
       tos_status?: string;
-      full_name?: string;
-      email?: string;
       type?: string;
       rejection_reasons?: string;
       rejection_attempts?: string;
