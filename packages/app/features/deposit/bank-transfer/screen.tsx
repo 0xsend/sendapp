@@ -23,7 +23,6 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
 import { useAnalytics } from 'app/provider/analytics'
 import { useUser } from 'app/utils/useUser'
-import { Link } from 'solito/link'
 
 const getErrorType = (error: unknown): 'network' | 'unknown' => {
   const message = error instanceof Error ? error.message : String(error)
@@ -66,7 +65,6 @@ export function BankTransferScreen() {
   const isDarkTheme = resolvedTheme?.startsWith('dark')
   const redirectUri = useRedirectUri()
   const isBusinessProfile = !!profile?.is_business
-  const showBusinessProfileNotice = isBusinessProfile && kycStatus === 'not_started'
   const verificationSubject = isBusinessProfile ? 'business' : 'identity'
 
   const handleStartKyc = useCallback(async () => {
@@ -292,33 +290,7 @@ export function BankTransferScreen() {
               onStartKyc={handleStartKyc}
               isLoading={initiateKyc.isPending}
               onInfoPress={() => setShowInfo(true)}
-            >
-              {showBusinessProfileNotice ? (
-                <YStack gap="$2.5">
-                  <Paragraph fontSize="$5" fontWeight={600}>
-                    Important
-                  </Paragraph>
-                  <Paragraph
-                    fontSize="$4"
-                    color="$lightGrayTextField"
-                    $theme-light={{ color: '$darkGrayTextField' }}
-                  >
-                    We detected this is a business profile. If this is a mistake, edit your profile
-                    before continuing. Business profiles require business documents.
-                  </Paragraph>
-                  <Link href="/account/edit-profile">
-                    <Paragraph
-                      fontSize="$4"
-                      color="$primary"
-                      textDecorationLine="underline"
-                      $theme-light={{ color: '$color12' }}
-                    >
-                      Change Profile Type
-                    </Paragraph>
-                  </Link>
-                </YStack>
-              ) : null}
-            </KycStatusCard>
+            />
           )}
         </AnimatePresence>
       </YStack>
