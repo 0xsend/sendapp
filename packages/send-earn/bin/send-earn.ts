@@ -285,8 +285,8 @@ function formatTVL(result: TVLResult, format: OutputFormat): string {
       // 'table' format (default) - box-drawing table per spec
       const lines: string[] = []
 
-      // Table header (total width: 1 + 26 + 1 + 18 + 1 + 19 + 1 = 67 chars)
-      lines.push(`┌${'─'.repeat(26)}┬${'─'.repeat(18)}┬${'─'.repeat(19)}┐`)
+      // Table header (total width: 1 + 65 + 1 = 67 chars)
+      lines.push(`┌${'─'.repeat(65)}┐`)
       lines.push(`│${pad(' Send Earn TVL', 65, 'left')}│`)
       lines.push(`├${'─'.repeat(26)}┬${'─'.repeat(18)}┬${'─'.repeat(19)}┤`)
       lines.push(
