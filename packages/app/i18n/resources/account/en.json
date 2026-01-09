@@ -69,13 +69,17 @@
         "public": "Public Profile",
         "private": "Private Profile"
       },
+      "businessProfile": "Business Profile",
       "edit": "edit profile"
     },
     "form": {
       "name": "Name",
       "about": "About",
       "aboutPlaceholder": "Tell us about yourself",
-      "makePublic": "Make Profile Public"
+      "makePublic": "Make Profile Public",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Once set, business profiles can't switch back to personal.",
+      "personalToBusinessLockNotice": "KYC is already complete for this account, so the profile type can't be changed."
     }
   },
   "personalInfo": {

@@ -87,6 +87,7 @@ local_resource(
         "snaplet:sync",
         "supabase",
         "shovel",
+        "temporal",
     ] + (["next:web"] if not CI else []),  # in CI, we will let playwright test start the web server
 )
 

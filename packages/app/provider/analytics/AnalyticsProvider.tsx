@@ -30,13 +30,14 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
         analytics.identify(String(profile.send_id), {
           send_account_id: String(profile.send_id),
           sendtag: profile.main_tag?.name ?? undefined,
+          profile_type: profile.is_business ? 'business' : 'personal',
         })
       } else {
         analytics.reset()
       }
     }
     identify()
-  }, [user?.id, profile?.send_id, profile?.main_tag?.name])
+  }, [user?.id, profile?.send_id, profile?.main_tag?.name, profile?.is_business])
 
   return <AnalyticsContext.Provider value={analytics}>{children}</AnalyticsContext.Provider>
 }

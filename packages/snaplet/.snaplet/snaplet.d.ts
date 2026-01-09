@@ -59,6 +59,77 @@ interface Table_auth_audit_log_entries {
   created_at: string | null;
   ip_address: string;
 }
+interface Table_public_bridge_customers {
+  id: string;
+  user_id: string;
+  bridge_customer_id: string | null;
+  kyc_link_id: string;
+  kyc_status: string;
+  tos_status: string;
+  full_name: string | null;
+  email: string;
+  type: string;
+  rejection_reasons: Json | null;
+  rejection_attempts: number;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_public_bridge_deposits {
+  id: string;
+  virtual_account_id: string | null;
+  transfer_template_id: string | null;
+  bridge_transfer_id: string;
+  last_event_id: string | null;
+  last_event_type: string | null;
+  payment_rail: string;
+  amount: number;
+  currency: string;
+  status: string;
+  sender_name: string | null;
+  sender_routing_number: string | null;
+  trace_number: string | null;
+  destination_tx_hash: string | null;
+  fee_amount: number | null;
+  net_amount: number | null;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_public_bridge_transfer_templates {
+  id: string;
+  bridge_customer_id: string;
+  bridge_transfer_template_id: string;
+  source_currency: string;
+  destination_currency: string;
+  destination_payment_rail: string;
+  destination_address: string;
+  source_deposit_instructions: Json | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_public_bridge_virtual_accounts {
+  id: string;
+  bridge_customer_id: string;
+  bridge_virtual_account_id: string;
+  source_currency: string;
+  destination_currency: string;
+  destination_payment_rail: string;
+  destination_address: string;
+  source_deposit_instructions: Json | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+interface Table_public_bridge_webhook_events {
+  id: string;
+  bridge_event_id: string;
+  event_type: string;
+  event_created_at: string | null;
+  payload: Json;
+  processed_at: string | null;
+  error: string | null;
+  created_at: string;
+}
 interface Table_storage_buckets {
   id: string;
   name: string;
@@ -427,6 +498,7 @@ interface Table_public_profiles {
   banner_url: string | null;
   verified_at: string | null;
   sync_referrals_to_contacts: boolean;
+  is_business: boolean;
 }
 interface Table_public_receipts {
   hash: string | null;
@@ -521,6 +593,10 @@ interface Table_vault_secrets {
   nonce: string | null;
   created_at: string;
   updated_at: string;
+}
+interface Table_supabase_migrations_seed_files {
+  path: string;
+  hash: string;
 }
 interface Table_public_send_account_created {
   chain_id: number;
@@ -1104,6 +1180,11 @@ interface Schema_private {
 interface Schema_public {
   activity: Table_public_activity;
   affiliate_stats: Table_public_affiliate_stats;
+  bridge_customers: Table_public_bridge_customers;
+  bridge_deposits: Table_public_bridge_deposits;
+  bridge_transfer_templates: Table_public_bridge_transfer_templates;
+  bridge_virtual_accounts: Table_public_bridge_virtual_accounts;
+  bridge_webhook_events: Table_public_bridge_webhook_events;
   canton_party_verifications: Table_public_canton_party_verifications;
   chain_addresses: Table_public_chain_addresses;
   challenges: Table_public_challenges;
@@ -1176,6 +1257,7 @@ interface Schema_supabase_functions {
 }
 interface Schema_supabase_migrations {
   schema_migrations: Table_supabase_migrations_schema_migrations;
+  seed_files: Table_supabase_migrations_seed_files;
 }
 interface Schema_temporal {
   send_account_transfers: Table_temporal_send_account_transfers;
@@ -1233,6 +1315,52 @@ interface Tables_relationships {
     };
     parentDestinationsTables: "public.profiles" | {};
     childDestinationsTables:  | {};
+    
+  };
+  "public.bridge_customers": {
+    parent: {
+       bridge_customers_user_id_fkey: "auth.users";
+    };
+    children: {
+       bridge_transfer_templates_bridge_customer_id_fkey: "public.bridge_transfer_templates";
+       bridge_virtual_accounts_bridge_customer_id_fkey: "public.bridge_virtual_accounts";
+    };
+    parentDestinationsTables: "auth.users" | {};
+    childDestinationsTables: "public.bridge_transfer_templates" | "public.bridge_virtual_accounts" | {};
+    
+  };
+  "public.bridge_deposits": {
+    parent: {
+       bridge_deposits_transfer_template_id_fkey: "public.bridge_transfer_templates";
+       bridge_deposits_virtual_account_id_fkey: "public.bridge_virtual_accounts";
+    };
+    children: {
+
+    };
+    parentDestinationsTables: "public.bridge_transfer_templates" | "public.bridge_virtual_accounts" | {};
+    childDestinationsTables:  | {};
+    
+  };
+  "public.bridge_transfer_templates": {
+    parent: {
+       bridge_transfer_templates_bridge_customer_id_fkey: "public.bridge_customers";
+    };
+    children: {
+       bridge_deposits_transfer_template_id_fkey: "public.bridge_deposits";
+    };
+    parentDestinationsTables: "public.bridge_customers" | {};
+    childDestinationsTables: "public.bridge_deposits" | {};
+    
+  };
+  "public.bridge_virtual_accounts": {
+    parent: {
+       bridge_virtual_accounts_bridge_customer_id_fkey: "public.bridge_customers";
+    };
+    children: {
+       bridge_deposits_virtual_account_id_fkey: "public.bridge_deposits";
+    };
+    parentDestinationsTables: "public.bridge_customers" | {};
+    childDestinationsTables: "public.bridge_deposits" | {};
     
   };
   "storage.buckets": {
@@ -1787,6 +1915,7 @@ interface Tables_relationships {
        leaderboard_referrals_all_time_user_id_fkey: "private.leaderboard_referrals_all_time";
        activity_from_user_id_fkey: "public.activity";
        activity_to_user_id_fkey: "public.activity";
+       bridge_customers_user_id_fkey: "public.bridge_customers";
        canton_party_verifications_user_id_fkey: "public.canton_party_verifications";
        chain_addresses_user_id_fkey: "public.chain_addresses";
        contact_labels_owner_id_fkey: "public.contact_labels";
@@ -1802,7 +1931,7 @@ interface Tables_relationships {
        webauthn_credentials_user_id_fkey: "public.webauthn_credentials";
     };
     parentDestinationsTables:  | {};
-    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.canton_party_verifications" | "public.chain_addresses" | "public.contact_labels" | "public.contacts" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
+    childDestinationsTables: "auth.identities" | "auth.mfa_factors" | "auth.oauth_authorizations" | "auth.oauth_consents" | "auth.one_time_tokens" | "auth.sessions" | "private.leaderboard_referrals_all_time" | "public.activity" | "public.bridge_customers" | "public.canton_party_verifications" | "public.chain_addresses" | "public.contact_labels" | "public.contacts" | "public.distribution_shares" | "public.distribution_verifications" | "public.link_in_bio" | "public.profiles" | "public.receipts" | "public.send_accounts" | "public.tags" | "public.webauthn_credentials" | {};
     
   };
   "public.webauthn_credentials": {

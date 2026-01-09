@@ -69,7 +69,7 @@
   },
   "options": {
     "applePay": {
-      "description": "仅限借记卡",
+      "description": "仅限借记卡 • 每周最高 $500",
       "title": "Apple Pay"
     },
     "crypto": {
@@ -77,8 +77,12 @@
       "title": "加密货币钱包"
     },
     "debitCard": {
-      "description": "每周快速存款，最高 $500",
+      "description": "每周最高 $500",
       "title": "借记卡"
+    },
+    "bankTransfer": {
+      "description": "适合每周超过 $500 • ACH 或电汇",
+      "title": "银行转账"
     }
   },
   "success": {

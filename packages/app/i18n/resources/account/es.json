@@ -69,13 +69,17 @@
         "public": "Perfil público",
         "private": "Perfil privado"
       },
+      "businessProfile": "Business Profile",
       "edit": "editar perfil"
     },
     "form": {
       "name": "Nombre",
       "about": "Descripción",
       "aboutPlaceholder": "Cuéntanos sobre ti",
-      "makePublic": "Hacer perfil público"
+      "makePublic": "Hacer perfil público",
+      "businessProfile": "Business Profile",
+      "businessProfileLockNotice": "Una vez configurado, los perfiles empresariales no pueden volver a personal.",
+      "personalToBusinessLockNotice": "La verificación KYC ya está completa para esta cuenta, por lo que no se puede cambiar el tipo de perfil."
     }
   },
   "personalInfo": {
