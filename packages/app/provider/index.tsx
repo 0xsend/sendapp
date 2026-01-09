@@ -21,6 +21,7 @@ import { TamaguiProvider } from './tamagui'
 import { ToastProvider } from './toast'
 import { UniversalThemeProvider } from './theme'
 import { WagmiProvider } from './wagmi'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 export { loadThemePromise } from './theme/UniversalThemeProvider'
 
@@ -82,4 +83,5 @@ const Providers = compose([
   ToastProvider,
   ScrollDirectionProvider,
   ActivityDetailsProvider,
+  KeyboardProvider,
 ])

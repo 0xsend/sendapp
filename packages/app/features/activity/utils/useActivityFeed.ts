@@ -27,7 +27,7 @@ const sendtagCheckoutAddresses = Object.values(sendtagCheckoutAddress)
  * @param pageSize - number of items to fetch per page
  */
 export function useActivityFeed({
-  pageSize = 10,
+  pageSize = 50,
 }: { pageSize?: number } = {}): UseInfiniteQueryResult<
   InfiniteData<Activity[]>,
   PostgrestError | ZodError

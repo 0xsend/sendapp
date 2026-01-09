@@ -77,7 +77,9 @@ export function TokenChartSection() {
           pathProps={pathProps}
           childrenBeforePath={
             isLoading ? null : isError && !isLoading ? (
-              <Paragraph color={'$color10'}>{t('token.chartError')}</Paragraph>
+              <Paragraph px="$5" color={'$color10'}>
+                {t('token.chartError')}
+              </Paragraph>
             ) : (
               <ChartScrubReadoutWeb
                 fallbackPrice={last}
@@ -85,6 +87,7 @@ export function TokenChartSection() {
                 changeBadge={changeBadge}
                 price={price}
                 ts={ts}
+                px="$5"
               />
             )
           }
@@ -96,46 +99,44 @@ export function TokenChartSection() {
   )
 }
 
-function ChartScrubReadoutWeb({
-  fallbackPrice,
-  changeBadge,
-  decimals,
-  price,
-  ts,
-}: {
+interface ChartScrubReadoutWebProps {
   fallbackPrice: number
   changeBadge: React.ReactNode
   decimals: number
   price: number | null
   ts: number | null
-}) {
-  const displayPrice = price ?? fallbackPrice
-  const formattedPrice = `$${formatAmount(displayPrice, 9, decimals)}`
-
-  const timeLabel = (() => {
-    if (ts === null)
-      return new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
-    try {
-      const d = new Date(ts)
-      return d.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
-    } catch {
-      return null
-    }
-  })()
-
-  return (
-    <YStack gap="$1" mb={'$5'}>
-      <XStack ai="center" gap={'$2'}>
-        <Paragraph size={'$5'} fontWeight={500} color={'$color12'}>
-          {formattedPrice}
-        </Paragraph>
-        {price === null ? changeBadge : null}
-      </XStack>
-      {timeLabel ? (
-        <Paragraph size={'$3'} color={'$color10'}>
-          {timeLabel}
-        </Paragraph>
-      ) : null}
-    </YStack>
-  )
 }
+
+const ChartScrubReadoutWeb = YStack.styleable<ChartScrubReadoutWebProps>(
+  ({ fallbackPrice, changeBadge, decimals, price, ts, ...props }) => {
+    const displayPrice = price ?? fallbackPrice
+    const formattedPrice = `$${formatAmount(displayPrice, 9, decimals)}`
+
+    const timeLabel = (() => {
+      if (ts === null)
+        return new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+      try {
+        const d = new Date(ts)
+        return d.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+      } catch {
+        return null
+      }
+    })()
+
+    return (
+      <YStack gap="$1" mb={'$5'} {...props}>
+        <XStack ai="center" gap={'$2'}>
+          <Paragraph size={'$5'} fontWeight={500} color={'$color12'}>
+            {formattedPrice}
+          </Paragraph>
+          {price === null ? changeBadge : null}
+        </XStack>
+        {timeLabel ? (
+          <Paragraph size={'$3'} color={'$color10'}>
+            {timeLabel}
+          </Paragraph>
+        ) : null}
+      </YStack>
+    )
+  }
+)

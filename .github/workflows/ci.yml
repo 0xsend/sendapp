@@ -83,6 +83,39 @@ jobs:
         id: output-tar
         run: echo "path=next-app-image.tar" >> $GITHUB_OUTPUT
 
+  docker-build:
+    name: Docker Build (${{ matrix.target }})
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: distributor-runner
+            package: distributor
+          - target: shovel-runner
+            package: "@my/shovel"
+          - target: workers-runner
+            package: workers
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          target: ${{ matrix.target }}
+          push: false
+          build-args: |
+            PACKAGE=${{ matrix.package }}
+
   supabase-schema-drift-check:
     name: Supabase Schema Drift Check
     runs-on: blacksmith-4vcpu-ubuntu-2404
@@ -249,8 +282,8 @@ jobs:
         shell: bash
         run: |
           export DEBUG="api:*,app:*,test:*,-test:fixtures:snaplet:*"
-          # Use the skip_docker_compose flag to not manage docker compose in tilt
-          nohup tilt up playwright:deps -- --skip_docker_compose &
+          # Playwright needs docker compose services (anvil, shovel, bundler, temporal)
+          nohup tilt up playwright:deps &
           tilt_pid=$!
           echo "Tilt process started with PID: $tilt_pid"
           echo waiting for tilt to be ready
@@ -324,6 +357,7 @@ jobs:
 
       - name: Playwright Tests
         id: playwright
+        continue-on-error: true # Don't fail the job on test failures, let reports be generated
         shell: bash
         run: yarn playwright test --shard=${{ matrix.shard }}/4
 
@@ -377,6 +411,15 @@ jobs:
           retention-days: 14
       - name: Merge into JSON Report
         run: npx playwright merge-reports --reporter json ./all-blob-reports > playwright-report/report.json
+
+      - name: Upload JSON report
+        id: upload-json-report
+        uses: actions/upload-artifact@v4
+        with:
+          name: json-report--attempt-${{ github.run_attempt }}
+          path: playwright-report/report.json
+          retention-days: 14
+
       - name: Playwright Markdown Report
         if: always() # Always run regardless of previous step outcome
         id: playwright-md-report
@@ -392,6 +435,8 @@ jobs:
           echo "------------------"
         env:
           PLAYWRIGHT_REPORT_PATH: playwright-report/report.json
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
 
       - uses: mshick/add-pr-comment@v2
         if: ${{ !cancelled() && github.event_name == 'pull_request' }} # Only comment on PRs

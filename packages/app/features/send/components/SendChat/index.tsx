@@ -44,11 +44,13 @@ import {
 import type BottomSheet from '@gorhom/bottom-sheet'
 import { SendModalContainer, ReviewSendAmountBox, NoteInput } from '../shared'
 
+import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
+
 import { formatUnits, isAddress } from 'viem'
 
 import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { allCoins, allCoinsDict, type CoinWithBalance } from 'app/data/coins'
+import { allCoins, allCoinsDict } from 'app/data/coins'
 import { IconBadgeCheckSolid2, IconCoin, IconAccount, IconHeart } from 'app/components/icons'
 import { AddressAvatar } from 'app/components/avatars'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
@@ -63,7 +65,6 @@ import { formFields } from 'app/utils/SchemaForm'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CoinField } from './CoinField'
 import { useCoin, useCoins } from 'app/provider/coins'
-import { MAX_NOTE_LENGTH } from 'app/components/FormFields/NoteField'
 import { assert } from 'app/utils/assert'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useUser } from 'app/utils/useUser'
@@ -76,6 +77,7 @@ import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { throwIf } from 'app/utils/throwIf'
+import Animated, { useAnimatedStyle, useDerivedValue, withSpring } from 'react-native-reanimated'
 
 import debug from 'debug'
 import { signUserOp } from 'app/utils/signUserOp'
@@ -95,6 +97,8 @@ import type { Database } from '@my/supabase/database.types'
 const log = debug('app:features:send:confirm:screen')
 
 type Sections = 'chat' | 'enterAmount' | 'reviewAndSend'
+
+const AnimatedYStack = Animated.createAnimatedComponent(YStack)
 
 const SendChatContext = createStyledContext<{
   activeSection: Sections
@@ -120,6 +124,29 @@ const Input = (isWeb ? InputOG : GorhomSheetInput) as unknown as typeof InputOG
 export const SendChat = memo(
   ({ open: openProp, onOpenChange: onOpenChangeProp }: SendChatProps) => {
     const { height } = useWindowDimensions()
+    const { height: keyboardHeight } = useReanimatedKeyboardAnimation()
+    const { bottom: safeAreaBottom } = useSafeAreaInsets()
+
+    const springKeyboardHeight = useDerivedValue(() => {
+      'worklet'
+      return withSpring(keyboardHeight.value, {
+        damping: 15,
+        stiffness: 150,
+        mass: 0.5,
+      })
+    }, [keyboardHeight])
+
+    const animatedStyle = useAnimatedStyle(() => {
+      'worklet'
+      return {
+        transform: [
+          {
+            translateY:
+              springKeyboardHeight.value + (-springKeyboardHeight.value > 0 ? safeAreaBottom : 0),
+          },
+        ],
+      }
+    }, [springKeyboardHeight, safeAreaBottom])
 
     const { gtLg } = useMedia()
 
@@ -211,13 +238,14 @@ export const SendChat = memo(
                       animateOnly={['height']}
                       mah="100%"
                     >
-                      <YStack
+                      <AnimatedYStack
                         br="$6"
                         elevation="$9"
                         shadowOpacity={0.4}
                         ov="hidden"
                         f={1}
                         bg="$color1"
+                        style={animatedStyle}
                       >
                         <SendChatHeader
                           onClose={() => {
@@ -231,12 +259,12 @@ export const SendChat = memo(
                           zi={2}
                         />
                         <ChatList />
-                        {isAndroid ? <SendChatInputAndroid /> : <SendChatInput />}
+                        <SendChatInput />
 
                         <AnimatePresence>
                           {activeSection !== 'chat' && <EnterAmountNoteSection key="enterAmount" />}
                         </AnimatePresence>
-                      </YStack>
+                      </AnimatedYStack>
                     </YStack>
                   </View>
                 )}
@@ -422,47 +450,6 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...prop
   )
 })
 
-const SendChatInputAndroid = YStack.styleable(() => {
-  const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
-
-  if (activeSection !== 'chat') {
-    return null
-  }
-
-  return (
-    <YStack zi={1}>
-      <YStack w="100%" zi={1}>
-        <XStack py="$4" px="$4">
-          <View
-            animation="responsive"
-            animateOnly={['height', 'transform']}
-            h={activeSection === 'chat' ? 47 : 80}
-            y={activeSection === 'chat' ? 0 : -84}
-            f={1}
-            tabIndex={0}
-            onPress={() => setActiveSection('enterAmount')}
-          >
-            <View
-              bg="$aztec5"
-              $theme-light={{
-                bg: '$gray3',
-              }}
-              f={1}
-              br="$3"
-              p="$3"
-              jc="center"
-            >
-              <SizableText size="$5" color="$gray11">
-                {activeSection === 'chat' ? 'Type amount, add a note...' : 'Add a note...'}
-              </SizableText>
-            </View>
-          </View>
-        </XStack>
-      </YStack>
-    </YStack>
-  )
-})
-
 const SendChatInput = Input.styleable((props) => {
   const { setActiveSection, activeSection } = SendChatContext.useStyledContext()
 
@@ -510,6 +497,7 @@ const SendChatInput = Input.styleable((props) => {
             f={1}
             tabIndex={0}
             onPress={() => setActiveSection('enterAmount')}
+            pe={activeSection === 'enterAmount' ? 'box-none' : 'box-only'}
           >
             <Input
               bg="$aztec5"
@@ -1116,7 +1104,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
           </View>
           <View
             // @ts-expect-error - delay is not typed properly
-            animation={present && !isAndroid ? ['200ms', { delay: 200 }] : null}
+            animation={present ? ['200ms', { delay: 200 }] : null}
             // changing animation at runtime require a key change to remount the component and avoid hook errors
             key={present ? 'note-input-enter' : 'note-input-exit'}
             opacity={present ? 1 : 0}

@@ -2,26 +2,47 @@ import { Button, H2, Paragraph, Sheet, Spinner, YStack } from '@my/ui'
 import { Rocket } from '@tamagui/lucide-icons'
 import { useExpoUpdates } from 'app/utils/useExpoUpdates'
 import { useTranslation } from 'react-i18next'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAnalytics } from 'app/provider/analytics'
+
+const REMIND_LATER_DELAY_MS = 5 * 60 * 1000 // 5 minutes
 
 /**
  * Native OTA update sheet component.
  *
- * Shows a non-dismissible bottom sheet when an OTA update has been downloaded.
- * The user must press "Update Now" to restart the app and apply the update.
- *
- * This is a "soft force" approach - the sheet cannot be dismissed, but the user
- * controls when to restart. The app continues to function while the sheet is visible.
+ * Shows a dismissible bottom sheet when an OTA update has been downloaded.
+ * The user can press "Update Now" to restart the app or dismiss to update later.
+ * If dismissed, the sheet will reappear after REMIND_LATER_DELAY_MS.
  */
 export function OTAUpdateSheet() {
   const { t } = useTranslation('common')
   const { isDownloaded, isDownloading, restartApp, error } = useExpoUpdates()
   const analytics = useAnalytics()
   const hasTrackedPrompt = useRef(false)
+  const [isDismissed, setIsDismissed] = useState(false)
+  const remindTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Only show when update is downloaded and ready to apply
-  const isOpen = isDownloaded && !error
+  // Only show when update is downloaded, ready to apply, and not dismissed
+  const isOpen = isDownloaded && !error && !isDismissed
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (remindTimerRef.current) {
+        clearTimeout(remindTimerRef.current)
+      }
+    }
+  }, [])
+
+  const handleDismiss = useCallback(() => {
+    setIsDismissed(true)
+
+    // Set timer to show the sheet again
+    remindTimerRef.current = setTimeout(() => {
+      setIsDismissed(false)
+      hasTrackedPrompt.current = false // Reset so we track the next prompt
+    }, REMIND_LATER_DELAY_MS)
+  }, [])
 
   // Track when update prompt is shown
   useEffect(() => {
@@ -46,11 +67,16 @@ export function OTAUpdateSheet() {
   return (
     <Sheet
       open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleDismiss()
+        }
+      }}
       modal
-      dismissOnSnapToBottom={false}
-      dismissOnOverlayPress={false}
-      disableDrag
-      snapPoints={[45]}
+      dismissOnSnapToBottom
+      dismissOnOverlayPress
+      snapPoints={['fit']}
+      snapPointsMode="fit"
       animation="200ms"
       zIndex={100_000}
     >

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
   Button,
   Fade,
@@ -50,6 +50,7 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
   const [sendChatOpen, setSendChatOpen] = useState(false)
   const [sendParams, setSendParams] = useSendScreenParams()
   const { user } = useUser()
+  const prevSendChatOpenRef = useRef(sendChatOpen)
 
   // Open SendChat when params are set
   useEffect(() => {
@@ -58,17 +59,24 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
     }
   }, [sendParams.idType, sendParams.recipient])
 
-  // Clear params when SendChat closes
+  // Clear params only when modal is actively closed (transition from open to closed)
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
-    if (!sendChatOpen) {
-      setSendParams({
-        idType: undefined,
-        recipient: undefined,
-        note: undefined,
-        amount: sendParams.amount,
-        sendToken: sendParams.sendToken,
-      })
+    const wasOpen = prevSendChatOpenRef.current
+    prevSendChatOpenRef.current = sendChatOpen
+
+    // Only clear params when transitioning from open to closed, not on initial mount
+    if (wasOpen && !sendChatOpen) {
+      setSendParams(
+        {
+          idType: undefined,
+          recipient: undefined,
+          note: undefined,
+          amount: sendParams.amount,
+          sendToken: sendParams.sendToken,
+        },
+        { webBehavior: 'replace' }
+      )
     }
   }, [sendChatOpen])
   const { selectActivity, isOpen } = useActivityDetails()
@@ -225,11 +233,14 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
             {/* Send Button */}
             <Button
               onPress={() => {
-                setSendParams({
-                  ...sendParams,
-                  recipient: address,
-                  idType: 'address',
-                })
+                setSendParams(
+                  {
+                    ...sendParams,
+                    recipient: address,
+                    idType: 'address',
+                  },
+                  { webBehavior: 'replace' }
+                )
                 setSendChatOpen(true)
               }}
               borderRadius="$4"
@@ -341,39 +352,35 @@ export function ExternalAddressScreen({ address }: ExternalAddressScreenProps) {
               </YStack>
             </View>
           ) : (
-            <View br="$4" ov="hidden">
-              <FlatList<Activity>
-                testID="ExternalAddressActivityFeed"
-                style={{ flex: 1 }}
-                data={activities}
-                keyExtractor={(activity) => activity.event_id}
-                renderItem={({ item: activity, index }) => {
-                  const sent = isSent(activity)
-                  const isFirst = index === 0
-                  const isLast = index === activities.length - 1
-                  return (
-                    <Fade>
-                      <ActivityRow
-                        activity={activity}
-                        sent={sent}
-                        onPress={() => selectActivity(activity)}
-                        isFirst={isFirst}
-                        isLast={isLast}
-                      />
-                    </Fade>
-                  )
-                }}
-                onEndReached={() => {
-                  if (hasNextPage) fetchNextPage()
-                }}
-                ListFooterComponent={
-                  hasNextPage || isFetchingNextPage ? (
-                    <Spinner size="small" color="$color12" my="$2" />
-                  ) : null
-                }
-                showsVerticalScrollIndicator={false}
-              />
-            </View>
+            <FlatList<Activity>
+              testID="ExternalAddressActivityFeed"
+              style={{ flex: 1 }}
+              data={activities}
+              keyExtractor={(activity) => activity.event_id}
+              renderItem={({ item: activity, index }) => {
+                const sent = isSent(activity)
+                const isFirst = index === 0
+                const isLast = index === activities.length - 1
+                return (
+                  <ActivityRow
+                    activity={activity}
+                    sent={sent}
+                    onPress={() => selectActivity(activity)}
+                    isFirst={isFirst}
+                    isLast={isLast}
+                  />
+                )
+              }}
+              onEndReached={() => {
+                if (hasNextPage) fetchNextPage()
+              }}
+              ListFooterComponent={
+                hasNextPage || isFetchingNextPage ? (
+                  <Spinner size="small" color="$color12" my="$2" />
+                ) : null
+              }
+              showsVerticalScrollIndicator={false}
+            />
           )}
         </YStack>
       </YStack>
