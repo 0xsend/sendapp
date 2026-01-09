@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import debug from 'debug'
 import {
   navigateFromNotification,
@@ -78,43 +78,18 @@ export interface UseNotificationHandlerResult {
 export function useNotificationHandler(
   options: UseNotificationHandlerOptions = {}
 ): UseNotificationHandlerResult {
-  const { enableNavigation = true, onNotificationReceived, onNotificationTapped } = options
+  // Note: onNotificationReceived and onNotificationTapped are kept for API compatibility
+  // but are not currently used because the service worker handles notification display
+  // and click navigation directly (no events are sent to the client).
+  const { enableNavigation = true } = options
 
+  // These states are part of the hook's public API for compatibility with native,
+  // but are not populated on web because the service worker handles notification
+  // events directly without posting messages to the client.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [lastNotification, setLastNotification] = useState<Notification | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [lastResponse, setLastResponse] = useState<Notification | null>(null)
-
-  /**
-   * Handle notification received.
-   */
-  const handleNotificationReceived = useCallback(
-    (notification: Notification) => {
-      log('Notification received:', notification)
-      setLastNotification(notification)
-      onNotificationReceived?.(notification)
-    },
-    [onNotificationReceived]
-  )
-
-  /**
-   * Handle notification click.
-   */
-  const handleNotificationClick = useCallback(
-    (notification: Notification, data: unknown) => {
-      log('Notification click received:', notification, data)
-      setLastResponse(notification)
-
-      const parsedData = parseNotificationData(data)
-
-      log('Parsed notification data:', parsedData)
-      onNotificationTapped?.(notification, parsedData)
-
-      // Navigate if enabled and we have valid data
-      if (enableNavigation && parsedData) {
-        navigateFromNotification(parsedData)
-      }
-    },
-    [enableNavigation, onNotificationTapped]
-  )
 
   /**
    * Clear the badge count (no-op on web).
@@ -164,31 +139,23 @@ export function useNotificationHandler(
   }, [])
 
   // Listen for messages from Service Worker
+  // Note: The service worker handles notification display and click navigation directly.
+  // We only receive PUSH_SUBSCRIPTION_CHANGED messages for re-syncing subscriptions.
+  // Notification clicks are handled entirely by the service worker which navigates
+  // to the appropriate URL - the client doesn't receive click events.
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       return
     }
 
     const messageHandler = (event: MessageEvent) => {
-      const { type, notification, data } = event.data || {}
+      const { type } = event.data || {}
 
-      switch (type) {
-        case 'notification-received':
-          if (notification) {
-            // Note: The actual Notification object isn't available here
-            // We create a mock for compatibility
-            handleNotificationReceived(notification)
-          }
-          break
-
-        case 'notification-click':
-          if (notification) {
-            handleNotificationClick(notification, data)
-          }
-          break
-
-        default:
-          break
+      // Currently the service worker only posts PUSH_SUBSCRIPTION_CHANGED
+      // which is handled by useNotifications.web.ts for re-syncing tokens.
+      // Notification clicks are handled by the service worker directly via navigation.
+      if (type === 'PUSH_SUBSCRIPTION_CHANGED') {
+        log('Push subscription changed (handled by useNotifications)')
       }
     }
 
@@ -197,7 +164,7 @@ export function useNotificationHandler(
     return () => {
       navigator.serviceWorker.removeEventListener('message', messageHandler)
     }
-  }, [handleNotificationReceived, handleNotificationClick])
+  }, [])
 
   // Check for notifications on mount (in case app was opened from notification)
   useEffect(() => {

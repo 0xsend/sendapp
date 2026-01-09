@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSupabase } from './supabase/useSupabase'
 import { useSessionContext } from './supabase/useSessionContext'
 import debug from 'debug'
 
 const log = debug('app:utils:useNotifications')
 
 export interface UseNotificationsResult {
-  /** Web push subscription endpoint */
+  /** Web push subscription (JSON stringified) */
   expoPushToken: string | null
   /** Whether push notifications are enabled */
   isEnabled: boolean
@@ -37,12 +36,14 @@ interface UseNotificationsOptions {
  * Handles:
  * - Permission requests
  * - Push subscription via Service Worker
- * - Token registration with backend (Supabase push_tokens table)
+ * - Token registration with backend via /api/notifications/subscribe
  * - Notification handling
+ *
+ * All subscription operations route through /api/notifications/subscribe
+ * to ensure proper validation, rate limiting, and CSRF protection.
  */
 export function useNotifications(options: UseNotificationsOptions = {}): UseNotificationsResult {
   const { autoRegister = true, enableEventListeners = true } = options
-  const supabase = useSupabase()
   const { session } = useSessionContext()
 
   const [expoPushToken, setExpoPushToken] = useState<string | null>(null)
@@ -83,7 +84,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
   /**
    * Get Web Push subscription from Service Worker
    */
-  const getWebPushSubscription = useCallback(async (): Promise<string | null> => {
+  const getWebPushSubscription = useCallback(async (): Promise<PushSubscription | null> => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
       log('Service Workers not supported')
       return null
@@ -98,7 +99,6 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
 
       if (!subscription) {
         // Create new subscription
-        // You'll need to provide your VAPID public key here
         const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 
         if (!vapidPublicKey) {
@@ -113,10 +113,8 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         })
       }
 
-      // Convert subscription to string for storage
-      const subscriptionJson = JSON.stringify(subscription)
       log('Got web push subscription')
-      return subscriptionJson
+      return subscription
     } catch (e) {
       const err = e instanceof Error ? e : new Error('Failed to get push subscription')
       log('Error getting push subscription:', err)
@@ -126,7 +124,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
   }, [])
 
   /**
-   * Register push token with backend via Supabase RPC
+   * Register push token with backend via /api/notifications/subscribe
    */
   const registerToken = useCallback(async (): Promise<boolean> => {
     if (!session?.user?.id) {
@@ -134,39 +132,38 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       return false
     }
 
-    if (!expoPushToken) {
-      // Try to get subscription first
-      const token = await getWebPushSubscription()
-      if (!token) {
-        log('Cannot register token: Failed to get push subscription')
-        return false
-      }
-      setExpoPushToken(token)
-    }
-
-    const tokenToRegister = expoPushToken || (await getWebPushSubscription())
-    if (!tokenToRegister) {
-      return false
-    }
-
     try {
       log('Registering push token with backend...')
 
-      // Use Supabase RPC to register token via the register_push_token function
-      // Web push tokens must be registered with platform='web'
-      const { data, error: rpcError } = await supabase.rpc('register_push_token', {
-        token_value: tokenToRegister,
-        token_platform: 'web' as 'expo' | 'web',
-        token_device_id: getBrowserInfo(),
-      })
-
-      if (rpcError) {
-        log('Error registering push token:', rpcError)
-        setError(new Error(rpcError.message))
+      // Get push subscription
+      const subscription = await getWebPushSubscription()
+      if (!subscription) {
+        log('Cannot register token: Failed to get push subscription')
         return false
       }
 
-      log('Successfully registered push token:', data?.[0]?.id)
+      // Store stringified subscription for state
+      const subscriptionJson = JSON.stringify(subscription)
+      setExpoPushToken(subscriptionJson)
+
+      // Register via API route (includes validation, rate limiting, CSRF protection)
+      const response = await fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store',
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        const errorMsg = data.error || `HTTP ${response.status}`
+        log('Error registering push token:', errorMsg)
+        setError(new Error(errorMsg))
+        return false
+      }
+
+      log('Successfully registered push token')
       return true
     } catch (e) {
       const err = e instanceof Error ? e : new Error('Failed to register push token')
@@ -174,38 +171,39 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       setError(err)
       return false
     }
-  }, [session?.user?.id, expoPushToken, getWebPushSubscription, supabase])
+  }, [session?.user?.id, getWebPushSubscription])
 
   /**
-   * Unregister push token from backend
+   * Unregister push token from backend via /api/notifications/subscribe
    */
   const unregisterToken = useCallback(async (): Promise<boolean> => {
-    if (!session?.user?.id || !expoPushToken) {
+    if (!session?.user?.id) {
       return false
     }
 
     try {
       log('Unregistering push token...')
 
-      const { error: deleteError } = await supabase
-        .from('push_tokens')
-        .delete()
-        .eq('token', expoPushToken)
-        .eq('user_id', session.user.id)
-        .eq('platform', 'web')
+      // Get current subscription to get the endpoint
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.getSubscription()
 
-      if (deleteError) {
-        log('Error unregistering push token:', deleteError)
-        setError(new Error(deleteError.message))
-        return false
-      }
+      if (subscription) {
+        // Unsubscribe from push service first
+        await subscription.unsubscribe()
 
-      // Also unsubscribe from push service
-      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready
-        const subscription = await registration.pushManager.getSubscription()
-        if (subscription) {
-          await subscription.unsubscribe()
+        // Remove from backend via API route
+        const response = await fetch('/api/notifications/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify({ endpoint: subscription.endpoint }),
+        })
+
+        if (!response.ok) {
+          log('Warning: Failed to remove subscription from backend')
+          // Don't throw - local unsubscribe succeeded
         }
       }
 
@@ -218,7 +216,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       setError(err)
       return false
     }
-  }, [session?.user?.id, expoPushToken, supabase])
+  }, [session?.user?.id])
 
   // Check permissions on mount
   useEffect(() => {
@@ -234,7 +232,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     const fetchSubscription = async () => {
       const subscription = await getWebPushSubscription()
       if (subscription) {
-        setExpoPushToken(subscription)
+        setExpoPushToken(JSON.stringify(subscription))
       }
     }
 
@@ -250,18 +248,18 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     void registerToken()
   }, [autoRegister, session?.user?.id, expoPushToken, isEnabled, registerToken])
 
-  // Set up notification listeners (optional) - handled by Service Worker on web
+  // Set up notification listeners - listen for PUSH_SUBSCRIPTION_CHANGED from service worker
   useEffect(() => {
     if (!enableEventListeners || typeof window === 'undefined') {
       return
     }
 
-    // On web, notifications are typically handled by the Service Worker
-    // You can listen for messages from the Service Worker here
+    // On web, notifications are handled by the Service Worker
+    // We listen for subscription changes to re-sync with backend
     const messageHandler = (event: MessageEvent) => {
-      if (event.data?.type === 'notification-click') {
-        log('Notification clicked:', event.data.notification)
-        // Handle notification click - navigation handled in notification-navigation.web.ts
+      if (event.data?.type === 'PUSH_SUBSCRIPTION_CHANGED') {
+        log('Push subscription changed, re-syncing with backend...')
+        void registerToken()
       }
     }
 
@@ -270,7 +268,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     return () => {
       navigator.serviceWorker?.removeEventListener('message', messageHandler)
     }
-  }, [enableEventListeners])
+  }, [enableEventListeners, registerToken])
 
   return {
     expoPushToken,
@@ -307,21 +305,4 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
     outputArray[i] = rawData.charCodeAt(i)
   }
   return outputArray
-}
-
-/**
- * Get browser info for device identification
- */
-function getBrowserInfo(): string {
-  if (typeof window === 'undefined') return 'unknown'
-
-  const ua = navigator.userAgent
-  let browser = 'Unknown'
-
-  if (ua.includes('Firefox')) browser = 'Firefox'
-  else if (ua.includes('Chrome')) browser = 'Chrome'
-  else if (ua.includes('Safari')) browser = 'Safari'
-  else if (ua.includes('Edge')) browser = 'Edge'
-
-  return `${browser} on ${navigator.platform}`
 }
