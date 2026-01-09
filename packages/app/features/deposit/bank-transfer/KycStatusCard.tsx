@@ -1,5 +1,5 @@
 import { FadeCard, Paragraph, YStack, XStack, Button, Spinner } from '@my/ui'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, HelpCircle } from '@tamagui/lucide-icons'
 import type { KycStatus } from '@my/bridge'
 
 interface KycStatusCardProps {
@@ -10,6 +10,7 @@ interface KycStatusCardProps {
   startDisabled?: boolean
   rejectionReasons?: string[]
   isMaxAttemptsExceeded?: boolean
+  onInfoPress?: () => void
   children?: React.ReactNode
 }
 
@@ -107,6 +108,7 @@ export function KycStatusCard({
   startDisabled,
   rejectionReasons,
   isMaxAttemptsExceeded = false,
+  onInfoPress,
   children,
 }: KycStatusCardProps) {
   // Don't show button if max attempts exceeded
@@ -170,13 +172,30 @@ export function KycStatusCard({
     return (
       <FadeCard>
         <YStack gap="$4">
-          <Paragraph
-            fontSize="$4"
-            color="$lightGrayTextField"
-            $theme-light={{ color: '$darkGrayTextField' }}
-          >
-            {getStatusDescription(kycStatus)}
-          </Paragraph>
+          <XStack jc="space-between" ai="flex-start">
+            <Paragraph
+              fontSize="$4"
+              color="$lightGrayTextField"
+              $theme-light={{ color: '$darkGrayTextField' }}
+              f={1}
+              pr="$2"
+            >
+              {getStatusDescription(kycStatus)}
+            </Paragraph>
+            {onInfoPress && (
+              <Button
+                size="$2"
+                circular
+                chromeless
+                onPress={onInfoPress}
+                pressStyle={{ scale: 0.9 }}
+              >
+                <Button.Icon>
+                  <HelpCircle size={18} color="$gray10" />
+                </Button.Icon>
+              </Button>
+            )}
+          </XStack>
 
           <YStack gap="$3" py="$2">
             <StepIndicator
@@ -211,9 +230,18 @@ export function KycStatusCard({
   return (
     <FadeCard>
       <YStack gap="$4">
-        <Paragraph fontSize="$6" fontWeight={600}>
-          {getStatusText(kycStatus)}
-        </Paragraph>
+        <XStack jc="space-between" ai="flex-start">
+          <Paragraph fontSize="$6" fontWeight={600} f={1}>
+            {getStatusText(kycStatus)}
+          </Paragraph>
+          {onInfoPress && (
+            <Button size="$2" circular chromeless onPress={onInfoPress} pressStyle={{ scale: 0.9 }}>
+              <Button.Icon>
+                <HelpCircle size={18} color="$gray10" />
+              </Button.Icon>
+            </Button>
+          )}
+        </XStack>
 
         <Paragraph
           fontSize="$4"

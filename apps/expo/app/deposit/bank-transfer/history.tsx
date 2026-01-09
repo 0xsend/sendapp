@@ -10,7 +10,7 @@ export default function BankTransferHistoryScreenRoute() {
     <>
       <Stack.Screen
         options={{
-          title: t('stack.deposit.bankTransferHistory', 'Transfer History'),
+          title: t('stack.deposit.bankTransferHistory', 'Bank Transfer History'),
         }}
       />
       <ScreenContainer>

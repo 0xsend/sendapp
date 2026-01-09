@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW public.bridge_customers_safe
-WITH (security_barrier = true) AS
+WITH (security_barrier = true, security_invoker = true) AS
 SELECT
     id,
     user_id,

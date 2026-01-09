@@ -1,5 +1,5 @@
 import { FadeCard, Paragraph, XStack, YStack, Button, Spinner } from '@my/ui'
-import { Copy, Check } from '@tamagui/lucide-icons'
+import { Copy, Check, HelpCircle } from '@tamagui/lucide-icons'
 import { useState, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
 import { Link } from 'solito/link'
@@ -11,6 +11,7 @@ interface BankDetailsCardProps {
   beneficiaryName: string | null
   depositMessage?: string | null
   paymentRails: string[]
+  onInfoPress?: () => void
 }
 
 function CopyableField({
@@ -62,25 +63,43 @@ export function BankDetailsCard({
   beneficiaryName,
   depositMessage,
   paymentRails,
+  onInfoPress,
 }: BankDetailsCardProps) {
+  const hasAch = paymentRails.includes('ach_push')
+  const hasWire = paymentRails.includes('wire')
+  const transferType =
+    hasAch && hasWire ? 'ACH or wire transfer' : hasAch ? 'ACH transfer' : 'wire transfer'
+
   return (
     <FadeCard>
       <YStack gap="$2">
-        <Paragraph
-          fontSize="$4"
-          color="$lightGrayTextField"
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Send a USD bank transfer using the details below. Your deposit is matched using the memo.
-        </Paragraph>
-        <Paragraph
-          fontSize="$4"
-          color="$lightGrayTextField"
-          $theme-light={{ color: '$darkGrayTextField' }}
-        >
-          Important: include the memo exactly as shown. Missing or incorrect memos can delay your
-          deposit, cause it to be returned, or require manual support to recover funds.
-        </Paragraph>
+        <XStack jc="space-between" ai="flex-start">
+          <Paragraph
+            fontSize="$4"
+            color="$lightGrayTextField"
+            $theme-light={{ color: '$darkGrayTextField' }}
+            f={1}
+            pr="$2"
+          >
+            Use your bank's {transferType} feature to deposit USD to your Send account.
+          </Paragraph>
+          {onInfoPress && (
+            <Button
+              size="$3"
+              circular
+              animation="100ms"
+              animateOnly={['transform']}
+              boc="$aztec3"
+              hoverStyle={{ boc: '$aztec4' }}
+              pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+              onPress={onInfoPress}
+            >
+              <Button.Icon scaleIcon={1.2}>
+                <HelpCircle size={16} />
+              </Button.Icon>
+            </Button>
+          )}
+        </XStack>
 
         {bankName && (
           <XStack jc="space-between" ai="center" py="$2">
@@ -101,32 +120,18 @@ export function BankDetailsCard({
 
         <CopyableField label="Routing Number" value={routingNumber} />
         <CopyableField label="Account Number" value={accountNumber} />
-        <CopyableField label="Beneficiary Name" value={beneficiaryName} />
         <CopyableField label="Memo" value={depositMessage ?? null} />
+        <CopyableField label="Beneficiary Name" value={beneficiaryName} />
 
-        {paymentRails.length > 0 && (
-          <XStack jc="space-between" ai="center" py="$2">
-            <YStack>
-              <Paragraph
-                fontSize="$3"
-                color="$lightGrayTextField"
-                $theme-light={{ color: '$darkGrayTextField' }}
-              >
-                Supported Methods
-              </Paragraph>
-              <Paragraph fontSize="$5" fontWeight={500}>
-                {paymentRails.map((r) => (r === 'ach_push' ? 'ACH' : 'Wire')).join(', ')}
-              </Paragraph>
-            </YStack>
-          </XStack>
-        )}
-
-        <Paragraph fontSize="$3" color="$lightGrayTextField" ta="center">
-          ACH transfers typically arrive within 1-3 business days. Wire transfers are usually
-          same-day.
+        <Paragraph fontSize="$3" color="$lightGrayTextField" py="$4">
+          <Paragraph fontSize="$3" fontWeight="bold" color="$lightGrayTextField">
+            Important:
+          </Paragraph>{' '}
+          Include the memo exactly as shown. Missing or incorrect memos may result in delay and loss
+          of funds.
         </Paragraph>
 
-        <Link href="/deposit/bank-transfer/history">
+        <Link href="/deposit/bank-transfer/history" style={{ paddingTop: 8 }}>
           <Button size="$4" theme="green">
             View Transfer History
           </Button>

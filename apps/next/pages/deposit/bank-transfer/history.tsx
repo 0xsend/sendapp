@@ -9,7 +9,7 @@ import { userProtectedGetSSP } from 'utils/userProtected'
 export const Page: NextPageWithLayout = () => {
   return (
     <>
-      <NextSeo title="Send | Transfer History" />
+      <NextSeo title="Send | Bank Transfer History" />
       <BankTransferHistoryScreen />
     </>
   )
@@ -17,7 +17,7 @@ export const Page: NextPageWithLayout = () => {
 
 function BankTransferHistoryLayout({ children }: { children: ReactNode }) {
   return (
-    <HomeLayout TopNav={<TopNav header="Transfer History" backFunction="pop" />}>
+    <HomeLayout TopNav={<TopNav header="Bank Transfer History" backFunction="pop" />}>
       {children}
     </HomeLayout>
   )

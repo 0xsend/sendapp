@@ -6,7 +6,7 @@ import { createInterface } from 'node:readline/promises'
 import { stdin as input, stdout as output } from 'node:process'
 import { createSupabaseAdminClient } from '../packages/app/utils/supabase/admin'
 
-type FlowMode = 'kyc' | 'deposit' | 'all'
+type FlowMode = 'kyc' | 'deposit' | 'transfer' | 'all'
 
 type RejectionReason = {
   developer_reason: string
@@ -237,10 +237,23 @@ type VirtualAccount = {
   bridge_customer_id: string
 }
 
+type TransferTemplate = {
+  id: string
+  bridge_transfer_template_id: string
+  bridge_customer_id: string
+}
+
 const DEFAULT_KYC_STATUSES = ['incomplete', 'under_review', 'approved']
 const DEFAULT_DEPOSIT_STATUSES = [
   'funds_received',
   'funds_scheduled',
+  'in_review',
+  'payment_submitted',
+  'payment_processed',
+]
+const DEFAULT_TRANSFER_STATUSES = [
+  'awaiting_funds',
+  'funds_received',
   'in_review',
   'payment_submitted',
   'payment_processed',
@@ -264,14 +277,16 @@ Options:
   --user-id <uuid>                Supabase auth user id
   --send-id <number>              Send ID (from profiles.send_id)
   --email <email>                 Email used when creating bridge customer
-  --flow <kyc|deposit|all>        Which events to send (default: all)
+  --flow <kyc|deposit|transfer|all> Which events to send (default: all)
   --kyc-statuses <csv>            Override KYC status sequence
   --deposit-statuses <csv>        Override deposit status sequence
+  --transfer-statuses <csv>       Override transfer status sequence
   --amount <number>               Deposit amount (default: 100)
   --currency <code>               Deposit currency (default: usd)
   --webhook-url <url>             Webhook endpoint (default: ${DEFAULT_WEBHOOK_URL})
   --create-customer               Create bridge_customers row if missing
   --create-virtual-account        Create bridge_virtual_accounts row if missing
+  --create-transfer-template      Create bridge_transfer_templates row if missing
   --destination-address <0x..>    Destination address for seeded virtual account
   --cleanup                       Delete bridge customer + virtual account + deposit rows
   --interactive                   Guided prompt for local testing
@@ -282,6 +297,7 @@ Options:
 Examples:
   bun run bin/bridge-webhook-events.ts --send-id 1234 --flow kyc --create-customer --email test@example.com
   bun run bin/bridge-webhook-events.ts --user-id <uuid> --flow deposit --create-virtual-account
+  bun run bin/bridge-webhook-events.ts --send-id 1234 --flow transfer --create-transfer-template
 `)
 }
 
@@ -398,9 +414,19 @@ async function cleanupWebhookEvents(params: {
   kycLinkId?: string | null
   bridgeCustomerId?: string | null
   virtualAccountIds: string[]
+  transferTemplateIds: string[]
   depositIds: string[]
+  transferIds: string[]
 }) {
-  const { supabase, kycLinkId, bridgeCustomerId, virtualAccountIds, depositIds } = params
+  const {
+    supabase,
+    kycLinkId,
+    bridgeCustomerId,
+    virtualAccountIds,
+    transferTemplateIds,
+    depositIds,
+    transferIds,
+  } = params
 
   if (kycLinkId) {
     await deleteWebhookEventsByPayload(supabase, `kyc_link_id ${kycLinkId}`, {
@@ -437,6 +463,23 @@ async function cleanupWebhookEvents(params: {
     })
     await deleteWebhookEventsByPayload(supabase, `deposit_id ${depositId}`, {
       event_object: { id: depositId },
+    })
+  }
+
+  const uniqueTemplateIds = Array.from(new Set(transferTemplateIds))
+  for (const templateId of uniqueTemplateIds) {
+    await deleteWebhookEventsByPayload(supabase, `template_id ${templateId}`, {
+      event_object: { template_id: templateId },
+    })
+  }
+
+  const uniqueTransferIds = Array.from(new Set(transferIds))
+  for (const transferId of uniqueTransferIds) {
+    await deleteWebhookEventsByPayload(supabase, `transfer_id ${transferId}`, {
+      event_object_id: transferId,
+    })
+    await deleteWebhookEventsByPayload(supabase, `transfer_id ${transferId}`, {
+      event_object: { id: transferId },
     })
   }
 }
@@ -481,12 +524,44 @@ async function cleanupBridgeUser(params: {
       .filter((depositId): depositId is string => Boolean(depositId))
   }
 
+  const { data: transferTemplates, error: transferTemplateError } = await supabase
+    .from('bridge_transfer_templates')
+    .select('id, bridge_transfer_template_id')
+    .eq('bridge_customer_id', bridgeCustomer.id)
+
+  if (transferTemplateError) {
+    throw new Error(`Failed to load transfer templates: ${transferTemplateError.message}`)
+  }
+
+  const transferTemplateIds = (transferTemplates ?? []).map((template) => template.id)
+  const transferTemplateBridgeIds = (transferTemplates ?? []).map(
+    (template) => template.bridge_transfer_template_id
+  )
+
+  let transferIds: string[] = []
+  if (transferTemplateIds.length > 0) {
+    const { data: transfers, error: transferError } = await supabase
+      .from('bridge_deposits')
+      .select('bridge_transfer_id')
+      .in('transfer_template_id', transferTemplateIds)
+
+    if (transferError) {
+      throw new Error(`Failed to load transfer deposits: ${transferError.message}`)
+    }
+
+    transferIds = (transfers ?? [])
+      .map((transfer) => transfer.bridge_transfer_id)
+      .filter((transferId): transferId is string => Boolean(transferId))
+  }
+
   await cleanupWebhookEvents({
     supabase,
     kycLinkId: bridgeCustomer.kyc_link_id,
     bridgeCustomerId: bridgeCustomer.bridge_customer_id,
     virtualAccountIds: virtualAccountBridgeIds,
+    transferTemplateIds: transferTemplateBridgeIds,
     depositIds,
+    transferIds,
   })
 
   const { error: deleteError } = await supabase
@@ -554,6 +629,43 @@ async function printBridgeStatus(
       }
     }
   }
+
+  const { data: transferTemplates } = await supabase
+    .from('bridge_transfer_templates')
+    .select('id, bridge_transfer_template_id, status, created_at')
+    .eq('bridge_customer_id', bridgeCustomer.id)
+
+  if (!transferTemplates?.length) {
+    console.log('- bridge_transfer_templates: none')
+  } else {
+    console.log(`- bridge_transfer_templates: ${transferTemplates.length}`)
+    for (const template of transferTemplates) {
+      console.log(
+        `  - id=${template.bridge_transfer_template_id} status=${template.status} created_at=${template.created_at}`
+      )
+    }
+  }
+
+  if (transferTemplates?.length) {
+    const { data: transfers } = await supabase
+      .from('bridge_deposits')
+      .select('bridge_transfer_id, status, amount, currency, created_at')
+      .in(
+        'transfer_template_id',
+        transferTemplates.map((template) => template.id)
+      )
+
+    if (!transfers?.length) {
+      console.log('- bridge_transfers: none')
+    } else {
+      console.log(`- bridge_transfers: ${transfers.length}`)
+      for (const transfer of transfers) {
+        console.log(
+          `  - id=${transfer.bridge_transfer_id} status=${transfer.status} amount=${transfer.amount} ${transfer.currency} created_at=${transfer.created_at}`
+        )
+      }
+    }
+  }
 }
 
 async function promptInteractive() {
@@ -598,12 +710,14 @@ async function promptInteractive() {
       console.log('2) Send TOS accepted event')
       console.log('3) Send KYC status event')
       console.log('4) Create virtual account (if missing)')
-      console.log('5) Send deposit status sequence')
-      console.log('6) Cleanup bridge data + webhook events')
-      console.log('7) Exit')
+      console.log('5) Send deposit status sequence (virtual account)')
+      console.log('6) Create transfer template (if missing)')
+      console.log('7) Send transfer status sequence (transfer template)')
+      console.log('8) Cleanup bridge data + webhook events')
+      console.log('9) Exit')
 
-      const choice = (await rl.question('Select 1-7: ')).trim()
-      if (choice === '7') break
+      const choice = (await rl.question('Select 1-9: ')).trim()
+      if (choice === '9') break
 
       if (choice === '1') {
         const email = (await rl.question('Email (required if missing): ')).trim() || undefined
@@ -725,6 +839,135 @@ async function promptInteractive() {
       }
 
       if (choice === '6') {
+        const destinationAddress = (
+          await rl.question('Destination address (0x.. or blank): ')
+        ).trim()
+        await ensureTransferTemplate(
+          supabase,
+          await ensureBridgeCustomer(supabase, userId, {
+            create: false,
+          }),
+          {
+            create: true,
+            destinationAddress: destinationAddress || undefined,
+            memo: sendId ? `SEND-${sendId}` : undefined,
+          }
+        )
+        console.log('Transfer template ensured.')
+        continue
+      }
+
+      if (choice === '7') {
+        const bridgeCustomer = await ensureBridgeCustomer(supabase, userId, { create: false })
+        const transferTemplate = await ensureTransferTemplate(supabase, bridgeCustomer, {
+          create: false,
+        })
+        if (!transferTemplate) {
+          console.log('No transfer template found. Create one first.')
+          continue
+        }
+
+        // Query existing transfers for this template
+        const { data: existingTransfers } = await supabase
+          .from('bridge_deposits')
+          .select('bridge_transfer_id, status, amount, currency, created_at')
+          .eq('transfer_template_id', transferTemplate.id)
+          .order('created_at', { ascending: false })
+
+        const transfers = existingTransfers ?? []
+
+        if (transfers.length === 0) {
+          // No existing transfers - ask for initial status
+          console.log(`Transfer status options: ${DEFAULT_TRANSFER_STATUSES.join(', ')}`)
+          const status = (await rl.question('Initial transfer status: ')).trim()
+          if (!status) {
+            console.log('Status required.')
+            continue
+          }
+          const transferId = `tr_${randomUUID()}`
+          const event = buildTransferEvent({
+            transferId,
+            templateId: transferTemplate.bridge_transfer_template_id,
+            bridgeCustomerId: bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`,
+            status,
+            amount: DEFAULT_DEPOSIT_AMOUNT,
+            currency: DEFAULT_DEPOSIT_CURRENCY,
+          })
+          try {
+            await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
+          } catch (error) {
+            console.log(
+              `Failed to send webhook. Ensure the handler is running at ${webhookUrl} and reachable.`
+            )
+            throw error
+          }
+          console.log(`Sent transfer event with status: ${status}`)
+        } else {
+          // Existing transfers found - show them and offer options
+          console.log('')
+          console.log('Existing transfers:')
+          for (let i = 0; i < transfers.length; i++) {
+            const t = transfers[i]
+            console.log(
+              `  ${i + 1}) id=${t.bridge_transfer_id} status=${t.status} amount=${t.amount} ${t.currency}`
+            )
+          }
+          console.log(`  ${transfers.length + 1}) Add new transfer`)
+          console.log('')
+
+          const selection = (
+            await rl.question(`Select transfer (1-${transfers.length + 1}): `)
+          ).trim()
+          const selectionNum = Number.parseInt(selection, 10)
+
+          if (
+            Number.isNaN(selectionNum) ||
+            selectionNum < 1 ||
+            selectionNum > transfers.length + 1
+          ) {
+            console.log('Invalid selection.')
+            continue
+          }
+
+          console.log(`Transfer status options: ${DEFAULT_TRANSFER_STATUSES.join(', ')}`)
+          const newStatus = (await rl.question('New status: ')).trim()
+          if (!newStatus) {
+            console.log('Status required.')
+            continue
+          }
+
+          let transferId: string
+          if (selectionNum === transfers.length + 1) {
+            // Add new transfer
+            transferId = `tr_${randomUUID()}`
+          } else {
+            // Update existing transfer
+            const selectedTransfer = transfers[selectionNum - 1]
+            transferId = selectedTransfer?.bridge_transfer_id ?? `tr_${randomUUID()}`
+          }
+
+          const event = buildTransferEvent({
+            transferId,
+            templateId: transferTemplate.bridge_transfer_template_id,
+            bridgeCustomerId: bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`,
+            status: newStatus,
+            amount: DEFAULT_DEPOSIT_AMOUNT,
+            currency: DEFAULT_DEPOSIT_CURRENCY,
+          })
+          try {
+            await sendWebhookEvent({ event, webhookUrl, privateKey, dryRun: false })
+          } catch (error) {
+            console.log(
+              `Failed to send webhook. Ensure the handler is running at ${webhookUrl} and reachable.`
+            )
+            throw error
+          }
+          console.log(`Sent transfer event with status: ${newStatus}`)
+        }
+        continue
+      }
+
+      if (choice === '8') {
         await cleanupBridgeUser({ supabase, userId })
         continue
       }
@@ -838,6 +1081,63 @@ async function ensureVirtualAccount(
   return inserted as VirtualAccount
 }
 
+async function ensureTransferTemplate(
+  supabase: ReturnType<typeof createSupabaseAdminClient>,
+  bridgeCustomer: BridgeCustomer,
+  options: { create: boolean; destinationAddress?: string; memo?: string }
+): Promise<TransferTemplate | null> {
+  const { data, error } = await supabase
+    .from('bridge_transfer_templates')
+    .select('*')
+    .eq('bridge_customer_id', bridgeCustomer.id)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`Failed to load transfer template: ${error.message}`)
+  }
+
+  if (data) return data as TransferTemplate
+  if (!options.create) return null
+
+  const templateId = `tmpl_${randomUUID()}`
+  const destinationAddress =
+    options.destinationAddress ?? '0x0000000000000000000000000000000000000000'
+  const memo = options.memo ?? `SEND-${bridgeCustomer.user_id.slice(0, 6)}`
+
+  const { data: inserted, error: insertError } = await supabase
+    .from('bridge_transfer_templates')
+    .insert({
+      bridge_customer_id: bridgeCustomer.id,
+      bridge_transfer_template_id: templateId,
+      destination_address: destinationAddress,
+      source_currency: 'usd',
+      destination_currency: 'usdc',
+      destination_payment_rail: 'base',
+      status: 'active',
+      source_deposit_instructions: {
+        currency: 'usd',
+        bank_name: 'Bridge Sandbox Bank',
+        bank_routing_number: '021000021',
+        bank_account_number: '9876543210',
+        bank_beneficiary_name: 'Send Test User',
+        bank_beneficiary_address: 'New York, NY',
+        payment_rails: ['ach_push', 'wire'],
+        deposit_message: memo,
+      },
+    })
+    .select('*')
+    .single()
+
+  if (insertError || !inserted) {
+    throw new Error(
+      `Failed to create bridge transfer template: ${insertError?.message ?? 'unknown error'}`
+    )
+  }
+
+  return inserted as TransferTemplate
+}
+
 function buildKycEvent(params: {
   kycLinkId: string
   customerId: string
@@ -884,6 +1184,42 @@ function buildDepositEvent(params: {
       currency: params.currency,
       amount: params.amount,
       subtotal_amount: params.amount,
+      source: {
+        payment_rail: 'ach_push',
+        sender_bank_routing_number: '111000025',
+        sender_name: 'Test Sender',
+        trace_number: 'trace_test_123',
+      },
+      receipt: {
+        final_amount: params.amount,
+        destination_tx_hash: null,
+      },
+    },
+    event_created_at: new Date().toISOString(),
+  }
+}
+
+function buildTransferEvent(params: {
+  transferId: string
+  templateId: string
+  bridgeCustomerId: string
+  status: string
+  amount: string
+  currency: string
+}) {
+  return {
+    api_version: '2024-01-01',
+    event_id: `evt_${randomUUID()}`,
+    event_category: 'transfer',
+    event_type: 'transfer.updated',
+    event_object_id: params.transferId,
+    event_object: {
+      id: params.transferId,
+      state: params.status,
+      on_behalf_of: params.bridgeCustomerId,
+      template_id: params.templateId,
+      currency: params.currency,
+      amount: params.amount,
       source: {
         payment_rail: 'ach_push',
         sender_bank_routing_number: '111000025',
@@ -946,11 +1282,13 @@ async function main() {
       flow: { type: 'string' },
       kycStatuses: { type: 'string' },
       depositStatuses: { type: 'string' },
+      transferStatuses: { type: 'string' },
       amount: { type: 'string' },
       currency: { type: 'string' },
       webhookUrl: { type: 'string' },
       createCustomer: { type: 'boolean' },
       createVirtualAccount: { type: 'boolean' },
+      createTransferTemplate: { type: 'boolean' },
       destinationAddress: { type: 'string' },
       cleanup: { type: 'boolean' },
       interactive: { type: 'boolean' },
@@ -972,7 +1310,7 @@ async function main() {
   }
 
   const flow = (values.flow ?? 'all') as FlowMode
-  if (!['kyc', 'deposit', 'all'].includes(flow)) {
+  if (!['kyc', 'deposit', 'transfer', 'all'].includes(flow)) {
     throw new Error(`Invalid --flow value: ${values.flow}`)
   }
 
@@ -1022,6 +1360,7 @@ async function main() {
 
   const kycStatuses = parseCsv(values.kycStatuses) ?? DEFAULT_KYC_STATUSES
   const depositStatuses = parseCsv(values.depositStatuses) ?? DEFAULT_DEPOSIT_STATUSES
+  const transferStatuses = parseCsv(values.transferStatuses) ?? DEFAULT_TRANSFER_STATUSES
 
   const events: Record<string, unknown>[] = []
 
@@ -1060,6 +1399,32 @@ async function main() {
         buildDepositEvent({
           depositId,
           virtualAccountId: virtualAccount.bridge_virtual_account_id,
+          status,
+          amount,
+          currency,
+        })
+      )
+    }
+  }
+
+  if (flow === 'transfer') {
+    const transferTemplate = await ensureTransferTemplate(supabase, bridgeCustomer, {
+      create: Boolean(values.createTransferTemplate),
+      destinationAddress: values.destinationAddress,
+      memo: values.sendId ? `SEND-${values.sendId}` : undefined,
+    })
+
+    if (!transferTemplate) {
+      throw new Error('No transfer template found. Re-run with --create-transfer-template')
+    }
+
+    const transferId = `tr_${randomUUID()}`
+    for (const status of transferStatuses) {
+      events.push(
+        buildTransferEvent({
+          transferId,
+          templateId: transferTemplate.bridge_transfer_template_id,
+          bridgeCustomerId: bridgeCustomer.bridge_customer_id ?? `cust_${randomUUID()}`,
           status,
           amount,
           currency,

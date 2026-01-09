@@ -125,6 +125,11 @@ export default async function handler(
 
     const destinationAddress = sendAccount.address
 
+    if (!destinationAddress) {
+      log('send account address not found', sendAccountError)
+      return res.status(400).json({ error: 'Send account address required' })
+    }
+
     // Get user's bridge customer record
     const { data: customer, error: customerError } = await adminClient
       .from('bridge_customers')
