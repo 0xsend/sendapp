@@ -8,8 +8,6 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_customers" (
     "kyc_link_id" "text" UNIQUE NOT NULL,
     "kyc_status" "text" NOT NULL DEFAULT 'not_started',
     "tos_status" "text" NOT NULL DEFAULT 'pending',
-    "full_name" "text",
-    "email" "text" NOT NULL,
     "type" "text" NOT NULL DEFAULT 'individual',
     "rejection_reasons" "jsonb",
     "rejection_attempts" integer NOT NULL DEFAULT 0,

@@ -100,8 +100,6 @@ export type Database = {
         Row: {
           bridge_customer_id: string | null
           created_at: string
-          email: string
-          full_name: string | null
           id: string
           kyc_link_id: string
           kyc_status: string
@@ -115,8 +113,6 @@ export type Database = {
         Insert: {
           bridge_customer_id?: string | null
           created_at?: string
-          email: string
-          full_name?: string | null
           id?: string
           kyc_link_id: string
           kyc_status?: string
@@ -130,8 +126,6 @@ export type Database = {
         Update: {
           bridge_customer_id?: string | null
           created_at?: string
-          email?: string
-          full_name?: string | null
           id?: string
           kyc_link_id?: string
           kyc_status?: string
@@ -2335,8 +2329,6 @@ export type Database = {
         Row: {
           bridge_customer_id: string | null
           created_at: string | null
-          email: string | null
-          full_name: string | null
           id: string | null
           kyc_link_id: string | null
           kyc_status: string | null
@@ -2350,8 +2342,6 @@ export type Database = {
         Insert: {
           bridge_customer_id?: string | null
           created_at?: string | null
-          email?: string | null
-          full_name?: string | null
           id?: string | null
           kyc_link_id?: string | null
           kyc_status?: string | null
@@ -2365,8 +2355,6 @@ export type Database = {
         Update: {
           bridge_customer_id?: string | null
           created_at?: string | null
-          email?: string | null
-          full_name?: string | null
           id?: string | null
           kyc_link_id?: string | null
           kyc_status?: string | null

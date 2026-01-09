@@ -1211,7 +1211,7 @@ function buildTransferEvent(params: {
     api_version: '2024-01-01',
     event_id: `evt_${randomUUID()}`,
     event_category: 'transfer',
-    event_type: 'transfer.updated',
+    event_type: 'updated.status_transitioned',
     event_object_id: params.transferId,
     event_object: {
       id: params.transferId,
