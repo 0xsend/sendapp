@@ -150,7 +150,7 @@ const InvestmentsBalanceCardBody = ({
       </XStack>
       <InvestmentsWeeklyDelta />
     </YStack>
-    <Card jc={'center'} ai={'center'} shop={0}>
+    <Card jc={'center'} ai={'center'} shop={0} elevationAndroid={0}>
       <YStack gap={'$2'} jc={'center'} ai={'center'}>
         <Paragraph color={'$color10'} size={'$4'}>
           Today

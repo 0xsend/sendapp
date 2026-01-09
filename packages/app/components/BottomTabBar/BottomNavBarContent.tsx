@@ -45,7 +45,7 @@ export const BottomNavBarContent = ({
         $xxs={{
           gap: '$5',
         }}
-        $platform-ios={{
+        $platform-native={{
           elevation: 5,
           shadowOpacity: 0.1,
         }}
