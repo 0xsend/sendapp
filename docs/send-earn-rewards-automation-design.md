@@ -501,6 +501,112 @@ When `dryRun: true`, the workflow returns simulation data without executing tran
 3. **Gas Costs**: ETH spent on harvest + sweep transactions
 4. **Errors**: Failed harvests, failed sweeps, collections mismatches
 5. **Pending Revenue**: Value of revenue waiting to be collected
+6. **Total Value Locked (TVL)**: Total assets (USDC) deposited across all Send Earn vaults
+
+## TVL Calculation
+
+Track the total value locked across all Send Earn vaults for analytics and reporting.
+
+### Implementation
+
+```typescript
+// packages/send-earn/src/vaults.ts
+
+interface VaultTVL {
+  vault: `0x${string}`
+  totalAssets: bigint      // USDC (6 decimals)
+  totalSupply: bigint      // Vault shares
+  underlyingVault: `0x${string}`  // Morpho or Moonwell vault
+}
+
+interface TVLResult {
+  vaults: VaultTVL[]
+  totals: {
+    totalAssets: bigint    // Total USDC across all vaults
+    vaultCount: number     // Number of active vaults
+  }
+}
+
+/**
+ * Get TVL for all Send Earn vaults.
+ * Calls vault.totalAssets() to get the total USDC deposited.
+ */
+export async function getVaultsTVL(
+  config: RevenueConfig,
+  vaults: `0x${string}`[]
+): Promise<TVLResult> {
+  const client = createReadClient(config.rpcUrl)
+  const results: VaultTVL[] = []
+
+  for (const vault of vaults) {
+    const [totalAssets, totalSupply, underlyingVault] = await Promise.all([
+      client.readContract({
+        address: vault,
+        abi: erc4626Abi,
+        functionName: 'totalAssets',
+      }),
+      client.readContract({
+        address: vault,
+        abi: erc4626Abi,
+        functionName: 'totalSupply',
+      }),
+      client.readContract({
+        address: vault,
+        abi: sendEarnAbi,
+        functionName: 'VAULT',
+      }),
+    ])
+
+    results.push({
+      vault,
+      totalAssets,
+      totalSupply,
+      underlyingVault,
+    })
+  }
+
+  return {
+    vaults: results,
+    totals: {
+      totalAssets: results.reduce((sum, v) => sum + v.totalAssets, 0n),
+      vaultCount: results.length,
+    },
+  }
+}
+```
+
+### CLI Command
+
+```bash
+# Display TVL for all vaults
+send-earn tvl
+
+# Output formats
+send-earn tvl --format=json
+send-earn tvl --format=table
+```
+
+### Output Example (Table)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Send Earn TVL                                                    │
+├──────────────────────────┬──────────────────┬───────────────────┤
+│ Vault                    │ TVL (USDC)       │ Underlying        │
+├──────────────────────────┼──────────────────┼───────────────────┤
+│ 0x1234...abcd           │   1,234,567.89   │ Morpho            │
+│ 0x5678...efgh           │     567,890.12   │ Moonwell          │
+├──────────────────────────┼──────────────────┼───────────────────┤
+│ Total                    │   1,802,458.01   │ 2 vaults          │
+└──────────────────────────┴──────────────────┴───────────────────┘
+```
+
+### Use Cases
+
+1. **Analytics Dashboard**: Display total TVL on Send Earn analytics page
+2. **Revenue Projections**: Estimate expected fees based on TVL and APY
+3. **Protocol Health**: Monitor deposit/withdrawal trends over time
+4. **Reporting**: Monthly TVL snapshots for stakeholder updates
 
 ### Alerts
 
