@@ -127,14 +127,14 @@ export function BankTransferScreen() {
     }
   }, [analytics, kycStatus, verificationUrl, waitingFor])
 
-  // Transition waiting states as user progresses
+  // For new users, guide them through the various steps.
   useEffect(() => {
     if (waitingFor === 'tos' && isTosAccepted) {
-      // TOS accepted, now wait for KYC completion
-      // We stay in waiting state for incomplete/not_started since those aren't final states
+      // Now remove waiting for so user can see next step
       setWaitingFor(null)
     } else if (waitingFor === 'kyc' && !['incomplete', 'not_started'].includes(kycStatus)) {
       // KYC status changed to a final state (approved, rejected, under_review, etc.)
+      // Now remove the waiting for so user can see next step.
       setWaitingFor(null)
     }
   }, [kycStatus, isTosAccepted, waitingFor])
