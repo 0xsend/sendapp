@@ -43,7 +43,25 @@ We generally recommend writing the majority of your tests as integration tests.
 
 Because the test server supports skipping time, use the test server for both end-to-end and integration tests with Workers.
 
-Tests are written using [jest](https://jestjs.io/docs/getting-started) and [ts-jest](https://kulshekhar.github.io/ts-jest/docs/).
+Tests are written using [Vitest](https://vitest.dev/guide/). Two test configurations exist:
+
+- **Unit tests** (`yarn test`): Run with nock to mock network requests
+- **Anvil fork tests** (`yarn test:anvil`): Run against forked mainnet state using [@morpho-org/test](https://github.com/morpho-org/test)
+
+### Prerequisites
+
+**Anvil tests** require [Foundry](https://book.getfoundry.sh/getting-started/installation) installed:
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+**Native dependencies**: Some optional dependencies (like `better-sqlite3` used by snaplet) require native compilation. If `yarn install` fails with build errors, ensure you have:
+
+- Node.js 18+ with matching native module ABI
+- C++ build tools (`xcode-select --install` on macOS, `build-essential` on Linux)
+- Python with setuptools (`pip install setuptools`) - required for Python 3.12+ where `distutils` was removed
 
 Temporal runs tests in an in-memory environment. When testing workflows, you can use the `TestWorkflowEnvironment` to run tests against a local Temporal server. This is useful for testing workflows that interact with external services or databases. You can also mock activities. Do note, that if you miss an activity for a workflow, the test will fail with a timeout.
 

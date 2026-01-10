@@ -23,7 +23,6 @@
     "tsconfig.json",
     "./src",
     "../temporal/src",
-    "./jest.config.ts",
     "../../supabase",
     "../app",
     "../ui/src",
