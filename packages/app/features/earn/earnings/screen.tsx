@@ -1,14 +1,29 @@
-import { Card, Fade, H4, Paragraph, ScrollView, Separator, Spinner, XStack, YStack } from '@my/ui'
+import {
+  Card,
+  Fade,
+  Paragraph,
+  ScrollView,
+  Separator,
+  Spinner,
+  useThemeName,
+  XStack,
+  YStack,
+} from '@my/ui'
 import { IconCoin } from 'app/components/icons/IconCoin'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { ActivityRowFactory, getColors } from 'app/features/activity/rows/ActivityRowFactory'
+import { isHeaderRow } from 'app/features/activity/utils/activityRowTypes'
+import { transformActivitiesToRows } from 'app/features/activity/utils/activityTransform'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
+import { useAddressBook } from 'app/utils/useAddressBook'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
 import { isTemporalSendEarnDepositEvent } from 'app/utils/zod/activity'
 import { useEffect, useMemo, useRef } from 'react'
-import { Platform, SectionList } from 'react-native'
+import { useTranslation } from 'react-i18next'
+import { Platform } from 'react-native'
 import { useERC20AssetCoin } from '../params'
 import { useSendEarnCoin } from '../providers/SendEarnProvider'
 import { useEarnActivityFeed } from '../utils/useEarnActivityFeed'
-import { useSendScreenParams } from 'app/routers/params'
 
 export const EarningsBalance = () => {
   return (
@@ -31,140 +46,120 @@ export const EarningsBalance = () => {
 }
 
 export const EarningsFeed = () => {
+  const { t, i18n } = useTranslation('activity')
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
+  const theme = useThemeName()
+  const isDark = theme.includes('dark')
+
   const coin = useERC20AssetCoin()
   const { invalidateQueries } = useSendEarnCoin(coin.data || undefined)
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useEarnActivityFeed({
       pageSize: 10,
     })
-  const wasPendingRef = useRef(false) // Ref to track if a pending deposit was seen previously
+
+  // Get data for transform context
+  const { data: swapRouters } = useSwapRouters()
+  const { data: liquidityPools } = useLiquidityPools()
+  const { data: addressBook } = useAddressBook()
+
+  const wasPendingRef = useRef(false)
 
   useEffect(() => {
-    // Only proceed if data is available
     if (!data?.pages) return
 
     const activities = data.pages.flat()
-
-    // Check if there's currently a pending temporal deposit
     const isCurrentlyPending = activities.some(
       (activity) =>
         isTemporalSendEarnDepositEvent(activity) &&
-        // Assuming 'status' is within the 'data' object for this event type
         !['cancelled', 'failed'].includes(activity.data?.status)
     )
 
-    // If it was pending previously but isn't anymore, invalidate the balances query
     if (wasPendingRef.current && !isCurrentlyPending) {
-      // Use provider's centralized invalidation
       invalidateQueries()
     }
 
-    // Update the ref to store the current pending state for the next effect run
     wasPendingRef.current = isCurrentlyPending
   }, [data, invalidateQueries])
 
-  const sections = useMemo(() => {
+  // Transform activities to rows
+  const processedData = useMemo(() => {
     if (!data?.pages) return []
+    return transformActivitiesToRows(data.pages, {
+      t,
+      locale,
+      swapRouters,
+      liquidityPools,
+      addressBook,
+    })
+  }, [data?.pages, t, locale, swapRouters, liquidityPools, addressBook])
 
-    const activities = data.pages.flat()
-    const groups = activities.reduce<Record<string, typeof activities>>((acc, activity) => {
-      const isToday = new Date(activity.created_at).toDateString() === new Date().toDateString()
-      const dateKey = isToday
-        ? 'Today'
-        : new Date(activity.created_at).toLocaleDateString(undefined, {
-            day: 'numeric',
-            month: 'long',
-          })
+  // Compute colors once
+  const colors = useMemo(() => getColors(isDark), [isDark])
 
-      if (!acc[dateKey]) {
-        acc[dateKey] = []
-      }
-
-      acc[dateKey].push(activity)
-      return acc
-    }, {})
-
-    return Object.entries(groups).map(([title, data], index) => ({
-      title,
-      data,
-      index,
-    }))
-  }, [data?.pages])
-
-  const sendParamsAndSet = useSendScreenParams()
-
-  const sendParamsRef = useRef(sendParamsAndSet)
-  sendParamsRef.current = sendParamsAndSet
+  // Handle reaching end of list for pagination
+  const handleScroll = useMemo(() => {
+    if (!hasNextPage || isFetchingNextPage) return undefined
+    return () => fetchNextPage()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   if (!coin.isSuccess || !coin.data) return null
   if (isLoading) return <Spinner size="small" />
   if (error) return <Paragraph>{error.message}</Paragraph>
-  if (!sections.length) return <Paragraph>No earnings activity</Paragraph>
+  if (!processedData.length) return <Paragraph>No earnings activity</Paragraph>
 
   return (
     <Fade>
-      <SectionList
-        sections={sections}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) => activity.event_id}
-        renderItem={({ item: activity, index, section }) => (
-          <YStack
-            bc="$color1"
-            px="$2"
-            $gtLg={{
-              px: '$3.5',
-            }}
-            {...(index === 0 &&
-              Platform.OS === 'web' && {
-                pt: '$2',
-                $gtLg: {
-                  pt: '$3.5',
-                },
-                borderTopLeftRadius: '$6',
-                borderTopRightRadius: '$6',
+      <YStack gap="$0">
+        {processedData.map((item) => {
+          if (isHeaderRow(item)) {
+            return (
+              <ActivityRowFactory
+                key={`header-${item.sectionIndex}-${item.title}`}
+                item={item}
+                colors={colors}
+                isDark={isDark}
+              />
+            )
+          }
+
+          return (
+            <YStack
+              key={item.eventId}
+              bc="$color1"
+              p={10}
+              h={122}
+              mah={122}
+              {...(item.isFirst && {
+                borderTopLeftRadius: '$4',
+                borderTopRightRadius: '$4',
               })}
-            {...(index === section.data.length - 1 && {
-              pb: '$2',
-              $gtLg: {
-                pb: '$3.5',
-              },
-              borderBottomLeftRadius: '$6',
-              borderBottomRightRadius: '$6',
-            })}
-          >
-            <TokenActivityRow activity={activity} sendParamsRef={sendParamsRef} />
-          </YStack>
-        )}
-        renderSectionHeader={({ section: { title, index } }) =>
-          Platform.OS === 'web' ? (
-            <H4
-              fontWeight={'600'}
-              size={'$7'}
-              pt={index === 0 ? 0 : '$3.5'}
-              pb={'$3.5'}
-              bc={'$background'}
+              {...(item.isLast && {
+                borderBottomLeftRadius: '$4',
+                borderBottomRightRadius: '$4',
+              })}
             >
-              {title}
-            </H4>
-          ) : (
-            <XStack
-              mt={index === 0 ? 0 : '$3.5'}
-              p={'$3.5'}
-              pb={0}
-              bc={'$color1'}
-              borderTopLeftRadius={'$6'}
-              borderTopRightRadius={'$6'}
-            >
-              <Paragraph fontWeight={'900'} size={'$5'}>
-                {title}
-              </Paragraph>
-            </XStack>
+              <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
+            </YStack>
           )
-        }
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        ListFooterComponent={!isLoading && isFetchingNextPage ? <Spinner size="small" /> : null}
-        stickySectionHeadersEnabled={true}
-      />
+        })}
+        {hasNextPage && (
+          <XStack jc="center" py="$4">
+            {isFetchingNextPage ? (
+              <Spinner size="small" />
+            ) : (
+              <Paragraph
+                color="$color10"
+                pressStyle={{ opacity: 0.7 }}
+                onPress={handleScroll}
+                cursor="pointer"
+              >
+                Load more
+              </Paragraph>
+            )}
+          </XStack>
+        )}
+      </YStack>
     </Fade>
   )
 }
