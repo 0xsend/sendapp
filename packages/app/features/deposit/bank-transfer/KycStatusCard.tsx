@@ -117,21 +117,14 @@ export function KycStatusCard({
   children,
 }: KycStatusCardProps) {
   // Don't show button if max attempts exceeded
-  const showStartButton =
-    !isMaxAttemptsExceeded &&
-    (kycStatus === 'not_started' ||
-      kycStatus === 'incomplete' ||
-      kycStatus === 'awaiting_questionnaire' ||
-      kycStatus === 'awaiting_ubo' ||
-      kycStatus === 'rejected')
+  const showStartButton = !isMaxAttemptsExceeded && kycStatus !== 'rejected'
   const isNewUser = kycStatus === 'not_started'
-  const needsTos = !isTosAccepted && (isNewUser || kycStatus === 'incomplete')
 
   // Determine button label based on current step
   let buttonLabel = 'Continue Verification'
   if (kycStatus === 'rejected') {
     buttonLabel = 'Try Again'
-  } else if (needsTos) {
+  } else if (!isTosAccepted) {
     buttonLabel = 'Accept Terms of Service'
   } else if (isNewUser || kycStatus === 'incomplete') {
     buttonLabel = isBusinessProfile ? 'Verify Business' : 'Verify Identity'

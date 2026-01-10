@@ -213,7 +213,7 @@ export function BankTransferScreen() {
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <FadeCard ai="center">
           <Paragraph size="$6" fontWeight={600} ta="center">
-            Bank transfers aren't available in your region.
+            {"Bank transfers aren't available in your region."}
           </Paragraph>
           <Paragraph
             ta="center"
@@ -221,7 +221,7 @@ export function BankTransferScreen() {
             color="$lightGrayTextField"
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            We can't offer ACH or wire transfers where you're located.
+            {'Check back another time, we are actively expanding!'}
           </Paragraph>
         </FadeCard>
       </YStack>
