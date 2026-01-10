@@ -31,7 +31,7 @@
     "status": "npx supabase status",
     "_deploy": "yarn link-project && npx supabase db push",
     "deploy": "yarn _with-env yarn _deploy",
-    "test": "npx supabase test db"
+    "test": "SUPABASE_API_PORT=${SUPABASE_API_PORT:-54321} SUPABASE_DB_PORT=${SUPABASE_DB_PORT:-54322} SUPABASE_STUDIO_PORT=${SUPABASE_STUDIO_PORT:-54323} SUPABASE_INBUCKET_PORT=${SUPABASE_INBUCKET_PORT:-54324} SUPABASE_INBUCKET_SMTP_PORT=${SUPABASE_INBUCKET_SMTP_PORT:-54325} SUPABASE_INBUCKET_POP3_PORT=${SUPABASE_INBUCKET_POP3_PORT:-54326} npx supabase test db"
   },
   "devDependencies": {
     "dotenv-cli": "^7.3.0",
