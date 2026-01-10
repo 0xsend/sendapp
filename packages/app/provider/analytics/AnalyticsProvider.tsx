@@ -6,7 +6,7 @@ import { useUser } from 'app/utils/useUser'
 const AnalyticsContext = createContext<AnalyticsService | null>(null)
 
 export function AnalyticsProvider({ children }: { children: ReactNode }) {
-  const { user, profile } = useUser()
+  const { profile, isLoading: isUserLoading } = useUser()
   const initPromiseRef = useRef<Promise<void> | null>(null)
 
   // Initialize on mount
@@ -26,18 +26,18 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
 
       if (!analytics.isInitialized()) return
 
-      if (user?.id && profile?.send_id) {
-        analytics.identify(String(profile.send_id), {
-          send_account_id: String(profile.send_id),
-          sendtag: profile.main_tag?.name ?? undefined,
-          profile_type: profile.is_business ? 'business' : 'personal',
-        })
-      } else {
-        analytics.reset()
-      }
+      if (!isUserLoading) return
+
+      if (!profile?.send_id) return
+
+      analytics.identify(String(profile.send_id), {
+        send_account_id: String(profile.send_id),
+        sendtag: profile.main_tag?.name ?? undefined,
+        profile_type: profile.is_business ? 'business' : 'personal',
+      })
     }
     identify()
-  }, [user?.id, profile?.send_id, profile?.main_tag?.name, profile?.is_business])
+  }, [isUserLoading, profile?.send_id, profile?.main_tag?.name, profile?.is_business])
 
   return <AnalyticsContext.Provider value={analytics}>{children}</AnalyticsContext.Provider>
 }

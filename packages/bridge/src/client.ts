@@ -5,6 +5,8 @@ import type {
   CustomerResponse,
   KycLinkRequest,
   KycLinkResponse,
+  StaticMemoRequest,
+  StaticMemoResponse,
   TransferRequest,
   TransferResponse,
   VirtualAccountRequest,
@@ -135,6 +137,19 @@ export class BridgeClient {
    */
   async listVirtualAccounts(customerId: string): Promise<VirtualAccountResponse[]> {
     return this.request('GET', `/customers/${customerId}/virtual_accounts`)
+  }
+
+  // Static Memos
+
+  /**
+   * Create a static memo for a customer
+   */
+  async createStaticMemo(
+    customerId: string,
+    data: StaticMemoRequest,
+    options?: RequestOptions
+  ): Promise<StaticMemoResponse> {
+    return this.request('POST', `/customers/${customerId}/static_memos`, data, options)
   }
 
   // Transfers

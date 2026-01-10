@@ -14,17 +14,16 @@ import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
 import { KycStatusCard } from './KycStatusCard'
 import {
   useBridgeGeoBlock,
-  useKycStatus,
+  useBridgeCustomer,
   useInitiateKyc,
   useSyncKycStatus,
-  useCreateTransferTemplate,
-  useTransferTemplateBankAccountDetails,
+  useCreateStaticMemo,
+  useStaticMemoBankAccountDetails,
 } from 'app/features/bank-transfer'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
 import { useAnalytics } from 'app/provider/analytics'
 import { useUser } from 'app/utils/useUser'
-import { useBankTransferScreenParams } from 'app/routers/params'
 
 const getErrorType = (error: unknown): 'network' | 'unknown' => {
   const message = error instanceof Error ? error.message : String(error)
@@ -43,80 +42,30 @@ export function BankTransferScreen() {
   const { profile } = useUser()
 
   const {
-    kycLinkId,
-    kycStatus: kycStatusFromDb,
-    isTosAccepted: isTosAcceptedFromDb,
-    isApproved,
+    data: customer,
     rejectionReasons,
     isMaxAttemptsExceeded,
     isLoading: kycLoading,
-  } = useKycStatus()
-
-  // Get redirect params from Bridge callback URL
-  const [redirectParams, setRedirectParams] = useBankTransferScreenParams()
-  const hasRedirectParams = useRef(false)
-
-  // Track redirect status separately - this allows immediate display of status from redirect
-  // before polling catches up, avoiding the brief "incomplete" flash
-  const [redirectKycStatus, setRedirectKycStatus] = useState<string | null>(null)
-  const [redirectTosStatus, setRedirectTosStatus] = useState<string | null>(null)
-
-  // Process redirect params once on mount/when they change
-  useEffect(() => {
-    const { kyc_status, tos_status } = redirectParams
-    // Only process if we have redirect params and haven't processed them yet
-    if ((kyc_status || tos_status) && !hasRedirectParams.current) {
-      hasRedirectParams.current = true
-
-      // If Bridge returned a status that isn't 'incomplete', use it for immediate display
-      if (kyc_status && kyc_status !== 'incomplete') {
-        setRedirectKycStatus(kyc_status)
-      }
-      if (tos_status) {
-        setRedirectTosStatus(tos_status)
-      }
-
-      // Clear the URL params after processing
-      setRedirectParams(
-        { kyc_status: undefined, tos_status: undefined, customer_id: undefined },
-        { webBehavior: 'replace' }
-      )
-    }
-  }, [redirectParams, setRedirectParams])
-
-  // Clear redirect status once DB status catches up (is no longer 'incomplete' or matches redirect)
-  useEffect(() => {
-    if (
-      redirectKycStatus &&
-      kycStatusFromDb !== 'incomplete' &&
-      kycStatusFromDb !== 'not_started'
-    ) {
-      setRedirectKycStatus(null)
-    }
-    if (redirectTosStatus && isTosAcceptedFromDb) {
-      setRedirectTosStatus(null)
-    }
-  }, [kycStatusFromDb, isTosAcceptedFromDb, redirectKycStatus, redirectTosStatus])
-
-  // Use redirect status if available, otherwise fall back to DB status
-  const kycStatus = redirectKycStatus ?? kycStatusFromDb
-  const isTosAccepted = redirectTosStatus === 'approved' || isTosAcceptedFromDb
+  } = useBridgeCustomer()
+  const kycLinkId = customer?.kyc_link_id ?? null
+  const kycStatus = customer?.kyc_status ?? 'not_started'
+  const isTosAccepted = customer?.tos_status === 'approved'
+  const isApproved = customer?.kyc_status === 'approved'
 
   // Sync KYC status from Bridge API to DB for faster updates
   // Sync when: has kycLinkId AND not approved AND not (rejected with max attempts)
   const shouldSync = !!kycLinkId && !isApproved && !isMaxAttemptsExceeded
   useSyncKycStatus(kycLinkId ?? undefined, { enabled: shouldSync })
-  const {
-    hasTransferTemplate,
-    bankDetails,
-    isLoading: templateLoading,
-  } = useTransferTemplateBankAccountDetails()
+  const { hasStaticMemo, bankDetails, isLoading: memoLoading } = useStaticMemoBankAccountDetails()
   const initiateKyc = useInitiateKyc()
-  const createTransferTemplate = useCreateTransferTemplate()
+  const createStaticMemo = useCreateStaticMemo()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
   // Track which step we're waiting for: 'tos', 'kyc', or null
-  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(null)
+  // Initialize waiting state based on KYC status - incomplete means user started but hasn't finished
+  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(() =>
+    kycStatus === 'incomplete' ? 'kyc' : null
+  )
   const [showInfo, setShowInfo] = useState(false)
   const hasTrackedDetailsView = useRef(false)
   const hasTrackedInfoView = useRef(false)
@@ -178,40 +127,43 @@ export function BankTransferScreen() {
     }
   }, [analytics, kycStatus, verificationUrl, waitingFor])
 
-  // Stop waiting when the relevant status changes
+  // For new users, guide them through the various steps.
   useEffect(() => {
     if (waitingFor === 'tos' && isTosAccepted) {
+      // Now remove waiting for so user can see next step
       setWaitingFor(null)
-    } else if (waitingFor === 'kyc' && kycStatus !== 'not_started') {
+    } else if (waitingFor === 'kyc' && !['incomplete', 'not_started'].includes(kycStatus)) {
+      // KYC status changed to a final state (approved, rejected, under_review, etc.)
+      // Now remove the waiting for so user can see next step.
       setWaitingFor(null)
     }
   }, [kycStatus, isTosAccepted, waitingFor])
 
-  // Auto-create transfer template once approved
+  // Auto-create static memo once approved
   const {
-    mutate: createTemplate,
-    isPending: isTemplateCreating,
-    isError: templateCreationError,
-  } = createTransferTemplate
+    mutate: createMemo,
+    isPending: isMemoCreating,
+    isError: memoCreationError,
+  } = createStaticMemo
   useEffect(() => {
     if (
       !isGeoBlocked &&
       isApproved &&
-      !hasTransferTemplate &&
-      !templateLoading &&
-      !isTemplateCreating &&
-      !templateCreationError
+      !hasStaticMemo &&
+      !memoLoading &&
+      !isMemoCreating &&
+      !memoCreationError
     ) {
-      createTemplate()
+      createMemo()
     }
   }, [
     isGeoBlocked,
     isApproved,
-    hasTransferTemplate,
-    templateLoading,
-    isTemplateCreating,
-    templateCreationError,
-    createTemplate,
+    hasStaticMemo,
+    memoLoading,
+    isMemoCreating,
+    memoCreationError,
+    createMemo,
   ])
 
   useEffect(() => {
@@ -219,7 +171,7 @@ export function BankTransferScreen() {
       analytics.capture({
         name: 'bank_transfer_info_viewed',
         properties: {
-          info_type: hasTransferTemplate ? 'bank_details' : 'kyc',
+          info_type: hasStaticMemo ? 'bank_details' : 'kyc',
         },
       })
       hasTrackedInfoView.current = true
@@ -228,30 +180,30 @@ export function BankTransferScreen() {
     if (!showInfo) {
       hasTrackedInfoView.current = false
     }
-  }, [analytics, hasTransferTemplate, showInfo])
+  }, [analytics, hasStaticMemo, showInfo])
 
   useEffect(() => {
-    if (!hasTrackedDetailsView.current && hasTransferTemplate && bankDetails && !templateLoading) {
+    if (!hasTrackedDetailsView.current && hasStaticMemo && bankDetails && !memoLoading) {
       const hasAch = bankDetails.paymentRails.includes('ach_push')
       const hasWire = bankDetails.paymentRails.includes('wire')
 
       analytics.capture({
         name: 'bank_transfer_details_viewed',
         properties: {
-          account_source: 'transfer_template',
+          account_source: 'static_memo',
           has_ach: hasAch,
           has_wire: hasWire,
         },
       })
       hasTrackedDetailsView.current = true
     }
-  }, [analytics, bankDetails, hasTransferTemplate, templateLoading])
+  }, [analytics, bankDetails, hasStaticMemo, memoLoading])
 
-  // Handler to retry transfer template creation
-  const handleRetryTemplateCreation = useCallback(() => {
-    createTransferTemplate.reset()
-    createTransferTemplate.mutate()
-  }, [createTransferTemplate])
+  // Handler to retry static memo creation
+  const handleRetryMemoCreation = useCallback(() => {
+    createStaticMemo.reset()
+    createStaticMemo.mutate()
+  }, [createStaticMemo])
 
   // Loading state
   if (kycLoading || isGeoBlockLoading) {
@@ -267,7 +219,7 @@ export function BankTransferScreen() {
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <FadeCard ai="center">
           <Paragraph size="$6" fontWeight={600} ta="center">
-            Bank transfers aren't available in your region.
+            {"Bank transfers aren't available in your region."}
           </Paragraph>
           <Paragraph
             ta="center"
@@ -275,14 +227,14 @@ export function BankTransferScreen() {
             color="$lightGrayTextField"
             $theme-light={{ color: '$darkGrayTextField' }}
           >
-            We can't offer ACH or wire transfers where you're located.
+            {'Check back another time, we are actively expanding!'}
           </Paragraph>
         </FadeCard>
       </YStack>
     )
   }
 
-  // Waiting for TOS or KYC to complete
+  // Waiting for TOS or KYC to complete if status is not_started or incomplete
   if (waitingFor) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
@@ -357,34 +309,34 @@ export function BankTransferScreen() {
   }
 
   // Approved but setting up deposit account (auto-creating in background)
-  if (!hasTransferTemplate) {
+  if (!hasStaticMemo) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <FadeCard>
           <YStack gap="$4">
             <Paragraph fontSize="$6" fontWeight={600}>
-              {templateCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
+              {memoCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
             </Paragraph>
             <Paragraph
               fontSize="$4"
               color="$lightGrayTextField"
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              {templateCreationError
+              {memoCreationError
                 ? 'We encountered an issue creating your deposit account. Please try again.'
                 : `Your ${verificationSubject} has been verified. We're now creating your deposit account.`}
             </Paragraph>
-            {isTemplateCreating && (
+            {isMemoCreating && (
               <YStack ai="center" py="$2">
                 <Spinner size="small" color="$primary" />
               </YStack>
             )}
-            {templateCreationError && (
+            {memoCreationError && (
               <Button
                 size="$4"
                 theme="green"
-                onPress={handleRetryTemplateCreation}
-                disabled={isTemplateCreating}
+                onPress={handleRetryMemoCreation}
+                disabled={isMemoCreating}
               >
                 Try Again
               </Button>
@@ -395,8 +347,8 @@ export function BankTransferScreen() {
     )
   }
 
-  // Has transfer template - show bank details
-  if (templateLoading || !bankDetails) {
+  // Has static memo - show bank details
+  if (memoLoading || !bankDetails) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <BankDetailsCardSkeleton />

@@ -205,7 +205,7 @@ interface BankTransferKycFailedProps {
 }
 
 interface BankTransferAccountSetupProps {
-  method: 'transfer_template' | 'virtual_account'
+  method: 'transfer_template' | 'static_memo' | 'virtual_account'
 }
 
 interface BankTransferAccountSetupFailedProps extends BankTransferAccountSetupProps {
@@ -213,7 +213,7 @@ interface BankTransferAccountSetupFailedProps extends BankTransferAccountSetupPr
 }
 
 interface BankTransferDetailsViewedProps {
-  account_source: 'transfer_template' | 'virtual_account'
+  account_source: 'transfer_template' | 'static_memo' | 'virtual_account'
   has_ach: boolean
   has_wire: boolean
 }

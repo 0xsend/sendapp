@@ -74,9 +74,16 @@ export function useBridgeCustomer() {
     refetchInterval: 5_000,
   })
 
+  const customer = query.data
+  const rejectionReasons = extractCustomerRejectionReasons(customer?.rejection_reasons)
+  const rejectionAttempts = customer?.rejection_attempts ?? 0
+  const isMaxAttemptsExceeded = rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS
+
   return {
     ...query,
     isLoading: query.isLoading || isLoadingProfile,
+    rejectionReasons,
+    isMaxAttemptsExceeded,
   }
 }
 
@@ -125,37 +132,6 @@ export function useInitiateKyc() {
       queryClient.invalidateQueries({ queryKey: [BRIDGE_CUSTOMER_QUERY_KEY] })
     },
   })
-}
-
-/**
- * Check if user has completed KYC
- */
-export function useKycStatus() {
-  const { data: customer, isLoading, error, refetch } = useBridgeCustomer()
-  const rejectionReasons = extractCustomerRejectionReasons(customer?.rejection_reasons)
-  const rejectionAttempts = customer?.rejection_attempts ?? 0
-  const isMaxAttemptsExceeded = rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS
-
-  return {
-    isLoading,
-    error,
-    kycLinkId: customer?.kyc_link_id ?? null,
-    kycStatus: customer?.kyc_status ?? 'not_started',
-    tosStatus: customer?.tos_status ?? 'pending',
-    isTosAccepted: customer?.tos_status === 'approved',
-    isApproved: customer?.kyc_status === 'approved',
-    isRejected: customer?.kyc_status === 'rejected',
-    isPending:
-      customer?.kyc_status === 'under_review' ||
-      customer?.kyc_status === 'incomplete' ||
-      customer?.kyc_status === 'awaiting_questionnaire' ||
-      customer?.kyc_status === 'awaiting_ubo',
-    customer,
-    rejectionReasons,
-    rejectionAttempts,
-    isMaxAttemptsExceeded,
-    refetch,
-  }
 }
 
 /**

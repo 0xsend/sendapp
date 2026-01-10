@@ -83,6 +83,7 @@ schema_paths = [
   "./schemas/bridge_customers.sql",
   "./schemas/bridge_virtual_accounts.sql",
   "./schemas/bridge_transfer_templates.sql",
+  "./schemas/bridge_static_memos.sql",
   "./schemas/bridge_webhook_events.sql",
   "./schemas/bridge_deposits.sql",
 
