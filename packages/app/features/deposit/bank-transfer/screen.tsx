@@ -62,7 +62,10 @@ export function BankTransferScreen() {
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
   // Track which step we're waiting for: 'tos', 'kyc', or null
-  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(null)
+  // Initialize waiting state based on KYC status - incomplete means user started but hasn't finished
+  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(() =>
+    kycStatus === 'incomplete' ? 'kyc' : null
+  )
   const [showInfo, setShowInfo] = useState(false)
   const hasTrackedDetailsView = useRef(false)
   const hasTrackedInfoView = useRef(false)
@@ -124,11 +127,14 @@ export function BankTransferScreen() {
     }
   }, [analytics, kycStatus, verificationUrl, waitingFor])
 
-  // Stop waiting when the relevant status changes
+  // Transition waiting states as user progresses
   useEffect(() => {
     if (waitingFor === 'tos' && isTosAccepted) {
+      // TOS accepted, now wait for KYC completion
+      // We stay in waiting state for incomplete/not_started since those aren't final states
       setWaitingFor(null)
-    } else if (waitingFor === 'kyc' && kycStatus !== 'not_started') {
+    } else if (waitingFor === 'kyc' && !['incomplete', 'not_started'].includes(kycStatus)) {
+      // KYC status changed to a final state (approved, rejected, under_review, etc.)
       setWaitingFor(null)
     }
   }, [kycStatus, isTosAccepted, waitingFor])
@@ -228,7 +234,7 @@ export function BankTransferScreen() {
     )
   }
 
-  // Waiting for TOS or KYC to complete
+  // Waiting for TOS or KYC to complete if status is not_started or incomplete
   if (waitingFor) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
