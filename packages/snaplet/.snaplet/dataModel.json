@@ -663,6 +663,20 @@
           "hasDefaultValue": false
         },
         {
+          "name": "bridge_static_memos",
+          "type": "bridge_static_memos",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "bridge_static_memosTobridge_customers",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "bridge_transfer_templates",
           "type": "bridge_transfer_templates",
           "isRequired": false,
@@ -981,6 +995,38 @@
           "maxLength": null
         },
         {
+          "id": "public.bridge_deposits.static_memo_id",
+          "name": "static_memo_id",
+          "columnName": "static_memo_id",
+          "type": "uuid",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "bridge_static_memos",
+          "type": "bridge_static_memos",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "bridge_depositsTobridge_static_memos",
+          "relationFromFields": [
+            "static_memo_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
           "name": "bridge_transfer_templates",
           "type": "bridge_transfer_templates",
           "isRequired": false,
@@ -1029,6 +1075,222 @@
           "name": "bridge_deposits_pkey",
           "fields": [
             "id"
+          ],
+          "nullNotDistinct": false
+        }
+      ]
+    },
+    "bridge_static_memos": {
+      "id": "public.bridge_static_memos",
+      "schemaName": "public",
+      "tableName": "bridge_static_memos",
+      "fields": [
+        {
+          "id": "public.bridge_static_memos.id",
+          "name": "id",
+          "columnName": "id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": true,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.bridge_customer_id",
+          "name": "bridge_customer_id",
+          "columnName": "bridge_customer_id",
+          "type": "uuid",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.bridge_static_memo_id",
+          "name": "bridge_static_memo_id",
+          "columnName": "bridge_static_memo_id",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.source_currency",
+          "name": "source_currency",
+          "columnName": "source_currency",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.destination_currency",
+          "name": "destination_currency",
+          "columnName": "destination_currency",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.destination_payment_rail",
+          "name": "destination_payment_rail",
+          "columnName": "destination_payment_rail",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.destination_address",
+          "name": "destination_address",
+          "columnName": "destination_address",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.source_deposit_instructions",
+          "name": "source_deposit_instructions",
+          "columnName": "source_deposit_instructions",
+          "type": "jsonb",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.status",
+          "name": "status",
+          "columnName": "status",
+          "type": "text",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.created_at",
+          "name": "created_at",
+          "columnName": "created_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "id": "public.bridge_static_memos.updated_at",
+          "name": "updated_at",
+          "columnName": "updated_at",
+          "type": "timestamptz",
+          "isRequired": true,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": true,
+          "isId": false,
+          "maxLength": null
+        },
+        {
+          "name": "bridge_customers",
+          "type": "bridge_customers",
+          "isRequired": true,
+          "kind": "object",
+          "relationName": "bridge_static_memosTobridge_customers",
+          "relationFromFields": [
+            "bridge_customer_id"
+          ],
+          "relationToFields": [
+            "id"
+          ],
+          "isList": false,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        },
+        {
+          "name": "bridge_deposits",
+          "type": "bridge_deposits",
+          "isRequired": false,
+          "kind": "object",
+          "relationName": "bridge_depositsTobridge_static_memos",
+          "relationFromFields": [],
+          "relationToFields": [],
+          "isList": true,
+          "isId": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "name": "bridge_static_memos_bridge_static_memo_id_key",
+          "fields": [
+            "bridge_static_memo_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "bridge_static_memos_pkey",
+          "fields": [
+            "id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "bridge_static_memos_active_unique",
+          "fields": [
+            "bridge_customer_id"
           ],
           "nullNotDistinct": false
         }

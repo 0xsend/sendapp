@@ -91,6 +91,20 @@ interface Table_public_bridge_deposits {
   net_amount: number | null;
   created_at: string;
   updated_at: string;
+  static_memo_id: string | null;
+}
+interface Table_public_bridge_static_memos {
+  id: string;
+  bridge_customer_id: string;
+  bridge_static_memo_id: string;
+  source_currency: string;
+  destination_currency: string;
+  destination_payment_rail: string;
+  destination_address: string;
+  source_deposit_instructions: Json | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 interface Table_public_bridge_transfer_templates {
   id: string;
@@ -1180,6 +1194,7 @@ interface Schema_public {
   affiliate_stats: Table_public_affiliate_stats;
   bridge_customers: Table_public_bridge_customers;
   bridge_deposits: Table_public_bridge_deposits;
+  bridge_static_memos: Table_public_bridge_static_memos;
   bridge_transfer_templates: Table_public_bridge_transfer_templates;
   bridge_virtual_accounts: Table_public_bridge_virtual_accounts;
   bridge_webhook_events: Table_public_bridge_webhook_events;
@@ -1320,23 +1335,36 @@ interface Tables_relationships {
        bridge_customers_user_id_fkey: "auth.users";
     };
     children: {
+       bridge_static_memos_bridge_customer_id_fkey: "public.bridge_static_memos";
        bridge_transfer_templates_bridge_customer_id_fkey: "public.bridge_transfer_templates";
        bridge_virtual_accounts_bridge_customer_id_fkey: "public.bridge_virtual_accounts";
     };
     parentDestinationsTables: "auth.users" | {};
-    childDestinationsTables: "public.bridge_transfer_templates" | "public.bridge_virtual_accounts" | {};
+    childDestinationsTables: "public.bridge_static_memos" | "public.bridge_transfer_templates" | "public.bridge_virtual_accounts" | {};
     
   };
   "public.bridge_deposits": {
     parent: {
+       bridge_deposits_static_memo_id_fkey: "public.bridge_static_memos";
        bridge_deposits_transfer_template_id_fkey: "public.bridge_transfer_templates";
        bridge_deposits_virtual_account_id_fkey: "public.bridge_virtual_accounts";
     };
     children: {
 
     };
-    parentDestinationsTables: "public.bridge_transfer_templates" | "public.bridge_virtual_accounts" | {};
+    parentDestinationsTables: "public.bridge_static_memos" | "public.bridge_transfer_templates" | "public.bridge_virtual_accounts" | {};
     childDestinationsTables:  | {};
+    
+  };
+  "public.bridge_static_memos": {
+    parent: {
+       bridge_static_memos_bridge_customer_id_fkey: "public.bridge_customers";
+    };
+    children: {
+       bridge_deposits_static_memo_id_fkey: "public.bridge_deposits";
+    };
+    parentDestinationsTables: "public.bridge_customers" | {};
+    childDestinationsTables: "public.bridge_deposits" | {};
     
   };
   "public.bridge_transfer_templates": {
