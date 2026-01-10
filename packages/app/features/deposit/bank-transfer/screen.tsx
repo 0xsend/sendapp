@@ -24,6 +24,7 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
 import { useAnalytics } from 'app/provider/analytics'
 import { useUser } from 'app/utils/useUser'
+import { useBankTransferScreenParams } from 'app/routers/params'
 
 const getErrorType = (error: unknown): 'network' | 'unknown' => {
   const message = error instanceof Error ? error.message : String(error)
@@ -40,6 +41,7 @@ const getErrorType = (error: unknown): 'network' | 'unknown' => {
 export function BankTransferScreen() {
   const analytics = useAnalytics()
   const { profile } = useUser()
+  const [{ tosSuccess, verificationSuccess }, setScreenParams] = useBankTransferScreenParams()
 
   const {
     data: customer,
@@ -62,16 +64,22 @@ export function BankTransferScreen() {
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
   // Track which step we're waiting for: 'tos', 'kyc', or null
-  // Initialize waiting state based on KYC status - incomplete means user started but hasn't finished
-  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(() =>
-    kycStatus === 'incomplete' ? 'kyc' : null
-  )
+  // Success params act as early signals - verificationSuccess means show confirming state,
+  // tosSuccess means TOS is done so skip to next step (no waiting needed)
+  const [waitingFor, setWaitingFor] = useState<'tos' | 'kyc' | null>(() => {
+    if (verificationSuccess) return 'kyc'
+    // tosSuccess means TOS completed - don't wait, let user proceed to KYC
+    if (tosSuccess) return null
+    return kycStatus === 'incomplete' ? 'kyc' : null
+  })
+  // Track if user just returned from successful KYC verification (for UI changes)
+  const justCompletedVerification = verificationSuccess
   const [showInfo, setShowInfo] = useState(false)
   const hasTrackedDetailsView = useRef(false)
   const hasTrackedInfoView = useRef(false)
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
-  const redirectUri = useRedirectUri()
+  const baseRedirectUri = useRedirectUri()
   const isBusinessProfile = !!profile?.is_business
   const verificationSubject = isBusinessProfile ? 'business' : 'identity'
 
@@ -87,6 +95,11 @@ export function BankTransferScreen() {
           has_tos_accepted: isTosAccepted,
         },
       })
+      // Build redirectUri with success param so we know user completed the flow
+      // when they return (even if DB hasn't synced yet)
+      const successParam = isTosAccepted ? 'verificationSuccess' : 'tosSuccess'
+      const separator = baseRedirectUri.includes('?') ? '&' : '?'
+      const redirectUri = `${baseRedirectUri}${separator}${successParam}=true`
       const result = await initiateKyc.mutateAsync({ redirectUri })
       // If TOS is already accepted, go straight to KYC
       // Otherwise, open TOS link first (Bridge requires TOS acceptance before KYC)
@@ -112,7 +125,7 @@ export function BankTransferScreen() {
         },
       })
     }
-  }, [analytics, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus, redirectUri])
+  }, [analytics, baseRedirectUri, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus])
 
   const handleOpenVerificationLink = useCallback(() => {
     if (verificationUrl) {
@@ -127,17 +140,27 @@ export function BankTransferScreen() {
     }
   }, [analytics, kycStatus, verificationUrl, waitingFor])
 
+  // Clear success params from URL after reading them (clean URL)
+  useEffect(() => {
+    if (tosSuccess) {
+      setScreenParams({ tosSuccess: undefined }, { webBehavior: 'replace' })
+    }
+  }, [tosSuccess, setScreenParams])
+
   // For new users, guide them through the various steps.
   useEffect(() => {
     if (waitingFor === 'tos' && isTosAccepted) {
-      // Now remove waiting for so user can see next step
+      // TOS accepted via DB - clear waiting state
       setWaitingFor(null)
     } else if (waitingFor === 'kyc' && !['incomplete', 'not_started'].includes(kycStatus)) {
       // KYC status changed to a final state (approved, rejected, under_review, etc.)
-      // Now remove the waiting for so user can see next step.
+      // Clear waiting state and URL params
       setWaitingFor(null)
+      if (verificationSuccess) {
+        setScreenParams({ verificationSuccess: undefined }, { webBehavior: 'replace' })
+      }
     }
-  }, [kycStatus, isTosAccepted, waitingFor])
+  }, [kycStatus, isTosAccepted, waitingFor, verificationSuccess, setScreenParams])
 
   // Auto-create static memo once approved
   const {
@@ -242,7 +265,7 @@ export function BankTransferScreen() {
           <Spinner size="large" color={isDarkTheme ? '$primary' : '$color12'} />
           <YStack ai="center" gap="$2">
             <Paragraph size="$8" fontWeight={500} $gtLg={{ size: '$9' }} ta="center">
-              Hold tight...
+              {justCompletedVerification ? 'Almost there!' : 'Hold tight...'}
             </Paragraph>
             <Paragraph
               ta="center"
@@ -250,30 +273,36 @@ export function BankTransferScreen() {
               color="$lightGrayTextField"
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              {waitingFor === 'tos'
-                ? 'Accept the Terms of Service in your browser window.'
-                : 'Complete the verification in your browser window.'}
+              {justCompletedVerification
+                ? 'Verification complete. Confirming your details...'
+                : waitingFor === 'tos'
+                  ? 'Accept the Terms of Service in your browser window.'
+                  : 'Complete the verification in your browser window.'}
             </Paragraph>
-            <Paragraph
-              ta="center"
-              size="$3"
-              color="$lightGrayTextField"
-              $theme-light={{ color: '$darkGrayTextField' }}
-            >
-              Already finished? It may take a few seconds to update.
-            </Paragraph>
+            {!justCompletedVerification && (
+              <Paragraph
+                ta="center"
+                size="$3"
+                color="$lightGrayTextField"
+                $theme-light={{ color: '$darkGrayTextField' }}
+              >
+                Already finished verification? It may take a few seconds to update.
+              </Paragraph>
+            )}
           </YStack>
-          <Anchor
-            size="$4"
-            color="$primary"
-            onPress={handleOpenVerificationLink}
-            cursor="pointer"
-            hoverStyle={{ opacity: 0.8 }}
-          >
-            {waitingFor === 'tos'
-              ? 'Open Terms of Service window again'
-              : 'Open verification window again'}
-          </Anchor>
+          {!justCompletedVerification && (
+            <Anchor
+              size="$4"
+              color="$primary"
+              onPress={handleOpenVerificationLink}
+              cursor="pointer"
+              hoverStyle={{ opacity: 0.8 }}
+            >
+              {waitingFor === 'tos'
+                ? 'Open Terms of Service window again'
+                : 'Open verification window again'}
+            </Anchor>
+          )}
         </FadeCard>
       </YStack>
     )
