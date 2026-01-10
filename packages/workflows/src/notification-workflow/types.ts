@@ -48,6 +48,8 @@ export type SendPushResult = {
   sent: number
   failed: number
   errors?: string[]
+  /** Number of notifications skipped due to missing configuration (e.g., VAPID keys) */
+  skipped?: number
 }
 
 export type CreateNotificationResult = {
