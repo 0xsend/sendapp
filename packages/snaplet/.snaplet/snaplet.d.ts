@@ -66,8 +66,6 @@ interface Table_public_bridge_customers {
   kyc_link_id: string;
   kyc_status: string;
   tos_status: string;
-  full_name: string | null;
-  email: string;
   type: string;
   rejection_reasons: Json | null;
   rejection_attempts: number;

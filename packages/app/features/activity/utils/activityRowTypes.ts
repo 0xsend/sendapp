@@ -13,6 +13,7 @@ interface BaseActivityRow {
   isFirst: boolean
   isLast: boolean
   sectionIndex: number
+  isPending?: boolean // For temporal transfers showing spinner instead of date
 }
 
 // User-to-user transfer (between Send app users)

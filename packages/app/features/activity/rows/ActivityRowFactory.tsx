@@ -5,7 +5,7 @@
  */
 
 import { memo } from 'react'
-import { View, Text, StyleSheet, type TextStyle } from 'react-native'
+import { View, Text, StyleSheet, type TextStyle, ActivityIndicator } from 'react-native'
 import { isWeb } from '@tamagui/constants'
 import { View as TamaguiView } from 'tamagui'
 import { FastImage } from '@my/ui'
@@ -219,6 +219,13 @@ const styles = StyleSheet.create({
   spacer: {
     width: 4,
   },
+  // Spinner container (matches dateTextBase layout)
+  spinnerContainer: {
+    marginTop: 4,
+    height: 16, // Match lineHeight of dateTextBase
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
 })
 
 interface RowBaseProps {
@@ -232,14 +239,7 @@ interface RowData {
   subtitle: string
   amount: string
   date: string
-}
-
-// Shared layout component for all activity rows
-interface RowLayoutProps {
-  avatar: React.ReactNode
-  row: RowData
-  colors: ThemeColors
-  isDark?: boolean
+  isPending?: boolean
 }
 
 // Web hover styles (computed once, not per-render)
@@ -276,12 +276,26 @@ const RowContent = memo(
         <Text style={[styles.subTextBase, { color: colors.color10 }]} numberOfLines={2}>
           {row.subtitle}
         </Text>
-        <Text style={[styles.dateTextBase, { color: colors.color10 }]}>{row.date}</Text>
+        {row.isPending ? (
+          <View style={styles.spinnerContainer}>
+            <ActivityIndicator size="small" color={colors.color10} />
+          </View>
+        ) : (
+          <Text style={[styles.dateTextBase, { color: colors.color10 }]}>{row.date}</Text>
+        )}
       </View>
     </View>
   )
 )
 RowContent.displayName = 'RowContent'
+
+// Shared layout component for all activity rows
+interface RowLayoutProps {
+  avatar: React.ReactNode
+  row: RowData
+  colors: ThemeColors
+  isDark?: boolean
+}
 
 const RowLayout = memo(({ avatar, row, colors, isDark = true }: RowLayoutProps) => {
   if (isWeb) {

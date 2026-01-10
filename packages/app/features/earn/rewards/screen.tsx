@@ -1,12 +1,12 @@
 import {
   Card,
   Fade,
-  H4,
   Paragraph,
   PrimaryButton,
   ScrollView,
   Spinner,
   useAppToast,
+  useThemeName,
   XStack,
   YStack,
   Separator,
@@ -15,26 +15,30 @@ import { sendBaseMainnetBundlerClient, entryPointAddress } from '@my/wagmi'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { IconCoin } from 'app/components/icons/IconCoin'
 import type { CoinWithBalance } from 'app/data/coins'
+import { ActivityRowFactory, getColors } from 'app/features/activity/rows/ActivityRowFactory'
+import { isHeaderRow } from 'app/features/activity/utils/activityRowTypes'
+import { transformActivitiesToRows } from 'app/features/activity/utils/activityTransform'
 import { useSendEarn } from 'app/features/earn/providers/SendEarnProvider'
 import { useERC20AssetCoin } from 'app/features/earn/params'
 import { useSendEarnClaimRewardsCalls } from 'app/features/earn/rewards/hooks'
-import { TokenActivityRow } from 'app/features/home/TokenActivityRow'
+import { TokenDetailsMarketData } from 'app/features/home/TokenDetailsHeader'
+import { useCoin } from 'app/provider/coins'
 import { assert } from 'app/utils/assert'
 import { formatCoinAmount } from 'app/utils/formatCoinAmount'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { signUserOp } from 'app/utils/signUserOp'
 import { toNiceError } from 'app/utils/toNiceError'
+import { useAddressBook } from 'app/utils/useAddressBook'
+import { useLiquidityPools } from 'app/utils/useLiquidityPools'
 import { useAccountNonce, useUserOp } from 'app/utils/userop'
+import { useSwapRouters } from 'app/utils/useSwapRouters'
 import debug from 'debug'
-import { useMemo, useRef, useState } from 'react'
-import { Platform, SectionList } from 'react-native'
+import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Platform } from 'react-native'
 import { formatUnits, withRetry } from 'viem'
 import { useChainId } from 'wagmi'
 import { useEarnRewardsActivityFeed } from './hooks'
-import { TokenDetailsMarketData } from 'app/features/home/TokenDetailsHeader'
-import { useCoin } from 'app/provider/coins'
-import { useTranslation } from 'react-i18next'
-import { useSendScreenParams } from 'app/routers/params'
 
 const log = debug('app:features:earn:rewards')
 
@@ -252,117 +256,102 @@ function RewardsBalance() {
 }
 
 const RewardsFeed = () => {
+  const { t: tActivity, i18n } = useTranslation('activity')
+  const { t: tEarn } = useTranslation('earn')
+  const locale = i18n.resolvedLanguage ?? i18n.language ?? 'en'
+  const theme = useThemeName()
+  const isDark = theme.includes('dark')
+
   const coin = useERC20AssetCoin()
   const { data, isLoading, error, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useEarnRewardsActivityFeed({
       pageSize: 10,
     })
-  const { t, i18n } = useTranslation('earn')
 
-  const sections = useMemo(() => {
+  // Get data for transform context
+  const { data: swapRouters } = useSwapRouters()
+  const { data: liquidityPools } = useLiquidityPools()
+  const { data: addressBook } = useAddressBook()
+
+  // Transform activities to rows
+  const processedData = useMemo(() => {
     if (!data?.pages) return []
+    return transformActivitiesToRows(data.pages, {
+      t: tActivity,
+      locale,
+      swapRouters,
+      liquidityPools,
+      addressBook,
+    })
+  }, [data?.pages, tActivity, locale, swapRouters, liquidityPools, addressBook])
 
-    const activities = data.pages.flat()
-    const locale = i18n.resolvedLanguage ?? i18n.language
-    const groups = activities.reduce<Record<string, typeof activities>>((acc, activity) => {
-      const activityDate = new Date(activity.created_at)
-      const isToday = activityDate.toDateString() === new Date().toDateString()
-      const dateKey = isToday
-        ? t('rewards.feed.today')
-        : activityDate.toLocaleDateString(locale, {
-            day: 'numeric',
-            month: 'long',
-          })
+  // Compute colors once
+  const colors = useMemo(() => getColors(isDark), [isDark])
 
-      if (!acc[dateKey]) {
-        acc[dateKey] = []
-      }
-
-      acc[dateKey].push(activity)
-      return acc
-    }, {})
-
-    return Object.entries(groups).map(([title, data], index) => ({
-      title,
-      data,
-      index,
-    }))
-  }, [data?.pages, i18n.language, i18n.resolvedLanguage, t])
-
-  const sendParamsAndSet = useSendScreenParams()
-
-  const sendParamsRef = useRef(sendParamsAndSet)
-  sendParamsRef.current = sendParamsAndSet
+  // Handle reaching end of list for pagination
+  const handleLoadMore = useMemo(() => {
+    if (!hasNextPage || isFetchingNextPage) return undefined
+    return () => fetchNextPage()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   if (!coin.isSuccess || !coin.data) return null
   if (isLoading) return <Spinner size="small" />
-  if (error) return <Paragraph>{t('rewards.history.error', { message: error.message })}</Paragraph>
-  if (!sections.length) return <Paragraph>{t('rewards.history.empty')}</Paragraph>
+  if (error)
+    return <Paragraph>{tEarn('rewards.history.error', { message: error.message })}</Paragraph>
+  if (!processedData.length) return <Paragraph>{tEarn('rewards.history.empty')}</Paragraph>
 
   return (
     <Fade>
-      <SectionList
-        sections={sections}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(activity) => `${activity.event_name}-${activity.created_at.getTime()}`}
-        renderItem={({ item: activity, index, section }) => (
-          <YStack
-            bc="$color1"
-            px="$2"
-            $gtLg={{
-              px: '$3.5',
-            }}
-            {...(index === 0 &&
-              Platform.OS === 'web' && {
-                pt: '$2',
-                $gtLg: {
-                  pt: '$3.5',
-                },
-                borderTopLeftRadius: '$6',
-                borderTopRightRadius: '$6',
+      <YStack gap="$0">
+        {processedData.map((item) => {
+          if (isHeaderRow(item)) {
+            return (
+              <ActivityRowFactory
+                key={`header-${item.sectionIndex}-${item.title}`}
+                item={item}
+                colors={colors}
+                isDark={isDark}
+              />
+            )
+          }
+
+          return (
+            <YStack
+              key={item.eventId}
+              bc="$color1"
+              p={10}
+              h={122}
+              mah={122}
+              {...(item.isFirst && {
+                borderTopLeftRadius: '$4',
+                borderTopRightRadius: '$4',
               })}
-            {...(index === section.data.length - 1 && {
-              pb: '$2',
-              $gtLg: {
-                pb: '$3.5',
-              },
-              borderBottomLeftRadius: '$6',
-              borderBottomRightRadius: '$6',
-            })}
-          >
-            <TokenActivityRow activity={activity} sendParamsRef={sendParamsRef} />
-          </YStack>
-        )}
-        renderSectionHeader={({ section: { title, index } }) =>
-          Platform.OS === 'web' ? (
-            <H4
-              fontWeight={'600'}
-              size={'$7'}
-              pt={index === 0 ? 0 : '$3.5'}
-              pb={'$3.5'}
-              bc={'$background'}
+              {...(item.isLast && {
+                borderBottomLeftRadius: '$4',
+                borderBottomRightRadius: '$4',
+              })}
             >
-              {title}
-            </H4>
-          ) : (
-            <XStack
-              mt={index === 0 ? 0 : '$3.5'}
-              p={'$3.5'}
-              pb={0}
-              bc={'$color1'}
-              borderTopLeftRadius={'$6'}
-              borderTopRightRadius={'$6'}
-            >
-              <Paragraph fontWeight={'900'} size={'$5'}>
-                {title}
-              </Paragraph>
-            </XStack>
+              <ActivityRowFactory item={item} colors={colors} isDark={isDark} />
+            </YStack>
           )
-        }
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        ListFooterComponent={!isLoading && isFetchingNextPage ? <Spinner size="small" /> : null}
-        stickySectionHeadersEnabled={true}
-      />
+        })}
+        {hasNextPage && (
+          <XStack jc="center" py="$4">
+            {isFetchingNextPage ? (
+              <Spinner size="small" />
+            ) : (
+              <Paragraph
+                color="$color10"
+                pressStyle={{ opacity: 0.7 }}
+                onPress={handleLoadMore}
+                cursor="pointer"
+              >
+                Load more
+              </Paragraph>
+            )}
+          </XStack>
+        )}
+      </YStack>
     </Fade>
   )
 }
