@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'solito/router'
 import debugBase from 'debug'
 import { useQueryClient } from '@tanstack/react-query'
+import { analytics } from 'app/analytics'
 
 const debug = debugBase('app:utils:useRedirectAfterSignOut')
 
@@ -14,6 +15,7 @@ const useRedirectAfterSignOut = () => {
     const signOutListener = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         debug('SIGNED_OUT - clearing all caches')
+        analytics.reset()
         // Clear all cached queries to prevent stale data between logins
         queryClient.clear()
         router.replace('/')
