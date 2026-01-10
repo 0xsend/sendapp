@@ -26,7 +26,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
 
       if (!analytics.isInitialized()) return
 
-      if (!isUserLoading) return
+      if (isUserLoading) return
 
       if (!profile?.send_id) return
 
