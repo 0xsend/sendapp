@@ -7,12 +7,11 @@ const requiredEnvVars = [
   'SUPABASE_DB_URL',
   'SUPABASE_JWT_SECRET',
   'SUPABASE_SERVICE_ROLE',
-  'VAPID_PUBLIC_KEY',
-  'VAPID_PRIVATE_KEY',
-  'VAPID_SUBJECT',
 ] as const
 
-const optionalEnvVars = ['DEBUG']
+// VAPID keys are optional for local dev - web push notifications will be skipped if not configured
+// (see sendWebPushNotifications in notification-workflow/activities.ts)
+const optionalEnvVars = ['DEBUG', 'VAPID_PUBLIC_KEY', 'VAPID_PRIVATE_KEY', 'VAPID_SUBJECT']
 
 /**
  * Bootstraps the workflow by setting up the environment variables that many of our clients depend on.

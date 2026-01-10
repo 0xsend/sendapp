@@ -75,6 +75,21 @@ declare global {
        * Intercom app id
        */
       NEXT_PUBLIC_INTERCOM_APP_ID: string
+
+      /**
+       * VAPID subject for web push notifications (mailto: or https: URL)
+       */
+      VAPID_SUBJECT?: string
+      /**
+       * VAPID public key for web push notifications (base64 encoded)
+       * Optional for local dev - web push will be skipped if not configured
+       */
+      VAPID_PUBLIC_KEY?: string
+      /**
+       * VAPID private key for web push notifications (base64 encoded)
+       * Optional for local dev - web push will be skipped if not configured
+       */
+      VAPID_PRIVATE_KEY?: string
     }
   }
   /**
