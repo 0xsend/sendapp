@@ -127,14 +127,67 @@ const InvestmentsBalanceCardInvestButton = ({
   )
 }
 
-const InvestmentsBalanceCardBody = () => (
-  <YStack w={'100%'} gap={'$3'}>
-    <XStack ai="center" gap={'$2.5'}>
-      <InvestmentsBalanceCardBalance />
-      <InvestmentsAggregate />
-    </XStack>
-    <InvestmentsWeeklyDelta />
-  </YStack>
+interface InvestmentsBalanceCardBodyProps {
+  isLoadingMarket: boolean
+  isPriceHidden: boolean
+  pct24h: number
+  sign: string
+  formattedDeltaUSD: string
+}
+
+const InvestmentsBalanceCardBody = ({
+  isLoadingMarket,
+  isPriceHidden,
+  pct24h,
+  sign,
+  formattedDeltaUSD,
+}: InvestmentsBalanceCardBodyProps) => (
+  <XStack jc="space-between">
+    <YStack fs={0} gap={'$3'}>
+      <XStack ai="center" gap={'$2.5'}>
+        <InvestmentsBalanceCardBalance />
+        <InvestmentsAggregate />
+      </XStack>
+      <InvestmentsWeeklyDelta />
+    </YStack>
+    <Card jc={'center'} ai={'center'} shop={0} elevationAndroid={0}>
+      <YStack gap={'$2'} jc={'center'} ai={'center'}>
+        <Paragraph color={'$color10'} size={'$4'}>
+          Today
+        </Paragraph>
+        {isLoadingMarket ? (
+          <YStack gap="$2">
+            <Shimmer w={60} h={20} br={5} />
+            <Shimmer w={60} h={20} br={5} />
+          </YStack>
+        ) : (
+          <YStack ai={'center'} gap={'$2'}>
+            <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
+              {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD}`}
+            </Paragraph>
+            {/* Small neutral pill to mirror style (no color change) */}
+            <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
+              <XStack
+                bc={'$color2'}
+                $theme-dark={{
+                  bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.2)' : 'rgba(229, 115, 115, 0.2)',
+                }}
+                $theme-light={{
+                  bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.16)' : 'rgba(229, 115, 115, 0.16)',
+                }}
+                px={'$1.5'}
+                br={'$2'}
+              >
+                <Paragraph fontSize={'$2'} fontWeight={400}>
+                  {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
+                </Paragraph>
+              </XStack>
+            </Theme>
+          </YStack>
+        )}
+      </YStack>
+    </Card>
+  </XStack>
 )
 
 const InvestmentsBalanceCardBalance = (props: ParagraphProps) => {

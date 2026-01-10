@@ -16,13 +16,13 @@ export const InvestmentsBalanceList = ({ coins }: { coins: CoinWithBalance[] }) 
   const { data: tokensMarketData, isLoading: isLoadingTokensMarketData } = useTokensMarketData()
 
   return coins.map((coin) => (
-    <Fragment key={`token-balance-list-${coin.label}`}>
+    <YStack py="$1" key={`token-balance-list-${coin.label}`}>
       <TokenBalanceItem
         coin={coin}
         tokensMarketData={tokensMarketData}
         isLoadingTokensMarketData={isLoadingTokensMarketData}
       />
-    </Fragment>
+    </YStack>
   ))
 }
 
