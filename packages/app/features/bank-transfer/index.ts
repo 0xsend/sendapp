@@ -2,7 +2,6 @@
 export {
   useBridgeCustomer,
   useInitiateKyc,
-  useKycStatus,
   useSyncKycStatus,
   BRIDGE_CUSTOMER_QUERY_KEY,
 } from './useBridgeCustomer'

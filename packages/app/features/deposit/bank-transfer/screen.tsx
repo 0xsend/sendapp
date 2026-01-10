@@ -14,7 +14,7 @@ import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
 import { KycStatusCard } from './KycStatusCard'
 import {
   useBridgeGeoBlock,
-  useKycStatus,
+  useBridgeCustomer,
   useInitiateKyc,
   useSyncKycStatus,
   useCreateStaticMemo,
@@ -24,7 +24,6 @@ import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
 import { useAnalytics } from 'app/provider/analytics'
 import { useUser } from 'app/utils/useUser'
-import { useBankTransferScreenParams } from 'app/routers/params'
 
 const getErrorType = (error: unknown): 'network' | 'unknown' => {
   const message = error instanceof Error ? error.message : String(error)
@@ -43,64 +42,15 @@ export function BankTransferScreen() {
   const { profile } = useUser()
 
   const {
-    kycLinkId,
-    kycStatus: kycStatusFromDb,
-    isTosAccepted: isTosAcceptedFromDb,
-    isApproved,
+    data: customer,
     rejectionReasons,
     isMaxAttemptsExceeded,
     isLoading: kycLoading,
-  } = useKycStatus()
-
-  // Get redirect params from Bridge callback URL
-  const [redirectParams, setRedirectParams] = useBankTransferScreenParams()
-  const hasRedirectParams = useRef(false)
-
-  // Track redirect status separately - this allows immediate display of status from redirect
-  // before polling catches up, avoiding the brief "incomplete" flash
-  const [redirectKycStatus, setRedirectKycStatus] = useState<string | null>(null)
-  const [redirectTosStatus, setRedirectTosStatus] = useState<string | null>(null)
-
-  // Process redirect params once on mount/when they change
-  useEffect(() => {
-    const { kyc_status, tos_status } = redirectParams
-    // Only process if we have redirect params and haven't processed them yet
-    if ((kyc_status || tos_status) && !hasRedirectParams.current) {
-      hasRedirectParams.current = true
-
-      // If Bridge returned a status that isn't 'incomplete', use it for immediate display
-      if (kyc_status && kyc_status !== 'incomplete') {
-        setRedirectKycStatus(kyc_status)
-      }
-      if (tos_status) {
-        setRedirectTosStatus(tos_status)
-      }
-
-      // Clear the URL params after processing
-      setRedirectParams(
-        { kyc_status: undefined, tos_status: undefined, customer_id: undefined },
-        { webBehavior: 'replace' }
-      )
-    }
-  }, [redirectParams, setRedirectParams])
-
-  // Clear redirect status once DB status catches up (is no longer 'incomplete' or matches redirect)
-  useEffect(() => {
-    if (
-      redirectKycStatus &&
-      kycStatusFromDb !== 'incomplete' &&
-      kycStatusFromDb !== 'not_started'
-    ) {
-      setRedirectKycStatus(null)
-    }
-    if (redirectTosStatus && isTosAcceptedFromDb) {
-      setRedirectTosStatus(null)
-    }
-  }, [kycStatusFromDb, isTosAcceptedFromDb, redirectKycStatus, redirectTosStatus])
-
-  // Use redirect status if available, otherwise fall back to DB status
-  const kycStatus = redirectKycStatus ?? kycStatusFromDb
-  const isTosAccepted = redirectTosStatus === 'approved' || isTosAcceptedFromDb
+  } = useBridgeCustomer()
+  const kycLinkId = customer?.kyc_link_id ?? null
+  const kycStatus = customer?.kyc_status ?? 'not_started'
+  const isTosAccepted = customer?.tos_status === 'approved'
+  const isApproved = customer?.kyc_status === 'approved'
 
   // Sync KYC status from Bridge API to DB for faster updates
   // Sync when: has kycLinkId AND not approved AND not (rejected with max attempts)

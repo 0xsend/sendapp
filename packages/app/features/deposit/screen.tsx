@@ -5,12 +5,13 @@ import { IconApple, IconDebitCard, IconWallet, IconDollar } from 'app/components
 import { useTranslation } from 'react-i18next'
 import { useBridgeVirtualBankAccountEnabled } from 'app/utils/useFeatureFlag'
 import { Platform } from 'react-native'
-import { useBridgeGeoBlock, useKycStatus } from 'app/features/bank-transfer'
+import { useBridgeGeoBlock, useBridgeCustomer } from 'app/features/bank-transfer'
 
 export function DepositScreen() {
   const { t } = useTranslation('deposit')
   const isBridgeVirtualBankAccountEnabled = useBridgeVirtualBankAccountEnabled()
-  const { isApproved } = useKycStatus()
+  const { data: customer } = useBridgeCustomer()
+  const isApproved = customer?.kyc_status === 'approved'
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const geoblockEnabled =
     process.env.NEXT_PUBLIC_GEOBLOCK_BANK_TRANSFER ?? process.env.NEXT_PUBLIC_GEOBLOCK
