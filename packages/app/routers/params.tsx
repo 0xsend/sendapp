@@ -446,6 +446,52 @@ const useDepositScreenParamsBase = () => {
 
 export const useDepositScreenParams = withRootParams(useDepositScreenParamsBase)
 
+// Bank Transfer Screen Params (for Bridge KYC redirect)
+export type BankTransferScreenParams = {
+  /** KYC status returned from Bridge redirect */
+  kyc_status?: string
+  /** TOS status returned from Bridge redirect */
+  tos_status?: string
+  /** Customer ID returned from Bridge redirect */
+  customer_id?: string
+}
+
+const { useParam: useBankTransferParam, useParams: useBankTransferParams } =
+  createParam<BankTransferScreenParams>()
+
+const useBridgeKycStatus = () => {
+  const [kyc_status, setKycStatus] = useBankTransferParam('kyc_status')
+  return [kyc_status, setKycStatus] as const
+}
+
+const useBridgeTosStatus = () => {
+  const [tos_status, setTosStatus] = useBankTransferParam('tos_status')
+  return [tos_status, setTosStatus] as const
+}
+
+const useBridgeCustomerId = () => {
+  const [customer_id, setCustomerId] = useBankTransferParam('customer_id')
+  return [customer_id, setCustomerId] as const
+}
+
+const useBankTransferScreenParamsBase = () => {
+  const { setParams } = useBankTransferParams()
+  const [kyc_status] = useBridgeKycStatus()
+  const [tos_status] = useBridgeTosStatus()
+  const [customer_id] = useBridgeCustomerId()
+
+  return [
+    {
+      kyc_status,
+      tos_status,
+      customer_id,
+    },
+    setParams,
+  ] as const
+}
+
+export const useBankTransferScreenParams = withRootParams(useBankTransferScreenParamsBase)
+
 // Contacts Screen Params
 export type ContactsScreenParams = {
   /** Label ID to filter contacts by */
