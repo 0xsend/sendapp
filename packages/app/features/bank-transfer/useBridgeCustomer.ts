@@ -42,16 +42,10 @@ function extractCustomerRejectionReasons(input: unknown): string[] {
   return Array.from(new Set(reasons))
 }
 
-type UseBridgeCustomerOptions = {
-  /** Polling interval in ms. Set to false to disable polling. Default: 5000 */
-  refetchInterval?: number | false
-}
-
 /**
  * Hook to fetch the current user's Bridge customer record
  */
-export function useBridgeCustomer(options?: UseBridgeCustomerOptions) {
-  const { refetchInterval = 5_000 } = options ?? {}
+export function useBridgeCustomer() {
   const { user, profile, isLoadingProfile } = useUser()
   const supabase = useSupabase()
   const customerType = profile?.is_business ? 'business' : 'individual'
@@ -77,7 +71,7 @@ export function useBridgeCustomer(options?: UseBridgeCustomerOptions) {
       return data
     },
     staleTime: 5_000,
-    refetchInterval,
+    refetchInterval: 5_000,
   })
 
   return {
@@ -135,12 +129,9 @@ export function useInitiateKyc() {
 
 /**
  * Check if user has completed KYC
- *
- * @param options.refetchInterval - Polling interval in ms. Set to false to disable
- *   polling (e.g., when useSyncKycStatus is active). Default: 5000
  */
-export function useKycStatus(options?: UseBridgeCustomerOptions) {
-  const { data: customer, isLoading, error, refetch } = useBridgeCustomer(options)
+export function useKycStatus() {
+  const { data: customer, isLoading, error, refetch } = useBridgeCustomer()
   const rejectionReasons = extractCustomerRejectionReasons(customer?.rejection_reasons)
   const rejectionAttempts = customer?.rejection_attempts ?? 0
   const isMaxAttemptsExceeded = rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS
