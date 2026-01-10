@@ -22,8 +22,6 @@ function getStatusText(status: string, isBusinessProfile: boolean): string {
       return 'Verification Failed'
     case 'under_review':
       return 'Under Review'
-    case 'incomplete':
-      return 'Verification Incomplete'
     case 'awaiting_questionnaire':
       return 'Awaiting Questionnaire'
     case 'awaiting_ubo':
@@ -47,8 +45,6 @@ function getStatusDescription(status: string, isBusinessProfile: boolean): strin
         : 'Your identity verification was not successful.'
     case 'under_review':
       return 'Your verification is being reviewed. This usually takes 1-2 business days.'
-    case 'incomplete':
-      return 'Complete the verification process to start depositing from your bank.'
     case 'awaiting_questionnaire':
       return 'We are awaiting for you to fill out the questionnaire. Open the verification link to complete it.'
     case 'awaiting_ubo':
@@ -117,23 +113,16 @@ export function KycStatusCard({
   children,
 }: KycStatusCardProps) {
   // Don't show button if max attempts exceeded
-  const showStartButton =
-    !isMaxAttemptsExceeded &&
-    (kycStatus === 'not_started' ||
-      kycStatus === 'incomplete' ||
-      kycStatus === 'awaiting_questionnaire' ||
-      kycStatus === 'awaiting_ubo' ||
-      kycStatus === 'rejected')
+  const showStartButton = !isMaxAttemptsExceeded && kycStatus !== 'rejected'
   const isNewUser = kycStatus === 'not_started'
-  const needsTos = !isTosAccepted && (isNewUser || kycStatus === 'incomplete')
 
   // Determine button label based on current step
   let buttonLabel = 'Continue Verification'
   if (kycStatus === 'rejected') {
     buttonLabel = 'Try Again'
-  } else if (needsTos) {
+  } else if (!isTosAccepted) {
     buttonLabel = 'Accept Terms of Service'
-  } else if (isNewUser || kycStatus === 'incomplete') {
+  } else if (isNewUser) {
     buttonLabel = isBusinessProfile ? 'Verify Business' : 'Verify Identity'
   }
 

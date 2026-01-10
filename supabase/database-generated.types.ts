@@ -153,6 +153,7 @@ export type Database = {
           payment_rail: string
           sender_name: string | null
           sender_routing_number: string | null
+          static_memo_id: string | null
           status: string
           trace_number: string | null
           transfer_template_id: string | null
@@ -173,6 +174,7 @@ export type Database = {
           payment_rail: string
           sender_name?: string | null
           sender_routing_number?: string | null
+          static_memo_id?: string | null
           status?: string
           trace_number?: string | null
           transfer_template_id?: string | null
@@ -193,6 +195,7 @@ export type Database = {
           payment_rail?: string
           sender_name?: string | null
           sender_routing_number?: string | null
+          static_memo_id?: string | null
           status?: string
           trace_number?: string | null
           transfer_template_id?: string | null
@@ -200,6 +203,13 @@ export type Database = {
           virtual_account_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bridge_deposits_static_memo_id_fkey"
+            columns: ["static_memo_id"]
+            isOneToOne: false
+            referencedRelation: "bridge_static_memos"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bridge_deposits_transfer_template_id_fkey"
             columns: ["transfer_template_id"]
@@ -212,6 +222,63 @@ export type Database = {
             columns: ["virtual_account_id"]
             isOneToOne: false
             referencedRelation: "bridge_virtual_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bridge_static_memos: {
+        Row: {
+          bridge_customer_id: string
+          bridge_static_memo_id: string
+          created_at: string
+          destination_address: string
+          destination_currency: string
+          destination_payment_rail: string
+          id: string
+          source_currency: string
+          source_deposit_instructions: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bridge_customer_id: string
+          bridge_static_memo_id: string
+          created_at?: string
+          destination_address: string
+          destination_currency?: string
+          destination_payment_rail?: string
+          id?: string
+          source_currency?: string
+          source_deposit_instructions?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bridge_customer_id?: string
+          bridge_static_memo_id?: string
+          created_at?: string
+          destination_address?: string
+          destination_currency?: string
+          destination_payment_rail?: string
+          id?: string
+          source_currency?: string
+          source_deposit_instructions?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bridge_static_memos_bridge_customer_id_fkey"
+            columns: ["bridge_customer_id"]
+            isOneToOne: false
+            referencedRelation: "bridge_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bridge_static_memos_bridge_customer_id_fkey"
+            columns: ["bridge_customer_id"]
+            isOneToOne: false
+            referencedRelation: "bridge_customers_safe"
             referencedColumns: ["id"]
           },
         ]

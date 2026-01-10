@@ -2,7 +2,6 @@
 export {
   useBridgeCustomer,
   useInitiateKyc,
-  useKycStatus,
   useSyncKycStatus,
   BRIDGE_CUSTOMER_QUERY_KEY,
 } from './useBridgeCustomer'
@@ -20,6 +19,13 @@ export {
   useTransferTemplateBankAccountDetails,
   BRIDGE_TRANSFER_TEMPLATE_QUERY_KEY,
 } from './useBridgeTransferTemplate'
+
+export {
+  useBridgeStaticMemo,
+  useCreateStaticMemo,
+  useStaticMemoBankAccountDetails,
+  BRIDGE_STATIC_MEMO_QUERY_KEY,
+} from './useBridgeStaticMemo'
 
 export { useBridgeGeoBlock } from './useBridgeGeoBlock'
 

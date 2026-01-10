@@ -7,6 +7,7 @@ import {
   extractKycStatusFromEvent,
   extractDepositStatusFromEvent,
   isKycEvent,
+  isStaticMemoActivityEvent,
   isVirtualAccountActivityEvent,
   isTransferEvent,
 } from '@my/bridge'
@@ -151,6 +152,10 @@ async function handleVirtualAccountDepositEvent(event: WebhookEvent): Promise<vo
     : null
   const netAmount = receipt.final_amount ? Number(receipt.final_amount) : null
   const grossAmount = data.subtotal_amount ?? data.amount
+  if (grossAmount == null) {
+    log('missing amount for static memo event: depositId=%s', depositId)
+    return
+  }
 
   log(
     'processing deposit event: depositId=%s status=%s amount=%s',
@@ -205,6 +210,134 @@ async function handleVirtualAccountDepositEvent(event: WebhookEvent): Promise<vo
   }
 
   log('updated deposit status: depositId=%s status=%s', depositId, depositStatus)
+}
+
+/**
+ * Handle deposit-related webhook events for static memos
+ */
+async function handleStaticMemoDepositEvent(event: WebhookEvent): Promise<void> {
+  const depositStatus = extractDepositStatusFromEvent(event)
+  if (!depositStatus) {
+    log('could not extract static memo status from event type: %s', event.event_type)
+    return
+  }
+
+  const data = event.event_object as {
+    id: string
+    static_memo_id?: string | null
+    deposit_id?: string | null
+    type?: string | null
+    amount?: string | number | null
+    currency?: string | null
+    subtotal_amount?: string | number | null
+    destination_tx_hash?: string | null
+    source?: {
+      payment_rail?: string
+      sender_bank_routing_number?: string
+      bank_routing_number?: string
+      sender_name?: string
+      originator_name?: string
+      bank_beneficiary_name?: string
+      trace_number?: string
+      imad?: string
+      omad?: string
+    }
+    exchange_fee_amount?: string
+    developer_fee_amount?: string
+    gas_fee?: string
+    receipt?: {
+      developer_fee?: string
+      exchange_fee?: string
+      gas_fee?: string
+      final_amount?: string
+      destination_tx_hash?: string
+    }
+  }
+
+  const depositId = data.deposit_id ?? null
+  if (!depositId) {
+    log('no deposit_id in static memo event data, skipping')
+    return
+  }
+
+  const staticMemoId = data.static_memo_id ?? null
+  if (!staticMemoId) {
+    log('no static_memo_id in event data, skipping')
+    return
+  }
+
+  const source = data.source ?? {}
+  const receipt = data.receipt ?? {}
+
+  // Default to 'ach_push' as it's the most common rail for USD deposits
+  // DB constraint only allows 'ach_push' or 'wire'
+  const paymentRail = source.payment_rail ?? 'ach_push'
+  const senderRoutingNumber =
+    source.sender_bank_routing_number ?? source.bank_routing_number ?? null
+  const senderName =
+    source.sender_name ?? source.originator_name ?? source.bank_beneficiary_name ?? null
+  const traceNumber = source.trace_number ?? source.imad ?? source.omad ?? null
+  const destinationTxHash = data.destination_tx_hash ?? receipt.destination_tx_hash ?? null
+
+  const feePieces = [
+    receipt.developer_fee ?? data.developer_fee_amount,
+    receipt.exchange_fee ?? data.exchange_fee_amount,
+    receipt.gas_fee ?? data.gas_fee,
+  ].filter((value) => value != null)
+  const feeAmount = feePieces.length
+    ? feePieces.reduce((sum, value) => sum + Number(value), 0)
+    : null
+  const netAmount = receipt.final_amount ? Number(receipt.final_amount) : null
+  const grossAmount = data.subtotal_amount ?? data.amount
+
+  log(
+    'processing static memo deposit event: depositId=%s status=%s amount=%s',
+    depositId,
+    depositStatus,
+    grossAmount
+  )
+
+  const supabase = createSupabaseAdminClient()
+
+  const { data: staticMemo, error: memoError } = await supabase
+    .from('bridge_static_memos')
+    .select('id')
+    .eq('bridge_static_memo_id', staticMemoId)
+    .single()
+
+  if (memoError || !staticMemo) {
+    log('static memo not found: bridgeStaticMemoId=%s error=%O', staticMemoId, memoError)
+    throw memoError ?? new Error('Static memo not found')
+  }
+
+  const currency = data.currency ?? 'usd'
+
+  const { error: depositError } = await supabase.from('bridge_deposits').upsert(
+    {
+      bridge_transfer_id: depositId,
+      static_memo_id: staticMemo.id,
+      status: depositStatus,
+      payment_rail: paymentRail,
+      amount: Number(grossAmount),
+      currency,
+      sender_name: senderName,
+      sender_routing_number: senderRoutingNumber,
+      trace_number: traceNumber,
+      destination_tx_hash: destinationTxHash,
+      fee_amount: feeAmount,
+      net_amount: netAmount,
+      last_event_id: event.event_id,
+      last_event_type: event.event_type,
+    },
+    { onConflict: 'bridge_transfer_id' }
+  )
+
+  if (depositError) {
+    log('failed to upsert static memo deposit: depositId=%s error=%O', depositId, depositError)
+    throw depositError
+  }
+
+  log('updated static memo deposit status: depositId=%s status=%s', depositId, depositStatus)
 }
 
 /**
@@ -429,6 +562,8 @@ async function handleWebhookEvent(event: WebhookEvent): Promise<void> {
 
   if (isTransferEvent(event)) {
     await handleTransferDepositEvent(event)
+  } else if (isStaticMemoActivityEvent(event)) {
+    await handleStaticMemoDepositEvent(event)
   } else if (isVirtualAccountActivityEvent(event)) {
     const activityType = getVirtualAccountActivityType(event)
     if (!activityType) {

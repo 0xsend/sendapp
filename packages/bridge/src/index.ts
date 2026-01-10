@@ -8,6 +8,7 @@ export {
   extractTosStatusFromEvent,
   extractDepositStatusFromEvent,
   isKycEvent,
+  isStaticMemoActivityEvent,
   isVirtualAccountActivityEvent,
   isTransferEvent,
 } from './webhooks'

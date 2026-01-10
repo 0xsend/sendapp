@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_deposits" (
     "id" "uuid" PRIMARY KEY DEFAULT gen_random_uuid(),
     "virtual_account_id" "uuid",
     "transfer_template_id" "uuid",
+    "static_memo_id" "uuid",
     "bridge_transfer_id" "text" UNIQUE NOT NULL,
     "last_event_id" "text",
     "last_event_type" "text",
@@ -22,7 +23,9 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_deposits" (
     "updated_at" timestamp with time zone NOT NULL DEFAULT now(),
 
     CONSTRAINT "bridge_deposits_source_check" CHECK (
-        "virtual_account_id" IS NOT NULL OR "transfer_template_id" IS NOT NULL
+        "virtual_account_id" IS NOT NULL
+        OR "transfer_template_id" IS NOT NULL
+        OR "static_memo_id" IS NOT NULL
     ),
     CONSTRAINT "bridge_deposits_status_check" CHECK (
         "status" IN (
@@ -51,6 +54,7 @@ ALTER TABLE "public"."bridge_deposits" OWNER TO "postgres";
 -- Indexes
 CREATE INDEX IF NOT EXISTS "bridge_deposits_virtual_account_id_idx" ON "public"."bridge_deposits" ("virtual_account_id");
 CREATE INDEX IF NOT EXISTS "bridge_deposits_transfer_template_id_idx" ON "public"."bridge_deposits" ("transfer_template_id");
+CREATE INDEX IF NOT EXISTS "bridge_deposits_static_memo_id_idx" ON "public"."bridge_deposits" ("static_memo_id");
 CREATE INDEX IF NOT EXISTS "bridge_deposits_status_idx" ON "public"."bridge_deposits" ("status");
 CREATE INDEX IF NOT EXISTS "bridge_deposits_created_at_idx" ON "public"."bridge_deposits" ("created_at" DESC);
 
@@ -59,6 +63,8 @@ ALTER TABLE ONLY "public"."bridge_deposits"
     ADD CONSTRAINT "bridge_deposits_virtual_account_id_fkey" FOREIGN KEY ("virtual_account_id") REFERENCES "public"."bridge_virtual_accounts"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "public"."bridge_deposits"
     ADD CONSTRAINT "bridge_deposits_transfer_template_id_fkey" FOREIGN KEY ("transfer_template_id") REFERENCES "public"."bridge_transfer_templates"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "public"."bridge_deposits"
+    ADD CONSTRAINT "bridge_deposits_static_memo_id_fkey" FOREIGN KEY ("static_memo_id") REFERENCES "public"."bridge_static_memos"("id") ON DELETE CASCADE;
 
 -- RLS
 ALTER TABLE "public"."bridge_deposits" ENABLE ROW LEVEL SECURITY;
@@ -76,6 +82,12 @@ CREATE POLICY "Users can view own deposits"
             SELECT 1 FROM "public"."bridge_transfer_templates" btt
             JOIN "public"."bridge_customers" bc ON bc."id" = btt."bridge_customer_id"
             WHERE btt."id" = "bridge_deposits"."transfer_template_id"
+            AND bc."user_id" = (SELECT auth.uid())
+        )
+        OR EXISTS (
+            SELECT 1 FROM "public"."bridge_static_memos" bsm
+            JOIN "public"."bridge_customers" bc ON bc."id" = bsm."bridge_customer_id"
+            WHERE bsm."id" = "bridge_deposits"."static_memo_id"
             AND bc."user_id" = (SELECT auth.uid())
         )
     );
