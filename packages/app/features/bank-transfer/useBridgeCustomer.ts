@@ -139,6 +139,7 @@ export function useKycStatus() {
   return {
     isLoading,
     error,
+    kycLinkId: customer?.kyc_link_id ?? null,
     kycStatus: customer?.kyc_status ?? 'not_started',
     tosStatus: customer?.tos_status ?? 'pending',
     isTosAccepted: customer?.tos_status === 'approved',
@@ -168,18 +169,18 @@ function shouldStopPolling(kycStatus: string, rejectionAttempts: number): boolea
 }
 
 /**
- * Hook to poll Bridge API directly for KYC status.
- * More responsive than waiting for webhooks.
+ * Hook to sync KYC status from Bridge API to DB.
+ * Polls the Bridge API and updates the DB, providing faster updates than webhooks.
  *
- * Polling stops when:
+ * Syncing stops when:
  * - KYC is approved
  * - KYC is rejected AND max rejection attempts (3) reached
  *
- * @param kycLinkId - The KYC link ID to poll. Polling is disabled when undefined.
- * @param options.enabled - Additional condition to enable polling (default: true)
- * @param options.interval - Polling interval in ms (default: 2000)
+ * @param kycLinkId - The KYC link ID to sync. Syncing is disabled when undefined.
+ * @param options.enabled - Additional condition to enable syncing (default: true)
+ * @param options.interval - Sync interval in ms (default: 2000)
  */
-export function usePollKycStatus(
+export function useSyncKycStatus(
   kycLinkId: string | undefined,
   options?: { enabled?: boolean; interval?: number }
 ) {
@@ -196,9 +197,9 @@ export function usePollKycStatus(
         const data = query.state.data
         if (!data) return interval
 
-        // Stop polling if terminal state reached
+        // Stop syncing if terminal state reached
         if (shouldStopPolling(data.kycStatus, data.rejectionAttempts)) {
-          log('stopping KYC poll: status=%s attempts=%d', data.kycStatus, data.rejectionAttempts)
+          log('stopping KYC sync: status=%s attempts=%d', data.kycStatus, data.rejectionAttempts)
           return false
         }
 
