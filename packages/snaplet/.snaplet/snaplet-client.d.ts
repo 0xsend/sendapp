@@ -40,6 +40,7 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       users?: string;
+      bridge_static_memos?: string;
       bridge_transfer_templates?: string;
       bridge_virtual_accounts?: string;
     };
@@ -65,8 +66,28 @@ type Override = {
       net_amount?: string;
       created_at?: string;
       updated_at?: string;
+      static_memo_id?: string;
+      bridge_static_memos?: string;
       bridge_transfer_templates?: string;
       bridge_virtual_accounts?: string;
+    };
+  }
+  bridge_static_memos?: {
+    name?: string;
+    fields?: {
+      id?: string;
+      bridge_customer_id?: string;
+      bridge_static_memo_id?: string;
+      source_currency?: string;
+      destination_currency?: string;
+      destination_payment_rail?: string;
+      destination_address?: string;
+      source_deposit_instructions?: string;
+      status?: string;
+      created_at?: string;
+      updated_at?: string;
+      bridge_customers?: string;
+      bridge_deposits?: string;
     };
   }
   bridge_transfer_templates?: {
@@ -1137,6 +1158,7 @@ export interface Fingerprint {
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
     user?: FingerprintRelationField;
+    bridgeStaticMemos?: FingerprintRelationField;
     bridgeTransferTemplates?: FingerprintRelationField;
     bridgeVirtualAccounts?: FingerprintRelationField;
   }
@@ -1146,8 +1168,16 @@ export interface Fingerprint {
     netAmount?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
+    staticMemo?: FingerprintRelationField;
     transferTemplate?: FingerprintRelationField;
     virtualAccount?: FingerprintRelationField;
+  }
+  bridgeStaticMemos?: {
+    sourceDepositInstructions?: FingerprintJsonField;
+    createdAt?: FingerprintDateField;
+    updatedAt?: FingerprintDateField;
+    bridgeCustomer?: FingerprintRelationField;
+    bridgeDepositsByStaticMemoId?: FingerprintRelationField;
   }
   bridgeTransferTemplates?: {
     sourceDepositInstructions?: FingerprintJsonField;
