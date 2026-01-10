@@ -17,8 +17,8 @@ import {
   useKycStatus,
   useInitiateKyc,
   useSyncKycStatus,
-  useCreateTransferTemplate,
-  useTransferTemplateBankAccountDetails,
+  useCreateStaticMemo,
+  useStaticMemoBankAccountDetails,
 } from 'app/features/bank-transfer'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useRedirectUri } from 'app/utils/useRedirectUri'
@@ -106,13 +106,9 @@ export function BankTransferScreen() {
   // Sync when: has kycLinkId AND not approved AND not (rejected with max attempts)
   const shouldSync = !!kycLinkId && !isApproved && !isMaxAttemptsExceeded
   useSyncKycStatus(kycLinkId ?? undefined, { enabled: shouldSync })
-  const {
-    hasTransferTemplate,
-    bankDetails,
-    isLoading: templateLoading,
-  } = useTransferTemplateBankAccountDetails()
+  const { hasStaticMemo, bankDetails, isLoading: memoLoading } = useStaticMemoBankAccountDetails()
   const initiateKyc = useInitiateKyc()
-  const createTransferTemplate = useCreateTransferTemplate()
+  const createStaticMemo = useCreateStaticMemo()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
   // Track which step we're waiting for: 'tos', 'kyc', or null
@@ -187,31 +183,31 @@ export function BankTransferScreen() {
     }
   }, [kycStatus, isTosAccepted, waitingFor])
 
-  // Auto-create transfer template once approved
+  // Auto-create static memo once approved
   const {
-    mutate: createTemplate,
-    isPending: isTemplateCreating,
-    isError: templateCreationError,
-  } = createTransferTemplate
+    mutate: createMemo,
+    isPending: isMemoCreating,
+    isError: memoCreationError,
+  } = createStaticMemo
   useEffect(() => {
     if (
       !isGeoBlocked &&
       isApproved &&
-      !hasTransferTemplate &&
-      !templateLoading &&
-      !isTemplateCreating &&
-      !templateCreationError
+      !hasStaticMemo &&
+      !memoLoading &&
+      !isMemoCreating &&
+      !memoCreationError
     ) {
-      createTemplate()
+      createMemo()
     }
   }, [
     isGeoBlocked,
     isApproved,
-    hasTransferTemplate,
-    templateLoading,
-    isTemplateCreating,
-    templateCreationError,
-    createTemplate,
+    hasStaticMemo,
+    memoLoading,
+    isMemoCreating,
+    memoCreationError,
+    createMemo,
   ])
 
   useEffect(() => {
@@ -219,7 +215,7 @@ export function BankTransferScreen() {
       analytics.capture({
         name: 'bank_transfer_info_viewed',
         properties: {
-          info_type: hasTransferTemplate ? 'bank_details' : 'kyc',
+          info_type: hasStaticMemo ? 'bank_details' : 'kyc',
         },
       })
       hasTrackedInfoView.current = true
@@ -228,30 +224,30 @@ export function BankTransferScreen() {
     if (!showInfo) {
       hasTrackedInfoView.current = false
     }
-  }, [analytics, hasTransferTemplate, showInfo])
+  }, [analytics, hasStaticMemo, showInfo])
 
   useEffect(() => {
-    if (!hasTrackedDetailsView.current && hasTransferTemplate && bankDetails && !templateLoading) {
+    if (!hasTrackedDetailsView.current && hasStaticMemo && bankDetails && !memoLoading) {
       const hasAch = bankDetails.paymentRails.includes('ach_push')
       const hasWire = bankDetails.paymentRails.includes('wire')
 
       analytics.capture({
         name: 'bank_transfer_details_viewed',
         properties: {
-          account_source: 'transfer_template',
+          account_source: 'static_memo',
           has_ach: hasAch,
           has_wire: hasWire,
         },
       })
       hasTrackedDetailsView.current = true
     }
-  }, [analytics, bankDetails, hasTransferTemplate, templateLoading])
+  }, [analytics, bankDetails, hasStaticMemo, memoLoading])
 
-  // Handler to retry transfer template creation
-  const handleRetryTemplateCreation = useCallback(() => {
-    createTransferTemplate.reset()
-    createTransferTemplate.mutate()
-  }, [createTransferTemplate])
+  // Handler to retry static memo creation
+  const handleRetryMemoCreation = useCallback(() => {
+    createStaticMemo.reset()
+    createStaticMemo.mutate()
+  }, [createStaticMemo])
 
   // Loading state
   if (kycLoading || isGeoBlockLoading) {
@@ -357,34 +353,34 @@ export function BankTransferScreen() {
   }
 
   // Approved but setting up deposit account (auto-creating in background)
-  if (!hasTransferTemplate) {
+  if (!hasStaticMemo) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <FadeCard>
           <YStack gap="$4">
             <Paragraph fontSize="$6" fontWeight={600}>
-              {templateCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
+              {memoCreationError ? 'Setup Failed' : 'Setting Up Your Account'}
             </Paragraph>
             <Paragraph
               fontSize="$4"
               color="$lightGrayTextField"
               $theme-light={{ color: '$darkGrayTextField' }}
             >
-              {templateCreationError
+              {memoCreationError
                 ? 'We encountered an issue creating your deposit account. Please try again.'
                 : `Your ${verificationSubject} has been verified. We're now creating your deposit account.`}
             </Paragraph>
-            {isTemplateCreating && (
+            {isMemoCreating && (
               <YStack ai="center" py="$2">
                 <Spinner size="small" color="$primary" />
               </YStack>
             )}
-            {templateCreationError && (
+            {memoCreationError && (
               <Button
                 size="$4"
                 theme="green"
-                onPress={handleRetryTemplateCreation}
-                disabled={isTemplateCreating}
+                onPress={handleRetryMemoCreation}
+                disabled={isMemoCreating}
               >
                 Try Again
               </Button>
@@ -395,8 +391,8 @@ export function BankTransferScreen() {
     )
   }
 
-  // Has transfer template - show bank details
-  if (templateLoading || !bankDetails) {
+  // Has static memo - show bank details
+  if (memoLoading || !bankDetails) {
     return (
       <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
         <BankDetailsCardSkeleton />

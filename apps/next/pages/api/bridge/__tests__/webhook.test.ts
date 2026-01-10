@@ -17,6 +17,8 @@ jest.mock('@my/bridge', () => {
     event.event_category === 'virtual_account.activity'
   const isTransferEvent = (event: { event_category?: string }) =>
     event.event_category === 'transfer'
+  const isStaticMemoActivityEvent = (event: { event_category?: string }) =>
+    event.event_category === 'static_memo.activity'
 
   const extractKycStatusFromEvent = (event: { event_object?: { kyc_status?: string } }) =>
     isKycEvent(event) ? (event.event_object?.kyc_status ?? null) : null
@@ -54,6 +56,16 @@ jest.mock('@my/bridge', () => {
           return null
       }
     }
+    if (isStaticMemoActivityEvent(event)) {
+      switch (event.event_object?.type) {
+        case 'funds_received':
+          return 'funds_received'
+        case 'payment_processed':
+          return 'payment_processed'
+        default:
+          return null
+      }
+    }
   }
 
   return {
@@ -64,6 +76,7 @@ jest.mock('@my/bridge', () => {
     extractTosStatusFromEvent,
     extractDepositStatusFromEvent,
     isKycEvent,
+    isStaticMemoActivityEvent,
     isVirtualAccountActivityEvent,
     isTransferEvent,
   }
@@ -83,6 +96,9 @@ type SupabaseTableMocks = {
     select: jest.Mock
     update: jest.Mock
   }
+  bridge_static_memos: {
+    select: jest.Mock
+  }
   bridge_transfer_templates: {
     select: jest.Mock
   }
@@ -94,6 +110,7 @@ type SupabaseTableMocks = {
 function createSupabaseMock(options?: {
   existingEvent?: { id: string } | null
   virtualAccount?: { id: string } | null
+  staticMemo?: { id: string } | null
   transferTemplate?: { id: string } | null
   bridgeCustomer?: { id: string } | null
   insertError?: { code?: string } | null
@@ -140,6 +157,20 @@ function createSupabaseMock(options?: {
     update: jest.fn().mockReturnValue({ eq: virtualAccountUpdateEq }),
   }
 
+  const staticMemoSelectEq = jest.fn().mockReturnValue({
+    single: jest.fn().mockResolvedValue({
+      data: options?.staticMemo ?? { id: 'sm_local' },
+      error: null,
+    }),
+    maybeSingle: jest.fn().mockResolvedValue({
+      data: options?.staticMemo ?? { id: 'sm_local' },
+      error: null,
+    }),
+  })
+  const bridgeStaticMemos = {
+    select: jest.fn().mockReturnValue({ eq: staticMemoSelectEq }),
+  }
+
   const transferTemplateSelectEq = jest.fn().mockReturnValue({
     single: jest.fn().mockResolvedValue({
       data: options?.transferTemplate ?? { id: 'tmpl_local' },
@@ -162,6 +193,7 @@ function createSupabaseMock(options?: {
     bridge_webhook_events: webhookEvents,
     bridge_customers: bridgeCustomers,
     bridge_virtual_accounts: bridgeVirtualAccounts,
+    bridge_static_memos: bridgeStaticMemos,
     bridge_transfer_templates: bridgeTransferTemplates,
     bridge_deposits: bridgeDeposits,
   }
@@ -184,6 +216,7 @@ function createSupabaseMock(options?: {
       bridgeCustomersSelectEq,
       virtualAccountSelectEq,
       virtualAccountUpdateEq,
+      staticMemoSelectEq,
       transferTemplateSelectEq,
     },
   }
@@ -271,6 +304,57 @@ describe('Bridge webhook handler', () => {
         sender_name: 'Alice',
         sender_routing_number: '111000025',
         trace_number: 'trace_123',
+      }),
+      { onConflict: 'bridge_transfer_id' }
+    )
+  })
+
+  it('stores event and upserts deposit for static memo funds_received', async () => {
+    const { supabase, tables } = createSupabaseMock()
+    ;(createSupabaseAdminClient as jest.Mock).mockReturnValue(supabase)
+    ;(verifyWebhookSignature as jest.Mock).mockReturnValue(true)
+
+    const rawBody = JSON.stringify({
+      api_version: '2024-01-01',
+      event_id: 'evt_sm_1',
+      event_category: 'static_memo.activity',
+      event_type: 'static_memo.activity.updated',
+      event_object_id: 'sm_1',
+      event_object: {
+        type: 'funds_received',
+        static_memo_id: 'sm_1',
+        deposit_id: 'dep_1',
+        currency: 'usd',
+        amount: '250',
+        source: {
+          payment_rail: 'wire',
+          bank_routing_number: '011000015',
+          bank_beneficiary_name: 'ACME Corp',
+          imad: 'imad_123',
+        },
+      },
+      event_created_at: '2024-01-01T00:00:00Z',
+    })
+
+    const req = createMockReq(rawBody, { 'x-webhook-signature': 't=1,v0=abc' })
+    const res = createMockRes()
+
+    await handler(req, res)
+
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({ received: true, processed: true })
+    expect(tables.bridge_webhook_events.insert).toHaveBeenCalled()
+    expect(tables.bridge_deposits.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bridge_transfer_id: 'dep_1',
+        static_memo_id: 'sm_local',
+        status: 'funds_received',
+        payment_rail: 'wire',
+        amount: 250,
+        currency: 'usd',
+        sender_name: 'ACME Corp',
+        sender_routing_number: '011000015',
+        trace_number: 'imad_123',
       }),
       { onConflict: 'bridge_transfer_id' }
     )

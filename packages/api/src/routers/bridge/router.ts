@@ -10,6 +10,7 @@ import {
   type GetKycStatusOutput,
   type CreateVirtualAccountOutput,
   type CreateTransferTemplateOutput,
+  type CreateStaticMemoOutput,
 } from './types'
 
 const log = debug('api:routers:bridge')
@@ -471,6 +472,156 @@ export const bridgeRouter = createTRPCRouter({
       } catch (error) {
         if (error instanceof TRPCError) throw error
         log('error creating virtual account', error)
+        handleBridgeError(error)
+      }
+    }
+  ),
+
+  /**
+   * Create a static memo for the authenticated user after KYC approval
+   */
+  createStaticMemo: protectedProcedure.mutation(
+    async ({ ctx }): Promise<CreateStaticMemoOutput> => {
+      const userId = ctx.session.user.id
+      log('creating static memo for user', userId)
+
+      try {
+        const adminClient = createSupabaseAdminClient()
+
+        // Get user's send account (verified destination address)
+        const { data: sendAccount, error: sendAccountError } = await adminClient
+          .from('send_accounts')
+          .select('address')
+          .eq('user_id', userId)
+          .is('deleted_at', null)
+          .single()
+
+        if (sendAccountError || !sendAccount) {
+          log('send account not found', sendAccountError)
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Send account required' })
+        }
+
+        const destinationAddress = sendAccount.address
+
+        if (!destinationAddress) {
+          log('send account address not found')
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Send account address required' })
+        }
+
+        const { data: profile, error: profileError } = await adminClient
+          .from('profiles')
+          .select('is_business')
+          .eq('id', userId)
+          .maybeSingle()
+
+        if (profileError) {
+          log('failed to fetch profile: userId=%s error=%O', userId, profileError)
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to load profile' })
+        }
+
+        if (!profile) {
+          log('no profile found: userId=%s', userId)
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' })
+        }
+
+        const customerType = profile.is_business ? 'business' : 'individual'
+
+        // Get user's bridge customer record
+        const { data: customer, error: customerError } = await adminClient
+          .from('bridge_customers')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('type', customerType)
+          .single()
+
+        if (customerError || !customer) {
+          log('bridge customer not found', customerError)
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Complete KYC first' })
+        }
+
+        if (customer.kyc_status !== 'approved') {
+          log('KYC not approved', customer.kyc_status)
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'KYC must be approved first' })
+        }
+
+        if (!customer.bridge_customer_id) {
+          log('bridge customer ID not found')
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Bridge customer not created yet' })
+        }
+
+        // Check for existing active static memo
+        const { data: existingMemo } = await adminClient
+          .from('bridge_static_memos')
+          .select('*')
+          .eq('bridge_customer_id', customer.id)
+          .eq('status', 'active')
+          .maybeSingle()
+
+        if (existingMemo) {
+          log('user already has active static memo')
+          const existingInstructions = (existingMemo.source_deposit_instructions ??
+            null) as SourceDepositInstructions | null
+          return {
+            staticMemoId: existingMemo.bridge_static_memo_id,
+            bankDetails: getBankDetailsWithMessageFromInstructions(existingInstructions),
+          }
+        }
+
+        // Create static memo with Bridge
+        const bridgeClient = createBridgeClient()
+        const memoResponse = await bridgeClient.createStaticMemo(
+          customer.bridge_customer_id,
+          {
+            source: {
+              currency: 'usd',
+              payment_rail: 'wire',
+            },
+            destination: {
+              currency: 'usdc',
+              payment_rail: 'base',
+              address: destinationAddress,
+            },
+          },
+          { idempotencyKey: `static-memo-${customer.bridge_customer_id}` }
+        )
+
+        log('created static memo', memoResponse.id)
+
+        const sourceInstructions = memoResponse.source_deposit_instructions ?? null
+        if (!sourceInstructions) {
+          log('missing source deposit instructions on static memo', memoResponse.id)
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Missing deposit instructions from Bridge',
+          })
+        }
+
+        // Store the static memo
+        const { error: insertError } = await adminClient.from('bridge_static_memos').insert({
+          bridge_customer_id: customer.id,
+          bridge_static_memo_id: memoResponse.id,
+          source_currency: sourceInstructions.currency ?? 'usd',
+          destination_currency: memoResponse.destination?.currency ?? 'usdc',
+          destination_payment_rail: memoResponse.destination?.payment_rail ?? 'base',
+          destination_address: memoResponse.destination?.address ?? destinationAddress,
+          source_deposit_instructions: sourceInstructions,
+        })
+
+        if (insertError) {
+          log('failed to store static memo', insertError)
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to store static memo',
+          })
+        }
+
+        return {
+          staticMemoId: memoResponse.id,
+          bankDetails: getBankDetailsWithMessageFromInstructions(sourceInstructions),
+        }
+      } catch (error) {
+        if (error instanceof TRPCError) throw error
+        log('error creating static memo', error)
         handleBridgeError(error)
       }
     }

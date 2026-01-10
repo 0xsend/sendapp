@@ -108,6 +108,13 @@ export function isVirtualAccountActivityEvent(event: WebhookEvent): boolean {
 }
 
 /**
+ * Check if this is a static memo activity-related webhook event
+ */
+export function isStaticMemoActivityEvent(event: WebhookEvent): boolean {
+  return event.event_category === 'static_memo.activity'
+}
+
+/**
  * Check if this is a transfer-related webhook event
  */
 export function isTransferEvent(event: WebhookEvent): boolean {
@@ -195,6 +202,25 @@ export function extractDepositStatusFromEvent(event: WebhookEvent): DepositStatu
       case 'payment_processed':
         return 'payment_processed'
       case 'refunded':
+        return 'refund'
+      default:
+        return null
+    }
+  }
+
+  if (isStaticMemoActivityEvent(event)) {
+    const data = event.event_object as { type?: string }
+
+    switch (data.type) {
+      case 'funds_received':
+        return 'funds_received'
+      case 'in_review':
+        return 'in_review'
+      case 'payment_submitted':
+        return 'payment_submitted'
+      case 'payment_processed':
+        return 'payment_processed'
+      case 'refund':
         return 'refund'
       default:
         return null

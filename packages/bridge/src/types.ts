@@ -152,6 +152,39 @@ export const VirtualAccountResponseSchema = z.object({
 })
 export type VirtualAccountResponse = z.infer<typeof VirtualAccountResponseSchema>
 
+// Static Memo Request
+export const StaticMemoRequestSchema = z.object({
+  source: z.object({
+    currency: z.string(),
+    payment_rail: z.string(),
+  }),
+  destination: z.object({
+    currency: z.string(),
+    payment_rail: z.string(),
+    address: z.string(),
+    blockchain_memo: z.string().optional(),
+  }),
+  developer_fee_percent: z.union([z.number(), z.string()]).optional(),
+})
+export type StaticMemoRequest = z.infer<typeof StaticMemoRequestSchema>
+
+// Static Memo Response
+export const StaticMemoResponseSchema = z.object({
+  id: z.string(),
+  status: z.string().optional(),
+  customer_id: z.string().optional(),
+  created_at: z.string().optional(),
+  source_deposit_instructions: SourceDepositInstructionsSchema,
+  destination: z.object({
+    currency: z.string(),
+    payment_rail: z.string(),
+    address: z.string(),
+    blockchain_memo: z.string().optional(),
+  }),
+  developer_fee_percent: z.union([z.number(), z.string()]).optional(),
+})
+export type StaticMemoResponse = z.infer<typeof StaticMemoResponseSchema>
+
 // Transfer Request (Bridge orchestration transfers)
 export const TransferRequestSchema = z.object({
   amount: z.union([z.string(), z.number()]).optional(),
@@ -222,7 +255,12 @@ export const CustomerResponseSchema = z.object({
 export type CustomerResponse = z.infer<typeof CustomerResponseSchema>
 
 // Webhook Event Categories
-export const WebhookEventCategory = z.enum(['kyc_link', 'virtual_account.activity', 'transfer'])
+export const WebhookEventCategory = z.enum([
+  'kyc_link',
+  'virtual_account.activity',
+  'transfer',
+  'static_memo.activity',
+])
 export type WebhookEventCategory = z.infer<typeof WebhookEventCategory>
 
 // Webhook Event (Bridge uses event_* payload format)
