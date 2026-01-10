@@ -175,6 +175,10 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
 
   /**
    * Unregister push token from backend via /api/notifications/subscribe
+   *
+   * Handles two cases:
+   * 1. Active subscription exists: unsubscribe locally and remove from backend
+   * 2. Subscription lost/invalidated: use stored endpoint from state to clean up backend
    */
   const unregisterToken = useCallback(async (): Promise<boolean> => {
     if (!session?.user?.id) {
@@ -188,22 +192,37 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       const registration = await navigator.serviceWorker.ready
       const subscription = await registration.pushManager.getSubscription()
 
-      if (subscription) {
-        // Unsubscribe from push service first
-        await subscription.unsubscribe()
+      let endpointToDelete: string | null = null
 
-        // Remove from backend via API route
+      if (subscription) {
+        // Active subscription exists - unsubscribe locally first
+        endpointToDelete = subscription.endpoint
+        await subscription.unsubscribe()
+      } else if (expoPushToken) {
+        // Subscription lost/invalidated but we have stored state
+        // Extract endpoint from stored subscription JSON
+        try {
+          const storedSubscription = JSON.parse(expoPushToken) as { endpoint?: string }
+          endpointToDelete = storedSubscription.endpoint || null
+          log('Using stored endpoint for backend cleanup (subscription was lost)')
+        } catch {
+          log('Warning: Could not parse stored subscription')
+        }
+      }
+
+      // Remove from backend if we have an endpoint
+      if (endpointToDelete) {
         const response = await fetch('/api/notifications/subscribe', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'same-origin',
           cache: 'no-store',
-          body: JSON.stringify({ endpoint: subscription.endpoint }),
+          body: JSON.stringify({ endpoint: endpointToDelete }),
         })
 
         if (!response.ok) {
           log('Warning: Failed to remove subscription from backend')
-          // Don't throw - local unsubscribe succeeded
+          // Don't throw - continue to clear local state
         }
       }
 
@@ -216,7 +235,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       setError(err)
       return false
     }
-  }, [session?.user?.id])
+  }, [session?.user?.id, expoPushToken])
 
   // Check permissions on mount
   useEffect(() => {
