@@ -260,7 +260,13 @@ async function sendWebPushNotifications(
   body: string,
   vapidConfig: VapidConfig,
   data?: Record<string, unknown>
-): Promise<{ sent: number; failed: number; errors: string[]; invalidTokenIds: number[] }> {
+): Promise<{
+  sent: number
+  failed: number
+  errors: string[]
+  invalidTokenIds: number[]
+  skipped?: number
+}> {
   // Filter for web push tokens with required fields and validate endpoints
   const webSubscriptions: WebPushSubscription[] = tokens
     .filter(
@@ -289,12 +295,16 @@ async function sendWebPushNotifications(
   } = vapidConfig
 
   if (!vapidPublicKey || !vapidPrivateKey || !vapidSubject) {
-    log.warn('Web push VAPID keys not configured, skipping web push notifications')
+    log.warn('Web push VAPID keys not configured, skipping web push notifications', {
+      subscriptionsSkipped: webSubscriptions.length,
+    })
+    // Return as skipped (not failed) - this is intentional in local dev environments
     return {
       sent: 0,
-      failed: webSubscriptions.length,
-      errors: ['VAPID keys not configured'],
+      failed: 0,
+      errors: [],
       invalidTokenIds: [],
+      skipped: webSubscriptions.length,
     }
   }
 
@@ -434,6 +444,7 @@ async function sendPushNotificationActivity(
 
   let totalSent = 0
   let totalFailed = 0
+  let totalSkipped = 0
   const allErrors: string[] = []
   const allInvalidTokenIds: number[] = []
 
@@ -448,6 +459,7 @@ async function sendPushNotificationActivity(
   const webResult = await sendWebPushNotifications(tokens, title, body, vapidConfig, data)
   totalSent += webResult.sent
   totalFailed += webResult.failed
+  totalSkipped += webResult.skipped ?? 0
   allErrors.push(...webResult.errors)
   allInvalidTokenIds.push(...webResult.invalidTokenIds)
 
@@ -465,8 +477,10 @@ async function sendPushNotificationActivity(
     userId: redactId(userId),
     totalSent,
     totalFailed,
+    totalSkipped,
     expoSent: expoResult.sent,
     webSent: webResult.sent,
+    webSkipped: webResult.skipped ?? 0,
   })
 
   return {
@@ -474,6 +488,7 @@ async function sendPushNotificationActivity(
     sent: totalSent,
     failed: totalFailed,
     errors: allErrors.length > 0 ? allErrors : undefined,
+    skipped: totalSkipped > 0 ? totalSkipped : undefined,
   }
 }
 
