@@ -16,6 +16,14 @@ function redactHex(value: string): string {
   return `${value.slice(0, 8)}...${value.slice(-6)}`
 }
 
+function safeDecodeURIValue(value: string): string {
+  try {
+    return decodeURI(value)
+  } catch {
+    return value
+  }
+}
+
 function getWebPushHost(endpoint: string): string {
   try {
     return new URL(endpoint).hostname
@@ -38,18 +46,17 @@ import type {
   CreateNotificationResult,
   NotificationType,
   PushToken,
-  ExpoPushMessage,
-  ExpoPushTicket,
+  ReceiptCheckResult,
+  CheckPushReceiptsPayload,
+  DeactivateTokensPayload,
 } from './types'
 import {
   sanitizeTitle,
   sanitizeBody,
   sanitizeNotificationData,
-  isValidExpoPushToken,
   isValidWebPushEndpoint,
-  MAX_TITLE_LENGTH,
-  MAX_BODY_LENGTH,
 } from './validation'
+import { sendExpoPushNotifications, checkExpoPushReceipts } from './expoPush'
 import { allCoinsDict } from 'app/data/coins'
 import formatAmount, { localizeAmount } from 'app/utils/formatAmount'
 
@@ -58,6 +65,16 @@ type NotificationActivities = {
    * Send push notifications to all registered devices for a user
    */
   sendPushNotificationActivity: (payload: PushNotificationPayload) => Promise<SendPushResult>
+
+  /**
+   * Check push receipts (currently Expo receipts)
+   */
+  checkPushReceiptsActivity: (payload: CheckPushReceiptsPayload) => Promise<ReceiptCheckResult>
+
+  /**
+   * Mark push tokens inactive by push_tokens.id
+   */
+  deactivateTokensActivity: (payload: DeactivateTokensPayload) => Promise<number>
 
   /**
    * Create an in-app notification record
@@ -96,6 +113,8 @@ export const createNotificationActivities = (
 
   return {
     sendPushNotificationActivity: (payload) => sendPushNotificationActivity(payload, vapidConfig),
+    checkPushReceiptsActivity,
+    deactivateTokensActivity,
     createInAppNotificationActivity,
     notifyTransferReceivedActivity: (params) => notifyTransferReceivedActivity(params, vapidConfig),
     notifyTransferSentActivity: (params) => notifyTransferSentActivity(params, vapidConfig),
@@ -103,135 +122,11 @@ export const createNotificationActivities = (
   }
 }
 
-const EXPO_PUSH_API_URL = 'https://exp.host/--/api/v2/push/send'
-const EXPO_RECEIPTS_API_URL = 'https://exp.host/--/api/v2/push/getReceipts'
-
 /** Web push TTL (time to live) in seconds - 24 hours */
 const WEB_PUSH_TTL = 24 * 60 * 60
 
 /** Web push urgency - high for important notifications */
 const WEB_PUSH_URGENCY = 'high' as const
-
-/**
- * Send push notifications via Expo Push Service
- * Handles tokens from ios/android platforms that are in Expo format
- */
-async function sendExpoNotifications(
-  tokens: PushToken[],
-  title: string,
-  body: string,
-  data?: Record<string, unknown>
-): Promise<{ sent: number; failed: number; errors: string[]; invalidTokenIds: number[] }> {
-  // Filter for tokens that are in Expo push token format and validate
-  // Expo platform covers both iOS and Android devices
-  const expoTokens = tokens.filter(
-    (t) => t.platform === 'expo' && t.token && isValidExpoPushToken(t.token)
-  )
-
-  if (expoTokens.length === 0) {
-    return { sent: 0, failed: 0, errors: [], invalidTokenIds: [] }
-  }
-
-  // Sanitize title and body for push notifications
-  const sanitizedTitle = sanitizeTitle(title)
-  const sanitizedBody = sanitizeBody(body)
-  const sanitizedData = sanitizeNotificationData(data)
-
-  // Build messages for Expo Push Service
-  // We know token.token is non-null from the filter above
-  const messages: ExpoPushMessage[] = expoTokens.map((token) => ({
-    to: token.token as string,
-    sound: 'default',
-    title: sanitizedTitle,
-    body: sanitizedBody,
-    data: sanitizedData,
-    priority: 'high',
-    channelId: 'default',
-  }))
-
-  log.info('Sending Expo push notifications', {
-    count: messages.length,
-    titleLength: sanitizedTitle.length,
-  })
-
-  let sent = 0
-  let failed = 0
-  const errors: string[] = []
-  const invalidTokenIds: number[] = []
-
-  try {
-    // Send to Expo Push Service
-    const response = await fetch(EXPO_PUSH_API_URL, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-Encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(messages),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      log.error('Expo Push API error', { status: response.status, error: errorText })
-      return {
-        sent: 0,
-        failed: expoTokens.length,
-        errors: [`Expo API error: ${response.status}`],
-        invalidTokenIds: [],
-      }
-    }
-
-    const result = (await response.json()) as { data: ExpoPushTicket[] }
-    const tickets = result.data
-
-    // Process tickets to identify successful sends and invalid tokens
-    for (let i = 0; i < tickets.length; i++) {
-      const ticket = tickets[i]
-      const token = expoTokens[i]
-
-      if (!ticket) continue
-
-      if (ticket.status === 'ok') {
-        sent++
-        log.info('Push notification sent successfully', {
-          ticketId: ticket.id,
-          tokenId: token?.id !== undefined ? Number(token.id) : undefined,
-        })
-      } else if (ticket.status === 'error') {
-        failed++
-        const errorMsg = ticket.message || 'Unknown Expo error'
-        errors.push(errorMsg)
-
-        log.error('Expo push notification failed', {
-          error: errorMsg,
-          details: ticket.details,
-          tokenId: token?.id !== undefined ? Number(token.id) : undefined,
-        })
-
-        // Check for invalid token errors
-        if (
-          ticket.details?.error === 'DeviceNotRegistered' ||
-          ticket.details?.error === 'InvalidCredentials'
-        ) {
-          if (token?.id !== undefined) {
-            invalidTokenIds.push(Number(token.id))
-          }
-        }
-      }
-    }
-  } catch (error) {
-    log.error('Error calling Expo Push API', { error })
-    return {
-      sent: 0,
-      failed: expoTokens.length,
-      errors: [error instanceof Error ? error.message : 'Unknown error'],
-      invalidTokenIds: [],
-    }
-  }
-
-  return { sent, failed, errors, invalidTokenIds }
-}
 
 /**
  * Web Push subscription info from database
@@ -442,35 +337,54 @@ async function sendPushNotificationActivity(
     return { success: true, sent: 0, failed: 0 }
   }
 
+  // Sanitize payload once (activities may be invoked with untrusted input)
+  const sanitizedTitle = sanitizeTitle(title)
+  const sanitizedBody = sanitizeBody(body)
+  const sanitizedData = sanitizeNotificationData(data)
+
   let totalSent = 0
   let totalFailed = 0
   let totalSkipped = 0
   const allErrors: string[] = []
-  const allInvalidTokenIds: number[] = []
+  const tokenIdsToDeactivate = new Set<number>()
 
   // Send Expo notifications (iOS/Android)
-  const expoResult = await sendExpoNotifications(tokens, title, body, data)
+  const expoResult = await sendExpoPushNotifications(
+    tokens,
+    sanitizedTitle,
+    sanitizedBody,
+    sanitizedData
+  )
   totalSent += expoResult.sent
   totalFailed += expoResult.failed
-  allErrors.push(...expoResult.errors)
-  allInvalidTokenIds.push(...expoResult.invalidTokenIds)
+  if (expoResult.errors) {
+    allErrors.push(...expoResult.errors)
+  }
+  if (expoResult.tokenIdsToDeactivate) {
+    for (const tokenId of expoResult.tokenIdsToDeactivate) {
+      tokenIdsToDeactivate.add(tokenId)
+    }
+  }
 
   // Send Web Push notifications
-  const webResult = await sendWebPushNotifications(tokens, title, body, vapidConfig, data)
+  const webResult = await sendWebPushNotifications(
+    tokens,
+    sanitizedTitle,
+    sanitizedBody,
+    vapidConfig,
+    sanitizedData
+  )
   totalSent += webResult.sent
   totalFailed += webResult.failed
   totalSkipped += webResult.skipped ?? 0
   allErrors.push(...webResult.errors)
-  allInvalidTokenIds.push(...webResult.invalidTokenIds)
+  for (const tokenId of webResult.invalidTokenIds) {
+    tokenIdsToDeactivate.add(tokenId)
+  }
 
   // Mark all invalid tokens as inactive
-  for (const tokenId of allInvalidTokenIds) {
-    try {
-      await markTokenInactive(tokenId)
-      log.info('Marked invalid push token as inactive', { tokenId })
-    } catch (error) {
-      log.error('Failed to mark push token as inactive', { tokenId, error })
-    }
+  if (tokenIdsToDeactivate.size > 0) {
+    await deactivateTokensActivity({ tokenIds: [...tokenIdsToDeactivate] })
   }
 
   log.info('Push notifications sent', {
@@ -481,6 +395,7 @@ async function sendPushNotificationActivity(
     expoSent: expoResult.sent,
     webSent: webResult.sent,
     webSkipped: webResult.skipped ?? 0,
+    ticketCount: expoResult.ticketIds?.length || 0,
   })
 
   return {
@@ -489,7 +404,47 @@ async function sendPushNotificationActivity(
     failed: totalFailed,
     errors: allErrors.length > 0 ? allErrors : undefined,
     skipped: totalSkipped > 0 ? totalSkipped : undefined,
+    ticketIds: expoResult.ticketIds,
+    ticketIdToTokenId: expoResult.ticketIdToTokenId,
+    tokenIdsToDeactivate: tokenIdsToDeactivate.size > 0 ? [...tokenIdsToDeactivate] : undefined,
   }
+}
+
+/**
+ * Check push receipts (currently Expo).
+ */
+async function checkPushReceiptsActivity(
+  payload: CheckPushReceiptsPayload
+): Promise<ReceiptCheckResult> {
+  const { ticketIds, userId } = payload
+
+  log.info('Checking push receipts', {
+    userId: redactId(userId),
+    ticketCount: ticketIds.length,
+  })
+
+  return checkExpoPushReceipts(ticketIds)
+}
+
+/**
+ * Mark push tokens inactive by push_tokens.id.
+ */
+async function deactivateTokensActivity(payload: DeactivateTokensPayload): Promise<number> {
+  const { tokenIds } = payload
+
+  let deactivated = 0
+  for (const tokenId of tokenIds) {
+    try {
+      const ok = await markTokenInactive(tokenId)
+      if (ok) {
+        deactivated++
+      }
+    } catch (error) {
+      log.error('Failed to mark push token inactive', { tokenId, error })
+    }
+  }
+
+  return deactivated
 }
 
 /**
@@ -574,7 +529,8 @@ async function notifyTransferReceivedActivity(
   const tokenSymbol = coinInfo?.symbol || 'ETH'
 
   const title = `+ ${formattedAmount} ${tokenSymbol}`
-  const body = note ? `${decodeURI(note)}\n\n${senderDisplay}` : senderDisplay
+  const decodedNote = note ? safeDecodeURIValue(note) : undefined
+  const body = decodedNote ? `${decodedNote}\n\n${senderDisplay}` : senderDisplay
 
   const notificationData = {
     type: 'transfer_received' as const,

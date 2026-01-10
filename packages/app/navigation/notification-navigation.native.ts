@@ -1,6 +1,7 @@
 import { router } from 'expo-router'
 import type { NotificationData } from 'app/types/notification-types'
 import {
+  AndroidNotificationChannels,
   isTransferNotification,
   isSendEarnNotification,
   isSendtagNotification,
@@ -8,6 +9,19 @@ import {
   isSystemNotification,
 } from 'app/types/notification-types'
 import debug from 'debug'
+
+function parseOptionalInt(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string' && /^\d+$/.test(value)) {
+    const parsed = Number.parseInt(value, 10)
+    return Number.isFinite(parsed) ? parsed : undefined
+  }
+
+  return undefined
+}
 
 const log = debug('app:navigation:notification')
 
@@ -173,6 +187,7 @@ export function parseNotificationData(payload: unknown): NotificationData | null
     return {
       type: data.type as NotificationData['type'],
       route: typeof data.route === 'string' ? data.route : undefined,
+      path: typeof data.path === 'string' ? data.path : undefined,
       userId: typeof data.userId === 'string' ? data.userId : undefined,
       createdAt: typeof data.createdAt === 'string' ? data.createdAt : undefined,
     }
@@ -182,6 +197,7 @@ export function parseNotificationData(payload: unknown): NotificationData | null
   const baseData = {
     type: data.type as NotificationData['type'],
     route: typeof data.route === 'string' ? data.route : undefined,
+    path: typeof data.path === 'string' ? data.path : undefined,
     userId: typeof data.userId === 'string' ? data.userId : undefined,
     createdAt: typeof data.createdAt === 'string' ? data.createdAt : undefined,
   }
@@ -193,7 +209,7 @@ export function parseNotificationData(payload: unknown): NotificationData | null
       type: data.type,
       txHash: typeof data.txHash === 'string' ? data.txHash : undefined,
       activityId: typeof data.activityId === 'string' ? data.activityId : undefined,
-      sendId: typeof data.sendId === 'number' ? data.sendId : undefined,
+      sendId: parseOptionalInt(data.sendId),
       amount: typeof data.amount === 'string' ? data.amount : undefined,
       tokenSymbol: typeof data.tokenSymbol === 'string' ? data.tokenSymbol : undefined,
     }
@@ -249,13 +265,13 @@ export function getNotificationChannelId(type: NotificationData['type']): string
   switch (type) {
     case 'transfer_received':
     case 'transfer_sent':
-      return 'transfers'
+      return AndroidNotificationChannels.TRANSFERS
     case 'send_earn_deposit':
     case 'send_earn_withdraw':
-      return 'send_earn'
+      return AndroidNotificationChannels.SEND_EARN
     case 'system':
-      return 'system'
+      return AndroidNotificationChannels.SYSTEM
     default:
-      return 'default'
+      return AndroidNotificationChannels.DEFAULT
   }
 }

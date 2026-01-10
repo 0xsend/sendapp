@@ -1,6 +1,12 @@
 import type { Database } from '@my/supabase/database.types'
 import type { Address } from 'viem'
 
+// Push notification payload size limits
+// APNs limit is 4KB total; we target smaller to leave room for other payload fields
+export const MAX_NOTE_LENGTH = 256
+export const MAX_BODY_LENGTH = 500
+export const MAX_TITLE_LENGTH = 100
+
 // Database types
 export type Notification = Database['public']['Tables']['notifications']['Row']
 export type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
@@ -25,6 +31,8 @@ export type TransferNotificationParams = {
   token: Address | null // null for ETH
   txHash: string
   note?: string
+  /** Workflow ID for idempotency - prevents duplicate notifications on retries */
+  workflowId?: string
 }
 
 export type PushNotificationPayload = {
@@ -50,6 +58,34 @@ export type SendPushResult = {
   errors?: string[]
   /** Number of notifications skipped due to missing configuration (e.g., VAPID keys) */
   skipped?: number
+
+  /** Expo ticket IDs from successful sends (used for receipt checks). */
+  ticketIds?: string[]
+
+  /** Mapping from Expo ticket ID -> push_tokens.id (for receipt-based invalidation). */
+  ticketIdToTokenId?: Record<string, number>
+
+  /** push_tokens.id values that should be marked inactive immediately (e.g. DeviceNotRegistered). */
+  tokenIdsToDeactivate?: number[]
+}
+
+export type ReceiptCheckResult = {
+  checked: number
+  delivered: number
+  failed: number
+  errors?: string[]
+
+  /** Ticket IDs whose receipts indicate the device/token is no longer valid. */
+  ticketIdsToDeactivate?: string[]
+}
+
+export type CheckPushReceiptsPayload = {
+  ticketIds: string[]
+  userId: string
+}
+
+export type DeactivateTokensPayload = {
+  tokenIds: number[]
 }
 
 export type CreateNotificationResult = {

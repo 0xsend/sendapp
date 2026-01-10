@@ -9,7 +9,7 @@ import * as Notifications from 'expo-notifications'
 import { useSessionContext } from 'app/utils/supabase/useSessionContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const PROMPT_DISMISSED_KEY = 'notification_prompt_dismissed'
+const PROMPT_DISMISSED_KEY_PREFIX = 'notification_prompt_dismissed'
 const PROMPT_COOLDOWN_DAYS = 7
 
 interface NotificationPermissionPromptProps {
@@ -50,6 +50,12 @@ export function NotificationPermissionPrompt({
         return
       }
 
+      // Avoid prompting until we've fetched an initial permissionStatus.
+      if (permissionStatus == null) {
+        setShouldShow(false)
+        return
+      }
+
       // Don't show if permissions already granted
       if (isEnabled) {
         setShouldShow(false)
@@ -62,9 +68,11 @@ export function NotificationPermissionPrompt({
         return
       }
 
+      const dismissedKey = `${PROMPT_DISMISSED_KEY_PREFIX}:${session.user.id}`
+
       // Check if user dismissed recently
       try {
-        const dismissedAt = await AsyncStorage.getItem(PROMPT_DISMISSED_KEY)
+        const dismissedAt = await AsyncStorage.getItem(dismissedKey)
         if (dismissedAt) {
           const dismissedDate = new Date(dismissedAt)
           const daysSinceDismissed = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24)
@@ -116,14 +124,17 @@ export function NotificationPermissionPrompt({
 
   const handleDismiss = useCallback(async () => {
     // Record dismissal time for cooldown
-    try {
-      await AsyncStorage.setItem(PROMPT_DISMISSED_KEY, new Date().toISOString())
-    } catch {
-      // Ignore storage errors
+    if (session?.user?.id) {
+      const dismissedKey = `${PROMPT_DISMISSED_KEY_PREFIX}:${session.user.id}`
+      try {
+        await AsyncStorage.setItem(dismissedKey, new Date().toISOString())
+      } catch {
+        // Ignore storage errors
+      }
     }
     setIsOpen(false)
     setShouldShow(false)
-  }, [])
+  }, [session?.user?.id])
 
   // Don't render on web
   if (Platform.OS === 'web') {

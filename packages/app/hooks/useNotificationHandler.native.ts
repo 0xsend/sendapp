@@ -1,7 +1,6 @@
 import * as Notifications from 'expo-notifications'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Platform, AppState, type AppStateStatus } from 'react-native'
-import { router } from 'expo-router'
+import { AppState, type AppStateStatus, Platform } from 'react-native'
 import debug from 'debug'
 import {
   navigateFromNotification,
@@ -91,6 +90,11 @@ export function useNotificationHandler(
   const responseListener = useRef<Notifications.EventSubscription>()
   const appStateRef = useRef<AppStateStatus>(AppState.currentState)
 
+  // Avoid double-handling the same notification response (e.g. cold-start + response listener)
+  const lastHandledResponseKeyRef = useRef<string | null>(null)
+  // Allow canceling delayed navigation on unmount
+  const navigationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   /**
    * Handle notification received while app is foregrounded.
    */
@@ -108,6 +112,13 @@ export function useNotificationHandler(
    */
   const handleNotificationResponse = useCallback(
     (response: Notifications.NotificationResponse) => {
+      const responseKey = `${response.actionIdentifier}:${response.notification.request.identifier}`
+      if (lastHandledResponseKeyRef.current === responseKey) {
+        log('Skipping duplicate notification response:', responseKey)
+        return
+      }
+      lastHandledResponseKeyRef.current = responseKey
+
       log('Notification response received:', response)
       setLastResponse(response)
 
@@ -120,7 +131,11 @@ export function useNotificationHandler(
       // Navigate if enabled and we have valid data
       if (enableNavigation && data) {
         // Small delay to ensure navigation is ready
-        setTimeout(() => {
+        if (navigationTimeoutRef.current) {
+          clearTimeout(navigationTimeoutRef.current)
+        }
+
+        navigationTimeoutRef.current = setTimeout(() => {
           navigateFromNotification(data)
         }, 100)
       }
@@ -178,12 +193,20 @@ export function useNotificationHandler(
 
   // Handle app coming from killed state (cold start) with notification
   useEffect(() => {
+    let isActive = true
+
     const getInitialNotification = async () => {
-      // Get notification that launched the app
-      const response = await Notifications.getLastNotificationResponseAsync()
-      if (response) {
+      try {
+        // Get notification that launched the app
+        const response = await Notifications.getLastNotificationResponseAsync()
+        if (!isActive || !response) {
+          return
+        }
+
         log('App launched from notification:', response)
         handleNotificationResponse(response)
+      } catch (error) {
+        log('Error getting initial notification response:', error)
       }
     }
 
@@ -192,7 +215,10 @@ export function useNotificationHandler(
       void getInitialNotification()
     }, 500)
 
-    return () => clearTimeout(timer)
+    return () => {
+      isActive = false
+      clearTimeout(timer)
+    }
   }, [handleNotificationResponse])
 
   // Set up notification listeners
@@ -208,11 +234,18 @@ export function useNotificationHandler(
     )
 
     return () => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current)
+        navigationTimeoutRef.current = null
+      }
+
       if (notificationListener.current) {
         notificationListener.current.remove()
+        notificationListener.current = undefined
       }
       if (responseListener.current) {
         responseListener.current.remove()
+        responseListener.current = undefined
       }
     }
   }, [handleNotificationReceived, handleNotificationResponse])

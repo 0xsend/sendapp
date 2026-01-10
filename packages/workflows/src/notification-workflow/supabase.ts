@@ -26,7 +26,11 @@ export async function getUserPushTokens(userId: string): Promise<PushToken[]> {
   }
 
   const supabaseAdmin = createSupabaseAdminClient()
-  const { data, error } = await supabaseAdmin.from('push_tokens').select('*').eq('user_id', userId)
+  const { data, error } = await supabaseAdmin
+    .from('push_tokens')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
 
   if (error) {
     log.error('Error fetching push tokens:', { userId: redactId(userId), error })
@@ -77,7 +81,7 @@ export async function createNotification(notification: NotificationInsert): Prom
   if (!user_id || !type || !title || !body) {
     return {
       data: null,
-      error: new Error('user_id, type, title, and body are required'),
+      error: { message: 'user_id, type, title, and body are required' },
     }
   }
 

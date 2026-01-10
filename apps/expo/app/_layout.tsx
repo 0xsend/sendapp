@@ -43,6 +43,10 @@ import {
 import { DMMono_400Regular } from '@expo-google-fonts/dm-mono'
 import * as SystemUI from 'expo-system-ui'
 import { NotificationPermissionPrompt } from 'app/components/NotificationPermissionPrompt'
+import {
+  initializeNotificationConfig,
+  useNotificationHandler,
+} from 'app/hooks/useNotificationHandler'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -55,6 +59,8 @@ LogBox.ignoreLogs([
 ])
 
 export default function RootLayout() {
+  useNotificationHandler()
+
   const [fontsLoaded] = useFonts({
     'DM Sans': DMSans_400Regular,
     'DM Sans Medium': DMSans_500Medium,
@@ -75,6 +81,10 @@ export default function RootLayout() {
       void SystemUI.setBackgroundColorAsync('#f7f7f7')
     }
   }, [scheme])
+
+  useEffect(() => {
+    void initializeNotificationConfig()
+  }, [])
 
   useEffect(() => {
     supabase.auth

@@ -1,12 +1,11 @@
 import * as Notifications from 'expo-notifications'
 import * as Device from 'expo-device'
 import Constants from 'expo-constants'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Platform, AppState, type AppStateStatus } from 'react-native'
+import debug from 'debug'
+import { useCallback, useEffect, useState } from 'react'
+import { AppState, type AppStateStatus } from 'react-native'
 import { useSupabase } from './supabase/useSupabase'
 import { useSessionContext } from './supabase/useSessionContext'
-import { router } from 'expo-router'
-import debug from 'debug'
 
 const log = debug('app:utils:useNotifications')
 
@@ -41,7 +40,8 @@ interface UseNotificationsOptions {
  * - Permission requests
  * - Push token retrieval from Expo Push Service
  * - Token registration with backend (Supabase push_tokens table)
- * - Foreground/background notification handling
+ *
+ * Note: notification tap handling/navigation is owned by useNotificationHandler.
  */
 export function useNotifications(options: UseNotificationsOptions = {}): UseNotificationsResult {
   const { autoRegister = true } = options
@@ -54,9 +54,6 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
   )
   const [isRequestingPermission, setIsRequestingPermission] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-
-  const notificationListener = useRef<Notifications.EventSubscription>()
-  const responseListener = useRef<Notifications.EventSubscription>()
 
   const isEnabled = permissionStatus === Notifications.PermissionStatus.GRANTED
 
@@ -106,8 +103,9 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     }
 
     try {
-      // Get project ID from app config
-      const projectId = Constants.expoConfig?.extra?.eas?.projectId
+      // Prefer the modern EAS config, fall back to legacy expoConfig.extra.eas.
+      const projectId =
+        Constants.easConfig?.projectId ?? Constants.expoConfig?.extra?.eas?.projectId
 
       if (!projectId) {
         log('Missing EAS project ID in app config')
@@ -138,31 +136,30 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       return false
     }
 
-    if (!expoPushToken) {
-      // Try to get token first
-      const token = await getExpoPushToken()
-      if (!token) {
-        log('Cannot register token: Failed to get push token')
-        return false
-      }
-      setExpoPushToken(token)
+    if (!isEnabled) {
+      log('Cannot register token: Notifications permission not granted')
+      return false
     }
 
-    const tokenToRegister = expoPushToken || (await getExpoPushToken())
-    if (!tokenToRegister) {
+    const token = expoPushToken ?? (await getExpoPushToken())
+    if (!token) {
+      log('Cannot register token: Failed to get push token')
       return false
+    }
+
+    // Keep local state in sync, but avoid extra token fetches.
+    if (!expoPushToken) {
+      setExpoPushToken(token)
     }
 
     try {
       log('Registering push token with backend...')
 
       // Use Supabase RPC to register token via the register_push_token function
-      // Note: The 'expo' platform value needs to be added to the enum in the database
-      // For now, we map to the appropriate native platform
-      const platform = Platform.OS === 'ios' ? 'ios' : 'android'
+      // Backend schema uses push_token_platform = ('expo' | 'web')
       const { data, error: rpcError } = await supabase.rpc('register_push_token', {
-        token_value: tokenToRegister,
-        token_platform: platform as 'ios' | 'android' | 'web',
+        token_value: token,
+        token_platform: 'expo',
         token_device_id: Device.deviceName || undefined,
       })
 
@@ -172,7 +169,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         return false
       }
 
-      log('Successfully registered push token:', data?.id)
+      log('Successfully registered push token:', data?.[0]?.id)
       return true
     } catch (e) {
       const err = e instanceof Error ? e : new Error('Failed to register push token')
@@ -180,7 +177,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       setError(err)
       return false
     }
-  }, [session?.user?.id, expoPushToken, getExpoPushToken, supabase])
+  }, [session?.user?.id, isEnabled, expoPushToken, getExpoPushToken, supabase])
 
   /**
    * Unregister push token from backend
@@ -197,6 +194,7 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
         .from('push_tokens')
         .delete()
         .eq('token', expoPushToken)
+        .eq('platform', 'expo')
         .eq('user_id', session.user.id)
 
       if (deleteError) {
@@ -215,31 +213,6 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
       return false
     }
   }, [session?.user?.id, expoPushToken, supabase])
-
-  /**
-   * Handle notification received while app is foregrounded
-   */
-  const handleNotification = useCallback((notification: Notifications.Notification) => {
-    log('Received notification in foreground:', notification.request.content)
-    // The notification will be shown by Expo based on handler config
-  }, [])
-
-  /**
-   * Handle user interaction with notification (tap)
-   */
-  const handleNotificationResponse = useCallback((response: Notifications.NotificationResponse) => {
-    const data = response.notification.request.content.data
-    log('User tapped notification:', data)
-
-    // Navigate based on notification data
-    if (data?.type === 'transfer_received' || data?.type === 'transfer_sent') {
-      // Navigate to activity screen
-      router.push('/activity')
-    } else if (data?.route) {
-      // Generic route navigation
-      router.push(data.route as string)
-    }
-  }, [])
 
   // Check permissions on mount
   useEffect(() => {
@@ -276,26 +249,6 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
     void registerToken()
   }, [autoRegister, session?.user?.id, expoPushToken, isEnabled, registerToken])
 
-  // Set up notification listeners
-  useEffect(() => {
-    // Listener for notifications received while app is foregrounded
-    notificationListener.current = Notifications.addNotificationReceivedListener(handleNotification)
-
-    // Listener for user interaction with notifications
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse
-    )
-
-    return () => {
-      if (notificationListener.current) {
-        notificationListener.current.remove()
-      }
-      if (responseListener.current) {
-        responseListener.current.remove()
-      }
-    }
-  }, [handleNotification, handleNotificationResponse])
-
   // Re-check permissions when app comes to foreground
   useEffect(() => {
     const handleAppStateChange = async (nextState: AppStateStatus) => {
@@ -307,18 +260,6 @@ export function useNotifications(options: UseNotificationsOptions = {}): UseNoti
 
     const subscription = AppState.addEventListener('change', handleAppStateChange)
     return () => subscription.remove()
-  }, [])
-
-  // Configure Android notification channel
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      void Notifications.setNotificationChannelAsync('default', {
-        name: 'Default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#86ad7f',
-      })
-    }
   }, [])
 
   return {
