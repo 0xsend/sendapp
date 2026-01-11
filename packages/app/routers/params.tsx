@@ -474,3 +474,51 @@ const useContactsScreenParamsBase = () => {
 }
 
 export const useContactsScreenParams = withRootParams(useContactsScreenParamsBase)
+
+// Bank Transfer Screen Params
+export type BankTransferScreenParams = {
+  /** Indicates user just completed TOS acceptance */
+  tosSuccess?: boolean
+  /** Indicates user just completed KYC verification */
+  verificationSuccess?: boolean
+}
+
+const { useParam: useBankTransferParam, useParams: useBankTransferParams } =
+  createParam<BankTransferScreenParams>()
+
+const useTosSuccess = () => {
+  const [tosSuccess, setTosSuccess] = useBankTransferParam('tosSuccess', {
+    initial: undefined,
+    parse: (value) => (value === 'true' ? true : undefined),
+  })
+
+  return [tosSuccess, setTosSuccess] as const
+}
+
+const useVerificationSuccess = () => {
+  const [verificationSuccess, setVerificationSuccess] = useBankTransferParam(
+    'verificationSuccess',
+    {
+      initial: undefined,
+      parse: (value) => (value === 'true' ? true : undefined),
+    }
+  )
+
+  return [verificationSuccess, setVerificationSuccess] as const
+}
+
+const useBankTransferScreenParamsBase = () => {
+  const { setParams } = useBankTransferParams()
+  const [tosSuccess] = useTosSuccess()
+  const [verificationSuccess] = useVerificationSuccess()
+
+  return [
+    {
+      tosSuccess,
+      verificationSuccess,
+    },
+    setParams,
+  ] as const
+}
+
+export const useBankTransferScreenParams = withRootParams(useBankTransferScreenParamsBase)

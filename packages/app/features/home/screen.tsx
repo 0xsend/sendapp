@@ -1,5 +1,6 @@
 import {
   AnimatePresence,
+  BlinkingSkeleton,
   Button,
   Card,
   createStyledContext,
@@ -12,7 +13,6 @@ import {
   Spinner,
   Stack,
   styled,
-  Theme,
   useMedia,
   View,
   XStack,
@@ -477,7 +477,6 @@ export function InvestmentsBody() {
           padded
           size="$6"
           w="100%"
-          mah={220}
           gap="$5"
         >
           <Card.Header p={0}>
@@ -490,8 +489,13 @@ export function InvestmentsBody() {
               Portfolio Value
             </Paragraph>
           </Card.Header>
-
-          <InvestmentsBalanceCard.Body />
+          <InvestmentsBalanceCard.Body
+            sign={sign}
+            formattedDeltaUSD={formattedDeltaUSD}
+            isLoadingMarket={isLoadingMarket}
+            isPriceHidden={isPriceHidden}
+            pct24h={pct24h}
+          />
 
           <CoinsModal
             open={isSheetOpen}
@@ -544,86 +548,6 @@ export function InvestmentsBody() {
             </CoinsModal.Content>
           </CoinsModal>
         </InvestmentsPortfolioCard>
-
-        {/* Summary cards under the header */}
-        <XStack w={'100%'} gap={'$3'}>
-          <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
-            <YStack gap={'$2'} jc={'center'} ai={'center'}>
-              <Paragraph color={'$color10'} size={'$4'}>
-                Today
-              </Paragraph>
-              {isLoadingMarket ? (
-                <Spinner size={'small'} />
-              ) : (
-                <YStack ai={'center'} gap={'$2'}>
-                  <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                    {isPriceHidden ? '******' : `${sign}$${formattedDeltaUSD}`}
-                  </Paragraph>
-                  {/* Small neutral pill to mirror style (no color change) */}
-                  <Theme name={pct24h >= 0 ? 'green_active' : 'red_active'}>
-                    <XStack
-                      bc={'$color2'}
-                      $theme-dark={{
-                        bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.2)' : 'rgba(229, 115, 115, 0.2)',
-                      }}
-                      $theme-light={{
-                        bc: pct24h >= 0 ? 'rgba(134, 174, 128, 0.16)' : 'rgba(229, 115, 115, 0.16)',
-                      }}
-                      px={'$1.5'}
-                      br={'$2'}
-                    >
-                      <Paragraph fontSize={'$2'} fontWeight={400}>
-                        {`${pct24h > 0 ? '+' : pct24h < 0 ? '-' : ''}${Math.abs(pct24h).toFixed(2)}%`}
-                      </Paragraph>
-                    </XStack>
-                  </Theme>
-                </YStack>
-              )}
-            </YStack>
-          </Card>
-          <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
-            <YStack gap={'$2'} jc={'center'} ai={'center'}>
-              {/* <Paragraph color={'$color10'} size={'$4'}>
-              Total Return
-            </Paragraph> */}
-              {isLoadingMarket ? (
-                <Spinner size={'small'} />
-              ) : (
-                <YStack ai={'center'} gap={'$2'}>
-                  {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  —
-                </Paragraph> */}
-                  <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
-                    {/* <Paragraph fontSize={'$2'} fontWeight={400}>
-                    —
-                  </Paragraph> */}
-                  </XStack>
-                </YStack>
-              )}
-            </YStack>
-          </Card>
-          <Card f={1} padded elevation={'$0.75'} jc={'center'} ai={'center'} w="100%">
-            <YStack gap={'$2'} jc={'center'} ai={'center'}>
-              {/* <Paragraph color={'$color10'} size={'$4'}>
-              Investment
-            </Paragraph> */}
-              {isLoadingMarket ? (
-                <Spinner size={'small'} />
-              ) : (
-                <YStack ai={'center'} gap={'$2'}>
-                  {/* <Paragraph size={'$4'} fontWeight={600} color={'$color12'}>
-                  —
-                </Paragraph> */}
-                  <XStack bc={'$color2'} px={'$1.5'} br={'$2'}>
-                    {/* <Paragraph fontSize={'$2'} fontWeight={400}>
-                    —
-                  </Paragraph> */}
-                  </XStack>
-                </YStack>
-              )}
-            </YStack>
-          </Card>
-        </XStack>
       </YStack>
       {/* Holdings list */}
       <YStack w="100%" gap="$2">
@@ -632,8 +556,58 @@ export function InvestmentsBody() {
         </H4>
         <View gap="$2.5" width="100%">
           {isLoading ? (
-            <YStack p="$3.5" ai="center">
-              <Spinner />
+            <YStack w="100%" gap="$2.5" ai="center">
+              <BlinkingSkeleton
+                bg="$white"
+                $theme-dark={{
+                  bg: '$aztec3',
+                }}
+                elevation={2}
+                shadowOpacity={0.1}
+                $platform-native={{
+                  shadowOpacity: 0.08,
+                }}
+                w="100%"
+                h={90}
+                br="$6"
+                minOpacity={0.5}
+                maxOpacity={1}
+                duration={1000}
+              />
+              <BlinkingSkeleton
+                bg="$white"
+                $theme-dark={{
+                  bg: '$aztec3',
+                }}
+                elevation={2}
+                shadowOpacity={0.1}
+                $platform-native={{
+                  shadowOpacity: 0.08,
+                }}
+                w="100%"
+                h={90}
+                br="$6"
+                minOpacity={0.5}
+                maxOpacity={1}
+                duration={1100}
+              />
+              <BlinkingSkeleton
+                bg="$white"
+                $theme-dark={{
+                  bg: '$aztec3',
+                }}
+                elevation={2}
+                shadowOpacity={0.1}
+                $platform-native={{
+                  shadowOpacity: 0.08,
+                }}
+                w="100%"
+                h={90}
+                br="$6"
+                minOpacity={0.5}
+                maxOpacity={1}
+                duration={1200}
+              />
             </YStack>
           ) : (
             <>

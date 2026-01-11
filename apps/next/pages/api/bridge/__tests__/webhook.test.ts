@@ -473,7 +473,7 @@ describe('Bridge webhook handler', () => {
   })
 
   it('tracks rejection_attempts on KYC rejection events', async () => {
-    const { supabase, tables, fns } = createSupabaseMock()
+    const { supabase, tables } = createSupabaseMock()
     ;(createSupabaseAdminClient as jest.Mock).mockReturnValue(supabase)
     ;(verifyWebhookSignature as jest.Mock).mockReturnValue(true)
 

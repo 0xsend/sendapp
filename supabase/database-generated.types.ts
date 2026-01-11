@@ -877,6 +877,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          data: Json | null
+          delivered_at: string | null
+          id: number
+          read: boolean
+          read_at: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          data?: Json | null
+          delivered_at?: string | null
+          id?: number
+          read?: boolean
+          read_at?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          data?: Json | null
+          delivered_at?: string | null
+          id?: number
+          read?: boolean
+          read_at?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           about: string | null
@@ -968,6 +1007,51 @@ export type Database = {
           sync_referrals_to_contacts?: boolean
           verified_at?: string | null
           x_username?: string | null
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          auth: string | null
+          created_at: string
+          device_id: string | null
+          endpoint: string | null
+          id: number
+          is_active: boolean
+          last_used_at: string | null
+          p256dh: string | null
+          platform: Database["public"]["Enums"]["push_token_platform"]
+          token: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth?: string | null
+          created_at?: string
+          device_id?: string | null
+          endpoint?: string | null
+          id?: number
+          is_active?: boolean
+          last_used_at?: string | null
+          p256dh?: string | null
+          platform: Database["public"]["Enums"]["push_token_platform"]
+          token?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth?: string | null
+          created_at?: string
+          device_id?: string | null
+          endpoint?: string | null
+          id?: number
+          is_active?: boolean
+          last_used_at?: string | null
+          p256dh?: string | null
+          platform?: Database["public"]["Enums"]["push_token_platform"]
+          token?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -2599,6 +2683,13 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      cleanup_stale_push_tokens: {
+        Args: never
+        Returns: {
+          deactivated_count: number
+          deleted_count: number
+        }[]
+      }
       confirm_tags: {
         Args: {
           _event_id: string
@@ -2996,6 +3087,33 @@ export type Database = {
         }
         Returns: Json
       }
+      register_push_token: {
+        Args: {
+          token_device_id?: string
+          token_platform: Database["public"]["Enums"]["push_token_platform"]
+          token_value: string
+        }
+        Returns: {
+          auth: string | null
+          created_at: string
+          device_id: string | null
+          endpoint: string | null
+          id: number
+          is_active: boolean
+          last_used_at: string | null
+          p256dh: string | null
+          platform: Database["public"]["Enums"]["push_token_platform"]
+          token: string | null
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "push_tokens"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       send_accounts_add_webauthn_credential: {
         Args: {
           key_slot: number
@@ -3121,6 +3239,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      upsert_web_push_token: {
+        Args: { p_auth: string; p_endpoint: string; p_p256dh: string }
+        Returns: undefined
+      }
       user_referrals_count: { Args: never; Returns: number }
       wrapped_send_score_rank: {
         Args: never
@@ -3167,6 +3289,13 @@ export type Database = {
         | "Snapchat"
         | "Twitch"
       lookup_type_enum: "sendid" | "tag" | "refcode" | "address" | "phone"
+      notification_type:
+        | "transfer_sent"
+        | "transfer_received"
+        | "tag_confirmed"
+        | "account_activity"
+        | "system"
+      push_token_platform: "expo" | "web"
       tag_status: "pending" | "confirmed" | "available"
       temporal_status:
         | "initialized"
@@ -3509,6 +3638,14 @@ export const Constants = {
         "Twitch",
       ],
       lookup_type_enum: ["sendid", "tag", "refcode", "address", "phone"],
+      notification_type: [
+        "transfer_sent",
+        "transfer_received",
+        "tag_confirmed",
+        "account_activity",
+        "system",
+      ],
+      push_token_platform: ["expo", "web"],
       tag_status: ["pending", "confirmed", "available"],
       temporal_status: [
         "initialized",

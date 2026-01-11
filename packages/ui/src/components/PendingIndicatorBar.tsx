@@ -89,7 +89,7 @@ const IndicatorContainer = styled(Stack, {
   left: 0,
   w: '100%',
   pointerEvents: 'none',
-  zIndex: 20,
+  zIndex: 9999, // Higher than bottom nav portal (zIndex 100)
 
   variants: {
     native: {

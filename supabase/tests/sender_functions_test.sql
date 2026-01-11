@@ -48,10 +48,13 @@ VALUES
     ('recipient2_tag', 'confirmed', tests.get_supabase_uid('recipient_user_2'));
 
 -- Link tags to send accounts
+-- Idempotent: some environments may already have these associations (e.g., from prior runs),
+-- so avoid failing the entire file on a duplicate.
 INSERT INTO send_account_tags (send_account_id, tag_id)
 SELECT sa.id, t.id
 FROM send_accounts sa
-JOIN tags t ON t.user_id = sa.user_id;
+JOIN tags t ON t.user_id = sa.user_id
+ON CONFLICT (send_account_id, tag_id) DO NOTHING;
 
 SET ROLE postgres;
 

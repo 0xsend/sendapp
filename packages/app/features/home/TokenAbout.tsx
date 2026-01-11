@@ -67,7 +67,16 @@ export const TokenAbout = () => {
       {isLoading ? (
         <Spinner size="small" color={'$color12'} />
       ) : (
-        <Card py="$5" px="$4" w={'100%'} elevation={1}>
+        <Card
+          py="$5"
+          px="$4"
+          w={'100%'}
+          elevation={1}
+          $platform-native={{
+            elevation: 1,
+            shadowOpacity: 0.1,
+          }}
+        >
           <YStack gap={'$3'}>
             <Paragraph
               color={'$color12'}
