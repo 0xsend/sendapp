@@ -24,7 +24,7 @@
     "eas-build-post-install": "./eas/post-install"
   },
   "dependencies": {
-    "@babel/runtime": "^7.27.3",
+    "@babel/runtime": "^7.27.6",
     "@expo-google-fonts/dm-mono": "^0.4.1",
     "@expo-google-fonts/dm-sans": "^0.4.1",
     "@intercom/intercom-react-native": "^8.6.0",
