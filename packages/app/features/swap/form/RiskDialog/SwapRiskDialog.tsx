@@ -3,7 +3,6 @@ import {
   Button,
   Checkbox,
   Dialog,
-  H2,
   Label,
   Paragraph,
   Sheet,
@@ -83,25 +82,28 @@ const SwapRiskDialog = () => {
   const dialogContent = (
     <>
       {didUserSwap.error ? (
-        <YStack gap="$4">
+        <YStack gap="$3">
           <Dialog.Title>{t('risk.errorTitle')}</Dialog.Title>
-          <Paragraph>{toNiceError(didUserSwap.error)}</Paragraph>
+          <Paragraph size="$4">{toNiceError(didUserSwap.error)}</Paragraph>
         </YStack>
       ) : (
-        <YStack gap="$4" testID={'swapRiskDialogContent'}>
-          <H2>{t('risk.title')}</H2>
-          <Paragraph color="$gray11" size="$6">
+        <YStack p="$2" gap="$3.5" testID={'swapRiskDialogContent'}>
+          <Paragraph size="$7" fontWeight="600">
+            {t('risk.title')}
+          </Paragraph>
+          <Paragraph color="$gray11" size="$4">
             {t('risk.description')}{' '}
             <Anchor
               target="_blank"
               href="https://support.send.app/en/articles/10916009-terms-of-service"
               rel="noreferrer"
               textDecorationLine={'underline'}
+              size="$4"
             >
               {t('risk.learnMore')}
             </Anchor>
           </Paragraph>
-          <Spacer />
+          <Spacer size="$1" />
           <XStack ai={'center'} gap={'$2'}>
             <Checkbox
               id={id}
@@ -115,21 +117,21 @@ const SwapRiskDialog = () => {
               focusStyle={{ outlineWidth: 0 }}
               bw={2}
               boc="$aztec6"
-              size="$2"
+              size="$1"
             >
               <Checkbox.Indicator>
-                <Check color={'$black'} />
+                <Check color={'$black'} size={14} />
               </Checkbox.Indicator>
             </Checkbox>
-            <Label size="$6" htmlFor={id} cursor={'pointer'} lineHeight={20}>
+            <Label size="$4" htmlFor={id} cursor={'pointer'} lineHeight={18}>
               {t('risk.checkbox')}
             </Label>
           </XStack>
-          <XStack justifyContent="flex-end" marginTop="$4" gap="$4">
+          <XStack justifyContent="flex-end" marginTop="$3" gap="$3">
             {Platform.OS === 'web' && (
               <Dialog.Close asChild>
-                <Button testID={'swapRiskDialogCancelButton'} br={'$2'}>
-                  <Button.Text>{t('risk.buttons.cancel')}</Button.Text>
+                <Button testID={'swapRiskDialogCancelButton'} br={'$2'} size="$3">
+                  <Button.Text size="$3">{t('risk.buttons.cancel')}</Button.Text>
                 </Button>
               </Dialog.Close>
             )}
@@ -138,11 +140,12 @@ const SwapRiskDialog = () => {
               testID={'swapRiskDialogContinueButton'}
               onPress={handleConfirm}
               br={'$2'}
+              size="$3"
               disabled={!isChecked}
               disabledStyle={{ opacity: 0.5 }}
               width={Platform.OS === 'web' ? undefined : '100%'}
             >
-              <Button.Text>{t('risk.buttons.confirm')}</Button.Text>
+              <Button.Text size="$3">{t('risk.buttons.confirm')}</Button.Text>
             </Button>
           </XStack>
         </YStack>
@@ -155,15 +158,22 @@ const SwapRiskDialog = () => {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <Dialog.Portal>
-          <Dialog.Overlay />
+          <Dialog.Overlay
+            animation="responsive"
+            animateOnly={['opacity']}
+            exitStyle={{ opacity: 0 }}
+          />
           <Dialog.Content
             key="swap-risk-dialog"
-            gap="$4"
-            w={600}
+            gap="$3"
+            w={420}
             maxWidth={'90%'}
-            $gtMd={{ maxWidth: '40%' }}
+            $gtMd={{ maxWidth: '30%' }}
             bg="$aztec1"
-            p="$6"
+            p="$4"
+            animation="responsive"
+            animateOnly={['transform', 'opacity']}
+            exitStyle={{ x: 0, y: 20, opacity: 0, scale: 0.95 }}
           >
             {dialogContent}
           </Dialog.Content>
@@ -184,7 +194,7 @@ const SwapRiskDialog = () => {
       snapPoints={['fit']}
       snapPointsMode="fit"
     >
-      <Sheet.Frame key="swap-risk-sheet" gap="$4" padding="$4" pb={'$6'}>
+      <Sheet.Frame key="swap-risk-sheet" gap="$3" padding="$3" pb={'$5'}>
         {dialogContent}
       </Sheet.Frame>
       <Sheet.Overlay />
