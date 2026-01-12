@@ -1,4 +1,4 @@
-import { createVerify } from 'node:crypto'
+import { createVerify, createHash } from 'node:crypto'
 import debug from 'debug'
 import { WebhookSignatureError } from './errors'
 import { WebhookEventSchema, type DepositStatus, type WebhookEvent } from './types'
@@ -60,9 +60,15 @@ export function verifyWebhookSignature(
     throw new WebhookSignatureError('Signature timestamp outside tolerance')
   }
 
+  // Step 2: Join timestamp with raw body and generate SHA256 digest
+  // Per Bridge docs: https://apidocs.bridge.xyz/platform/additional-information/webhooks/signature
   const signedPayload = `${timestamp}.${rawBody}`
+  const digest = createHash('sha256').update(signedPayload).digest()
+
+  // Step 3-4: Verify signature using public key, digest, and decoded signature
+  // Node's verify() handles base64 decoding automatically when we pass 'base64' encoding
   const verifier = createVerify('RSA-SHA256')
-  verifier.update(signedPayload)
+  verifier.update(digest)
   verifier.end()
 
   let isValid: boolean
