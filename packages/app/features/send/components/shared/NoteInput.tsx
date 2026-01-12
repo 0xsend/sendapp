@@ -30,6 +30,7 @@ export const NoteInput = ({
             bg="$aztec5"
             numberOfLines={4}
             ai="flex-start"
+            verticalAlign="top"
             $theme-light={{ bg: '$gray3' }}
             placeholderTextColor="$gray11"
             disabled={disabled}
