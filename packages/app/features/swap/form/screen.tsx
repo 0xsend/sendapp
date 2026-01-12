@@ -3,6 +3,7 @@ import {
   FadeCard,
   Input,
   Paragraph,
+  Shimmer,
   Spinner,
   Stack,
   SubmitButton,
@@ -11,7 +12,7 @@ import {
   XStack,
   YStack,
 } from '@my/ui'
-import { ArrowDown, ArrowUp, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
+import { ArrowDown, ArrowUp, ChevronUp } from '@tamagui/lucide-icons'
 import { useThemeSetting } from '@tamagui/next-theme'
 import { useQueryClient } from '@tanstack/react-query'
 import { IconSwap } from 'app/components/icons'
@@ -32,15 +33,7 @@ import { api } from 'app/utils/api'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { formFields, SchemaForm } from 'app/utils/SchemaForm'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import {
-  type Ref,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useRouter } from 'solito/router'
 import { formatUnits } from 'viem'
@@ -554,7 +547,7 @@ export const SwapFormScreen = () => {
                       </XStack>
                       <XStack ai={'center'} jc={'space-between'}>
                         {isLoadingCoins ? (
-                          <Spinner color="$color11" />
+                          <Shimmer width={100} height={20} />
                         ) : !inCoin || !parsedInAmount ? (
                           <Paragraph
                             size={'$5'}
@@ -582,7 +575,7 @@ export const SwapFormScreen = () => {
                         )}
                         <XStack gap={'$3.5'} ai={'center'}>
                           {isLoadingCoins ? (
-                            <Spinner color="$color11" />
+                            <Shimmer width={100} height={20} />
                           ) : !isLoadingCoins && !inCoin ? (
                             <Paragraph color="$error">{t('form.errors.balance')}</Paragraph>
                           ) : !inCoin?.balance ? (
@@ -684,7 +677,7 @@ export const SwapFormScreen = () => {
                           <XStack height={'$2'} ai={'center'}>
                             {(quoteSide === 'EXACT_IN' ? isFetchingSwap : isEstimating) ||
                             isLoadingCoins ? (
-                              <Spinner color="$color11" />
+                              <Shimmer width={100} height={20} />
                             ) : !outCoin || !outAmountUsd ? (
                               <Paragraph
                                 size={'$5'}
