@@ -506,6 +506,7 @@ const SendChatInput = Input.styleable((props) => {
               }}
               numberOfLines={4}
               multiline
+              verticalAlign="top"
               placeholderTextColor="$gray11"
               f={1}
               ref={inputRef}
