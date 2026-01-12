@@ -220,9 +220,19 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           <Button.Text>{t('links.signOut')}</Button.Text>
         </Button>
         {Platform.OS !== 'web' && (
-          <Paragraph size="$2" color="$color4" textAlign="center">
-            Version {Application.nativeApplicationVersion}
-          </Paragraph>
+          <YStack
+            justifyContent={'center'}
+            ai={'center'}
+            backgroundColor={'rgba(102, 102, 102, 0.40)'}
+            borderRadius={'$2'}
+            backdropFilter={'blur(32px)'}
+            alignSelf={'center'}
+            mt={'$2'}
+          >
+            <Paragraph size="$2" color="$white" textAlign="center" px={'$2'} py={'$1.5'}>
+              Version {Application.nativeApplicationVersion}
+            </Paragraph>
+          </YStack>
         )}
       </YStack>
       <AccountDeletionFlow open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} />
