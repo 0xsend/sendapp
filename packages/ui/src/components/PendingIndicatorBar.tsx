@@ -85,8 +85,8 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
   )
 }
 const IndicatorContainer = styled(Stack, {
-  position: 'absolute',
   left: 0,
+  right: 0,
   w: '100%',
   pointerEvents: 'none',
   zIndex: 101, // Above BottomNavBar (zIndex 100), both in Portal stacking context
@@ -94,13 +94,17 @@ const IndicatorContainer = styled(Stack, {
   variants: {
     native: {
       true: {
+        position: 'absolute',
         bottom: 0,
       },
       false: {
         top: 0,
+        '$platform-web': {
+          position: 'fixed',
+        },
       },
     },
-  },
+  } as const,
 })
 
 export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => {
