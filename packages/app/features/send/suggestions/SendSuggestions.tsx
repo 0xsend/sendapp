@@ -65,6 +65,7 @@ const SuggestionsList = memo(
     const { t } = useTranslation('send')
     const skeletonBaseId = useId()
     const skeletonKeys = Array.from({ length: 10 }, (_, i) => `${skeletonBaseId}-${i}`)
+    const theme = useTheme()
 
     const pages = data?.pages || []
 
@@ -149,7 +150,7 @@ const SuggestionsList = memo(
                   display="none"
                   $sm={{ display: 'flex' }}
                   pointerEvents="none"
-                  colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+                  colors={[`${theme.background.val}00`, '$aztec1']}
                   start={{ x: 0, y: 0.5 }}
                   end={{ x: 1, y: 0.5 }}
                   width="$4"
