@@ -1,12 +1,12 @@
-import { describe, expect, it, jest, beforeEach } from '@jest/globals'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 // Mock the Temporal activity log
-jest.mock('@temporalio/activity', () => ({
+vi.mock('@temporalio/activity', () => ({
   log: {
-    warn: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-    debug: jest.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
   },
 }))
 
@@ -31,7 +31,7 @@ import {
 
 describe('Notification Validation', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('isPlainObject', () => {
