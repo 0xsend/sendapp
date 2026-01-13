@@ -16,13 +16,14 @@ import type { AuthProviderProps } from 'app/provider/auth'
 import { api } from 'app/utils/api'
 import type { NextPage } from 'next'
 import { DefaultSeo } from 'next-seo'
-import { type ReactElement, type ReactNode, useEffect } from 'react'
+import { type ReactElement, type ReactNode, useEffect, useRef } from 'react'
 import type { SolitoAppProps } from 'solito'
 
 import { defaultSEOConfig } from '../config/next-seo'
 import Head from 'next/head'
 import { NextSeo } from 'next-seo'
 import type { buildSeo } from 'utils/seo'
+import { NotificationAutoPrompt } from '../components/NotificationAutoPrompt'
 
 if (process.env.NODE_ENV === 'production') {
   require('../public/tamagui.css')
@@ -49,6 +50,25 @@ function MyApp({
   seo?: ReturnType<typeof buildSeo>
 }>) {
   const [, setTheme] = useRootTheme()
+  const swRegistered = useRef(false)
+
+  // Register service worker for web push notifications
+  useEffect(() => {
+    if (swRegistered.current) return
+    if (typeof window === 'undefined') return
+    if (!('serviceWorker' in navigator)) return
+
+    swRegistered.current = true
+
+    navigator.serviceWorker
+      .register('/service_worker.js', { scope: '/' })
+      .then((registration) => {
+        console.log('[SW] Service worker registered:', registration.scope)
+      })
+      .catch((error) => {
+        console.error('[SW] Service worker registration failed:', error)
+      })
+  }, [])
 
   useEffect(() => {
     // Update to user's preferred locale after hydration (stored preference only)
@@ -98,6 +118,7 @@ function MyApp({
               <ErrorFallback error={error} resetError={resetError} />
             )}
           >
+            <NotificationAutoPrompt />
             {getLayout(<Component {...pageProps} />)}
           </AnalyticsErrorBoundary>
         </Provider>

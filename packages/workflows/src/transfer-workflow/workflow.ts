@@ -5,6 +5,7 @@ import superjson from 'superjson'
 import debug from 'debug'
 import { hexToBytea } from 'app/utils/hexToBytea'
 import type { createUserOpActivities } from '../userop-workflow/activities'
+import type { createNotificationActivities } from '../notification-workflow/activities'
 
 const debugLog = debug('workflows:transfer')
 
@@ -38,6 +39,18 @@ const { waitForTransactionReceiptActivity } = proxyActivities<
     backoffCoefficient: 1.5,
     initialInterval: '10 seconds',
     maximumInterval: '60 seconds',
+  },
+})
+
+const { notifyTransferReceivedActivity, notifyTransferSentActivity } = proxyActivities<
+  ReturnType<typeof createNotificationActivities>
+>({
+  startToCloseTimeout: '30 seconds',
+  retry: {
+    maximumAttempts: 3,
+    backoffCoefficient: 2,
+    initialInterval: '1 second',
+    maximumInterval: '30 seconds',
   },
 })
 
@@ -156,6 +169,37 @@ export async function transfer(userOp: UserOperation<'v0.7'>, note?: string) {
       event_id: eventId,
     },
   })
+
+  // Send notifications after transfer is confirmed
+  debugLog('Sending transfer notifications', workflowId)
+  try {
+    // Notify recipient of received transfer
+    await notifyTransferReceivedActivity({
+      senderAddress: from,
+      recipientAddress: to,
+      amount: amount.toString(),
+      token,
+      txHash: bundlerReceipt.receipt.transactionHash,
+      note,
+    })
+
+    // Notify sender of sent transfer confirmation
+    await notifyTransferSentActivity({
+      senderAddress: from,
+      recipientAddress: to,
+      amount: amount.toString(),
+      token,
+      txHash: bundlerReceipt.receipt.transactionHash,
+      note,
+    })
+    debugLog('Transfer notifications sent successfully', workflowId)
+  } catch (notificationError) {
+    // Log but don't fail the workflow if notifications fail
+    log.warn('Failed to send transfer notifications', {
+      workflowId,
+      error: notificationError,
+    })
+  }
 
   return hash
 }

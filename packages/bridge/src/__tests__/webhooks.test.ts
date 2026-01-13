@@ -1,4 +1,4 @@
-import { generateKeyPairSync, createSign } from 'node:crypto'
+import { generateKeyPairSync, createSign, createHash } from 'node:crypto'
 import {
   verifyWebhookSignature,
   parseWebhookEvent,
@@ -17,8 +17,10 @@ describe('verifyWebhookSignature', () => {
   const publicKeyPem = publicKey.export({ type: 'pkcs1', format: 'pem' }).toString()
 
   function createSignature(body: string, timestamp: number): string {
+    // Mirror Bridge's signature process: hash then sign
     const signedPayload = `${timestamp}.${body}`
-    const signature = createSign('RSA-SHA256').update(signedPayload).sign(privateKey, 'base64')
+    const digest = createHash('sha256').update(signedPayload).digest()
+    const signature = createSign('RSA-SHA256').update(digest).sign(privateKey, 'base64')
     return `t=${timestamp},v0=${signature}`
   }
 

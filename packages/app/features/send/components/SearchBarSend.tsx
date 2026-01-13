@@ -643,6 +643,9 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 fontWeight: 'normal',
                 br: '$4',
                 placeholderTextColor: '$color4',
+                numberOfLines: 1,
+                multiline: false,
+                textAlignVertical: 'center',
                 focusStyle: {
                   outlineWidth: 2,
                   outlineColor: borderColor,

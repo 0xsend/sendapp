@@ -17,7 +17,7 @@ import {
   IconWorldSearch,
   IconXLogo,
 } from 'app/components/icons'
-import { FileSignature, Lock } from '@tamagui/lucide-icons'
+import { Bell, FileSignature, Lock } from '@tamagui/lucide-icons'
 import { RowLabel } from 'app/components/layout/RowLabel'
 import useIntercom from 'app/utils/intercom/useIntercom'
 import { memo, useCallback, useMemo, useState } from 'react'
@@ -81,6 +81,7 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
       infoCircle: <IconInfoCircle {...iconProps} />,
       questionCircle: <IconQuestionCircle {...iconProps} />,
       lock: <Lock {...iconProps} />,
+      bell: <Bell {...iconProps} />,
     }),
     []
   )
@@ -109,6 +110,13 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               text={t('links.items.language')}
               href="/account/language"
               icon={icons.worldSearch}
+            />
+          </YGroup.Item>
+          <YGroup.Item>
+            <AccountNavLink
+              text={t('links.items.notifications', 'Notifications')}
+              href="/account/notifications"
+              icon={icons.bell}
             />
           </YGroup.Item>
           <YGroup.Item>
@@ -212,9 +220,19 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
           <Button.Text>{t('links.signOut')}</Button.Text>
         </Button>
         {Platform.OS !== 'web' && (
-          <Paragraph size="$2" color="$color4" textAlign="center">
-            Version {Application.nativeApplicationVersion}
-          </Paragraph>
+          <YStack
+            justifyContent={'center'}
+            ai={'center'}
+            backgroundColor={'rgba(102, 102, 102, 0.40)'}
+            borderRadius={'$2'}
+            backdropFilter={'blur(32px)'}
+            alignSelf={'center'}
+            mt={'$2'}
+          >
+            <Paragraph size="$2" color="$white" textAlign="center" px={'$2'} py={'$1.5'}>
+              Version {Application.nativeApplicationVersion}
+            </Paragraph>
+          </YStack>
         )}
       </YStack>
       <AccountDeletionFlow open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} />
