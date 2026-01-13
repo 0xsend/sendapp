@@ -280,13 +280,15 @@ const useSendToken = () => {
 const useNote = () => {
   const [note, setNoteParam] = useSendParam('note', {
     initial: undefined,
-    stringify: (note) => {
-      if (!note) return ''
-      return encodeURIComponent(note)
-    },
     parse: (value) => {
       if (!value || !value[0] || value === '') return undefined
-      return Array.isArray(value) ? decodeURIComponent(value[0]) : decodeURIComponent(value)
+      // Decode URL-encoded values from the router (especially on native)
+      const rawValue = Array.isArray(value) ? value[0] : value
+      try {
+        return decodeURIComponent(rawValue)
+      } catch {
+        return rawValue
+      }
     },
   })
   return [note, setNoteParam] as const
@@ -302,12 +304,7 @@ const useSendScreenParamsBase = () => {
 
   const setEncodedParams = useCallback(
     (params, options) => {
-      const encodedParams = {
-        ...params,
-        note: params.note ? encodeURIComponent(params.note) : undefined,
-      }
-
-      setParams(encodedParams, options)
+      setParams(params, options)
     },
     [setParams]
   )
