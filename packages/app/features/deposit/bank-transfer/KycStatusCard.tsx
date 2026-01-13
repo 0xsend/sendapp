@@ -44,7 +44,7 @@ function getStatusDescription(status: string, isBusinessProfile: boolean): strin
         ? 'Your business verification was not successful.'
         : 'Your identity verification was not successful.'
     case 'under_review':
-      return 'Your verification is being reviewed. This usually takes 1-2 business days.'
+      return 'Your verification is being reviewed. This usually takes 1-2 business days. Please check your email for any additional requests for information.'
     case 'awaiting_questionnaire':
       return 'We are awaiting for you to fill out the questionnaire. Open the verification link to complete it.'
     case 'awaiting_ubo':
@@ -112,8 +112,9 @@ export function KycStatusCard({
   onInfoPress,
   children,
 }: KycStatusCardProps) {
-  // Don't show button if max attempts exceeded
-  const showStartButton = !isMaxAttemptsExceeded && kycStatus !== 'rejected'
+  // Statuses where no user action is possible - either waiting for review or account is terminal
+  const statusesWithNoUserAction = ['rejected', 'under_review', 'paused', 'offboarded']
+  const showStartButton = !isMaxAttemptsExceeded && !statusesWithNoUserAction.includes(kycStatus)
   const isNewUser = kycStatus === 'not_started'
 
   // Determine button label based on current step
