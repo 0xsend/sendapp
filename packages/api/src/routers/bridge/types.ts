@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const CreateKycLinkInputSchema = z.object({
   redirectUri: z.string().optional(),
+  email: z.string().email().optional(),
 })
 
 export const GetKycStatusInputSchema = z.object({

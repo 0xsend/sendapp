@@ -1,10 +1,12 @@
-import { FadeCard, Paragraph, YStack, XStack, Button, Spinner } from '@my/ui'
+import { FadeCard, Paragraph, YStack, XStack, Button, Spinner, Input } from '@my/ui'
 import { Check, HelpCircle } from '@tamagui/lucide-icons'
 
 interface KycStatusCardProps {
   kycStatus: string
   isBusinessProfile?: boolean
   isTosAccepted?: boolean
+  email?: string
+  onEmailChange?: (email: string) => void
   onStartKyc?: () => void
   isLoading?: boolean
   startDisabled?: boolean
@@ -12,6 +14,10 @@ interface KycStatusCardProps {
   isMaxAttemptsExceeded?: boolean
   onInfoPress?: () => void
   children?: React.ReactNode
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
 function getStatusText(status: string, isBusinessProfile: boolean): string {
@@ -104,6 +110,8 @@ export function KycStatusCard({
   kycStatus,
   isBusinessProfile = false,
   isTosAccepted = false,
+  email = '',
+  onEmailChange,
   onStartKyc,
   isLoading,
   startDisabled,
@@ -116,11 +124,14 @@ export function KycStatusCard({
   const statusesWithNoUserAction = ['rejected', 'under_review', 'paused', 'offboarded']
   const showStartButton = !isMaxAttemptsExceeded && !statusesWithNoUserAction.includes(kycStatus)
   const isNewUser = kycStatus === 'not_started'
+  const hasValidEmail = isValidEmail(email)
 
   // Determine button label based on current step
   let buttonLabel = 'Continue Verification'
   if (kycStatus === 'rejected') {
     buttonLabel = 'Try Again'
+  } else if (!hasValidEmail) {
+    buttonLabel = 'Enter Email to Continue'
   } else if (!isTosAccepted) {
     buttonLabel = 'Accept Terms of Service'
   } else if (isNewUser) {
@@ -198,15 +209,36 @@ export function KycStatusCard({
           <YStack gap="$3" py="$2">
             <StepIndicator
               step={1}
-              label="Accept Terms of Service"
-              isComplete={isTosAccepted}
-              isActive={!isTosAccepted}
+              label="Enter Email Address"
+              isComplete={hasValidEmail}
+              isActive={!hasValidEmail}
             />
             <StepIndicator
               step={2}
+              label="Accept Terms of Service"
+              isComplete={isTosAccepted}
+              isActive={hasValidEmail && !isTosAccepted}
+            />
+            <StepIndicator
+              step={3}
               label={isBusinessProfile ? 'Verify Your Business' : 'Verify Your Identity'}
               isComplete={false}
-              isActive={isTosAccepted}
+              isActive={hasValidEmail && isTosAccepted}
+            />
+          </YStack>
+
+          <YStack gap="$2">
+            <Paragraph fontSize="$3" color="$gray10">
+              Email for verification follow-ups
+            </Paragraph>
+            <Input
+              placeholder="you@example.com"
+              value={email}
+              onChangeText={onEmailChange}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              size="$4"
             />
           </YStack>
 
@@ -214,7 +246,7 @@ export function KycStatusCard({
             size="$4"
             theme="green"
             onPress={onStartKyc}
-            disabled={isLoading || startDisabled}
+            disabled={isLoading || startDisabled || !hasValidEmail}
             icon={isLoading ? <Spinner size="small" /> : undefined}
           >
             {buttonLabel}

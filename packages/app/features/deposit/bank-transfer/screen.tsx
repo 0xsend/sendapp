@@ -63,6 +63,7 @@ export function BankTransferScreen() {
   const createStaticMemo = useCreateStaticMemo()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
   // Track which step we're waiting for: 'tos', 'kyc', or null
   // Success params act as early signals - verificationSuccess means show confirming state,
   // tosSuccess means TOS is done so skip to next step (no waiting needed)
@@ -100,7 +101,7 @@ export function BankTransferScreen() {
       const successParam = isTosAccepted ? 'verificationSuccess' : 'tosSuccess'
       const separator = baseRedirectUri.includes('?') ? '&' : '?'
       const redirectUri = `${baseRedirectUri}${separator}${successParam}=true`
-      const result = await initiateKyc.mutateAsync({ redirectUri })
+      const result = await initiateKyc.mutateAsync({ redirectUri, email })
       // If TOS is already accepted, go straight to KYC
       // Otherwise, open TOS link first (Bridge requires TOS acceptance before KYC)
       const urlToOpen = isTosAccepted ? result.kycLink : result.tosLink || result.kycLink
@@ -125,7 +126,7 @@ export function BankTransferScreen() {
         },
       })
     }
-  }, [analytics, baseRedirectUri, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus])
+  }, [analytics, baseRedirectUri, email, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus])
 
   const handleOpenVerificationLink = useCallback(() => {
     if (verificationUrl) {
@@ -325,6 +326,8 @@ export function BankTransferScreen() {
               kycStatus={kycStatus}
               isBusinessProfile={isBusinessProfile}
               isTosAccepted={isTosAccepted}
+              email={email}
+              onEmailChange={setEmail}
               rejectionReasons={rejectionReasons}
               isMaxAttemptsExceeded={isMaxAttemptsExceeded}
               onStartKyc={handleStartKyc}

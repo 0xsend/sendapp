@@ -196,8 +196,14 @@ export const bridgeRouter = createTRPCRouter({
           }
         }
 
-        // Use send_id for deterministic email - user emails are unreliable with passkey auth
-        const email = `${profile.send_id}@no-reply.users.send.app`
+        // Email is required when creating a new KYC link
+        if (!input.email) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Email is required to start verification',
+          })
+        }
+        const email = input.email
 
         // Validate redirectUri against allowlist
         const validatedRedirectUri =
