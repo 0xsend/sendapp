@@ -615,11 +615,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Verify signature
   try {
     verifyWebhookSignature(rawBody, signatureHeader ?? '', webhookPublicKey)
+    log('✅ signature verified successfully')
   } catch (err) {
     if (err instanceof WebhookSignatureError) {
-      log('webhook signature verification failed: %s', err.message)
+      log('❌ signature verification failed: %s', err.message)
       return res.status(400).json({ error: 'Invalid signature' })
     }
+    log('unexpected verification error: %O', err)
     throw err
   }
 
@@ -627,6 +629,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let event: WebhookEvent
   try {
     event = parseWebhookEvent(rawBody)
+    log(
+      'event parsed: eventId=%s eventType=%s category=%s',
+      event.event_id,
+      event.event_type,
+      event.event_category
+    )
   } catch (err) {
     log('failed to parse webhook event: %O', err)
     return res.status(400).json({ error: 'Invalid event payload' })

@@ -1,5 +1,5 @@
 #!/usr/bin/env bun run
-import { createSign, generateKeyPairSync, randomUUID } from 'node:crypto'
+import { createSign, createHash, generateKeyPairSync, randomUUID } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { parseArgs } from 'node:util'
 import { createInterface } from 'node:readline/promises'
@@ -310,8 +310,11 @@ function loadPrivateKey(input?: string | null): string | null {
 }
 
 function createSignature(body: string, privateKey: string, timestamp: number): string {
+  // Mirror Bridge's signature process: hash the signed payload with SHA256, then sign with RSA-SHA256
+  // Per Bridge docs: https://apidocs.bridge.xyz/platform/additional-information/webhooks/signature
   const signedPayload = `${timestamp}.${body}`
-  const signature = createSign('RSA-SHA256').update(signedPayload).sign(privateKey, 'base64')
+  const digest = createHash('sha256').update(signedPayload).digest()
+  const signature = createSign('RSA-SHA256').update(digest).sign(privateKey, 'base64')
   return `t=${timestamp},v0=${signature}`
 }
 
