@@ -1,6 +1,7 @@
 import type React from 'react'
-import { useEffect, useState } from 'react'
-import { useMedia, useSafeAreaInsets, View } from '@my/ui'
+import { useCallback, useEffect, useState } from 'react'
+import { isWeb, useMedia, useSafeAreaInsets, View } from '@my/ui'
+import { isAndroid } from '@tamagui/constants'
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
 export interface SendModalContainerProps {
@@ -9,6 +10,19 @@ export interface SendModalContainerProps {
   setOpen: (open: boolean) => void
   bottomSheetRef: React.RefObject<BottomSheet>
 }
+
+const DragHandle = () =>
+  isWeb ? null : (
+    <View
+      ai="center"
+      jc="center"
+      width="100%"
+      height={isAndroid ? 20 : 1}
+      y={isAndroid ? 10 : 0}
+      hitSlop={{ top: 20, bottom: 20, left: 0, right: 0 }}
+      collapsable={false}
+    />
+  )
 
 export const SendModalContainer = ({
   children,
@@ -20,6 +34,8 @@ export const SendModalContainer = ({
   const { bottom, top } = useSafeAreaInsets()
 
   const [render, setRender] = useState(false)
+
+  const renderHandle = useCallback(() => <DragHandle />, [])
 
   useEffect(() => {
     if (open) {
@@ -35,6 +51,7 @@ export const SendModalContainer = ({
         style={{ backgroundColor: 'transparent' }}
         enableDynamicSizing={false}
         enablePanDownToClose
+        enableContentPanningGesture={false}
         detached
         onClose={() => {
           setOpen(false)
@@ -43,7 +60,7 @@ export const SendModalContainer = ({
           damping: 35,
           stiffness: 400,
         }}
-        handleComponent={null}
+        handleComponent={renderHandle}
         backgroundStyle={{
           backgroundColor: 'transparent',
         }}
