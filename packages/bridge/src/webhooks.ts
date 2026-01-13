@@ -65,7 +65,7 @@ export function verifyWebhookSignature(
   const signedPayload = `${timestamp}.${rawBody}`
   const digest = createHash('sha256').update(signedPayload).digest()
 
-  // Step 3-4: Verify signature using public key, digest, and decoded signature
+  // Step 3: Verify signature against the digest using RSA-SHA256
   // Node's verify() handles base64 decoding automatically when we pass 'base64' encoding
   const verifier = createVerify('RSA-SHA256')
   verifier.update(digest)
