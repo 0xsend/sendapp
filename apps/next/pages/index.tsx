@@ -31,7 +31,8 @@ export const Page: NextPageWithLayout = () => {
   const siteUrl = process.env.NEXT_PUBLIC_URL || 'https://send.app'
   const seo = buildSeo({
     title: 'Send',
-    description: 'Peer-to-peer money. Send. Save. Invest.',
+    description:
+      'Send money, earn up to 10% yield, invest, and collect rewards with every transaction - no banks required. start sending.',
     url: siteUrl,
     type: 'website',
   })
