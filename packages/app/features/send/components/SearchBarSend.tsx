@@ -637,13 +637,19 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
             props={{
               query: {
                 pr: '$3.5',
-                pl: '$8',
+                pl: '$9',
+                fontSize: 17,
+                lineHeight: 20,
+                '$platform-native': {
+                  pl: 44,
+                  fontSize: 14,
+                  lineHeight: 18,
+                },
                 accessibilityRole: 'search',
                 placeholder,
                 fontWeight: 'normal',
-                br: '$4',
+                br: 1000_000,
                 placeholderTextColor: '$color4',
-                numberOfLines: 1,
                 multiline: false,
                 textAlignVertical: 'center',
                 focusStyle: {
@@ -656,15 +662,15 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                     outlineColor: '$gray7',
                   },
                 },
-                fontSize: 17,
-                lineHeight: 20,
                 ...(Platform.OS === 'web' ? { py: '$5' } : {}),
                 onChangeText: handleTextChange,
+                numberOfLines: 1,
+                minWidth: 325,
                 iconBefore: (
                   <IconSearch
                     ml={Platform.OS === 'web' ? 0 : '$3'}
                     color={'$silverChalice'}
-                    x="$-1"
+                    x="$1"
                     $theme-light={{ color: '$darkGrayTextField' }}
                   />
                 ),
@@ -693,7 +699,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 elevation={'$0.75'}
                 shadowOpacity={0.3}
                 $platform-native={{ elevation: '$0.25', shadowOpacity: 0.05 }}
-                br="$4"
+                br={1000_000}
                 {...containerProps}
               >
                 {query}
