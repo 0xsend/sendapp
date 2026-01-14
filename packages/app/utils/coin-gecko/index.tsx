@@ -1,11 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
 import type { CoingeckoId, coins, CoinWithBalance } from 'app/data/coins'
 import { allCoins, COINGECKO_IDS } from 'app/data/coins'
 import { z } from 'zod'
 import { api } from 'app/utils/api'
 
-// Market data (current prices) is fetched from the free CoinGecko API on the client.
-// Detailed coin data and charts are fetched via our server API (Pro keys stay server-only).
+// Market data is now fetched via our server API for centralized caching and fault tolerance.
+// Detailed coin data and charts are also fetched via server API (Pro keys stay server-only).
 
 // Strict runtime validation against supported CoinGecko IDs
 export const CoinIdEnum = z.enum(COINGECKO_IDS)
@@ -75,59 +74,34 @@ export const useTokenPrice = (tokenId: CoingeckoId) => {
 export const useSendPrice = () => useTokenPrice('send-token-2' as const)
 
 /**
- * Fetch coin market data for multiple tokens at once
+ * Fetch coin market data for multiple tokens at once via our server API.
+ * The server provides centralized caching and fault tolerance - if CoinGecko
+ * fails, users receive cached prices instead of errors.
  */
-type VsCurrency = 'usd'
-
-function buildCgMarketsUrl(params: {
-  ids: readonly (typeof COINGECKO_IDS)[number][]
-  vsCurrency: VsCurrency
-  priceChangePercentage: readonly ('24h' | '7d')[]
-}) {
-  const canonicalIds = Array.from(new Set(params.ids)).sort().join(',')
-  const url = new URL('https://api.coingecko.com/api/v3/coins/markets')
-  url.searchParams.set('ids', canonicalIds)
-  url.searchParams.set('vs_currency', params.vsCurrency)
-  url.searchParams.set('price_change_percentage', params.priceChangePercentage.join(','))
-  return url
-}
-
 export const useTokensMarketData = <R = MarketData>(options?: {
   select?: (data: MarketData) => R
   enabled?: boolean
 }) => {
   // Filter out coins without CoinGecko IDs
-  const ids = allCoins.map((c) => c.coingeckoTokenId).filter((id) => id !== undefined)
-  const canonicalIds = Array.from(new Set(ids)).sort().join(',')
+  const ids = allCoins
+    .map((c) => c.coingeckoTokenId)
+    .filter((id): id is CoingeckoId => id !== undefined)
 
-  const cgQuery = useQuery<MarketData, Error, R>({
-    queryKey: ['coin-market-data', canonicalIds, ids],
-    enabled: options?.enabled ?? canonicalIds.length > 0,
-    queryFn: async () => {
-      const url = buildCgMarketsUrl({
-        ids,
-        vsCurrency: 'usd',
-        priceChangePercentage: ['24h', '7d'],
-      })
+  const query = api.coinGecko.getMarketsData.useQuery(
+    { ids, vsCurrency: 'usd', priceChangePercentage: ['24h', '7d'] },
+    {
+      enabled: (options?.enabled ?? true) && ids.length > 0,
+      staleTime: 15_000,
+      refetchInterval: 15_000,
+      select: (result) => {
+        // Extract data from server response, apply user's select if provided
+        const data = result.data
+        return options?.select ? options.select(data) : (data as R)
+      },
+    }
+  )
 
-      const response = await fetch(url.toString(), {
-        headers: { Accept: 'application/json' },
-        mode: 'cors',
-      })
-
-      if (!response.ok)
-        throw new Error(`Failed to fetch market data for: ${canonicalIds}, ${response.status}`)
-      const data = await response.json()
-      const parsedData = MarketDataSchema.parse(data)
-
-      return parsedData
-    },
-    select: options?.select,
-    staleTime: 45000,
-    refetchInterval: 45000,
-  })
-
-  return cgQuery
+  return query
 }
 
 // Minimal schema for /coins/{id} when only description is needed

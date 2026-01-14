@@ -41,7 +41,8 @@ import type { Functions } from '@my/supabase/database.types'
 import { useTokenPrices } from 'app/utils/useTokenPrices'
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { parseUnits } from 'viem'
-import { type allCoins, type allCoinsDict, coinsDict } from 'app/data/coins'
+import { type allCoinsDict, coinsDict } from 'app/data/coins'
+import type { TokenPriceData } from 'app/utils/useTokenPrices'
 import { IconFYSI } from 'app/components/icons/IconFYSI'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
 import { Linking, Platform, Pressable } from 'react-native'
@@ -499,7 +500,7 @@ const Vibes = ({
   tokenPrices,
 }: {
   profile: Functions<'profile_lookup'>[number]
-  tokenPrices: Record<allCoins[number]['token'], number> | undefined
+  tokenPrices: TokenPriceData | undefined
 }) => {
   const media = useMedia()
   const dollarToTokenAmount = ({
