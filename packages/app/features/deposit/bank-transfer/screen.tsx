@@ -8,6 +8,7 @@ import {
   Button,
   AnimatePresence,
 } from '@my/ui'
+import debug from 'debug'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
@@ -25,6 +26,8 @@ import { useRedirectUri } from 'app/utils/useRedirectUri'
 import { useAnalytics } from 'app/provider/analytics'
 import { useUser } from 'app/utils/useUser'
 import { useBankTransferScreenParams } from 'app/routers/params'
+
+const log = debug('app:bank-transfer')
 
 const getErrorType = (error: unknown): 'network' | 'unknown' => {
   const message = error instanceof Error ? error.message : String(error)
@@ -112,34 +115,40 @@ export function BankTransferScreen() {
           has_tos_accepted: isTosAccepted,
         },
       })
-      // Build redirectUri with success param so we know user completed the flow
-      // when they return (even if DB hasn't synced yet)
-      const successParam = isTosAccepted ? 'verificationSuccess' : 'tosSuccess'
-      const separator = baseRedirectUri.includes('?') ? '&' : '?'
-      const redirectUri = `${baseRedirectUri}${separator}${successParam}=true`
-      const result = await initiateKyc.mutateAsync({ redirectUri, email })
-      // If TOS is already accepted, go straight to KYC
-      // Otherwise, open TOS link first (Bridge requires TOS acceptance before KYC)
-      const urlToOpen = isTosAccepted ? result.kycLink : result.tosLink || result.kycLink
+
+      // Get or create KYC link - returns actual status from Bridge
+      const result = await initiateKyc.mutateAsync({
+        redirectUri: baseRedirectUri,
+        email,
+      })
+
+      // Check for expected errors returned in response
+      if (result.error === 'email_in_use') {
+        setEmailError(result.message)
+        return
+      }
+
+      // Use returned status to determine what to do (not stale local state)
+      const needsTos = result.tosStatus !== 'approved'
+      const urlToOpen = needsTos ? result.tosLink || result.kycLink : result.kycLink
+
       if (urlToOpen) {
         analytics.capture({
           name: 'bank_transfer_kyc_link_opened',
           properties: {
-            link_type: !isTosAccepted && result.tosLink ? 'tos' : 'kyc',
-            kyc_status: kycStatus,
+            link_type: needsTos ? 'tos' : 'kyc',
+            kyc_status: result.kycStatus,
+            tos_status: result.tosStatus,
           },
         })
         await Linking.openURL(urlToOpen)
         setVerificationUrl(result.kycLink)
-        setWaitingFor(isTosAccepted ? 'kyc' : 'tos')
+        setWaitingFor(needsTos ? 'tos' : 'kyc')
+        // Reset editing state after successful submission
+        setIsEditingEmail(false)
       }
     } catch (error) {
-      console.error('Failed to initiate KYC:', error)
-      // Check if email is already in use
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      if (errorMessage.includes('already in use')) {
-        setEmailError('This email is already in use for verification.')
-      }
+      log('failed to initiate KYC: %O', error)
       analytics.capture({
         name: 'bank_transfer_kyc_failed',
         properties: {

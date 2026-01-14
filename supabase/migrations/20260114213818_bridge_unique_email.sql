@@ -8,7 +8,8 @@ CREATE UNIQUE INDEX bridge_customers_email_key ON public.bridge_customers USING 
 
 alter table "public"."bridge_customers" add constraint "bridge_customers_email_key" UNIQUE using index "bridge_customers_email_key";
 
-create or replace view "public"."bridge_customers_safe" as  SELECT bridge_customers.id,
+create or replace view "public"."bridge_customers_safe"
+with (security_barrier = true, security_invoker = true) as  SELECT bridge_customers.id,
     bridge_customers.user_id,
     bridge_customers.bridge_customer_id,
     bridge_customers.kyc_link_id,
@@ -29,5 +30,8 @@ create or replace view "public"."bridge_customers_safe" as  SELECT bridge_custom
         END AS rejection_reasons
    FROM bridge_customers;
 
+ALTER VIEW public.bridge_customers_safe OWNER TO postgres;
 
-
+REVOKE SELECT ON TABLE public.bridge_customers_safe FROM anon;
+GRANT SELECT ON TABLE public.bridge_customers_safe TO authenticated;
+GRANT SELECT ON TABLE public.bridge_customers_safe TO service_role;
