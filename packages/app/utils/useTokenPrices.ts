@@ -13,10 +13,22 @@ import {
   usdcAddress,
 } from '@my/wagmi'
 import { z } from 'zod'
-import { useQuery, type UseQueryResult } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { allCoins } from 'app/data/coins'
 import { usePathname } from 'app/utils/usePathname'
 import { useTokensMarketData, type MarketData } from 'app/utils/coin-gecko'
+
+// Flexible price data type - can be keyed by any token address or 'eth'
+export type TokenPriceData = Record<string, number>
+
+// Common query result shape for price queries (works with both tRPC and vanilla React Query)
+export type TokenPriceQueryResult = {
+  data: TokenPriceData | undefined
+  isSuccess: boolean
+  isError: boolean
+  isLoading: boolean
+  isPending: boolean
+}
 
 const CoingeckoTokenPriceSchema = z.object({
   usd: z.number(),
@@ -145,7 +157,7 @@ type priceSource = 'coingecko' | 'dexscreener'
 export const useTokenPrices = (
   source: priceSource = 'coingecko'
 ): {
-  query: UseQueryResult<Record<allCoins[number]['token'], number>, Error>
+  query: TokenPriceQueryResult
   enabled: boolean
 } => {
   const pathname = usePathname()
@@ -167,7 +179,7 @@ export const useTokenPrices = (
     !isAuthRoute &&
     (source === 'dexscreener' || (source === 'coingecko' && (cgQuery.isError || hasMissingPrices)))
 
-  const dexQuery = useQuery<Record<(typeof allCoins)[number]['token'], number>, Error>({
+  const dexQuery = useQuery({
     queryKey: ['tokenPrices', 'dexscreener'],
     enabled: dexQueryEnabled,
     staleTime: 1000 * 60,
