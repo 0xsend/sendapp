@@ -18,6 +18,7 @@ export const CreateKycLinkOutputSchema = z.object({
 export const GetKycStatusOutputSchema = z.object({
   kycStatus: z.string(),
   tosStatus: z.string(),
+  email: z.string(),
   rejectionReasons: z.array(z.unknown()).nullable(),
   rejectionAttempts: z.number(),
   customerId: z.string().nullable(),

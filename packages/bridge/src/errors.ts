@@ -7,13 +7,16 @@ export class BridgeApiError extends Error {
   readonly status: number
   readonly code: string | undefined
   readonly details: Record<string, unknown> | undefined
+  /** Full response body for cases where Bridge includes extra data (e.g., existing KYC link) */
+  readonly responseBody: Record<string, unknown>
 
-  constructor(status: number, response: BridgeApiErrorResponse) {
+  constructor(status: number, response: BridgeApiErrorResponse & Record<string, unknown>) {
     super(response.message)
     this.name = 'BridgeApiError'
     this.status = status
     this.code = response.code
     this.details = response.details
+    this.responseBody = response
   }
 
   toJSON() {

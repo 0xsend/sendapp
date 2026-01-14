@@ -53,17 +53,33 @@ export function BankTransferScreen() {
   const kycStatus = customer?.kyc_status ?? 'not_started'
   const isTosAccepted = customer?.tos_status === 'approved'
   const isApproved = customer?.kyc_status === 'approved'
+  // User is new if they don't have a bridge_customers record yet (not just based on status)
+  const isNewUser = !customer
 
   // Sync KYC status from Bridge API to DB for faster updates
   // Sync when: has kycLinkId AND not approved AND not (rejected with max attempts)
   const shouldSync = !!kycLinkId && !isApproved && !isMaxAttemptsExceeded
-  useSyncKycStatus(kycLinkId ?? undefined, { enabled: shouldSync })
+  const { email: savedEmail, isLoading: emailLoading } = useSyncKycStatus(kycLinkId ?? undefined, {
+    enabled: shouldSync,
+  })
   const { hasStaticMemo, bankDetails, isLoading: memoLoading } = useStaticMemoBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createStaticMemo = useCreateStaticMemo()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
+  // null = user hasn't edited, use savedEmail; string = user's input
+  const [emailInput, setEmailInput] = useState<string | null>(null)
+  const [isEditingEmail, setIsEditingEmail] = useState(false)
+  const [emailError, setEmailError] = useState<string | null>(null)
+
+  // Derive email: user input takes precedence, otherwise use saved
+  const email = emailInput ?? savedEmail ?? ''
+
+  // Clear email error when email changes
+  const setEmail = useCallback((value: string) => {
+    setEmailInput(value)
+    setEmailError(null)
+  }, [])
   // Track which step we're waiting for: 'tos', 'kyc', or null
   // Success params act as early signals - verificationSuccess means show confirming state,
   // tosSuccess means TOS is done so skip to next step (no waiting needed)
@@ -119,6 +135,11 @@ export function BankTransferScreen() {
       }
     } catch (error) {
       console.error('Failed to initiate KYC:', error)
+      // Check if email is already in use
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      if (errorMessage.includes('already in use')) {
+        setEmailError('This email is already in use for verification.')
+      }
       analytics.capture({
         name: 'bank_transfer_kyc_failed',
         properties: {
@@ -230,10 +251,16 @@ export function BankTransferScreen() {
   }, [createStaticMemo])
 
   // Loading state
-  if (kycLoading || isGeoBlockLoading) {
+  // For returning users, wait for email to load to prevent content shift
+  const isEmailInitializing = !isNewUser && shouldSync && emailLoading
+  if (kycLoading || isGeoBlockLoading || isEmailInitializing) {
     return (
-      <YStack f={1} ai="center" jc="center" py="$8">
-        <Spinner size="large" color="$primary" />
+      <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
+        <FadeCard>
+          <YStack ai="center" jc="center" py="$8">
+            <Spinner size="large" color="$primary" />
+          </YStack>
+        </FadeCard>
       </YStack>
     )
   }
@@ -326,8 +353,13 @@ export function BankTransferScreen() {
               kycStatus={kycStatus}
               isBusinessProfile={isBusinessProfile}
               isTosAccepted={isTosAccepted}
+              isNewUser={isNewUser}
               email={email}
+              savedEmail={savedEmail}
               onEmailChange={setEmail}
+              isEditingEmail={isEditingEmail}
+              onEditEmail={setIsEditingEmail}
+              emailError={emailError}
               rejectionReasons={rejectionReasons}
               isMaxAttemptsExceeded={isMaxAttemptsExceeded}
               onStartKyc={handleStartKyc}

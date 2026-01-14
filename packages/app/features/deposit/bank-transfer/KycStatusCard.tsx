@@ -5,8 +5,13 @@ interface KycStatusCardProps {
   kycStatus: string
   isBusinessProfile?: boolean
   isTosAccepted?: boolean
+  isNewUser?: boolean
   email?: string
+  savedEmail?: string | null
   onEmailChange?: (email: string) => void
+  isEditingEmail?: boolean
+  onEditEmail?: (editing: boolean) => void
+  emailError?: string | null
   onStartKyc?: () => void
   isLoading?: boolean
   startDisabled?: boolean
@@ -110,8 +115,13 @@ export function KycStatusCard({
   kycStatus,
   isBusinessProfile = false,
   isTosAccepted = false,
+  isNewUser = false,
   email = '',
+  savedEmail,
   onEmailChange,
+  isEditingEmail = false,
+  onEditEmail,
+  emailError,
   onStartKyc,
   isLoading,
   startDisabled,
@@ -123,14 +133,18 @@ export function KycStatusCard({
   // Statuses where no user action is possible - either waiting for review or account is terminal
   const statusesWithNoUserAction = ['rejected', 'under_review', 'paused', 'offboarded']
   const showStartButton = !isMaxAttemptsExceeded && !statusesWithNoUserAction.includes(kycStatus)
-  const isNewUser = kycStatus === 'not_started'
   const hasValidEmail = isValidEmail(email)
+  // Email is changed if user has entered a different email than what's saved
+  const isEmailChanged = savedEmail ? email !== savedEmail : false
+  // Show email input if: new user, OR returning user who is editing email
+  const showEmailInput = isNewUser || isEditingEmail
 
   // Determine button label based on current step
+  // Email validation only applies to new users - returning users already have email in their KYC link
   let buttonLabel = 'Continue Verification'
   if (kycStatus === 'rejected') {
     buttonLabel = 'Try Again'
-  } else if (!hasValidEmail) {
+  } else if (isNewUser && !hasValidEmail) {
     buttonLabel = 'Enter Email to Continue'
   } else if (!isTosAccepted) {
     buttonLabel = 'Accept Terms of Service'
@@ -173,8 +187,12 @@ export function KycStatusCard({
     )
   }
 
-  // New user flow with step indicators
-  if (isNewUser && onStartKyc) {
+  // For new users, email step is complete when they've entered a valid email
+  // For returning users, email step is always complete (they already provided it)
+  const isEmailStepComplete = isNewUser ? hasValidEmail : true
+
+  // Show step indicators for users who can take action (not in terminal states)
+  if (showStartButton && onStartKyc) {
     return (
       <FadeCard pos="relative">
         {onInfoPress && (
@@ -210,43 +228,116 @@ export function KycStatusCard({
             <StepIndicator
               step={1}
               label="Enter Email Address"
-              isComplete={hasValidEmail}
-              isActive={!hasValidEmail}
+              isComplete={isEmailStepComplete}
+              isActive={isNewUser && !hasValidEmail}
             />
             <StepIndicator
               step={2}
               label="Accept Terms of Service"
               isComplete={isTosAccepted}
-              isActive={hasValidEmail && !isTosAccepted}
+              isActive={isEmailStepComplete && !isTosAccepted}
             />
             <StepIndicator
               step={3}
               label={isBusinessProfile ? 'Verify Your Business' : 'Verify Your Identity'}
               isComplete={false}
-              isActive={hasValidEmail && isTosAccepted}
+              isActive={isEmailStepComplete && isTosAccepted}
             />
           </YStack>
 
+          {/* Email section */}
           <YStack gap="$2">
-            <Paragraph fontSize="$3" color="$gray10">
-              Email for verification follow-ups
-            </Paragraph>
-            <Input
-              placeholder="you@example.com"
-              value={email}
-              onChangeText={onEmailChange}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              size="$4"
-            />
+            <XStack jc="space-between" ai="center">
+              <Paragraph
+                fontSize="$3"
+                color="$lightGrayTextField"
+                $theme-light={{ color: '$darkGrayTextField' }}
+              >
+                Email for verification follow-ups
+              </Paragraph>
+              {/* Show edit button for returning users with saved email */}
+              {!isNewUser && savedEmail && !isEditingEmail && onEditEmail && (
+                <Button size="$2" chromeless onPress={() => onEditEmail(true)} px="$2">
+                  <Paragraph fontSize="$3" color="$primary">
+                    Edit
+                  </Paragraph>
+                </Button>
+              )}
+              {/* Show cancel button when editing */}
+              {!isNewUser && isEditingEmail && onEditEmail && (
+                <Button
+                  size="$2"
+                  chromeless
+                  onPress={() => {
+                    onEditEmail(false)
+                    // Reset email to saved value
+                    if (savedEmail && onEmailChange) {
+                      onEmailChange(savedEmail)
+                    }
+                  }}
+                  px="$2"
+                >
+                  <Paragraph fontSize="$3" color="$gray10">
+                    Cancel
+                  </Paragraph>
+                </Button>
+              )}
+            </XStack>
+
+            {/* Show input for new users or when editing */}
+            {showEmailInput ? (
+              <Input
+                placeholder="you@example.com"
+                value={email}
+                onChangeText={onEmailChange}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                size="$4"
+                bg="$color1"
+                bw={1}
+                boc="$color3"
+                br="$4"
+                placeholderTextColor="$gray9"
+                focusStyle={{
+                  boc: '$primary',
+                  bg: '$color1',
+                }}
+              />
+            ) : (
+              /* Show saved email as read-only text */
+              <Paragraph fontSize="$4" color="$color12">
+                {savedEmail || email}
+              </Paragraph>
+            )}
+
+            {/* Email error from server */}
+            {emailError && (
+              <Paragraph fontSize="$2" color="$red10">
+                {emailError}
+              </Paragraph>
+            )}
+            {/* Email validation feedback */}
+            {!emailError && showEmailInput && email.length > 0 && !hasValidEmail && (
+              <Paragraph fontSize="$2" color="$red10">
+                Please enter a valid email address.
+              </Paragraph>
+            )}
+            {/* Warning when email is changed */}
+            {!emailError && hasValidEmail && isEmailChanged && (
+              <Paragraph fontSize="$2" color="$orange10">
+                Changing your email will require accepting Terms of Service again.
+              </Paragraph>
+            )}
           </YStack>
 
           <Button
             size="$4"
             theme="green"
             onPress={onStartKyc}
-            disabled={isLoading || startDisabled || !hasValidEmail}
+            disabled={
+              isLoading || startDisabled || !!emailError || (showEmailInput && !hasValidEmail)
+            }
             icon={isLoading ? <Spinner size="small" /> : undefined}
           >
             {buttonLabel}
@@ -256,6 +347,7 @@ export function KycStatusCard({
     )
   }
 
+  // Terminal states (under_review, paused, offboarded) - no action possible
   return (
     <FadeCard pos="relative">
       {onInfoPress && (
@@ -300,18 +392,6 @@ export function KycStatusCard({
             ))}
           </YStack>
         ) : null}
-
-        {showStartButton && onStartKyc && (
-          <Button
-            size="$4"
-            theme="green"
-            onPress={onStartKyc}
-            disabled={isLoading || startDisabled}
-            icon={isLoading ? <Spinner size="small" /> : undefined}
-          >
-            {buttonLabel}
-          </Button>
-        )}
       </YStack>
     </FadeCard>
   )
