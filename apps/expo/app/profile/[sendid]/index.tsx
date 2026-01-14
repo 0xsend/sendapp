@@ -5,10 +5,12 @@ import { ScreenContainer } from 'apps-expo/components/layout/ScreenContainer'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { isAddress, type Address } from 'viem'
 import { useEffect } from 'react'
+import { useClearSendParamsOnBlur } from 'apps-expo/utils/useClearSendParamsOnBlur'
 
 export default function Screen() {
   const sendid = useLocalSearchParams<{ sendid: string }>()?.sendid
   const router = useRouter()
+  useClearSendParamsOnBlur()
 
   // Determine if identifier is an Ethereum address
   const isEthAddress = sendid ? isAddress(sendid) : false
