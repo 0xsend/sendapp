@@ -29,7 +29,29 @@ import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
-import React, { memo, useCallback, useId, useMemo, useState } from 'react'
+import {
+  useMockQuery,
+  mockRecentSenders,
+  mockFavoriteSenders,
+  mockTopSenders,
+  mockBirthdaySenders,
+} from './mockSuggestions'
+
+// Toggle this to switch between mock and real data
+const USE_MOCK_DATA = true
+import React, { memo, useCallback, useDeferredValue, useId, useMemo, useState } from 'react'
+
+// TODO: Remove fallback once upgraded to React Native 0.83+ (adds Activity support)
+const ReactActivity = isWeb
+  ? (
+      React as unknown as {
+        Activity?: React.FC<{ mode: 'visible' | 'hidden'; children: React.ReactNode }>
+      }
+    ).Activity
+  : undefined
+const Activity: React.FC<{ mode: 'visible' | 'hidden'; children: React.ReactNode }> =
+  ReactActivity ?? (({ mode, children }) => (mode === 'hidden' ? null : <>{children}</>))
+
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
 import { AnimatedLetterText } from '@my/ui'
@@ -87,10 +109,26 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
 }
 
 export const SendSuggestions = () => {
-  const recentSendersQuery = useRecentSenders()
-  const favouriteSendersQuery = useFavouriteSenders()
-  const topSendersQuery = useTopSenders()
-  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
+  // Real hooks
+  const realRecentSendersQuery = useRecentSenders()
+  const realFavouriteSendersQuery = useFavouriteSenders()
+  const realTopSendersQuery = useTopSenders()
+  const realTodayBirthdaySendersQuery = useTodayBirthdaySenders()
+
+  // Mock hooks
+  const mockRecentQuery = useMockQuery(mockRecentSenders)
+  const mockFavoritesQuery = useMockQuery(mockFavoriteSenders)
+  const mockTopQuery = useMockQuery(mockTopSenders)
+  const mockBirthdaysQuery = useMockQuery(mockBirthdaySenders)
+
+  // Select based on flag
+  const recentSendersQuery = USE_MOCK_DATA ? mockRecentQuery : realRecentSendersQuery
+  const favouriteSendersQuery = USE_MOCK_DATA ? mockFavoritesQuery : realFavouriteSendersQuery
+  const topSendersQuery = USE_MOCK_DATA ? mockTopQuery : realTopSendersQuery
+  const todayBirthdaySendersQuery = USE_MOCK_DATA
+    ? mockBirthdaysQuery
+    : realTodayBirthdaySendersQuery
+
   const { t } = useTranslation('send')
 
   const [tabState, setTabState] = useState<{
@@ -209,18 +247,18 @@ export const SendSuggestions = () => {
           {activeTitle}
         </TitleText>
         <XStack mih={120}>
-          <CustomTabs.Content value="recent">
+          <Activity mode={currentTab === 'recent' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={recentSendersQuery} />
-          </CustomTabs.Content>
-          <CustomTabs.Content value="favorites">
+          </Activity>
+          <Activity mode={currentTab === 'favorites' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={favouriteSendersQuery} />
-          </CustomTabs.Content>
-          <CustomTabs.Content value="top">
+          </Activity>
+          <Activity mode={currentTab === 'top' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={topSendersQuery} />
-          </CustomTabs.Content>
-          <CustomTabs.Content value="birthdays">
+          </Activity>
+          <Activity mode={currentTab === 'birthdays' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={todayBirthdaySendersQuery} />
-          </CustomTabs.Content>
+          </Activity>
         </XStack>
       </View>
     </CustomTabs>
@@ -266,13 +304,7 @@ const SuggestionsContent = memo(({ query }: { query: SendSuggestionsQueryResult 
 
   const pages = data?.pages || []
 
-  const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
-    return <SenderSuggestion item={item} />
-  }, [])
-
-  const keyExtractor = useCallback((item: SendSuggestionItem, index: number) => {
-    return item?.send_id?.toString() ?? String(index)
-  }, [])
+  const deferredPages = useDeferredValue(pages)
 
   const hasAnyData = pages.some((page) => page && page.length > 0)
 
@@ -292,47 +324,13 @@ const SuggestionsContent = memo(({ query }: { query: SendSuggestionsQueryResult 
           {error.message?.split('.')[0] ?? t('search.unknownError')}
         </Paragraph>
       ) : (
-        <>
-          {pages.map((pageItems, pageIndex) => (
-            <View
-              key={`page-${pageIndex}-${pageItems[0]?.send_id ?? pageIndex}`}
-              animation="200ms"
-              enterStyle={{ opacity: 0, y: 10 }}
-              exitStyle={{ opacity: 0, y: 10 }}
-              mx={-24}
-              pos="relative"
-            >
-              <FlatList
-                horizontal
-                bounces={true}
-                data={pageItems}
-                renderItem={renderItem}
-                keyExtractor={keyExtractor}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  paddingRight: 24,
-                  paddingHorizontal: 24,
-                  paddingVertical: 8,
-                }}
-                $platform-native={{
-                  overflow: 'visible',
-                }}
-              />
-              <LinearGradient
-                display="none"
-                $sm={{ display: 'flex' }}
-                pointerEvents="none"
-                colors={['rgba(255, 255, 255, 0)', '$aztec1']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                width="$4"
-                height="100%"
-                zi={100}
-                pos="absolute"
-                top={0}
-                right={0}
-              />
-            </View>
+        <View>
+          {deferredPages.map((pageItems, pageIndex) => (
+            <PageRow
+              key={`page-${pageItems[0]?.send_id ?? pageIndex}`}
+              pageItems={pageItems}
+              pageIndex={pageIndex}
+            />
           ))}
           {hasNextPage && isFetchingNextPage ? (
             <XStack gap="$2" px="$1">
@@ -354,7 +352,7 @@ const SuggestionsContent = memo(({ query }: { query: SendSuggestionsQueryResult 
               </Button>
             </XStack>
           ) : null}
-        </>
+        </View>
       )}
     </YStack>
   )
@@ -362,101 +360,164 @@ const SuggestionsContent = memo(({ query }: { query: SendSuggestionsQueryResult 
 
 SuggestionsContent.displayName = 'SuggestionsContent'
 
-const SenderSuggestion = ({ item }: { item: SendSuggestionItem }) => {
-  const [sendParams, setSendParams] = useSendScreenParams()
+const PageRow = memo(
+  function PageRow({
+    pageItems,
+    pageIndex,
+  }: {
+    pageItems: SendSuggestionItem[]
+    pageIndex: number
+  }) {
+    const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
+      return <SenderSuggestion item={item} />
+    }, [])
 
-  // Prefer main_tag_name, fallback to first tag in tags array
-  const tagToUse = item?.main_tag_name || item?.tags?.[0]
+    const keyExtractor = useCallback((item: SendSuggestionItem, index: number) => {
+      return item?.send_id?.toString() ?? String(index)
+    }, [])
 
-  const label = tagToUse
-    ? `/${tagToUse}`
-    : item?.name
-      ? item.name
-      : item?.send_id
-        ? `#${item.send_id}`
-        : '??'
-
-  const isVerified = item?.is_verified ?? false
-  const avatarUrl = item?.avatar_url ?? ''
-
-  const theme = useThemeName()
-
-  const isDark = theme.includes('dark')
-
-  const onSelect = () => {
-    const _sendParams = JSON.parse(JSON.stringify(sendParams))
-    setSendParams({
-      ...sendParams,
-      ...(tagToUse
-        ? {
-            ..._sendParams,
-            idType: 'tag',
-            recipient: tagToUse,
-          }
-        : {
-            ..._sendParams,
-            idType: 'sendid',
-            recipient: item?.send_id,
-          }),
-    })
-  }
-
-  return (
-    <YStack
-      gap={'$2'}
-      mr={'$2'}
-      $gtLg={{ mr: '$3.5' }}
-      elevation={Platform.OS === 'web' ? undefined : '$0.75'}
-      cur="pointer"
-    >
+    return (
       <View
-        hoverStyle={{
-          opacity: 0.8,
-        }}
-        animation="100ms"
-        pressStyle={{
-          scale: 0.95,
-        }}
-        onPress={onSelect}
+        animation={pageIndex === 0 ? undefined : '200ms'}
+        enterStyle={pageIndex === 0 ? undefined : { opacity: 0, y: 10 }}
+        mx={-24}
+        pos="relative"
       >
-        <Image avatarUrl={avatarUrl} label={label} />
-
-        {isVerified && (
-          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$-1" y="$-1">
-            <XStack
-              pos="absolute"
-              x="$-0.5"
-              y="$-0.5"
-              elevation={'$1'}
-              scale={0.7}
-              br={1000}
-              inset={0}
-            />
-            <IconBadgeCheckSolid2
-              size="$1"
-              scale={0.95}
-              color="$neon8"
-              $theme-dark={{ color: '$neon7' }}
-              //@ts-expect-error - checkColor is not typed
-              checkColor={isDark ? '#082B1B' : '#fff'}
-            />
-          </XStack>
-        )}
+        <FlatList
+          horizontal
+          bounces={true}
+          data={pageItems}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingRight: 24,
+            paddingHorizontal: 24,
+            paddingVertical: 8,
+          }}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={3}
+          removeClippedSubviews={!isWeb}
+          $platform-native={{
+            overflow: 'visible',
+          }}
+        />
+        <LinearGradient
+          display="none"
+          $sm={{ display: 'flex' }}
+          pointerEvents="none"
+          colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          width="$4"
+          height="100%"
+          zi={100}
+          pos="absolute"
+          top={0}
+          right={0}
+        />
       </View>
-      <Text
-        w={74}
-        fontSize={'$3'}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        color="$color12"
-        disableClassName
-        ta={'center'}
+    )
+  },
+  (prevProps, nextProps) =>
+    prevProps.pageIndex === nextProps.pageIndex && prevProps.pageItems === nextProps.pageItems
+)
+
+const SenderSuggestion = memo(
+  function SenderSuggestion({ item }: { item: SendSuggestionItem }) {
+    const [, setSendParams] = useSendScreenParams()
+
+    // Prefer main_tag_name, fallback to first tag in tags array
+    const tagToUse = item?.main_tag_name || item?.tags?.[0]
+
+    const label = tagToUse
+      ? `/${tagToUse}`
+      : item?.name
+        ? item.name
+        : item?.send_id
+          ? `#${item.send_id}`
+          : '??'
+
+    const isVerified = item?.is_verified ?? false
+    const avatarUrl = item?.avatar_url ?? ''
+
+    const theme = useThemeName()
+
+    const isDark = theme.includes('dark')
+
+    const onSelect = useCallback(() => {
+      setSendParams(
+        tagToUse
+          ? {
+              idType: 'tag',
+              recipient: tagToUse,
+            }
+          : {
+              idType: 'sendid',
+              recipient: String(item?.send_id),
+            }
+      )
+    }, [setSendParams, tagToUse, item?.send_id])
+
+    return (
+      <YStack
+        gap={'$2'}
+        mr={'$2'}
+        $gtLg={{ mr: '$3.5' }}
+        elevation={Platform.OS === 'web' ? undefined : '$0.75'}
+        cur="pointer"
       >
-        {label}
-      </Text>
-    </YStack>
-  )
-}
+        <View
+          hoverStyle={{
+            opacity: 0.8,
+          }}
+          animation="100ms"
+          pressStyle={{
+            scale: 0.95,
+          }}
+          onPress={onSelect}
+        >
+          <Image avatarUrl={avatarUrl} label={label} />
+
+          {isVerified && (
+            <XStack zi={100} pos="absolute" bottom={0} right={0} x="$-1" y="$-1">
+              <XStack
+                pos="absolute"
+                x="$-0.5"
+                y="$-0.5"
+                elevation={'$1'}
+                scale={0.7}
+                br={1000}
+                inset={0}
+              />
+              <IconBadgeCheckSolid2
+                size="$1"
+                scale={0.95}
+                color="$neon8"
+                $theme-dark={{ color: '$neon7' }}
+                //@ts-expect-error - checkColor is not typed
+                checkColor={isDark ? '#082B1B' : '#fff'}
+              />
+            </XStack>
+          )}
+        </View>
+        <Text
+          w={74}
+          fontSize={'$3'}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          color="$color12"
+          disableClassName
+          ta={'center'}
+        >
+          {label}
+        </Text>
+      </YStack>
+    )
+  },
+  (prevProps, nextProps) => prevProps.item?.send_id === nextProps.item?.send_id
+)
 
 interface ImageProps {
   avatarUrl: string
