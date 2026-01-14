@@ -113,16 +113,17 @@
     }
   },
   "search": {
-    "placeholder": "Search by send tag or wallet address",
+    "placeholder": "Search by send tag or paste wallet address",
     "errorHeading": "Error",
     "unknownError": "Unknown error"
   },
   "suggestions": {
-    "recent": "Recent Activity",
-    "favorites": "Favorite Senders",
-    "top": "Top Senders",
-    "birthdays": "Wish Them Happy Birthday",
-    "viewMore": "View More"
+    "recent": "Recent",
+    "favorites": "Favorites",
+    "top": "Top",
+    "birthdays": "Birthdays",
+    "viewMore": "View More",
+    "noResults": "No results found"
   },
   "recipient": {
     "label": "TO",
