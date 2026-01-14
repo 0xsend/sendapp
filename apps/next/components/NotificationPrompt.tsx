@@ -3,7 +3,7 @@
 import { useWebPush } from './WebPushSubscription'
 import { Button, YStack, XStack, Text, Paragraph } from '@my/ui'
 import { Bell } from '@tamagui/lucide-icons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface NotificationPromptProps {
   /** Called when the prompt is dismissed */
@@ -45,21 +45,23 @@ export function NotificationPrompt({
   // - Not supported
   // - Permission already requested
   // - User dismissed
-  if (!isSupported || permission !== 'prompt' || dismissed) {
-    return null
-  }
+  useEffect(() => {
+    if (!isSupported || permission !== 'prompt' || dismissed) {
+      onDismiss?.()
+    }
+  }, [isSupported, permission, dismissed, onDismiss])
 
   return (
     <YStack
+      componentName="Card"
       padding="$4"
       backgroundColor="$background"
-      borderRadius="$4"
+      borderRadius="$6"
       borderWidth={1}
       borderColor="$borderColor"
-      gap="$3"
-      shadowColor="$shadowColor"
-      shadowRadius={8}
-      shadowOffset={{ width: 0, height: 2 }}
+      gap="$5"
+      elevation="$8"
+      shadowOpacity={0.3}
     >
       <XStack justifyContent="space-between" alignItems="flex-start">
         <XStack gap="$3" flex={1} alignItems="flex-start">
