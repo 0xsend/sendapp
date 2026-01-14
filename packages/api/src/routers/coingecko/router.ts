@@ -1,8 +1,14 @@
 import { z } from 'zod'
 import { createTRPCRouter, publicProcedure } from '../../trpc'
-import { CoingeckoCoinSchema, CoinIdEnum, MarketChartSchema } from 'app/utils/coin-gecko'
+import {
+  CoingeckoCoinSchema,
+  CoinIdEnum,
+  MarketChartSchema,
+  MarketDataSchema,
+} from 'app/utils/coin-gecko'
 
 const COINGECKO_PRO_KEY = process.env.COINGECKO_PRO_KEY
+
 const getBase = () =>
   COINGECKO_PRO_KEY ? 'https://pro-api.coingecko.com/api/v3' : 'https://api.coingecko.com/api/v3'
 const getHeaders = () => {
@@ -124,5 +130,34 @@ export const coinGeckoRouter = createTRPCRouter({
       } catch {}
 
       return { coingeckoCoin: coinJson, coingeckoChart: chartJson }
+    }),
+
+  // Cached market data endpoint - relies on CDN caching (s-maxage + stale-while-revalidate)
+  getMarketsData: publicProcedure
+    .input(
+      z.object({
+        ids: z.array(CoinIdEnum),
+        vsCurrency: z.literal('usd').default('usd'),
+        priceChangePercentage: z.array(z.enum(['24h', '7d'])).default(['24h', '7d']),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const canonicalIds = Array.from(new Set(input.ids)).sort().join(',')
+
+      const base = getBase()
+      const url = new URL(`${base}/coins/markets`)
+      url.searchParams.set('ids', canonicalIds)
+      url.searchParams.set('vs_currency', input.vsCurrency)
+      url.searchParams.set('price_change_percentage', input.priceChangePercentage.join(','))
+
+      const json = await fetchJson(url.toString())
+      const data = MarketDataSchema.parse(json)
+
+      // CDN caching: fresh for 15s, serve stale up to 5min while revalidating
+      try {
+        ctx.res?.setHeader?.('Cache-Control', 'public, s-maxage=15, stale-while-revalidate=300')
+      } catch {}
+
+      return { data }
     }),
 })
