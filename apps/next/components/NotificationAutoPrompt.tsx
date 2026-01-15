@@ -8,6 +8,7 @@ import { useSessionContext } from 'app/utils/supabase/useSessionContext'
 
 import { NotificationPrompt } from './NotificationPrompt'
 import { useWebPush } from './WebPushSubscription'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const log = debug('app:web-push:auto-sync')
 
@@ -230,6 +231,8 @@ export function NotificationAutoPrompt() {
     return () => clearTimeout(timer)
   }, [session?.user, permission, isSupported, isSubscribed])
 
+  const safeAreaInsets = useSafeAreaInsets()
+
   return (
     <AnimatePresence>
       {showBanner ? (
@@ -241,7 +244,7 @@ export function NotificationAutoPrompt() {
           enterStyle={{ opacity: 0, y: -10 }}
           exitStyle={{ opacity: 0, y: 10 }}
           opacity={1}
-          y={0}
+          y={safeAreaInsets.top}
           animation="smoothResponsive"
           {...(media.gtMd ? { bottom: 20, marginTop: 'auto' } : { top: 20, marginBottom: 'auto' })}
         >
