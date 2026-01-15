@@ -16,7 +16,7 @@ import {
   styled,
   ThemeableStack,
 } from '@my/ui'
-import { isAndroid, useEvent, type StackProps } from '@tamagui/core'
+import { isAndroid, useEvent, useMedia, type StackProps } from '@tamagui/core'
 import type { TabLayout, TabsTabProps } from '@tamagui/tabs'
 import { createTabs } from '@tamagui/tabs'
 import { FlatList, Platform } from 'react-native'
@@ -87,11 +87,14 @@ const CustomTabs = createTabs({
 
 const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackProps) => {
   const theme = useThemeName()
+  const { gtSm } = useMedia()
   return (
     <YStack
       position="absolute"
-      animation="100ms"
-      animateOnly={['opacity', 'transform']}
+      {...(gtSm && {
+        animation: '100ms',
+        animateOnly: ['opacity', 'transform'],
+      })}
       elevation="$1"
       shadowOpacity={0.3}
       enterStyle={{
