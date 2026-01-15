@@ -29,16 +29,6 @@ import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
-import {
-  useMockQuery,
-  mockRecentSenders,
-  mockFavoriteSenders,
-  mockTopSenders,
-  mockBirthdaySenders,
-} from './mockSuggestions'
-
-// Toggle this to switch between mock and real data
-const USE_MOCK_DATA = true
 import React, { memo, useCallback, useDeferredValue, useId, useMemo, useState } from 'react'
 
 // TODO: Remove fallback once upgraded to React Native 0.83+ (adds Activity support)
@@ -114,25 +104,10 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
 }
 
 export const SendSuggestions = () => {
-  // Real hooks
-  const realRecentSendersQuery = useRecentSenders()
-  const realFavouriteSendersQuery = useFavouriteSenders()
-  const realTopSendersQuery = useTopSenders()
-  const realTodayBirthdaySendersQuery = useTodayBirthdaySenders()
-
-  // Mock hooks
-  const mockRecentQuery = useMockQuery(mockRecentSenders)
-  const mockFavoritesQuery = useMockQuery(mockFavoriteSenders)
-  const mockTopQuery = useMockQuery(mockTopSenders)
-  const mockBirthdaysQuery = useMockQuery(mockBirthdaySenders)
-
-  // Select based on flag
-  const recentSendersQuery = USE_MOCK_DATA ? mockRecentQuery : realRecentSendersQuery
-  const favouriteSendersQuery = USE_MOCK_DATA ? mockFavoritesQuery : realFavouriteSendersQuery
-  const topSendersQuery = USE_MOCK_DATA ? mockTopQuery : realTopSendersQuery
-  const todayBirthdaySendersQuery = USE_MOCK_DATA
-    ? mockBirthdaysQuery
-    : realTodayBirthdaySendersQuery
+  const recentSendersQuery = useRecentSenders()
+  const favouriteSendersQuery = useFavouriteSenders()
+  const topSendersQuery = useTopSenders()
+  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
 
   const { t } = useTranslation('send')
 
