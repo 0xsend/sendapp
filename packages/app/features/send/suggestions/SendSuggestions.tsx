@@ -16,7 +16,7 @@ import {
   styled,
   ThemeableStack,
 } from '@my/ui'
-import { isAndroid, type StackProps } from '@tamagui/core'
+import { isAndroid, useEvent, type StackProps } from '@tamagui/core'
 import type { TabLayout, TabsTabProps } from '@tamagui/tabs'
 import { createTabs } from '@tamagui/tabs'
 import { FlatList, Platform } from 'react-native'
@@ -145,21 +145,18 @@ export const SendSuggestions = () => {
   })
 
   const setCurrentTab = (currentTab: string) => setTabState({ ...tabState, currentTab })
-  const setIntentIndicator = (intentAt: TabLayout | null) => setTabState({ ...tabState, intentAt })
   const setActiveIndicator = (activeAt: TabLayout | null) =>
     setTabState({ ...tabState, prevActiveAt: tabState.activeAt, activeAt })
 
-  const { activeAt, intentAt, currentTab } = tabState
+  const { activeAt, currentTab } = tabState
 
   const currentTabDeferred = useDeferredValue(currentTab)
 
-  const handleOnInteraction: TabsTabProps['onInteraction'] = (type, layout) => {
+  const handleOnInteraction: TabsTabProps['onInteraction'] = useEvent((type, layout) => {
     if (type === 'select') {
       setActiveIndicator(layout)
-    } else {
-      setIntentIndicator(layout)
     }
-  }
+  })
 
   const activeTitle =
     currentTab === 'recent'
