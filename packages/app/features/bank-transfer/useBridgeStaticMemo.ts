@@ -27,8 +27,7 @@ type BankDetails = {
   bankName: string | null
   routingNumber: string | null
   accountNumber: string | null
-  beneficiaryName: string | null
-  beneficiaryAddress: string | null
+  bankAddress: string | null
   depositMessage: string | null
   paymentRails: string[]
 }
@@ -46,9 +45,7 @@ function getBankDetailsFromInstructions(
     bankName: instructions?.bank_name ?? null,
     routingNumber: instructions?.bank_routing_number ?? null,
     accountNumber: instructions?.bank_account_number ?? null,
-    beneficiaryName:
-      instructions?.bank_beneficiary_name ?? instructions?.account_holder_name ?? null,
-    beneficiaryAddress: instructions?.bank_beneficiary_address ?? null,
+    bankAddress: instructions?.bank_address ?? null,
     depositMessage: instructions?.deposit_message ?? null,
     paymentRails,
   }
