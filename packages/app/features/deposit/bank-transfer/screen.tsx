@@ -124,7 +124,7 @@ export function BankTransferScreen() {
       })
 
       // Check for expected errors returned in response
-      if (result.error === 'email_in_use') {
+      if (result.error === 'email_in_use' || result.error === 'max_emails_exceeded') {
         setEmailError(result.message)
         return
       }

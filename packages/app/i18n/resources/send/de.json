@@ -113,16 +113,17 @@
     }
   },
   "search": {
-    "placeholder": "Suche nach Sende-Tag oder Wallet-Adresse",
+    "placeholder": "Suche nach Sende-Tag oder Wallet-Adresse einfügen",
     "errorHeading": "Fehler",
     "unknownError": "Unbekannter Fehler"
   },
   "suggestions": {
-    "recent": "Letzte Aktivitäten",
-    "favorites": "Favorisierte Absender",
-    "top": "Top-Absender",
-    "birthdays": "Alles Gute zum Geburtstag wünschen",
-    "viewMore": "Mehr anzeigen"
+    "recent": "Kürzlich",
+    "favorites": "Favoriten",
+    "top": "Top",
+    "birthdays": "Geburtstage",
+    "viewMore": "Mehr anzeigen",
+    "noResults": "Keine Ergebnisse gefunden"
   },
   "recipient": {
     "label": "AN",

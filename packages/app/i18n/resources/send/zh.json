@@ -113,16 +113,17 @@
     }
   },
   "search": {
-    "placeholder": "按发送标签或钱包地址搜索",
+    "placeholder": "按发送标签搜索或粘贴钱包地址",
     "errorHeading": "错误",
     "unknownError": "未知错误"
   },
   "suggestions": {
-    "recent": "最近活动",
-    "favorites": "收藏的发送者",
-    "top": "热门发送者",
-    "birthdays": "祝他们生日快乐",
-    "viewMore": "查看更多"
+    "recent": "最近",
+    "favorites": "收藏",
+    "top": "热门",
+    "birthdays": "生日",
+    "viewMore": "查看更多",
+    "noResults": "未找到结果"
   },
   "recipient": {
     "label": "至",

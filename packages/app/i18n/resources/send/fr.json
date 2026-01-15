@@ -113,16 +113,17 @@
     }
   },
   "search": {
-    "placeholder": "Rechercher par balise d'envoi ou adresse de portefeuille",
+    "placeholder": "Rechercher par balise d'envoi ou coller l'adresse de portefeuille",
     "errorHeading": "Erreur",
     "unknownError": "Erreur inconnue"
   },
   "suggestions": {
-    "recent": "Activité récente",
-    "favorites": "Expéditeurs favoris",
-    "top": "Meilleurs expéditeurs",
-    "birthdays": "Souhaitez-leur un joyeux anniversaire",
-    "viewMore": "Voir plus"
+    "recent": "Récent",
+    "favorites": "Favoris",
+    "top": "Top",
+    "birthdays": "Anniversaires",
+    "viewMore": "Voir plus",
+    "noResults": "Aucun résultat trouvé"
   },
   "recipient": {
     "label": "À",

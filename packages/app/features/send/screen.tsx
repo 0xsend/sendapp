@@ -101,7 +101,7 @@ export const SendScreen = () => {
         o={finalIsLoading ? 0.5 : 1}
         width="100%"
         pb="$4"
-        gap="$6"
+        gap="$8"
         $lg={{ pt: '$3' }}
         $platform-web={{
           transition: 'opacity 200ms linear',
@@ -111,12 +111,14 @@ export const SendScreen = () => {
           animateOnly: ['opacity'],
         }}
       >
-        <YStack width="100%" gap="$1.5" $gtSm={{ gap: '$2.5' }}>
+        <YStack width="100%" gap="$4">
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
+          {!search && <SendSuggestions />}
         </YStack>
-        {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
-        {!search && <SendContactsSection />}
-        {!search && <SendSuggestions />}
+        <YStack>
+          {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
+          {!search && <SendContactsSection />}
+        </YStack>
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />
         </LazyMount>
