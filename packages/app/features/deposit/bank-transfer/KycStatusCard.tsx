@@ -130,9 +130,9 @@ export function KycStatusCard({
   onInfoPress,
   children,
 }: KycStatusCardProps) {
-  // Statuses where no user action is possible - either waiting for review or account is terminal
-  const statusesWithNoUserAction = ['rejected', 'under_review', 'paused', 'offboarded']
-  const showStartButton = !isMaxAttemptsExceeded && !statusesWithNoUserAction.includes(kycStatus)
+  // Statuses that show step-by-step onboarding UI (email → TOS → verify)
+  const onboardingStatuses = ['not_started', 'incomplete']
+  const showStepIndicators = onboardingStatuses.includes(kycStatus)
   const hasValidEmail = isValidEmail(email)
   // Email is changed if user has entered a different email than what's saved
   const isEmailChanged = savedEmail ? email !== savedEmail : false
@@ -191,8 +191,8 @@ export function KycStatusCard({
   // For returning users, email step is always complete (they already provided it)
   const isEmailStepComplete = isNewUser ? hasValidEmail : true
 
-  // Show step indicators for users who can take action (not in terminal states)
-  if (showStartButton && onStartKyc) {
+  // Show step-by-step onboarding UI for users starting or continuing verification
+  if (showStepIndicators && onStartKyc) {
     return (
       <FadeCard pos="relative">
         {onInfoPress && (
@@ -347,7 +347,13 @@ export function KycStatusCard({
     )
   }
 
-  // Terminal states (under_review, paused, offboarded) - no action possible
+  // Statuses where user can take action (but not onboarding flow)
+  const canRetry = kycStatus === 'rejected' && !isMaxAttemptsExceeded
+  const showActionButton =
+    onStartKyc && (canRetry || ['awaiting_ubo', 'awaiting_questionnaire'].includes(kycStatus))
+  const actionButtonLabel = kycStatus === 'rejected' ? 'Try Again' : 'Continue Verification'
+
+  // Simple UI for waiting states, terminal states, and statuses awaiting external action
   return (
     <FadeCard pos="relative">
       {onInfoPress && (
@@ -392,6 +398,18 @@ export function KycStatusCard({
             ))}
           </YStack>
         ) : null}
+
+        {showActionButton && (
+          <Button
+            size="$4"
+            theme="green"
+            onPress={onStartKyc}
+            disabled={isLoading}
+            icon={isLoading ? <Spinner size="small" /> : undefined}
+          >
+            {actionButtonLabel}
+          </Button>
+        )}
       </YStack>
     </FadeCard>
   )
