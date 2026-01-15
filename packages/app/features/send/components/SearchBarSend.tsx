@@ -637,7 +637,7 @@ function Search({ label, placeholder = 'Search', autoFocus = false, containerPro
                 pl: '$9',
                 fontSize: 17,
                 lineHeight: 20,
-                '$platform-native': {
+                $sm: {
                   pl: 44,
                   fontSize: 14,
                   lineHeight: 18,
