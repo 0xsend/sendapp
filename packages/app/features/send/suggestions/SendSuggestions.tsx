@@ -93,9 +93,9 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
       position="absolute"
       {...(gtSm && {
         animation: '100ms',
-        animateOnly: ['opacity', 'transform'],
+        animateOnly: ['opacity', 'transform', 'width', 'height'],
       })}
-      elevation="$1"
+      elevation={isWeb ? '$1' : 0}
       shadowOpacity={0.3}
       enterStyle={{
         opacity: 0,
@@ -108,6 +108,7 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
         opacity: 1,
       })}
       {...props}
+      y={isWeb ? 0 : props.y}
     />
   )
 }
@@ -175,6 +176,8 @@ export const SendSuggestions = () => {
   // TODO: enable animated letter text for android once upgrade to react-native-reanimated 3.19.4 or higher
   const TitleText = isAndroid ? Text : AnimatedLetterText
 
+  const themeName = useThemeName()
+
   return (
     <CustomTabs
       value={currentTab}
@@ -188,20 +191,18 @@ export const SendSuggestions = () => {
       }}
     >
       <YStack position="relative">
-        {/* Hover/focus indicator */}
-
         <CustomTabs.List
           als="flex-start"
           br={100}
           disablePassBorderRadius
           loop={false}
-          backgroundColor="$aztec2"
-          $theme-light={{
-            backgroundColor: '$gray1',
-          }}
+          backgroundColor={themeName === 'light' ? '$gray1' : '$aztec2'}
           py={4}
-          px={2}
-          pr={6}
+          px={4}
+          $platform-web={{
+            px: 2,
+            pr: 6,
+          }}
           ov="hidden"
         >
           <AnimatePresence>
@@ -212,6 +213,7 @@ export const SendSuggestions = () => {
                 width={activeAt.width}
                 height={activeAt.height}
                 x={activeAt.x}
+                y={activeAt.y}
               />
             )}
           </AnimatePresence>
@@ -378,12 +380,7 @@ const PageRow = memo(
     }, [])
 
     return (
-      <View
-        animation={pageIndex === 0 ? undefined : '200ms'}
-        enterStyle={pageIndex === 0 ? undefined : { opacity: 0, y: 10 }}
-        mx={-24}
-        pos="relative"
-      >
+      <View mx={-24} pos="relative">
         <FlatList
           horizontal
           bounces={true}
