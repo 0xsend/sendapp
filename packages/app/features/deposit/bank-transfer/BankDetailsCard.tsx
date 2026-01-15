@@ -1,4 +1,4 @@
-import { FadeCard, Paragraph, XStack, YStack, Button, Spinner } from '@my/ui'
+import { FadeCard, Paragraph, XStack, YStack, Button, Spinner, SelectableText } from '@my/ui'
 import { Copy, Check, HelpCircle } from '@tamagui/lucide-icons'
 import { useState, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
@@ -87,15 +87,9 @@ function CopyableField({
         >
           {label}
         </Paragraph>
-        <Paragraph
-          fontSize="$5"
-          fontWeight={500}
-          fontFamily="$mono"
-          userSelect="text"
-          className="selectable-value"
-        >
+        <SelectableText fontSize="$5" fontWeight={500} fontFamily="$mono">
           {value}
-        </Paragraph>
+        </SelectableText>
       </YStack>
       <Button
         size="$2"
@@ -133,15 +127,9 @@ function AddressField({ label, value }: { label: string; value: string | null })
         </Paragraph>
         <YStack>
           {lines.map((line) => (
-            <Paragraph
-              key={line}
-              fontSize="$5"
-              fontWeight={500}
-              userSelect="text"
-              className="selectable-value"
-            >
+            <SelectableText key={line} fontSize="$5" fontWeight={500}>
               {line}
-            </Paragraph>
+            </SelectableText>
           ))}
         </YStack>
       </YStack>
@@ -212,14 +200,9 @@ export function BankDetailsCard({
               >
                 Bank Name
               </Paragraph>
-              <Paragraph
-                fontSize="$5"
-                fontWeight={500}
-                userSelect="text"
-                className="selectable-value"
-              >
+              <SelectableText fontSize="$5" fontWeight={500}>
                 {bankName}
-              </Paragraph>
+              </SelectableText>
             </YStack>
           </XStack>
         )}
