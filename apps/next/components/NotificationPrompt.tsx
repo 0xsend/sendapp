@@ -78,10 +78,10 @@ export function NotificationPrompt({
       </XStack>
 
       <XStack gap="$2">
-        <Button flex={1} onPress={handleEnable} disabled={isLoading} theme="green">
+        <Button br='$3' flex={1} onPress={handleEnable} disabled={isLoading} theme="green">
           {isLoading ? 'Enabling...' : 'Enable'}
         </Button>
-        <Button flex={1} onPress={handleDismiss} theme="gray" chromeless>
+        <Button br='$3' flex={1} onPress={handleDismiss} theme="gray" chromeless>
           Not now
         </Button>
       </XStack>
