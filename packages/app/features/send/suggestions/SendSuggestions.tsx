@@ -25,6 +25,7 @@ import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
 } from 'app/features/send/suggestions/SendSuggestion.types'
+import { ContactsRow, useSendPageContacts } from 'app/features/contacts/send-integration'
 import { useRecentSenders } from './useRecentSenders'
 import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
@@ -108,6 +109,7 @@ export const SendSuggestions = () => {
   const favouriteSendersQuery = useFavouriteSenders()
   const topSendersQuery = useTopSenders()
   const todayBirthdaySendersQuery = useTodayBirthdaySenders()
+  const contactsQuery = useSendPageContacts()
 
   const { t } = useTranslation('send')
 
@@ -146,7 +148,9 @@ export const SendSuggestions = () => {
           ? t('suggestions.top')
           : currentTab === 'birthdays'
             ? t('suggestions.birthdays')
-            : ''
+            : currentTab === 'contacts'
+              ? t('suggestions.contacts')
+              : ''
 
   // TODO: enable animated letter text for android once upgrade to react-native-reanimated 3.19.4 or higher
   const TitleText = isAndroid ? Text : AnimatedLetterText
@@ -165,20 +169,27 @@ export const SendSuggestions = () => {
         gap: '$6',
       }}
     >
-      <YStack position="relative">
+      <YStack
+        $xs={{
+          mx: -5,
+        }}
+        position="relative"
+      >
         <CustomTabs.List
           als="flex-start"
           br={100}
           disablePassBorderRadius
           loop={false}
           backgroundColor={themeName === 'light' ? '$gray1' : '$aztec2'}
-          py={4}
-          px={4}
-          $platform-web={{
-            px: 2,
-            pr: 6,
-          }}
           ov="hidden"
+          w="100%"
+          maw={460}
+          p="$1.5"
+          pr="$2"
+          pl="$1"
+          $platform-android={{
+            px: '$1.5',
+          }}
         >
           <AnimatePresence>
             {activeAt && (
@@ -206,6 +217,7 @@ export const SendSuggestions = () => {
           />
           <EachTab
             value="top"
+            f={1.5}
             title={t('suggestions.top')}
             onInteraction={handleOnInteraction}
             currentTab={currentTab}
@@ -213,6 +225,12 @@ export const SendSuggestions = () => {
           <EachTab
             value="birthdays"
             title={t('suggestions.birthdays')}
+            onInteraction={handleOnInteraction}
+            currentTab={currentTab}
+          />
+          <EachTab
+            value="contacts"
+            title={t('suggestions.contacts')}
             onInteraction={handleOnInteraction}
             currentTab={currentTab}
           />
@@ -236,34 +254,40 @@ export const SendSuggestions = () => {
           <Activity mode={currentTabDeferred === 'birthdays' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={todayBirthdaySendersQuery} />
           </Activity>
+          <Activity mode={currentTabDeferred === 'contacts' ? 'visible' : 'hidden'}>
+            <ContactsTabContent query={contactsQuery} />
+          </Activity>
         </XStack>
       </View>
     </CustomTabs>
   )
 }
 
-interface EachTabProps {
+interface EachTabProps extends StackProps {
   value: string
   title: string
   onInteraction: TabsTabProps['onInteraction']
   currentTab: string
 }
 
-const EachTab = ({ value, title, onInteraction, currentTab }: EachTabProps) => {
+const EachTab = ({ value, title, onInteraction, currentTab, ...props }: EachTabProps) => {
   return (
     <CustomTabs.Tab
       unstyled
       cur="pointer"
       paddingVertical="$2"
-      paddingHorizontal="$4"
       value={value}
       onInteraction={onInteraction}
       active={currentTab === value}
+      f={2}
+      jc="center"
+      ai="center"
+      {...props}
     >
       <SizableText
         size="$5"
         $sm={{
-          size: '$4',
+          size: '$3',
         }}
         color={currentTab === value ? '$color11' : '$color10'}
       >
@@ -336,6 +360,72 @@ const SuggestionsContent = memo(({ query }: { query: SendSuggestionsQueryResult 
 })
 
 SuggestionsContent.displayName = 'SuggestionsContent'
+
+/**
+ * Content component for the Contacts tab.
+ * Renders contacts in multiple horizontal rows like other tabs.
+ * Reuses ContactsRow from contacts feature.
+ */
+const ContactsTabContent = memo(({ query }: { query: ReturnType<typeof useSendPageContacts> }) => {
+  const { error, data, hasNextPage, fetchNextPage, isFetchingNextPage } = query
+  const { t } = useTranslation('send')
+  const skeletonBaseId = useId()
+  const skeletonKeys = Array.from({ length: 10 }, (_, i) => `${skeletonBaseId}-contact-${i}`)
+
+  const pages = data?.pages || []
+  const deferredPages = useDeferredValue(pages)
+  const hasAnyData = pages.some((page) => page && page.length > 0)
+
+  if (!hasAnyData) {
+    return (
+      <View gap="$2">
+        <UserSearch color="$gray9" size="$3" strokeWidth={1.4} />
+        <Paragraph color="$color10">{t('suggestions.noResults')}</Paragraph>
+      </View>
+    )
+  }
+
+  return (
+    <YStack gap="$4" flex={1}>
+      {error ? (
+        <Paragraph color={'$error'}>
+          {error.message?.split('.')[0] ?? t('search.unknownError')}
+        </Paragraph>
+      ) : (
+        <View>
+          {deferredPages.map((pageItems, pageIndex) => (
+            <ContactsRow
+              key={`contact-page-${pageItems[0]?.contact_id ?? pageIndex}`}
+              contacts={pageItems}
+            />
+          ))}
+          {hasNextPage && isFetchingNextPage ? (
+            <XStack gap="$2" px="$1">
+              {skeletonKeys.map((key) => (
+                <Shimmer key={key} ov="hidden" br="$12" w="$7" h="$7" bg="$color1" />
+              ))}
+            </XStack>
+          ) : hasNextPage ? (
+            <XStack mt="$2" px="$1">
+              <Button
+                size="$3"
+                onPress={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+                chromeless
+              >
+                <Button.Text textDecorationLine="underline" color="$color10">
+                  {t('suggestions.viewMore')}
+                </Button.Text>
+              </Button>
+            </XStack>
+          ) : null}
+        </View>
+      )}
+    </YStack>
+  )
+})
+
+ContactsTabContent.displayName = 'ContactsTabContent'
 
 const PageRow = memo(
   function PageRow({

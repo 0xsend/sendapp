@@ -27,7 +27,7 @@ import {
   getUserPushTokens,
   getUserIdFromAddress,
   createNotification,
-  getUserMainTagName,
+  getSendAccountMainTagName,
   markTokenInactive,
 } from './supabase'
 import type {
@@ -553,9 +553,9 @@ async function notifyTransferReceivedActivity(
     return
   }
 
-  // Get sender tag name for friendly display
-  const senderUserId = await getUserIdFromAddress(senderAddress)
-  const senderTagName = senderUserId ? await getUserMainTagName(senderUserId) : null
+  // Get sender tag name for friendly display using address-based lookup
+  // This uses send_accounts.main_tag_id to get the canonical main tag
+  const senderTagName = await getSendAccountMainTagName(senderAddress)
   const senderDisplay = senderTagName
     ? `/${senderTagName}`
     : `${senderAddress.slice(0, 6)}...${senderAddress.slice(-4)}`
@@ -629,9 +629,9 @@ async function notifyTransferSentActivity(
     return
   }
 
-  // Get recipient tag name for friendly display
-  const recipientUserId = await getUserIdFromAddress(recipientAddress)
-  const recipientTagName = recipientUserId ? await getUserMainTagName(recipientUserId) : null
+  // Get recipient tag name for friendly display using address-based lookup
+  // This uses send_accounts.main_tag_id to get the canonical main tag
+  const recipientTagName = await getSendAccountMainTagName(recipientAddress)
   const recipientDisplay = recipientTagName
     ? `/${recipientTagName}`
     : `${recipientAddress.slice(0, 6)}...${recipientAddress.slice(-4)}`

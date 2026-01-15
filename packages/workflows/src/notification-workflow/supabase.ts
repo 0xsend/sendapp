@@ -108,25 +108,95 @@ export async function createNotification(notification: NotificationInsert): Prom
 }
 
 /**
- * Gets user main tag name for formatting notification messages
+ * Gets user main tag name for formatting notification messages.
+ * @deprecated Use getSendAccountMainTagName instead for address-based lookup
+ * that properly uses send_accounts.main_tag_id.
  */
 export async function getUserMainTagName(userId: string): Promise<string | null> {
   if (!userId) return null
 
   const supabaseAdmin = createSupabaseAdminClient()
-  // Get the user's main tag
-  const { data: tagData, error: tagError } = await supabaseAdmin
-    .from('tags')
-    .select('name')
+
+  // Query via send_accounts.main_tag_id join to get the canonical main tag
+  const { data: accountData, error: accountError } = await supabaseAdmin
+    .from('send_accounts')
+    .select('main_tag:tags!send_accounts_main_tag_id_fkey(name)')
     .eq('user_id', userId)
     .maybeSingle()
 
-  if (tagError) {
-    log.warn('Error fetching tag for user:', { userId: redactId(userId), error: tagError })
+  if (accountError) {
+    log.warn('Error fetching main tag for user:', {
+      userId: redactId(userId),
+      error: accountError,
+      errorMessage: accountError.message,
+      errorCode: accountError.code,
+    })
     return null
   }
 
-  return tagData?.name || null
+  if (!accountData) {
+    log.info('No send account found for user:', { userId: redactId(userId) })
+    return null
+  }
+
+  // main_tag can be null if no main tag is set, or an object with name
+  const mainTag = accountData.main_tag as { name: string } | null
+  if (!mainTag?.name) {
+    log.info('No main tag set for user send account:', { userId: redactId(userId) })
+    return null
+  }
+
+  return mainTag.name
+}
+
+/**
+ * Gets the main tag name for a send account by address.
+ * Uses send_accounts.main_tag_id to fetch the canonical main tag.
+ * This is the preferred method when the address is available.
+ */
+export async function getSendAccountMainTagName(address: Address): Promise<string | null> {
+  if (!address) {
+    log.warn('getSendAccountMainTagName: received empty address')
+    return null
+  }
+
+  const supabaseAdmin = createSupabaseAdminClient()
+
+  // Query send_accounts with a join to tags via main_tag_id foreign key
+  const { data: accountData, error: accountError } = await supabaseAdmin
+    .from('send_accounts')
+    .select('main_tag:tags!send_accounts_main_tag_id_fkey(name)')
+    .eq('address', address)
+    .maybeSingle()
+
+  if (accountError) {
+    log.warn('Error fetching main tag for address:', {
+      address: redactHex(address),
+      error: accountError,
+      errorMessage: accountError.message,
+      errorCode: accountError.code,
+    })
+    return null
+  }
+
+  if (!accountData) {
+    log.info('No send account found for address:', { address: redactHex(address) })
+    return null
+  }
+
+  // main_tag can be null if no main tag is set, or an object with name
+  const mainTag = accountData.main_tag as { name: string } | null
+  if (!mainTag?.name) {
+    log.info('No main tag set for send account:', { address: redactHex(address) })
+    return null
+  }
+
+  log.info('Found main tag for address:', {
+    address: redactHex(address),
+    tagName: mainTag.name,
+  })
+
+  return mainTag.name
 }
 
 /**
