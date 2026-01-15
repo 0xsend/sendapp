@@ -169,7 +169,12 @@ export const SendSuggestions = () => {
         gap: '$6',
       }}
     >
-      <YStack position="relative">
+      <YStack
+        $xs={{
+          mx: -5,
+        }}
+        position="relative"
+      >
         <CustomTabs.List
           als="flex-start"
           br={100}
@@ -212,6 +217,7 @@ export const SendSuggestions = () => {
           />
           <EachTab
             value="top"
+            f={1.5}
             title={t('suggestions.top')}
             onInteraction={handleOnInteraction}
             currentTab={currentTab}
@@ -257,14 +263,14 @@ export const SendSuggestions = () => {
   )
 }
 
-interface EachTabProps {
+interface EachTabProps extends StackProps {
   value: string
   title: string
   onInteraction: TabsTabProps['onInteraction']
   currentTab: string
 }
 
-const EachTab = ({ value, title, onInteraction, currentTab }: EachTabProps) => {
+const EachTab = ({ value, title, onInteraction, currentTab, ...props }: EachTabProps) => {
   return (
     <CustomTabs.Tab
       unstyled
@@ -273,9 +279,10 @@ const EachTab = ({ value, title, onInteraction, currentTab }: EachTabProps) => {
       value={value}
       onInteraction={onInteraction}
       active={currentTab === value}
-      f={1}
+      f={2}
       jc="center"
       ai="center"
+      {...props}
     >
       <SizableText
         size="$5"
