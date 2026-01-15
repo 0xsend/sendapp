@@ -242,8 +242,8 @@ export const SendSuggestions = () => {
         </CustomTabs.List>
       </YStack>
 
-      <View gap="$3">
-        <TitleText fontSize="$8" fontWeight="600" color="$color12" h={30}>
+      <View gap="$3" pl='$1.5'>
+        <TitleText x='$1' fontSize="$8" fontWeight="600" color="$color12" h={30}>
           {activeTitle}
         </TitleText>
         <XStack mih={120}>
