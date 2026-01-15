@@ -2,7 +2,12 @@ import debug from 'debug'
 import { TRPCError } from '@trpc/server'
 import { createTRPCRouter, protectedProcedure } from '../../trpc'
 import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
-import { createBridgeClient, BridgeApiError, type SourceDepositInstructions } from '@my/bridge'
+import {
+  createBridgeClient,
+  BridgeApiError,
+  type SourceDepositInstructions,
+  type KycLinkResponse,
+} from '@my/bridge'
 import {
   CreateKycLinkInputSchema,
   GetKycStatusInputSchema,
@@ -126,17 +131,78 @@ export const bridgeRouter = createTRPCRouter({
 
         const customerType = profile.is_business ? 'business' : 'individual'
 
-        // Check if user already has a bridge customer record for this profile type
+        // Email is required for KYC
+        if (!input.email) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Email is required to start verification',
+          })
+        }
+        const email = input.email
+
+        // Check if this email is already used by another user
+        const { data: emailOwner } = await adminClient
+          .from('bridge_customers')
+          .select('user_id, kyc_link_id, kyc_status, tos_status, rejection_attempts')
+          .eq('email', email)
+          .maybeSingle()
+
+        if (emailOwner && emailOwner.user_id !== userId) {
+          log('email already in use by another user: %s', email)
+          return {
+            error: 'email_in_use' as const,
+            message: 'This email is already in use for verification. Try another email address.',
+          }
+        }
+
+        // If email belongs to current user, use the existing KYC link
+        if (emailOwner && emailOwner.user_id === userId) {
+          log('using existing KYC link for email: %s', email)
+
+          // Check status constraints
+          if (emailOwner.kyc_status === 'approved') {
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'KYC already approved' })
+          }
+
+          const rejectionAttempts = emailOwner.rejection_attempts ?? 0
+          if (rejectionAttempts >= MAX_KYC_REJECTION_ATTEMPTS) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message:
+                'Maximum verification attempts exceeded. If you believe this was a mistake, please contact support@send.app',
+            })
+          }
+
+          const bridgeClient = createBridgeClient()
+          const kycLink = await bridgeClient.getKycLink(emailOwner.kyc_link_id)
+
+          // If user is retrying after rejection, reset status to incomplete
+          if (emailOwner.kyc_status === 'rejected') {
+            await adminClient
+              .from('bridge_customers')
+              .update({ kyc_status: 'incomplete' })
+              .eq('email', email)
+            log('reset kyc_status from rejected to incomplete for retry')
+          }
+
+          return {
+            kycLink: kycLink.kyc_link,
+            tosLink: kycLink.tos_link,
+            kycLinkId: kycLink.id,
+            kycStatus: kycLink.kyc_status,
+            tosStatus: kycLink.tos_status,
+          }
+        }
+
+        // Check if user has an existing record (different email)
         const { data: existingCustomer } = await adminClient
           .from('bridge_customers')
-          .select('*')
+          .select('kyc_status, rejection_attempts')
           .eq('user_id', userId)
           .eq('type', customerType)
           .maybeSingle()
 
         if (existingCustomer) {
-          log('user already has bridge customer', existingCustomer.kyc_link_id)
-
           // If already approved, return error
           if (existingCustomer.kyc_status === 'approved') {
             throw new TRPCError({ code: 'BAD_REQUEST', message: 'KYC already approved' })
@@ -152,52 +218,7 @@ export const bridgeRouter = createTRPCRouter({
                 'Maximum verification attempts exceeded. If you believe this was a mistake, please contact support@send.app',
             })
           }
-
-          const bridgeClient = createBridgeClient()
-
-          if (existingCustomer.kyc_link_id) {
-            const kycLink = await bridgeClient.getKycLink(existingCustomer.kyc_link_id)
-
-            // If user is retrying after rejection, reset status to incomplete
-            if (existingCustomer.kyc_status === 'rejected') {
-              await adminClient
-                .from('bridge_customers')
-                .update({ kyc_status: 'incomplete' })
-                .eq('user_id', userId)
-              log('reset kyc_status from rejected to incomplete for retry: userId=%s', userId)
-            }
-
-            return {
-              kycLink: kycLink.kyc_link,
-              tosLink: kycLink.tos_link,
-              kycLinkId: kycLink.id,
-            }
-          }
-
-          if (existingCustomer.bridge_customer_id) {
-            const kycLink = await bridgeClient.getCustomerKycLink(
-              existingCustomer.bridge_customer_id
-            )
-
-            // If user is retrying after rejection, reset status to incomplete
-            if (existingCustomer.kyc_status === 'rejected') {
-              await adminClient
-                .from('bridge_customers')
-                .update({ kyc_status: 'incomplete' })
-                .eq('user_id', userId)
-              log('reset kyc_status from rejected to incomplete for retry: userId=%s', userId)
-            }
-
-            return {
-              kycLink: kycLink.kyc_link,
-              tosLink: '',
-              kycLinkId: existingCustomer.kyc_link_id ?? '',
-            }
-          }
         }
-
-        // Use send_id for deterministic email - user emails are unreliable with passkey auth
-        const email = `${profile.send_id}@no-reply.users.send.app`
 
         // Validate redirectUri against allowlist
         const validatedRedirectUri =
@@ -205,31 +226,55 @@ export const bridgeRouter = createTRPCRouter({
             ? input.redirectUri
             : undefined
 
-        // Create new KYC link with Bridge
+        // Create or get existing KYC link from Bridge
         const bridgeClient = createBridgeClient()
-        const kycLinkResponse = await bridgeClient.createKycLink(
+        let kycLinkResponse: KycLinkResponse
+        try {
+          kycLinkResponse = await bridgeClient.createKycLink(
+            {
+              email,
+              type: customerType,
+              redirect_uri: validatedRedirectUri,
+            },
+            { idempotencyKey: `kyc-${profile.send_id}-${customerType}-${email}` }
+          )
+        } catch (error) {
+          // Idempotency error means this email was used by a different user
+          // (idempotency key includes send_id, so same user would get cached response)
+          if (
+            error instanceof BridgeApiError &&
+            error.message.includes('idempotency key has already been used')
+          ) {
+            log('email already in use (idempotency conflict): %s', email)
+            return {
+              error: 'email_in_use' as const,
+              message: 'This email is already in use for verification. Try another email address.',
+            }
+          }
+          throw error
+        }
+        log('got KYC link from create', kycLinkResponse.id)
+
+        // Fetch current status - idempotent response may have stale status
+        const currentLink = await bridgeClient.getKycLink(kycLinkResponse.id)
+        log('current status: kyc=%s tos=%s', currentLink.kyc_status, currentLink.tos_status)
+
+        // Store or update the customer record with email and current status
+        const { error: upsertError } = await adminClient.from('bridge_customers').upsert(
           {
+            user_id: userId,
+            kyc_link_id: currentLink.id,
             email,
+            kyc_status: currentLink.kyc_status,
+            tos_status: currentLink.tos_status,
+            bridge_customer_id: currentLink.customer_id,
             type: customerType,
-            redirect_uri: validatedRedirectUri,
           },
-          { idempotencyKey: `kyc-${profile.send_id}-${customerType}` }
+          { onConflict: 'user_id,type' }
         )
 
-        log('created KYC link', kycLinkResponse.id)
-
-        // Store the customer record
-        const { error: insertError } = await adminClient.from('bridge_customers').insert({
-          user_id: userId,
-          kyc_link_id: kycLinkResponse.id,
-          kyc_status: kycLinkResponse.kyc_status,
-          tos_status: kycLinkResponse.tos_status,
-          bridge_customer_id: kycLinkResponse.customer_id,
-          type: customerType,
-        })
-
-        if (insertError) {
-          log('failed to store bridge customer', insertError)
+        if (upsertError) {
+          log('failed to store bridge customer', upsertError)
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: 'Failed to store customer record',
@@ -237,9 +282,11 @@ export const bridgeRouter = createTRPCRouter({
         }
 
         return {
-          kycLink: kycLinkResponse.kyc_link,
-          tosLink: kycLinkResponse.tos_link,
-          kycLinkId: kycLinkResponse.id,
+          kycLink: currentLink.kyc_link,
+          tosLink: currentLink.tos_link,
+          kycLinkId: currentLink.id,
+          kycStatus: currentLink.kyc_status,
+          tosStatus: currentLink.tos_status,
         }
       } catch (error) {
         if (error instanceof TRPCError) throw error
@@ -330,6 +377,7 @@ export const bridgeRouter = createTRPCRouter({
         return {
           kycStatus: kycLink.kyc_status,
           tosStatus: kycLink.tos_status,
+          email: kycLink.email,
           rejectionReasons: kycLink.rejection_reasons,
           rejectionAttempts,
           customerId: kycLink.customer_id,

@@ -202,6 +202,7 @@ export function useSyncKycStatus(
     ...query,
     kycStatus: data?.kycStatus ?? 'not_started',
     tosStatus: data?.tosStatus ?? 'pending',
+    email: data?.email ?? null,
     rejectionReasons,
     rejectionAttempts: data?.rejectionAttempts ?? 0,
     isApproved: data?.kycStatus === 'approved',

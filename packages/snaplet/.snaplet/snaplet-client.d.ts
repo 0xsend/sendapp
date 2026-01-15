@@ -39,6 +39,7 @@ type Override = {
       rejection_attempts?: string;
       created_at?: string;
       updated_at?: string;
+      email?: string;
       users?: string;
       bridge_static_memos?: string;
       bridge_transfer_templates?: string;

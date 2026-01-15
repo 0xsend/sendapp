@@ -4,23 +4,16 @@ import { DepositOptionButton } from './components/DepositOptionButton'
 import { IconApple, IconDebitCard, IconWallet, IconDollar } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'
 import { useBridgeVirtualBankAccountEnabled } from 'app/utils/useFeatureFlag'
-import { Platform } from 'react-native'
-import { useBridgeGeoBlock, useBridgeCustomer } from 'app/features/bank-transfer'
+import { useBridgeGeoBlock } from 'app/features/bank-transfer'
 
 export function DepositScreen() {
   const { t } = useTranslation('deposit')
   const isBridgeVirtualBankAccountEnabled = useBridgeVirtualBankAccountEnabled()
-  const { data: customer } = useBridgeCustomer()
-  const isApproved = customer?.kyc_status === 'approved'
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const geoblockEnabled =
     process.env.NEXT_PUBLIC_GEOBLOCK_BANK_TRANSFER ?? process.env.NEXT_PUBLIC_GEOBLOCK
-  const isNative = Platform.OS !== 'web'
   const shouldShowBankTransfer =
-    isBridgeVirtualBankAccountEnabled &&
-    (!isNative || isApproved) &&
-    !isGeoBlocked &&
-    !isGeoBlockLoading
+    isBridgeVirtualBankAccountEnabled && !isGeoBlocked && !isGeoBlockLoading
   type DepositOption = Parameters<typeof DepositOptionButton>[0]
 
   const options = useMemo<DepositOption[]>(() => {

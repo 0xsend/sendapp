@@ -2,21 +2,32 @@ import { z } from 'zod'
 
 export const CreateKycLinkInputSchema = z.object({
   redirectUri: z.string().optional(),
+  email: z.string().email().optional(),
 })
 
 export const GetKycStatusInputSchema = z.object({
   kycLinkId: z.string().min(1),
 })
 
-export const CreateKycLinkOutputSchema = z.object({
-  kycLink: z.string(),
-  tosLink: z.string(),
-  kycLinkId: z.string(),
-})
+export const CreateKycLinkOutputSchema = z.union([
+  z.object({
+    kycLink: z.string(),
+    tosLink: z.string(),
+    kycLinkId: z.string(),
+    kycStatus: z.string(),
+    tosStatus: z.string(),
+    error: z.undefined(),
+  }),
+  z.object({
+    error: z.literal('email_in_use'),
+    message: z.string(),
+  }),
+])
 
 export const GetKycStatusOutputSchema = z.object({
   kycStatus: z.string(),
   tosStatus: z.string(),
+  email: z.string(),
   rejectionReasons: z.array(z.unknown()).nullable(),
   rejectionAttempts: z.number(),
   customerId: z.string().nullable(),

@@ -645,6 +645,20 @@
           "maxLength": null
         },
         {
+          "id": "public.bridge_customers.email",
+          "name": "email",
+          "columnName": "email",
+          "type": "text",
+          "isRequired": false,
+          "kind": "scalar",
+          "isList": false,
+          "isGenerated": false,
+          "sequence": false,
+          "hasDefaultValue": false,
+          "isId": false,
+          "maxLength": null
+        },
+        {
           "name": "users",
           "type": "users",
           "isRequired": true,
@@ -710,6 +724,13 @@
           "name": "bridge_customers_bridge_customer_id_key",
           "fields": [
             "bridge_customer_id"
+          ],
+          "nullNotDistinct": false
+        },
+        {
+          "name": "bridge_customers_email_key",
+          "fields": [
+            "email"
           ],
           "nullNotDistinct": false
         },

@@ -61,7 +61,7 @@ export const coinGeckoRouter = createTRPCRouter({
     // Vercel CDN caching across users
     try {
       // when market_data included, keep short TTL to avoid stale pricing
-      ctx.res?.setHeader?.('Cache-Control', 'public, s-maxage=120, stale-while-revalidate=600')
+      ctx.res?.setHeader?.('Cache-Coi wthntrol', 'public, s-maxage=120, stale-while-revalidate=600')
     } catch {}
 
     return coingeckoCoin

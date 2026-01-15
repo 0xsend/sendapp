@@ -1,4 +1,4 @@
-import { FadeCard, Paragraph, XStack, YStack, Button, Spinner } from '@my/ui'
+import { FadeCard, Paragraph, XStack, YStack, Button, Spinner, SelectableText } from '@my/ui'
 import { Copy, Check, HelpCircle } from '@tamagui/lucide-icons'
 import { useState, useCallback } from 'react'
 import * as Clipboard from 'expo-clipboard'
@@ -9,9 +9,54 @@ interface BankDetailsCardProps {
   routingNumber: string | null
   accountNumber: string | null
   beneficiaryName: string | null
+  beneficiaryAddress: string | null
   depositMessage?: string | null
   paymentRails: string[]
   onInfoPress?: () => void
+}
+
+/**
+ * Format a 9-digit ZIP code:
+ * - If +4 is 0000, show just 5-digit ZIP (820010000 → 82001)
+ * - Otherwise add hyphen (820012636 → 82001-2636)
+ */
+function formatZipCode(text: string): string {
+  return text.replace(/\b(\d{5})(\d{4})\b/g, (_, zip5, plus4) =>
+    plus4 === '0000' ? zip5 : `${zip5}-${plus4}`
+  )
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  US: 'United States',
+  USA: 'United States',
+}
+
+function formatCountry(code: string): string {
+  return COUNTRY_NAMES[code.toUpperCase()] ?? code
+}
+
+/**
+ * Parse address string into formatted lines.
+ * Input: "1712 Pioneer Avenue, Suite 2636, Cheyenne, Wyoming 820010000, US"
+ * Output: ["1712 Pioneer Avenue", "Suite 2636", "Cheyenne, Wyoming 82001", "United States"]
+ */
+function formatAddress(address: string): string[] {
+  const parts = address.split(',').map((part) => part.trim())
+  if (parts.length <= 2) return parts
+
+  // Group: street, suite/unit, city+state+zip, country
+  const street = parts[0]
+  const suite = parts.length > 3 ? parts[1] : undefined
+  const cityStateZip =
+    parts.length > 3 ? parts.slice(2, -1).join(', ') : parts.slice(1, -1).join(', ')
+  const country = parts[parts.length - 1]
+
+  return [
+    street,
+    suite,
+    cityStateZip ? formatZipCode(cityStateZip) : undefined,
+    country ? formatCountry(country) : undefined,
+  ].filter((line): line is string => !!line)
 }
 
 function CopyableField({
@@ -42,9 +87,51 @@ function CopyableField({
         >
           {label}
         </Paragraph>
-        <Paragraph fontSize="$5" fontWeight={500} fontFamily="$mono">
+        <SelectableText fontSize="$5" fontWeight={500} fontFamily="$mono">
           {value}
+        </SelectableText>
+      </YStack>
+      <Button
+        size="$2"
+        chromeless
+        onPress={handleCopy}
+        icon={copied ? <Check size={16} color="$primary" /> : <Copy size={16} />}
+      />
+    </XStack>
+  )
+}
+
+function AddressField({ label, value }: { label: string; value: string | null }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(async () => {
+    if (!value) return
+    await Clipboard.setStringAsync(value)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [value])
+
+  if (!value) return null
+
+  const lines = formatAddress(value)
+
+  return (
+    <XStack jc="space-between" ai="flex-start" py="$2">
+      <YStack f={1}>
+        <Paragraph
+          fontSize="$3"
+          color="$lightGrayTextField"
+          $theme-light={{ color: '$darkGrayTextField' }}
+        >
+          {label}
         </Paragraph>
+        <YStack>
+          {lines.map((line) => (
+            <SelectableText key={line} fontSize="$5" fontWeight={500}>
+              {line}
+            </SelectableText>
+          ))}
+        </YStack>
       </YStack>
       <Button
         size="$2"
@@ -61,6 +148,7 @@ export function BankDetailsCard({
   routingNumber,
   accountNumber,
   beneficiaryName,
+  beneficiaryAddress,
   depositMessage,
   paymentRails,
   onInfoPress,
@@ -112,9 +200,9 @@ export function BankDetailsCard({
               >
                 Bank Name
               </Paragraph>
-              <Paragraph fontSize="$5" fontWeight={500}>
+              <SelectableText fontSize="$5" fontWeight={500}>
                 {bankName}
-              </Paragraph>
+              </SelectableText>
             </YStack>
           </XStack>
         )}
@@ -123,6 +211,7 @@ export function BankDetailsCard({
         <CopyableField label="Account Number" value={accountNumber} />
         <CopyableField label="Memo" value={depositMessage ?? null} />
         <CopyableField label="Beneficiary Name" value={beneficiaryName} />
+        <AddressField label="Beneficiary Address" value={beneficiaryAddress} />
 
         <Paragraph fontSize="$3" color="$color12" py="$4">
           <Paragraph fontSize="$3" fontWeight="bold" color="$color12">
