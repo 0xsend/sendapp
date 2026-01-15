@@ -253,7 +253,7 @@ export function KycStatusCard({
                 color="$lightGrayTextField"
                 $theme-light={{ color: '$darkGrayTextField' }}
               >
-                Email for verification follow-ups
+                To get started, we'll need your email address
               </Paragraph>
               {/* Show edit button for returning users with saved email */}
               {!isNewUser && savedEmail && !isEditingEmail && onEditEmail && (
