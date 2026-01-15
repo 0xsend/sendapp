@@ -90,10 +90,10 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
   return (
     <YStack
       position="absolute"
-      backgroundColor={theme === 'light' ? '$gray1' : '$color1'}
-      opacity={0.7}
       animation="100ms"
       animateOnly={['opacity', 'transform']}
+      elevation="$1"
+      shadowOpacity={0.3}
       enterStyle={{
         opacity: 0,
       }}
@@ -101,7 +101,7 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
         opacity: 0,
       }}
       {...(active && {
-        backgroundColor: theme === 'light' ? '$gray6' : '$aztec5',
+        backgroundColor: theme === 'light' ? '$gray7' : '$aztec5',
         opacity: 1,
       })}
       {...props}
@@ -189,35 +189,32 @@ export const SendSuggestions = () => {
     >
       <YStack position="relative">
         {/* Hover/focus indicator */}
-        {isWeb && (
+
+        <CustomTabs.List
+          als="flex-start"
+          br={100}
+          disablePassBorderRadius
+          loop={false}
+          backgroundColor="$aztec2"
+          $theme-light={{
+            backgroundColor: '$gray1',
+          }}
+          py={4}
+          px={2}
+          pr={6}
+          ov="hidden"
+        >
           <AnimatePresence>
-            {intentAt && (
+            {activeAt && (
               <TabsRovingIndicator
                 borderRadius={1000}
-                width={intentAt.width}
-                height={intentAt.height}
-                x={intentAt.x}
-                y={intentAt.y}
+                active
+                width={activeAt.width}
+                height={activeAt.height}
+                x={activeAt.x}
               />
             )}
           </AnimatePresence>
-        )}
-
-        {/* Active tab indicator */}
-        <AnimatePresence>
-          {activeAt && (
-            <TabsRovingIndicator
-              borderRadius={1000}
-              active
-              width={activeAt.width}
-              height={activeAt.height}
-              x={activeAt.x}
-              y={activeAt.y}
-            />
-          )}
-        </AnimatePresence>
-
-        <CustomTabs.List disablePassBorderRadius loop={false} backgroundColor="transparent">
           <EachTab
             value="recent"
             title={t('suggestions.recent')}
