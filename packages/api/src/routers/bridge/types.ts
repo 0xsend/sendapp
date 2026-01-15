@@ -22,6 +22,10 @@ export const CreateKycLinkOutputSchema = z.union([
     error: z.literal('email_in_use'),
     message: z.string(),
   }),
+  z.object({
+    error: z.literal('max_emails_exceeded'),
+    message: z.string(),
+  }),
 ])
 
 export const GetKycStatusOutputSchema = z.object({

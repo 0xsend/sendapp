@@ -82,6 +82,7 @@ export type Database = {
           rejection_attempts: number
           rejection_reasons: Json | null
           tos_status: string
+          tried_emails: Json
           type: string
           updated_at: string
           user_id: string
@@ -96,6 +97,7 @@ export type Database = {
           rejection_attempts?: number
           rejection_reasons?: Json | null
           tos_status?: string
+          tried_emails?: Json
           type?: string
           updated_at?: string
           user_id: string
@@ -110,6 +112,7 @@ export type Database = {
           rejection_attempts?: number
           rejection_reasons?: Json | null
           tos_status?: string
+          tried_emails?: Json
           type?: string
           updated_at?: string
           user_id?: string

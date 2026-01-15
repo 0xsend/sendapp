@@ -21,6 +21,7 @@ import {
 const log = debug('api:routers:bridge')
 
 const MAX_KYC_REJECTION_ATTEMPTS = 3
+const MAX_EMAIL_ATTEMPTS = 3
 
 // Allowed redirect URI patterns for KYC completion
 const ALLOWED_REDIRECT_PATTERNS = [
@@ -197,7 +198,7 @@ export const bridgeRouter = createTRPCRouter({
         // Check if user has an existing record (different email)
         const { data: existingCustomer } = await adminClient
           .from('bridge_customers')
-          .select('kyc_status, rejection_attempts')
+          .select('kyc_status, rejection_attempts, tried_emails')
           .eq('user_id', userId)
           .eq('type', customerType)
           .maybeSingle()
@@ -217,6 +218,17 @@ export const bridgeRouter = createTRPCRouter({
               message:
                 'Maximum verification attempts exceeded. If you believe this was a mistake, please contact support@send.app',
             })
+          }
+
+          // Check email attempts limit
+          const triedEmails = (existingCustomer.tried_emails as string[]) ?? []
+          const emailAlreadyTried = triedEmails.includes(email)
+          if (!emailAlreadyTried && triedEmails.length >= MAX_EMAIL_ATTEMPTS) {
+            log('max email attempts exceeded: userId=%s emails=%d', userId, triedEmails.length)
+            return {
+              error: 'max_emails_exceeded' as const,
+              message: `You have reached the maximum of ${MAX_EMAIL_ATTEMPTS} email addresses. Please use one of your existing emails.`,
+            }
           }
         }
 
@@ -259,6 +271,12 @@ export const bridgeRouter = createTRPCRouter({
         const currentLink = await bridgeClient.getKycLink(kycLinkResponse.id)
         log('current status: kyc=%s tos=%s', currentLink.kyc_status, currentLink.tos_status)
 
+        // Compute updated tried_emails array
+        const existingTriedEmails = (existingCustomer?.tried_emails as string[]) ?? []
+        const updatedTriedEmails = existingTriedEmails.includes(email)
+          ? existingTriedEmails
+          : [...existingTriedEmails, email]
+
         // Store or update the customer record with email and current status
         const { error: upsertError } = await adminClient.from('bridge_customers').upsert(
           {
@@ -269,6 +287,7 @@ export const bridgeRouter = createTRPCRouter({
             tos_status: currentLink.tos_status,
             bridge_customer_id: currentLink.customer_id,
             type: customerType,
+            tried_emails: updatedTriedEmails,
           },
           { onConflict: 'user_id,type' }
         )
