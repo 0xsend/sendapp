@@ -4,9 +4,10 @@
  * Provides components and hooks for using contacts in the Send page.
  */
 
-export { SendContactsSection } from './SendContactsSection'
+export { SendContactsSection, ContactsRow, ContactSuggestion } from './SendContactsSection'
 export {
   useFavoriteContacts,
   useRecentContacts,
+  useSendPageContacts,
   type SendContactItem,
 } from './useFavoriteContacts'
