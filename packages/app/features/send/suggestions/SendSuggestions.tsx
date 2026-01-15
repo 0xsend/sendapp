@@ -176,13 +176,15 @@ export const SendSuggestions = () => {
           disablePassBorderRadius
           loop={false}
           backgroundColor={themeName === 'light' ? '$gray1' : '$aztec2'}
-          py={4}
-          px={4}
-          $platform-web={{
-            px: 2,
-            pr: 6,
-          }}
           ov="hidden"
+          w="100%"
+          maw={600}
+          p="$1.5"
+          pr="$2"
+          pl="$1"
+          $platform-android={{
+            px: '$1.5',
+          }}
         >
           <AnimatePresence>
             {activeAt && (
@@ -268,15 +270,17 @@ const EachTab = ({ value, title, onInteraction, currentTab }: EachTabProps) => {
       unstyled
       cur="pointer"
       paddingVertical="$2"
-      paddingHorizontal="$4"
       value={value}
       onInteraction={onInteraction}
       active={currentTab === value}
+      f={1}
+      jc="center"
+      ai="center"
     >
       <SizableText
         size="$5"
         $sm={{
-          size: '$4',
+          size: '$3',
         }}
         color={currentTab === value ? '$color11' : '$color10'}
       >
