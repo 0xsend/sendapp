@@ -183,7 +183,7 @@ export const SendSuggestions = () => {
           backgroundColor={themeName === 'light' ? '$gray1' : '$aztec2'}
           ov="hidden"
           w="100%"
-          maw={600}
+          maw={460}
           p="$1.5"
           pr="$2"
           pl="$1"
