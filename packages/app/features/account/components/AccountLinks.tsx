@@ -112,13 +112,15 @@ export const AccountLinks = memo(function AccountLinks(): JSX.Element {
               icon={icons.worldSearch}
             />
           </YGroup.Item>
-          <YGroup.Item>
-            <AccountNavLink
-              text={t('links.items.notifications', 'Notifications')}
-              href="/account/notifications"
-              icon={icons.bell}
-            />
-          </YGroup.Item>
+          {Platform.OS === 'web' && (
+            <YGroup.Item>
+              <AccountNavLink
+                text={t('links.items.notifications', 'Notifications')}
+                href="/account/notifications"
+                icon={icons.bell}
+              />
+            </YGroup.Item>
+          )}
           <YGroup.Item>
             <AccountNavLink
               text={t('links.items.linkInBio')}
