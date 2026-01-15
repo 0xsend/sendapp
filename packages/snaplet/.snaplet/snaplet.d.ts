@@ -74,6 +74,7 @@ interface Table_public_bridge_customers {
   created_at: string;
   updated_at: string;
   email: string | null;
+  tried_emails: Json;
 }
 interface Table_public_bridge_deposits {
   id: string;

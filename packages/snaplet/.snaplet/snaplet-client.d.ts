@@ -40,6 +40,7 @@ type Override = {
       created_at?: string;
       updated_at?: string;
       email?: string;
+      tried_emails?: string;
       users?: string;
       bridge_static_memos?: string;
       bridge_transfer_templates?: string;
@@ -1194,6 +1195,7 @@ export interface Fingerprint {
     rejectionAttempts?: FingerprintNumberField;
     createdAt?: FingerprintDateField;
     updatedAt?: FingerprintDateField;
+    triedEmails?: FingerprintJsonField;
     user?: FingerprintRelationField;
     bridgeStaticMemos?: FingerprintRelationField;
     bridgeTransferTemplates?: FingerprintRelationField;
