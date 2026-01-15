@@ -188,23 +188,8 @@ export function BankDetailsCard({
           Use your bank's {transferType} feature to deposit USD to your Send account.
         </Paragraph>
 
-        {bankName && (
-          <XStack jc="space-between" ai="center" py="$2">
-            <YStack>
-              <Paragraph
-                fontSize="$3"
-                color="$lightGrayTextField"
-                $theme-light={{ color: '$darkGrayTextField' }}
-              >
-                Bank Name
-              </Paragraph>
-              <SelectableText fontSize="$5" fontWeight={500}>
-                {bankName}
-              </SelectableText>
-            </YStack>
-          </XStack>
-        )}
-
+        <CopyableField label="Account Type" value="Checking" />
+        <CopyableField label="Bank Name" value={bankName} />
         <CopyableField label="Routing Number" value={routingNumber} />
         <CopyableField label="Account Number" value={accountNumber} />
         <AddressField label="Bank Address" value={bankAddress} />

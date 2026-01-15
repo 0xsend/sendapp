@@ -117,9 +117,16 @@ export function BankTransferScreen() {
         },
       })
 
+      // Construct redirect URI with success param based on expected flow
+      // If TOS not yet accepted, user will go through TOS first
+      // Otherwise, they'll go directly to KYC/KYB verification
+      const redirectUri = isTosAccepted
+        ? `${baseRedirectUri}?verificationSuccess=true`
+        : `${baseRedirectUri}?tosSuccess=true`
+
       // Get or create KYC link - returns actual status from Bridge
       const result = await initiateKyc.mutateAsync({
-        redirectUri: baseRedirectUri,
+        redirectUri,
         email,
       })
 
