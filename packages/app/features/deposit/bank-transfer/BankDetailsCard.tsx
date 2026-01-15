@@ -8,8 +8,7 @@ interface BankDetailsCardProps {
   bankName: string | null
   routingNumber: string | null
   accountNumber: string | null
-  beneficiaryName: string | null
-  beneficiaryAddress: string | null
+  bankAddress: string | null
   depositMessage?: string | null
   paymentRails: string[]
   onInfoPress?: () => void
@@ -147,8 +146,7 @@ export function BankDetailsCard({
   bankName,
   routingNumber,
   accountNumber,
-  beneficiaryName,
-  beneficiaryAddress,
+  bankAddress,
   depositMessage,
   paymentRails,
   onInfoPress,
@@ -209,9 +207,8 @@ export function BankDetailsCard({
 
         <CopyableField label="Routing Number" value={routingNumber} />
         <CopyableField label="Account Number" value={accountNumber} />
+        <AddressField label="Bank Address" value={bankAddress} />
         <CopyableField label="Memo" value={depositMessage ?? null} />
-        <CopyableField label="Beneficiary Name" value={beneficiaryName} />
-        <AddressField label="Beneficiary Address" value={beneficiaryAddress} />
 
         <Paragraph fontSize="$3" color="$color12" py="$4">
           <Paragraph fontSize="$3" fontWeight="bold" color="$color12">
