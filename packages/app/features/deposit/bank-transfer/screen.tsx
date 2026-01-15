@@ -445,8 +445,7 @@ export function BankTransferScreen() {
             bankName={bankDetails.bankName}
             routingNumber={bankDetails.routingNumber}
             accountNumber={bankDetails.accountNumber}
-            beneficiaryName={bankDetails.beneficiaryName}
-            beneficiaryAddress={bankDetails.beneficiaryAddress}
+            bankAddress={bankDetails.bankAddress}
             depositMessage={bankDetails.depositMessage}
             paymentRails={bankDetails.paymentRails}
             onInfoPress={() => setShowInfo(true)}
