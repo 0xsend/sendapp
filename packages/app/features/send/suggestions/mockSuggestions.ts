@@ -3,6 +3,7 @@ import type {
   SendSuggestionItem,
   SendSuggestionsQueryResult,
 } from 'app/features/send/suggestions/SendSuggestion.types'
+import type { SendContactItem } from 'app/features/contacts/send-integration'
 
 const FIRST_NAMES = [
   'Alice',
@@ -156,6 +157,149 @@ export const mockRecentSenders: SendSuggestionItem[] = generateMockSenders(1000,
 export const mockFavoriteSenders: SendSuggestionItem[] = generateMockSenders(2000, 50, 10)
 export const mockTopSenders: SendSuggestionItem[] = generateMockSenders(3000, 50, 20)
 export const mockBirthdaySenders: SendSuggestionItem[] = generateMockSenders(4000, 50, 30)
+
+// Mock contacts data
+const createMockContactItem = (
+  contactId: number,
+  overrides: Partial<SendContactItem> = {}
+): SendContactItem => ({
+  contact_id: contactId,
+  send_id: null,
+  main_tag_name: null,
+  tags: null,
+  name: null,
+  avatar_url: null,
+  is_verified: false,
+  is_favorite: false,
+  external_address: null,
+  chain_id: null,
+  ...overrides,
+})
+
+const generateMockContacts = (baseId: number, count: number, seed = 0): SendContactItem[] => {
+  return Array.from({ length: count }, (_, i) => {
+    const idx = (i + seed) % FIRST_NAMES.length
+    const lastIdx = (i + seed + 5) % LAST_NAMES.length
+    const firstName = FIRST_NAMES[idx] as string
+    const lastName = LAST_NAMES[lastIdx] as string
+    const tagName = `${firstName.toLowerCase()}${i > 0 ? i : ''}`
+
+    return createMockContactItem(baseId + i, {
+      send_id: 5000 + baseId + i,
+      name: `${firstName} ${lastName}`,
+      main_tag_name: tagName,
+      tags: [tagName],
+      avatar_url: `https://i.pravatar.cc/150?u=contact_${tagName}${baseId}`,
+      is_verified: i % 4 === 0,
+      is_favorite: i % 5 === 0,
+    })
+  })
+}
+
+export const mockContacts: SendContactItem[] = generateMockContacts(100, 50, 40)
+
+export interface MockContactsQueryResult {
+  data: {
+    pages: SendContactItem[][]
+    pageParams: (number | undefined)[]
+  }
+  error: Error | null
+  isError: boolean
+  isPending: boolean
+  isLoading: boolean
+  isLoadingError: boolean
+  isRefetchError: boolean
+  isSuccess: boolean
+  status: 'success' | 'error' | 'pending'
+  isFetched: boolean
+  isFetchedAfterMount: boolean
+  isFetching: boolean
+  isRefetching: boolean
+  isStale: boolean
+  isPlaceholderData: boolean
+  refetch: () => Promise<MockContactsQueryResult>
+  failureCount: number
+  failureReason: Error | null
+  errorUpdateCount: number
+  dataUpdatedAt: number
+  errorUpdatedAt: number
+  fetchStatus: 'idle' | 'fetching' | 'paused'
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  isFetchingNextPage: boolean
+  isFetchingPreviousPage: boolean
+  fetchNextPage: () => Promise<MockContactsQueryResult>
+  fetchPreviousPage: () => Promise<MockContactsQueryResult>
+}
+
+const CONTACTS_PAGE_SIZE = 10
+
+export const useMockContactsQuery = (
+  allContacts: SendContactItem[] = mockContacts
+): MockContactsQueryResult => {
+  const [pages, setPages] = useState<SendContactItem[][]>(() => [
+    allContacts.slice(0, CONTACTS_PAGE_SIZE),
+  ])
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
+
+  const totalPages = Math.ceil(allContacts.length / CONTACTS_PAGE_SIZE)
+  const currentPage = pages.length - 1
+  const hasNextPage = currentPage < totalPages - 1
+
+  const fetchNextPage = useCallback(async () => {
+    if (!hasNextPage || isFetchingNextPage) return {} as MockContactsQueryResult
+
+    setIsFetchingNextPage(true)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    const nextPageIndex = pages.length
+    const start = nextPageIndex * CONTACTS_PAGE_SIZE
+    const end = start + CONTACTS_PAGE_SIZE
+    const nextPageData = allContacts.slice(start, end)
+
+    setPages((prev) => [...prev, nextPageData])
+    setIsFetchingNextPage(false)
+
+    return {} as MockContactsQueryResult
+  }, [hasNextPage, isFetchingNextPage, pages.length, allContacts])
+
+  return useMemo(
+    () => ({
+      data: {
+        pages,
+        pageParams: pages.map((_, i) => (i === 0 ? undefined : i)),
+      },
+      error: null,
+      isError: false,
+      isPending: false,
+      isLoading: false,
+      isLoadingError: false,
+      isRefetchError: false,
+      isSuccess: true,
+      status: 'success',
+      isFetched: true,
+      isFetchedAfterMount: true,
+      isFetching: false,
+      isRefetching: false,
+      isStale: false,
+      isPlaceholderData: false,
+      refetch: () => Promise.resolve({} as MockContactsQueryResult),
+      failureCount: 0,
+      failureReason: null,
+      errorUpdateCount: 0,
+      dataUpdatedAt: Date.now(),
+      errorUpdatedAt: 0,
+      fetchStatus: 'idle',
+      hasNextPage,
+      hasPreviousPage: false,
+      isFetchingNextPage,
+      isFetchingPreviousPage: false,
+      fetchNextPage,
+      fetchPreviousPage: () => Promise.resolve({} as MockContactsQueryResult),
+    }),
+    [pages, hasNextPage, isFetchingNextPage, fetchNextPage]
+  )
+}
 
 export const PAGE_SIZE = 10
 

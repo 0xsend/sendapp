@@ -129,6 +129,7 @@ async function getReadyRegistration(): Promise<ServiceWorkerRegistration | null>
  */
 export function NotificationAutoPrompt() {
   const media = useMedia()
+  const insets = useSafeAreaInsets()
   const { session } = useSessionContext()
   const { permission, isSupported, isSubscribed } = useWebPush()
 
@@ -231,28 +232,33 @@ export function NotificationAutoPrompt() {
     return () => clearTimeout(timer)
   }, [session?.user, permission, isSupported, isSubscribed])
 
-  const safeAreaInsets = useSafeAreaInsets()
+  // Calculate offsets with safe area insets
+  const topOffset = Math.max(insets.top, 20)
+  const bottomOffset = Math.max(insets.bottom, 20)
 
   return (
     <AnimatePresence>
       {showBanner ? (
         <View
           position="absolute"
-          right={20}
-          maxWidth={400}
+          paddingHorizontal={20}
+          alignItems="center"
           zIndex={9999}
           enterStyle={{ opacity: 0, y: -10 }}
           exitStyle={{ opacity: 0, y: 10 }}
           opacity={1}
-          y={safeAreaInsets.top}
           animation="smoothResponsive"
-          {...(media.gtMd ? { bottom: 20, marginTop: 'auto' } : { top: 20, marginBottom: 'auto' })}
+          {...(media.gtMd
+            ? { right: 20, bottom: bottomOffset, marginTop: 'auto' }
+            : { left: 0, right: 0, top: topOffset, marginBottom: 'auto' })}
         >
-          <NotificationPrompt
-            onDismiss={() => setShowBanner(false)}
-            title="Enable notifications"
-            description="Get notified instantly when you receive payments"
-          />
+          <View maxWidth={400} width="100%">
+            <NotificationPrompt
+              onDismiss={() => setShowBanner(false)}
+              title="Enable notifications"
+              description="Never miss important activity on your account"
+            />
+          </View>
         </View>
       ) : null}
     </AnimatePresence>

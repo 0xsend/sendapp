@@ -125,6 +125,7 @@ import {
   getUserIdFromAddress,
   createNotification,
   getUserMainTagName,
+  getSendAccountMainTagName,
 } from './supabase'
 
 describe('Notification Workflow Supabase Helpers', () => {
@@ -331,21 +332,39 @@ describe('Notification Workflow Supabase Helpers', () => {
       expect(mockFrom).not.toHaveBeenCalled()
     })
 
-    it('should return tag name when found', async () => {
+    it('should return tag name when found via send_accounts.main_tag_id', async () => {
       const mockTagName = 'alice'
-      mockMaybeSingle.mockResolvedValueOnce(createSuccessMaybeSingleResponse({ name: mockTagName }))
+      mockMaybeSingle.mockResolvedValueOnce(
+        createSuccessMaybeSingleResponse({ main_tag: { name: mockTagName } })
+      )
 
       const result = await getUserMainTagName(mockUserId)
       expect(result).toBe(mockTagName)
-      expect(mockFrom).toHaveBeenCalledWith('tags')
-      expect(mockSelect).toHaveBeenCalledWith('name')
+      expect(mockFrom).toHaveBeenCalledWith('send_accounts')
+      expect(mockSelect).toHaveBeenCalledWith('main_tag:tags!send_accounts_main_tag_id_fkey(name)')
+      expect(mockEq).toHaveBeenCalledWith('user_id', mockUserId)
     })
 
-    it('should return null when no tag found', async () => {
-      mockMaybeSingle.mockResolvedValueOnce(createNotFoundMaybeSingleResponse<{ name: string }>())
+    it('should return null when no send account found', async () => {
+      mockMaybeSingle.mockResolvedValueOnce(
+        createNotFoundMaybeSingleResponse<{ main_tag: { name: string } | null }>()
+      )
 
       const result = await getUserMainTagName(mockUserId)
       expect(result).toBeNull()
+      expect(log.info).toHaveBeenCalledWith('No send account found for user:', {
+        userId: redactId(mockUserId),
+      })
+    })
+
+    it('should return null when main_tag is null', async () => {
+      mockMaybeSingle.mockResolvedValueOnce(createSuccessMaybeSingleResponse({ main_tag: null }))
+
+      const result = await getUserMainTagName(mockUserId)
+      expect(result).toBeNull()
+      expect(log.info).toHaveBeenCalledWith('No main tag set for user send account:', {
+        userId: redactId(mockUserId),
+      })
     })
 
     it('should return null on database error', async () => {
@@ -360,9 +379,79 @@ describe('Notification Workflow Supabase Helpers', () => {
 
       const result = await getUserMainTagName(mockUserId)
       expect(result).toBeNull()
-      expect(log.warn).toHaveBeenCalledWith('Error fetching tag for user:', {
+      expect(log.warn).toHaveBeenCalledWith('Error fetching main tag for user:', {
         userId: redactId(mockUserId),
         error: mockError,
+        errorMessage: mockError.message,
+        errorCode: mockError.code,
+      })
+    })
+  })
+
+  describe('getSendAccountMainTagName', () => {
+    it('should return null when address is empty', async () => {
+      const result = await getSendAccountMainTagName('' as Address)
+      expect(result).toBeNull()
+      expect(log.warn).toHaveBeenCalledWith('getSendAccountMainTagName: received empty address')
+      expect(mockFrom).not.toHaveBeenCalled()
+    })
+
+    it('should return tag name when found via send_accounts.main_tag_id', async () => {
+      const mockTagName = 'bob'
+      mockMaybeSingle.mockResolvedValueOnce(
+        createSuccessMaybeSingleResponse({ main_tag: { name: mockTagName } })
+      )
+
+      const result = await getSendAccountMainTagName(mockAddress)
+      expect(result).toBe(mockTagName)
+      expect(mockFrom).toHaveBeenCalledWith('send_accounts')
+      expect(mockSelect).toHaveBeenCalledWith('main_tag:tags!send_accounts_main_tag_id_fkey(name)')
+      expect(mockEq).toHaveBeenCalledWith('address', mockAddress)
+      expect(log.info).toHaveBeenCalledWith('Found main tag for address:', {
+        address: redactHex(mockAddress),
+        tagName: mockTagName,
+      })
+    })
+
+    it('should return null when no send account found', async () => {
+      mockMaybeSingle.mockResolvedValueOnce(
+        createNotFoundMaybeSingleResponse<{ main_tag: { name: string } | null }>()
+      )
+
+      const result = await getSendAccountMainTagName(mockAddress)
+      expect(result).toBeNull()
+      expect(log.info).toHaveBeenCalledWith('No send account found for address:', {
+        address: redactHex(mockAddress),
+      })
+    })
+
+    it('should return null when main_tag is null', async () => {
+      mockMaybeSingle.mockResolvedValueOnce(createSuccessMaybeSingleResponse({ main_tag: null }))
+
+      const result = await getSendAccountMainTagName(mockAddress)
+      expect(result).toBeNull()
+      expect(log.info).toHaveBeenCalledWith('No main tag set for send account:', {
+        address: redactHex(mockAddress),
+      })
+    })
+
+    it('should return null on database error', async () => {
+      const mockError = createMockPostgrestError('DB error')
+      mockMaybeSingle.mockResolvedValueOnce({
+        data: null,
+        error: mockError,
+        count: null,
+        status: 500,
+        statusText: 'Internal Server Error',
+      })
+
+      const result = await getSendAccountMainTagName(mockAddress)
+      expect(result).toBeNull()
+      expect(log.warn).toHaveBeenCalledWith('Error fetching main tag for address:', {
+        address: redactHex(mockAddress),
+        error: mockError,
+        errorMessage: mockError.message,
+        errorCode: mockError.code,
       })
     })
   })

@@ -29,7 +29,6 @@ import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
 import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
-import { SendContactsSection } from 'app/features/contacts/send-integration'
 import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
 import { getContactDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
 import { SendCheckButton } from './components/SendCheckButton'
@@ -115,10 +114,7 @@ export const SendScreen = () => {
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
           {!search && <SendSuggestions />}
         </YStack>
-        <YStack>
-          {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
-          {!search && <SendContactsSection />}
-        </YStack>
+        {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />
         </LazyMount>
