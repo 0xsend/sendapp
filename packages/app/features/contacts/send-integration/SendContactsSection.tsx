@@ -43,11 +43,17 @@ import { type SendContactItem, useSendPageContacts } from './useFavoriteContacts
  * ```
  */
 export const SendContactsSection = memo(function SendContactsSection() {
-  const { data: contacts, isLoading, error } = useSendPageContacts()
+  const { data, isLoading, error } = useSendPageContacts()
   const router = useRouter()
   const { t } = useTranslation('send')
 
-  const hasContacts = contacts && contacts.length > 0
+  // Flatten pages into a single array for the first row display
+  const contacts = useMemo(() => {
+    if (!data?.pages) return []
+    return data.pages.flat()
+  }, [data?.pages])
+
+  const hasContacts = contacts.length > 0
 
   // Don't render if loading or no contacts (but show if there's an error)
   if (isLoading || (!hasContacts && !error)) {
@@ -94,7 +100,7 @@ export const SendContactsSection = memo(function SendContactsSection() {
           {error.message?.split('.')[0] ?? 'Error loading contacts'}
         </Paragraph>
       ) : (
-        <ContactsRow contacts={contacts ?? []} />
+        <ContactsRow contacts={contacts} />
       )}
     </YStack>
   )
@@ -103,7 +109,7 @@ export const SendContactsSection = memo(function SendContactsSection() {
 /**
  * Single horizontal scrolling row of contacts.
  */
-const ContactsRow = memo(function ContactsRow({
+export const ContactsRow = memo(function ContactsRow({
   contacts,
 }: {
   contacts: SendContactItem[]
@@ -160,7 +166,7 @@ const ContactsRow = memo(function ContactsRow({
 /**
  * Individual contact suggestion item.
  */
-const ContactSuggestion = memo(function ContactSuggestion({
+export const ContactSuggestion = memo(function ContactSuggestion({
   contact,
 }: { contact: SendContactItem }) {
   const [sendParams, setSendParams] = useSendScreenParams()
