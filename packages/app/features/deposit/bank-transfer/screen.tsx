@@ -99,6 +99,7 @@ export function BankTransferScreen() {
   const hasTrackedInfoView = useRef(false)
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+  // Bridge doesn't support custom URL schemes, so always use web URL
   const baseRedirectUri = useRedirectUri()
   const isBusinessProfile = !!profile?.is_business
   const verificationSubject = isBusinessProfile ? 'business' : 'identity'
