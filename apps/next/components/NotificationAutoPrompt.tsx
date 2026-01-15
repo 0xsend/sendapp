@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import debug from 'debug'
-import { useMedia, View } from '@my/ui'
+import { AnimatePresence, useMedia, View } from '@my/ui'
 
 import { useSessionContext } from 'app/utils/supabase/useSessionContext'
 
 import { NotificationPrompt } from './NotificationPrompt'
 import { useWebPush } from './WebPushSubscription'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const log = debug('app:web-push:auto-sync')
 
@@ -230,23 +231,30 @@ export function NotificationAutoPrompt() {
     return () => clearTimeout(timer)
   }, [session?.user, permission, isSupported, isSubscribed])
 
-  if (!showBanner) {
-    return null
-  }
+  const safeAreaInsets = useSafeAreaInsets()
 
   return (
-    <View
-      position="absolute"
-      right={20}
-      maxWidth={400}
-      zIndex={9999}
-      {...(media.gtMd ? { bottom: 20, marginTop: 'auto' } : { top: 20, marginBottom: 'auto' })}
-    >
-      <NotificationPrompt
-        onDismiss={() => setShowBanner(false)}
-        title="Enable notifications"
-        description="Get notified instantly when you receive payments"
-      />
-    </View>
+    <AnimatePresence>
+      {showBanner ? (
+        <View
+          position="absolute"
+          right={20}
+          maxWidth={400}
+          zIndex={9999}
+          enterStyle={{ opacity: 0, y: -10 }}
+          exitStyle={{ opacity: 0, y: 10 }}
+          opacity={1}
+          y={safeAreaInsets.top}
+          animation="smoothResponsive"
+          {...(media.gtMd ? { bottom: 20, marginTop: 'auto' } : { top: 20, marginBottom: 'auto' })}
+        >
+          <NotificationPrompt
+            onDismiss={() => setShowBanner(false)}
+            title="Enable notifications"
+            description="Get notified instantly when you receive payments"
+          />
+        </View>
+      ) : null}
+    </AnimatePresence>
   )
 }

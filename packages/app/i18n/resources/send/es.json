@@ -113,16 +113,17 @@
     }
   },
   "search": {
-    "placeholder": "Busca por send tag o dirección de wallet",
+    "placeholder": "Busca por send tag o pega dirección de wallet",
     "errorHeading": "Error",
     "unknownError": "Error desconocido"
   },
   "suggestions": {
-    "recent": "Actividad reciente",
-    "favorites": "Remitentes favoritos",
-    "top": "Remitentes destacados",
-    "birthdays": "Desea feliz cumpleaños",
-    "viewMore": "Ver más"
+    "recent": "Reciente",
+    "favorites": "Favoritos",
+    "top": "Top",
+    "birthdays": "Cumpleaños",
+    "viewMore": "Ver más",
+    "noResults": "No se encontraron resultados"
   },
   "recipient": {
     "label": "PARA",
