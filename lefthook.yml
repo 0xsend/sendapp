@@ -8,6 +8,9 @@ pre-commit:
     deps:
       glob: "**/package.json"
       run: yarn check-deps
+    view-security:
+      glob: "**/*.sql"
+      run: ./scripts/check-view-security-invoker.sh {staged_files}
 pre-push:
   commands:
     check:

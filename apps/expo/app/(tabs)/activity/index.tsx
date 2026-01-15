@@ -1,9 +1,11 @@
 import { ActivityScreen } from 'app/features/activity/screen'
 import { Container } from '@my/ui'
 import { useTabBarSize } from 'app/components/BottomTabBar/useTabBarSize'
+import { useClearSendParamsOnBlur } from 'apps-expo/utils/useClearSendParamsOnBlur'
 
 export default function ActivityTabScreen() {
   const { height } = useTabBarSize()
+  useClearSendParamsOnBlur()
 
   return (
     <Container

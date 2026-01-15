@@ -29,7 +29,7 @@ import type { CoinWithBalance } from 'app/data/coins'
 import { cantonCoin } from 'app/data/coins'
 import { useCoins } from 'app/provider/coins'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
-import { Dimensions } from 'react-native'
+import { Dimensions, Keyboard } from 'react-native'
 import { useController, useFormContext } from 'react-hook-form'
 
 export const CoinField = memo(
@@ -98,6 +98,7 @@ export const CoinField = memo(
           scaleSpace={0.5}
           padding={'$2'}
           onPress={() => {
+            if (!isWeb) Keyboard.dismiss()
             setIsOpen(true)
           }}
           bc={hoverStyles.backgroundColor}
@@ -143,7 +144,12 @@ export const CoinField = memo(
               id={id}
               value={field.value}
               onValueChange={field.onChange}
-              onOpenChange={setIsOpen}
+              onOpenChange={(open) => {
+                if (open && !isWeb) {
+                  Keyboard.dismiss()
+                }
+                setIsOpen(open)
+              }}
               defaultValue={usdcAddress[baseMainnet.id]}
               open={isOpen}
               disablePreventBodyScroll
