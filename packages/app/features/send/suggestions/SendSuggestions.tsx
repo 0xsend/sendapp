@@ -93,6 +93,7 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
       backgroundColor={theme === 'light' ? '$gray1' : '$color1'}
       opacity={0.7}
       animation="100ms"
+      animateOnly={['opacity', 'transform']}
       enterStyle={{
         opacity: 0,
       }}
@@ -149,6 +150,8 @@ export const SendSuggestions = () => {
     setTabState({ ...tabState, prevActiveAt: tabState.activeAt, activeAt })
 
   const { activeAt, intentAt, currentTab } = tabState
+
+  const currentTabDeferred = useDeferredValue(currentTab)
 
   const handleOnInteraction: TabsTabProps['onInteraction'] = (type, layout) => {
     if (type === 'select') {
@@ -247,16 +250,16 @@ export const SendSuggestions = () => {
           {activeTitle}
         </TitleText>
         <XStack mih={120}>
-          <Activity mode={currentTab === 'recent' ? 'visible' : 'hidden'}>
+          <Activity mode={currentTabDeferred === 'recent' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={recentSendersQuery} />
           </Activity>
-          <Activity mode={currentTab === 'favorites' ? 'visible' : 'hidden'}>
+          <Activity mode={currentTabDeferred === 'favorites' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={favouriteSendersQuery} />
           </Activity>
-          <Activity mode={currentTab === 'top' ? 'visible' : 'hidden'}>
+          <Activity mode={currentTabDeferred === 'top' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={topSendersQuery} />
           </Activity>
-          <Activity mode={currentTab === 'birthdays' ? 'visible' : 'hidden'}>
+          <Activity mode={currentTabDeferred === 'birthdays' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={todayBirthdaySendersQuery} />
           </Activity>
         </XStack>
