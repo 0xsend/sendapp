@@ -5,13 +5,23 @@ SELECT
     user_id,
     bridge_customer_id,
     kyc_link_id,
-    kyc_status,
+    -- Mask rejected status as under_review for 5 minutes to:
+    -- 1. Prevent users from immediately retrying after automated rejection
+    -- 2. Handle race condition where Bridge changes status shortly after rejection
+    CASE
+        WHEN kyc_status = 'rejected' AND updated_at > now() - interval '5 minutes'
+        THEN 'under_review'
+        ELSE kyc_status
+    END AS kyc_status,
     tos_status,
     type,
     rejection_attempts,
     created_at,
     updated_at,
+    -- Only show rejection reasons after the 5-minute masking period
     CASE
+        WHEN kyc_status = 'rejected' AND updated_at > now() - interval '5 minutes'
+        THEN NULL
         WHEN rejection_reasons IS NULL THEN NULL
         ELSE (
             SELECT jsonb_agg(
