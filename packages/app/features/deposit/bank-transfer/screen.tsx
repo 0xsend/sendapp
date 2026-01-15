@@ -8,6 +8,7 @@ import {
   Button,
   AnimatePresence,
 } from '@my/ui'
+import debug from 'debug'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Linking } from 'react-native'
 import { BankDetailsCard, BankDetailsCardSkeleton } from './BankDetailsCard'
@@ -25,6 +26,8 @@ import { useRedirectUri } from 'app/utils/useRedirectUri'
 import { useAnalytics } from 'app/provider/analytics'
 import { useUser } from 'app/utils/useUser'
 import { useBankTransferScreenParams } from 'app/routers/params'
+
+const log = debug('app:bank-transfer')
 
 const getErrorType = (error: unknown): 'network' | 'unknown' => {
   const message = error instanceof Error ? error.message : String(error)
@@ -53,16 +56,33 @@ export function BankTransferScreen() {
   const kycStatus = customer?.kyc_status ?? 'not_started'
   const isTosAccepted = customer?.tos_status === 'approved'
   const isApproved = customer?.kyc_status === 'approved'
+  // User is new if they don't have a bridge_customers record yet (not just based on status)
+  const isNewUser = !customer
 
   // Sync KYC status from Bridge API to DB for faster updates
   // Sync when: has kycLinkId AND not approved AND not (rejected with max attempts)
   const shouldSync = !!kycLinkId && !isApproved && !isMaxAttemptsExceeded
-  useSyncKycStatus(kycLinkId ?? undefined, { enabled: shouldSync })
+  const { email: savedEmail, isLoading: emailLoading } = useSyncKycStatus(kycLinkId ?? undefined, {
+    enabled: shouldSync,
+  })
   const { hasStaticMemo, bankDetails, isLoading: memoLoading } = useStaticMemoBankAccountDetails()
   const initiateKyc = useInitiateKyc()
   const createStaticMemo = useCreateStaticMemo()
   const { data: isGeoBlocked, isLoading: isGeoBlockLoading } = useBridgeGeoBlock()
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
+  // null = user hasn't edited, use savedEmail; string = user's input
+  const [emailInput, setEmailInput] = useState<string | null>(null)
+  const [isEditingEmail, setIsEditingEmail] = useState(false)
+  const [emailError, setEmailError] = useState<string | null>(null)
+
+  // Derive email: user input takes precedence, otherwise use saved
+  const email = emailInput ?? savedEmail ?? ''
+
+  // Clear email error when email changes
+  const setEmail = useCallback((value: string) => {
+    setEmailInput(value)
+    setEmailError(null)
+  }, [])
   // Track which step we're waiting for: 'tos', 'kyc', or null
   // Success params act as early signals - verificationSuccess means show confirming state,
   // tosSuccess means TOS is done so skip to next step (no waiting needed)
@@ -79,6 +99,7 @@ export function BankTransferScreen() {
   const hasTrackedInfoView = useRef(false)
   const { resolvedTheme } = useThemeSetting()
   const isDarkTheme = resolvedTheme?.startsWith('dark')
+  // Bridge doesn't support custom URL schemes, so always use web URL
   const baseRedirectUri = useRedirectUri()
   const isBusinessProfile = !!profile?.is_business
   const verificationSubject = isBusinessProfile ? 'business' : 'identity'
@@ -95,29 +116,40 @@ export function BankTransferScreen() {
           has_tos_accepted: isTosAccepted,
         },
       })
-      // Build redirectUri with success param so we know user completed the flow
-      // when they return (even if DB hasn't synced yet)
-      const successParam = isTosAccepted ? 'verificationSuccess' : 'tosSuccess'
-      const separator = baseRedirectUri.includes('?') ? '&' : '?'
-      const redirectUri = `${baseRedirectUri}${separator}${successParam}=true`
-      const result = await initiateKyc.mutateAsync({ redirectUri })
-      // If TOS is already accepted, go straight to KYC
-      // Otherwise, open TOS link first (Bridge requires TOS acceptance before KYC)
-      const urlToOpen = isTosAccepted ? result.kycLink : result.tosLink || result.kycLink
+
+      // Get or create KYC link - returns actual status from Bridge
+      const result = await initiateKyc.mutateAsync({
+        redirectUri: baseRedirectUri,
+        email,
+      })
+
+      // Check for expected errors returned in response
+      if (result.error === 'email_in_use') {
+        setEmailError(result.message)
+        return
+      }
+
+      // Use returned status to determine what to do (not stale local state)
+      const needsTos = result.tosStatus !== 'approved'
+      const urlToOpen = needsTos ? result.tosLink || result.kycLink : result.kycLink
+
       if (urlToOpen) {
         analytics.capture({
           name: 'bank_transfer_kyc_link_opened',
           properties: {
-            link_type: !isTosAccepted && result.tosLink ? 'tos' : 'kyc',
-            kyc_status: kycStatus,
+            link_type: needsTos ? 'tos' : 'kyc',
+            kyc_status: result.kycStatus,
+            tos_status: result.tosStatus,
           },
         })
         await Linking.openURL(urlToOpen)
         setVerificationUrl(result.kycLink)
-        setWaitingFor(isTosAccepted ? 'kyc' : 'tos')
+        setWaitingFor(needsTos ? 'tos' : 'kyc')
+        // Reset editing state after successful submission
+        setIsEditingEmail(false)
       }
     } catch (error) {
-      console.error('Failed to initiate KYC:', error)
+      log('failed to initiate KYC: %O', error)
       analytics.capture({
         name: 'bank_transfer_kyc_failed',
         properties: {
@@ -125,7 +157,7 @@ export function BankTransferScreen() {
         },
       })
     }
-  }, [analytics, baseRedirectUri, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus])
+  }, [analytics, baseRedirectUri, email, initiateKyc, isGeoBlocked, isTosAccepted, kycStatus])
 
   const handleOpenVerificationLink = useCallback(() => {
     if (verificationUrl) {
@@ -229,10 +261,16 @@ export function BankTransferScreen() {
   }, [createStaticMemo])
 
   // Loading state
-  if (kycLoading || isGeoBlockLoading) {
+  // For returning users, wait for email to load to prevent content shift
+  const isEmailInitializing = !isNewUser && shouldSync && emailLoading
+  if (kycLoading || isGeoBlockLoading || isEmailInitializing) {
     return (
-      <YStack f={1} ai="center" jc="center" py="$8">
-        <Spinner size="large" color="$primary" />
+      <YStack width="100%" gap="$5" $gtLg={{ width: '50%' }}>
+        <FadeCard>
+          <YStack ai="center" jc="center" py="$8">
+            <Spinner size="large" color="$primary" />
+          </YStack>
+        </FadeCard>
       </YStack>
     )
   }
@@ -325,6 +363,13 @@ export function BankTransferScreen() {
               kycStatus={kycStatus}
               isBusinessProfile={isBusinessProfile}
               isTosAccepted={isTosAccepted}
+              isNewUser={isNewUser}
+              email={email}
+              savedEmail={savedEmail}
+              onEmailChange={setEmail}
+              isEditingEmail={isEditingEmail}
+              onEditEmail={setIsEditingEmail}
+              emailError={emailError}
               rejectionReasons={rejectionReasons}
               isMaxAttemptsExceeded={isMaxAttemptsExceeded}
               onStartKyc={handleStartKyc}
@@ -401,6 +446,7 @@ export function BankTransferScreen() {
             routingNumber={bankDetails.routingNumber}
             accountNumber={bankDetails.accountNumber}
             beneficiaryName={bankDetails.beneficiaryName}
+            beneficiaryAddress={bankDetails.beneficiaryAddress}
             depositMessage={bankDetails.depositMessage}
             paymentRails={bankDetails.paymentRails}
             onInfoPress={() => setShowInfo(true)}

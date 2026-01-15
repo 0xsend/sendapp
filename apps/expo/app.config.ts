@@ -32,7 +32,7 @@ module.exports = {
   owner: 'send-it',
   slug: 'send',
   scheme: 'send',
-  version: '1.1.4',
+  version: '1.1.5',
   experiments: {
     reactCanary: true,
     reactCompiler: true,

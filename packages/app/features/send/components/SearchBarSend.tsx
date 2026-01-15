@@ -28,13 +28,9 @@ import { SearchSchema, useTagSearch } from 'app/provider/tag-search'
 import { useRootScreenParams } from 'app/routers/params'
 import { SchemaForm } from 'app/utils/SchemaForm'
 import { shorten } from 'app/utils/strings'
-import { useSearchResultHref } from 'app/utils/useSearchResultHref'
-import * as Linking from 'expo-linking'
 import { Fragment, useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { FormProvider } from 'react-hook-form'
-import { Link } from 'solito/link'
-import { useRouter } from 'solito/router'
 import { type Address, isAddress } from 'viem'
 import { IconAccount, IconBadgeCheckSolid2, IconSearch, IconX } from '../../../components/icons'
 import { baseMainnet } from '@my/wagmi'
@@ -252,12 +248,11 @@ function SearchFilterButton({
 }
 
 const AddressSearchResultRow = ({ address }: { address: Address }) => {
-  const href = useSearchResultHref()
+  const [queryParams, setRootParams] = useRootScreenParams()
   const { data: ensFromAddress, isLoading: isLoadingEns } = useEnsName({
     address,
   })
 
-  const router = useRouter()
   const { gtMd } = useMedia()
   const [sendConfirmDialogIsOpen, setSendConfirmDialogIsOpen] = useState(false)
 
@@ -322,12 +317,14 @@ const AddressSearchResultRow = ({ address }: { address: Address }) => {
         isOpen={sendConfirmDialogIsOpen}
         onClose={() => setSendConfirmDialogIsOpen(false)}
         onConfirm={() => {
-          if (Platform.OS !== 'web' && !href.startsWith('/')) {
-            Linking.openURL(href)
-            return
-          }
           setSendConfirmDialogIsOpen(false)
-          router.push(href)
+          setRootParams({
+            ...queryParams,
+            ...{
+              recipient: address,
+              idType: 'address',
+            },
+          })
         }}
         address={address}
       />

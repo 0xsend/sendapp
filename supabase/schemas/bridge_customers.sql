@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS "public"."bridge_customers" (
     "user_id" "uuid" NOT NULL,
     "bridge_customer_id" "text" UNIQUE,
     "kyc_link_id" "text" UNIQUE NOT NULL,
+    "email" "text" UNIQUE,
     "kyc_status" "text" NOT NULL DEFAULT 'not_started',
     "tos_status" "text" NOT NULL DEFAULT 'pending',
     "type" "text" NOT NULL DEFAULT 'individual',
@@ -32,6 +33,7 @@ ALTER TABLE "public"."bridge_customers" OWNER TO "postgres";
 CREATE INDEX IF NOT EXISTS "bridge_customers_user_id_idx" ON "public"."bridge_customers" ("user_id");
 CREATE INDEX IF NOT EXISTS "bridge_customers_bridge_customer_id_idx" ON "public"."bridge_customers" ("bridge_customer_id");
 CREATE INDEX IF NOT EXISTS "bridge_customers_kyc_link_id_idx" ON "public"."bridge_customers" ("kyc_link_id");
+CREATE INDEX IF NOT EXISTS "bridge_customers_email_idx" ON "public"."bridge_customers" ("email");
 CREATE INDEX IF NOT EXISTS "bridge_customers_kyc_status_idx" ON "public"."bridge_customers" ("kyc_status");
 
 -- Foreign Keys

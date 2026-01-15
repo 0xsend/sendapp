@@ -4,8 +4,11 @@ import { useExpoUpdates } from 'app/utils/useExpoUpdates'
 import { useTranslation } from 'react-i18next'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAnalytics } from 'app/provider/analytics'
+import { useUser } from 'app/utils/useUser'
+import { useSegments } from 'expo-router'
 
 const REMIND_LATER_DELAY_MS = 5 * 60 * 1000 // 5 minutes
+const APP_STORE_REVIEW_EMAIL = 'appreview@send.app'
 
 /**
  * Native OTA update sheet component.
@@ -18,12 +21,20 @@ export function OTAUpdateSheet() {
   const { t } = useTranslation('common')
   const { isDownloaded, isDownloading, restartApp, error } = useExpoUpdates()
   const analytics = useAnalytics()
+  const { user } = useUser()
+  const segments = useSegments() as string[]
   const hasTrackedPrompt = useRef(false)
   const [isDismissed, setIsDismissed] = useState(false)
   const remindTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Only show when update is downloaded, ready to apply, and not dismissed
-  const isOpen = isDownloaded && !error && !isDismissed
+  // Don't show on auth/onboarding screens
+  const isAuthScreen = segments[0] === '(auth)'
+
+  // Only show sheet to authenticated users who are not the review account and not on auth screens
+  const shouldShowToUser = !!user && user.email !== APP_STORE_REVIEW_EMAIL && !isAuthScreen
+
+  // Only show when update is downloaded, ready to apply, not dismissed, and user is eligible
+  const isOpen = isDownloaded && !error && !isDismissed && shouldShowToUser
 
   // Clear timer on unmount
   useEffect(() => {

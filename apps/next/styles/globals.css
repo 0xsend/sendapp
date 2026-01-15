@@ -62,3 +62,10 @@ body {
 .will-change-transform {
   will-change: transform;
 }
+
+/* Selectable bank details with visible highlight */
+.selectable-value::selection,
+.selectable-value *::selection {
+  background-color: rgba(60, 200, 120, 0.5) !important;
+  color: inherit !important;
+}

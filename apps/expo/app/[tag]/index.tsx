@@ -7,6 +7,7 @@ import { useEffect, useMemo } from 'react'
 import { useUser } from 'app/utils/useUser'
 import { useSetReferralCode } from 'app/utils/useReferralCode'
 import { Spinner, YStack } from '@my/ui'
+import { useClearSendParamsOnBlur } from 'apps-expo/utils/useClearSendParamsOnBlur'
 
 /**
  * Dynamic route for tag-based profile URLs (e.g., /musidlo)
@@ -17,6 +18,7 @@ export default function TagProfileScreen() {
   const router = useRouter()
   const { session } = useUser()
   const { mutateAsync: setReferralCodeMutateAsync } = useSetReferralCode()
+  useClearSendParamsOnBlur()
 
   // Validate the tag
   const validatedTag = useMemo(() => {

@@ -1,12 +1,12 @@
 import type React from 'react'
 import {
+  memo,
   type PropsWithChildren,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  memo,
 } from 'react'
 import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
 import { useContactByExternalAddress } from 'app/features/contacts/hooks/useContactByExternalAddress'
@@ -19,14 +19,12 @@ import {
   GorhomSheetInput,
   Input as InputOG,
   LinearGradient,
-  Link,
   Paragraph,
   Portal,
   type ScrollView,
   Shimmer,
   SizableText,
   Spinner,
-  Text,
   useAppToast,
   useControllableState,
   useDebounce,
@@ -42,7 +40,7 @@ import {
 } from '@my/ui'
 
 import type BottomSheet from '@gorhom/bottom-sheet'
-import { SendModalContainer, ReviewSendAmountBox, NoteInput } from '../shared'
+import { NoteInput, ReviewSendAmountBox, SendModalContainer } from '../shared'
 
 import { useReanimatedKeyboardAnimation } from 'react-native-keyboard-controller'
 
@@ -51,7 +49,7 @@ import { formatUnits, isAddress } from 'viem'
 import type { InfiniteData } from '@tanstack/react-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { allCoins, allCoinsDict } from 'app/data/coins'
-import { IconBadgeCheckSolid2, IconCoin, IconAccount, IconHeart } from 'app/components/icons'
+import { IconAccount, IconBadgeCheckSolid2, IconCoin, IconHeart } from 'app/components/icons'
 import { AddressAvatar } from 'app/components/avatars'
 import formatAmount, { localizeAmount, sanitizeAmount } from 'app/utils/formatAmount'
 import { AlertCircle, CheckCheck, Clock4, History, X } from '@tamagui/lucide-icons'
@@ -76,6 +74,7 @@ import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
 import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
+import { useRouter } from 'solito/router'
 import { throwIf } from 'app/utils/throwIf'
 import Animated, { useAnimatedStyle, useDerivedValue, withSpring } from 'react-native-reanimated'
 
@@ -178,6 +177,11 @@ export const SendChat = memo(
     )
     const bottomSheetRef = useRef<BottomSheet>(null)
 
+    const onNavigateAway = useCallback(() => {
+      setOpen(false)
+      bottomSheetRef.current?.close()
+    }, [setOpen])
+
     useEffect(() => {
       if (open) {
         bottomSheetRef.current?.expand()
@@ -256,6 +260,7 @@ export const SendChat = memo(
                               setActiveSection('chat')
                             }
                           }}
+                          onNavigateAway={onNavigateAway}
                           zi={2}
                         />
                         <ChatList />
@@ -302,153 +307,160 @@ SendChat.displayName = 'SendChat'
 
 interface SendChatHeaderProps {
   onClose: () => void
+  onNavigateAway: () => void
 }
 
-const SendChatHeader = XStack.styleable<SendChatHeaderProps>(({ onClose, ...props }) => {
-  const themeName = useThemeName()
-  const isDark = themeName.includes('dark')
+const SendChatHeader = XStack.styleable<SendChatHeaderProps>(
+  ({ onClose, onNavigateAway, ...props }) => {
+    const themeName = useThemeName()
+    const isDark = themeName.includes('dark')
+    const router = useRouter()
 
-  const { useSendScreenParams } = SendChatContext.useStyledContext()
-  const [{ recipient, idType }] = useSendScreenParams()
-  const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
+    const { useSendScreenParams } = SendChatContext.useStyledContext()
+    const [{ recipient, idType }] = useSendScreenParams()
+    const { data: profile } = useProfileLookup(idType ?? 'tag', recipient ?? '')
 
-  // Look up contact to get custom_name if it exists
-  const { data: contact } = useContactBySendId(profile?.sendid ?? undefined)
+    // Look up contact to get custom_name if it exists
+    const { data: contact } = useContactBySendId(profile?.sendid ?? undefined)
 
-  const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
+    const isExternalAddress = idType === 'address' && isAddress((recipient || '') as `0x${string}`)
 
-  // Look up external address contact for custom_name
-  const { data: externalContact } = useContactByExternalAddress(
-    isExternalAddress ? recipient : undefined
-  )
-  const href = isExternalAddress
-    ? `/profile/${recipient}`
-    : profile
-      ? `/profile/${profile?.sendid}`
-      : ''
+    // Look up external address contact for custom_name
+    const { data: externalContact } = useContactByExternalAddress(
+      isExternalAddress ? recipient : undefined
+    )
+    const href = isExternalAddress
+      ? `/profile/${recipient}`
+      : profile
+        ? `/profile/${profile?.sendid}`
+        : ''
 
-  const tagName = isExternalAddress
-    ? shorten(recipient, 5, 4)
-    : profile?.tag
-      ? `/${profile?.tag}`
-      : `#${profile?.sendid}`
+    const tagName = isExternalAddress
+      ? shorten(recipient, 5, 4)
+      : profile?.tag
+        ? `/${profile?.tag}`
+        : `#${profile?.sendid}`
 
-  // Display name priority: custom_name > profile_name > sendtag > send_id > address
-  const displayName = useMemo(() => {
-    if (isExternalAddress) {
-      // Use external contact's custom_name if available, otherwise shortened address
-      return externalContact?.custom_name || tagName
-    }
-    if (contact) {
-      return getContactDisplayName({
-        custom_name: contact.custom_name,
-        profile_name: contact.profile_name,
-        main_tag_name: contact.main_tag_name,
-        send_id: contact.send_id,
-        external_address: null,
-      })
-    }
-    // No contact - use profile name or tag
-    return profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'
-  }, [contact, profile, tagName, isExternalAddress, externalContact])
+    // Display name priority: custom_name > profile_name > sendtag > send_id > address
+    const displayName = useMemo(() => {
+      if (isExternalAddress) {
+        // Use external contact's custom_name if available, otherwise shortened address
+        return externalContact?.custom_name || tagName
+      }
+      if (contact) {
+        return getContactDisplayName({
+          custom_name: contact.custom_name,
+          profile_name: contact.profile_name,
+          main_tag_name: contact.main_tag_name,
+          send_id: contact.send_id,
+          external_address: null,
+        })
+      }
+      // No contact - use profile name or tag
+      return profile?.name || tagName?.replace('/', '').replace('#', '') || '—-'
+    }, [contact, profile, tagName, isExternalAddress, externalContact])
 
-  return (
-    <XStack
-      gap="$3"
-      ai="center"
-      p="$4"
-      bg="$aztec1"
-      bbw={1}
-      bbc="$gray3"
-      $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
-      {...props}
-    >
-      <XStack>
-        {href ? (
-          <Link
-            hoverStyle={{ opacity: 0.8 }}
-            focusStyle={{ opacity: 0.8 }}
-            pressStyle={{ scale: 0.95 }}
-            href={href}
-          >
-            {isExternalAddress && !profile?.avatar_url && recipient ? (
-              <AddressAvatar
-                address={recipient as `0x${string}`}
-                size="$4.5"
-                br="$10"
-                elevation="$0.75"
-              />
-            ) : (
-              <Avatar circular size="$4.5" elevation="$0.75">
-                {isAndroid && !profile?.avatar_url ? (
-                  <IconAccount size={'$4'} color="$olive" />
-                ) : (
-                  <>
-                    <Avatar.Image src={profile?.avatar_url ?? ''} />
-                    <Avatar.Fallback jc="center">
-                      <IconAccount size={'$4'} color="$olive" />
-                    </Avatar.Fallback>
-                  </>
-                )}
-              </Avatar>
-            )}
-          </Link>
-        ) : (
-          <Avatar circular size="$4.5" elevation="$0.75">
-            <Avatar.Fallback jc="center">
-              <IconAccount size={'$4'} color="$olive" />
-            </Avatar.Fallback>
-          </Avatar>
-        )}
-        {/* Badge priority: favorite > verified > none */}
-        {!isExternalAddress && contact?.is_favorite ? (
-          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
-            <IconHeart size="$1" color="$red9" />
-          </XStack>
-        ) : profile?.is_verified && !isExternalAddress ? (
-          <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
-            <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
-            <IconBadgeCheckSolid2
-              size="$1"
-              scale={0.7}
-              color="$neon8"
-              $theme-dark={{ color: '$neon7' }}
-              //@ts-expect-error - checkColor is not typed
-              checkColor={isDark ? '#082B1B' : '#fff'}
-            />
-          </XStack>
-        ) : null}
-      </XStack>
-      <YStack gap="$1.5" f={1}>
-        <SizableText size="$4" color="$gray12" fow="500">
-          {displayName}
-        </SizableText>
-        <SizableText size="$3" color="$gray10">
-          {tagName}
-        </SizableText>
-      </YStack>
-      <Button
-        size="$3"
-        circular
-        animation="100ms"
-        animateOnly={['transform']}
-        pos="absolute"
-        r={0}
-        t={0}
-        x={-9}
-        y={10}
-        boc="$aztec3"
-        hoverStyle={{ boc: '$aztec4' }}
-        pressStyle={{ boc: '$aztec4', scale: 0.9 }}
-        onPress={onClose}
+    const onAvatarPress = useCallback(() => {
+      if (href) {
+        onNavigateAway()
+        router.push(href)
+      }
+    }, [href, onNavigateAway, router])
+
+    const avatarProps = useMemo(
+      () => ({
+        size: '$4.5' as const,
+        elevation: '$0.75' as const,
+        ...(href
+          ? {
+              cursor: 'pointer' as const,
+              onPress: onAvatarPress,
+              hoverStyle: { opacity: 0.8 },
+              pressStyle: { scale: 0.95 },
+            }
+          : {}),
+      }),
+      [href, onAvatarPress]
+    )
+
+    return (
+      <XStack
+        gap="$3"
+        ai="center"
+        p="$4"
+        bg="$aztec1"
+        bbw={1}
+        bbc="$gray3"
+        $theme-dark={{ bg: '$aztec4', bbc: '$aztec3' }}
+        {...props}
       >
-        <Button.Icon scaleIcon={1.2}>
-          <X />
-        </Button.Icon>
-      </Button>
-    </XStack>
-  )
-})
+        <XStack>
+          {isExternalAddress && !profile?.avatar_url && recipient ? (
+            <AddressAvatar address={recipient as `0x${string}`} br="$10" {...avatarProps} />
+          ) : (
+            <Avatar circular {...avatarProps}>
+              {isAndroid && !profile?.avatar_url ? (
+                <IconAccount size={'$4'} color="$olive" />
+              ) : (
+                <>
+                  <Avatar.Image src={profile?.avatar_url ?? ''} />
+                  <Avatar.Fallback jc="center" alignItems={'center'}>
+                    <IconAccount size={'$4'} color="$olive" />
+                  </Avatar.Fallback>
+                </>
+              )}
+            </Avatar>
+          )}
+          {/* Badge priority: favorite > verified > none */}
+          {!isExternalAddress && contact?.is_favorite ? (
+            <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
+              <IconHeart size="$1" color="$red9" />
+            </XStack>
+          ) : profile?.is_verified && !isExternalAddress ? (
+            <XStack zi={100} pos="absolute" bottom={0} right={0} x="$1" y="$1">
+              <XStack pos="absolute" elevation={'$1'} scale={0.5} br={1000} inset={0} />
+              <IconBadgeCheckSolid2
+                size="$1"
+                scale={0.7}
+                color="$neon8"
+                $theme-dark={{ color: '$neon7' }}
+                //@ts-expect-error - checkColor is not typed
+                checkColor={isDark ? '#082B1B' : '#fff'}
+              />
+            </XStack>
+          ) : null}
+        </XStack>
+        <YStack gap="$1.5" f={1}>
+          <SizableText size="$4" color="$gray12" fow="500">
+            {displayName}
+          </SizableText>
+          <SizableText size="$3" color="$gray10">
+            {tagName}
+          </SizableText>
+        </YStack>
+        <Button
+          size="$3"
+          circular
+          animation="100ms"
+          animateOnly={['transform']}
+          pos="absolute"
+          r={0}
+          t={0}
+          x={-9}
+          y={10}
+          boc="$aztec3"
+          hoverStyle={{ boc: '$aztec4' }}
+          pressStyle={{ boc: '$aztec4', scale: 0.9 }}
+          onPress={onClose}
+        >
+          <Button.Icon scaleIcon={1.2}>
+            <X />
+          </Button.Icon>
+        </Button>
+      </XStack>
+    )
+  }
+)
 
 const SendChatInput = Input.styleable((props) => {
   const { setActiveSection, activeSection } = SendChatContext.useStyledContext()

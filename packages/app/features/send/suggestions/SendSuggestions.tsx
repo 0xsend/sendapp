@@ -242,7 +242,7 @@ export const SendSuggestions = () => {
         </CustomTabs.List>
       </YStack>
 
-      <View gap="$3" pl="$3.5">
+      <View gap="$3">
         <TitleText fontSize="$8" fontWeight="600" color="$color12" h={30}>
           {activeTitle}
         </TitleText>
@@ -368,6 +368,7 @@ const PageRow = memo(
     pageItems: SendSuggestionItem[]
     pageIndex: number
   }) {
+    const theme = useTheme()
     const renderItem = useCallback(({ item }: { item: SendSuggestionItem }) => {
       return <SenderSuggestion item={item} />
     }, [])
@@ -407,7 +408,7 @@ const PageRow = memo(
           display="none"
           $sm={{ display: 'flex' }}
           pointerEvents="none"
-          colors={['rgba(255, 255, 255, 0)', '$aztec1']}
+          colors={[`${theme.background.val}00`, '$aztec1']}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           width="$4"

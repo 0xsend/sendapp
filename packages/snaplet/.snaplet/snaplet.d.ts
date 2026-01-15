@@ -73,6 +73,7 @@ interface Table_public_bridge_customers {
   rejection_attempts: number;
   created_at: string;
   updated_at: string;
+  email: string | null;
 }
 interface Table_public_bridge_deposits {
   id: string;
