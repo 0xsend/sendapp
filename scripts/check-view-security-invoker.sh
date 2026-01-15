@@ -1,6 +1,6 @@
 #!/bin/bash
-# Check that CREATE VIEW statements include security_invoker and proper grants
-# Fails if a view is missing security_invoker or grants (when DROP VIEW is used)
+# Check that CREATE VIEW statements include security_invoker, security_barrier, and proper grants
+# Fails if a view is missing security_invoker, security_barrier, or grants (when DROP VIEW is used)
 
 set -euo pipefail
 
@@ -49,6 +49,25 @@ for FILE in $FILES; do
     echo ""
     echo "If you intentionally want a SECURITY DEFINER view, add this comment:"
     echo "  -- no-security-invoker: <reason>"
+    echo ""
+    FAILED=1
+  fi
+
+  # Check if file has security_barrier
+  HAS_SECURITY_BARRIER=$(grep -iE 'security_barrier[[:space:]]*=[[:space:]]*(true|on)' "$FILE" || true)
+
+  # Check if file has acknowledgment to skip security_barrier check
+  HAS_BARRIER_ACK=$(grep -E -- '--.*no-security-barrier' "$FILE" || true)
+
+  if [ -z "$HAS_SECURITY_BARRIER" ] && [ -z "$HAS_BARRIER_ACK" ]; then
+    echo -e "${RED}ERROR:${NC} $FILE contains CREATE VIEW without security_barrier"
+    echo -e "${YELLOW}Views should include 'WITH (security_barrier=on)' to prevent data leakage.${NC}"
+    echo ""
+    echo "Example:"
+    echo "  CREATE VIEW my_view WITH (security_barrier=on, security_invoker=on) AS SELECT ..."
+    echo ""
+    echo "If you intentionally don't need security_barrier, add this comment:"
+    echo "  -- no-security-barrier: <reason>"
     echo ""
     FAILED=1
   fi
