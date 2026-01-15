@@ -37,6 +37,7 @@ export default function StackNavigator() {
     <Stack
       screenOptions={{
         headerShadowVisible: false,
+        headerBackTitle: '',
         headerStyle: {
           backgroundColor: theme.background.val,
         },
