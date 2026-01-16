@@ -70,6 +70,16 @@ const getTaskHref = (verificationType: keyof typeof verificationTypeTitleKey): s
   }
 }
 
+/**
+ * Checks if a distribution should hide the progress bar and send tasks.
+ * Starting from distribution 23, these UI elements are hidden.
+ */
+const shouldHideProgressAndSendTasks = (
+  distribution: UseDistributionsResultData[number]
+): boolean => {
+  return distribution.number >= 23
+}
+
 export function ActivityRewardsScreen() {
   const { t } = useTranslation('rewards')
   const [queryParams, setRewardsScreenParams] = useRewardsScreenParams()
@@ -413,6 +423,7 @@ const TaskCards = ({
 
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
+  const shouldHideSendTasks = shouldHideProgressAndSendTasks(distribution)
 
   return (
     <YStack w={'100%'} gap="$5">
@@ -427,9 +438,11 @@ const TaskCards = ({
             fixed_value: BigInt(verification.fixed_value ?? 0),
           }))
           ?.filter(
-            ({ fixed_value, weight }) =>
-              (fixed_value > 0 && !isQualificationOver) ||
-              (isQualificationOver && weight !== 0n && fixed_value > 0n)
+            ({ fixed_value, weight, type }) =>
+              // Hide send_ten and send_one_hundred for current/future months
+              !(shouldHideSendTasks && (type === 'send_ten' || type === 'send_one_hundred')) &&
+              ((fixed_value > 0 && !isQualificationOver) ||
+                (isQualificationOver && weight !== 0n && fixed_value > 0n))
           )
           .sort((a, b) => {
             const orderA = Object.keys(verificationTypeTitleKey).indexOf(a.type)
@@ -709,6 +722,12 @@ const ProgressCard = ({
   verificationsQuery: DistributionsVerificationsQuery
 }) => {
   const { t } = useTranslation('rewards')
+
+  // Hide progress bar for distribution 23 and later
+  if (shouldHideProgressAndSendTasks(distribution)) {
+    return null
+  }
+
   const sendSlash = distribution.send_slash.at(0)
 
   if (!sendSlash) {
