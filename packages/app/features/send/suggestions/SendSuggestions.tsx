@@ -210,8 +210,8 @@ export const SendSuggestions = () => {
             currentTab={currentTab}
           />
           <EachTab
-            value="favorites"
-            title={t('suggestions.favorites')}
+            value="contacts"
+            title={t('suggestions.contacts')}
             onInteraction={handleOnInteraction}
             currentTab={currentTab}
           />
@@ -228,12 +228,6 @@ export const SendSuggestions = () => {
             onInteraction={handleOnInteraction}
             currentTab={currentTab}
           />
-          <EachTab
-            value="contacts"
-            title={t('suggestions.contacts')}
-            onInteraction={handleOnInteraction}
-            currentTab={currentTab}
-          />
         </CustomTabs.List>
       </YStack>
 
@@ -244,9 +238,6 @@ export const SendSuggestions = () => {
         <XStack mih={120}>
           <Activity mode={currentTabDeferred === 'recent' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={recentSendersQuery} />
-          </Activity>
-          <Activity mode={currentTabDeferred === 'favorites' ? 'visible' : 'hidden'}>
-            <SuggestionsContent query={favouriteSendersQuery} />
           </Activity>
           <Activity mode={currentTabDeferred === 'top' ? 'visible' : 'hidden'}>
             <SuggestionsContent query={topSendersQuery} />
