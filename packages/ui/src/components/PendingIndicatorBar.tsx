@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { isWeb, Stack, styled } from 'tamagui'
+import { isWeb, Portal, Stack, styled } from 'tamagui'
 import { usePwa, useSafeAreaInsets } from '../utils'
 
 const getTimeout = (progress: number): number => {
@@ -85,30 +85,36 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
   )
 }
 const IndicatorContainer = styled(Stack, {
-  position: 'absolute',
   left: 0,
+  right: 0,
   w: '100%',
   pointerEvents: 'none',
-  zIndex: 9999, // Higher than bottom nav portal (zIndex 100)
+  zIndex: 101, // Above BottomNavBar (zIndex 100), both in Portal stacking context
 
   variants: {
     native: {
       true: {
+        position: 'absolute',
         bottom: 0,
       },
       false: {
         top: 0,
+        '$platform-web': {
+          position: 'fixed',
+        },
       },
     },
-  },
+  } as const,
 })
 
 export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => {
   const isNative = usePwa() || !isWeb
 
   return (
-    <IndicatorContainer native={isNative}>
-      <LoadingBar visible={pending} />
-    </IndicatorContainer>
+    <Portal>
+      <IndicatorContainer native={isNative}>
+        <LoadingBar visible={pending} />
+      </IndicatorContainer>
+    </Portal>
   )
 }
