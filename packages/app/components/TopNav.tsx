@@ -202,7 +202,7 @@ export function TopNav({
                     }}
                   >
                     {/* We need the buttons to be there for layout purposes */}
-                    <AvatarMenuButton profile={profile} />
+                    <AvatarMenuButton />
                   </XStack>
                 </>
               )

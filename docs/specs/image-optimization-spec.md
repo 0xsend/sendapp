@@ -20,6 +20,7 @@ Current implementation:
 3. Implement persistent disk caching with appropriate headers
 4. Reduce bandwidth and improve load times
 5. Provide immediate visual feedback via blurhash placeholders
+6. Replace all avatar/banner consumers in one release (no dual-write period)
 
 ## Image Size Variants
 
@@ -104,7 +105,7 @@ ADD COLUMN banner_data jsonb;
 -- No GIN index needed - only queried by profile id
 ```
 
-Note: `avatar_url` and `banner_url` columns will be kept nullable but no longer written to. They will be dropped in a future migration after backfill completes.
+Note: `avatar_url` and `banner_url` columns will be kept nullable but no longer written to. All SQL functions/views and client usages must be updated in the same release. The columns will be dropped in a future migration after backfill completes.
 
 ### Avatar/Banner Data Schema
 
@@ -240,6 +241,7 @@ const {
   processVariantActivity,
   updateProfileImageDataActivity,
   deleteOldImageActivity,
+  deleteOriginalUploadActivity,
 } = proxyActivities<ReturnType<typeof createImageActivities>>({
   startToCloseTimeout: '2 minutes',
   retry: {
@@ -286,6 +288,11 @@ export async function processImage(input: ProcessImageInput) {
     status: 'complete',
   })
 
+  // Delete original uploaded file (best-effort)
+  await deleteOriginalUploadActivity({
+    storagePath,
+  })
+
   // Delete old image variants
   if (previousImageId) {
     await deleteOldImageActivity({
@@ -303,13 +310,12 @@ export async function processImage(input: ProcessImageInput) {
 // packages/workflows/src/image-workflow/activities.ts
 
 import sharp from 'sharp'
-import { createClient } from '@supabase/supabase-js'
+import { createSupabaseAdminClient } from 'app/utils/supabase/admin'
+import { bootstrap } from '@my/workflows/utils'
 
-export function createImageActivities() {
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+export function createImageActivities(env: Record<string, string | undefined>) {
+  bootstrap(env)
+  const supabase = createSupabaseAdminClient()
 
   return {
     async processVariantActivity(input: {
@@ -382,16 +388,20 @@ export function createImageActivities() {
 
       const column = imageType === 'avatar' ? 'avatar_data' : 'banner_data'
 
+      // Only update if the current imageId matches (prevents stale workflows overwriting newer uploads)
       await supabase
         .from('profiles')
         .update({
           [column]: {
             ...((await supabase.from('profiles').select(column).eq('id', userId).single()).data?.[column] ?? {}),
             processingStatus: status,
+            baseUrl,
+            imageId,
             variants,
           }
         })
         .eq('id', userId)
+        .eq(`${column}->>imageId`, imageId)
     },
 
     async deleteOldImageActivity(input: {
@@ -412,6 +422,11 @@ export function createImageActivities() {
         await supabase.storage.from('avatars').remove(paths)
       }
     },
+
+    async deleteOriginalUploadActivity(input: { storagePath: string }) {
+      const { storagePath } = input
+      await supabase.storage.from('avatars').remove([storagePath])
+    },
   }
 }
 ```
@@ -423,7 +438,8 @@ export function createImageActivities() {
 ```typescript
 // packages/api/src/routers/profile.ts
 
-import { startWorkflow } from '@my/workflows/utils/startWorkflow'
+import { getTemporalClient } from '@my/temporal/client'
+import { startWorkflow } from '@my/workflows/utils'
 
 export const profileRouter = router({
   uploadImage: protectedProcedure
@@ -463,9 +479,11 @@ export const profileRouter = router({
         .eq('id', userId)
 
       // Start Temporal workflow
+      const client = await getTemporalClient()
       await startWorkflow({
-        workflowType: 'processImage',
-        workflowId: `process-${imageType}-${userId}-${imageId}`,
+        client,
+        workflow: 'processImage',
+        ids: [userId, imageType, imageId],
         args: [{
           userId,
           storagePath,
@@ -510,7 +528,7 @@ export function useUploadProfileImage(imageType: 'avatar' | 'banner') {
     if (error) throw error
 
     // Generate blurhash client-side
-    // (for avatars 4x4 components, for banners 6x4)
+    // (avatars: 4x4, banners: 6x4)
     const componentX = imageType === 'banner' ? 6 : 4
     const componentY = 4
     const blurhash = await generateBlurhash(base64Image, componentX, componentY)
@@ -609,6 +627,10 @@ export function getImagePlaceholder(
 }
 ```
 
+### Blurhash on Web
+
+For web placeholders, decode blurhash to a small data URL and pass it as `blurDataURL` to `FastImage` (Next.js). Keep blurhash stored in the DB to avoid storing large base64 strings.
+
 ### ProfileAvatar Component
 
 ```typescript
@@ -701,6 +723,7 @@ WHERE id = 'avatars';
 2. Add avatar/banner URL helpers
 3. Update ProfileAvatar to use new data structure
 4. Stop writing to `avatar_url` / `banner_url` columns
+5. Replace all SQL functions/views and client usages in the same release (no dual-write)
 
 ### Phase 3: Backfill (Temporal Workflow)
 

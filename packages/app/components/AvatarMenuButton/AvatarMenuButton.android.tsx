@@ -1,15 +1,11 @@
 import { Avatar, LinkableAvatar, Spinner } from '@my/ui'
 import { IconAccount } from 'app/components/icons'
-import { useUser, type UseUserReturn } from 'app/utils/useUser'
-
-interface AvatarMenuButtonProps {
-  profile?: UseUserReturn['profile']
-}
+import { useUser } from 'app/utils/useUser'
 
 // due to current bug need to add fallback manually when url is falsy on android
 // https://github.com/tamagui/tamagui/issues/2757
-const AvatarMenuButton = ({ profile }: AvatarMenuButtonProps) => {
-  const { isLoading } = useUser()
+const AvatarMenuButton = () => {
+  const { isLoading, avatarUrl } = useUser()
 
   if (isLoading) return <Spinner size="small" color={'$color12'} alignSelf="center" p="$3" />
 
@@ -21,9 +17,9 @@ const AvatarMenuButton = ({ profile }: AvatarMenuButtonProps) => {
       circular={true}
       backgroundColor={'$color1'}
     >
-      {profile?.avatar_url ? (
+      {avatarUrl ? (
         <>
-          <Avatar.Image src={profile.avatar_url} w="100%" h="100%" objectFit="cover" />
+          <Avatar.Image src={avatarUrl} w="100%" h="100%" objectFit="cover" />
           <Avatar.Fallback jc={'center'} ai="center">
             <IconAccount size={'$2'} />
           </Avatar.Fallback>

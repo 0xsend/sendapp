@@ -35,6 +35,7 @@ import { Link } from 'solito/link'
 import { useRouter } from 'solito/router'
 import { type Address, isAddress } from 'viem'
 import { IconAccount, IconBadgeCheckSolid2, IconSearch, IconX } from './icons'
+import { getProfileAvatarUrl } from 'app/utils/avatar'
 import { baseMainnet } from '@my/wagmi'
 import { useEnsName } from 'wagmi'
 import { useHoverStyles } from 'app/utils/useHoverStyles'
@@ -480,13 +481,13 @@ function SearchResultRow({
           <XStack testID={`tag-search-${profile.send_id}`} ai="center" gap="$4">
             <View>
               <Avatar size="$5" circular>
-                {Platform.OS === 'android' && !profile.avatar_url ? (
+                {Platform.OS === 'android' && !getProfileAvatarUrl(profile) ? (
                   <Avatar.Image
                     src={`https://ui-avatars.com/api/?name=${label}&size=256&format=png&background=86ad7f`}
                   />
                 ) : (
                   <>
-                    <Avatar.Image testID="avatar" src={profile.avatar_url ?? undefined} />
+                    <Avatar.Image testID="avatar" src={getProfileAvatarUrl(profile)} />
                     <Avatar.Fallback jc="center" bc="$olive">
                       <Avatar size="$4.5" br="$3">
                         <Avatar.Image

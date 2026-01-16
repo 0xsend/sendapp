@@ -45,12 +45,10 @@ const shadowProps = {
 } as const
 
 export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
-  const { profile } = useUser()
+  const { profile, avatarUrl } = useUser()
   const hoverStyles = useHoverStyles()
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const { t } = useTranslation('account')
-
-  const avatar_url = useMemo(() => profile?.avatar_url, [profile?.avatar_url])
   const name = useMemo(() => profile?.name, [profile?.name])
   const referralCode = useMemo(
     () => profile?.main_tag?.name || profile?.referral_code,
@@ -97,7 +95,7 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
   }
 
   const avatarContent = useMemo(() => {
-    if (Platform.OS === 'android' && !avatar_url) {
+    if (Platform.OS === 'android' && !avatarUrl) {
       return (
         <XStack f={1} bc="$color2">
           {icons.account}
@@ -106,13 +104,13 @@ export const AccountHeader = memo<YStackProps>(function AccountHeader(props) {
     }
     return (
       <>
-        <Avatar.Image src={avatar_url ?? ''} />
+        <Avatar.Image src={avatarUrl ?? ''} />
         <Avatar.Fallback f={1} ai={'center'} bc="$color2">
           {icons.account}
         </Avatar.Fallback>
       </>
     )
-  }, [avatar_url])
+  }, [avatarUrl])
 
   return (
     <YStack gap={'$3.5'} {...props}>

@@ -1,13 +1,10 @@
 import { SizableText, Spinner, useThemeName, YStack } from '@my/ui'
 import { IconAccount, IconRefresh } from 'app/components/icons'
-import { useSupabase } from 'app/utils/supabase/useSupabase'
 import { useUser } from 'app/utils/useUser'
-import { decode } from 'base64-arraybuffer'
-import * as ImagePicker from 'expo-image-picker'
 import type React from 'react'
-import { type Ref, forwardRef, useImperativeHandle, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { type Ref, forwardRef, useImperativeHandle } from 'react'
 import { useAnalytics } from 'app/provider/analytics'
+import { useUploadProfileImage } from '../../hooks/useUploadProfileImage'
 
 export interface UploadAvatarRefObject {
   pickImage: () => void
@@ -17,96 +14,28 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
   { children }: { children: React.ReactNode },
   ref: Ref<UploadAvatarRefObject>
 ) {
-  const { user, profile, updateProfile } = useUser()
-  const supabase = useSupabase()
+  const { profile } = useUser()
   const analytics = useAnalytics()
-  const [errMsg, setErrMsg] = useState('')
-  const [isUploading, setIsUploading] = useState(false)
   const isDark = useThemeName()?.startsWith('dark')
-  const { t } = useTranslation('account')
 
-  useImperativeHandle(ref, () => ({ pickImage }))
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-      base64: true,
-    })
-
-    await uploadImage(result)
-  }
-
-  const uploadImage = async (pickerResult: ImagePicker.ImagePickerResult) => {
-    if (pickerResult.canceled) {
-      return
-    }
-    if (!user) return
-    const image = pickerResult.assets[0]
-    if (!image) {
-      setErrMsg(t('upload.errors.noImage'))
-      return
-    }
-
-    const base64Image = image.base64
-
-    if (!base64Image) {
-      setErrMsg(t('upload.errors.noImage'))
-      return
-    }
-
-    const base64Str = base64Image.includes('base64,')
-      ? base64Image.substring(base64Image.indexOf('base64,') + 'base64,'.length)
-      : base64Image
-    const res = decode(base64Str)
-
-    if (!(res.byteLength > 0)) {
-      setErrMsg(t('upload.errors.bufferNull'))
-      // console.error('ArrayBuffer is null')
-      return null
-    }
-    setIsUploading(true)
-    const result = await supabase.storage
-      .from('avatars')
-      .upload(`${user.id}/${Number(new Date())}.jpeg`, res, {
-        contentType: 'image/jpeg',
-        upsert: true,
+  const { pickAndUpload, error, isUploading, isProcessing } = useUploadProfileImage({
+    imageType: 'avatar',
+    aspect: [1, 1],
+    onSuccess: () => {
+      analytics.capture({
+        name: 'profile_updated',
+        properties: {
+          fields_updated: ['avatar_data'],
+        },
       })
-    if (result.error) {
-      setErrMsg(result.error.message)
-      setIsUploading(false)
-      return
-      // console.log(result.error)
-      // throw new Error(result.error.message)
-    }
+    },
+  })
 
-    const publicUrlRes = await supabase.storage
-      .from('avatars')
-      .getPublicUrl(result.data.path.replace('avatars/', ''))
+  useImperativeHandle(ref, () => ({ pickImage: pickAndUpload }))
 
-    const { error: update_error } = await supabase
-      .from('profiles')
-      .update({ avatar_url: publicUrlRes.data.publicUrl })
-      .eq('id', user.id)
-    if (update_error) {
-      setErrMsg(update_error.message)
-      return
-    }
-    setIsUploading(false)
-
-    // Track profile update
-    analytics.capture({
-      name: 'profile_updated',
-      properties: {
-        fields_updated: ['avatar_url'],
-      },
-    })
-
-    await updateProfile()
-  }
+  const avatarData = profile?.avatar_data as { processingStatus?: string } | null
+  const hasAvatar = !!profile?.avatar_url || avatarData?.processingStatus === 'complete'
+  const isPending = isUploading || isProcessing || avatarData?.processingStatus === 'pending'
 
   return (
     <YStack gap={'$4'}>
@@ -114,7 +43,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
         position="relative"
         alignSelf="flex-start"
         flexShrink={1}
-        onPress={() => pickImage()}
+        onPress={() => pickAndUpload()}
         cursor="pointer"
       >
         {children}
@@ -144,9 +73,9 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
           <YStack position="absolute" left={0} right={0} top={0} bottom={0} jc="center" ai="center">
             {(() => {
               switch (true) {
-                case isUploading:
+                case isPending:
                   return <Spinner size="small" color={isDark ? '$primary' : '$color12'} />
-                case !!profile?.avatar_url:
+                case hasAvatar:
                   return <IconRefresh color={isDark ? '$primary' : '$color12'} size="$1.5" />
                 default:
                   return <IconAccount color={isDark ? '$primary' : '$color12'} size={'$4'} />
@@ -155,7 +84,7 @@ export const UploadAvatar = forwardRef(function UploadAvatar(
           </YStack>
         </YStack>
       </YStack>
-      {errMsg ? <SizableText theme="red">{errMsg}</SizableText> : <></>}
+      {error ? <SizableText theme="red">{error}</SizableText> : <></>}
     </YStack>
   )
 })

@@ -1,5 +1,5 @@
 import type { Merge, MergeDeep } from 'type-fest'
-import type { Database as DatabaseGenerated } from './database-generated.types'
+import type { Database as DatabaseGenerated, Json } from './database-generated.types'
 export type { Json } from './database-generated.types'
 import type { PostgrestError } from '@supabase/supabase-js'
 
@@ -13,6 +13,9 @@ type ProfileLookupRow =
   DatabaseGenerated['public']['Functions']['profile_lookup']['Returns'][number]
 type ProfileLookup = {
   [K in keyof ProfileLookupRow]: K extends 'address' ? Hex | null : ProfileLookupRow[K] | null
+} & {
+  avatar_data: Json | null
+  banner_data: Json | null
 }
 
 type ProfileDistributionSharesRow =
@@ -64,6 +67,8 @@ export type Database = MergeDeep<
             main_tag: DatabaseGenerated['public']['Tables']['tags']['Row']
             links_in_bio: DatabaseGenerated['public']['Tables']['link_in_bio']['Row'][]
             distribution_shares: ProfileDistributionShares[]
+            avatar_data: Json | null
+            banner_data: Json | null
           }
         }
         webauthn_credentials: {

@@ -56,7 +56,7 @@ export function SendTopNav() {
           </Paragraph>
           {profile && (
             <XStack ml={'auto'}>
-              <AvatarMenuButton profile={profile} />
+              <AvatarMenuButton />
             </XStack>
           )}
         </XStack>

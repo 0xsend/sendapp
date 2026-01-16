@@ -70,7 +70,7 @@ export function ProfileTopNav() {
         </XStack>
         {media.gtLg ? null : (
           <XStack ai="center">
-            <AvatarMenuButton profile={profile} />
+            <AvatarMenuButton />
           </XStack>
         )}
       </Container>

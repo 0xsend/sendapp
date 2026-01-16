@@ -9,8 +9,7 @@ const MainLayout = ({
   scrollable = false,
   children,
 }: { scrollable?: boolean; children?: React.ReactNode }) => {
-  const { profile } = useUser()
-  const avatar_url = profile?.avatar_url
+  const { profile, avatarUrl } = useUser()
   const { resolvedTheme } = useThemeSetting()
   const separatorColor = resolvedTheme?.startsWith('dark') ? '#343434' : '#E6E6E6'
   const iconColor = resolvedTheme?.startsWith('dark') ? '$primary' : '$black'
@@ -24,8 +23,8 @@ const MainLayout = ({
             <Link href={'/account'}>
               <XStack position="relative">
                 <LinkableAvatar br={'$6'} size={'$4.5'} href={`/profile/${profile?.send_id}`}>
-                  {avatar_url ? (
-                    <Avatar.Image src={avatar_url} width={48} height={48} />
+                  {avatarUrl ? (
+                    <Avatar.Image src={avatarUrl} width={48} height={48} />
                   ) : (
                     <Avatar.Fallback jc={'center'}>
                       <Spinner size="large" color="$color12" />

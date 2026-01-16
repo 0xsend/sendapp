@@ -79,6 +79,7 @@ import { throwIf } from 'app/utils/throwIf'
 import Animated, { useAnimatedStyle, useDerivedValue, withSpring } from 'react-native-reanimated'
 
 import debug from 'debug'
+import { getProfileAvatarUrl } from 'app/utils/avatar'
 import { signUserOp } from 'app/utils/signUserOp'
 import type { UserOperation } from 'permissionless'
 import { decodeTransferUserOp } from 'app/utils/decodeTransferUserOp'
@@ -395,15 +396,15 @@ const SendChatHeader = XStack.styleable<SendChatHeaderProps>(
         {...props}
       >
         <XStack>
-          {isExternalAddress && !profile?.avatar_url && recipient ? (
+          {isExternalAddress && !getProfileAvatarUrl(profile) && recipient ? (
             <AddressAvatar address={recipient as `0x${string}`} br="$10" {...avatarProps} />
           ) : (
             <Avatar circular {...avatarProps}>
-              {isAndroid && !profile?.avatar_url ? (
+              {isAndroid && !getProfileAvatarUrl(profile) ? (
                 <IconAccount size={'$4'} color="$olive" />
               ) : (
                 <>
-                  <Avatar.Image src={profile?.avatar_url ?? ''} />
+                  <Avatar.Image src={getProfileAvatarUrl(profile) ?? ''} />
                   <Avatar.Fallback jc="center" alignItems={'center'}>
                     <IconAccount size={'$4'} color="$olive" />
                   </Avatar.Fallback>

@@ -103,7 +103,7 @@ function HomeSideBar({ ...props }: YStackProps) {
 HomeSideBar.displayName = 'HomeSideBar'
 
 const DesktopAccountMenuEntry = () => {
-  const { profile } = useUser()
+  const { profile, avatarUrl } = useUser()
   const hoverStyles = useHoverStyles()
   const location = usePathname()
   const parts = location.split('/').filter(Boolean)
@@ -130,7 +130,7 @@ const DesktopAccountMenuEntry = () => {
     >
       <XStack position="relative">
         <Avatar circular={true} size={'$3'}>
-          <Avatar.Image src={profile?.avatar_url ?? ''} w="100%" h="100%" objectFit="cover" />
+          <Avatar.Image src={avatarUrl} w="100%" h="100%" objectFit="cover" />
           <Avatar.Fallback jc={'center'} ai="center" theme="green_active" bc="$color2">
             <IconAccount size={'$2'} color="$color1" $theme-light={{ color: '$gray1' }} />
           </Avatar.Fallback>
@@ -161,9 +161,8 @@ const DesktopAccountMenuEntry = () => {
 }
 
 const HomeBottomSheet = () => {
-  const { profile } = useUser()
+  const { profile, avatarUrl } = useUser()
   const hoverStyles = useHoverStyles()
-  const avatarUrl = profile?.avatar_url
   const { t } = useTranslation('navigation')
   const links = useMemo(() => buildNavigationLinks(t), [t])
   const theme = useThemeName()
