@@ -73,15 +73,19 @@ export default function ActivityFeed() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: only trigger when sendChatOpen changes
   useEffect(() => {
     if (!sendChatOpen) {
-      setTimeout(() => {
-        setSendParams({
-          idType: undefined,
-          recipient: undefined,
-          note: undefined,
-          amount: sendParams.amount,
-          sendToken: sendParams.sendToken,
-        })
+      const timeoutId = setTimeout(() => {
+        setSendParams(
+          {
+            idType: undefined,
+            recipient: undefined,
+            note: undefined,
+            amount: sendParams.amount,
+            sendToken: sendParams.sendToken,
+          },
+          { webBehavior: 'replace' }
+        )
       }, 400)
+      return () => clearTimeout(timeoutId)
     }
   }, [sendChatOpen])
 
