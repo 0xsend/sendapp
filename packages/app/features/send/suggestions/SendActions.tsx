@@ -1,7 +1,8 @@
 import { View, H2, YStack, Button, type ButtonProps, isWeb, Link } from '@my/ui'
 import type { IconProps } from '@tamagui/helpers-icon'
-import { DollarSign, Percent, Wallet } from '@tamagui/lucide-icons'
+import { Percent, Send, Wallet } from '@tamagui/lucide-icons'
 import type { ComponentType } from 'react'
+
 export function SendActions() {
   return (
     <View gap="$4">
@@ -9,7 +10,7 @@ export function SendActions() {
         Send Actions
       </H2>
       <YStack ov="hidden" br={10} maw={600}>
-        <EachItem iconLeft={DollarSign} title="Send via Link" onPress={() => {}} />
+        <EachItem iconLeft={Send} title="Send via Link" onPress={() => {}} />
         <EachItem
           iconLeft={Percent}
           title="Send to Savings"
@@ -44,6 +45,9 @@ function EachItem({ iconLeft, title, onPress, href }: EachItemProps) {
       jc="flex-start"
       animation="responsive"
       animateOnly={['transform']}
+      focusVisibleStyle={{
+        scale: 1.01,
+      }}
       hoverStyle={{
         scale: 1.01,
         bg: '$background',
