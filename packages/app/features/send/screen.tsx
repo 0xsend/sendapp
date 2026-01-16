@@ -2,6 +2,7 @@ import type { Functions } from '@my/supabase/database.types'
 import {
   Anchor,
   AnimatePresence,
+  Activity,
   Avatar,
   Button,
   Fade,
@@ -36,6 +37,7 @@ import { Keyboard, Platform } from 'react-native'
 import { SendChat } from './components/SendChat'
 import { SendCheckChat } from './components/SendCheckChat'
 import { useTranslation } from 'react-i18next'
+import { SendActions } from './suggestions/SendActions'
 
 export const SendScreen = () => {
   const [{ recipient, idType }] = useSendScreenParams()
@@ -112,9 +114,14 @@ export const SendScreen = () => {
       >
         <YStack width="100%" gap="$4">
           <Search placeholder={t('search.placeholder')} autoFocus={Platform.OS === 'web'} />
-          {!search && <SendSuggestions />}
+          <Activity mode={!search ? 'visible' : 'hidden'}>
+            <SendSuggestions />
+          </Activity>
         </YStack>
-        {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />}
+        <Activity mode={!search ? 'visible' : 'hidden'}>
+          <SendActions />
+        </Activity>
+        {/* {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />} */}
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />
         </LazyMount>
