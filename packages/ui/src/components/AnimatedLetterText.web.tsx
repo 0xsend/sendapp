@@ -1,0 +1,49 @@
+import type { ViewProps } from '@tamagui/core'
+import { useMemo } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
+
+interface AnimatedLetterTextProps extends ViewProps {
+  children: string
+}
+
+function createEachLetter(letter: string, text: string, index: number) {
+  const lowerLetter = letter.toLowerCase()
+  const lowerText = text.toLowerCase()
+  const howManySameLettersBefore = lowerText.slice(0, index).split(lowerLetter).length - 1
+
+  return (
+    <motion.span
+      className="font_heading"
+      key={`${lowerLetter}-${howManySameLettersBefore}`}
+      layoutId={`${lowerLetter}-${howManySameLettersBefore}`}
+      initial={{ opacity: 0, scale: 0.6, filter: 'blur(2px)' }}
+      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, scale: 0.6, filter: 'blur(2px)' }}
+      transition={{
+        layout: { type: 'spring', stiffness: 1400, damping: 140 },
+      }}
+      style={{
+        fontSize: 23,
+        fontWeight: 500,
+        color: 'var(--color12)',
+        fontFamily: 'var(--f-family)',
+      }}
+    >
+      {letter}
+    </motion.span>
+  )
+}
+
+export function AnimatedLetterText({ children }: AnimatedLetterTextProps) {
+  const letterItems = useMemo(() => {
+    return children.split('').map((letter, index) => createEachLetter(letter, children, index))
+  }, [children])
+
+  return (
+    <div style={{ display: 'inline-flex' }}>
+      <AnimatePresence initial={false} mode="popLayout">
+        {letterItems}
+      </AnimatePresence>
+    </div>
+  )
+}
