@@ -10,7 +10,7 @@ export function SendActions() {
         Send Actions
       </H2>
       <YStack ov="hidden" br={10} maw={600}>
-        <EachItem iconLeft={Send} title="Send via Link" onPress={() => {}} />
+        <EachItem href="/check" iconLeft={Send} title="Send via Link" onPress={() => {}} />
         <EachItem
           iconLeft={Percent}
           title="Send to Savings"

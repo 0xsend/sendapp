@@ -32,10 +32,8 @@ import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
 import { getContactDisplayName } from 'app/features/contacts/utils/getContactDisplayName'
-import { SendCheckButton } from './components/SendCheckButton'
 import { Keyboard, Platform } from 'react-native'
 import { SendChat } from './components/SendChat'
-import { SendCheckChat } from './components/SendCheckChat'
 import { useTranslation } from 'react-i18next'
 import { SendActions } from './suggestions/SendActions'
 
@@ -56,7 +54,6 @@ export const SendScreen = () => {
   const [queryParams, setQueryParams] = useSendScreenParams()
 
   const [open, setOpen] = useState(false)
-  const [sendCheckOpen, setSendCheckOpen] = useState(false)
 
   // Check if recipient is an external address (not a Send profile)
   const isExternalAddress = idType === 'address' && isAddress(recipient as Address)
@@ -121,12 +118,8 @@ export const SendScreen = () => {
         <Activity mode={!search ? 'visible' : 'hidden'}>
           <SendActions />
         </Activity>
-        {/* {!search && <SendCheckButton onPress={() => setSendCheckOpen(true)} />} */}
         <LazyMount when={open}>
           <SendChat open={open} onOpenChange={onSendChatOpenChange} />
-        </LazyMount>
-        <LazyMount when={sendCheckOpen}>
-          <SendCheckChat open={sendCheckOpen} onOpenChange={setSendCheckOpen} />
         </LazyMount>
         <SendSearchBody />
       </YStack>
