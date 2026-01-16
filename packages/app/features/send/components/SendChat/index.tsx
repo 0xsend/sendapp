@@ -72,7 +72,7 @@ import { useAccountNonce } from 'app/utils/userop'
 import { useGenerateTransferUserOp } from 'app/utils/useUserOpTransferMutation'
 import { useUSDCFees } from 'app/utils/useUSDCFees'
 import { useEstimateFeesPerGas } from 'wagmi'
-import { baseMainnet, baseMainnetClient, entryPointAddress, usdcAddress } from '@my/wagmi'
+import { baseMainnet, baseMainnetClient, entryPointAddress, sendTokenAddress } from '@my/wagmi'
 import { FlatList } from 'react-native'
 import { useRouter } from 'solito/router'
 import { throwIf } from 'app/utils/throwIf'
@@ -551,7 +551,7 @@ const SendAmountSchema = z.object({
 const EnterAmountNoteSection = YStack.styleable((props) => {
   const { useSendScreenParams } = SendChatContext.useStyledContext()
   const [sendParams, setSendParams] = useSendScreenParams()
-  const { coin } = useCoin(sendParams.sendToken || usdcAddress[baseMainnet.id])
+  const { coin } = useCoin(sendParams.sendToken || sendTokenAddress[baseMainnet.id])
 
   const themeName = useThemeName()
 
@@ -679,7 +679,7 @@ const EnterAmountNoteSection = YStack.styleable((props) => {
   const [queryParams] = useSendScreenParams()
   const { sendToken, amount, note } = queryParams
   const { data: sendAccount, isLoading: isSendAccountLoading } = useSendAccount()
-  const { coin: selectedCoin } = useCoin(sendToken || usdcAddress[baseMainnet.id])
+  const { coin: selectedCoin } = useCoin(sendToken || sendTokenAddress[baseMainnet.id])
   const { profile: currentUserProfile } = useUser()
 
   const [loadingSend, setLoadingSend] = useState(false)
