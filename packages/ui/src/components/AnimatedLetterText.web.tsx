@@ -7,6 +7,7 @@ interface AnimatedLetterTextProps extends ViewProps {
 }
 
 const transition = {
+  duration: 0.2,
   layout: { type: 'spring', stiffness: 1400, damping: 140 },
 } as const
 
