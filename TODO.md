@@ -14,6 +14,8 @@
 - [x] Fix avatar_url usages in SendChat and SearchBar (iteration 5)
 - [x] Fix AvatarMenuButton web implementation to use useUser internally (iteration 5)
 - [x] Run verification commands (typecheck, lint) - all pass (iteration 5)
+- [x] ISSUE-13: Fix native blurhash generation - now returns default placeholder (iteration 6)
+- [x] ISSUE-14: Fix remaining avatar_url usages in SearchBarSend.tsx and screen.tsx (iteration 6)
 
 ## In Progress
 (none)
@@ -26,16 +28,13 @@
 
 ## Notes
 - Followed patterns from deposit-workflow for activities structure
-- sharp dependency added to packages/workflows
+- sharp dependency added to packages/workflows (version 0.32.6 to match next-app)
 - Pre-existing TypeScript error in wagmi/constants.ts (missing contracts build artifact) - not related to this work
 - Server-side blurhash generation handles native uploads when client doesn't provide blurhash
 - getProfileAvatarUrl utility function provides fallback from avatar_data to legacy avatar_url
+- Native platforms now return a default placeholder blurhash instead of undefined
 
-## Verification Results (Iteration 5)
-- Workflow structure: ✅ workflow.ts, activities.ts, types.ts in packages/workflows/src/image-workflow/
-- Migration: ✅ 20260115203322_add_image_data_columns_to_profiles.sql
-- tRPC endpoint: ✅ profile.uploadImage in packages/api/src/routers/profile.ts
-- Upload hook: ✅ useUploadProfileImage.ts in packages/app/features/account/hooks/
-- Avatar helpers: ✅ getAvatarUrl, getBannerUrl, getProfileAvatarUrl in packages/app/utils/avatar.ts
-- Lint: ✅ 0 errors, 39 warnings (pre-existing)
-- TypeScript: ✅ Only pre-existing wagmi error (missing contracts build)
+## Verification Results (Iteration 6)
+- ISSUE-13 Fixed: Native generateBlurhash now returns default placeholder blurhash
+- ISSUE-14 Fixed: SearchBarSend.tsx and screen.tsx now use getProfileAvatarUrl
+- Biome check: No fixes needed

@@ -1,19 +1,26 @@
 import { encode, decode } from 'blurhash'
 import { Platform } from 'react-native'
 
+// Default blurhash placeholders for native platforms
+// These are neutral gray tones that work as temporary placeholders
+// until the server generates the actual blurhash from the image
+const DEFAULT_AVATAR_BLURHASH = 'L6PZfS-;fQfQfQfQfQfQ~qj[fQfQ' // 4x4 neutral gray
+const DEFAULT_BANNER_BLURHASH = 'L5PZfS-;fQfQfQfQfQfQ-;j[fQfQ' // 6x4 neutral gray
+
 /**
  * Generate a blurhash from a base64 image string.
  * On web, uses Canvas API to get pixel data.
- * On native, returns undefined (server will generate it).
+ * On native, returns a default placeholder blurhash (server will generate the real one).
  */
 export async function generateBlurhash(
   base64Image: string,
   imageType: 'avatar' | 'banner'
 ): Promise<string | undefined> {
-  // On native platforms, let the server generate blurhash
-  // Client-side blurhash on mobile requires native modules
+  // On native platforms, return a default placeholder blurhash
+  // The server will generate the actual blurhash from the uploaded image
+  // and update the profile. The default ensures pending state shows a placeholder.
   if (Platform.OS !== 'web') {
-    return undefined
+    return imageType === 'banner' ? DEFAULT_BANNER_BLURHASH : DEFAULT_AVATAR_BLURHASH
   }
 
   return generateBlurhashWeb(base64Image, imageType)

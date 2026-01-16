@@ -27,6 +27,7 @@ import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 
 import { type Address, isAddress } from 'viem'
 import { useRouter } from 'solito/router'
 import { IconAccount } from 'app/components/icons'
+import { getProfileAvatarUrl } from 'app/utils/avatar'
 import { shorten } from 'app/utils/strings'
 import { SendSuggestions } from 'app/features/send/suggestions/SendSuggestions'
 import { useContactBySendId } from 'app/features/contacts/hooks/useContactBySendId'
@@ -230,11 +231,11 @@ export function SendRecipient({ ...props }: YStackProps) {
         $theme-light={{ bc: '$gray3Light' }}
       >
         <LinkableAvatar size="$4.5" br="$3" href={href}>
-          {Platform.OS === 'android' && !profile?.avatar_url ? (
+          {Platform.OS === 'android' && !getProfileAvatarUrl(profile) ? (
             <IconAccount size="$4.5" color="$olive" />
           ) : (
             <>
-              <Avatar.Image src={profile?.avatar_url ?? ''} />
+              <Avatar.Image src={getProfileAvatarUrl(profile) ?? ''} />
               <Avatar.Fallback jc="center">
                 <IconAccount size="$4.5" color="$olive" />
               </Avatar.Fallback>
