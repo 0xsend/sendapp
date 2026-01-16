@@ -367,13 +367,13 @@ export const ContactDetailSheet = memo(function ContactDetailSheet({
       onOpenChange={onOpenChange}
       dismissOnSnapToBottom
       dismissOnOverlayPress={!isMutating}
-      native
-      snapPoints={[85]}
+      snapPointsMode="fit"
     >
-      <Sheet.Frame key="contact-detail-sheet">
-        <Sheet.ScrollView>{sheetContent}</Sheet.ScrollView>
+      <Sheet.Overlay animation="quick" enterStyle={{ opacity: 0 }} exitStyle={{ opacity: 0 }} />
+      <Sheet.Frame key="contact-detail-sheet" backgroundColor="$background">
+        <Sheet.Handle />
+        {sheetContent}
       </Sheet.Frame>
-      <Sheet.Overlay />
     </Sheet>
   )
 })
