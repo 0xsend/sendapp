@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`calculateWeights should calculate exponential weights using exponential mode: exponential 1`] = `
+exports[`calculateWeights > should calculate exponential weights using exponential mode > exponential 1`] = `
 {
   "poolWeights": {
     "0x1": 9975n,
@@ -26,7 +26,7 @@ exports[`calculateWeights should calculate exponential weights using exponential
 }
 `;
 
-exports[`calculateWeights should calculate linear weights using linear mode: linear 1`] = `
+exports[`calculateWeights > should calculate linear weights using linear mode > linear 1`] = `
 {
   "poolWeights": {
     "0x1": 1000n,
@@ -52,7 +52,7 @@ exports[`calculateWeights should calculate linear weights using linear mode: lin
 }
 `;
 
-exports[`calculateWeights should calculate logarithmic weights using logarithmic mode: logarithmic 1`] = `
+exports[`calculateWeights > should calculate logarithmic weights using logarithmic mode > logarithmic 1`] = `
 {
   "poolWeights": {
     "0x1": 1541n,
@@ -78,7 +78,7 @@ exports[`calculateWeights should calculate logarithmic weights using logarithmic
 }
 `;
 
-exports[`calculateWeights should calculate square_root weights using square_root mode: square_root 1`] = `
+exports[`calculateWeights > should calculate square_root weights using square_root mode > square_root 1`] = `
 {
   "poolWeights": {
     "0x1": 9128n,

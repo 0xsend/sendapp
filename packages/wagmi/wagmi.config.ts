@@ -460,6 +460,28 @@ export default defineConfig({
         },
       ] as const,
     },
+    {
+      name: 'MerklDistributor',
+      address: {
+        [base.id]: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
+        [baseLocal.id]: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
+        [baseSepolia.id]: '0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae',
+      },
+      abi: [
+        {
+          type: 'function',
+          name: 'claim',
+          inputs: [
+            { name: 'users', type: 'address[]', internalType: 'address[]' },
+            { name: 'tokens', type: 'address[]', internalType: 'address[]' },
+            { name: 'amounts', type: 'uint256[]', internalType: 'uint256[]' },
+            { name: 'proofs', type: 'bytes32[][]', internalType: 'bytes32[][]' },
+          ],
+          outputs: [],
+          stateMutability: 'nonpayable',
+        },
+      ] as const,
+    },
   ],
   plugins: [
     foundry({

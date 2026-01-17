@@ -39,6 +39,7 @@ COPY packages/bridge/package.json packages/bridge/package.json
 COPY packages/contracts/package.json packages/contracts/package.json
 COPY packages/eslint-config-custom/package.json packages/eslint-config-custom/package.json
 COPY packages/playwright/package.json packages/playwright/package.json
+COPY packages/send-earn/package.json packages/send-earn/package.json
 COPY packages/sendctl/package.json packages/sendctl/package.json
 COPY packages/shovel/package.json packages/shovel/package.json
 COPY packages/snaplet/package.json packages/snaplet/package.json

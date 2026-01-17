@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import { beforeEach, describe, expect, it, vi, type Mocked, type MockInstance } from 'vitest'
 import type {
   PostgrestError,
   PostgrestMaybeSingleResponse,
@@ -9,8 +9,8 @@ import type { Address } from 'viem'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Mock the modules FIRST
-jest.mock('app/utils/supabase/admin')
-jest.mock('@temporalio/activity', () => {
+vi.mock('app/utils/supabase/admin')
+vi.mock('@temporalio/activity', () => {
   const createRetryableError = (message: string, code: string, details: unknown) => {
     const error = new Error(message)
     Object.assign(error, { code, details, type: 'retryable' })
@@ -23,14 +23,14 @@ jest.mock('@temporalio/activity', () => {
   }
   return {
     log: {
-      warn: jest.fn(),
-      error: jest.fn(),
-      info: jest.fn(),
-      debug: jest.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      info: vi.fn(),
+      debug: vi.fn(),
     },
     ApplicationFailure: {
-      retryable: jest.fn(createRetryableError),
-      nonRetryable: jest.fn(createNonRetryableError),
+      retryable: vi.fn(createRetryableError),
+      nonRetryable: vi.fn(createNonRetryableError),
     },
   }
 })
@@ -38,35 +38,35 @@ jest.mock('@temporalio/activity', () => {
 // --- Mock Setup ---
 // Create the mock client instance first
 const mockedSupabaseAdmin = {
-  from: jest.fn(),
-} as unknown as jest.Mocked<SupabaseClient>
+  from: vi.fn(),
+} as unknown as Mocked<SupabaseClient>
 
 // Mock the module, making the factory function return our mock instance
-jest.mock('app/utils/supabase/admin', () => ({
-  createSupabaseAdminClient: jest.fn(() => mockedSupabaseAdmin),
+vi.mock('app/utils/supabase/admin', () => ({
+  createSupabaseAdminClient: vi.fn(() => mockedSupabaseAdmin),
 }))
 
 // Define reusable mock functions for the chain
-const mockMaybeSingle = jest.fn<() => Promise<PostgrestMaybeSingleResponse<unknown>>>()
-const mockSingle = jest.fn<() => Promise<PostgrestSingleResponse<unknown>>>()
-const mockEq = jest.fn().mockImplementation(() => ({
+const mockMaybeSingle = vi.fn<() => Promise<PostgrestMaybeSingleResponse<unknown>>>()
+const mockSingle = vi.fn<() => Promise<PostgrestSingleResponse<unknown>>>()
+const mockEq = vi.fn().mockImplementation(() => ({
   single: mockSingle,
   maybeSingle: mockMaybeSingle,
   eq: mockEq,
   limit: mockLimit,
 }))
-const mockLimit = jest.fn().mockImplementation(() => ({
+const mockLimit = vi.fn().mockImplementation(() => ({
   maybeSingle: mockMaybeSingle,
 }))
-const mockSelect = jest.fn().mockImplementation(() => ({
+const mockSelect = vi.fn().mockImplementation(() => ({
   eq: mockEq,
   single: mockSingle,
   maybeSingle: mockMaybeSingle,
 }))
-const mockInsert = jest.fn().mockImplementation(() => ({
+const mockInsert = vi.fn().mockImplementation(() => ({
   select: mockSelect,
 }))
-const mockFrom = jest.fn().mockImplementation(() => ({
+const mockFrom = vi.fn().mockImplementation(() => ({
   select: mockSelect,
   insert: mockInsert,
 }))
@@ -108,8 +108,8 @@ const createNotFoundMaybeSingleResponse = <T>(): PostgrestMaybeSingleResponse<T>
 })
 
 beforeEach(() => {
-  jest.clearAllMocks()
-  ;(mockedSupabaseAdmin.from as jest.Mock).mockImplementation(mockFrom)
+  vi.clearAllMocks()
+  ;(mockedSupabaseAdmin.from as MockInstance).mockImplementation(mockFrom)
   mockFrom.mockClear()
   mockSelect.mockClear()
   mockEq.mockClear()
