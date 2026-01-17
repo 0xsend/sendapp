@@ -97,6 +97,24 @@ export function ActivityRewardsScreen() {
   const verificationsQuery = useDistributionVerifications(
     distribution ?? distributions?.[0]?.number
   )
+
+  const distributionDates = useMemo(
+    () =>
+      distributions?.map((d) => {
+        const date = d.timezone_adjusted_qualification_end
+        if (!date) return ''
+        return `${date.toLocaleString('default', {
+          month: 'long',
+        })} ${date.toLocaleString('default', { year: 'numeric' })}`
+      }) ?? [],
+    [distributions]
+  )
+
+  const currentPeriod = useMemo(() => {
+    const fallbackPeriod = t('activity.title.fallback')
+    return distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? fallbackPeriod
+  }, [distributionDates, selectedDistributionIndex, t])
+
   const onValueChange = (value: string) => {
     const newDistribution = distributions?.[Number(value)]
     if (newDistribution?.number === distribution) return
@@ -106,22 +124,6 @@ export function ActivityRewardsScreen() {
   if (isLoading) {
     return <ActivityRewardsSkeleton />
   }
-
-  const distributionDates = useMemo(
-    () =>
-      distributions?.map(
-        (d) =>
-          `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
-            month: 'long',
-          })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
-      ) ?? [],
-    [distributions]
-  )
-
-  const currentPeriod = useMemo(() => {
-    const fallbackPeriod = t('activity.title.fallback')
-    return distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? fallbackPeriod
-  }, [distributionDates, selectedDistributionIndex, t])
 
   if (!distributions?.length) {
     return (
@@ -646,13 +648,11 @@ const MultiplierCards = ({
     )
   }, [verifications?.multipliers, isQualificationOver])
 
-  const distributionMonth = useMemo(
-    () =>
-      distribution.timezone_adjusted_qualification_end.toLocaleString('default', {
-        month: 'long',
-      }),
-    [distribution.timezone_adjusted_qualification_end]
-  )
+  const distributionMonth = useMemo(() => {
+    const date = distribution.timezone_adjusted_qualification_end
+    if (!date) return ''
+    return date.toLocaleString('default', { month: 'long' })
+  }, [distribution.timezone_adjusted_qualification_end])
 
   if (verificationsQuery.isLoading) {
     return (
@@ -850,13 +850,9 @@ const ClaimableRewardsCard = ({
   const now = new Date()
   const isQualificationOver = distribution.qualification_end < now
 
-  const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
-    'default',
-    {
-      month: 'long',
-    }
-  )
-  const periodLabel = distributionMonth ?? t('activity.title.fallback')
+  const date = distribution.timezone_adjusted_qualification_end
+  const distributionMonth = date ? date.toLocaleString('default', { month: 'long' }) : ''
+  const periodLabel = distributionMonth || t('activity.title.fallback')
   const headingText = isQualificationOver
     ? t('claim.heading.total', { period: periodLabel })
     : t('claim.heading.period', { period: periodLabel })

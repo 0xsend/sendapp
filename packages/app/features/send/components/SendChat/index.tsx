@@ -209,7 +209,7 @@ export const SendChat = memo(
 
     return (
       <>
-        <Portal zIndex={10}>
+        <Portal zIndex={101}>
           <SendModalContainer bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
             <SendChatContext.Provider
               activeSection={activeSection}
