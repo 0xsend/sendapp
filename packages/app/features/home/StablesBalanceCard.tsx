@@ -26,7 +26,7 @@ import { IconArrowUp, IconPlus } from 'app/components/icons'
 import { useThemeSetting } from 'app/provider/theme'
 import { type NativeTouchEvent, type NativeSyntheticEvent, Platform } from 'react-native'
 import { useRouter } from 'solito/router'
-import { baseMainnet, usdcAddress } from '@my/wagmi'
+import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { memo, useMemo, type PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -217,7 +217,7 @@ const SendButton = () => {
     shouldShowSendButton && (
       <LinkableButton
         prefetch
-        href={`/send?sendToken=${queryParams.token ?? usdcAddress[baseMainnet.id]}`}
+        href={`/send?sendToken=${queryParams.token ?? sendTokenAddress[baseMainnet.id]}`}
         jc="center"
         ai="center"
         overflow={'hidden'}

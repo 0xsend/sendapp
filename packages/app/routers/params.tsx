@@ -3,7 +3,6 @@ import { baseMainnet, sendTokenAddress, usdcAddress } from '@my/wagmi'
 import { type allCoins, allCoinsDict } from 'app/data/coins'
 import { createParam } from 'solito'
 import { type Address, isAddress } from 'viem'
-import { useCoin } from 'app/provider/coins'
 import { useCallback } from 'react'
 import { SendtagSchema } from 'app/utils/zod/sendtag'
 
@@ -256,21 +255,17 @@ const parseTokenParam = (value) => {
   if (Array.isArray(value)) {
     return isAddress(value[0] ?? '') || Object.keys(allCoinsDict).includes(value[0] ?? '')
       ? (value[0] as allCoins[number]['token'])
-      : usdcAddress[baseMainnet.id]
+      : sendTokenAddress[baseMainnet.id]
   }
 
   return isAddress(value ?? '') || Object.keys(allCoinsDict).includes(value ?? '')
     ? (value as allCoins[number]['token'])
-    : usdcAddress[baseMainnet.id]
+    : sendTokenAddress[baseMainnet.id]
 }
 
 const useSendToken = () => {
-  const { coin: sendCoin } = useCoin('SEND')
   const [sendToken, setSendTokenParam] = useSendParam('sendToken', {
-    initial:
-      sendCoin?.balance && sendCoin.balance > 0n
-        ? sendTokenAddress[baseMainnet.id]
-        : usdcAddress[baseMainnet.id],
+    initial: sendTokenAddress[baseMainnet.id],
     parse: parseTokenParam,
   })
 
@@ -295,7 +290,7 @@ const useNote = () => {
 }
 
 const useSendScreenParamsBase = () => {
-  const { setParams, params } = useSendParams()
+  const { setParams } = useSendParams()
   const [idType] = useIdType()
   const [recipient] = useRecipient()
   const [amount] = useAmount()
