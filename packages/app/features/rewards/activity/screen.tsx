@@ -107,6 +107,22 @@ export function ActivityRewardsScreen() {
     return <ActivityRewardsSkeleton />
   }
 
+  const distributionDates = useMemo(
+    () =>
+      distributions?.map(
+        (d) =>
+          `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
+            month: 'long',
+          })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
+      ) ?? [],
+    [distributions]
+  )
+
+  const currentPeriod = useMemo(() => {
+    const fallbackPeriod = t('activity.title.fallback')
+    return distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? fallbackPeriod
+  }, [distributionDates, selectedDistributionIndex, t])
+
   if (!distributions?.length) {
     return (
       <YStack f={1} pt={'$6'} $gtLg={{ pt: '$0' }} gap={'$7'}>
@@ -118,16 +134,6 @@ export function ActivityRewardsScreen() {
       </YStack>
     )
   }
-
-  const distributionDates = distributions?.map(
-    (d) =>
-      `${d.timezone_adjusted_qualification_end.toLocaleString('default', {
-        month: 'long',
-      })} ${d.timezone_adjusted_qualification_end.toLocaleString('default', { year: 'numeric' })}`
-  )
-  const fallbackPeriod = t('activity.title.fallback')
-  const currentPeriod =
-    distributionDates[selectedDistributionIndex]?.split(' ')[0] ?? fallbackPeriod
 
   return (
     <YStack pb={'$12'} pt={'$3.5'} gap={'$7'} $gtLg={{ pt: '$0' }} $platform-web={{ f: 1 }}>
@@ -406,6 +412,32 @@ const TaskCards = ({
   const { t } = useTranslation('rewards')
   const verifications = verificationsQuery.data
 
+  const now = new Date()
+  const isQualificationOver = distribution.qualification_end < now
+  const shouldHideSendTasks = shouldHideProgressAndSendTasks(distribution)
+
+  const tasks = useMemo(() => {
+    if (!verifications?.verification_values) return []
+    return verifications.verification_values
+      .map((verification) => ({
+        ...verification,
+        weight: BigInt(verification.weight ?? 0),
+        fixed_value: BigInt(verification.fixed_value ?? 0),
+      }))
+      .filter(
+        ({ fixed_value, weight, type }) =>
+          // Hide send_ten and send_one_hundred for current/future months
+          !(shouldHideSendTasks && (type === 'send_ten' || type === 'send_one_hundred')) &&
+          ((fixed_value > 0 && !isQualificationOver) ||
+            (isQualificationOver && weight !== 0n && fixed_value > 0n))
+      )
+      .sort((a, b) => {
+        const orderA = Object.keys(verificationTypeTitleKey).indexOf(a.type)
+        const orderB = Object.keys(verificationTypeTitleKey).indexOf(b.type)
+        return orderA - orderB
+      })
+  }, [verifications?.verification_values, shouldHideSendTasks, isQualificationOver])
+
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
@@ -421,50 +453,28 @@ const TaskCards = ({
     )
   }
 
-  const now = new Date()
-  const isQualificationOver = distribution.qualification_end < now
-  const shouldHideSendTasks = shouldHideProgressAndSendTasks(distribution)
-
   return (
     <YStack w={'100%'} gap="$5">
       <H3 fontWeight={'600'} color={'$color12'}>
         {t('activity.sections.tasks')}
       </H3>
       <Stack gap="$5" $gtXs={{ fd: 'row' }} $platform-web={{ flexWrap: 'wrap' }}>
-        {verifications?.verification_values
-          ?.map((verification) => ({
-            ...verification,
-            weight: BigInt(verification.weight ?? 0),
-            fixed_value: BigInt(verification.fixed_value ?? 0),
-          }))
-          ?.filter(
-            ({ fixed_value, weight, type }) =>
-              // Hide send_ten and send_one_hundred for current/future months
-              !(shouldHideSendTasks && (type === 'send_ten' || type === 'send_one_hundred')) &&
-              ((fixed_value > 0 && !isQualificationOver) ||
-                (isQualificationOver && weight !== 0n && fixed_value > 0n))
-          )
-          .sort((a, b) => {
-            const orderA = Object.keys(verificationTypeTitleKey).indexOf(a.type)
-            const orderB = Object.keys(verificationTypeTitleKey).indexOf(b.type)
-            return orderA - orderB
-          })
-          .map((verification) => (
-            <TaskCard
-              key={verification.type}
-              verification={verification}
-              isQualificationOver={isQualificationOver}
-              url={getTaskHref(verification.type)}
-            >
-              <H3 fontWeight={'600'} color={'$color12'}>
-                {(() => {
-                  const type = verification.type as keyof typeof verificationTypeTitleKey
-                  const key = verificationTypeTitleKey[type]
-                  return key ? t(key) : ''
-                })()}
-              </H3>
-            </TaskCard>
-          ))}
+        {tasks.map((verification) => (
+          <TaskCard
+            key={verification.type}
+            verification={verification}
+            isQualificationOver={isQualificationOver}
+            url={getTaskHref(verification.type)}
+          >
+            <H3 fontWeight={'600'} color={'$color12'}>
+              {(() => {
+                const type = verification.type as keyof typeof verificationTypeTitleKey
+                const key = verificationTypeTitleKey[type]
+                return key ? t(key) : ''
+              })()}
+            </H3>
+          </TaskCard>
+        ))}
       </Stack>
     </YStack>
   )
@@ -622,6 +632,28 @@ const MultiplierCards = ({
 }) => {
   const { t } = useTranslation('rewards')
   const verifications = verificationsQuery.data
+
+  const now = new Date()
+  const isQualificationOver = distribution.qualification_end < now
+
+  const activeMultipliers = useMemo(() => {
+    const multipliers = verifications?.multipliers
+    if (!multipliers) return []
+    return multipliers.filter(
+      ({ value, multiplier_step, multiplier_max }) =>
+        (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
+        (isQualificationOver && Boolean(value) && (value ?? 0) > 1.0)
+    )
+  }, [verifications?.multipliers, isQualificationOver])
+
+  const distributionMonth = useMemo(
+    () =>
+      distribution.timezone_adjusted_qualification_end.toLocaleString('default', {
+        month: 'long',
+      }),
+    [distribution.timezone_adjusted_qualification_end]
+  )
+
   if (verificationsQuery.isLoading) {
     return (
       <YStack f={1} w={'100%'} gap="$5">
@@ -636,23 +668,8 @@ const MultiplierCards = ({
       </YStack>
     )
   }
-  const now = new Date()
-  const isQualificationOver = distribution.qualification_end < now
-  const multipliers = verifications?.multipliers
-  const activeMultipliers = multipliers?.filter(
-    ({ value, multiplier_step, multiplier_max }) =>
-      (!isQualificationOver && multiplier_step > 0.0 && multiplier_max > 1.0) ||
-      (isQualificationOver && Boolean(value) && (value ?? 0) > 1.0)
-  )
 
-  const distributionMonth = distribution.timezone_adjusted_qualification_end.toLocaleString(
-    'default',
-    {
-      month: 'long',
-    }
-  )
-
-  if (!activeMultipliers || activeMultipliers.length === 0) return null
+  if (activeMultipliers.length === 0) return null
 
   return (
     <YStack w={'100%'} gap="$5">
