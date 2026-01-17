@@ -6,29 +6,52 @@ import { useState, useEffect } from 'react'
   Read More: https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
 */
 
-export const usePwa = () => {
-  const [isPwa, setIsPwa] = useState<boolean | null>(null)
+const checkPwaSync = (): boolean => {
+  if (typeof window === 'undefined') return false
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  // @ts-expect-error navigator.standalone is iOS-specific
+  const isIosStandalone = window?.navigator?.standalone === true
+  const isAndroidTwa = document.referrer.includes('android-app://')
+
+  return isStandalone || isIosStandalone || isAndroidTwa
+}
+
+export const usePwa = (): boolean => {
+  // Initialize with synchronous check to avoid layout flicker
+  const [isPwa, setIsPwa] = useState<boolean>(() => checkPwaSync())
 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const checkPwa = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      //@ts-expect-error window.navigator is not defined in the browser
-      const isIosStandalone = window?.navigator.standalone
-      const isAndroidTwa = document.referrer.includes('android-app://')
-
-      setIsPwa(isStandalone || isIosStandalone || isAndroidTwa)
+    // Re-check in case SSR value differs from client
+    const currentValue = checkPwaSync()
+    if (currentValue !== isPwa) {
+      setIsPwa(currentValue)
     }
-
-    checkPwa()
 
     // Listen for changes in display mode
     const mediaQuery = window.matchMedia('(display-mode: standalone)')
-    mediaQuery.addEventListener('change', checkPwa)
 
-    return () => mediaQuery.removeEventListener('change', checkPwa)
-  }, [])
+    const handleChange = () => {
+      setIsPwa(checkPwaSync())
+    }
+
+    // Safari fallback: addListener is deprecated but needed for older Safari < 14
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange)
+    } else if (mediaQuery.addListener) {
+      mediaQuery.addListener(handleChange)
+    }
+
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange)
+      } else if (mediaQuery.removeListener) {
+        mediaQuery.removeListener(handleChange)
+      }
+    }
+  }, [isPwa])
 
   return isPwa
 }

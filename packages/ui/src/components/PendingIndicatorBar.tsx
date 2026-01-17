@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { isWeb, Stack, styled } from 'tamagui'
+import { isWeb, Portal, Stack, styled } from 'tamagui'
 import { usePwa, useSafeAreaInsets } from '../utils'
 
 const getTimeout = (progress: number): number => {
@@ -85,30 +85,48 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
   )
 }
 const IndicatorContainer = styled(Stack, {
-  position: 'absolute',
   left: 0,
+  right: 0,
   w: '100%',
   pointerEvents: 'none',
-  zIndex: 9999, // Higher than bottom nav portal (zIndex 100)
+  zIndex: 101, // Above BottomNavBar (zIndex 100), both in Portal stacking context
 
   variants: {
-    native: {
+    pwa: {
       true: {
+        // PWA: fixed at bottom, above the nav bar
         bottom: 0,
+        '$platform-web': {
+          position: 'fixed',
+        },
       },
       false: {
+        // Regular web: fixed at top
         top: 0,
+        '$platform-web': {
+          position: 'fixed',
+        },
       },
     },
-  },
+    native: {
+      true: {
+        // React Native: absolute at bottom
+        position: 'absolute',
+        bottom: 0,
+      },
+    },
+  } as const,
 })
 
 export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => {
-  const isNative = usePwa() || !isWeb
+  const isPwa = usePwa()
+  const isNative = !isWeb
 
   return (
-    <IndicatorContainer native={isNative}>
-      <LoadingBar visible={pending} />
-    </IndicatorContainer>
+    <Portal zIndex={101}>
+      <IndicatorContainer native={isNative} pwa={!isNative && isPwa}>
+        <LoadingBar visible={pending} />
+      </IndicatorContainer>
+    </Portal>
   )
 }

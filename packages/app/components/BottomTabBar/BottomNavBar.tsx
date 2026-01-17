@@ -55,7 +55,7 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   )
 
   return (
-    <Portal>
+    <Portal zIndex={100}>
       <XStack
         $platform-web={{
           position: 'fixed',
