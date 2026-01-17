@@ -142,14 +142,22 @@ export default function ActivityFeed() {
     }
   }, [hasNextPage, fetchNextPage, isFetchingNextPageActivities])
 
+  // Store activityMap and selectActivity in refs to avoid recreating onActivityPress
+  const activityMapRef = useRef(activityMap)
+  activityMapRef.current = activityMap
+  const selectActivityRef = useRef(selectActivity)
+  selectActivityRef.current = selectActivity
+
   const onActivityPress = useCallback(
     (item: ActivityRow) => {
       // For user transfers and referrals, open send chat with counterpart
       if (item.kind === 'user-transfer' || item.kind === 'referral') {
         const row = item as UserTransferRow | ReferralRow
         if (row.counterpartSendId !== null) {
-          setSendParams({
-            ...sendParams,
+          // Use ref to get current params and setter, avoiding dependency on sendParams
+          const [currentParams, setParams] = sendParamsRef.current
+          setParams({
+            ...currentParams,
             recipient: row.counterpartSendId.toString(),
             idType: 'sendid',
           })
@@ -158,13 +166,13 @@ export default function ActivityFeed() {
       }
       // For all other activities, show activity details
       if (item.kind !== 'header') {
-        const activity = activityMap.get(item.eventId)
+        const activity = activityMapRef.current.get(item.eventId)
         if (activity) {
-          selectActivity(activity)
+          selectActivityRef.current(activity)
         }
       }
     },
-    [sendParams, setSendParams, activityMap, selectActivity]
+    [] // Stable callback - no dependencies since we use refs
   )
 
   // Only show full shimmer on initial load (no data yet)

@@ -27,7 +27,6 @@ import type {
 } from 'app/features/send/suggestions/SendSuggestion.types'
 import { ContactsRow, useSendPageContacts } from 'app/features/contacts/send-integration'
 import { useRecentSenders } from './useRecentSenders'
-import { useFavouriteSenders } from './useFavouriteSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
 import React, { memo, useCallback, useDeferredValue, useId, useMemo, useState } from 'react'
@@ -105,12 +104,6 @@ const TabsRovingIndicator = ({ active, ...props }: { active?: boolean } & StackP
 }
 
 export const SendSuggestions = () => {
-  const recentSendersQuery = useRecentSenders()
-  const favouriteSendersQuery = useFavouriteSenders()
-  const topSendersQuery = useTopSenders()
-  const todayBirthdaySendersQuery = useTodayBirthdaySenders()
-  const contactsQuery = useSendPageContacts()
-
   const { t } = useTranslation('send')
 
   const [tabState, setTabState] = useState<{
@@ -125,11 +118,19 @@ export const SendSuggestions = () => {
     prevActiveAt: null,
   })
 
-  const setCurrentTab = (currentTab: string) => setTabState({ ...tabState, currentTab })
+  const { currentTab } = tabState
+
+  // Gate queries by active tab to avoid unnecessary fetches
+  const recentSendersQuery = useRecentSenders({ enabled: currentTab === 'recent' })
+  const topSendersQuery = useTopSenders({ enabled: currentTab === 'top' })
+  const todayBirthdaySendersQuery = useTodayBirthdaySenders({ enabled: currentTab === 'birthdays' })
+  const contactsQuery = useSendPageContacts({ enabled: currentTab === 'contacts' })
+
+  const setCurrentTab = (newTab: string) => setTabState({ ...tabState, currentTab: newTab })
   const setActiveIndicator = (activeAt: TabLayout | null) =>
     setTabState({ ...tabState, prevActiveAt: tabState.activeAt, activeAt })
 
-  const { activeAt, currentTab } = tabState
+  const { activeAt } = tabState
 
   const currentTabDeferred = useDeferredValue(currentTab)
 
@@ -570,7 +571,19 @@ const SenderSuggestion = memo(
       </YStack>
     )
   },
-  (prevProps, nextProps) => prevProps.item?.send_id === nextProps.item?.send_id
+  (prevProps, nextProps) => {
+    const prev = prevProps.item
+    const next = nextProps.item
+    // Compare all fields used in render to ensure UI updates when any change
+    return (
+      prev?.send_id === next?.send_id &&
+      prev?.avatar_url === next?.avatar_url &&
+      prev?.main_tag_name === next?.main_tag_name &&
+      prev?.tags?.[0] === next?.tags?.[0] &&
+      prev?.name === next?.name &&
+      prev?.is_verified === next?.is_verified
+    )
+  }
 )
 
 interface ImageProps {

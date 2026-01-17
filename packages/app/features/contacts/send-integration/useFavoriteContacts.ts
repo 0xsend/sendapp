@@ -179,6 +179,9 @@ useRecentContacts.queryKey = RECENT_CONTACTS_SEND_KEY
  * Note: The contact_search function already sorts by last_interacted_at DESC NULLS LAST,
  * which naturally puts contacts without transactions at the end.
  *
+ * @param pageSize - number of items to fetch per page (default: 10)
+ * @param enabled - whether the query should run (default: true)
+ *
  * @example
  * ```tsx
  * const { data, hasNextPage, fetchNextPage } = useSendPageContacts()
@@ -198,7 +201,10 @@ useRecentContacts.queryKey = RECENT_CONTACTS_SEND_KEY
  * )
  * ```
  */
-export function useSendPageContacts({ pageSize = 10 }: { pageSize?: number } = {}) {
+export function useSendPageContacts({
+  pageSize = 10,
+  enabled = true,
+}: { pageSize?: number; enabled?: boolean } = {}) {
   const supabase = useSupabase()
 
   async function fetchContacts({ pageParam }: { pageParam: number }): Promise<SendContactItem[]> {
@@ -251,6 +257,7 @@ export function useSendPageContacts({ pageSize = 10 }: { pageSize?: number } = {
     },
     queryFn: fetchContacts,
     staleTime: 30_000, // 30 seconds
+    enabled,
   })
 }
 

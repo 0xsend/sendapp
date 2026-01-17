@@ -9,10 +9,12 @@ const QUERY_KEY = 'today_birthday_senders'
 /**
  * Infinite query to fetch today's birthday senders
  * @param pageSize - number of items to fetch per page
+ * @param enabled - whether the query should run (default: true)
  */
 export const useTodayBirthdaySenders = ({
   pageSize = 10,
-}: { pageSize?: number } = {}): SendSuggestionsQueryResult => {
+  enabled = true,
+}: { pageSize?: number; enabled?: boolean } = {}): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   async function fetchTodayBirthdaySenders({ pageParam }: { pageParam: number }) {
@@ -43,6 +45,7 @@ export const useTodayBirthdaySenders = ({
     },
     queryFn: fetchTodayBirthdaySenders,
     retry: false,
+    enabled,
   })
 }
 

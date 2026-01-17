@@ -9,10 +9,12 @@ const QUERY_KEY = 'favourite_senders'
 /**
  * Infinite query to fetch favourite senders
  * @param pageSize - number of items to fetch per page
+ * @param enabled - whether the query should run (default: true)
  */
 export const useFavouriteSenders = ({
   pageSize = 10,
-}: { pageSize?: number } = {}): SendSuggestionsQueryResult => {
+  enabled = true,
+}: { pageSize?: number; enabled?: boolean } = {}): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   async function fetchFavouriteSenders({ pageParam }: { pageParam: number }) {
@@ -43,6 +45,7 @@ export const useFavouriteSenders = ({
     },
     queryFn: fetchFavouriteSenders,
     retry: false,
+    enabled,
   })
 }
 
