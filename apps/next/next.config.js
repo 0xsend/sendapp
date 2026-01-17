@@ -127,6 +127,7 @@ export default () => {
       '@shopify/flash-list',
     ],
     experimental: {
+      reactCompiler: true,
       optimizePackageImports: [
         '@supabase/supabase-js',
         '@tanstack/react-query',

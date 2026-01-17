@@ -15,6 +15,7 @@ import {
   isWeb,
   styled,
   ThemeableStack,
+  Activity,
 } from '@my/ui'
 import { isAndroid, useEvent, useMedia, type StackProps } from '@tamagui/core'
 import type { TabLayout, TabsTabProps } from '@tamagui/tabs'
@@ -30,17 +31,6 @@ import { useRecentSenders } from './useRecentSenders'
 import { useTopSenders } from './useTopSenders'
 import { useTodayBirthdaySenders } from './useTodayBirthdaySenders'
 import React, { memo, useCallback, useDeferredValue, useId, useMemo, useState } from 'react'
-
-// TODO: Remove fallback once upgraded to React Native 0.83+ (adds Activity support)
-const ReactActivity = isWeb
-  ? (
-      React as unknown as {
-        Activity?: React.FC<{ mode: 'visible' | 'hidden'; children: React.ReactNode }>
-      }
-    ).Activity
-  : undefined
-const Activity: React.FC<{ mode: 'visible' | 'hidden'; children: React.ReactNode }> =
-  ReactActivity ?? (({ mode, children }) => (mode === 'hidden' ? null : <>{children}</>))
 
 import { IconBadgeCheckSolid2 } from 'app/components/icons'
 import { useTranslation } from 'react-i18next'

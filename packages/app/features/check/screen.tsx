@@ -1,18 +1,25 @@
 import {
   Avatar,
+  Card,
+  H2,
   H4,
+  LazyMount,
   Paragraph,
   Shimmer,
+  Spacer,
   Spinner,
   Text,
   useAppToast,
+  useMedia,
+  useThemeName,
   View,
   XStack,
   YStack,
 } from '@my/ui'
-import { ArrowDown, ArrowUp, Clock, XCircle } from '@tamagui/lucide-icons'
+import { ArrowDown, ArrowUp, Clock, Send, XCircle } from '@tamagui/lucide-icons'
 import { useTranslation } from 'react-i18next'
 import { useState, useCallback, useMemo, memo } from 'react'
+import { SendCheckChat } from 'app/features/send/components/SendCheckChat'
 import { useSendAccount } from 'app/utils/send-accounts'
 import { useUserSendChecks, useSendCheckRevoke, type Check } from 'app/utils/useSendCheck'
 import { formatUnits, checksumAddress } from 'viem'
@@ -33,18 +40,76 @@ const log = debug('app:features:check')
 // Activity-style row height (matches RecentActivityFeed)
 const ROW_HEIGHT = 122
 
-export function CheckScreen() {
+interface CreateCheckButtonProps {
+  onPress: () => void
+}
+
+function CreateCheckButton({ onPress }: CreateCheckButtonProps) {
+  const { t } = useTranslation('send')
+  const { xs } = useMedia()
+  const theme = useThemeName()
+  const isDark = theme?.startsWith('dark')
+
   return (
-    <YStack
-      f={1}
-      width={'100%'}
-      maxWidth={600}
-      pb="$3"
-      pt="$3"
-      gap="$6"
-      $gtLg={{ pt: 0, gap: '$7' }}
+    <Card
+      size="$4"
+      padded
+      elevation={1}
+      $platform-native={{
+        elevation: 1,
+        shadowOpacity: 0.1,
+      }}
+      br="$5"
+      cur="pointer"
+      hoverStyle={{ opacity: 0.9, scale: 1.01 }}
+      pressStyle={{ scale: 0.98 }}
+      animation="100ms"
+      onPress={onPress}
+      bc={isDark ? '$aztec4' : '$white'}
+      mt="$4"
     >
+      <XStack ai="center" gap="$3">
+        <XStack
+          w="$4"
+          h="$4"
+          br="$4"
+          ai="center"
+          jc="center"
+          bc={isDark ? '$aztec6' : '$gray3'}
+          flexShrink={0}
+        >
+          <Send size="$1.5" color="$neon9" />
+        </XStack>
+        <YStack f={1} gap="$1" flexShrink={1}>
+          {!xs && (
+            <Paragraph size="$5" fontWeight="600" color="$color12" numberOfLines={1}>
+              Send via Link
+            </Paragraph>
+          )}
+          <Paragraph size={xs ? '$4' : '$3'} color="$color10">
+            {t('check.buttonDescription')}
+          </Paragraph>
+        </YStack>
+      </XStack>
+    </Card>
+  )
+}
+
+export function CheckScreen() {
+  const [sendCheckOpen, setSendCheckOpen] = useState(true)
+
+  return (
+    <YStack f={1} width={'100%'} maxWidth={600} pb="$3" pt="$3" $gtLg={{ pt: 0 }}>
+      <Spacer />
+      <CreateCheckButton onPress={() => setSendCheckOpen(true)} />
+      <Spacer h={30} />
+      <H2 bbw={1} bbc="$gray4" $theme-dark={{ bbc: '$aztec4' }} h={50} size="$9" fow="500">
+        Send Links
+      </H2>
       <ChecksList />
+      <LazyMount when={sendCheckOpen}>
+        <SendCheckChat open={sendCheckOpen} onOpenChange={setSendCheckOpen} />
+      </LazyMount>
     </YStack>
   )
 }
@@ -77,9 +142,8 @@ function ChecksList() {
   }, [hasNextPage, fetchNextPage, isFetchingNextPage])
 
   const { flattenedData, sectionDataMap } = useMemo(() => {
-    if (!data?.pages) return { flattenedData: [], sectionDataMap: new Map() }
-
-    const checks = data.pages.flat()
+    const checks = data?.pages?.flat() ?? []
+    if (checks.length === 0) return { flattenedData: [], sectionDataMap: new Map() }
 
     // Group checks: active/expired-unclaimed go to "Pending", others by sent date
     const groups: Record<string, Check[]> = {}
