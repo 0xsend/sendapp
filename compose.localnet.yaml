@@ -84,7 +84,7 @@ services:
     container_name: ${WORKSPACE_NAME:-sendapp}-aa-bundler
     image: docker.io/0xbigboss/bundler:latest
     pull_policy: always
-    mem_limit: 500m
+    mem_limit: 1g
     depends_on:
       anvil-proxy:
         condition: service_healthy
@@ -134,7 +134,9 @@ services:
     volumes:
       - ./packages/shovel/etc:/etc/shovel:ro
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:${SUPABASE_DB_PORT:-54322}/postgres
+      # Use container name directly since both are on the same docker network
+      # supabase names its db container as supabase_db_${WORKSPACE_NAME}
+      DATABASE_URL: postgresql://postgres:postgres@supabase_db_${WORKSPACE_NAME:-sendapp}:5432/postgres
       BASE_NAME: base
       BASE_RPC_URL_PRIMARY: http://anvil-proxy:80
       BASE_RPC_URL_BACKUP1: http://anvil-proxy:80
