@@ -8,6 +8,7 @@ import { BottomNavBarContent } from 'app/components/BottomTabBar/BottomNavBarCon
 import { baseMainnet, sendTokenAddress } from '@my/wagmi'
 import { useTranslation } from 'react-i18next'
 import { CurrentRouteProvider } from './contexts'
+import { Portal } from '@my/ui'
 
 const TABS = [
   {
@@ -90,21 +91,23 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   }, [currentRoute, direction, translateY, segments, height])
 
   return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        height: height,
-        transform: [{ translateY }],
-      }}
-    >
-      <CurrentRouteProvider currentRoute={currentRoute}>
-        <BottomNavBarContent tabs={translatedTabs} />
-      </CurrentRouteProvider>
-    </Animated.View>
+    <Portal>
+      <Animated.View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          height: height,
+          transform: [{ translateY }],
+        }}
+      >
+        <CurrentRouteProvider currentRoute={currentRoute}>
+          <BottomNavBarContent tabs={translatedTabs} />
+        </CurrentRouteProvider>
+      </Animated.View>
+    </Portal>
   )
 }
 

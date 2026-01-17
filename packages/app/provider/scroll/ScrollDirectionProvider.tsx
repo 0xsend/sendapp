@@ -46,27 +46,25 @@ const ScrollDirectionProvider = ({ children }: { children: ReactNode }) => {
   // Get window dimensions
   const windowHeight = Dimensions.get('window').height
 
-  // Refs for performance-critical values
+  // Refs for performance-critical values (avoid re-renders)
   const contentOffsetRef = useRef(0)
+  const scrollPositionsRef = useRef<ScrollPositions>({})
+  const isAtEndRef = useRef(false)
+  const rafPendingRef = useRef(false)
 
-  // State for UI updates
+  // State for UI updates (only direction triggers re-render)
   const [direction, setDirection] = useState<ScrollDirectionContextValue['direction']>(null)
   const [contentHeight, setContentHeight] = useState<number>(0)
-
   const [isAtEnd, setIsAtEnd] = useState(false)
-  const [, setScrollPositions] = useState<ScrollPositions>({})
 
   useEffect(() => {
     const key = generateScrollKey(pathname, query)
-    setScrollPositions((prev) => {
-      if (prev[key] === undefined) {
-        return { ...prev, [key]: 0 }
-      }
-      if (prev[key] !== undefined && contentHeight >= prev[key]) {
-        ref.current?.scrollTo({ y: prev[key], animated: false })
-      }
-      return prev
-    })
+    const positions = scrollPositionsRef.current
+    if (positions[key] === undefined) {
+      positions[key] = 0
+    } else if (contentHeight >= positions[key]) {
+      ref.current?.scrollTo({ y: positions[key], animated: false })
+    }
     if (contentHeight <= windowHeight) {
       setDirection(null)
     }
@@ -76,40 +74,63 @@ const ScrollDirectionProvider = ({ children }: { children: ReactNode }) => {
   const onContentSizeChange = useCallback(
     (w: number, height: number) => {
       setContentHeight(height)
-      setIsAtEnd(height <= windowHeight)
+      const atEnd = height <= windowHeight
+      isAtEndRef.current = atEnd
+      setIsAtEnd(atEnd)
     },
     [windowHeight]
   )
 
-  // Scroll event handler
+  // Scroll event handler - throttled via rAF
   const onScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const key = generateScrollKey(pathname, query)
+      // Skip if already queued
+      if (rafPendingRef.current) return
+      rafPendingRef.current = true
+
       const { contentOffset } = e.nativeEvent
       const contentOffsetY = contentOffset.y
 
-      // Determine scroll direction
-      if (contentOffsetY < THRESHOLD) {
-        setDirection('up')
-      } else if (contentOffsetRef.current - contentOffsetY > THRESHOLD && !isAtEnd) {
-        setDirection('up')
-      } else if (contentOffsetY - contentOffsetRef.current > THRESHOLD || isAtEnd) {
-        setDirection('down')
-      }
+      requestAnimationFrame(() => {
+        rafPendingRef.current = false
 
-      // Update last scroll position
-      contentOffsetRef.current = contentOffsetY
-      setScrollPositions((prev) => ({ ...prev, [key]: contentOffsetY }))
+        const key = generateScrollKey(pathname, query)
+        const prevOffset = contentOffsetRef.current
+        const atEnd = isAtEndRef.current
 
-      // Check if at the end of content
-      const isScrollAtEnd =
-        contentHeight > windowHeight
-          ? windowHeight + contentOffsetY >= contentHeight - THRESHOLD
-          : false
+        // Determine new direction - only update state if changed
+        let newDirection: ScrollDirectionContextValue['direction'] = null
+        if (contentOffsetY < THRESHOLD) {
+          newDirection = 'up'
+        } else if (prevOffset - contentOffsetY > THRESHOLD && !atEnd) {
+          newDirection = 'up'
+        } else if (contentOffsetY - prevOffset > THRESHOLD || atEnd) {
+          newDirection = 'down'
+        }
 
-      setIsAtEnd(isScrollAtEnd)
+        // Only trigger re-render if direction actually changed
+        if (newDirection !== null) {
+          setDirection((prev) => (prev !== newDirection ? newDirection : prev))
+        }
+
+        // Update refs without triggering re-renders
+        contentOffsetRef.current = contentOffsetY
+        scrollPositionsRef.current[key] = contentOffsetY
+
+        // Check if at the end of content
+        const isScrollAtEnd =
+          contentHeight > windowHeight
+            ? windowHeight + contentOffsetY >= contentHeight - THRESHOLD
+            : false
+
+        // Only update state if changed
+        if (isScrollAtEnd !== isAtEndRef.current) {
+          isAtEndRef.current = isScrollAtEnd
+          setIsAtEnd(isScrollAtEnd)
+        }
+      })
     },
-    [isAtEnd, contentHeight, windowHeight, pathname, query]
+    [contentHeight, windowHeight, pathname, query]
   )
   // Memoized context value
   const value = useMemo(

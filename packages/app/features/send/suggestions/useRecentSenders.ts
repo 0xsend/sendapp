@@ -9,10 +9,12 @@ const QUERY_KEY = 'recent_senders'
 /**
  * Infinite query to fetch recent senders
  * @param pageSize - number of items to fetch per page
+ * @param enabled - whether the query should run (default: true)
  */
 export const useRecentSenders = ({
   pageSize = 10,
-}: { pageSize?: number } = {}): SendSuggestionsQueryResult => {
+  enabled = true,
+}: { pageSize?: number; enabled?: boolean } = {}): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   async function fetchRecentSenders({ pageParam }: { pageParam: number }) {
@@ -43,6 +45,7 @@ export const useRecentSenders = ({
     },
     queryFn: fetchRecentSenders,
     retry: false,
+    enabled,
   })
 }
 

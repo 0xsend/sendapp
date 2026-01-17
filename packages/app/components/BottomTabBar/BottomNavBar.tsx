@@ -55,19 +55,20 @@ function BottomNavBar({ currentRoute }: { currentRoute: string }) {
   )
 
   return (
-    <Portal>
+    <Portal zIndex={100}>
       <XStack
         $platform-web={{
           position: 'fixed',
         }}
         pe="auto"
-        bottom={direction === 'down' ? -height : 0}
+        bottom={0}
         left={0}
         right={0}
         zIndex={100}
         height={height}
+        y={direction === 'down' ? height : 0}
         animation="200ms"
-        animateOnly={['bottom']}
+        animateOnly={['transform']}
         $gtLg={{ display: 'none' }}
       >
         <CurrentRouteProvider currentRoute={currentRoute}>

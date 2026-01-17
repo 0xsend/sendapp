@@ -1,45 +1,64 @@
-import { useEffect, useState } from 'react'
-import { isWeb, Stack, styled } from 'tamagui'
+import { useEffect, useRef, useState } from 'react'
+import { isWeb, Portal, Stack, styled } from 'tamagui'
 import { usePwa, useSafeAreaInsets } from '../utils'
 
-const getTimeout = (progress: number): number => {
-  if (progress < 0.7) {
-    return 0
-  }
-  if (progress < 0.8) {
-    return 800
-  }
-  if (progress < 0.95) {
-    return 1000
-  }
-  return 1500
+// Progress cap to prevent infinite updates while pending
+const PROGRESS_CAP = 0.95
+
+// Get interval delay based on progress phase
+const getIntervalDelay = (progress: number): number => {
+  if (progress < 0.7) return 50 // Fast initial fill
+  if (progress < 0.8) return 800
+  if (progress < PROGRESS_CAP) return 1000
+  return 0 // Stop at cap
+}
+
+// Get progress increment based on current phase
+const getProgressIncrement = (progress: number): number => {
+  if (progress < 0.7) return 0.1
+  if (progress < 0.8) return 0.02
+  if (progress < PROGRESS_CAP) return 0.01
+  return 0 // Stop at cap
 }
 
 const LoadingBar = ({ visible }: { visible: boolean }) => {
   const [render, setRender] = useState(visible)
   const [progress, setProgress] = useState(0)
+  const rafRef = useRef<number | null>(null)
+  const lastUpdateRef = useRef<number>(0)
 
-  const translate = 100 - progress * 100
+  const translate = Math.max(0, 100 - Math.min(progress, 1) * 100)
 
   const insets = useSafeAreaInsets()
 
+  // Use requestAnimationFrame with throttling for smooth progress updates
   useEffect(() => {
-    if (render) {
-      const timeoutId = setTimeout(() => {
-        setProgress((currentProgress) => {
-          if (currentProgress < 0.7) {
-            return currentProgress + 0.7
-          }
-          if (currentProgress < 0.8) {
-            return currentProgress + 0.05
-          }
-          if (currentProgress < 0.95) {
-            return currentProgress + 0.025
-          }
-          return currentProgress + 0.005
-        })
-      }, getTimeout(progress))
-      return () => clearTimeout(timeoutId)
+    if (!render || progress >= PROGRESS_CAP) {
+      return
+    }
+
+    const tick = (timestamp: number) => {
+      const delay = getIntervalDelay(progress)
+      if (delay === 0) return // At cap, stop ticking
+
+      if (timestamp - lastUpdateRef.current >= delay) {
+        lastUpdateRef.current = timestamp
+        const increment = getProgressIncrement(progress)
+        if (increment > 0) {
+          setProgress((p) => Math.min(p + increment, PROGRESS_CAP))
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(tick)
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
     }
   }, [progress, render])
 
@@ -50,6 +69,7 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
       }, 200)
       const progressTimeoutId = setTimeout(() => {
         setProgress(0)
+        lastUpdateRef.current = 0
       }, 500)
 
       setProgress(1)
@@ -61,6 +81,7 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
 
     const timeoutId = setTimeout(() => {
       setProgress(0)
+      lastUpdateRef.current = 0
       setRender(true)
     }, 300)
 
@@ -85,30 +106,48 @@ const LoadingBar = ({ visible }: { visible: boolean }) => {
   )
 }
 const IndicatorContainer = styled(Stack, {
-  position: 'absolute',
   left: 0,
+  right: 0,
   w: '100%',
   pointerEvents: 'none',
-  zIndex: 9999, // Higher than bottom nav portal (zIndex 100)
+  zIndex: 101, // Above BottomNavBar (zIndex 100), both in Portal stacking context
 
   variants: {
-    native: {
+    pwa: {
       true: {
+        // PWA: fixed at bottom, above the nav bar
         bottom: 0,
+        '$platform-web': {
+          position: 'fixed',
+        },
       },
       false: {
+        // Regular web: fixed at top
         top: 0,
+        '$platform-web': {
+          position: 'fixed',
+        },
       },
     },
-  },
+    native: {
+      true: {
+        // React Native: absolute at bottom
+        position: 'absolute',
+        bottom: 0,
+      },
+    },
+  } as const,
 })
 
 export const PendingIndicatorBar = ({ pending }: { pending: boolean }) => {
-  const isNative = usePwa() || !isWeb
+  const isPwa = usePwa()
+  const isNative = !isWeb
 
   return (
-    <IndicatorContainer native={isNative}>
-      <LoadingBar visible={pending} />
-    </IndicatorContainer>
+    <Portal zIndex={101}>
+      <IndicatorContainer native={isNative} pwa={!isNative && isPwa}>
+        <LoadingBar visible={pending} />
+      </IndicatorContainer>
+    </Portal>
   )
 }
