@@ -176,6 +176,25 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
     `https://ghassets.send.app/app_images/auth_image_${Math.floor(Math.random() * 3) + 1}.jpg`
   )
 
+  // Get URLs from new data structure, falling back to legacy URLs
+  const avatarDataTyped = otherUserProfile?.avatar_data as {
+    processingStatus?: string
+    variants?: { md?: { webp?: string } }
+  } | null
+  const bannerDataTyped = otherUserProfile?.banner_data as {
+    processingStatus?: string
+    variants?: { md?: { webp?: string } }
+  } | null
+
+  const avatarUrlResolved =
+    avatarDataTyped?.processingStatus === 'complete'
+      ? avatarDataTyped.variants?.md?.webp
+      : otherUserProfile?.avatar_url
+  const bannerUrlResolved =
+    bannerDataTyped?.processingStatus === 'complete'
+      ? bannerDataTyped.variants?.md?.webp
+      : otherUserProfile?.banner_url
+
   const {
     query: { data: tokenPrices, isLoading: isLoadingTokenPrices },
   } = useTokenPrices()
@@ -210,17 +229,14 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
         <Card.Background br="$5">
           <BlurStack
             fullscreen
-            intensity={otherUserProfile?.banner_url ? 0 : 30}
+            intensity={bannerUrlResolved ? 0 : 30}
             zIndex={100}
             tint={isDark ? 'dark' : 'light'}
             overflow="hidden"
           />
           <Image
             source={{
-              uri:
-                otherUserProfile?.banner_url ??
-                otherUserProfile?.avatar_url ??
-                imagePlaceholder.current,
+              uri: bannerUrlResolved ?? avatarUrlResolved ?? imagePlaceholder.current,
               width: 428,
               height: 200,
             }}
@@ -249,7 +265,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
           ) : null}
           <Card gap="$4" size={media.gtMd ? '$7' : '$5'} padded elevation={1}>
             <XStack jc="space-between" w="100%">
-              {Platform.OS === 'android' && !otherUserProfile?.avatar_url ? (
+              {Platform.OS === 'android' && !avatarUrlResolved ? (
                 <XStack
                   w={media.gtMd ? 80 : 64}
                   h={media.gtMd ? 80 : 64}
@@ -269,7 +285,7 @@ export function ProfileScreen({ sendid: propSendid }: ProfileScreenProps) {
                   bc={isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}
                   als="center"
                 >
-                  <Avatar.Image src={otherUserProfile?.avatar_url ?? undefined} objectFit="cover" />
+                  <Avatar.Image src={avatarUrlResolved ?? undefined} objectFit="cover" />
                   <Avatar.Fallback f={1} jc={'center'} ai={'center'}>
                     <IconAccount color="$color12" size={'100%'} />
                   </Avatar.Fallback>

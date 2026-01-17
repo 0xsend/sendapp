@@ -7010,6 +7010,7 @@ __metadata:
     "@tamagui/themes": "npm:^1.138.5"
     "@tamagui/toast": "npm:^1.138.5"
     "@ts-react/form": "npm:^1.8.3"
+    blurhash: "npm:^2.0.5"
     expo-blur: "npm:~15.0.7"
     expo-linear-gradient: "npm:~15.0.7"
     moti: "npm:^0.29.0"
@@ -7062,14 +7063,17 @@ __metadata:
     "@temporalio/nyc-test-coverage": "npm:^1.11.7"
     "@temporalio/testing": "npm:^1.11.7"
     "@temporalio/workflow": "npm:^1.11.7"
+    "@types/sharp": "npm:^0.31.0"
     "@types/source-map-support": "npm:^0"
     "@types/web-push": "npm:^3.6.4"
     "@wagmi/core": "npm:^2.16.7"
     app: "workspace:*"
+    blurhash: "npm:^2.0.5"
     dotenv-cli: "npm:^7.3.0"
     jest: "npm:^29"
     nyc: "npm:^17.0.0"
     permissionless: "npm:^0.1.49"
+    sharp: "npm:0.32.6"
     source-map-support: "npm:^0.5.21"
     ts-jest: "npm:^29"
     ts-node: "npm:^10.9.2"
@@ -13178,6 +13182,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/sharp@npm:^0.31.0":
+  version: 0.31.1
+  resolution: "@types/sharp@npm:0.31.1"
+  dependencies:
+    "@types/node": "npm:*"
+  checksum: 10/e5ec6cd7ae604111053bb6664a4c6ec5bdc60fc59c833305b0d12bff707e417c1a9119086c1b9bd4593ed2f2c8cb9f03178d5bc37dc7429adc40d132367745de
+  languageName: node
+  linkType: hard
+
 "@types/source-map-support@npm:^0":
   version: 0.5.10
   resolution: "@types/source-map-support@npm:0.5.10"
@@ -15387,6 +15400,7 @@ __metadata:
     "@wagmi/core": "npm:^2.16.7"
     babel-preset-expo: "npm:~54.0.0"
     base64-arraybuffer: "npm:^1.0.2"
+    blurhash: "npm:^2.0.5"
     burnt: "npm:^0.12.1"
     cbor2: "npm:^1.12.0"
     debug: "npm:^4.4.1"
@@ -16364,6 +16378,13 @@ __metadata:
     inherits: "npm:^2.0.4"
     readable-stream: "npm:^3.4.0"
   checksum: 10/b7904e66ed0bdfc813c06ea6c3e35eafecb104369dbf5356d0f416af90c1546de3b74e5b63506f0629acf5e16a6f87c3798f16233dcff086e9129383aa02ab55
+  languageName: node
+  linkType: hard
+
+"blurhash@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "blurhash@npm:2.0.5"
+  checksum: 10/ff0e156c1383e79b03ab2cef8de35ab560118cb70d311cf447f17311795ab1dad6261b1e0904b886fa4547f47ccd7984d5155c1404a19224533c79b46c153c55
   languageName: node
   linkType: hard
 

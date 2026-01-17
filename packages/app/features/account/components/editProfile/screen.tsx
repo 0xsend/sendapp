@@ -66,7 +66,8 @@ export const EditProfile = () => {
 }
 
 const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: () => void }) => {
-  const { name, about, is_public, is_business, avatar_url, banner_url } = profile
+  const { name, about, is_public, is_business, avatar_url, banner_url, avatar_data, banner_data } =
+    profile
   const avatarRef = useRef<UploadAvatarRefObject>(null)
   const bannerRef = useRef<UploadBannerRefObject>(null)
   const { t } = useTranslation('account')
@@ -74,6 +75,25 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
     ? t('profile.overview.visibility.public')
     : t('profile.overview.visibility.private')
   const businessProfileLabel = t('profile.overview.businessProfile')
+
+  // Get URLs from new data structure, falling back to legacy URLs
+  const avatarDataTyped = avatar_data as {
+    processingStatus?: string
+    variants?: { md?: { webp?: string } }
+  } | null
+  const bannerDataTyped = banner_data as {
+    processingStatus?: string
+    variants?: { md?: { webp?: string } }
+  } | null
+
+  const avatarUrlResolved =
+    avatarDataTyped?.processingStatus === 'complete'
+      ? avatarDataTyped.variants?.md?.webp
+      : avatar_url
+  const bannerUrlResolved =
+    bannerDataTyped?.processingStatus === 'complete'
+      ? bannerDataTyped.variants?.md?.webp
+      : banner_url
 
   return (
     <YStack gap={'$5'}>
@@ -90,9 +110,9 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
                 ai="center"
                 overflow="hidden"
               >
-                {banner_url ? (
+                {bannerUrlResolved ? (
                   <Image
-                    source={{ uri: banner_url }}
+                    source={{ uri: bannerUrlResolved }}
                     w="100%"
                     h="100%"
                     borderRadius="$3"
@@ -112,7 +132,8 @@ const Overview = ({ profile, onPress }: { profile: Tables<'profiles'>; onPress: 
             >
               <UploadAvatar ref={avatarRef}>
                 <ProfileAvatar
-                  avatarUrl={avatar_url ? avatar_url : undefined}
+                  avatarUrl={avatarUrlResolved ?? undefined}
+                  avatarData={avatar_data as Parameters<typeof ProfileAvatar>[0]['avatarData']}
                   $gtMd={{ size: 88 }}
                   size={88}
                 />

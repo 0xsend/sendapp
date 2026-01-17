@@ -16,6 +16,7 @@ import { onrampRouter } from './onramp/router'
 import { coinGeckoRouter } from './coingecko/router'
 import { cantonRouter } from './canton'
 import { bridgeRouter } from './bridge/router'
+import { profileRouter } from './profile'
 
 // avoids error TS7056: The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed.
 // Keep this in sync with the declared variable below
@@ -37,6 +38,7 @@ type AppRouterType = ReturnType<
     coinGecko: typeof coinGeckoRouter
     canton: typeof cantonRouter
     bridge: typeof bridgeRouter
+    profile: typeof profileRouter
   }>
 >
 export const appRouter: AppRouterType = createTRPCRouter({
@@ -56,6 +58,7 @@ export const appRouter: AppRouterType = createTRPCRouter({
   coinGecko: coinGeckoRouter,
   canton: cantonRouter,
   bridge: bridgeRouter,
+  profile: profileRouter,
 })
 
 export type AppRouter = typeof appRouter

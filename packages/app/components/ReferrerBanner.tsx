@@ -3,6 +3,7 @@ import { useReferralCodeQuery } from 'app/utils/useReferralCode'
 import { useProfileLookup } from 'app/utils/useProfileLookup'
 import { AvatarProfile } from 'app/features/profile/AvatarProfile'
 import { useTranslation } from 'react-i18next'
+import { useMemo } from 'react'
 
 /**
  * Displays a compact inline banner showing who referred the user during onboarding.
@@ -57,6 +58,16 @@ export function ReferrerBanner() {
     return null
   }
 
+  // Resolve avatar URL from new data structure, falling back to legacy URL
+  const avatarDataTyped = referrer.avatar_data as {
+    processingStatus?: string
+    variants?: { md?: { webp?: string } }
+  } | null
+  const avatarUrl =
+    avatarDataTyped?.processingStatus === 'complete'
+      ? avatarDataTyped.variants?.md?.webp
+      : referrer.avatar_url
+
   return (
     <Fade>
       <XStack ai="center" jc="center" gap="$2">
@@ -68,11 +79,11 @@ export function ReferrerBanner() {
           {t('referral.referredBy')}
         </Paragraph>
         <XStack ai="center" gap="$1.5">
-          {referrer.avatar_url && (
+          {avatarUrl && (
             <AvatarProfile
               profile={{
                 name: referrer.name,
-                avatar_url: referrer.avatar_url,
+                avatar_url: avatarUrl,
                 is_verified: referrer.is_verified,
               }}
               size="$2"

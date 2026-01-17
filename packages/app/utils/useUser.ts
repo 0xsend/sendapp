@@ -46,7 +46,7 @@ export const useUser = () => {
     const { data, error } = await supabase
       .from('profiles')
       .select(
-        '*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*), canton_party_verifications(*)'
+        '*, tags(*), main_tag(*), links_in_bio(*), distribution_shares(*), canton_party_verifications(*), avatar_data, banner_data'
       )
       .eq('id', user?.id ?? '')
       .maybeSingle()
@@ -79,6 +79,16 @@ export const useUser = () => {
   })
 
   const avatarUrl = useMemo(() => {
+    // Prefer new avatar_data format (optimized variants)
+    const avatarData = profile?.avatar_data as {
+      processingStatus?: string
+      variants?: { md?: { webp?: string } }
+    } | null
+    if (avatarData?.processingStatus === 'complete' && avatarData.variants?.md?.webp) {
+      return avatarData.variants.md.webp
+    }
+
+    // Fall back to legacy avatar_url
     if (profile?.avatar_url) return profile.avatar_url
     if (typeof user?.user_metadata?.avatar_url === 'string') return user.user_metadata.avatar_url
 
@@ -87,7 +97,13 @@ export const useUser = () => {
     params.append('name', name)
     params.append('size', '256') // will be resized again by NextImage/SolitoImage
     return `https://ui-avatars.com/api?${params.toString()}&format=png&background=86ad7f`
-  }, [profile?.avatar_url, profile?.name, user?.email, user?.user_metadata?.avatar_url])
+  }, [
+    profile?.avatar_data,
+    profile?.avatar_url,
+    profile?.name,
+    user?.email,
+    user?.user_metadata?.avatar_url,
+  ])
 
   return {
     session,
