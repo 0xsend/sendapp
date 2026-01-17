@@ -1,0 +1,95 @@
+name: EAS Preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches-ignore:
+      - '**/graphite-base/**'
+
+concurrency:
+  group: eas-preview-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  eas-update:
+    name: EAS Update Preview
+    # Skip if targeting dev or main branches (handled by deploy workflows)
+    if: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/main' && github.head_ref != 'dev' && github.head_ref != 'main' }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    env:
+      YARN_ENABLE_HARDENED_MODE: 0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-env
+        env:
+          YARN_ENABLE_HARDENED_MODE: 0
+        with:
+          install-tilt: false
+          brew-bundle: false
+
+      - name: Extract branch name
+        id: extract-branch
+        uses: ./.github/actions/extract-branch
+
+      - name: Set branch name with fallback
+        id: branch-name
+        run: |
+          BRANCH="${{ steps.extract-branch.outputs.branch }}"
+          if [ -z "$BRANCH" ]; then
+            # Fallback to PR number or short SHA
+            BRANCH="pr-${{ github.event.pull_request.number }}"
+          fi
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Build monorepo
+        run: yarn build
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish EAS Update
+        id: eas-update
+        working-directory: apps/expo
+        run: |
+          # Use PR title for the update message
+          eas update \
+            --branch "${{ steps.branch-name.outputs.branch }}" \
+            --message "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" \
+            --non-interactive
+
+      - name: Comment on PR
+        uses: mshick/add-pr-comment@v2
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          message-id: eas-preview-update
+          refresh-message-position: true
+          message: |
+            ## EAS Preview Update
+
+            A new EAS update has been published for this PR.
+
+            **Branch:** `${{ steps.branch-name.outputs.branch }}`
+            **Commit:** ${{ github.event.pull_request.head.sha }}
+
+            ### How to Preview
+
+            1. Install a [preview build](https://expo.dev/accounts/send-it/projects/send/builds?channel=preview) on your device
+            2. Open the app and shake to open the developer menu
+            3. Select "Extensions" > "Switch Branch"
+            4. Enter branch name: `${{ steps.branch-name.outputs.branch }}`
+
+            [View on EAS Dashboard](https://expo.dev/accounts/send-it/projects/send/updates)
