@@ -166,7 +166,7 @@ export const SendCheckChat = memo(
       <>
         <Portal zIndex={10}>
           <SendModalContainer bottomSheetRef={bottomSheetRef} open={open} setOpen={setOpen}>
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
               {(open || !gtLg) && (
                 <View
                   w={700}
@@ -616,17 +616,7 @@ const SendCheckContent = ({
     <FormProvider {...form}>
       <YStack zi={1} f={1} w="100%" gap="$4" p="$4" jc="space-between">
         <YStack gap="$3.5" f={1}>
-          <View
-            animation={'responsive'}
-            animateOnly={['opacity', 'transform']}
-            enterStyle={{
-              opacity: 0,
-              y: -100,
-            }}
-            y={present ? 0 : -100}
-            o={present ? 1 : 0}
-            gap="$2.5"
-          >
+          <View gap="$2.5">
             <XStack ai="center" w="100%" jc="space-between">
               <SizableText size="$4" fow="500" col="$gray10">
                 {t('check.youreSending', "You're Sending")}
