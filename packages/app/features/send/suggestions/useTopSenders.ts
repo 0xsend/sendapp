@@ -9,10 +9,12 @@ const QUERY_KEY = 'top_senders'
 /**
  * Infinite query to fetch top senders
  * @param pageSize - number of items to fetch per page
+ * @param enabled - whether the query should run (default: true)
  */
 export const useTopSenders = ({
   pageSize = 10,
-}: { pageSize?: number } = {}): SendSuggestionsQueryResult => {
+  enabled = true,
+}: { pageSize?: number; enabled?: boolean } = {}): SendSuggestionsQueryResult => {
   const supabase = useSupabase()
 
   async function fetchTopSenders({ pageParam }: { pageParam: number }) {
@@ -43,6 +45,7 @@ export const useTopSenders = ({
     },
     queryFn: fetchTopSenders,
     retry: false,
+    enabled,
   })
 }
 
